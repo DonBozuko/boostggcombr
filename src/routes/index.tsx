@@ -144,7 +144,7 @@ function Landing() {
   const [form, setForm] = useState({ plan: "", profile: "", contact: "" });
   const [loading, setLoading] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = orderSchema.safeParse(form);
     if (!result.success) {
@@ -152,11 +152,18 @@ function Landing() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
-      setForm({ plan: "", profile: "", contact: "" });
-    }, 900);
+    const { error } = await supabase.from("pedidos").insert({
+      pacote_selecionado: result.data.plan,
+      link_instagram: result.data.profile,
+      whatsapp_contato: result.data.contact,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error("Erro ao registrar pedido. Tente novamente.");
+      return;
+    }
+    toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
+    setForm({ plan: "", profile: "", contact: "" });
   };
 
   return (
