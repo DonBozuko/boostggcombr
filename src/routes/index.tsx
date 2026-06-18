@@ -11,7 +11,6 @@ import {
   Star,
   Sparkles,
   TrendingUp,
-  ChevronDown,
   Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,11 +35,11 @@ import { z } from "zod";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "BoostGram — Seguidores Reais para Instagram | 1k a 5k" },
+      { title: "BoostGram — Seguidores Reais e Brasileiros | 1k a 5k" },
       {
         name: "description",
         content:
-          "Pacotes de seguidores Instagram com entrega rápida, sem senha e garantia de 30 dias. Bronze 1k, Prata 3k, Ouro 5k. Pague no Pix.",
+          "Pacotes de seguidores reais e brasileiros para Instagram. Entrega automática após o Pix, sem senha, com garantia de 30 dias. Start 1k, Growth 3k, VIP 5k.",
       },
     ],
   }),
@@ -49,60 +48,64 @@ export const Route = createFileRoute("/")({
 
 const plans = [
   {
-    id: "bronze",
-    tier: "Bronze",
+    id: "start",
+    tier: "Start",
     label: "Iniciante",
     qty: "1.000",
-    price: "R$ 24,90",
+    price: "R$ 39,90",
     cta: "Comprar Agora",
     icon: Star,
     highlight: false,
-    features: ["1.000 seguidores reais", "Entrega em até 24h", "Sem queda garantida 30 dias"],
+    features: [
+      "1.000 seguidores reais e brasileiros",
+      "Reposição garantida 30 dias",
+      "Entrega em até 24h",
+    ],
   },
   {
-    id: "prata",
-    tier: "Prata",
+    id: "growth",
+    tier: "Growth",
     label: "Mais Vendido",
     qty: "3.000",
-    price: "R$ 59,90",
+    price: "R$ 89,90",
     cta: "Garantir Desconto",
     icon: Sparkles,
     highlight: true,
     features: [
-      "3.000 seguidores premium",
+      "3.000 seguidores reais e brasileiros",
+      "Bônus de curtidas nos posts",
+      "Reposição garantida 30 dias",
       "Entrega em até 12h",
-      "Reposição automática 30 dias",
-      "Suporte prioritário",
     ],
   },
   {
-    id: "ouro",
-    tier: "Ouro",
-    label: "Profissional",
+    id: "vip",
+    tier: "VIP",
+    label: "Aceleração Máxima",
     qty: "5.000",
-    price: "R$ 89,90",
+    price: "R$ 139,90",
     cta: "Alavancar Perfil",
     icon: Crown,
     highlight: false,
     features: [
-      "5.000 seguidores top tier",
+      "5.000 seguidores reais e brasileiros",
+      "Suporte prioritário via WhatsApp",
+      "Reposição garantida 30 dias",
       "Entrega em até 6h",
-      "Reposição vitalícia 30 dias",
-      "Suporte VIP via WhatsApp",
     ],
   },
 ];
 
 const trustBadges = [
-  { icon: Zap, title: "Entrega Rápida e Segura", desc: "Processamento automático em minutos após a aprovação do Pix." },
+  { icon: Zap, title: "Entrega Automática e Segura", desc: "Processamento automático em minutos após a aprovação do Pix." },
   { icon: ShieldCheck, title: "Sem Necessidade de Senha", desc: "Trabalhamos apenas com o @ público. Sua conta nunca é acessada." },
-  { icon: RefreshCw, title: "Garantia de Reposição 30 dias", desc: "Caiu? A gente repõe. Sem letra miúda, sem burocracia." },
+  { icon: RefreshCw, title: "Garantia de Reposição de 30 dias", desc: "Caiu? A gente repõe. Sem letra miúda, sem burocracia." },
 ];
 
 const faqs = [
   {
     q: "Como funciona?",
-    a: "Assim que o Pix é aprovado, o sistema processa automaticamente o envio dos seguidores para o @ informado. Você acompanha o crescimento em tempo real direto no seu Instagram.",
+    a: "O sistema processa o envio assim que o Pix é aprovado. Você acompanha o crescimento em tempo real direto no seu Instagram.",
   },
   {
     q: "Meu perfil corre algum risco?",
@@ -110,11 +113,11 @@ const faqs = [
   },
   {
     q: "Preciso informar minha senha?",
-    a: "Nunca. A gente jamais vai pedir sua senha. Só precisamos do @ do seu perfil público para fazer a entrega.",
+    a: "Nunca pediremos sua senha. Precisamos apenas do @ do perfil público para fazer a entrega.",
   },
   {
     q: "Qual o prazo de entrega?",
-    a: "Bronze entrega em até 24h, Prata em até 12h e Ouro em até 6h. Na prática, 90% dos pedidos começam em minutos.",
+    a: "Start entrega em até 24h, Growth em até 12h e VIP em até 6h. Na prática, 90% dos pedidos começam em minutos.",
   },
   {
     q: "Posso pagar de outra forma além do Pix?",
@@ -127,13 +130,12 @@ const orderSchema = z.object({
   profile: z
     .string()
     .trim()
-    .min(2, "Informe seu @ do Instagram")
-    .max(50, "Máximo 50 caracteres")
-    .regex(/^@?[A-Za-z0-9._]+$/, "Use apenas letras, números, . e _"),
+    .min(2, "Informe o link ou @ do Instagram")
+    .max(120, "Máximo 120 caracteres"),
   contact: z
     .string()
     .trim()
-    .min(5, "Informe WhatsApp ou e-mail")
+    .min(5, "Informe seu WhatsApp")
     .max(120, "Máximo 120 caracteres"),
 });
 
@@ -151,7 +153,7 @@ function Landing() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      toast.success("Pedido recebido! Em instantes você receberá o Pix no contato informado.");
+      toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
       setForm({ plan: "", profile: "", contact: "" });
     }, 900);
   };
@@ -199,8 +201,8 @@ function Landing() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight"
           >
-            Seu perfil <span className="text-gradient">explodindo</span><br />
-            em até 24 horas.
+            Seguidores <span className="text-gradient">reais e brasileiros</span><br />
+            para seu Instagram.
           </motion.h1>
 
           <motion.p
@@ -209,7 +211,7 @@ function Landing() {
             transition={{ duration: 0.6, delay: 0.25 }}
             className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
           >
-            Pacotes de seguidores reais para Instagram. Entrega automática após o Pix,
+            Pacotes premium de seguidores reais e brasileiros. Entrega automática após o Pix,
             sem precisar da sua senha, com garantia de reposição por 30 dias.
           </motion.p>
 
@@ -312,7 +314,7 @@ function Landing() {
           <div className="text-center mb-10">
             <h2 className="text-4xl font-bold">Faça seu pedido</h2>
             <p className="mt-3 text-muted-foreground">
-              Preencha os dados abaixo. Em segundos você recebe o Pix.
+              Preencha os dados abaixo. Em segundos você recebe o Pix no WhatsApp.
             </p>
           </div>
 
@@ -337,25 +339,25 @@ function Landing() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="profile">Link ou @ do Instagram</Label>
+              <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
               <div className="relative">
                 <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
                   id="profile"
-                  placeholder="@seu_perfil"
+                  placeholder="@seu_perfil ou instagram.com/seu_perfil"
                   className="h-12 pl-10"
                   value={form.profile}
                   onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                  maxLength={50}
+                  maxLength={120}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="contact">WhatsApp ou E-mail (para o comprovante)</Label>
+              <Label htmlFor="contact">WhatsApp para contato e envio do comprovante</Label>
               <Input
                 id="contact"
-                placeholder="(11) 99999-9999 ou voce@email.com"
+                placeholder="(11) 99999-9999"
                 className="h-12"
                 value={form.contact}
                 onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
