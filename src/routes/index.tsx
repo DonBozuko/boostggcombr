@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
@@ -14,7 +15,6 @@ import {
   Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { z } from "zod";
+import { criarPedido } from "@/lib/pedidos.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
