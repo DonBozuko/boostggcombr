@@ -143,6 +143,8 @@ const orderSchema = z.object({
 function Landing() {
   const [form, setForm] = useState({ plan: "", profile: "", contact: "" });
   const [loading, setLoading] = useState(false);
+  const [orderStep, setOrderStep] = useState<"form" | "success">("form");
+  const [pixPayload, setPixPayload] = useState<{ code?: string; link?: string } | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,6 +166,14 @@ function Landing() {
     }
     toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
     setForm({ plan: "", profile: "", contact: "" });
+    setOrderStep("success");
+    // Estrutura pronta para receber código/link de pagamento externo
+    setPixPayload({ code: undefined, link: undefined });
+  };
+
+  const resetOrder = () => {
+    setOrderStep("form");
+    setPixPayload(null);
   };
 
   return (
@@ -326,69 +336,140 @@ function Landing() {
             </p>
           </div>
 
-          <form
-            onSubmit={onSubmit}
-            className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
-          >
-            <div className="space-y-2">
-              <Label htmlFor="plan">Pacote escolhido</Label>
-              <Select value={form.plan} onValueChange={(v) => setForm((f) => ({ ...f, plan: v }))}>
-                <SelectTrigger id="plan" className="h-12">
-                  <SelectValue placeholder="Selecione um pacote" />
-                </SelectTrigger>
-                <SelectContent>
-                  {plans.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.tier} — {p.qty} seguidores ({p.price})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {orderStep === "form" && (
+            <form
+              onSubmit={onSubmit}
+              className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="plan">Pacote escolhido</Label>
+                <Select value={form.plan} onValueChange={(v) => setForm((f) => ({ ...f, plan: v }))}>
+                  <SelectTrigger id="plan" className="h-12">
+                    <SelectValue placeholder="Selecione um pacote" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {plans.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.tier} — {p.qty} seguidores ({p.price})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
-              <div className="relative">
-                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <div className="space-y-2">
+                <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
+                <div className="relative">
+                  <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                  <Input
+                    id="profile"
+                    placeholder="@seu_perfil ou instagram.com/seu_perfil"
+                    className="h-12 pl-10"
+                    value={form.profile}
+                    onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
+                    maxLength={120}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="contact">WhatsApp para contato e envio do comprovante</Label>
                 <Input
-                  id="profile"
-                  placeholder="@seu_perfil ou instagram.com/seu_perfil"
-                  className="h-12 pl-10"
-                  value={form.profile}
-                  onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
+                  id="contact"
+                  placeholder="(11) 99999-9999"
+                  className="h-12"
+                  value={form.contact}
+                  onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
                   maxLength={120}
                 />
               </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contact">WhatsApp para contato e envio do comprovante</Label>
-              <Input
-                id="contact"
-                placeholder="(11) 99999-9999"
-                className="h-12"
-                value={form.contact}
-                onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
-                maxLength={120}
-              />
-            </div>
+              <Button
+                type="submit"
+                size="lg"
+                disabled={loading}
+                className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
+              >
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Gerando seu código Pix de pagamento... Por favor, aguarde
+                  </span>
+                ) : (
+                  <>
+                    Gerar Pix <Send className="size-4" />
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Pagamento seguro · Pedido processado em segundos após o Pix
+              </p>
+            </form>
+          )}
 
-            <Button
-              type="submit"
-              size="lg"
-              disabled={loading}
-              className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
+          {loading && orderStep === "form" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-2xl border border-border bg-card p-10 text-center space-y-4 shadow-glow-blue"
             >
-              {loading ? "Processando..." : (
-                <>
-                  Gerar Pix <Send className="size-4" />
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-center text-muted-foreground">
-              Pagamento seguro · Pedido processado em segundos após o Pix
-            </p>
-          </form>
+              <div className="mx-auto size-10 border-4 border-[var(--neon)] border-t-transparent rounded-full animate-spin" />
+              <p className="text-lg font-semibold">Gerando seu código Pix de pagamento...</p>
+              <p className="text-sm text-muted-foreground">Por favor, aguarde. Estamos preparando tudo para você.</p>
+            </motion.div>
+          )}
+
+          {orderStep === "success" && pixPayload && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
+            >
+              <div className="text-center space-y-2">
+                <div className="mx-auto size-12 rounded-full bg-green-500/20 text-green-400 grid place-items-center">
+                  <Check className="size-6" />
+                </div>
+                <h3 className="text-xl font-bold">Pedido registrado com sucesso!</h3>
+                <p className="text-sm text-muted-foreground">
+                  Em instantes você receberá o Pix no WhatsApp informado.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <Label>Código Pix (Copia e Cola)</Label>
+                  <div className="rounded-lg border border-border bg-muted p-3 text-sm break-all font-mospace">
+                    {pixPayload.code ? (
+                      pixPayload.code
+                    ) : (
+                      <span className="text-muted-foreground italic">Código Pix será gerado em breve...</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Label>Link de Pagamento</Label>
+                  <div className="rounded-lg border border-border bg-muted p-3 text-sm break-all">
+                    {pixPayload.link ? (
+                      <a href={pixPayload.link} target="_blank" rel="noopener noreferrer" className="text-[var(--neon)] underline">
+                        {pixPayload.link}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground italic">Link de pagamento será disponibilizado em breve...</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={resetOrder}
+                variant="outline"
+                className="w-full h-12 border-border bg-card/40"
+              >
+                Fazer novo pedido
+              </Button>
+            </motion.div>
+          )}
         </div>
       </section>
 
