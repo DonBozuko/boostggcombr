@@ -156,8 +156,8 @@ const orderSchema = z.object({
 function Landing() {
   const [form, setForm] = useState({ plan: "", profile: "", contact: "" });
   const [loading, setLoading] = useState(false);
-  const [orderStep, setOrderStep] = useState<"form" | "success">("form");
-  const [pixPayload, setPixPayload] = useState<{ code?: string; link?: string } | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pedidoInfo, setPedidoInfo] = useState<{ price: string; tier: string; profile: string } | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -177,10 +177,13 @@ function Landing() {
           status_pagamento: "pendente",
         },
       });
-      toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
-      setForm({ plan: "", profile: "", contact: "" });
-      setOrderStep("success");
-      setPixPayload({ code: undefined, link: undefined });
+      const selected = plans.find((p) => p.id === result.data.plan);
+      setPedidoInfo({
+        price: selected?.price ?? "",
+        tier: selected?.tier ?? "",
+        profile: result.data.profile,
+      });
+      setModalOpen(true);
     } catch {
       toast.error("Erro ao registrar pedido. Tente novamente.");
     } finally {
@@ -188,10 +191,20 @@ function Landing() {
     }
   };
 
-  const resetOrder = () => {
-    setOrderStep("form");
-    setPixPayload(null);
+  const copyPix = async () => {
+    try {
+      await navigator.clipboard.writeText(PIX_COPIA_E_COLA);
+      toast.success("Código Pix copiado!");
+    } catch {
+      toast.error("Não foi possível copiar. Copie manualmente.");
+    }
   };
+
+  const whatsappHref = pedidoInfo
+    ? `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(
+        `Olá! Acabei de fazer o pagamento do pacote para o perfil ${pedidoInfo.profile}. Segue o comprovante.`,
+      )}`
+    : `https://wa.me/${WHATSAPP_ADMIN}`;
 
   return (
     <div className="dark min-h-screen text-foreground">
