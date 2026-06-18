@@ -13,6 +13,8 @@ import {
   Sparkles,
   TrendingUp,
   Send,
+  Copy,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,9 +32,19 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+
+const PIX_COPIA_E_COLA = "SUA_CHAVE_PIX_AQUI";
+const WHATSAPP_ADMIN = "5515997445388";
 
 export const Route = createFileRoute("/")({
   head: () => ({
