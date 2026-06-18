@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import {
@@ -14,7 +15,6 @@ import {
   Send,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import { z } from "zod";
+import { criarPedido } from "@/lib/pedidos.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -145,6 +146,7 @@ function Landing() {
   const [loading, setLoading] = useState(false);
   const [orderStep, setOrderStep] = useState<"form" | "success">("form");
   const [pixPayload, setPixPayload] = useState<{ code?: string; link?: string } | null>(null);
+  const criarPedidoFn = useServerFn(criarPedido);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,21 +156,24 @@ function Landing() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.from("pedidos").insert({
-      pacote_selecionado: result.data.plan,
-      link_instagram: result.data.profile,
-      whatsapp_contato: result.data.contact,
-    });
-    setLoading(false);
-    if (error) {
+    try {
+      await criarPedidoFn({
+        data: {
+          pacote_selecionado: result.data.plan,
+          link_instagram: result.data.profile,
+          whatsapp_contato: result.data.contact,
+          status_pagamento: "pendente",
+        },
+      });
+      toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
+      setForm({ plan: "", profile: "", contact: "" });
+      setOrderStep("success");
+      setPixPayload({ code: undefined, link: undefined });
+    } catch {
       toast.error("Erro ao registrar pedido. Tente novamente.");
-      return;
+    } finally {
+      setLoading(false);
     }
-    toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
-    setForm({ plan: "", profile: "", contact: "" });
-    setOrderStep("success");
-    // Estrutura pronta para receber código/link de pagamento externo
-    setPixPayload({ code: undefined, link: undefined });
   };
 
   const resetOrder = () => {
