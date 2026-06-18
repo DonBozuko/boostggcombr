@@ -9,8 +9,6 @@ const pedidoSchema = z.object({
   status_pagamento: z.literal("pendente"),
 });
 
-const WEBHOOK_URL = "https://hook.us2.make.com/mcpsxyj34lp1gcsrocek2sra0b3teoo5";
-
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 
 export const criarPedido = createServerFn({ method: "POST" })
@@ -23,7 +21,6 @@ export const criarPedido = createServerFn({ method: "POST" })
       status_pagamento: data.status_pagamento,
     };
 
-    // 1. Salva no Supabase primeiro (fonte da verdade)
     try {
       const supabase = createClient(
         process.env.SUPABASE_URL!,
@@ -38,20 +35,6 @@ export const criarPedido = createServerFn({ method: "POST" })
     } catch (err) {
       console.error("Erro inesperado no Supabase:", err);
       return { ok: false, error: "DB_FAILED" as const };
-    }
-
-    // 2. Webhook externo — nunca quebra o fluxo do usuário
-    try {
-      const res = await fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, criado_em: new Date().toISOString() }),
-      });
-      if (!res.ok) {
-        console.error("Webhook respondeu com status", res.status, await res.text().catch(() => ""));
-      }
-    } catch (webhookErr) {
-      console.error("Erro ao chamar webhook:", webhookErr);
     }
 
     return { ok: true as const };
