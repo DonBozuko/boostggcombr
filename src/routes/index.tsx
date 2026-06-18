@@ -488,8 +488,8 @@ function Landing() {
             )}
           </DialogContent>
         </Dialog>
-        </div>
       </section>
+
 
       {/* TRUST BADGES */}
       <section className="container mx-auto px-6 py-24">
