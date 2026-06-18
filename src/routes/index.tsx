@@ -143,6 +143,8 @@ const orderSchema = z.object({
 function Landing() {
   const [form, setForm] = useState({ plan: "", profile: "", contact: "" });
   const [loading, setLoading] = useState(false);
+  const [orderStep, setOrderStep] = useState<"form" | "success">("form");
+  const [pixPayload, setPixPayload] = useState<{ code?: string; link?: string } | null>(null);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,6 +166,14 @@ function Landing() {
     }
     toast.success("Pedido recebido! Em instantes você receberá o Pix no WhatsApp informado.");
     setForm({ plan: "", profile: "", contact: "" });
+    setOrderStep("success");
+    // Estrutura pronta para receber código/link de pagamento externo
+    setPixPayload({ code: undefined, link: undefined });
+  };
+
+  const resetOrder = () => {
+    setOrderStep("form");
+    setPixPayload(null);
   };
 
   return (
