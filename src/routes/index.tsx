@@ -447,7 +447,10 @@ function Landing() {
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
             <span className="font-display font-semibold text-foreground">BoostGram</span>
           </div>
-          <p>© 2026 BoostGram. Não somos afiliados ao Instagram ou Meta.</p>
+          <div className="flex items-center gap-4">
+            <a href="/privacidade" className="hover:text-foreground">Privacidade & Segurança</a>
+            <span>© 2026 BoostGram. Não somos afiliados ao Instagram ou Meta.</span>
+          </div>
         </div>
       </footer>
     </div>
