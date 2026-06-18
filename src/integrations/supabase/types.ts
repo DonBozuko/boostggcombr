@@ -14,7 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      pedidos: {
+        Row: {
+          criado_em: string
+          id: string
+          link_instagram: string
+          pacote_selecionado: string
+          status_pagamento: string
+          whatsapp_contato: string
+        }
+        Insert: {
+          criado_em?: string
+          id?: string
+          link_instagram: string
+          pacote_selecionado: string
+          status_pagamento?: string
+          whatsapp_contato: string
+        }
+        Update: {
+          criado_em?: string
+          id?: string
+          link_instagram?: string
+          pacote_selecionado?: string
+          status_pagamento?: string
+          whatsapp_contato?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
