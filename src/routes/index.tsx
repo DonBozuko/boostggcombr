@@ -366,140 +366,128 @@ function Landing() {
             </p>
           </div>
 
-          {orderStep === "form" && (
-            <form
-              onSubmit={onSubmit}
-              className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
-            >
-              <div className="space-y-2">
-                <Label htmlFor="plan">Pacote escolhido</Label>
-                <Select value={form.plan} onValueChange={(v) => setForm((f) => ({ ...f, plan: v }))}>
-                  <SelectTrigger id="plan" className="h-12">
-                    <SelectValue placeholder="Selecione um pacote" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {plans.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.tier} — {p.qty} seguidores ({p.price})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+          <form
+            onSubmit={onSubmit}
+            className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="plan">Pacote escolhido</Label>
+              <Select value={form.plan} onValueChange={(v) => setForm((f) => ({ ...f, plan: v }))}>
+                <SelectTrigger id="plan" className="h-12">
+                  <SelectValue placeholder="Selecione um pacote" />
+                </SelectTrigger>
+                <SelectContent>
+                  {plans.map((p) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.tier} — {p.qty} seguidores ({p.price})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
-                <div className="relative">
-                  <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                  <Input
-                    id="profile"
-                    placeholder="@seu_perfil ou instagram.com/seu_perfil"
-                    className="h-12 pl-10"
-                    value={form.profile}
-                    onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                    maxLength={120}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="contact">WhatsApp para contato e envio do comprovante</Label>
+            <div className="space-y-2">
+              <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
+              <div className="relative">
+                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                 <Input
-                  id="contact"
-                  placeholder="(11) 99999-9999"
-                  className="h-12"
-                  value={form.contact}
-                  onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
+                  id="profile"
+                  placeholder="@seu_perfil ou instagram.com/seu_perfil"
+                  className="h-12 pl-10"
+                  value={form.profile}
+                  onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
                   maxLength={120}
                 />
               </div>
+            </div>
 
-              <Button
-                type="submit"
-                size="lg"
-                disabled={loading}
-                className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    Gerando seu código Pix de pagamento... Por favor, aguarde
-                  </span>
-                ) : (
-                  <>
-                    Gerar Pix <Send className="size-4" />
-                  </>
-                )}
-              </Button>
-              <p className="text-xs text-center text-muted-foreground">
-                Pagamento seguro · Pedido processado em segundos após o Pix
-              </p>
-            </form>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="contact">WhatsApp para contato e envio do comprovante</Label>
+              <Input
+                id="contact"
+                placeholder="(11) 99999-9999"
+                className="h-12"
+                value={form.contact}
+                onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))}
+                maxLength={120}
+              />
+            </div>
 
-          {loading && orderStep === "form" && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="rounded-2xl border border-border bg-card p-10 text-center space-y-4 shadow-glow-blue"
+            <Button
+              type="submit"
+              size="lg"
+              disabled={loading}
+              className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
             >
-              <div className="mx-auto size-10 border-4 border-[var(--neon)] border-t-transparent rounded-full animate-spin" />
-              <p className="text-lg font-semibold">Gerando seu código Pix de pagamento...</p>
-              <p className="text-sm text-muted-foreground">Por favor, aguarde. Estamos preparando tudo para você.</p>
-            </motion.div>
-          )}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Gerando seu código Pix de pagamento... Por favor, aguarde
+                </span>
+              ) : (
+                <>
+                  Gerar Pix <Send className="size-4" />
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              Pagamento seguro · Pedido processado em segundos após o Pix
+            </p>
+          </form>
+        </div>
 
-          {orderStep === "success" && pixPayload && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
-            >
-              <div className="text-center space-y-2">
-                <div className="mx-auto size-12 rounded-full bg-green-500/20 text-green-400 grid place-items-center">
-                  <Check className="size-6" />
-                </div>
-                <h3 className="text-xl font-bold">Pedido registrado com sucesso!</h3>
-                <p className="text-sm text-muted-foreground">
-                  Em instantes você receberá o Pix no WhatsApp informado.
-                </p>
+        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+          <DialogContent className="max-w-md border-border bg-card">
+            <DialogHeader>
+              <div className="mx-auto size-12 rounded-full bg-green-500/20 text-green-400 grid place-items-center mb-2">
+                <Check className="size-6" />
               </div>
+              <DialogTitle className="text-center text-xl">Pedido registrado!</DialogTitle>
+              <DialogDescription className="text-center">
+                Realize o pagamento abaixo para iniciar o envio automático.
+              </DialogDescription>
+            </DialogHeader>
 
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <Label>Código Pix (Copia e Cola)</Label>
-                  <div className="rounded-lg border border-border bg-muted p-3 text-sm break-all font-mospace">
-                    {pixPayload.code ? (
-                      pixPayload.code
-                    ) : (
-                      <span className="text-muted-foreground italic">Código Pix será gerado em breve...</span>
-                    )}
+            {pedidoInfo && (
+              <div className="space-y-5">
+                <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Pacote {pedidoInfo.tier}
+                  </div>
+                  <div className="text-3xl font-display font-bold text-gradient mt-1">
+                    {pedidoInfo.price}
                   </div>
                 </div>
 
-                <div className="space-y-1">
-                  <Label>Link de Pagamento</Label>
-                  <div className="rounded-lg border border-border bg-muted p-3 text-sm break-all">
-                    {pixPayload.link ? (
-                      <a href={pixPayload.link} target="_blank" rel="noopener noreferrer" className="text-[var(--neon)] underline">
-                        {pixPayload.link}
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground italic">Link de pagamento será disponibilizado em breve...</span>
-                    )}
+                <div className="space-y-2">
+                  <Label>Pix Copia e Cola</Label>
+                  <div className="rounded-lg border border-border bg-muted p-3 text-xs break-all font-mono">
+                    {PIX_COPIA_E_COLA}
                   </div>
+                  <Button
+                    type="button"
+                    onClick={copyPix}
+                    variant="outline"
+                    className="w-full h-11 border-border bg-card/40"
+                  >
+                    <Copy className="size-4" /> Copiar Código
+                  </Button>
                 </div>
-              </div>
 
-              <Button
-                onClick={resetOrder}
-                variant="outline"
-                className="w-full h-12 border-border bg-card/40"
-              >
-                Fazer novo pedido
-              </Button>
-            </motion.div>
-          )}
+                <Button
+                  asChild
+                  size="lg"
+                  className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
+                >
+                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="size-5" />
+                    Já paguei! Enviar comprovante no WhatsApp
+                  </a>
+                </Button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
         </div>
       </section>
 
