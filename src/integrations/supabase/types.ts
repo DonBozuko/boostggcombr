@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      connection_tests: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Relationships: []
+      }
       pedidos: {
         Row: {
           criado_em: string
@@ -46,7 +64,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_public_schema: {
+        Args: never
+        Returns: {
+          column_default: string
+          column_name: string
+          constraint_type: string
+          data_type: string
+          is_nullable: string
+          table_name: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
