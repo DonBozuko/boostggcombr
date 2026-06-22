@@ -151,6 +151,11 @@ const orderSchema = z.object({
     .trim()
     .min(2, "Informe o link ou @ do Instagram")
     .max(120, "Máximo 120 caracteres"),
+  email: z
+    .string()
+    .trim()
+    .email("Informe um e-mail válido")
+    .max(120, "Máximo 120 caracteres"),
   contact: z
     .string()
     .trim()
@@ -163,11 +168,12 @@ type PedidoInfo = {
   tier: string;
   profile: string;
   pixCode: string;
+  qrCodeBase64: string;
   pedidoId: string | null;
 };
 
 function Landing() {
-  const [form, setForm] = useState({ plan: "", profile: "", contact: "" });
+  const [form, setForm] = useState({ plan: "", profile: "", email: "", contact: "" });
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
@@ -193,18 +199,21 @@ function Landing() {
           pacote: selected.tier,
           quantidade: selected.quantidade,
           valor: selected.valor,
+          email: result.data.email,
           whatsapp_contato: result.data.contact,
         },
       });
-      // TODO (integração real): substituir PIX_COPIA_E_COLA pelo qr_code retornado
-      // pela API do Mercado Pago (POST /v1/payments com payment_method_id=pix)
-      // e salvar o mercado_pago_id no pedido (UPDATE em public.pedidos).
+      if (!res?.ok) {
+        toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
+        return;
+      }
       setPedidoInfo({
         price: selected.price,
         tier: selected.tier,
         profile: result.data.profile,
-        pixCode: PIX_COPIA_E_COLA,
-        pedidoId: res?.ok ? res.pedidoId : null,
+        pixCode: res.qrCode,
+        qrCodeBase64: res.qrCodeBase64,
+        pedidoId: res.pedidoId,
       });
       setModalOpen(true);
     } catch {
@@ -230,10 +239,9 @@ function Landing() {
       )}`
     : `https://wa.me/${WHATSAPP_ADMIN}`;
 
-  // QR Code fictício gerado a partir do código Pix. Em produção, o Mercado Pago
-  // retorna `qr_code_base64` — basta trocar a URL por `data:image/png;base64,${qr_code_base64}`.
-  const qrCodeUrl = pedidoInfo
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(pedidoInfo.pixCode)}`
+  // QR Code real retornado pelo Mercado Pago (base64 PNG).
+  const qrCodeUrl = pedidoInfo?.qrCodeBase64
+    ? `data:image/png;base64,${pedidoInfo.qrCodeBase64}`
     : "";
 
   return (
