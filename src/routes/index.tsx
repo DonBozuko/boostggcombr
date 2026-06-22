@@ -66,6 +66,8 @@ const plans = [
     tier: "Start",
     label: "Iniciante",
     qty: "1.000",
+    quantidade: 1000,
+    valor: 39.9,
     price: "R$ 39,90",
     cta: "Comprar Agora",
     icon: Star,
@@ -81,6 +83,8 @@ const plans = [
     tier: "Growth",
     label: "Mais Vendido",
     qty: "3.000",
+    quantidade: 3000,
+    valor: 89.9,
     price: "R$ 89,90",
     cta: "Garantir Desconto",
     icon: Sparkles,
@@ -97,6 +101,8 @@ const plans = [
     tier: "VIP",
     label: "Aceleração Máxima",
     qty: "5.000",
+    quantidade: 5000,
+    valor: 139.9,
     price: "R$ 139,90",
     cta: "Alavancar Perfil",
     icon: Crown,
@@ -153,11 +159,19 @@ const orderSchema = z.object({
     .max(120, "Máximo 120 caracteres"),
 });
 
+type PedidoInfo = {
+  price: string;
+  tier: string;
+  profile: string;
+  pixCode: string;
+  pedidoId: string | null;
+};
+
 function Landing() {
   const [form, setForm] = useState({ plan: "", profile: "", contact: "" });
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [pedidoInfo, setPedidoInfo] = useState<{ price: string; tier: string; profile: string } | null>(null);
+  const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -167,21 +181,31 @@ function Landing() {
       toast.error(result.error.issues[0].message);
       return;
     }
+    const selected = plans.find((p) => p.id === result.data.plan);
+    if (!selected) {
+      toast.error("Pacote inválido.");
+      return;
+    }
     setLoading(true);
     try {
-      await criarPedidoFn({
+      const res = await criarPedidoFn({
         data: {
-          pacote_selecionado: result.data.plan,
-          link_instagram: result.data.profile,
+          instagram_user: result.data.profile,
+          pacote: selected.tier,
+          quantidade: selected.quantidade,
+          valor: selected.valor,
           whatsapp_contato: result.data.contact,
-          status_pagamento: "pendente",
         },
       });
-      const selected = plans.find((p) => p.id === result.data.plan);
+      // TODO (integração real): substituir PIX_COPIA_E_COLA pelo qr_code retornado
+      // pela API do Mercado Pago (POST /v1/payments com payment_method_id=pix)
+      // e salvar o mercado_pago_id no pedido (UPDATE em public.pedidos).
       setPedidoInfo({
-        price: selected?.price ?? "",
-        tier: selected?.tier ?? "",
+        price: selected.price,
+        tier: selected.tier,
         profile: result.data.profile,
+        pixCode: PIX_COPIA_E_COLA,
+        pedidoId: res?.ok ? res.pedidoId : null,
       });
       setModalOpen(true);
     } catch {
@@ -192,8 +216,9 @@ function Landing() {
   };
 
   const copyPix = async () => {
+    if (!pedidoInfo) return;
     try {
-      await navigator.clipboard.writeText(PIX_COPIA_E_COLA);
+      await navigator.clipboard.writeText(pedidoInfo.pixCode);
       toast.success("Código Pix copiado!");
     } catch {
       toast.error("Não foi possível copiar. Copie manualmente.");
@@ -202,9 +227,15 @@ function Landing() {
 
   const whatsappHref = pedidoInfo
     ? `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(
-        `Olá! Acabei de fazer o pagamento do pacote para o perfil ${pedidoInfo.profile}. Segue o comprovante.`,
+        `Olá! Acabei de fazer o pagamento do pacote ${pedidoInfo.tier} para o perfil ${pedidoInfo.profile}. Segue o comprovante.`,
       )}`
     : `https://wa.me/${WHATSAPP_ADMIN}`;
+
+  // QR Code fictício gerado a partir do código Pix. Em produção, o Mercado Pago
+  // retorna `qr_code_base64` — basta trocar a URL por `data:image/png;base64,${qr_code_base64}`.
+  const qrCodeUrl = pedidoInfo
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=0&data=${encodeURIComponent(pedidoInfo.pixCode)}`
+    : "";
 
   return (
     <div className="dark min-h-screen text-foreground">
