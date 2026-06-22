@@ -440,6 +440,19 @@ function Landing() {
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="email">E-mail (para o recibo do Mercado Pago)</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="voce@email.com"
+                className="h-12"
+                value={form.email}
+                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                maxLength={120}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="contact">WhatsApp para contato e envio do comprovante</Label>
               <Input
                 id="contact"
