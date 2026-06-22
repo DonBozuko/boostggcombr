@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
@@ -28,35 +29,49 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
+  id: '/api/public/mp-webhook',
+  path: '/api/public/mp-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/diagnostico' | '/privacidade'
+  fullPaths: '/' | '/diagnostico' | '/privacidade' | '/api/public/mp-webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/diagnostico' | '/privacidade'
-  id: '__root__' | '/' | '/diagnostico' | '/privacidade'
+  to: '/' | '/diagnostico' | '/privacidade' | '/api/public/mp-webhook'
+  id:
+    | '__root__'
+    | '/'
+    | '/diagnostico'
+    | '/privacidade'
+    | '/api/public/mp-webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +97,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/mp-webhook': {
+      id: '/api/public/mp-webhook'
+      path: '/api/public/mp-webhook'
+      fullPath: '/api/public/mp-webhook'
+      preLoaderRoute: typeof ApiPublicMpWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +111,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
