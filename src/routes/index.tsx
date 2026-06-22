@@ -43,7 +43,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 
-const PIX_COPIA_E_COLA = "SUA_CHAVE_PIX_AQUI";
+// Código Pix fictício — em produção será substituído pelo `qr_code` retornado
+// pela API do Mercado Pago (POST /v1/payments com payment_method_id="pix").
+const PIX_COPIA_E_COLA =
+  "00020126580014br.gov.bcb.pix0136a1b2c3d4-e5f6-7890-abcd-ef1234567890520400005303986540539.905802BR5913BOOSTGRAM LTD6009SAO PAULO62070503***6304B12F";
 const WHATSAPP_ADMIN = "5515997445388";
 
 export const Route = createFileRoute("/")({
@@ -470,12 +473,9 @@ function Landing() {
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogContent className="max-w-md border-border bg-card">
             <DialogHeader>
-              <div className="mx-auto size-12 rounded-full bg-green-500/20 text-green-400 grid place-items-center mb-2">
-                <Check className="size-6" />
-              </div>
-              <DialogTitle className="text-center text-xl">Pedido registrado!</DialogTitle>
+              <DialogTitle className="text-center text-xl">Pague com Pix para liberar</DialogTitle>
               <DialogDescription className="text-center">
-                Realize o pagamento abaixo para iniciar o envio automático.
+                Escaneie o QR Code ou use o Pix Copia e Cola. A entrega inicia automaticamente após a confirmação.
               </DialogDescription>
             </DialogHeader>
 
@@ -483,17 +483,30 @@ function Landing() {
               <div className="space-y-5">
                 <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
                   <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                    Pacote {pedidoInfo.tier}
+                    Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
                   </div>
                   <div className="text-3xl font-display font-bold text-gradient mt-1">
                     {pedidoInfo.price}
                   </div>
                 </div>
 
+                {/* QR Code — fictício hoje, virá do Mercado Pago em produção */}
+                <div className="flex justify-center">
+                  <div className="rounded-xl bg-white p-3 shadow-glow">
+                    <img
+                      src={qrCodeUrl}
+                      alt="QR Code Pix"
+                      width={220}
+                      height={220}
+                      className="block"
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label>Pix Copia e Cola</Label>
-                  <div className="rounded-lg border border-border bg-muted p-3 text-xs break-all font-mono">
-                    {PIX_COPIA_E_COLA}
+                  <div className="rounded-lg border border-border bg-muted p-3 text-xs break-all font-mono max-h-24 overflow-y-auto">
+                    {pedidoInfo.pixCode}
                   </div>
                   <Button
                     type="button"
@@ -503,6 +516,12 @@ function Landing() {
                   >
                     <Copy className="size-4" /> Copiar Código
                   </Button>
+                </div>
+
+                {/* Status — placeholder até webhook do Mercado Pago atualizar `status` em public.pedidos */}
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-muted-foreground">
+                  <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  Aguardando pagamento...
                 </div>
 
                 <Button
