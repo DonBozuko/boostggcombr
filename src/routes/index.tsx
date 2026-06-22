@@ -43,10 +43,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 
-// Código Pix fictício — em produção será substituído pelo `qr_code` retornado
-// pela API do Mercado Pago (POST /v1/payments com payment_method_id="pix").
-const PIX_COPIA_E_COLA =
-  "00020126580014br.gov.bcb.pix0136a1b2c3d4-e5f6-7890-abcd-ef1234567890520400005303986540539.905802BR5913BOOSTGRAM LTD6009SAO PAULO62070503***6304B12F";
 const WHATSAPP_ADMIN = "5515997445388";
 
 export const Route = createFileRoute("/")({
