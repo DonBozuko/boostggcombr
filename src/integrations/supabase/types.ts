@@ -34,6 +34,39 @@ export type Database = {
       }
       pedidos: {
         Row: {
+          created_at: string
+          id: string
+          instagram_user: string
+          mercado_pago_id: string | null
+          pacote: string
+          quantidade: number
+          status: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          instagram_user: string
+          mercado_pago_id?: string | null
+          pacote: string
+          quantidade: number
+          status?: string
+          valor: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          instagram_user?: string
+          mercado_pago_id?: string | null
+          pacote?: string
+          quantidade?: number
+          status?: string
+          valor?: number
+        }
+        Relationships: []
+      }
+      pedidos_legacy: {
+        Row: {
           criado_em: string
           id: string
           link_instagram: string
