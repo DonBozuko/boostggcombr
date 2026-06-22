@@ -5,9 +5,9 @@ import { createFileRoute } from "@tanstack/react-router";
 // TROQUE pelos IDs reais do painel do SMMhype quando tiver.
 // ============================================================
 const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  Start: 0, // R$ 39,90 — 1.000 seguidores
-  Growth: 0, // R$ 89,90 — 3.000 seguidores
-  VIP: 0, // R$ 139,90 — 5.000 seguidores
+  Start: 14325, // R$ 39,90 — 1.000 seguidores
+  Growth: 14325, // R$ 89,90 — 3.000 seguidores
+  VIP: 14225, // R$ 139,90 — 5.000 seguidores
 };
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
