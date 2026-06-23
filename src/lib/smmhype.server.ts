@@ -1,10 +1,26 @@
 // Server-only helper para disparar pedido no SMMhype.
 // NÃO importar de código client-reachable em escopo de módulo.
 
+// Service IDs definitivos (Nov/2025):
+// - 14325 para quantidades 100 a 2000
+// - 14225 para quantidades 5000 a 100000
+export function resolveServiceId(quantidade: number): number | null {
+  if (quantidade >= 100 && quantidade <= 2000) return 14325;
+  if (quantidade >= 5000 && quantidade <= 100000) return 14225;
+  return null;
+}
+
+// Compat: ainda exportamos um map por pacote id usado por código antigo.
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  start: 14325,
-  growth: 14325,
-  vip: 14225,
+  p100: 14325,
+  p500: 14325,
+  p1k: 14325,
+  p2k: 14325,
+  p5k: 14225,
+  p10k: 14225,
+  p20k: 14225,
+  p50k: 14225,
+  p100k: 14225,
 };
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
@@ -27,9 +43,17 @@ export async function dispatchSmmhype(args: {
 }): Promise<SmmDispatchResult> {
   const smmKey = process.env.SMMHYPE_API_KEY;
   if (!smmKey) return { ok: false, error: "SMMHYPE_API_KEY ausente" };
-  const pacoteKey = String(args.pacote ?? "").trim().toLowerCase();
-  const serviceId = SMMHYPE_SERVICE_IDS[pacoteKey];
-  if (!serviceId) return { ok: false, error: `service id ausente p/ pacote ${args.pacote}` };
+
+  // Resolve service por quantidade (fonte de verdade); fallback no map por pacote.
+  const serviceId =
+    resolveServiceId(args.quantidade) ??
+    SMMHYPE_SERVICE_IDS[String(args.pacote ?? "").trim().toLowerCase()];
+  if (!serviceId) {
+    return {
+      ok: false,
+      error: `service id ausente p/ quantidade=${args.quantidade} pacote=${args.pacote}`,
+    };
+  }
 
   const link = normalizeInstagramUser(args.instagram_user);
   const body = new URLSearchParams({

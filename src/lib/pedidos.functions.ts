@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const pedidoSchema = z.object({
   instagram_user: z.string().min(1).max(200),
-  pacote: z.enum(["start", "growth", "vip"]),
+  pacote: z.string().min(1).max(20),
   quantidade: z.number().int().positive(),
   valor: z.number().positive(),
   email: z.string().email().max(200),
