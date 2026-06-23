@@ -12,6 +12,9 @@ import {
   Send,
   Copy,
   MessageCircle,
+  Heart,
+  User,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,24 +64,25 @@ export const Route = createFileRoute("/")({
 type Plan = {
   id: string;
   tier: string;
+  tag: string;
   qty: string;
   quantidade: number;
   valor: number;
   price: string;
-  badge?: string;
+  benefit: string;
   highlight?: boolean;
 };
 
 const plans: Plan[] = [
-  { id: "p100",   tier: "Teste",       qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00" },
-  { id: "p500",   tier: "Start",       qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00" },
-  { id: "p1k",    tier: "Essencial",   qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00" },
-  { id: "p2k",    tier: "Plus",        qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00" },
-  { id: "p5k",    tier: "Growth",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00" },
-  { id: "p10k",   tier: "Pro",         qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", badge: "Mais Recomendado", highlight: true },
-  { id: "p20k",   tier: "Elite",       qty: "20.000",  quantidade: 20000,  valor: 220.0, price: "R$ 220,00" },
-  { id: "p50k",   tier: "VIP",         qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00" },
-  { id: "p100k",  tier: "Império",     qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00" },
+  { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Entrega rápida e segura" },
+  { id: "p500",   tier: "500 Seguidores",     tag: "+ STARTER",  qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00",  benefit: "Entrega rápida e segura" },
+  { id: "p1k",    tier: "1.000 Seguidores",   tag: "+ BASIC",    qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00",  benefit: "Entrega rápida e segura" },
+  { id: "p2k",    tier: "2.000 Seguidores",   tag: "+ GROWTH",   qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00",  benefit: "Entrega rápida e segura" },
+  { id: "p5k",    tier: "5.000 Seguidores",   tag: "+ PRO",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00",  benefit: "Entrega rápida e segura" },
+  { id: "p10k",   tier: "10.000 Seguidores",  tag: "+ VIP",      qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", benefit: "Mais recomendado pelos clientes", highlight: true },
+  { id: "p20k",   tier: "20.000 Seguidores",  tag: "+ ELITE",    qty: "20.000",  quantidade: 20000,  valor: 220.0, price: "R$ 220,00", benefit: "Entrega rápida e segura" },
+  { id: "p50k",   tier: "50.000 Seguidores",  tag: "+ MASTER",   qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00", benefit: "Entrega rápida e segura" },
+  { id: "p100k",  tier: "100.000 Seguidores", tag: "+ ULTIMATE", qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00", benefit: "Entrega rápida e segura" },
 ];
 
 const trustBadges = [
@@ -261,133 +265,122 @@ function Landing() {
           className="absolute inset-0 -z-10"
           style={{ background: "var(--gradient-hero)" }}
         />
-        <div className="container mx-auto px-6 pt-24 pb-32 text-center max-w-4xl">
+        <div className="container mx-auto px-6 pt-20 pb-20 text-center max-w-3xl">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs font-medium text-muted-foreground mb-8"
+            className="mx-auto mb-8 size-20 rounded-2xl grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_60px_-5px_rgba(236,72,153,0.7)]"
           >
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--neon)] opacity-75 animate-ping" />
-              <span className="relative inline-flex size-2 rounded-full bg-[var(--neon)]" />
-            </span>
-            +12.847 perfis impulsionados em 2026
+            <Instagram className="size-10 text-white" strokeWidth={2.2} />
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-bold leading-[1.05] tracking-tight"
+            className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight"
           >
-            Seguidores <span className="text-gradient">reais e brasileiros</span><br />
-            para seu Instagram.
+            Impulsione seu Perfil com{" "}
+            <span className="bg-gradient-to-r from-fuchsia-400 via-pink-400 to-orange-300 bg-clip-text text-transparent">
+              Seguidores Reais
+            </span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"
+            className="mt-5 text-base md:text-lg text-muted-foreground max-w-xl mx-auto"
           >
-            Pacotes premium de seguidores reais e brasileiros. Entrega automática após o Pix,
-            sem precisar da sua senha, com garantia de reposição por 30 dias.
+            Entrega automática · 100% seguro · Sem senha · Garantia de reposição 30 dias.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-10 flex flex-col sm:flex-row gap-3 justify-center"
+            className="mt-8 flex flex-wrap gap-3 justify-center"
           >
-            <Button asChild size="lg" className="h-12 px-8 bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90">
-              <a href="#planos">Quero Bombar Meu Perfil</a>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="h-12 px-8 border-border bg-card/40">
-              <a href="#faq">Como Funciona</a>
-            </Button>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-full border border-pink-500/40 bg-pink-500/10 px-5 py-2.5 text-sm font-semibold text-pink-300 hover:bg-pink-500/20 transition-colors"
+            >
+              <Heart className="size-4 fill-pink-400 text-pink-400" />
+              Curtidas
+            </button>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/40 bg-fuchsia-500/10 px-5 py-2.5 text-sm font-semibold text-fuchsia-300 hover:bg-fuchsia-500/20 transition-colors"
+            >
+              <User className="size-4" />
+              Seguidores
+            </button>
           </motion.div>
         </div>
       </section>
 
       {/* PLANS */}
-      <section id="planos" className="container mx-auto px-6 py-24">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold">Escolha seu pacote</h2>
-          <p className="mt-4 text-muted-foreground">
-            Preço fixo, sem assinatura, sem pegadinha. Pague uma vez e veja o resultado.
+      <section id="planos" className="container mx-auto px-6 py-16">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold">Escolha seu pacote</h2>
+          <p className="mt-3 text-muted-foreground">
+            Preço fixo, sem pegadinha. Pague uma vez e veja o resultado.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
-          {plans.map((p, i) => (
-            <motion.div
-              key={p.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.3) }}
-              className={`relative rounded-2xl border p-6 flex flex-col ${
-                p.highlight
-                  ? "border-[var(--neon)] bg-card shadow-glow lg:scale-[1.04] z-10"
-                  : "border-border bg-card/60 hover:border-[var(--neon)]/40 transition-colors"
-              }`}
-            >
-              {p.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[image:var(--gradient-cta)] text-background text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shadow-glow">
-                  {p.badge}
-                </div>
-              )}
-
-              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                {p.tier}
-              </div>
-
-              <div className="mt-3 flex items-baseline gap-2">
-                <span className="text-4xl font-display font-bold leading-none">{p.qty}</span>
-                <span className="text-sm text-muted-foreground">seguidores</span>
-              </div>
-
-              <div className="mt-4 text-3xl font-display font-bold text-gradient">
-                {p.price}
-              </div>
-
-              <ul className="mt-5 space-y-2 mb-6 flex-1 text-sm">
-                <li className="flex items-start gap-2">
-                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
-                  <span>Seguidores reais e brasileiros</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
-                  <span>Reposição garantida 30 dias</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
-                  <span>Entrega automática após o Pix</span>
-                </li>
-              </ul>
-
-              <Button
-                asChild
-                size="lg"
-                className={
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {plans.map((p, i) => {
+            const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
+            return (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.3) }}
+                className={`relative rounded-2xl border bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 p-6 pt-8 flex flex-col items-center text-center ${
                   p.highlight
-                    ? "w-full bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
-                    : "w-full bg-foreground text-background hover:bg-foreground/90"
-                }
+                    ? "border-fuchsia-500/60 shadow-[0_0_40px_-10px_rgba(217,70,239,0.6)]"
+                    : "border-white/10 hover:border-fuchsia-500/40 transition-colors"
+                }`}
               >
+                {/* Neon tag */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.7)]">
+                  {p.tag}
+                </div>
+
+                {/* Instagram neon circle */}
+                <div className="mt-2 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
+                  <Instagram className="size-7 text-white" strokeWidth={2.2} />
+                </div>
+
+                <h3 className="text-xl font-bold text-white">{p.tier}</h3>
+                <p className="mt-1 text-xs text-zinc-400">{p.benefit}</p>
+
+                {/* Urgency counter */}
+                <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">
+                  <Eye className="size-3.5" />
+                  {viewing} vendo agora
+                </div>
+
+                <div className="mt-5 text-4xl font-extrabold text-white tracking-tight">
+                  {p.price}
+                </div>
+
                 <a
                   href="#pedido"
                   onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-red-500 to-red-600 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white shadow-[0_8px_24px_-8px_rgba(239,68,68,0.7)] hover:from-red-400 hover:to-red-500 transition-colors"
                 >
-                  Comprar agora
+                  <Zap className="size-4 fill-white" /> COMPRAR AGORA
                 </a>
-              </Button>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       </section>
+
 
       {/* ORDER FORM */}
       <section id="pedido" className="py-24 border-y border-border bg-card/30">
