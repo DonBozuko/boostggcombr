@@ -57,7 +57,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           "X-Idempotency-Key": idempotencyKey,
         },
         body: JSON.stringify({
-          transaction_amount: Number(data.valor.toFixed(2)),
+          transaction_amount: Number(valorCobrar.toFixed(2)),
           description: `BoostGram - Pacote ${clean(data.pacote)} (${data.quantidade} seguidores) para ${clean(data.instagram_user)}`,
           payment_method_id: "pix",
           payer: { email: data.email.trim().toLowerCase() },
@@ -97,7 +97,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           instagram_user: clean(data.instagram_user),
           pacote: clean(data.pacote),
           quantidade: data.quantidade,
-          valor: data.valor,
+          valor: valorCobrar,
           status: "pending",
           mercado_pago_id: mpId,
         })
