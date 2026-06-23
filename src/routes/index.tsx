@@ -182,8 +182,8 @@ export const Route = createFileRoute("/")({
                   ratingValue: "4.9",
                   bestRating: "5",
                   worstRating: "1",
-                  ratingCount: "12500",
-                  reviewCount: "12500",
+                  ratingCount: "147",
+                  reviewCount: "147",
                 },
                 review: [
                   {
