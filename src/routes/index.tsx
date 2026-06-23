@@ -15,7 +15,10 @@ import {
   Heart,
   User,
   Eye,
+  Star,
 } from "lucide-react";
+
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -188,6 +191,20 @@ const trustBadges = [
   { icon: ShieldCheck, title: "Sem Necessidade de Senha", desc: "Trabalhamos apenas com o @ público. Sua conta nunca é acessada." },
   { icon: RefreshCw, title: "Garantia de Reposição de 30 dias", desc: "Caiu? A gente repõe. Sem letra miúda, sem burocracia." },
 ];
+
+const testimonials = [
+  { name: "Larissa M.", handle: "@lari.makeup", text: "Cheguei em 12k em uma semana. O engajamento dobrou e fechei 3 publis novas.", pkg: "Pacote 10k" },
+  { name: "Rafael D.", handle: "@rafadias.fit", text: "Pix caiu, em 4 minutos já tinham começado a entregar. Surreal.", pkg: "Pacote 5k" },
+  { name: "Camila S.", handle: "@cami.travel", text: "Já testei vários sites e só aqui não caiu seguidor depois. Suporte responde rápido.", pkg: "Pacote 20k" },
+];
+
+const socialStats = [
+  { value: "+12.500", label: "Clientes ativos" },
+  { value: "98%", label: "Pagamentos via Pix aprovados" },
+  { value: "4.9/5", label: "Avaliação média" },
+  { value: "24/7", label: "Suporte no WhatsApp" },
+];
+
 
 const faqs = [
   {
@@ -476,10 +493,11 @@ function Landing() {
                 <a
                   href="#pedido"
                   onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] shadow-[0_0_25px_-2px_rgba(221,42,123,0.7)] hover:shadow-[0_0_35px_-2px_rgba(221,42,123,0.9)] hover:brightness-110 transition-all"
+                  className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
                 >
                   <Zap className="size-4 fill-white" /> COMPRAR AGORA
                 </a>
+
               </motion.div>
             );
           })}
@@ -562,7 +580,7 @@ function Landing() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] shadow-[0_0_25px_-2px_rgba(221,42,123,0.7)] hover:shadow-[0_0_35px_-2px_rgba(221,42,123,0.9)] hover:brightness-110 transition-all"
+              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
             >
 
               {loading ? (
@@ -687,7 +705,62 @@ function Landing() {
       </section>
 
 
+      {/* SOCIAL PROOF */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-1 mb-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Star key={i} className="size-5 fill-yellow-400 text-yellow-400" />
+            ))}
+            <span className="ml-2 text-sm font-semibold text-zinc-200">4.9/5 · +12.500 clientes</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">Quem usa, recomenda</h2>
+          <p className="mt-3 text-zinc-300">Relatos reais de quem impulsionou o perfil com a gente.</p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-10">
+          {socialStats.map((s) => (
+            <div key={s.label} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5 text-center">
+              <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-fuchsia-400 via-pink-400 to-orange-300 bg-clip-text text-transparent">
+                {s.value}
+              </div>
+              <div className="mt-1 text-xs md:text-sm text-zinc-300">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={t.handle}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
+              className="rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 p-6 flex flex-col"
+            >
+              <div className="flex items-center gap-1 mb-3">
+                {[0, 1, 2, 3, 4].map((s) => (
+                  <Star key={s} className="size-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-sm text-zinc-200 leading-relaxed flex-1">"{t.text}"</p>
+              <div className="mt-5 flex items-center gap-3 pt-4 border-t border-white/10">
+                <div className="size-10 shrink-0 rounded-full bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 grid place-items-center text-white font-bold">
+                  {t.name[0]}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white truncate">{t.name}</div>
+                  <div className="text-xs text-zinc-400 truncate">{t.handle} · {t.pkg}</div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* TRUST BADGES */}
+
       <section className="container mx-auto px-6 py-24">
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {trustBadges.map((b, i) => {
