@@ -1,0 +1,1 @@
+ALTER TABLE public.pedidos DROP CONSTRAINT IF EXISTS pedidos_pacote_check;
