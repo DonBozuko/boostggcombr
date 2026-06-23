@@ -50,6 +50,25 @@ import { CheckCircle2 } from "lucide-react";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
+// Analytics: dispara evento p/ gtag, dataLayer (GTM) e fbq, sem quebrar se nenhum existir.
+type TrackPayload = Record<string, string | number | boolean | undefined>;
+function trackEvent(name: string, payload: TrackPayload = {}) {
+  if (typeof window === "undefined") return;
+  try {
+    const w = window as unknown as {
+      gtag?: (...a: unknown[]) => void;
+      dataLayer?: unknown[];
+      fbq?: (...a: unknown[]) => void;
+    };
+    w.gtag?.("event", name, payload);
+    w.dataLayer?.push({ event: name, ...payload });
+    w.fbq?.("trackCustom", name, payload);
+    if (import.meta.env.DEV) console.debug("[track]", name, payload);
+  } catch (err) {
+    console.error("[trackEvent]", err);
+  }
+}
+
 export const Route = createFileRoute("/")({
   head: () => {
     const title = "Boostygram | Comprar Seguidores no Instagram e Engajamento Real";
@@ -148,6 +167,45 @@ export const Route = createFileRoute("/")({
                       "@type": "Answer",
                       text: "A entrega começa em poucos minutos após a confirmação do Pix.",
                     },
+                  },
+                ],
+              },
+              {
+                "@type": "Product",
+                "@id": "https://boostygram.lovable.app/#product",
+                name: "Seguidores Reais para Instagram - Boostygram",
+                description,
+                brand: { "@type": "Brand", name: "Boostygram" },
+                image: ogImage,
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: "4.9",
+                  bestRating: "5",
+                  worstRating: "1",
+                  ratingCount: "12500",
+                  reviewCount: "12500",
+                },
+                review: [
+                  {
+                    "@type": "Review",
+                    author: { "@type": "Person", name: "Larissa M." },
+                    reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                    reviewBody:
+                      "Cheguei em 12k em uma semana. O engajamento dobrou e fechei 3 publis novas.",
+                  },
+                  {
+                    "@type": "Review",
+                    author: { "@type": "Person", name: "Rafael D." },
+                    reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                    reviewBody:
+                      "Pix caiu, em 4 minutos já tinham começado a entregar. Surreal.",
+                  },
+                  {
+                    "@type": "Review",
+                    author: { "@type": "Person", name: "Camila S." },
+                    reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                    reviewBody:
+                      "Já testei vários sites e só aqui não caiu seguidor depois. Suporte responde rápido.",
                   },
                 ],
               },
@@ -299,6 +357,11 @@ function Landing() {
       toast.error("Pacote inválido.");
       return;
     }
+    trackEvent("checkout_submit", {
+      plan_id: selected.id,
+      plan_tier: selected.tier,
+      plan_value: selected.valor,
+    });
     setLoading(true);
     try {
       const res = await criarPedidoFn({
@@ -492,8 +555,18 @@ function Landing() {
 
                 <a
                   href="#pedido"
-                  onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
+                  onClick={() => {
+                    setForm((f) => ({ ...f, plan: p.id }));
+                    trackEvent("cta_plan_click", {
+                      plan_id: p.id,
+                      plan_tier: p.tier,
+                      plan_quantity: p.quantidade,
+                      plan_value: p.valor,
+                      highlight: p.highlight ?? false,
+                    });
+                  }}
                   className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
+                  aria-label={`Comprar pacote ${p.tier} por ${p.price}`}
                 >
                   <Zap className="size-4 fill-white" /> COMPRAR AGORA
                 </a>
@@ -691,7 +764,17 @@ function Landing() {
                       size="lg"
                       className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
                     >
-                      <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                          trackEvent("cta_payment_confirm_whatsapp", {
+                            pedido_id: pedidoInfo?.pedidoId ?? "",
+                            plan_tier: pedidoInfo?.tier ?? "",
+                          })
+                        }
+                      >
                         <MessageCircle className="size-5" />
                         Já paguei! Enviar comprovante no WhatsApp
                       </a>
