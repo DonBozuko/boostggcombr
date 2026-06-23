@@ -186,7 +186,7 @@ function Landing() {
       const res = await criarPedidoFn({
         data: {
           instagram_user: result.data.profile,
-          pacote: selected.id as "start" | "growth" | "vip",
+          pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
           email: result.data.email,
