@@ -1,24 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// ============================================================
-// Mapeamento pacote -> service ID do SMMhype.
-// TROQUE pelos IDs reais do painel do SMMhype quando tiver.
-// ============================================================
-const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  start: 14325, // R$ 39,90 — 1.000 seguidores
-  growth: 14325, // R$ 89,90 — 3.000 seguidores
-  vip: 14225, // R$ 139,90 — 5.000 seguidores
-};
-
-const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
-
-function normalizeInstagramUser(raw: string): string {
-  const trimmed = raw.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  const handle = trimmed.replace(/^@+/, "").replace(/^instagram\.com\//i, "");
-  return `https://instagram.com/${handle}`;
-}
 
 export const Route = createFileRoute("/api/public/mp-webhook")({
   server: {
