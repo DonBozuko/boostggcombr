@@ -493,7 +493,7 @@ function Landing() {
         <div className="container mx-auto px-6 max-w-2xl">
           <div className="text-center mb-10">
             <h2 className="text-4xl font-bold">Faça seu pedido</h2>
-            <p className="mt-3 text-muted-foreground">
+            <p className="mt-3 text-zinc-300">
               Preencha os dados abaixo. Em segundos você recebe o Pix no WhatsApp.
             </p>
           </div>
@@ -521,7 +521,7 @@ function Landing() {
             <div className="space-y-2">
               <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
               <div className="relative">
-                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
                 <Input
                   id="profile"
                   placeholder="@seu_perfil ou instagram.com/seu_perfil"
@@ -575,7 +575,7 @@ function Landing() {
                 </>
               )}
             </Button>
-            <p className="text-xs text-center text-muted-foreground">
+            <p className="text-xs text-center text-zinc-300">
               Pagamento seguro · Pedido processado em segundos após o Pix
             </p>
           </form>
@@ -595,7 +595,7 @@ function Landing() {
                   <CheckCircle2 className="size-20 text-green-500" strokeWidth={1.5} />
                   {pedidoInfo && (
                     <div className="text-center">
-                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                      <div className="text-xs uppercase tracking-wider text-zinc-300">
                         Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
                       </div>
                       <div className="text-3xl font-display font-bold text-gradient mt-1">
@@ -603,7 +603,7 @@ function Landing() {
                       </div>
                     </div>
                   )}
-                  <p className="text-sm text-muted-foreground text-center">
+                  <p className="text-sm text-zinc-300 text-center">
                     Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.
                   </p>
                 </div>
@@ -627,7 +627,7 @@ function Landing() {
                 {pedidoInfo && (
                   <div className="space-y-5">
                     <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
-                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                      <div className="text-xs uppercase tracking-wider text-zinc-300">
                         Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
                       </div>
                       <div className="text-3xl font-display font-bold text-gradient mt-1">
@@ -662,7 +662,7 @@ function Landing() {
                       </Button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-zinc-300">
                       <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       Aguardando pagamento...
                     </div>
@@ -704,7 +704,7 @@ function Landing() {
                   <Icon className="size-6 text-background" />
                 </div>
                 <h3 className="font-display font-bold text-lg mb-2">{b.title}</h3>
-                <p className="text-sm text-muted-foreground">{b.desc}</p>
+                <p className="text-sm text-zinc-300">{b.desc}</p>
               </motion.div>
             );
           })}
@@ -715,7 +715,7 @@ function Landing() {
       <section id="faq" className="container mx-auto px-6 py-24 max-w-3xl">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold">Perguntas frequentes</h2>
-          <p className="mt-3 text-muted-foreground">Tudo o que você precisa saber antes de comprar.</p>
+          <p className="mt-3 text-zinc-300">Tudo o que você precisa saber antes de comprar.</p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
@@ -728,7 +728,7 @@ function Landing() {
               <AccordionTrigger className="text-left font-display font-semibold hover:no-underline py-5">
                 {f.q}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-5">{f.a}</AccordionContent>
+              <AccordionContent className="text-zinc-300 pb-5">{f.a}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
@@ -736,7 +736,7 @@ function Landing() {
 
       {/* FOOTER */}
       <footer className="border-t border-border py-10">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
             <span className="font-display font-semibold text-foreground">BoostGram</span>
