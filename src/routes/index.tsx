@@ -235,6 +235,7 @@ function Landing() {
         toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
         return;
       }
+      setPaid(false);
       setPedidoInfo({
         price: selected.price,
         tier: selected.tier,
