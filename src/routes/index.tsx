@@ -151,6 +151,45 @@ export const Route = createFileRoute("/")({
                   },
                 ],
               },
+              {
+                "@type": "Product",
+                "@id": "https://boostygram.lovable.app/#product",
+                name: "Seguidores Reais para Instagram - Boostygram",
+                description,
+                brand: { "@type": "Brand", name: "Boostygram" },
+                image: ogImage,
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: "4.9",
+                  bestRating: "5",
+                  worstRating: "1",
+                  ratingCount: "12500",
+                  reviewCount: "12500",
+                },
+                review: [
+                  {
+                    "@type": "Review",
+                    author: { "@type": "Person", name: "Larissa M." },
+                    reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                    reviewBody:
+                      "Cheguei em 12k em uma semana. O engajamento dobrou e fechei 3 publis novas.",
+                  },
+                  {
+                    "@type": "Review",
+                    author: { "@type": "Person", name: "Rafael D." },
+                    reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                    reviewBody:
+                      "Pix caiu, em 4 minutos já tinham começado a entregar. Surreal.",
+                  },
+                  {
+                    "@type": "Review",
+                    author: { "@type": "Person", name: "Camila S." },
+                    reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                    reviewBody:
+                      "Já testei vários sites e só aqui não caiu seguidor depois. Suporte responde rápido.",
+                  },
+                ],
+              },
             ],
           }),
         },
