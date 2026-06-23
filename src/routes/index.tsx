@@ -179,7 +179,30 @@ function Landing() {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
+  const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
+  const getStatusFn = useServerFn(getPedidoStatus);
+
+  // Polling: a cada 3s consulta o status do pedido até detectar 'paid'.
+  useEffect(() => {
+    if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
+    const id = pedidoInfo.pedidoId;
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const res = await getStatusFn({ data: { id } });
+        if (!cancelled && res.ok && res.status === "paid") setPaid(true);
+      } catch (err) {
+        console.error("[poll status]", err);
+      }
+    };
+    tick();
+    const interval = setInterval(tick, 3000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
