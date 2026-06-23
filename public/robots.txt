@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /api/
+Disallow: /diagnostico
+
+Sitemap: https://boostygram.lovable.app/sitemap.xml
