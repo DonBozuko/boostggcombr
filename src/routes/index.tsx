@@ -323,71 +323,72 @@ function Landing() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {plans.map((p, i) => {
-            const Icon = p.icon;
-            return (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative rounded-2xl border p-8 flex flex-col ${
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+          {plans.map((p, i) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.3) }}
+              className={`relative rounded-2xl border p-6 flex flex-col ${
+                p.highlight
+                  ? "border-[var(--neon)] bg-card shadow-glow lg:scale-[1.04] z-10"
+                  : "border-border bg-card/60 hover:border-[var(--neon)]/40 transition-colors"
+              }`}
+            >
+              {p.badge && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[image:var(--gradient-cta)] text-background text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shadow-glow">
+                  {p.badge}
+                </div>
+              )}
+
+              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                {p.tier}
+              </div>
+
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-4xl font-display font-bold leading-none">{p.qty}</span>
+                <span className="text-sm text-muted-foreground">seguidores</span>
+              </div>
+
+              <div className="mt-4 text-3xl font-display font-bold text-gradient">
+                {p.price}
+              </div>
+
+              <ul className="mt-5 space-y-2 mb-6 flex-1 text-sm">
+                <li className="flex items-start gap-2">
+                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
+                  <span>Seguidores reais e brasileiros</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
+                  <span>Reposição garantida 30 dias</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
+                  <span>Entrega automática após o Pix</span>
+                </li>
+              </ul>
+
+              <Button
+                asChild
+                size="lg"
+                className={
                   p.highlight
-                    ? "border-[var(--neon)] bg-card shadow-glow scale-[1.03]"
-                    : "border-border bg-card/60"
-                }`}
+                    ? "w-full bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
+                    : "w-full bg-foreground text-background hover:bg-foreground/90"
+                }
               >
-                {p.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[image:var(--gradient-cta)] text-background text-xs font-bold uppercase tracking-wider">
-                    {p.label}
-                  </div>
-                )}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={`size-10 rounded-lg grid place-items-center ${p.highlight ? "bg-[image:var(--gradient-cta)] text-background" : "bg-muted text-foreground"}`}>
-                    <Icon className="size-5" />
-                  </div>
-                  <div>
-                    <div className="font-display font-bold text-xl">{p.tier}</div>
-                    {!p.highlight && <div className="text-xs text-muted-foreground">{p.label}</div>}
-                  </div>
-                </div>
-
-                <div className="mb-2">
-                  <span className="text-5xl font-display font-bold">{p.qty}</span>
-                  <span className="text-muted-foreground ml-2">seguidores</span>
-                </div>
-                <div className="text-3xl font-display font-bold text-gradient mb-6">{p.price}</div>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  asChild
-                  size="lg"
-                  className={
-                    p.highlight
-                      ? "bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
-                      : "bg-foreground text-background hover:bg-foreground/90"
-                  }
+                <a
+                  href="#pedido"
+                  onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
                 >
-                  <a
-                    href="#pedido"
-                    onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
-                  >
-                    {p.cta}
-                  </a>
-                </Button>
-              </motion.div>
-            );
-          })}
+                  Comprar agora
+                </a>
+              </Button>
+            </motion.div>
+          ))}
         </div>
       </section>
 
