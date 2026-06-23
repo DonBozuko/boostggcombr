@@ -422,13 +422,13 @@ function Landing() {
       {/* PLANS */}
       <section id="planos" className="container mx-auto px-6 py-16">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold">Escolha seu pacote</h2>
-          <p className="mt-3 text-muted-foreground">
+          <h2 className="text-3xl md:text-4xl font-bold text-white">Escolha seu pacote</h2>
+          <p className="mt-3 text-zinc-300">
             Preço fixo, sem pegadinha. Pague uma vez e veja o resultado.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
           {plans.map((p, i) => {
             const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
             return (
@@ -440,22 +440,28 @@ function Landing() {
                 transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.3) }}
                 className={`relative rounded-2xl border bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 p-6 pt-8 flex flex-col items-center text-center ${
                   p.highlight
-                    ? "border-fuchsia-500/60 shadow-[0_0_40px_-10px_rgba(217,70,239,0.6)]"
+                    ? "border-transparent lg:scale-105 lg:-my-2 z-10 shadow-[0_0_50px_-8px_rgba(236,72,153,0.75)] [background:linear-gradient(#0a0a0a,#0a0a0a)_padding-box,linear-gradient(135deg,#feda77,#f58529,#dd2a7b,#8134af)_border-box] border-2"
                     : "border-white/10 hover:border-fuchsia-500/40 transition-colors"
                 }`}
               >
-                {/* Neon tag */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.7)]">
+                {p.highlight && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_25px_rgba(249,115,22,0.8)]">
+                    ⭐ Mais Vendido
+                  </div>
+                )}
+
+                {/* Tag */}
+                <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.7)]`}>
                   {p.tag}
                 </div>
 
                 {/* Instagram neon circle */}
-                <div className="mt-2 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
+                <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
                   <Instagram className="size-7 text-white" strokeWidth={2.2} />
                 </div>
 
                 <h3 className="text-xl font-bold text-white">{p.tier}</h3>
-                <p className="mt-1 text-xs text-zinc-400">{p.benefit}</p>
+                <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
 
                 {/* Urgency counter */}
                 <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">
@@ -470,7 +476,7 @@ function Landing() {
                 <a
                   href="#pedido"
                   onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-red-500 to-red-600 px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white shadow-[0_8px_24px_-8px_rgba(239,68,68,0.7)] hover:from-red-400 hover:to-red-500 transition-colors"
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] shadow-[0_0_25px_-2px_rgba(221,42,123,0.7)] hover:shadow-[0_0_35px_-2px_rgba(221,42,123,0.9)] hover:brightness-110 transition-all"
                 >
                   <Zap className="size-4 fill-white" /> COMPRAR AGORA
                 </a>
@@ -479,6 +485,7 @@ function Landing() {
           })}
         </div>
       </section>
+
 
 
       {/* ORDER FORM */}
