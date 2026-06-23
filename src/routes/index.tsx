@@ -196,13 +196,16 @@ function Landing() {
       const res = await criarPedidoFn({
         data: {
           instagram_user: result.data.profile,
-          pacote: selected.tier,
+          pacote: selected.id as "start" | "growth" | "vip",
           quantidade: selected.quantidade,
           valor: selected.valor,
           email: result.data.email,
           whatsapp_contato: result.data.contact,
         },
       });
+      if (!res?.ok) {
+        console.error("criarPedido falhou:", res);
+      }
       if (!res?.ok) {
         toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
         return;
