@@ -389,10 +389,11 @@ function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
-            className="mt-5 text-base md:text-lg text-muted-foreground max-w-xl mx-auto"
+            className="mt-5 text-base md:text-lg text-zinc-300 max-w-xl mx-auto"
           >
             Entrega automática · 100% seguro · Sem senha · Garantia de reposição 30 dias.
           </motion.p>
+
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
