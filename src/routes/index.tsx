@@ -8,9 +8,6 @@ import {
   ShieldCheck,
   RefreshCw,
   Check,
-  Crown,
-  Star,
-  Sparkles,
   TrendingUp,
   Send,
   Copy,
@@ -61,60 +58,27 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const plans = [
-  {
-    id: "start",
-    tier: "Start",
-    label: "Iniciante",
-    qty: "1.000",
-    quantidade: 1000,
-    valor: 39.9,
-    price: "R$ 39,90",
-    cta: "Comprar Agora",
-    icon: Star,
-    highlight: false,
-    features: [
-      "1.000 seguidores reais e brasileiros",
-      "Reposição garantida 30 dias",
-      "Entrega em até 24h",
-    ],
-  },
-  {
-    id: "growth",
-    tier: "Growth",
-    label: "Mais Vendido",
-    qty: "3.000",
-    quantidade: 3000,
-    valor: 89.9,
-    price: "R$ 89,90",
-    cta: "Garantir Desconto",
-    icon: Sparkles,
-    highlight: true,
-    features: [
-      "3.000 seguidores reais e brasileiros",
-      "Bônus de curtidas nos posts",
-      "Reposição garantida 30 dias",
-      "Entrega em até 12h",
-    ],
-  },
-  {
-    id: "vip",
-    tier: "VIP",
-    label: "Aceleração Máxima",
-    qty: "5.000",
-    quantidade: 5000,
-    valor: 139.9,
-    price: "R$ 139,90",
-    cta: "Alavancar Perfil",
-    icon: Crown,
-    highlight: false,
-    features: [
-      "5.000 seguidores reais e brasileiros",
-      "Suporte prioritário via WhatsApp",
-      "Reposição garantida 30 dias",
-      "Entrega em até 6h",
-    ],
-  },
+type Plan = {
+  id: string;
+  tier: string;
+  qty: string;
+  quantidade: number;
+  valor: number;
+  price: string;
+  badge?: string;
+  highlight?: boolean;
+};
+
+const plans: Plan[] = [
+  { id: "p100",   tier: "Teste",       qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00" },
+  { id: "p500",   tier: "Start",       qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00" },
+  { id: "p1k",    tier: "Essencial",   qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00" },
+  { id: "p2k",    tier: "Plus",        qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00" },
+  { id: "p5k",    tier: "Growth",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00" },
+  { id: "p10k",   tier: "Pro",         qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", badge: "Mais Recomendado", highlight: true },
+  { id: "p20k",   tier: "Elite",       qty: "20.000",  quantidade: 20000,  valor: 220.0, price: "R$ 220,00" },
+  { id: "p50k",   tier: "VIP",         qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00" },
+  { id: "p100k",  tier: "Império",     qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00" },
 ];
 
 const trustBadges = [
@@ -221,7 +185,7 @@ function Landing() {
       const res = await criarPedidoFn({
         data: {
           instagram_user: result.data.profile,
-          pacote: selected.id as "start" | "growth" | "vip",
+          pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
           email: result.data.email,
@@ -356,71 +320,72 @@ function Landing() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {plans.map((p, i) => {
-            const Icon = p.icon;
-            return (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative rounded-2xl border p-8 flex flex-col ${
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+          {plans.map((p, i) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.3) }}
+              className={`relative rounded-2xl border p-6 flex flex-col ${
+                p.highlight
+                  ? "border-[var(--neon)] bg-card shadow-glow lg:scale-[1.04] z-10"
+                  : "border-border bg-card/60 hover:border-[var(--neon)]/40 transition-colors"
+              }`}
+            >
+              {p.badge && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-[image:var(--gradient-cta)] text-background text-[10px] font-bold uppercase tracking-wider whitespace-nowrap shadow-glow">
+                  {p.badge}
+                </div>
+              )}
+
+              <div className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                {p.tier}
+              </div>
+
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-4xl font-display font-bold leading-none">{p.qty}</span>
+                <span className="text-sm text-muted-foreground">seguidores</span>
+              </div>
+
+              <div className="mt-4 text-3xl font-display font-bold text-gradient">
+                {p.price}
+              </div>
+
+              <ul className="mt-5 space-y-2 mb-6 flex-1 text-sm">
+                <li className="flex items-start gap-2">
+                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
+                  <span>Seguidores reais e brasileiros</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
+                  <span>Reposição garantida 30 dias</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
+                  <span>Entrega automática após o Pix</span>
+                </li>
+              </ul>
+
+              <Button
+                asChild
+                size="lg"
+                className={
                   p.highlight
-                    ? "border-[var(--neon)] bg-card shadow-glow scale-[1.03]"
-                    : "border-border bg-card/60"
-                }`}
+                    ? "w-full bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
+                    : "w-full bg-foreground text-background hover:bg-foreground/90"
+                }
               >
-                {p.highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-[image:var(--gradient-cta)] text-background text-xs font-bold uppercase tracking-wider">
-                    {p.label}
-                  </div>
-                )}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={`size-10 rounded-lg grid place-items-center ${p.highlight ? "bg-[image:var(--gradient-cta)] text-background" : "bg-muted text-foreground"}`}>
-                    <Icon className="size-5" />
-                  </div>
-                  <div>
-                    <div className="font-display font-bold text-xl">{p.tier}</div>
-                    {!p.highlight && <div className="text-xs text-muted-foreground">{p.label}</div>}
-                  </div>
-                </div>
-
-                <div className="mb-2">
-                  <span className="text-5xl font-display font-bold">{p.qty}</span>
-                  <span className="text-muted-foreground ml-2">seguidores</span>
-                </div>
-                <div className="text-3xl font-display font-bold text-gradient mb-6">{p.price}</div>
-
-                <ul className="space-y-3 mb-8 flex-1">
-                  {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm">
-                      <Check className="size-4 text-[var(--neon)] mt-0.5 shrink-0" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  asChild
-                  size="lg"
-                  className={
-                    p.highlight
-                      ? "bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
-                      : "bg-foreground text-background hover:bg-foreground/90"
-                  }
+                <a
+                  href="#pedido"
+                  onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
                 >
-                  <a
-                    href="#pedido"
-                    onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
-                  >
-                    {p.cta}
-                  </a>
-                </Button>
-              </motion.div>
-            );
-          })}
+                  Comprar agora
+                </a>
+              </Button>
+            </motion.div>
+          ))}
         </div>
       </section>
 
