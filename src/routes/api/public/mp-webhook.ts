@@ -1,24 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// ============================================================
-// Mapeamento pacote -> service ID do SMMhype.
-// TROQUE pelos IDs reais do painel do SMMhype quando tiver.
-// ============================================================
-const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  start: 14325, // R$ 39,90 — 1.000 seguidores
-  growth: 14325, // R$ 89,90 — 3.000 seguidores
-  vip: 14225, // R$ 139,90 — 5.000 seguidores
-};
-
-const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
-
-function normalizeInstagramUser(raw: string): string {
-  const trimmed = raw.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  const handle = trimmed.replace(/^@+/, "").replace(/^instagram\.com\//i, "");
-  return `https://instagram.com/${handle}`;
-}
 
 export const Route = createFileRoute("/api/public/mp-webhook")({
   server: {
@@ -108,57 +90,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // 3) Dispara pedido no SMMhype
-          const smmKey = process.env.SMMHYPE_API_KEY;
-          if (!smmKey) {
-            console.error("[mp-webhook] SMMHYPE_API_KEY ausente — pedido marcado paid sem disparo");
-            return new Response("ok", { status: 200 });
-          }
-          const pacoteKey = String(pedido.pacote ?? "").trim().toLowerCase();
-          const serviceId = SMMHYPE_SERVICE_IDS[pacoteKey];
-          if (!serviceId) {
-            console.error("[mp-webhook] service id ausente p/ pacote", pedido.pacote);
-            return new Response("ok", { status: 200 });
-          }
-
-          const link = normalizeInstagramUser(pedido.instagram_user);
-          const smmPayload = {
-            key: smmKey,
-            action: "add",
-            service: serviceId,
-            link,
-            quantity: pedido.quantidade,
-          };
-          console.log("[mp-webhook] disparando SMMhype", {
-            pedidoId: pedido.id,
-            service: serviceId,
-            link,
-            quantity: pedido.quantidade,
+          // 3) Dispara pedido no SMMhype via helper compartilhado
+          const { dispatchSmmhype } = await import("@/lib/smmhype.server");
+          const smm = await dispatchSmmhype({
+            pacote: pedido.pacote,
+            quantidade: pedido.quantidade,
+            instagram_user: pedido.instagram_user,
           });
-
-          const smmBody = new URLSearchParams({
-            key: smmPayload.key,
-            action: smmPayload.action,
-            service: String(smmPayload.service),
-            link: smmPayload.link,
-            quantity: String(smmPayload.quantity),
-          });
-
-          const smmRes = await fetch(SMMHYPE_ENDPOINT, {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: smmBody.toString(),
-          });
-          const smmText = await smmRes.text();
-          let smmJson: unknown = null;
-          try { smmJson = JSON.parse(smmText); } catch { /* não-JSON */ }
-          if (!smmRes.ok || (smmJson && (smmJson as { error?: string }).error)) {
-            console.error("[mp-webhook] SMMhype falhou", {
-              status: smmRes.status,
-              body: smmText,
-            });
+          if (!smm.ok) {
+            console.error("[mp-webhook] SMMhype falhou", { pedidoId: pedido.id, ...smm });
           } else {
-            console.log("[mp-webhook] SMMhype ok", { status: smmRes.status, body: smmJson ?? smmText });
+            console.log("[mp-webhook] SMMhype ok", { pedidoId: pedido.id, orderId: smm.orderId });
           }
 
           return new Response("ok", { status: 200 });
