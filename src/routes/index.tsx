@@ -61,60 +61,27 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const plans = [
-  {
-    id: "start",
-    tier: "Start",
-    label: "Iniciante",
-    qty: "1.000",
-    quantidade: 1000,
-    valor: 39.9,
-    price: "R$ 39,90",
-    cta: "Comprar Agora",
-    icon: Star,
-    highlight: false,
-    features: [
-      "1.000 seguidores reais e brasileiros",
-      "Reposição garantida 30 dias",
-      "Entrega em até 24h",
-    ],
-  },
-  {
-    id: "growth",
-    tier: "Growth",
-    label: "Mais Vendido",
-    qty: "3.000",
-    quantidade: 3000,
-    valor: 89.9,
-    price: "R$ 89,90",
-    cta: "Garantir Desconto",
-    icon: Sparkles,
-    highlight: true,
-    features: [
-      "3.000 seguidores reais e brasileiros",
-      "Bônus de curtidas nos posts",
-      "Reposição garantida 30 dias",
-      "Entrega em até 12h",
-    ],
-  },
-  {
-    id: "vip",
-    tier: "VIP",
-    label: "Aceleração Máxima",
-    qty: "5.000",
-    quantidade: 5000,
-    valor: 139.9,
-    price: "R$ 139,90",
-    cta: "Alavancar Perfil",
-    icon: Crown,
-    highlight: false,
-    features: [
-      "5.000 seguidores reais e brasileiros",
-      "Suporte prioritário via WhatsApp",
-      "Reposição garantida 30 dias",
-      "Entrega em até 6h",
-    ],
-  },
+type Plan = {
+  id: string;
+  tier: string;
+  qty: string;
+  quantidade: number;
+  valor: number;
+  price: string;
+  badge?: string;
+  highlight?: boolean;
+};
+
+const plans: Plan[] = [
+  { id: "p100",   tier: "Teste",       qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00" },
+  { id: "p500",   tier: "Start",       qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00" },
+  { id: "p1k",    tier: "Essencial",   qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00" },
+  { id: "p2k",    tier: "Plus",        qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00" },
+  { id: "p5k",    tier: "Growth",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00" },
+  { id: "p10k",   tier: "Pro",         qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", badge: "Mais Recomendado", highlight: true },
+  { id: "p20k",   tier: "Elite",       qty: "20.000",  quantidade: 20000,  valor: 220.0, price: "R$ 220,00" },
+  { id: "p50k",   tier: "VIP",         qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00" },
+  { id: "p100k",  tier: "Império",     qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00" },
 ];
 
 const trustBadges = [
