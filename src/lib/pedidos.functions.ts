@@ -68,11 +68,8 @@ export const criarPedido = createServerFn({ method: "POST" })
 
     // 2) Persiste o pedido com status 'pending' e o mercado_pago_id
     try {
-      const supabase = createClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_PUBLISHABLE_KEY!,
-        { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-      );
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const supabase = supabaseAdmin;
       const { data: inserted, error } = await supabase
         .from("pedidos")
         .insert({
