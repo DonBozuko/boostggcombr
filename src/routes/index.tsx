@@ -562,8 +562,9 @@ function Landing() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-semibold shadow-glow hover:opacity-90"
+              className="w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] shadow-[0_0_25px_-2px_rgba(221,42,123,0.7)] hover:shadow-[0_0_35px_-2px_rgba(221,42,123,0.9)] hover:brightness-110 transition-all"
             >
+
               {loading ? (
                 <span className="flex items-center gap-2">
                   <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
