@@ -189,6 +189,20 @@ const trustBadges = [
   { icon: RefreshCw, title: "Garantia de Reposição de 30 dias", desc: "Caiu? A gente repõe. Sem letra miúda, sem burocracia." },
 ];
 
+const testimonials = [
+  { name: "Larissa M.", handle: "@lari.makeup", text: "Cheguei em 12k em uma semana. O engajamento dobrou e fechei 3 publis novas.", pkg: "Pacote 10k" },
+  { name: "Rafael D.", handle: "@rafadias.fit", text: "Pix caiu, em 4 minutos já tinham começado a entregar. Surreal.", pkg: "Pacote 5k" },
+  { name: "Camila S.", handle: "@cami.travel", text: "Já testei vários sites e só aqui não caiu seguidor depois. Suporte responde rápido.", pkg: "Pacote 20k" },
+];
+
+const socialStats = [
+  { value: "+12.500", label: "Clientes ativos" },
+  { value: "98%", label: "Pagamentos via Pix aprovados" },
+  { value: "4.9/5", label: "Avaliação média" },
+  { value: "24/7", label: "Suporte no WhatsApp" },
+];
+
+
 const faqs = [
   {
     q: "Como funciona?",
