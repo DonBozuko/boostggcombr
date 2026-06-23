@@ -550,8 +550,18 @@ function Landing() {
 
                 <a
                   href="#pedido"
-                  onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
+                  onClick={() => {
+                    setForm((f) => ({ ...f, plan: p.id }));
+                    trackEvent("cta_plan_click", {
+                      plan_id: p.id,
+                      plan_tier: p.tier,
+                      plan_quantity: p.quantidade,
+                      plan_value: p.valor,
+                      highlight: p.highlight ?? false,
+                    });
+                  }}
                   className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
+                  aria-label={`Comprar pacote ${p.tier} por ${p.price}`}
                 >
                   <Zap className="size-4 fill-white" /> COMPRAR AGORA
                 </a>
