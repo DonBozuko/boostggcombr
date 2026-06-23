@@ -580,7 +580,7 @@ function Landing() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] shadow-[0_0_25px_-2px_rgba(221,42,123,0.7)] hover:shadow-[0_0_35px_-2px_rgba(221,42,123,0.9)] hover:brightness-110 transition-all"
+              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
             >
 
               {loading ? (
