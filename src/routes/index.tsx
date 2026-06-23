@@ -48,16 +48,35 @@ import { CheckCircle2 } from "lucide-react";
 const WHATSAPP_ADMIN = "5515997445388";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "BoostGram — Seguidores Reais e Brasileiros | 1k a 5k" },
-      {
-        name: "description",
-        content:
-          "Pacotes de seguidores reais e brasileiros para Instagram. Entrega automática após o Pix, sem senha, com garantia de 30 dias. Start 1k, Growth 3k, VIP 5k.",
-      },
-    ],
-  }),
+  head: () => {
+    const title = "Boostygram | Comprar Seguidores no Instagram e Engajamento Real";
+    const description =
+      "Comprar seguidores reais no Instagram com entrega imediata e segura via Pix. Impulsione seu Instagram com engajamento real, sem senha e com garantia.";
+    const url = "https://boostygram.lovable.app/";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        {
+          name: "keywords",
+          content:
+            "comprar seguidores reais, comprar seguidores instagram, impulsionar instagram, seguidores via pix, entrega imediata, seguidores brasileiros, engajamento real",
+        },
+        { name: "robots", content: "index, follow" },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:site_name", content: "Boostygram" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
+
   component: Landing,
 });
 
