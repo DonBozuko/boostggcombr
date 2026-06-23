@@ -63,6 +63,6 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
     });
     console.log("[reprocessar] resultado", { pedidoId: pedido.id, smm });
     if (!smm.ok)
-      return { ok: false as const, error: "SMM_FAILED" as const, detail: smm };
+      return { ok: false as const, error: "SMM_FAILED" as const, detail: smm.error };
     return { ok: true as const, orderId: smm.orderId ?? null };
   });
