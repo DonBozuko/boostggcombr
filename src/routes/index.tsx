@@ -764,7 +764,17 @@ function Landing() {
                       size="lg"
                       className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
                     >
-                      <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={whatsappHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                          trackEvent("cta_payment_confirm_whatsapp", {
+                            pedido_id: pedidoInfo?.pedidoId ?? "",
+                            plan_tier: pedidoInfo?.tier ?? "",
+                          })
+                        }
+                      >
                         <MessageCircle className="size-5" />
                         Já paguei! Enviar comprovante no WhatsApp
                       </a>
