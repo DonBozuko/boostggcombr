@@ -50,6 +50,25 @@ import { CheckCircle2 } from "lucide-react";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
+// Analytics: dispara evento p/ gtag, dataLayer (GTM) e fbq, sem quebrar se nenhum existir.
+type TrackPayload = Record<string, string | number | boolean | undefined>;
+function trackEvent(name: string, payload: TrackPayload = {}) {
+  if (typeof window === "undefined") return;
+  try {
+    const w = window as unknown as {
+      gtag?: (...a: unknown[]) => void;
+      dataLayer?: unknown[];
+      fbq?: (...a: unknown[]) => void;
+    };
+    w.gtag?.("event", name, payload);
+    w.dataLayer?.push({ event: name, ...payload });
+    w.fbq?.("trackCustom", name, payload);
+    if (import.meta.env.DEV) console.debug("[track]", name, payload);
+  } catch (err) {
+    console.error("[trackEvent]", err);
+  }
+}
+
 export const Route = createFileRoute("/")({
   head: () => {
     const title = "Boostygram | Comprar Seguidores no Instagram e Engajamento Real";
