@@ -357,6 +357,11 @@ function Landing() {
       toast.error("Pacote inválido.");
       return;
     }
+    trackEvent("checkout_submit", {
+      plan_id: selected.id,
+      plan_tier: selected.tier,
+      plan_value: selected.valor,
+    });
     setLoading(true);
     try {
       const res = await criarPedidoFn({
