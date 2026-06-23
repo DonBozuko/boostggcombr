@@ -476,10 +476,11 @@ function Landing() {
                 <a
                   href="#pedido"
                   onClick={() => setForm((f) => ({ ...f, plan: p.id }))}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] shadow-[0_0_25px_-2px_rgba(221,42,123,0.7)] hover:shadow-[0_0_35px_-2px_rgba(221,42,123,0.9)] hover:brightness-110 transition-all"
+                  className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
                 >
                   <Zap className="size-4 fill-white" /> COMPRAR AGORA
                 </a>
+
               </motion.div>
             );
           })}
