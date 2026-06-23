@@ -1,0 +1,1 @@
+ALTER TABLE public.pedidos ADD CONSTRAINT pedidos_pacote_check CHECK (pacote IN ('start','growth','vip'));
