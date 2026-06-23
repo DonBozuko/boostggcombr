@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   RefreshCw,
   Check,
-  Check,
   TrendingUp,
   Send,
   Copy,
