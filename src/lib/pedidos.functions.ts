@@ -12,9 +12,30 @@ const pedidoSchema = z.object({
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 
+// Tabela oficial (fonte de verdade no servidor) — evita preço adulterado pelo cliente.
+const PRICE_TABLE: Record<number, number> = {
+  100: 5.0,
+  500: 12.0,
+  1000: 18.0,
+  2000: 30.0,
+  5000: 65.0,
+  10000: 120.0,
+  20000: 220.0,
+  50000: 490.0,
+  100000: 890.0,
+};
+
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {
+    // Força o valor oficial do servidor (ignora qualquer preço enviado pelo client).
+    const oficial = PRICE_TABLE[data.quantidade];
+    if (!oficial) {
+      console.error("[criarPedido] quantidade inválida:", data.quantidade);
+      return { ok: false as const, error: "INVALID_QTY" as const };
+    }
+    const valorCobrar = oficial;
+
     const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
     if (!mpToken) {
       console.error("MERCADO_PAGO_ACCESS_TOKEN ausente");
