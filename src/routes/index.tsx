@@ -219,7 +219,8 @@ function Landing() {
         pedidoId: res.pedidoId,
       });
       setModalOpen(true);
-    } catch {
+    } catch (err) {
+      console.error("Erro inesperado em criarPedido:", err);
       toast.error("Erro ao registrar pedido. Tente novamente.");
     } finally {
       setLoading(false);
