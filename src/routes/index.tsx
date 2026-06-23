@@ -519,69 +519,103 @@ function Landing() {
 
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
           <DialogContent className="max-w-md border-border bg-card">
-            <DialogHeader>
-              <DialogTitle className="text-center text-xl">Pague com Pix para liberar</DialogTitle>
-              <DialogDescription className="text-center">
-                Escaneie o QR Code ou use o Pix Copia e Cola. A entrega inicia automaticamente após a confirmação.
-              </DialogDescription>
-            </DialogHeader>
-
-            {pedidoInfo && (
-              <div className="space-y-5">
-                <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                    Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
-                  </div>
-                  <div className="text-3xl font-display font-bold text-gradient mt-1">
-                    {pedidoInfo.price}
-                  </div>
+            {paid ? (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-center text-2xl">🎉 Pagamento confirmado!</DialogTitle>
+                  <DialogDescription className="text-center">
+                    Seu pedido está em produção. Os seguidores começam a chegar em poucos minutos.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex flex-col items-center gap-4 py-4">
+                  <CheckCircle2 className="size-20 text-green-500" strokeWidth={1.5} />
+                  {pedidoInfo && (
+                    <div className="text-center">
+                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                        Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
+                      </div>
+                      <div className="text-3xl font-display font-bold text-gradient mt-1">
+                        {pedidoInfo.price}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-sm text-muted-foreground text-center">
+                    Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.
+                  </p>
                 </div>
-
-                {/* QR Code — fictício hoje, virá do Mercado Pago em produção */}
-                <div className="flex justify-center">
-                  <div className="rounded-xl bg-white p-3 shadow-glow">
-                    <img
-                      src={qrCodeUrl}
-                      alt="QR Code Pix"
-                      width={220}
-                      height={220}
-                      className="block"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Pix Copia e Cola</Label>
-                  <div className="rounded-lg border border-border bg-muted p-3 text-xs break-all font-mono max-h-24 overflow-y-auto">
-                    {pedidoInfo.pixCode}
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={copyPix}
-                    variant="outline"
-                    className="w-full h-11 border-border bg-card/40"
-                  >
-                    <Copy className="size-4" /> Copiar Código
-                  </Button>
-                </div>
-
-                {/* Status — placeholder até webhook do Mercado Pago atualizar `status` em public.pedidos */}
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-muted-foreground">
-                  <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  Aguardando pagamento...
-                </div>
-
                 <Button
-                  asChild
                   size="lg"
-                  className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
+                  className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-bold"
+                  onClick={() => setModalOpen(false)}
                 >
-                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="size-5" />
-                    Já paguei! Enviar comprovante no WhatsApp
-                  </a>
+                  Fechar
                 </Button>
-              </div>
+              </>
+            ) : (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="text-center text-xl">Pague com Pix para liberar</DialogTitle>
+                  <DialogDescription className="text-center">
+                    Escaneie o QR Code ou use o Pix Copia e Cola. A entrega inicia automaticamente após a confirmação.
+                  </DialogDescription>
+                </DialogHeader>
+
+                {pedidoInfo && (
+                  <div className="space-y-5">
+                    <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
+                      <div className="text-xs uppercase tracking-wider text-muted-foreground">
+                        Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
+                      </div>
+                      <div className="text-3xl font-display font-bold text-gradient mt-1">
+                        {pedidoInfo.price}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center">
+                      <div className="rounded-xl bg-white p-3 shadow-glow">
+                        <img
+                          src={qrCodeUrl}
+                          alt="QR Code Pix"
+                          width={220}
+                          height={220}
+                          className="block"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Pix Copia e Cola</Label>
+                      <div className="rounded-lg border border-border bg-muted p-3 text-xs break-all font-mono max-h-24 overflow-y-auto">
+                        {pedidoInfo.pixCode}
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={copyPix}
+                        variant="outline"
+                        className="w-full h-11 border-border bg-card/40"
+                      >
+                        <Copy className="size-4" /> Copiar Código
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-muted-foreground">
+                      <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                      Aguardando pagamento...
+                    </div>
+
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
+                    >
+                      <a href={whatsappHref} target="_blank" rel="noopener noreferrer">
+                        <MessageCircle className="size-5" />
+                        Já paguei! Enviar comprovante no WhatsApp
+                      </a>
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </DialogContent>
         </Dialog>
