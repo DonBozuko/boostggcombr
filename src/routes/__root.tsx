@@ -78,17 +78,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BoostGram — Seguidores Reais para Instagram | Entrega Rápida" },
-      { name: "description", content: "Compre seguidores de alta qualidade para Instagram. Entrega rápida, segura, sem senha. Garantia de reposição 30 dias. Pix aprovado, perfil bombando." },
-      { name: "author", content: "BoostGram" },
-      { property: "og:title", content: "BoostGram — Seguidores Reais para Instagram | Entrega Rápida" },
-      { property: "og:description", content: "Compre seguidores de alta qualidade para Instagram. Entrega rápida, segura, sem senha. Garantia de reposição 30 dias. Pix aprovado, perfil bombando." },
+      { name: "author", content: "Boostygram" },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "BoostGram — Seguidores Reais para Instagram | Entrega Rápida" },
-      { name: "twitter:description", content: "Compre seguidores de alta qualidade para Instagram. Entrega rápida, segura, sem senha. Garantia de reposição 30 dias. Pix aprovado, perfil bombando." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b0f7d6a4-35f5-41bb-9a85-98f7ea447236/id-preview-084bda75--c88c4437-6c11-4710-b369-9cb46d021440.lovable.app-1781804690965.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b0f7d6a4-35f5-41bb-9a85-98f7ea447236/id-preview-084bda75--c88c4437-6c11-4710-b369-9cb46d021440.lovable.app-1781804690965.png" },
+      { property: "og:site_name", content: "Boostygram" },
+      { property: "og:locale", content: "pt_BR" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -97,6 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" },
     ],
   }),
+
 
   shellComponent: RootShell,
   component: RootComponent,

@@ -53,6 +53,7 @@ export const Route = createFileRoute("/")({
     const description =
       "Comprar seguidores reais no Instagram com entrega imediata e segura via Pix. Impulsione seu Instagram com engajamento real, sem senha e com garantia.";
     const url = "https://boostygram.lovable.app/";
+    const ogImage = "https://boostygram.lovable.app/__l5e/assets-v1/676afb5f-ed9d-49df-9171-6c3166ce217a/og-boostygram.jpg";
     return {
       meta: [
         { title },
@@ -67,15 +68,93 @@ export const Route = createFileRoute("/")({
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1216" },
+        { property: "og:image:height", content: "640" },
+        { property: "og:image:alt", content: "Boostygram — Seguidores reais no Instagram via Pix" },
         { property: "og:site_name", content: "Boostygram" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": "https://boostygram.lovable.app/#organization",
+                name: "Boostygram",
+                url: "https://boostygram.lovable.app/",
+                logo: ogImage,
+                description,
+                sameAs: [],
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://boostygram.lovable.app/#website",
+                url: "https://boostygram.lovable.app/",
+                name: "Boostygram",
+                inLanguage: "pt-BR",
+                publisher: { "@id": "https://boostygram.lovable.app/#organization" },
+              },
+              {
+                "@type": "Service",
+                serviceType: "Marketing de Instagram e Engajamento Social",
+                provider: { "@id": "https://boostygram.lovable.app/#organization" },
+                areaServed: { "@type": "Country", name: "Brasil" },
+                name: "Compra de Seguidores Reais no Instagram",
+                description,
+                offers: {
+                  "@type": "AggregateOffer",
+                  priceCurrency: "BRL",
+                  lowPrice: "5.00",
+                  highPrice: "499.00",
+                  offerCount: "9",
+                  availability: "https://schema.org/InStock",
+                },
+              },
+              {
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "Os seguidores são reais?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Sim. Entregamos seguidores reais com perfis ativos, sem bots, com entrega imediata via Pix.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Preciso fornecer minha senha?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Não. Só precisamos do seu @usuário público do Instagram. Nunca pedimos senha.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Em quanto tempo recebo os seguidores?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "A entrega começa em poucos minutos após a confirmação do Pix.",
+                    },
+                  },
+                ],
+              },
+            ],
+          }),
+        },
+      ],
     };
   },
+
 
   component: Landing,
 });
