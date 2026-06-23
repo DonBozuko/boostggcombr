@@ -114,18 +114,34 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.error("[mp-webhook] SMMHYPE_API_KEY ausente — pedido marcado paid sem disparo");
             return new Response("ok", { status: 200 });
           }
-          const serviceId = SMMHYPE_SERVICE_IDS[pedido.pacote];
+          const pacoteKey = String(pedido.pacote ?? "").trim().toLowerCase();
+          const serviceId = SMMHYPE_SERVICE_IDS[pacoteKey];
           if (!serviceId) {
             console.error("[mp-webhook] service id ausente p/ pacote", pedido.pacote);
             return new Response("ok", { status: 200 });
           }
 
-          const smmBody = new URLSearchParams({
+          const link = normalizeInstagramUser(pedido.instagram_user);
+          const smmPayload = {
             key: smmKey,
             action: "add",
-            service: String(serviceId),
-            link: normalizeInstagramUser(pedido.instagram_user),
-            quantity: String(pedido.quantidade),
+            service: serviceId,
+            link,
+            quantity: pedido.quantidade,
+          };
+          console.log("[mp-webhook] disparando SMMhype", {
+            pedidoId: pedido.id,
+            service: serviceId,
+            link,
+            quantity: pedido.quantidade,
+          });
+
+          const smmBody = new URLSearchParams({
+            key: smmPayload.key,
+            action: smmPayload.action,
+            service: String(smmPayload.service),
+            link: smmPayload.link,
+            quantity: String(smmPayload.quantity),
           });
 
           const smmRes = await fetch(SMMHYPE_ENDPOINT, {
@@ -133,11 +149,16 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: smmBody.toString(),
           });
-          const smmJson = await smmRes.json().catch(() => ({}));
-          if (!smmRes.ok || (smmJson as { error?: string }).error) {
-            console.error("[mp-webhook] SMMhype falhou", smmRes.status, smmJson);
+          const smmText = await smmRes.text();
+          let smmJson: unknown = null;
+          try { smmJson = JSON.parse(smmText); } catch { /* não-JSON */ }
+          if (!smmRes.ok || (smmJson && (smmJson as { error?: string }).error)) {
+            console.error("[mp-webhook] SMMhype falhou", {
+              status: smmRes.status,
+              body: smmText,
+            });
           } else {
-            console.log("[mp-webhook] SMMhype ok", smmJson);
+            console.log("[mp-webhook] SMMhype ok", { status: smmRes.status, body: smmJson ?? smmText });
           }
 
           return new Response("ok", { status: 200 });
