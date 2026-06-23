@@ -705,7 +705,62 @@ function Landing() {
       </section>
 
 
+      {/* SOCIAL PROOF */}
+      <section className="container mx-auto px-6 py-20">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <div className="inline-flex items-center gap-1 mb-3">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Star key={i} className="size-5 fill-yellow-400 text-yellow-400" />
+            ))}
+            <span className="ml-2 text-sm font-semibold text-zinc-200">4.9/5 · +12.500 clientes</span>
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-white">Quem usa, recomenda</h2>
+          <p className="mt-3 text-zinc-300">Relatos reais de quem impulsionou o perfil com a gente.</p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-10">
+          {socialStats.map((s) => (
+            <div key={s.label} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5 text-center">
+              <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-fuchsia-400 via-pink-400 to-orange-300 bg-clip-text text-transparent">
+                {s.value}
+              </div>
+              <div className="mt-1 text-xs md:text-sm text-zinc-300">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={t.handle}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
+              className="rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 p-6 flex flex-col"
+            >
+              <div className="flex items-center gap-1 mb-3">
+                {[0, 1, 2, 3, 4].map((s) => (
+                  <Star key={s} className="size-4 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-sm text-zinc-200 leading-relaxed flex-1">"{t.text}"</p>
+              <div className="mt-5 flex items-center gap-3 pt-4 border-t border-white/10">
+                <div className="size-10 shrink-0 rounded-full bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 grid place-items-center text-white font-bold">
+                  {t.name[0]}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white truncate">{t.name}</div>
+                  <div className="text-xs text-zinc-400 truncate">{t.handle} · {t.pkg}</div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* TRUST BADGES */}
+
       <section className="container mx-auto px-6 py-24">
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {trustBadges.map((b, i) => {
