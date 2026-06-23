@@ -109,9 +109,10 @@
 }
 @utility cta-pulse {
   animation: cta-pulse 2.2s ease-in-out infinite;
+  &:hover {
+    animation-play-state: paused;
+    filter: brightness(1.1);
+  }
 }
-@utility cta-pulse:hover {
-  animation-play-state: paused;
-  filter: brightness(1.1);
-}
+
 
