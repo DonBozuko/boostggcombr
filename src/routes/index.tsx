@@ -64,24 +64,25 @@ export const Route = createFileRoute("/")({
 type Plan = {
   id: string;
   tier: string;
+  tag: string;
   qty: string;
   quantidade: number;
   valor: number;
   price: string;
-  badge?: string;
+  benefit: string;
   highlight?: boolean;
 };
 
 const plans: Plan[] = [
-  { id: "p100",   tier: "Teste",       qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00" },
-  { id: "p500",   tier: "Start",       qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00" },
-  { id: "p1k",    tier: "Essencial",   qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00" },
-  { id: "p2k",    tier: "Plus",        qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00" },
-  { id: "p5k",    tier: "Growth",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00" },
-  { id: "p10k",   tier: "Pro",         qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", badge: "Mais Recomendado", highlight: true },
-  { id: "p20k",   tier: "Elite",       qty: "20.000",  quantidade: 20000,  valor: 220.0, price: "R$ 220,00" },
-  { id: "p50k",   tier: "VIP",         qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00" },
-  { id: "p100k",  tier: "Império",     qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00" },
+  { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Entrega rápida e segura" },
+  { id: "p500",   tier: "500 Seguidores",     tag: "+ STARTER",  qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00",  benefit: "Entrega rápida e segura" },
+  { id: "p1k",    tier: "1.000 Seguidores",   tag: "+ BASIC",    qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00",  benefit: "Entrega rápida e segura" },
+  { id: "p2k",    tier: "2.000 Seguidores",   tag: "+ GROWTH",   qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00",  benefit: "Entrega rápida e segura" },
+  { id: "p5k",    tier: "5.000 Seguidores",   tag: "+ PRO",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00",  benefit: "Entrega rápida e segura" },
+  { id: "p10k",   tier: "10.000 Seguidores",  tag: "+ VIP",      qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", benefit: "Mais recomendado pelos clientes", highlight: true },
+  { id: "p20k",   tier: "20.000 Seguidores",  tag: "+ ELITE",    qty: "20.000",  quantidade: 20000,  valor: 220.0, price: "R$ 220,00", benefit: "Entrega rápida e segura" },
+  { id: "p50k",   tier: "50.000 Seguidores",  tag: "+ MASTER",   qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00", benefit: "Entrega rápida e segura" },
+  { id: "p100k",  tier: "100.000 Seguidores", tag: "+ ULTIMATE", qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00", benefit: "Entrega rápida e segura" },
 ];
 
 const trustBadges = [
