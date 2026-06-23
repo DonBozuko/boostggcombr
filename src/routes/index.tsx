@@ -42,6 +42,8 @@ import {
 import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { getPedidoStatus } from "@/lib/admin.functions";
+import { CheckCircle2 } from "lucide-react";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
