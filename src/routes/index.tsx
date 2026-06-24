@@ -539,7 +539,7 @@ function Landing() {
                     setForm((f) => ({ ...f, plan: "" }));
                     trackEvent("tab_category_change", { category: c });
                   }}
-                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                  className={`inline-flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide transition-all ${
                     active
                       ? "bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] text-white shadow-[0_0_25px_rgba(249,115,22,0.6)]"
                       : "text-zinc-400 hover:text-white"
