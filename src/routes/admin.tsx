@@ -134,6 +134,11 @@ function AdminPage() {
     total: number; last_sync: string | null; missing_monitored: number[]; monitorados: number[];
   } | null>(null);
   const [cacheBusy, setCacheBusy] = useState(false);
+  const [caixa, setCaixa] = useState<{
+    supplier: { nome: string; saldo_atual: number; saldo_minimo: number; meta_ideal: number; falta_depositar: number; ultimo_update: string } | null;
+    bank: { nome: string; saldo_atual: number; saldo_minimo_seguranca: number; ok: boolean; status_text: string } | null;
+    alerts: { id: string; tipo: string; nivel: number; mensagem: string; created_at: string }[];
+  } | null>(null);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
