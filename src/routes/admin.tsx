@@ -178,6 +178,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadPendentes = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await listarPendentes({ data: { token: tk } });
+      if (res.ok) setPendentes(res.pedidos as any);
+    } catch {}
+  };
+
   const loadCaixa = async (tk = token) => {
     if (!tk) return;
     try {
