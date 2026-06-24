@@ -6,9 +6,17 @@
 // - Curtidas: 18860 (todas quantidades)
 const LIKES_SERVICE_ID = 18860;
 const VIEWS_SERVICE_ID = 18855;
+// TikTok (SMMhype)
+const TT_FOLLOWERS_SERVICE_ID = 14330;
+const TT_LIKES_SERVICE_ID = 19191;
+const TT_VIEWS_SERVICE_ID = 14907;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // TikTok prefixes: tf* / tl* / tv*
+  if (p.startsWith("tf")) return TT_FOLLOWERS_SERVICE_ID;
+  if (p.startsWith("tl")) return TT_LIKES_SERVICE_ID;
+  if (p.startsWith("tv")) return TT_VIEWS_SERVICE_ID;
   if (p.startsWith("v")) return VIEWS_SERVICE_ID;
   if (p.startsWith("l")) return LIKES_SERVICE_ID;
   if (quantidade >= 100 && quantidade <= 2000) return 14325;
@@ -24,7 +32,11 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
   v1k: VIEWS_SERVICE_ID, v5k: VIEWS_SERVICE_ID, v10k: VIEWS_SERVICE_ID,
   v25k: VIEWS_SERVICE_ID, v50k: VIEWS_SERVICE_ID,
+  tf100: TT_FOLLOWERS_SERVICE_ID, tf500: TT_FOLLOWERS_SERVICE_ID, tf1k: TT_FOLLOWERS_SERVICE_ID,
+  tl500: TT_LIKES_SERVICE_ID, tl1k: TT_LIKES_SERVICE_ID, tl2k: TT_LIKES_SERVICE_ID,
+  tv5k: TT_VIEWS_SERVICE_ID, tv10k: TT_VIEWS_SERVICE_ID, tv50k: TT_VIEWS_SERVICE_ID,
 };
+
 
 
 // Self-check: garante que todo pacote conhecido resolve para um service id válido,
@@ -75,6 +87,17 @@ function normalizeInstagramUser(raw: string): string {
   return `https://instagram.com/${handle}`;
 }
 
+function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (isFollowers) {
+    const handle = trimmed.replace(/^@+/, "").replace(/^tiktok\.com\//i, "");
+    return `https://tiktok.com/@${handle}`;
+  }
+  return trimmed;
+}
+
+
 export type SmmDispatchResult =
   | { ok: true; orderId?: string | number; body: unknown }
   | { ok: false; error: string; status?: number; body?: unknown };
@@ -98,7 +121,11 @@ export async function dispatchSmmhype(args: {
     };
   }
 
-  const link = normalizeInstagramUser(args.instagram_user);
+  const pkg = String(args.pacote ?? "").trim().toLowerCase();
+  const isTiktok = pkg.startsWith("t");
+  const link = isTiktok
+    ? normalizeTiktokTarget(args.instagram_user, pkg.startsWith("tf"))
+    : normalizeInstagramUser(args.instagram_user);
   const body = new URLSearchParams({
     key: smmKey,
     action: "add",
