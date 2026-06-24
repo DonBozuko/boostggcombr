@@ -176,6 +176,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadCaixa = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getCaixa({ data: { token: tk } });
+      if (res.ok) setCaixa({ supplier: res.supplier, bank: res.bank, alerts: res.alerts });
+    } catch {}
+  };
+
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
     setCacheBusy(true);
@@ -195,7 +203,8 @@ function AdminPage() {
     loadCron();
     loadCache();
     loadFalhos();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); }, 30000);
+    loadCaixa();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadCaixa(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
