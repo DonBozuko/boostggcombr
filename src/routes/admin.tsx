@@ -326,8 +326,9 @@ function AdminPage() {
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
+  const fOnline = !!f && (f.status === "Online" || (f.falhas_consecutivas === 0 && f.saldo_brl != null));
   const isAlerta =
-    (!!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico")) ||
+    (!!f && (!fOnline || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico")) ||
     falhos.length > 0;
 
   useEffect(() => {
@@ -403,7 +404,9 @@ function AdminPage() {
   };
 
   const style = f ? NIVEL_STYLE[f.nivel_alerta] : null;
-  const online = f?.status === "Online";
+  // Deriva Online no frontend: se não houve falhas consecutivas e o saldo veio,
+  // tratamos como Online mesmo que o backend ainda tenha um status stale.
+  const online = !!f && (f.status === "Online" || (f.falhas_consecutivas === 0 && f.saldo_brl != null));
 
   const chartData = useMemo(
     () =>
@@ -559,8 +562,8 @@ function AdminPage() {
               {f ? (
                 <div className="flex items-center gap-3 text-sm flex-wrap">
                   <span className="inline-flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${f.status === "Online" ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
-                    {f.nome}: <strong>{f.status}</strong>
+                    <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                    {f.nome}: <strong>{online ? "Online" : f.status}</strong>
                   </span>
                   <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
                   <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
@@ -666,7 +669,7 @@ function AdminPage() {
                   value={
                     <span className="inline-flex items-center gap-2">
                       <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.9)]" : "bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.9)]"}`} />
-                      {f.status}
+                      {online ? "Online" : f.status}
                     </span>
                   }
                 />
