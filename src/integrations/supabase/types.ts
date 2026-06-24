@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      alerts: {
+        Row: {
+          created_at: string
+          id: string
+          mensagem: string
+          nivel: number
+          status: string
+          tipo: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mensagem: string
+          nivel?: number
+          status?: string
+          tipo: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mensagem?: string
+          nivel?: number
+          status?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
+      bank_accounts: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          saldo_atual: number
+          saldo_minimo_seguranca: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          saldo_atual?: number
+          saldo_minimo_seguranca?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          saldo_atual?: number
+          saldo_minimo_seguranca?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       connection_tests: {
         Row: {
           created_at: string
@@ -205,6 +259,36 @@ export type Database = {
           rate?: number
           refill?: boolean
           updated_at?: string
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          created_at: string
+          id: string
+          meta_ideal: number
+          nome: string
+          saldo_atual: number
+          saldo_minimo: number
+          ultimo_update: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta_ideal?: number
+          nome: string
+          saldo_atual?: number
+          saldo_minimo?: number
+          ultimo_update?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta_ideal?: number
+          nome?: string
+          saldo_atual?: number
+          saldo_minimo?: number
+          ultimo_update?: string
         }
         Relationships: []
       }
