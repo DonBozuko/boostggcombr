@@ -1,0 +1,55 @@
+import { createFileRoute } from "@tanstack/react-router";
+
+// Cron hook: detecta pedidos 'pending' >15min sem notificação e dispara Telegram para o admin.
+// Chamado por pg_cron a cada 5min. Idempotente — só notifica uma vez por pedido.
+export const Route = createFileRoute("/api/public/hooks/recover-abandoned")({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        // Validação leve: exige apikey (anon) — bloqueia tráfego de internet aleatório.
+        const apikey = request.headers.get("apikey");
+        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
+        if (!apikey || !expected || apikey !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+
+        // Busca pedidos pendentes >15min, ainda não notificados.
+        const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+        const { data: rows, error } = await supabaseAdmin
+          .from("pedidos")
+          .select("id, instagram_user, pacote, quantidade, created_at")
+          .eq("status", "pending")
+          .is("abandono_notificado_at", null)
+          .lt("created_at", cutoff)
+          .limit(20);
+
+        if (error) {
+          console.error("[recover-abandoned] query fail", error.message);
+          return Response.json({ ok: false, error: error.message }, { status: 500 });
+        }
+
+        const results: { id: string; sent: boolean; detail?: string }[] = [];
+        for (const p of rows ?? []) {
+          const msg =
+            `🔍 <b>Aviso de Pedido Pendente no Boostygram</b>\n` +
+            `O usuário <b>@${p.instagram_user}</b> gerou o Pix do pacote ` +
+            `<b>${p.pacote} (${p.quantidade})</b> mas a transação ainda não foi concluída.\n` +
+            `💡 Mande um direct de ajuda para ele!`;
+          const r = await dispatchWhatsappAlert(msg);
+          if (r.ok) {
+            await supabaseAdmin
+              .from("pedidos")
+              .update({ abandono_notificado_at: new Date().toISOString() })
+              .eq("id", p.id);
+          }
+          results.push({ id: p.id, sent: r.ok, detail: r.detail });
+        }
+
+        return Response.json({ ok: true, processed: results.length, results });
+      },
+    },
+  },
+});
