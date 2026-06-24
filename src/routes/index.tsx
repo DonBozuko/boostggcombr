@@ -500,27 +500,6 @@ function Landing() {
           </motion.p>
 
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-8 flex flex-wrap gap-3 justify-center"
-          >
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-full border border-pink-500/40 bg-pink-500/10 px-5 py-2.5 text-sm font-semibold text-pink-300 hover:bg-pink-500/20 transition-colors"
-            >
-              <Heart className="size-4 fill-pink-400 text-pink-400" />
-              Curtidas
-            </button>
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-full border border-fuchsia-500/40 bg-fuchsia-500/10 px-5 py-2.5 text-sm font-semibold text-fuchsia-300 hover:bg-fuchsia-500/20 transition-colors"
-            >
-              <User className="size-4" />
-              Seguidores
-            </button>
-          </motion.div>
         </div>
       </section>
 
