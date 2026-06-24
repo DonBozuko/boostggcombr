@@ -665,11 +665,16 @@ function AdminPage() {
               })}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Pedidos pendentes (Pix gerado, aguardando pagamento) */}
-        {pendentes.length > 0 && (
+        {(() => {
+          const lista = pendentes.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
+          if (lista.length === 0) return null;
+          return (
           <div className="rounded-2xl border border-yellow-700/60 bg-yellow-950/20 p-4 space-y-3">
+
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-yellow-200 flex items-center gap-2">
                 ⏳ {pendentes.length} pedido(s) pendente(s)
