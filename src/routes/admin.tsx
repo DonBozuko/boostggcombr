@@ -632,6 +632,9 @@ function AdminPage() {
                   <div key={p.id} className="py-3 flex items-start justify-between gap-3 text-sm">
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
+                        <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                          {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                        </span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-200 border border-red-500/50">
                           {p.status}
                         </span>
@@ -639,6 +642,7 @@ function AdminPage() {
                           {isCurtidas ? "Curtidas" : "Seguidores"}
                         </span>
                         <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+
                       </div>
                       {p.error_detail && (
                         <div className="text-xs text-red-300/90 font-mono break-all">{p.error_detail}</div>
@@ -673,7 +677,11 @@ function AdminPage() {
                 <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
+                      <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                        {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                      </span>
                       <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+
                       {p.abandono_notificado_at && (
                         <span
                           title={`Enviado em ${new Date(p.abandono_notificado_at).toLocaleString("pt-BR")}`}
@@ -737,6 +745,9 @@ function AdminPage() {
                 <div className="space-y-1">
                   <div className="font-mono text-xs text-muted-foreground">{p.id}</div>
                   <div className="flex items-center gap-2 flex-wrap">
+                    <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                      {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                    </span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       isCurtidas
                         ? "bg-pink-500/15 text-pink-300 border border-pink-500/40"
@@ -746,6 +757,7 @@ function AdminPage() {
                     </span>
                     <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
                   </div>
+
                   <div className="text-xs text-muted-foreground">
                     {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
                   </div>
