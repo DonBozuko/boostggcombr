@@ -5,22 +5,27 @@
 // - Seguidores: 14325 (100–2000), 14225 (5000–100000)
 // - Curtidas: 18860 (todas quantidades)
 const LIKES_SERVICE_ID = 18860;
+const VIEWS_SERVICE_ID = 18855;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  if (p.startsWith("v")) return VIEWS_SERVICE_ID;
   if (p.startsWith("l")) return LIKES_SERVICE_ID;
   if (quantidade >= 100 && quantidade <= 2000) return 14325;
   if (quantidade >= 5000 && quantidade <= 100000) return 14225;
   return null;
 }
 
-// Compat: map por pacote id (inclui curtidas).
+// Compat: map por pacote id (inclui curtidas e visualizações).
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   p100: 14325, p500: 14325, p1k: 14325, p2k: 14325,
   p5k: 14225, p10k: 14225, p20k: 14225, p50k: 14225, p100k: 14225,
   l100: LIKES_SERVICE_ID, l500: LIKES_SERVICE_ID, l1k: LIKES_SERVICE_ID,
   l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
+  v1k: VIEWS_SERVICE_ID, v5k: VIEWS_SERVICE_ID, v10k: VIEWS_SERVICE_ID,
+  v25k: VIEWS_SERVICE_ID, v50k: VIEWS_SERVICE_ID,
 };
+
 
 // Self-check: garante que todo pacote conhecido resolve para um service id válido,
 // e simula um webhook de Curtidas (prefixo 'l*') roteando para o service 18860.
