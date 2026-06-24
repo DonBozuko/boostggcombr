@@ -227,6 +227,9 @@ function AdminPage() {
       const res = await getFaturamento({ data: { token: tk } });
       if (res.ok) setFaturamento({ geral: res.geral, count: res.count, totais: res.totais });
     } catch {}
+  };
+
+
 
   const loadFornecedores = async (tk = token) => {
     if (!tk) return;
