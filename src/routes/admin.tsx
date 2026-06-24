@@ -326,8 +326,9 @@ function AdminPage() {
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
+  const fOnline = !!f && (f.status === "Online" || (f.falhas_consecutivas === 0 && f.saldo_brl != null));
   const isAlerta =
-    (!!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico")) ||
+    (!!f && (!fOnline || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico")) ||
     falhos.length > 0;
 
   useEffect(() => {
