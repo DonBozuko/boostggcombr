@@ -32,6 +32,83 @@ export type Database = {
         }
         Relationships: []
       }
+      fornecedores: {
+        Row: {
+          api_key_secret: string
+          api_url: string
+          created_at: string
+          falhas_consecutivas: number
+          id: string
+          nome: string
+          saldo_atual: number | null
+          status: string
+          ultima_verificacao: string | null
+          updated_at: string
+        }
+        Insert: {
+          api_key_secret: string
+          api_url: string
+          created_at?: string
+          falhas_consecutivas?: number
+          id?: string
+          nome: string
+          saldo_atual?: number | null
+          status?: string
+          ultima_verificacao?: string | null
+          updated_at?: string
+        }
+        Update: {
+          api_key_secret?: string
+          api_url?: string
+          created_at?: string
+          falhas_consecutivas?: number
+          id?: string
+          nome?: string
+          saldo_atual?: number | null
+          status?: string
+          ultima_verificacao?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      monitoramento_saldo: {
+        Row: {
+          data_hora: string
+          erro_retornado: string | null
+          fornecedor_id: string
+          id: string
+          saldo: number | null
+          status: string
+          tempo_resposta_ms: number | null
+        }
+        Insert: {
+          data_hora?: string
+          erro_retornado?: string | null
+          fornecedor_id: string
+          id?: string
+          saldo?: number | null
+          status: string
+          tempo_resposta_ms?: number | null
+        }
+        Update: {
+          data_hora?: string
+          erro_retornado?: string | null
+          fornecedor_id?: string
+          id?: string
+          saldo?: number | null
+          status?: string
+          tempo_resposta_ms?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoramento_saldo_fornecedor_id_fkey"
+            columns: ["fornecedor_id"]
+            isOneToOne: false
+            referencedRelation: "fornecedores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pedidos: {
         Row: {
           created_at: string
