@@ -35,8 +35,13 @@ export async function checkSmmhypeBalance() {
     const body = new URLSearchParams({ key: apiKey, action: "balance" });
     const res = await fetch(fornecedor.api_url, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+      },
       body: body.toString(),
+      signal: AbortSignal.timeout(15000),
     });
     const text = await res.text();
     let json: any = null;
