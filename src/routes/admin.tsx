@@ -113,6 +113,7 @@ function AdminPage() {
   const runCron = useServerFn(testarCron);
   const getCache = useServerFn(getServicesCacheStatus);
   const syncCache = useServerFn(sincronizarServicosAgora);
+  const getCaixa = useServerFn(getCaixaAssistente);
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
