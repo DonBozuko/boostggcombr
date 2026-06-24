@@ -413,3 +413,81 @@ function Info({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
+
+function CronCard({
+  cron,
+  busy,
+  onTest,
+  falhas,
+}: {
+  cron: {
+    jobname: string; schedule: string; active: boolean;
+    last_start: string | null; last_end: string | null;
+    last_status: string | null; last_return: string | null;
+  } | null;
+  busy: boolean;
+  onTest: () => void;
+  falhas: number;
+}) {
+  const lastOk = cron?.last_status === "succeeded";
+  const lastFail = cron?.last_status && cron.last_status !== "succeeded";
+  const stale = cron?.last_start
+    ? Date.now() - new Date(cron.last_start).getTime() > 10 * 60 * 1000
+    : true;
+  const healthy = !!cron?.active && lastOk && !stale;
+  const dot = healthy ? "bg-emerald-400" : lastFail ? "bg-red-500" : "bg-yellow-400";
+  const label = !cron
+    ? "Sem dados"
+    : !cron.active
+    ? "Inativo"
+    : lastFail
+    ? "Falhou"
+    : stale
+    ? "Atrasado"
+    : "Rodando";
+
+  return (
+    <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${dot} animate-pulse`} />
+            Status do Cron · {label}
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Agendamento automático que chama <code>/api/public/check-saldo</code> a cada 5 min.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onTest} disabled={busy}>
+          {busy ? "Testando..." : "Testar Cron"}
+        </Button>
+      </div>
+
+      {falhas >= 3 && (
+        <div className="rounded-md border border-red-600 bg-red-950/50 p-3 text-sm text-red-200 font-semibold">
+          ⚠ {falhas} falhas consecutivas detectadas — verifique logs e token.
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+        <Info label="Job" value={cron?.jobname ?? "—"} />
+        <Info label="Schedule" value={cron?.schedule ?? "—"} />
+        <Info label="Ativo" value={cron?.active ? "Sim" : "Não"} />
+        <Info
+          label="Última execução"
+          value={cron?.last_start ? new Date(cron.last_start).toLocaleString("pt-BR") : "—"}
+        />
+        <Info label="Status" value={cron?.last_status ?? "—"} />
+        <Info
+          label="Retorno"
+          value={
+            <span className="font-mono text-xs break-all line-clamp-2">
+              {cron?.last_return ?? "—"}
+            </span>
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
