@@ -166,6 +166,8 @@ function AdminPage() {
     bank: { nome: string; saldo_atual: number; saldo_minimo_seguranca: number; ok: boolean; status_text: string } | null;
     alerts: { id: string; tipo: string; nivel: number; mensagem: string; created_at: string }[];
   } | null>(null);
+  const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string }[]>([]);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
