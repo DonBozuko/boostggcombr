@@ -315,6 +315,11 @@ function AdminPage() {
               </div>
             </div>
 
+            {/* Status do Cron */}
+            <CronCard cron={cron} busy={cronBusy} onTest={testarCronAgora} falhas={f.falhas_consecutivas} />
+
+
+
             {/* Histórico 24h */}
             <div className="rounded-2xl border border-border bg-card/40 p-4">
               <div className="flex items-center justify-between mb-3">
