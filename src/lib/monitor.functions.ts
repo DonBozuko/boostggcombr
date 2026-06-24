@@ -102,3 +102,62 @@ export const testarCron = createServerFn({ method: "POST" })
       return { ok: false, status: 0, elapsed_ms: Date.now() - t0, body: e?.message ?? String(e) };
     }
   });
+
+export const getCaixaAssistente = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const [{ data: supplier }, { data: bank }, { data: alerts }] = await Promise.all([
+      supabaseAdmin.from("suppliers").select("*").eq("nome", "SMMhype").maybeSingle(),
+      supabaseAdmin.from("bank_accounts").select("*").eq("nome", "Caixa Principal").maybeSingle(),
+      supabaseAdmin
+        .from("alerts")
+        .select("*")
+        .eq("status", "open")
+        .order("created_at", { ascending: false })
+        .limit(10),
+    ]);
+
+    const saldoFornecedor = Number(supplier?.saldo_atual ?? 0);
+    const metaIdeal = Number(supplier?.meta_ideal ?? 1000);
+    const faltaDepositar = Math.max(0, metaIdeal - saldoFornecedor);
+
+    const saldoCaixa = Number(bank?.saldo_atual ?? 0);
+    const minimoSeguranca = Number(bank?.saldo_minimo_seguranca ?? 2000);
+    const caixaOk = saldoCaixa >= minimoSeguranca;
+
+    return {
+      ok: true as const,
+      supplier: supplier
+        ? {
+            nome: supplier.nome,
+            saldo_atual: saldoFornecedor,
+            saldo_minimo: Number(supplier.saldo_minimo ?? 0),
+            meta_ideal: metaIdeal,
+            falta_depositar: faltaDepositar,
+            ultimo_update: supplier.ultimo_update,
+          }
+        : null,
+      bank: bank
+        ? {
+            nome: bank.nome,
+            saldo_atual: saldoCaixa,
+            saldo_minimo_seguranca: minimoSeguranca,
+            ok: caixaOk,
+            status_text: caixaOk
+              ? "Status do Caixa: OK para recarregar"
+              : `🚨 Atenção: Saldo de segurança do caixa bancário está abaixo do mínimo (R$ ${minimoSeguranca.toFixed(2)})`,
+          }
+        : null,
+      alerts: (alerts ?? []).map((a: any) => ({
+        id: a.id,
+        tipo: a.tipo,
+        nivel: a.nivel,
+        mensagem: a.mensagem,
+        created_at: a.created_at,
+      })),
+    };
+  });
+
