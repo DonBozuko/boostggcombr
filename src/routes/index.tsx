@@ -522,8 +522,37 @@ function Landing() {
           </p>
         </div>
 
+        {/* Tabs categoria */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex p-1 rounded-full border border-white/10 bg-zinc-900/70 backdrop-blur">
+            {(["seguidores", "curtidas"] as Categoria[]).map((c) => {
+              const active = categoria === c;
+              const Icon = c === "seguidores" ? User : Heart;
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => {
+                    setCategoria(c);
+                    setForm((f) => ({ ...f, plan: "" }));
+                    trackEvent("tab_category_change", { category: c });
+                  }}
+                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                    active
+                      ? "bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] text-white shadow-[0_0_25px_rgba(249,115,22,0.6)]"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  <Icon className={`size-4 ${active && c === "curtidas" ? "fill-white" : ""}`} />
+                  {c === "seguidores" ? "Seguidores" : "Curtidas"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
-          {plans.map((p, i) => {
+          {(categoria === "seguidores" ? plans : likesPlans).map((p, i) => {
             const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
             return (
               <motion.div
