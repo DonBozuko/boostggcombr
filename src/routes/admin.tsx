@@ -65,6 +65,7 @@ type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null
 
 type MonitorState = {
   fornecedor: {
+    id?: string;
     nome: string;
     status: string;
     saldo_usd: number | null;
@@ -73,6 +74,7 @@ type MonitorState = {
     ultima_verificacao: string | null;
     falhas_consecutivas: number;
     usd_to_brl: number;
+    cotacao_brl?: number;
   };
   historico: Historico[];
 } | null;
