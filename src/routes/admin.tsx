@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,24 @@ type Pedido = {
   instagram_user: string;
   mercado_pago_id: string | null;
   error_detail?: string | null;
+  rede_social?: string | null;
 };
+
+type RedeKey = "overview" | "instagram" | "tiktok" | "youtube";
+
+const REDES: { key: RedeKey; label: string; icon: string; disabled?: boolean }[] = [
+  { key: "overview",  label: "Visão Geral",      icon: "🌐" },
+  { key: "instagram", label: "Instagram",        icon: "📸" },
+  { key: "tiktok",    label: "TikTok (Breve)",   icon: "🎵", disabled: true },
+  { key: "youtube",   label: "YouTube (Breve)",  icon: "📺", disabled: true },
+];
+
+const REDE_ICON: Record<string, string> = {
+  instagram: "📸",
+  tiktok: "🎵",
+  youtube: "📺",
+};
+
 
 type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null; status: string };
 
