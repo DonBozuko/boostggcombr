@@ -232,6 +232,8 @@ type Plan = {
   highlight?: boolean;
 };
 
+type Categoria = "seguidores" | "curtidas";
+
 const plans: Plan[] = [
   { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Entrega rápida e segura" },
   { id: "p500",   tier: "500 Seguidores",     tag: "+ STARTER",  qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00",  benefit: "Entrega rápida e segura" },
@@ -243,6 +245,17 @@ const plans: Plan[] = [
   { id: "p50k",   tier: "50.000 Seguidores",  tag: "+ MASTER",   qty: "50.000",  quantidade: 50000,  valor: 490.0, price: "R$ 490,00", benefit: "Entrega rápida e segura" },
   { id: "p100k",  tier: "100.000 Seguidores", tag: "+ ULTIMATE", qty: "100.000", quantidade: 100000, valor: 890.0, price: "R$ 890,00", benefit: "Entrega rápida e segura" },
 ];
+
+const likesPlans: Plan[] = [
+  { id: "l100", tier: "100 Curtidas",   tag: "+ MINI",    qty: "100",   quantidade: 100,  valor: 3.0,  price: "R$ 3,00",  benefit: "Entrega rápida em qualquer post" },
+  { id: "l500", tier: "500 Curtidas",   tag: "+ STARTER", qty: "500",   quantidade: 500,  valor: 7.0,  price: "R$ 7,00",  benefit: "Engajamento real e seguro" },
+  { id: "l1k",  tier: "1.000 Curtidas", tag: "+ BASIC",   qty: "1.000", quantidade: 1000, valor: 12.0, price: "R$ 12,00", benefit: "Mais recomendado", highlight: true },
+  { id: "l2k",  tier: "2.000 Curtidas", tag: "+ GROWTH",  qty: "2.000", quantidade: 2000, valor: 19.0, price: "R$ 19,00", benefit: "Boost rápido no alcance" },
+  { id: "l5k",  tier: "5.000 Curtidas", tag: "+ PRO",     qty: "5.000", quantidade: 5000, valor: 39.0, price: "R$ 39,00", benefit: "Máximo impacto no post" },
+];
+
+const allPlans: Plan[] = [...plans, ...likesPlans];
+
 
 const trustBadges = [
   { icon: Zap, title: "Entrega Automática e Segura", desc: "Processamento automático em minutos após a aprovação do Pix." },
@@ -316,6 +329,7 @@ type PedidoInfo = {
 };
 
 function Landing() {
+  const [categoria, setCategoria] = useState<Categoria>("seguidores");
   const [form, setForm] = useState({ plan: "", profile: "", email: "", contact: "" });
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -352,7 +366,7 @@ function Landing() {
       toast.error(result.error.issues[0].message);
       return;
     }
-    const selected = plans.find((p) => p.id === result.data.plan);
+    const selected = allPlans.find((p) => p.id === result.data.plan);
     if (!selected) {
       toast.error("Pacote inválido.");
       return;
@@ -508,8 +522,37 @@ function Landing() {
           </p>
         </div>
 
+        {/* Tabs categoria */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex p-1 rounded-full border border-white/10 bg-zinc-900/70 backdrop-blur">
+            {(["seguidores", "curtidas"] as Categoria[]).map((c) => {
+              const active = categoria === c;
+              const Icon = c === "seguidores" ? User : Heart;
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => {
+                    setCategoria(c);
+                    setForm((f) => ({ ...f, plan: "" }));
+                    trackEvent("tab_category_change", { category: c });
+                  }}
+                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                    active
+                      ? "bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] text-white shadow-[0_0_25px_rgba(249,115,22,0.6)]"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  <Icon className={`size-4 ${active && c === "curtidas" ? "fill-white" : ""}`} />
+                  {c === "seguidores" ? "Seguidores" : "Curtidas"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
-          {plans.map((p, i) => {
+          {(categoria === "seguidores" ? plans : likesPlans).map((p, i) => {
             const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
             return (
               <motion.div
@@ -600,9 +643,9 @@ function Landing() {
                   <SelectValue placeholder="Selecione um pacote" />
                 </SelectTrigger>
                 <SelectContent>
-                  {plans.map((p) => (
+                  {allPlans.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.tier} — {p.qty} seguidores ({p.price})
+                      {p.tier} — {p.qty} {p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
                     </SelectItem>
                   ))}
                 </SelectContent>

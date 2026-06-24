@@ -419,22 +419,32 @@ function AdminPage() {
           {pedidos.length === 0 && (
             <div className="p-4 text-sm text-muted-foreground">Nenhum pedido carregado.</div>
           )}
-          {pedidos.map((p) => (
-            <div key={p.id} className="p-4 flex items-center justify-between gap-4 text-sm">
-              <div className="space-y-1">
-                <div className="font-mono text-xs text-muted-foreground">{p.id}</div>
-                <div>
-                  <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+          {pedidos.map((p) => {
+            const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
+            return (
+              <div key={p.id} className="p-4 flex items-center justify-between gap-4 text-sm">
+                <div className="space-y-1">
+                  <div className="font-mono text-xs text-muted-foreground">{p.id}</div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      isCurtidas
+                        ? "bg-pink-500/15 text-pink-300 border border-pink-500/40"
+                        : "bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/40"
+                    }`}>
+                      {isCurtidas ? "Curtidas" : "Seguidores"}
+                    </span>
+                    <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
-                </div>
+                <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
+                  {busyId === p.id ? "Enviando..." : "Reenviar SMM"}
+                </Button>
               </div>
-              <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
-                {busyId === p.id ? "Enviando..." : "Reenviar SMM"}
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
