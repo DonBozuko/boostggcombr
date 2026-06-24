@@ -85,16 +85,42 @@ const NIVEL_STYLE: Record<string, { bg: string; border: string; glow: string; la
   critico:  { bg: "bg-red-950/60",     border: "border-red-600",     glow: "shadow-[0_0_60px_rgba(239,68,68,0.8)]",   label: "CRÍTICO", emoji: "🚨" },
 };
 
-// WebAudio beep — não precisa de asset
+// WebAudio beep — background-safe (Web Worker timer + silent loop keeps áudio vivo em segundo plano)
 function useAlertBeep() {
   const ctxRef = useRef<AudioContext | null>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const silentRef = useRef<HTMLAudioElement | null>(null);
   const enabledRef = useRef(false);
 
   const enable = () => {
     if (enabledRef.current) return;
     try {
       const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
-      ctxRef.current = new Ctx();
+      const ctx = new Ctx();
+      ctxRef.current = ctx;
+      // Mantém o AudioContext em "running" mesmo com aba em background.
+      ctx.resume().catch(() => {});
+
+      // Silent looping audio — impede o navegador de suspender o pipeline de áudio
+      // quando a aba está oculta/minimizada (especialmente Chrome desktop e iOS Safari).
+      const a = document.createElement("audio");
+      a.loop = true;
+      a.muted = false;
+      a.volume = 0.001;
+      // 1s de silêncio WAV (16-bit PCM mono 8kHz)
+      a.src =
+        "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+      a.play().catch(() => {});
+      silentRef.current = a;
+
+      // Web Worker tick — setInterval no thread principal é throttle-ado para 1s+ em background.
+      // Worker timers continuam disparando na frequência real mesmo com aba oculta.
+      const workerCode = `let h=null;onmessage=(e)=>{const d=e.data;if(d&&d.type==='start'){clearInterval(h);h=setInterval(()=>postMessage('tick'),d.interval);}else if(d&&d.type==='stop'){clearInterval(h);h=null;}};`;
+      const blob = new Blob([workerCode], { type: "application/javascript" });
+      const url = URL.createObjectURL(blob);
+      const w = new Worker(url);
+      workerRef.current = w;
+
       enabledRef.current = true;
     } catch {}
   };
@@ -102,8 +128,8 @@ function useAlertBeep() {
   const beep = () => {
     const ctx = ctxRef.current;
     if (!ctx) return;
+    if (ctx.state === "suspended") ctx.resume().catch(() => {});
     const now = ctx.currentTime;
-    // 3 pulsos curtos
     for (let i = 0; i < 3; i++) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -118,7 +144,19 @@ function useAlertBeep() {
     }
   };
 
-  return { enable, beep, isEnabled: () => enabledRef.current };
+  // Loop persistente baseado em Worker — não throttla em background.
+  const startLoop = (intervalMs: number) => {
+    const w = workerRef.current;
+    if (!w) return;
+    w.onmessage = () => beep();
+    w.postMessage({ type: "start", interval: intervalMs });
+    beep();
+  };
+  const stopLoop = () => {
+    workerRef.current?.postMessage({ type: "stop" });
+  };
+
+  return { enable, beep, startLoop, stopLoop, isEnabled: () => enabledRef.current };
 }
 
 function AdminPage() {
