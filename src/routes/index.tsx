@@ -329,6 +329,7 @@ type PedidoInfo = {
 };
 
 function Landing() {
+  const [categoria, setCategoria] = useState<Categoria>("seguidores");
   const [form, setForm] = useState({ plan: "", profile: "", email: "", contact: "" });
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
