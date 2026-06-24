@@ -732,6 +732,7 @@ function AdminPage() {
           ))}
           <span className="text-xs text-muted-foreground ml-auto">
             {pedidos.filter((p) => {
+              if (aba !== "overview" && (p.rede_social ?? "instagram") !== aba) return false;
               if (filtro === "todos") return true;
               const isC = p.pacote?.toLowerCase().startsWith("l");
               return filtro === "curtidas" ? isC : !isC;
@@ -745,10 +746,12 @@ function AdminPage() {
           )}
           {pedidos
             .filter((p) => {
+              if (aba !== "overview" && (p.rede_social ?? "instagram") !== aba) return false;
               if (filtro === "todos") return true;
               const isC = p.pacote?.toLowerCase().startsWith("l");
               return filtro === "curtidas" ? isC : !isC;
             })
+
             .map((p) => {
             const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
             return (
