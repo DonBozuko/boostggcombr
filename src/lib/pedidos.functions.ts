@@ -50,6 +50,14 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   tv5k:   { quantidade: 5000,  valor: 7.0 },
   tv10k:  { quantidade: 10000, valor: 12.0 },
   tv50k:  { quantidade: 50000, valor: 39.0 },
+  // YouTube — Inscritos (service 14343)
+  ys100:  { quantidade: 100,  valor: 29.0 },
+  ys500:  { quantidade: 500,  valor: 99.0 },
+  ys1k:   { quantidade: 1000, valor: 189.0 },
+  // YouTube — Visualizações (service 997)
+  yv1k:   { quantidade: 1000,  valor: 19.0 },
+  yv5k:   { quantidade: 5000,  valor: 59.0 },
+  yv10k:  { quantidade: 10000, valor: 99.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
