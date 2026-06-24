@@ -68,7 +68,7 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
       .eq("id", data.pedidoId)
       .maybeSingle();
     if (error || !pedido) return { ok: false as const, error: "NOT_FOUND" as const };
-    if (pedido.status !== "paid")
+    if (pedido.status !== "paid" && pedido.status !== "SMM_FAILED")
       return { ok: false as const, error: `STATUS_${pedido.status}` as const };
 
     const { dispatchSmmhype } = await import("@/lib/smmhype.server");
@@ -78,7 +78,17 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
       instagram_user: pedido.instagram_user,
     });
     console.log("[reprocessar] resultado", { pedidoId: pedido.id, smm });
-    if (!smm.ok)
+    if (!smm.ok) {
+      const detail = `${smm.error}${smm.status ? ` (HTTP ${smm.status})` : ""}`.slice(0, 500);
+      await supabaseAdmin
+        .from("pedidos")
+        .update({ status: "SMM_FAILED", error_detail: detail })
+        .eq("id", pedido.id);
       return { ok: false as const, error: "SMM_FAILED" as const, detail: smm.error };
+    }
+    await supabaseAdmin
+      .from("pedidos")
+      .update({ status: "paid", error_detail: null })
+      .eq("id", pedido.id);
     return { ok: true as const, orderId: smm.orderId ?? null };
   });
