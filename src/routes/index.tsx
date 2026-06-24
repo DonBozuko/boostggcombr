@@ -635,18 +635,18 @@ function Landing() {
 
 
       {/* ORDER FORM */}
-      <section id="pedido" className="py-24 border-y border-border bg-card/30">
-        <div className="container mx-auto px-6 max-w-2xl">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold">Faça seu pedido</h2>
-            <p className="mt-3 text-zinc-300">
+      <section id="pedido" className="py-16 sm:py-24 border-y border-border bg-card/30">
+        <div className="container mx-auto px-4 sm:px-6 max-w-2xl">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold">Faça seu pedido</h2>
+            <p className="mt-3 text-sm sm:text-base text-zinc-300">
               Preencha os dados abaixo. Em segundos você recebe o Pix no WhatsApp.
             </p>
           </div>
 
           <form
             onSubmit={onSubmit}
-            className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
+            className="rounded-2xl border border-border bg-card p-4 sm:p-8 space-y-6 shadow-glow-blue"
           >
             <div className="space-y-2">
               <Label htmlFor="plan">Pacote escolhido</Label>
