@@ -504,7 +504,7 @@ function AdminPage() {
             <div className={`rounded-2xl border-2 ${style.border} ${style.bg} ${style.glow} p-6 transition-all`}>
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Status do Estoque Atacadista</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">📸 Robô de Saldo · Instagram</div>
                   <div className="mt-1 flex items-center gap-3 text-3xl font-extrabold">
                     <span>{style.emoji}</span>
                     <span>{style.label}</span>
@@ -616,16 +616,20 @@ function AdminPage() {
         )}
 
         {/* Auditoria de falhas (SMM + MP recusado + valor divergente) */}
-        {falhos.length > 0 && (
+        {(() => {
+          const lista = falhos.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
+          if (lista.length === 0) return null;
+          return (
           <div className="rounded-2xl border-2 border-red-600 bg-red-950/40 shadow-[0_0_40px_rgba(239,68,68,0.45)] p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-red-200 flex items-center gap-2">
-                🚨 {falhos.length} pedido(s) com falha — requer ação
+                🚨 {lista.length} pedido(s) com falha — requer ação
               </h2>
               <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
             </div>
             <div className="divide-y divide-red-900/60">
-              {falhos.map((p) => {
+              {lista.map((p) => {
+
                 const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
                 const isSmm = p.status === "SMM_FAILED";
                 return (
@@ -661,19 +665,24 @@ function AdminPage() {
               })}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Pedidos pendentes (Pix gerado, aguardando pagamento) */}
-        {pendentes.length > 0 && (
+        {(() => {
+          const lista = pendentes.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
+          if (lista.length === 0) return null;
+          return (
           <div className="rounded-2xl border border-yellow-700/60 bg-yellow-950/20 p-4 space-y-3">
+
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-yellow-200 flex items-center gap-2">
-                ⏳ {pendentes.length} pedido(s) pendente(s)
+                ⏳ {lista.length} pedido(s) pendente(s)
               </h2>
               <Button size="sm" variant="outline" onClick={() => loadPendentes()}>Atualizar</Button>
             </div>
             <div className="divide-y divide-yellow-900/40">
-              {pendentes.map((p) => (
+              {lista.map((p) => (
                 <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -699,7 +708,9 @@ function AdminPage() {
               ))}
             </div>
           </div>
-        )}
+          );
+        })()}
+
 
 
 
@@ -721,6 +732,7 @@ function AdminPage() {
           ))}
           <span className="text-xs text-muted-foreground ml-auto">
             {pedidos.filter((p) => {
+              if (aba !== "overview" && (p.rede_social ?? "instagram") !== aba) return false;
               if (filtro === "todos") return true;
               const isC = p.pacote?.toLowerCase().startsWith("l");
               return filtro === "curtidas" ? isC : !isC;
@@ -734,10 +746,12 @@ function AdminPage() {
           )}
           {pedidos
             .filter((p) => {
+              if (aba !== "overview" && (p.rede_social ?? "instagram") !== aba) return false;
               if (filtro === "todos") return true;
               const isC = p.pacote?.toLowerCase().startsWith("l");
               return filtro === "curtidas" ? isC : !isC;
             })
+
             .map((p) => {
             const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
             return (
