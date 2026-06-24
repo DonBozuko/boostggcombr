@@ -14,7 +14,7 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { USD_TO_BRL, classifyBalance } = await import("@/lib/monitor-saldo.server");
+    const { USD_TO_BRL_DEFAULT, classifyBalance } = await import("@/lib/monitor-saldo.server");
 
     const { data: fornecedor } = await supabaseAdmin
       .from("fornecedores")
@@ -22,6 +22,8 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
       .eq("nome", "SMMhype")
       .maybeSingle();
     if (!fornecedor) return { ok: false as const, error: "NOT_FOUND" as const };
+
+    const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
 
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: historico } = await supabaseAdmin
@@ -31,11 +33,12 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
       .gte("data_hora", since)
       .order("data_hora", { ascending: true });
 
-    const saldoBrl = fornecedor.saldo_atual != null ? fornecedor.saldo_atual * USD_TO_BRL : null;
+    const saldoBrl = fornecedor.saldo_atual != null ? fornecedor.saldo_atual * cotacao : null;
 
     return {
       ok: true as const,
       fornecedor: {
+        id: fornecedor.id,
         nome: fornecedor.nome,
         status: fornecedor.status,
         saldo_usd: fornecedor.saldo_atual,
@@ -43,15 +46,31 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
         nivel_alerta: classifyBalance(saldoBrl),
         ultima_verificacao: fornecedor.ultima_verificacao,
         falhas_consecutivas: fornecedor.falhas_consecutivas,
-        usd_to_brl: USD_TO_BRL,
+        usd_to_brl: cotacao,
+        cotacao_brl: cotacao,
       },
       historico: (historico ?? []).map((h) => ({
         t: h.data_hora,
         saldo_usd: h.saldo,
-        saldo_brl: h.saldo != null ? h.saldo * USD_TO_BRL : null,
+        saldo_brl: h.saldo != null ? h.saldo * cotacao : null,
         status: h.status,
       })),
     };
+  });
+
+export const atualizarCotacaoFornecedor = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({ token: z.string().min(8), id: z.string().uuid(), cotacao_brl: z.number().positive().max(100) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("fornecedores")
+      .update({ cotacao_brl: data.cotacao_brl } as any)
+      .eq("id", data.id);
+    if (error) return { ok: false as const, error: "DB_FAILED" as const };
+    return { ok: true as const };
   });
 
 export const verificarSaldoAgora = createServerFn({ method: "POST" })
