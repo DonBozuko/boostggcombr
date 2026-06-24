@@ -712,7 +712,32 @@ function AdminPage() {
                 />
                 <Info label="Falhas consecutivas" value={String(f.falhas_consecutivas)} />
               </div>
+
+              {/* Cotação USD→BRL configurável */}
+              <div className="mt-4 flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-background/40 p-3">
+                <div className="flex-1 min-w-[180px]">
+                  <label className="text-xs uppercase text-muted-foreground">Cotação USD→BRL (manual)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="100"
+                    inputMode="decimal"
+                    value={cotacaoDraft}
+                    onChange={(e) => setCotacaoDraft(e.target.value)}
+                    placeholder={f.usd_to_brl.toFixed(2)}
+                    className="mt-1"
+                  />
+                </div>
+                <Button onClick={salvarCotacao} disabled={savingCotacao || !monitor?.fornecedor.id}>
+                  {savingCotacao ? "Salvando…" : "Salvar cotação"}
+                </Button>
+                <p className="basis-full text-xs text-muted-foreground">
+                  Atual: <strong>R$ {f.usd_to_brl.toFixed(2)}</strong> por USD. Ajuste para bater com o painel do fornecedor.
+                </p>
+              </div>
             </div>
+
 
             {/* Status do Cron */}
             <CronCard cron={cron} busy={cronBusy} onTest={testarCronAgora} falhas={f.falhas_consecutivas} />
