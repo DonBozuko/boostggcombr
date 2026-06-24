@@ -8,6 +8,7 @@ const pedidoSchema = z.object({
   valor: z.number().positive(),
   email: z.string().email().max(200),
   whatsapp_contato: z.string().min(5).max(50).optional(),
+  rede_social: z.enum(["instagram", "tiktok"]).optional(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
@@ -15,7 +16,7 @@ const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 // Tabela oficial (fonte de verdade no servidor) — keyed por pacote id.
 // Evita preço adulterado pelo cliente e diferencia seguidores vs curtidas.
 const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
-  // Seguidores
+  // Instagram — Seguidores
   p100:   { quantidade: 100,    valor: 5.0 },
   p500:   { quantidade: 500,    valor: 12.0 },
   p1k:    { quantidade: 1000,   valor: 18.0 },
@@ -25,12 +26,30 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   p20k:   { quantidade: 20000,  valor: 220.0 },
   p50k:   { quantidade: 50000,  valor: 490.0 },
   p100k:  { quantidade: 100000, valor: 890.0 },
-  // Curtidas (service 18860)
+  // Instagram — Curtidas (service 18860)
   l100:   { quantidade: 100,  valor: 3.0 },
   l500:   { quantidade: 500,  valor: 7.0 },
   l1k:    { quantidade: 1000, valor: 12.0 },
   l2k:    { quantidade: 2000, valor: 19.0 },
   l5k:    { quantidade: 5000, valor: 39.0 },
+  // Instagram — Visualizações
+  v1k:    { quantidade: 1000,  valor: 5.0 },
+  v5k:    { quantidade: 5000,  valor: 12.0 },
+  v10k:   { quantidade: 10000, valor: 19.0 },
+  v25k:   { quantidade: 25000, valor: 39.0 },
+  v50k:   { quantidade: 50000, valor: 69.0 },
+  // TikTok — Seguidores (service 14330)
+  tf100:  { quantidade: 100,  valor: 9.0 },
+  tf500:  { quantidade: 500,  valor: 29.0 },
+  tf1k:   { quantidade: 1000, valor: 49.0 },
+  // TikTok — Curtidas (service 19191)
+  tl500:  { quantidade: 500,  valor: 9.0 },
+  tl1k:   { quantidade: 1000, valor: 15.0 },
+  tl2k:   { quantidade: 2000, valor: 27.0 },
+  // TikTok — Visualizações (service 14907)
+  tv5k:   { quantidade: 5000,  valor: 7.0 },
+  tv10k:  { quantidade: 10000, valor: 12.0 },
+  tv50k:  { quantidade: 50000, valor: 39.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
@@ -42,7 +61,13 @@ export const criarPedido = createServerFn({ method: "POST" })
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
     const valorCobrar = oficial.valor;
-    const categoria = data.pacote.startsWith("l") ? "curtidas" : "seguidores";
+    const pkg = data.pacote.toLowerCase();
+    const isTiktok = pkg.startsWith("t");
+    const rede = data.rede_social ?? (isTiktok ? "tiktok" : "instagram");
+    const categoria =
+      isTiktok
+        ? (pkg.startsWith("tl") ? "curtidas" : pkg.startsWith("tv") ? "visualizacoes" : "seguidores")
+        : (pkg.startsWith("l") ? "curtidas" : pkg.startsWith("v") ? "visualizacoes" : "seguidores");
 
 
     const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
@@ -67,7 +92,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           transaction_amount: Number(valorCobrar.toFixed(2)),
-          description: `BoostGram - Pacote ${clean(data.pacote)} (${data.quantidade} ${categoria}) para ${clean(data.instagram_user)}`,
+          description: `BoostGram - ${rede.toUpperCase()} pacote ${clean(data.pacote)} (${data.quantidade} ${categoria}) para ${clean(data.instagram_user)}`,
           payment_method_id: "pix",
           payer: { email: data.email.trim().toLowerCase() },
         }),
@@ -109,6 +134,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           valor: valorCobrar,
           status: "pending",
           mercado_pago_id: mpId,
+          rede_social: rede,
         })
         .select("id")
         .single();
