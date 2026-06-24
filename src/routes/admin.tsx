@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
-import { getMonitorSaldo, verificarSaldoAgora } from "@/lib/monitor.functions";
+import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron } from "@/lib/monitor.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -106,6 +106,8 @@ function AdminPage() {
   const reprocessar = useServerFn(reprocessarPedido);
   const getMonitor = useServerFn(getMonitorSaldo);
   const checkAgora = useServerFn(verificarSaldoAgora);
+  const getCron = useServerFn(getCronStatus);
+  const runCron = useServerFn(testarCron);
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -114,6 +116,12 @@ function AdminPage() {
   const [monitor, setMonitor] = useState<MonitorState>(null);
   const [monitorBusy, setMonitorBusy] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [cron, setCron] = useState<{
+    jobname: string; schedule: string; active: boolean;
+    last_start: string | null; last_end: string | null;
+    last_status: string | null; last_return: string | null;
+  } | null>(null);
+  const [cronBusy, setCronBusy] = useState(false);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
