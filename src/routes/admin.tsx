@@ -188,14 +188,16 @@ function AdminPage() {
     loadMonitor();
     loadCron();
     loadCache();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); }, 30000);
+    loadFalhos();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
-  // Alerta sonoro: dispara a cada 30s enquanto em estado crítico
+  // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
   const isAlerta =
-    !!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico");
+    (!!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico")) ||
+    falhos.length > 0;
 
   useEffect(() => {
     if (!isAlerta || !soundOn) return;
