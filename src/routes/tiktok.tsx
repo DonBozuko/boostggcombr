@@ -147,7 +147,8 @@ function TiktokLanding() {
   const isFollowers = categoria === "seguidores";
 
   const submit = async (selected: Plan) => {
-    const parsed = orderSchema.safeParse({ plan: selected.id, profile });
+    const schema = selected.id.startsWith("tf") ? followersSchema : videoSchema;
+    const parsed = schema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
       return;
