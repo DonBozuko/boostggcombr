@@ -90,12 +90,15 @@ export type Database = {
         Row: {
           api_key_secret: string
           api_url: string
+          ativo: boolean
           created_at: string
           falhas_consecutivas: number
           id: string
           nome: string
+          prioridade: number
           rede_social: string
           saldo_atual: number | null
+          slug: string
           status: string
           ultima_verificacao: string | null
           updated_at: string
@@ -103,12 +106,15 @@ export type Database = {
         Insert: {
           api_key_secret: string
           api_url: string
+          ativo?: boolean
           created_at?: string
           falhas_consecutivas?: number
           id?: string
           nome: string
+          prioridade?: number
           rede_social?: string
           saldo_atual?: number | null
+          slug: string
           status?: string
           ultima_verificacao?: string | null
           updated_at?: string
@@ -116,12 +122,15 @@ export type Database = {
         Update: {
           api_key_secret?: string
           api_url?: string
+          ativo?: boolean
           created_at?: string
           falhas_consecutivas?: number
           id?: string
           nome?: string
+          prioridade?: number
           rede_social?: string
           saldo_atual?: number | null
+          slug?: string
           status?: string
           ultima_verificacao?: string | null
           updated_at?: string
