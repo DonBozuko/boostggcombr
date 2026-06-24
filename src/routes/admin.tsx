@@ -669,7 +669,7 @@ function AdminPage() {
                   value={
                     <span className="inline-flex items-center gap-2">
                       <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.9)]" : "bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.9)]"}`} />
-                      {f.status}
+                      {online ? "Online" : f.status}
                     </span>
                   }
                 />
