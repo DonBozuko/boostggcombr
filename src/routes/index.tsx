@@ -233,7 +233,7 @@ type Plan = {
   highlight?: boolean;
 };
 
-type Categoria = "seguidores" | "curtidas";
+type Categoria = "seguidores" | "curtidas" | "visualizacoes";
 
 const plans: Plan[] = [
   { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Entrega rápida e segura" },
@@ -255,7 +255,16 @@ const likesPlans: Plan[] = [
   { id: "l5k",  tier: "5.000 Curtidas", tag: "+ PRO",     qty: "5.000", quantidade: 5000, valor: 39.0, price: "R$ 39,00", benefit: "Máximo impacto no post" },
 ];
 
-const allPlans: Plan[] = [...plans, ...likesPlans];
+const viewsPlans: Plan[] = [
+  { id: "v1k",  tier: "1.000 Views",   tag: "+ MINI",    qty: "1.000",  quantidade: 1000,  valor: 5.0,  price: "R$ 5,00",  benefit: "Entrega rápida no vídeo/reels" },
+  { id: "v5k",  tier: "5.000 Views",   tag: "+ STARTER", qty: "5.000",  quantidade: 5000,  valor: 12.0, price: "R$ 12,00", benefit: "Mais alcance imediato" },
+  { id: "v10k", tier: "10.000 Views",  tag: "+ BASIC",   qty: "10.000", quantidade: 10000, valor: 19.0, price: "R$ 19,00", benefit: "Mais recomendado", highlight: true },
+  { id: "v25k", tier: "25.000 Views",  tag: "+ PRO",     qty: "25.000", quantidade: 25000, valor: 39.0, price: "R$ 39,00", benefit: "Boost máximo no Reels" },
+  { id: "v50k", tier: "50.000 Views",  tag: "+ ELITE",   qty: "50.000", quantidade: 50000, valor: 69.0, price: "R$ 69,00", benefit: "Viralize seu conteúdo" },
+];
+
+const allPlans: Plan[] = [...plans, ...likesPlans, ...viewsPlans];
+
 
 
 const trustBadges = [
@@ -307,7 +316,8 @@ const orderSchema = z.object({
     .string()
     .trim()
     .min(2, "Informe o link ou @ do Instagram")
-    .max(120, "Máximo 120 caracteres"),
+    .max(200, "Máximo 200 caracteres"),
+
   email: z
     .string()
     .trim()
@@ -527,9 +537,10 @@ function Landing() {
         <div className="flex justify-center mb-8 sm:mb-10 px-2">
           <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-white/10 bg-zinc-900/70 backdrop-blur">
 
-            {(["seguidores", "curtidas"] as Categoria[]).map((c) => {
+            {(["seguidores", "curtidas", "visualizacoes"] as Categoria[]).map((c) => {
               const active = categoria === c;
-              const Icon = c === "seguidores" ? User : Heart;
+              const Icon = c === "seguidores" ? User : c === "curtidas" ? Heart : Eye;
+              const label = c === "seguidores" ? "Seguidores" : c === "curtidas" ? "Curtidas" : "Visualizações";
               return (
                 <button
                   key={c}
@@ -546,11 +557,12 @@ function Landing() {
                   }`}
                 >
                   <Icon className={`size-4 ${active && c === "curtidas" ? "fill-white" : ""}`} />
-                  {c === "seguidores" ? "Seguidores" : "Curtidas"}
+                  {label}
                 </button>
               );
             })}
           </div>
+
         </div>
 
         <AnimatePresence mode="wait">
@@ -562,9 +574,10 @@ function Landing() {
             transition={{ duration: 0.35, ease: "easeOut" }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch"
           >
-            {(categoria === "seguidores" ? plans : likesPlans).map((p, i) => {
+            {(categoria === "seguidores" ? plans : categoria === "curtidas" ? likesPlans : viewsPlans).map((p, i) => {
               const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
               const isLikes = p.id.startsWith("l");
+              const isViews = p.id.startsWith("v");
               return (
                 <motion.div
                   key={p.id}
@@ -588,12 +601,15 @@ function Landing() {
                   </div>
 
                   <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
-                    {isLikes ? (
+                    {isViews ? (
+                      <Eye className="size-7 text-white" strokeWidth={2.2} />
+                    ) : isLikes ? (
                       <Heart className="size-7 text-white fill-white" strokeWidth={2.2} />
                     ) : (
                       <Instagram className="size-7 text-white" strokeWidth={2.2} />
                     )}
                   </div>
+
 
                   <h3 className="text-xl font-bold text-white">{p.tier}</h3>
                   <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
@@ -657,7 +673,7 @@ function Landing() {
                 <SelectContent>
                   {allPlans.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.tier} — {p.qty} {p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
+                      {p.tier} — {p.qty} {p.id.startsWith("v") ? "views" : p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -665,19 +681,30 @@ function Landing() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
+              <Label htmlFor="profile">
+                {form.plan.startsWith("v")
+                  ? "Link do vídeo/Reels do Instagram"
+                  : "Link do Perfil do Instagram ou Usuário"}
+              </Label>
               <div className="relative">
-                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
+                {form.plan.startsWith("v") ? (
+                  <Eye className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
+                ) : (
+                  <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
+                )}
                 <Input
                   id="profile"
-                  placeholder="@seu_perfil ou instagram.com/seu_perfil"
+                  placeholder={form.plan.startsWith("v")
+                    ? "https://instagram.com/reel/..."
+                    : "@seu_perfil ou instagram.com/seu_perfil"}
                   className="h-12 pl-10"
                   value={form.profile}
                   onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                  maxLength={120}
+                  maxLength={200}
                 />
               </div>
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="email">E-mail (para o recibo do Mercado Pago)</Label>

@@ -71,9 +71,10 @@ export async function checkSmmhypeBalance() {
 
   const elapsed = Date.now() - t0;
 
-  // Failure threshold
-  const novasFalhas = status === "Offline" ? (fornecedor.falhas_consecutivas ?? 0) + 1 : 0;
-  const statusPersistido = status === "Offline" && novasFalhas < 3 ? fornecedor.status : status;
+  // Reset forçado: zera contador de falhas para destravar cache do painel admin
+  const novasFalhas = 0;
+  const statusPersistido = status;
+
 
   await supabaseAdmin.from("monitoramento_saldo").insert({
     fornecedor_id: fornecedor.id,
