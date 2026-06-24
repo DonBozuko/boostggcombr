@@ -169,6 +169,42 @@ export type Database = {
         }
         Relationships: []
       }
+      services_cache: {
+        Row: {
+          category: string
+          id: string
+          max: number
+          min: number
+          name: string
+          provider_service_id: number
+          rate: number
+          refill: boolean
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          id?: string
+          max?: number
+          min?: number
+          name: string
+          provider_service_id: number
+          rate: number
+          refill?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          id?: string
+          max?: number
+          min?: number
+          name?: string
+          provider_service_id?: number
+          rate?: number
+          refill?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
