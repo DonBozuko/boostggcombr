@@ -209,6 +209,8 @@ function AdminPage() {
   } | null>(null);
   const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string }[]>([]);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [cotacaoDraft, setCotacaoDraft] = useState<string>("");
+  const [savingCotacao, setSavingCotacao] = useState(false);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
