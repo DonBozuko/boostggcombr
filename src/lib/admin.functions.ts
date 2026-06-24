@@ -31,10 +31,11 @@ export const listarPedidosPagos = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
-      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail")
+      .select("id, created_at, status, pacote, quantidade, valor, instagram_user, mercado_pago_id, error_detail, rede_social")
       .eq("status", "paid")
       .order("created_at", { ascending: false })
       .limit(50);
+
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
     return { ok: true as const, pedidos: rows ?? [] };
   });
@@ -47,7 +48,8 @@ export const listarPedidosFalhos = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
-      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail")
+      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail, rede_social")
+
       .or("status.eq.SMM_FAILED,status.eq.amount_mismatch,status.like.mp_%")
       .order("created_at", { ascending: false })
       .limit(50);
@@ -101,10 +103,37 @@ export const listarPedidosPendentes = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
-      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, abandono_notificado_at")
+      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, abandono_notificado_at, rede_social")
+
       .eq("status", "pending")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
     return { ok: true as const, pedidos: rows ?? [] };
+  });
+
+// Faturamento agregado por rede social (status=paid).
+export const getFaturamentoPorRede = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("pedidos")
+      .select("valor, rede_social")
+      .eq("status", "paid");
+    if (error) return { ok: false as const, error: "DB_FAILED" as const };
+    const totais: Record<string, { total: number; count: number }> = {};
+    let geral = 0;
+    let count = 0;
+    for (const r of rows ?? []) {
+      const rede = (r as any).rede_social ?? "instagram";
+      const v = Number((r as any).valor) || 0;
+      totais[rede] = totais[rede] ?? { total: 0, count: 0 };
+      totais[rede].total += v;
+      totais[rede].count += 1;
+      geral += v;
+      count += 1;
+    }
+    return { ok: true as const, geral, count, totais };
   });

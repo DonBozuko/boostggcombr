@@ -94,6 +94,7 @@ export type Database = {
           falhas_consecutivas: number
           id: string
           nome: string
+          rede_social: string
           saldo_atual: number | null
           status: string
           ultima_verificacao: string | null
@@ -106,6 +107,7 @@ export type Database = {
           falhas_consecutivas?: number
           id?: string
           nome: string
+          rede_social?: string
           saldo_atual?: number | null
           status?: string
           ultima_verificacao?: string | null
@@ -118,6 +120,7 @@ export type Database = {
           falhas_consecutivas?: number
           id?: string
           nome?: string
+          rede_social?: string
           saldo_atual?: number | null
           status?: string
           ultima_verificacao?: string | null
@@ -173,6 +176,7 @@ export type Database = {
           mercado_pago_id: string | null
           pacote: string
           quantidade: number
+          rede_social: string
           status: string
           valor: number
         }
@@ -185,6 +189,7 @@ export type Database = {
           mercado_pago_id?: string | null
           pacote: string
           quantidade: number
+          rede_social?: string
           status?: string
           valor: number
         }
@@ -197,6 +202,7 @@ export type Database = {
           mercado_pago_id?: string | null
           pacote?: string
           quantidade?: number
+          rede_social?: string
           status?: string
           valor?: number
         }

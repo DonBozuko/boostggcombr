@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,24 @@ type Pedido = {
   instagram_user: string;
   mercado_pago_id: string | null;
   error_detail?: string | null;
+  rede_social?: string | null;
 };
+
+type RedeKey = "overview" | "instagram" | "tiktok" | "youtube";
+
+const REDES: { key: RedeKey; label: string; icon: string; disabled?: boolean }[] = [
+  { key: "overview",  label: "Visão Geral",      icon: "🌐" },
+  { key: "instagram", label: "Instagram",        icon: "📸" },
+  { key: "tiktok",    label: "TikTok (Breve)",   icon: "🎵", disabled: true },
+  { key: "youtube",   label: "YouTube (Breve)",  icon: "📺", disabled: true },
+];
+
+const REDE_ICON: Record<string, string> = {
+  instagram: "📸",
+  tiktok: "🎵",
+  youtube: "📺",
+};
+
 
 type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null; status: string };
 
@@ -116,10 +133,15 @@ function AdminPage() {
   const syncCache = useServerFn(sincronizarServicosAgora);
   const getCaixa = useServerFn(getCaixaAssistente);
 
+  const getFaturamento = useServerFn(getFaturamentoPorRede);
+
   const [token, setToken] = useState("");
+  const [aba, setAba] = useState<RedeKey>("overview");
+  const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
   const [pendentes, setPendentes] = useState<(Pedido & { abandono_notificado_at: string | null })[]>([]);
+
   const [filtro, setFiltro] = useState<"todos" | "seguidores" | "curtidas">("todos");
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -194,6 +216,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadFaturamento = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getFaturamento({ data: { token: tk } });
+      if (res.ok) setFaturamento({ geral: res.geral, count: res.count, totais: res.totais });
+    } catch {}
+  };
+
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
     setCacheBusy(true);
@@ -215,9 +245,11 @@ function AdminPage() {
     loadFalhos();
     loadPendentes();
     loadCaixa();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); }, 30000);
+    loadFaturamento();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
+
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
@@ -333,6 +365,75 @@ function AdminPage() {
             {loading ? "Carregando..." : "Listar pagos"}
           </Button>
         </div>
+
+        {/* Navegação Multi-Painel (Casa dos Avós) */}
+        <div className="rounded-2xl border border-border bg-card/30 p-2 flex flex-wrap gap-2">
+          {REDES.map((r) => {
+            const active = aba === r.key;
+            return (
+              <button
+                key={r.key}
+                type="button"
+                onClick={() => !r.disabled && setAba(r.key)}
+                disabled={r.disabled}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                  active
+                    ? "bg-fuchsia-500/20 text-fuchsia-100 border-fuchsia-500/60 shadow-[0_0_20px_rgba(217,70,239,0.35)]"
+                    : r.disabled
+                    ? "bg-background/30 text-muted-foreground/60 border-border/50 cursor-not-allowed"
+                    : "bg-background/40 text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                <span className="mr-1.5">{r.icon}</span>{r.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Visão Geral — faturamento somado de todas as redes */}
+        {aba === "overview" && (
+          <div className="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-950/50 to-slate-950/60 p-6 shadow-[0_0_30px_rgba(16,185,129,0.25)] space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl font-extrabold tracking-tight">🌐 Visão Geral — Casa dos Avós</h2>
+              <span className="text-xs text-muted-foreground">{faturamento?.count ?? 0} pedido(s) pagos</span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-black/30 border border-emerald-500/30 p-4">
+                <div className="text-xs uppercase text-muted-foreground">Faturamento Total</div>
+                <div className="mt-1 text-2xl font-bold text-emerald-300">
+                  R$ {(faturamento?.geral ?? 0).toFixed(2)}
+                </div>
+              </div>
+              {REDES.filter((r) => r.key !== "overview").map((r) => {
+                const t = faturamento?.totais[r.key];
+                return (
+                  <div key={r.key} className={`rounded-xl bg-black/30 border p-4 ${r.disabled ? "border-border/40 opacity-60" : "border-border"}`}>
+                    <div className="text-xs uppercase text-muted-foreground">{r.icon} {r.label}</div>
+                    <div className="mt-1 text-2xl font-bold">R$ {(t?.total ?? 0).toFixed(2)}</div>
+                    <div className="text-[10px] text-muted-foreground">{t?.count ?? 0} pedido(s)</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="rounded-xl bg-black/30 border border-border p-4">
+              <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo</div>
+              {f ? (
+                <div className="flex items-center gap-3 text-sm flex-wrap">
+                  <span className="inline-flex items-center gap-2">
+                    <span className={`h-2.5 w-2.5 rounded-full ${f.status === "Online" ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                    {f.nome}: <strong>{f.status}</strong>
+                  </span>
+                  <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
+                  <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">Carregando status...</div>
+              )}
+            </div>
+          </div>
+        )}
+
+
 
         {/* Assistente de Caixa Inteligente */}
         {caixa && (
@@ -531,6 +632,9 @@ function AdminPage() {
                   <div key={p.id} className="py-3 flex items-start justify-between gap-3 text-sm">
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
+                        <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                          {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                        </span>
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-200 border border-red-500/50">
                           {p.status}
                         </span>
@@ -538,6 +642,7 @@ function AdminPage() {
                           {isCurtidas ? "Curtidas" : "Seguidores"}
                         </span>
                         <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+
                       </div>
                       {p.error_detail && (
                         <div className="text-xs text-red-300/90 font-mono break-all">{p.error_detail}</div>
@@ -572,7 +677,11 @@ function AdminPage() {
                 <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
+                      <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                        {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                      </span>
                       <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+
                       {p.abandono_notificado_at && (
                         <span
                           title={`Enviado em ${new Date(p.abandono_notificado_at).toLocaleString("pt-BR")}`}
@@ -636,6 +745,9 @@ function AdminPage() {
                 <div className="space-y-1">
                   <div className="font-mono text-xs text-muted-foreground">{p.id}</div>
                   <div className="flex items-center gap-2 flex-wrap">
+                    <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                      {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                    </span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       isCurtidas
                         ? "bg-pink-500/15 text-pink-300 border border-pink-500/40"
@@ -645,6 +757,7 @@ function AdminPage() {
                     </span>
                     <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
                   </div>
+
                   <div className="text-xs text-muted-foreground">
                     {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
                   </div>
