@@ -132,10 +132,19 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadCron = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getCron({ data: { token: tk } });
+      if (res.ok) setCron(res.cron);
+    } catch {}
+  };
+
   useEffect(() => {
     if (!token) return;
     loadMonitor();
-    const i = setInterval(() => loadMonitor(), 30000);
+    loadCron();
+    const i = setInterval(() => { loadMonitor(); loadCron(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -196,6 +205,19 @@ function AdminPage() {
       await loadMonitor();
     } finally {
       setMonitorBusy(false);
+    }
+  };
+
+  const testarCronAgora = async () => {
+    if (!token) return toast.error("Informe o token");
+    setCronBusy(true);
+    try {
+      const res = await runCron({ data: { token } });
+      if (res.ok) toast.success(`Cron OK · HTTP ${res.status} · ${res.elapsed_ms}ms`);
+      else toast.error(`Cron falhou · HTTP ${res.status} · ${res.body?.slice(0, 120) ?? ""}`);
+      await Promise.all([loadCron(), loadMonitor()]);
+    } finally {
+      setCronBusy(false);
     }
   };
 
