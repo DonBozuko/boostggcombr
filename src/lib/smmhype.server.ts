@@ -10,9 +10,15 @@ const VIEWS_SERVICE_ID = 18855;
 const TT_FOLLOWERS_SERVICE_ID = 14330;
 const TT_LIKES_SERVICE_ID = 19191;
 const TT_VIEWS_SERVICE_ID = 14907;
+// YouTube (SMMhype)
+const YT_SUBSCRIBERS_SERVICE_ID = 14343;
+const YT_VIEWS_SERVICE_ID = 997;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // YouTube prefixes: ys* (subscribers), yv* (views)
+  if (p.startsWith("ys")) return YT_SUBSCRIBERS_SERVICE_ID;
+  if (p.startsWith("yv")) return YT_VIEWS_SERVICE_ID;
   // TikTok prefixes: tf* / tl* / tv*
   if (p.startsWith("tf")) return TT_FOLLOWERS_SERVICE_ID;
   if (p.startsWith("tl")) return TT_LIKES_SERVICE_ID;
@@ -35,6 +41,8 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   tf100: TT_FOLLOWERS_SERVICE_ID, tf500: TT_FOLLOWERS_SERVICE_ID, tf1k: TT_FOLLOWERS_SERVICE_ID,
   tl500: TT_LIKES_SERVICE_ID, tl1k: TT_LIKES_SERVICE_ID, tl2k: TT_LIKES_SERVICE_ID,
   tv5k: TT_VIEWS_SERVICE_ID, tv10k: TT_VIEWS_SERVICE_ID, tv50k: TT_VIEWS_SERVICE_ID,
+  ys100: YT_SUBSCRIBERS_SERVICE_ID, ys500: YT_SUBSCRIBERS_SERVICE_ID, ys1k: YT_SUBSCRIBERS_SERVICE_ID,
+  yv1k: YT_VIEWS_SERVICE_ID, yv5k: YT_VIEWS_SERVICE_ID, yv10k: YT_VIEWS_SERVICE_ID,
 };
 
 
@@ -107,7 +115,14 @@ function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
   return trimmed;
 }
 
-
+function normalizeYoutubeTarget(raw: string): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.)?(m\.|music\.)?youtube\.com\//i.test(trimmed) || /^youtu\.be\//i.test(trimmed)) {
+    return `https://${trimmed.replace(/^www\./i, "")}`;
+  }
+  return trimmed;
+}
 
 export type SmmDispatchResult =
   | { ok: true; orderId?: string | number; body: unknown }
@@ -133,8 +148,11 @@ export async function dispatchSmmhype(args: {
   }
 
   const pkg = String(args.pacote ?? "").trim().toLowerCase();
-  const isTiktok = pkg.startsWith("t");
-  const link = isTiktok
+  const isYoutube = pkg.startsWith("y");
+  const isTiktok = !isYoutube && pkg.startsWith("t");
+  const link = isYoutube
+    ? normalizeYoutubeTarget(args.instagram_user)
+    : isTiktok
     ? normalizeTiktokTarget(args.instagram_user, pkg.startsWith("tf"))
     : normalizeInstagramUser(args.instagram_user);
   const body = new URLSearchParams({

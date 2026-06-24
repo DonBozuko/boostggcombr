@@ -63,10 +63,32 @@ Landing page pública **exclusivamente TikTok**, totalmente isolada da rota `/`.
 
 ---
 
+## 4. 📺 O NETO DO YOUTUBE — `/youtube`
+**Arquivo:** `src/routes/youtube.tsx`
+
+Landing page pública **exclusivamente YouTube**, totalmente isolada das demais rotas.
+
+**Identidade visual:**
+- Fundo Grafite Ultra Escuro `#0a0a0a`.
+- Acentos Vermelho Puro Neon `#FF0000` com glow.
+- Logo oficial do YouTube (SVG inline `YouTubeIcon`).
+
+**Catálogo (SMMhype service IDs):**
+- Inscritos → `14343`
+- Visualizações → `997`
+
+**Prefixos de pedido:** `ys*` (subscribers), `yv*` (views).
+**Coluna `rede_social`:** `youtube`.
+
+**Proibido:** qualquer referência visual ou textual a Instagram ou TikTok, ícones de outras redes, dourado/verde canarinho, ciano/rosa neon.
+
+---
+
 ## Regras de isolamento (checklist antes de qualquer PR)
 
-1. Editou `src/routes/index.tsx`? Não introduza ciano/rosa neon nem ícone do TikTok.
-2. Editou `src/routes/tiktok.tsx`? Não introduza dourado/verde canarinho nem ícone do Instagram.
-3. Editou `src/routes/admin.tsx`? Não exiba branding de rede social no header — use ícones apenas como filtro/etiqueta de linha.
-4. Novo pacote? Adicione em `src/lib/pedidos.functions.ts` (PRICE_TABLE) **e** mapeie o prefixo em `src/lib/smmhype.server.ts`.
-5. Build deve passar com `bun run build` antes de publicar.
+1. Editou `src/routes/index.tsx`? Não introduza ciano/rosa/vermelho neon nem ícones de TikTok/YouTube.
+2. Editou `src/routes/tiktok.tsx`? Não introduza dourado/verde canarinho, vermelho YouTube ou ícones de Instagram/YouTube.
+3. Editou `src/routes/youtube.tsx`? Não introduza identidades de Instagram ou TikTok.
+4. Editou `src/routes/admin.tsx`? Não exiba branding de rede social no header — use ícones apenas como filtro/etiqueta de linha.
+5. Novo pacote? Adicione em `src/lib/pedidos.functions.ts` (PRICE_TABLE) **e** mapeie o prefixo em `src/lib/smmhype.server.ts`.
+6. Build deve passar com `bun run build` antes de publicar.

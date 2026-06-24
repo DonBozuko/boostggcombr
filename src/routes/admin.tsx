@@ -51,7 +51,7 @@ const REDES: { key: RedeKey; label: string; icon: string; disabled?: boolean }[]
   { key: "overview",  label: "Visão Geral",      icon: "🌐" },
   { key: "instagram", label: "Instagram",        icon: "📸" },
   { key: "tiktok",    label: "TikTok",           icon: "🎵" },
-  { key: "youtube",   label: "YouTube (Breve)",  icon: "📺", disabled: true },
+  { key: "youtube",   label: "YouTube",          icon: "📺" },
 ];
 
 const REDE_ICON: Record<string, string> = {
