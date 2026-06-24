@@ -536,9 +536,10 @@ function Landing() {
         <div className="flex justify-center mb-8 sm:mb-10 px-2">
           <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-white/10 bg-zinc-900/70 backdrop-blur">
 
-            {(["seguidores", "curtidas"] as Categoria[]).map((c) => {
+            {(["seguidores", "curtidas", "visualizacoes"] as Categoria[]).map((c) => {
               const active = categoria === c;
-              const Icon = c === "seguidores" ? User : Heart;
+              const Icon = c === "seguidores" ? User : c === "curtidas" ? Heart : Eye;
+              const label = c === "seguidores" ? "Seguidores" : c === "curtidas" ? "Curtidas" : "Visualizações";
               return (
                 <button
                   key={c}
@@ -555,11 +556,12 @@ function Landing() {
                   }`}
                 >
                   <Icon className={`size-4 ${active && c === "curtidas" ? "fill-white" : ""}`} />
-                  {c === "seguidores" ? "Seguidores" : "Curtidas"}
+                  {label}
                 </button>
               );
             })}
           </div>
+
         </div>
 
         <AnimatePresence mode="wait">
