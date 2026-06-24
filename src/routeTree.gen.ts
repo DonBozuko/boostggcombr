@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
+import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -58,6 +59,12 @@ const ApiPublicCheckSaldoRoute = ApiPublicCheckSaldoRouteImport.update({
   path: '/api/public/check-saldo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksRecoverAbandonedRoute =
+  ApiPublicHooksRecoverAbandonedRouteImport.update({
+    id: '/api/public/hooks/recover-abandoned',
+    path: '/api/public/hooks/recover-abandoned',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +86,7 @@ export interface FileRoutesByTo {
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +98,7 @@ export interface FileRoutesById {
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +111,7 @@ export interface FileRouteTypes {
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/hooks/recover-abandoned'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +122,7 @@ export interface FileRouteTypes {
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/hooks/recover-abandoned'
   id:
     | '__root__'
     | '/'
@@ -121,6 +133,7 @@ export interface FileRouteTypes {
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/hooks/recover-abandoned'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +145,7 @@ export interface RootRouteChildren {
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
+  ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +206,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCheckSaldoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/recover-abandoned': {
+      id: '/api/public/hooks/recover-abandoned'
+      path: '/api/public/hooks/recover-abandoned'
+      fullPath: '/api/public/hooks/recover-abandoned'
+      preLoaderRoute: typeof ApiPublicHooksRecoverAbandonedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +225,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
+  ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
