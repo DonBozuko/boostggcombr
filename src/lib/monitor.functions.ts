@@ -23,12 +23,13 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!fornecedor) return { ok: false as const, error: "NOT_FOUND" as const };
 
-    const { data: logs } = await supabaseAdmin
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: historico } = await supabaseAdmin
       .from("monitoramento_saldo")
-      .select("saldo, status, data_hora, tempo_resposta_ms, erro_retornado")
+      .select("saldo, status, data_hora")
       .eq("fornecedor_id", fornecedor.id)
-      .order("data_hora", { ascending: false })
-      .limit(10);
+      .gte("data_hora", since)
+      .order("data_hora", { ascending: true });
 
     const saldoBrl = fornecedor.saldo_atual != null ? fornecedor.saldo_atual * USD_TO_BRL : null;
 
@@ -44,7 +45,12 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
         falhas_consecutivas: fornecedor.falhas_consecutivas,
         usd_to_brl: USD_TO_BRL,
       },
-      logs: logs ?? [],
+      historico: (historico ?? []).map((h) => ({
+        t: h.data_hora,
+        saldo_usd: h.saldo,
+        saldo_brl: h.saldo != null ? h.saldo * USD_TO_BRL : null,
+        status: h.status,
+      })),
     };
   });
 

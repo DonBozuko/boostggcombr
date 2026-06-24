@@ -1,10 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora } from "@/lib/monitor.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+  ReferenceLine,
+} from "recharts";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -22,6 +41,8 @@ type Pedido = {
   mercado_pago_id: string | null;
 };
 
+type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null; status: string };
+
 type MonitorState = {
   fornecedor: {
     nome: string;
@@ -33,6 +54,7 @@ type MonitorState = {
     falhas_consecutivas: number;
     usd_to_brl: number;
   };
+  historico: Historico[];
 } | null;
 
 const NIVEL_STYLE: Record<string, { bg: string; border: string; glow: string; label: string; emoji: string }> = {
@@ -42,6 +64,42 @@ const NIVEL_STYLE: Record<string, { bg: string; border: string; glow: string; la
   vermelho: { bg: "bg-red-950/40",     border: "border-red-500",     glow: "shadow-[0_0_45px_rgba(239,68,68,0.6)]",   label: "Recarregar Imediatamente", emoji: "🔴" },
   critico:  { bg: "bg-red-950/60",     border: "border-red-600",     glow: "shadow-[0_0_60px_rgba(239,68,68,0.8)]",   label: "CRÍTICO", emoji: "🚨" },
 };
+
+// WebAudio beep — não precisa de asset
+function useAlertBeep() {
+  const ctxRef = useRef<AudioContext | null>(null);
+  const enabledRef = useRef(false);
+
+  const enable = () => {
+    if (enabledRef.current) return;
+    try {
+      const Ctx = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+      ctxRef.current = new Ctx();
+      enabledRef.current = true;
+    } catch {}
+  };
+
+  const beep = () => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    // 3 pulsos curtos
+    for (let i = 0; i < 3; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, now + i * 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.25, now + i * 0.25 + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.25 + 0.2);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now + i * 0.25);
+      osc.stop(now + i * 0.25 + 0.22);
+    }
+  };
+
+  return { enable, beep, isEnabled: () => enabledRef.current };
+}
 
 function AdminPage() {
   const listar = useServerFn(listarPedidosPagos);
@@ -55,12 +113,14 @@ function AdminPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [monitor, setMonitor] = useState<MonitorState>(null);
   const [monitorBusy, setMonitorBusy] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
+  const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
     if (!tk) return;
     try {
       const res = await getMonitor({ data: { token: tk } });
-      if (res.ok) setMonitor({ fornecedor: res.fornecedor });
+      if (res.ok) setMonitor({ fornecedor: res.fornecedor, historico: res.historico });
     } catch {}
   };
 
@@ -70,6 +130,29 @@ function AdminPage() {
     const i = setInterval(() => loadMonitor(), 30000);
     return () => clearInterval(i);
   }, [token]);
+
+  // Alerta sonoro: dispara a cada 30s enquanto em estado crítico
+  const f = monitor?.fornecedor;
+  const isAlerta =
+    !!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico");
+
+  useEffect(() => {
+    if (!isAlerta || !soundOn) return;
+    alert.beep();
+    const i = setInterval(() => alert.beep(), 30000);
+    return () => clearInterval(i);
+  }, [isAlerta, soundOn]);
+
+  const toggleSound = () => {
+    if (!soundOn) {
+      alert.enable();
+      setSoundOn(true);
+      toast.success("Alerta sonoro ativado");
+    } else {
+      setSoundOn(false);
+      toast("Alerta sonoro desativado");
+    }
+  };
 
   const load = async () => {
     if (!token) return toast.error("Informe o token");
@@ -108,14 +191,31 @@ function AdminPage() {
     }
   };
 
-  const f = monitor?.fornecedor;
   const style = f ? NIVEL_STYLE[f.nivel_alerta] : null;
   const online = f?.status === "Online";
+
+  const chartData = useMemo(
+    () =>
+      (monitor?.historico ?? []).map((h) => ({
+        time: new Date(h.t).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+        brl: h.saldo_brl,
+      })),
+    [monitor?.historico],
+  );
 
   return (
     <div className="dark min-h-screen bg-background text-foreground p-6">
       <div className="max-w-5xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold">Admin · BoostGram</h1>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <h1 className="text-2xl font-bold">Admin · BoostGram</h1>
+          <Button
+            variant={soundOn ? "default" : "outline"}
+            size="sm"
+            onClick={toggleSound}
+          >
+            {soundOn ? "🔔 Som ON" : "🔕 Ativar alerta sonoro"}
+          </Button>
+        </div>
 
         <div className="flex gap-2">
           <Input
@@ -148,9 +248,14 @@ function AdminPage() {
                     <span>{style.label}</span>
                   </div>
                 </div>
-                <Button variant="secondary" size="sm" onClick={verificarAgora} disabled={monitorBusy}>
-                  {monitorBusy ? "Verificando..." : "Verificar agora"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={verificarAgora} disabled={monitorBusy}>
+                    {monitorBusy ? "..." : "Testar conexão"}
+                  </Button>
+                  <Button variant="secondary" size="sm" onClick={verificarAgora} disabled={monitorBusy}>
+                    {monitorBusy ? "Verificando..." : "Verificar agora"}
+                  </Button>
+                </div>
               </div>
 
               <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -178,6 +283,63 @@ function AdminPage() {
                 />
                 <Info label="Falhas consecutivas" value={String(f.falhas_consecutivas)} />
               </div>
+            </div>
+
+            {/* Histórico 24h */}
+            <div className="rounded-2xl border border-border bg-card/40 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-semibold">Histórico de saldo (últimas 24h · BRL)</h2>
+                <span className="text-xs text-muted-foreground">{chartData.length} pontos</span>
+              </div>
+              {chartData.length === 0 ? (
+                <div className="text-sm text-muted-foreground py-10 text-center">Sem dados ainda. Aguarde a próxima verificação.</div>
+              ) : (
+                <div className="h-56">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="time" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                      <YAxis stroke="hsl(var(--muted-foreground))" fontSize={11} tickFormatter={(v) => `R$${v}`} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+                        formatter={(v: number) => [`R$ ${v?.toFixed(2)}`, "Saldo"]}
+                      />
+                      <ReferenceLine y={50} stroke="#ef4444" strokeDasharray="4 4" label={{ value: "R$50", fill: "#ef4444", fontSize: 10 }} />
+                      <ReferenceLine y={20} stroke="#dc2626" strokeDasharray="4 4" label={{ value: "R$20", fill: "#dc2626", fontSize: 10 }} />
+                      <Line type="monotone" dataKey="brl" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </div>
+
+            {/* Fornecedores (multi — placeholder) */}
+            <div className="rounded-2xl border border-border bg-card/40 p-4 flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold">Fornecedores</h3>
+                <p className="text-xs text-muted-foreground">Atualmente: SMMhype. Suporte a múltiplos fornecedores em breve.</p>
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">+ Cadastrar fornecedor</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Cadastrar novo fornecedor</DialogTitle>
+                    <DialogDescription>
+                      Em breve. Estrutura preparada para herdar a tabela <code>fornecedores</code>.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3 opacity-60 pointer-events-none">
+                    <Input placeholder="Nome (ex: SMMPanel)" disabled />
+                    <Input placeholder="URL da API" disabled />
+                    <Input placeholder="Nome da secret (ex: SMMPANEL_API_KEY)" disabled />
+                  </div>
+                  <DialogFooter>
+                    <Button disabled>Cadastrar (em breve)</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         )}
