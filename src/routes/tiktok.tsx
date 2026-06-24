@@ -262,7 +262,8 @@ function TiktokLanding() {
       <section className="container mx-auto px-4 sm:px-6 pb-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {currentPlans.map((p) => {
-            const Icon = categoria === "seguidores" ? Music2 : categoria === "curtidas" ? Heart : Eye;
+            const isSeg = categoria === "seguidores";
+            const Icon = categoria === "curtidas" ? Heart : Eye;
             return (
               <div
                 key={p.id}
@@ -274,13 +275,14 @@ function TiktokLanding() {
                 }}
               >
                 <div
-                  className="mb-4 size-16 rounded-full grid place-items-center"
+                  className="mb-4 size-16 rounded-2xl grid place-items-center"
                   style={{
-                    background: `linear-gradient(135deg, ${CYAN}, ${PINK})`,
-                    boxShadow: `0 0 30px ${PINK}77`,
+                    background: "#0a0a0a",
+                    border: `1px solid ${CYAN}`,
+                    boxShadow: `0 0 24px ${CYAN}, 0 0 40px ${PINK}88`,
                   }}
                 >
-                  <Icon className="size-7 text-white" strokeWidth={2.2} />
+                  {isSeg ? <TikTokIcon size={28} /> : <Icon className="size-7 text-white" strokeWidth={2.2} />}
                 </div>
                 <h3 className="text-xl font-bold">{p.tier}</h3>
                 <div
