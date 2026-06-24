@@ -237,6 +237,7 @@ function AdminPage() {
       const res = await reprocessar({ data: { token, pedidoId: id } });
       if (!res.ok) toast.error(`Falhou: ${res.error}${"detail" in res ? ` — ${res.detail}` : ""}`);
       else toast.success(`Enviado! order=${res.orderId ?? "-"}`);
+      loadFalhos();
     } finally {
       setBusyId(null);
     }
