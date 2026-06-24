@@ -504,7 +504,7 @@ function AdminPage() {
             <div className={`rounded-2xl border-2 ${style.border} ${style.bg} ${style.glow} p-6 transition-all`}>
               <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
-                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Status do Estoque Atacadista</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">📸 Robô de Saldo · Instagram</div>
                   <div className="mt-1 flex items-center gap-3 text-3xl font-extrabold">
                     <span>{style.emoji}</span>
                     <span>{style.label}</span>
