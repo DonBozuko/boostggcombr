@@ -225,6 +225,7 @@ function AdminPage() {
       if (!res.ok) return toast.error(`Falhou: ${res.error}`);
       setPedidos(res.pedidos as Pedido[]);
       loadMonitor();
+      loadFalhos();
     } finally {
       setLoading(false);
     }
