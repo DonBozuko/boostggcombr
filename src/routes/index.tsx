@@ -86,7 +86,7 @@ export const Route = createFileRoute("/")({
             "comprar seguidores instagram, comprar seguidores brasileiros, seguidores reais instagram, comprar curtidas brasileiras, seguidores instagram barato, impulsionar instagram pix, seguidor de perfil, vaiviral, comprar seguidor do brasil, ganhar seguidores instagram rápido, automação de engajamento instagram, site para comprar seguidores",
         },
         { name: "robots", content: "index, follow" },
-        { name: "google-site-verification", content: "googlea461f60ce7ae2c61" },
+        { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
         { property: "og:type", content: "website" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
