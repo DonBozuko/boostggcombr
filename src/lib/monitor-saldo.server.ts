@@ -1,7 +1,7 @@
 // Server-only: check SMMhype balance and persist into monitoramento_saldo.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export const USD_TO_BRL = 5.6;
+export const USD_TO_BRL = 7.0;
 
 export type AlertLevel = "verde" | "amarelo" | "laranja" | "vermelho" | "critico";
 
