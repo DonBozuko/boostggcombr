@@ -527,3 +527,49 @@ function CronCard({
   );
 }
 
+function ServicesCacheCard({
+  cache,
+  busy,
+  onSync,
+}: {
+  cache: { total: number; last_sync: string | null; missing_monitored: number[]; monitorados: number[] } | null;
+  busy: boolean;
+  onSync: () => void;
+}) {
+  const hasMissing = (cache?.missing_monitored.length ?? 0) > 0;
+  return (
+    <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${hasMissing ? "bg-red-500 animate-pulse" : "bg-emerald-400 animate-pulse"}`} />
+            Cache de Serviços · Instagram (Refill)
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Sincroniza com SMMhype a cada 6h. Apenas serviços de Instagram com garantia de reposição.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onSync} disabled={busy}>
+          {busy ? "Sincronizando..." : "Sincronizar agora"}
+        </Button>
+      </div>
+
+      {hasMissing && (
+        <div className="rounded-md border-2 border-red-600 bg-red-950/60 p-3 text-sm font-bold text-red-200">
+          🚨 ATENÇÃO: serviço(s) monitorado(s) sumiram do fornecedor: {cache!.missing_monitored.join(", ")}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+        <Info label="Serviços ativos no cache" value={String(cache?.total ?? 0)} />
+        <Info
+          label="Última sincronização"
+          value={cache?.last_sync ? new Date(cache.last_sync).toLocaleString("pt-BR") : "—"}
+        />
+        <Info label="IDs monitorados" value={cache?.monitorados.join(", ") ?? "—"} />
+      </div>
+    </div>
+  );
+}
+
+
