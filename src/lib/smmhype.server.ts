@@ -87,6 +87,17 @@ function normalizeInstagramUser(raw: string): string {
   return `https://instagram.com/${handle}`;
 }
 
+function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (isFollowers) {
+    const handle = trimmed.replace(/^@+/, "").replace(/^tiktok\.com\//i, "");
+    return `https://tiktok.com/@${handle}`;
+  }
+  return trimmed;
+}
+
+
 export type SmmDispatchResult =
   | { ok: true; orderId?: string | number; body: unknown }
   | { ok: false; error: string; status?: number; body?: unknown };
