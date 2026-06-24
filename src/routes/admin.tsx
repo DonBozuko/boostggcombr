@@ -375,9 +375,9 @@ function AdminPage() {
   );
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between flex-wrap gap-3">
+    <div className="dark min-h-screen bg-background text-foreground p-4">
+      <div className="max-w-7xl mx-auto space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-2xl font-bold">Admin · BoostGram</h1>
           <Button
             variant={soundOn ? "default" : "outline"}
