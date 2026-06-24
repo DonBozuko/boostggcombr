@@ -1,27 +1,27 @@
 // Server-only helper para disparar pedido no SMMhype.
 // NÃO importar de código client-reachable em escopo de módulo.
 
-// Service IDs definitivos (Nov/2025):
-// - 14325 para quantidades 100 a 2000
-// - 14225 para quantidades 5000 a 100000
-export function resolveServiceId(quantidade: number): number | null {
+// Service IDs definitivos:
+// - Seguidores: 14325 (100–2000), 14225 (5000–100000)
+// - Curtidas: 18860 (todas quantidades)
+const LIKES_SERVICE_ID = 18860;
+
+export function resolveServiceId(pacote: string, quantidade: number): number | null {
+  const p = String(pacote ?? "").trim().toLowerCase();
+  if (p.startsWith("l")) return LIKES_SERVICE_ID;
   if (quantidade >= 100 && quantidade <= 2000) return 14325;
   if (quantidade >= 5000 && quantidade <= 100000) return 14225;
   return null;
 }
 
-// Compat: ainda exportamos um map por pacote id usado por código antigo.
+// Compat: map por pacote id (inclui curtidas).
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  p100: 14325,
-  p500: 14325,
-  p1k: 14325,
-  p2k: 14325,
-  p5k: 14225,
-  p10k: 14225,
-  p20k: 14225,
-  p50k: 14225,
-  p100k: 14225,
+  p100: 14325, p500: 14325, p1k: 14325, p2k: 14325,
+  p5k: 14225, p10k: 14225, p20k: 14225, p50k: 14225, p100k: 14225,
+  l100: LIKES_SERVICE_ID, l500: LIKES_SERVICE_ID, l1k: LIKES_SERVICE_ID,
+  l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
 };
+
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
