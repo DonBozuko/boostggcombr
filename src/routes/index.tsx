@@ -71,9 +71,9 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Boostygram | Comprar Seguidores no Instagram e Engajamento Real";
+    const title = "Comprar Seguidores no Instagram Orgânicos e Reais | Boostygram";
     const description =
-      "Comprar seguidores reais no Instagram com entrega imediata e segura via Pix. Impulsione seu Instagram com engajamento real, sem senha e com garantia.";
+      "Comprar seguidores no Instagram com entrega imediata e 100% seguro. Pacotes de seguidores brasileiros, curtidas e engajamento real via Pix. Teste por R$ 5!";
     const url = "https://boostygram.lovable.app/";
     const ogImage = "https://boostygram.lovable.app/__l5e/assets-v1/676afb5f-ed9d-49df-9171-6c3166ce217a/og-boostygram.jpg";
     return {
@@ -83,7 +83,7 @@ export const Route = createFileRoute("/")({
         {
           name: "keywords",
           content:
-            "comprar seguidores reais, comprar seguidores instagram, impulsionar instagram, seguidores via pix, entrega imediata, seguidores brasileiros, engajamento real",
+            "comprar seguidores instagram, comprar seguidores brasileiros, seguidores reais instagram, comprar curtidas brasileiras, seguidores instagram barato, impulsionar instagram pix, seguidor de perfil, vaiviral, comprar seguidor do brasil, ganhar seguidores instagram rápido, automação de engajamento instagram, site para comprar seguidores",
         },
         { name: "robots", content: "index, follow" },
         { property: "og:type", content: "website" },
