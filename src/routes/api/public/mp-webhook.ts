@@ -59,11 +59,23 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
           const payment = (await mpRes.json()) as {
             status?: string;
+            status_detail?: string;
             id?: string | number;
             transaction_amount?: number;
           };
           if (payment.status !== "approved") {
-            console.log("[mp-webhook] status != approved", payment.status, paymentId);
+            console.warn("[mp-webhook] MP recusou", {
+              paymentId, status: payment.status, status_detail: payment.status_detail,
+            });
+            // Audit: registra recusa no pedido se existir
+            const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
+            await admin
+              .from("pedidos")
+              .update({
+                status: `mp_${payment.status ?? "unknown"}`,
+                error_detail: `MP ${payment.status}: ${payment.status_detail ?? "sem detalhe"}`,
+              })
+              .eq("mercado_pago_id", String(paymentId));
             return new Response("ok", { status: 200 });
           }
 
