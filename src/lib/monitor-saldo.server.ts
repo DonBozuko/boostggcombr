@@ -97,7 +97,8 @@ export async function checkSmmhypeBalance() {
     })
     .eq("id", fornecedor.id);
 
-  const saldoBrl = saldoUsd != null ? saldoUsd * USD_TO_BRL : null;
+  const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
+  const saldoBrl = saldoUsd != null ? saldoUsd * cotacao : null;
 
   // ---- Previsão de consumo (últimas 24h) + alertas preventivos ----
   let previsao24hBrl = 0;
