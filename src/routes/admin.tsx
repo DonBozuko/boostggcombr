@@ -682,8 +682,8 @@ function AdminPage() {
             </div>
 
             {/* Fornecedores (multi — placeholder) */}
-            <div className="rounded-2xl border border-border bg-card/40 p-4 flex items-center justify-between">
-              <div>
+            <div className="rounded-2xl border border-border bg-card/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
                 <h3 className="font-semibold">Fornecedores</h3>
                 <p className="text-xs text-muted-foreground">Atualmente: SMMhype. Suporte a múltiplos fornecedores em breve.</p>
               </div>
