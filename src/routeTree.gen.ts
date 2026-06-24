@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as TiktokRouteImport } from './routes/tiktok'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
@@ -20,6 +21,11 @@ import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-w
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 
+const YoutubeRoute = YoutubeRouteImport.update({
+  id: '/youtube',
+  path: '/youtube',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TiktokRoute = TiktokRouteImport.update({
   id: '/tiktok',
   path: '/tiktok',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
+  '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
+  '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
+  '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
+    | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
+    | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
+    | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TiktokRoute: typeof TiktokRoute
+  YoutubeRoute: typeof YoutubeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
@@ -163,6 +176,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/youtube': {
+      id: '/youtube'
+      path: '/youtube'
+      fullPath: '/youtube'
+      preLoaderRoute: typeof YoutubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tiktok': {
       id: '/tiktok'
       path: '/tiktok'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TiktokRoute: TiktokRoute,
+  YoutubeRoute: YoutubeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
