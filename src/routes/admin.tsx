@@ -558,6 +558,42 @@ function AdminPage() {
           </div>
         )}
 
+        {/* Pedidos pendentes (Pix gerado, aguardando pagamento) */}
+        {pendentes.length > 0 && (
+          <div className="rounded-2xl border border-yellow-700/60 bg-yellow-950/20 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-yellow-200 flex items-center gap-2">
+                ⏳ {pendentes.length} pedido(s) pendente(s)
+              </h2>
+              <Button size="sm" variant="outline" onClick={() => loadPendentes()}>Atualizar</Button>
+            </div>
+            <div className="divide-y divide-yellow-900/40">
+              {pendentes.map((p) => (
+                <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+                      {p.abandono_notificado_at && (
+                        <span
+                          title={`Enviado em ${new Date(p.abandono_notificado_at).toLocaleString("pt-BR")}`}
+                          className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-500/10 text-emerald-300 border-emerald-500/40"
+                        >
+                          ✓ Notificação de Abandono Enviada
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
+
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs uppercase tracking-wider text-muted-foreground mr-1">Filtrar:</span>
           {(["todos", "seguidores", "curtidas"] as const).map((f) => (
