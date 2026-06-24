@@ -672,7 +672,7 @@ function Landing() {
                 <SelectContent>
                   {allPlans.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.tier} — {p.qty} {p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
+                      {p.tier} — {p.qty} {p.id.startsWith("v") ? "views" : p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -680,19 +680,30 @@ function Landing() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="profile">Link do Perfil do Instagram ou Usuário</Label>
+              <Label htmlFor="profile">
+                {form.plan.startsWith("v")
+                  ? "Link do vídeo/Reels do Instagram"
+                  : "Link do Perfil do Instagram ou Usuário"}
+              </Label>
               <div className="relative">
-                <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
+                {form.plan.startsWith("v") ? (
+                  <Eye className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
+                ) : (
+                  <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-300" />
+                )}
                 <Input
                   id="profile"
-                  placeholder="@seu_perfil ou instagram.com/seu_perfil"
+                  placeholder={form.plan.startsWith("v")
+                    ? "https://instagram.com/reel/..."
+                    : "@seu_perfil ou instagram.com/seu_perfil"}
                   className="h-12 pl-10"
                   value={form.profile}
                   onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                  maxLength={120}
+                  maxLength={200}
                 />
               </div>
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="email">E-mail (para o recibo do Mercado Pago)</Label>
