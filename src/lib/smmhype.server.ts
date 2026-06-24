@@ -121,7 +121,11 @@ export async function dispatchSmmhype(args: {
     };
   }
 
-  const link = normalizeInstagramUser(args.instagram_user);
+  const pkg = String(args.pacote ?? "").trim().toLowerCase();
+  const isTiktok = pkg.startsWith("t");
+  const link = isTiktok
+    ? normalizeTiktokTarget(args.instagram_user, pkg.startsWith("tf"))
+    : normalizeInstagramUser(args.instagram_user);
   const body = new URLSearchParams({
     key: smmKey,
     action: "add",
