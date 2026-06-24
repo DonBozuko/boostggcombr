@@ -316,7 +316,8 @@ const orderSchema = z.object({
     .string()
     .trim()
     .min(2, "Informe o link ou @ do Instagram")
-    .max(120, "Máximo 120 caracteres"),
+    .max(200, "Máximo 200 caracteres"),
+
   email: z
     .string()
     .trim()
