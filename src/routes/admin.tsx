@@ -562,8 +562,8 @@ function AdminPage() {
               {f ? (
                 <div className="flex items-center gap-3 text-sm flex-wrap">
                   <span className="inline-flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${f.status === "Online" ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
-                    {f.nome}: <strong>{f.status}</strong>
+                    <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                    {f.nome}: <strong>{online ? "Online" : f.status}</strong>
                   </span>
                   <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
                   <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
