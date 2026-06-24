@@ -22,9 +22,9 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
 };
 
-// Self-check: garante que todo pacote conhecido resolve para um service id válido.
-// Roda em runtime no servidor; loga e lança em DEV se algo estiver quebrado.
-export function validateDispatcherConfig(): { ok: boolean; missing: string[] } {
+// Self-check: garante que todo pacote conhecido resolve para um service id válido,
+// e simula um webhook de Curtidas (prefixo 'l*') roteando para o service 18860.
+export function validateDispatcherConfig(): { ok: boolean; missing: string[]; assertions: string[] } {
   const known: Array<[string, number]> = [
     ["p100", 100], ["p500", 500], ["p1k", 1000], ["p2k", 2000],
     ["p5k", 5000], ["p10k", 10000], ["p20k", 20000], ["p50k", 50000], ["p100k", 100000],
@@ -33,10 +33,23 @@ export function validateDispatcherConfig(): { ok: boolean; missing: string[] } {
   const missing = known
     .filter(([pkg, qty]) => resolveServiceId(pkg, qty) == null)
     .map(([pkg]) => pkg);
-  if (missing.length) {
-    console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
+
+  // Asserts específicos do roteamento 'l*' → 18860 (Curtidas)
+  const assertions: string[] = [];
+  for (const [pkg, qty] of known.filter(([p]) => p.startsWith("l"))) {
+    const sid = resolveServiceId(pkg, qty);
+    if (sid !== LIKES_SERVICE_ID) {
+      assertions.push(`prefixo 'l*' quebrado: ${pkg}(${qty}) → ${sid}, esperado ${LIKES_SERVICE_ID}`);
+    }
   }
-  return { ok: missing.length === 0, missing };
+  // Asserts de Seguidores
+  if (resolveServiceId("p500", 500) !== 14325) assertions.push("p500 deveria → 14325");
+  if (resolveServiceId("p10k", 10000) !== 14225) assertions.push("p10k deveria → 14225");
+
+  if (missing.length) console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
+  if (assertions.length) console.error("[smmhype] asserts falharam:", assertions);
+  else console.log("[smmhype] self-check OK · 14 pacotes (9 seguidores + 5 curtidas) · prefixo 'l*' → 18860");
+  return { ok: missing.length === 0 && assertions.length === 0, missing, assertions };
 }
 // roda na inicialização do módulo no servidor
 validateDispatcherConfig();

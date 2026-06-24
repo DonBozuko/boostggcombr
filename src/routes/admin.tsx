@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, reprocessarPedido } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,7 @@ type Pedido = {
   quantidade: number;
   instagram_user: string;
   mercado_pago_id: string | null;
+  error_detail?: string | null;
 };
 
 type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null; status: string };
@@ -104,6 +105,7 @@ function useAlertBeep() {
 
 function AdminPage() {
   const listar = useServerFn(listarPedidosPagos);
+  const listarFalhos = useServerFn(listarPedidosFalhos);
   const reprocessar = useServerFn(reprocessarPedido);
   const getMonitor = useServerFn(getMonitorSaldo);
   const checkAgora = useServerFn(verificarSaldoAgora);
@@ -114,6 +116,7 @@ function AdminPage() {
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [falhos, setFalhos] = useState<Pedido[]>([]);
   const [filtro, setFiltro] = useState<"todos" | "seguidores" | "curtidas">("todos");
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -159,6 +162,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadFalhos = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await listarFalhos({ data: { token: tk } });
+      if (res.ok) setFalhos(res.pedidos as Pedido[]);
+    } catch {}
+  };
+
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
     setCacheBusy(true);
@@ -177,14 +188,16 @@ function AdminPage() {
     loadMonitor();
     loadCron();
     loadCache();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); }, 30000);
+    loadFalhos();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
-  // Alerta sonoro: dispara a cada 30s enquanto em estado crítico
+  // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
   const isAlerta =
-    !!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico");
+    (!!f && (f.status === "Offline" || f.nivel_alerta === "vermelho" || f.nivel_alerta === "critico")) ||
+    falhos.length > 0;
 
   useEffect(() => {
     if (!isAlerta || !soundOn) return;
@@ -212,6 +225,7 @@ function AdminPage() {
       if (!res.ok) return toast.error(`Falhou: ${res.error}`);
       setPedidos(res.pedidos as Pedido[]);
       loadMonitor();
+      loadFalhos();
     } finally {
       setLoading(false);
     }
@@ -223,6 +237,7 @@ function AdminPage() {
       const res = await reprocessar({ data: { token, pedidoId: id } });
       if (!res.ok) toast.error(`Falhou: ${res.error}${"detail" in res ? ` — ${res.detail}` : ""}`);
       else toast.success(`Enviado! order=${res.orderId ?? "-"}`);
+      loadFalhos();
     } finally {
       setBusyId(null);
     }
@@ -412,6 +427,50 @@ function AdminPage() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+            </div>
+          </div>
+        )}
+
+        {/* Auditoria de falhas (SMM + MP recusado + valor divergente) */}
+        {falhos.length > 0 && (
+          <div className="rounded-2xl border-2 border-red-600 bg-red-950/40 shadow-[0_0_40px_rgba(239,68,68,0.45)] p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-red-200 flex items-center gap-2">
+                🚨 {falhos.length} pedido(s) com falha — requer ação
+              </h2>
+              <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
+            </div>
+            <div className="divide-y divide-red-900/60">
+              {falhos.map((p) => {
+                const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
+                const isSmm = p.status === "SMM_FAILED";
+                return (
+                  <div key={p.id} className="py-3 flex items-start justify-between gap-3 text-sm">
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-200 border border-red-500/50">
+                          {p.status}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-background/40 text-muted-foreground">
+                          {isCurtidas ? "Curtidas" : "Seguidores"}
+                        </span>
+                        <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+                      </div>
+                      {p.error_detail && (
+                        <div className="text-xs text-red-300/90 font-mono break-all">{p.error_detail}</div>
+                      )}
+                      <div className="text-xs text-muted-foreground">
+                        {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
+                      </div>
+                    </div>
+                    {isSmm && (
+                      <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
+                        {busyId === p.id ? "..." : "Tentar de novo"}
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

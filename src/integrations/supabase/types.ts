@@ -112,6 +112,7 @@ export type Database = {
       pedidos: {
         Row: {
           created_at: string
+          error_detail: string | null
           id: string
           instagram_user: string
           mercado_pago_id: string | null
@@ -122,6 +123,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          error_detail?: string | null
           id?: string
           instagram_user: string
           mercado_pago_id?: string | null
@@ -132,6 +134,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          error_detail?: string | null
           id?: string
           instagram_user?: string
           mercado_pago_id?: string | null

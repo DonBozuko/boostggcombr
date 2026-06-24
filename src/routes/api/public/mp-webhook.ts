@@ -59,11 +59,23 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
           const payment = (await mpRes.json()) as {
             status?: string;
+            status_detail?: string;
             id?: string | number;
             transaction_amount?: number;
           };
           if (payment.status !== "approved") {
-            console.log("[mp-webhook] status != approved", payment.status, paymentId);
+            console.warn("[mp-webhook] MP recusou", {
+              paymentId, status: payment.status, status_detail: payment.status_detail,
+            });
+            // Audit: registra recusa no pedido se existir
+            const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
+            await admin
+              .from("pedidos")
+              .update({
+                status: `mp_${payment.status ?? "unknown"}`,
+                error_detail: `MP ${payment.status}: ${payment.status_detail ?? "sem detalhe"}`,
+              })
+              .eq("mercado_pago_id", String(paymentId));
             return new Response("ok", { status: 200 });
           }
 
@@ -89,7 +101,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             });
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "amount_mismatch" })
+              .update({
+                status: "amount_mismatch",
+                error_detail: `Esperado R$${pedido.valor} · Recebido R$${payment.transaction_amount}`,
+              })
               .eq("id", pedido.id);
             return new Response("ok", { status: 200 });
           }
@@ -101,7 +116,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
           const { error: updErr } = await supabaseAdmin
             .from("pedidos")
-            .update({ status: "paid" })
+            .update({ status: "paid", error_detail: null })
             .eq("id", pedido.id);
           if (updErr) {
             console.error("[mp-webhook] update falhou", updErr);
@@ -117,6 +132,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           });
           if (!smm.ok) {
             console.error("[mp-webhook] SMMhype falhou", { pedidoId: pedido.id, ...smm });
+            const detail = `${smm.error}${smm.status ? ` (HTTP ${smm.status})` : ""}${
+              smm.body ? ` · ${typeof smm.body === "string" ? smm.body : JSON.stringify(smm.body)}` : ""
+            }`.slice(0, 500);
+            await supabaseAdmin
+              .from("pedidos")
+              .update({ status: "SMM_FAILED", error_detail: detail })
+              .eq("id", pedido.id);
           } else {
             console.log("[mp-webhook] SMMhype ok", { pedidoId: pedido.id, orderId: smm.orderId });
           }
