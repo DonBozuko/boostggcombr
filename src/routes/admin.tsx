@@ -227,7 +227,33 @@ function AdminPage() {
       const res = await getFaturamento({ data: { token: tk } });
       if (res.ok) setFaturamento({ geral: res.geral, count: res.count, totais: res.totais });
     } catch {}
+
+  const loadFornecedores = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await listFornecedores({ data: { token: tk } });
+      if (res.ok) setFornecedores(res.fornecedores);
+    } catch {}
   };
+
+  const handleToggleAtivo = async (id: string, ativoAtual: boolean) => {
+    if (!token) return toast.error("Informe o token");
+    setTogglingId(id);
+    // optimistic
+    setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: !ativoAtual } : p)));
+    try {
+      const res = await toggleFornecedor({ data: { token, id, ativo: !ativoAtual } });
+      if (!res.ok) {
+        toast.error("Falha ao alterar status");
+        setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: ativoAtual } : p)));
+      } else {
+        toast.success(!ativoAtual ? "Fornecedor ativado" : "Fornecedor desativado");
+      }
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
 
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
