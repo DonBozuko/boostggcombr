@@ -677,12 +677,12 @@ function AdminPage() {
 
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-yellow-200 flex items-center gap-2">
-                ⏳ {pendentes.length} pedido(s) pendente(s)
+                ⏳ {lista.length} pedido(s) pendente(s)
               </h2>
               <Button size="sm" variant="outline" onClick={() => loadPendentes()}>Atualizar</Button>
             </div>
             <div className="divide-y divide-yellow-900/40">
-              {pendentes.map((p) => (
+              {lista.map((p) => (
                 <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
