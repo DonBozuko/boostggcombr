@@ -643,9 +643,9 @@ function Landing() {
                   <SelectValue placeholder="Selecione um pacote" />
                 </SelectTrigger>
                 <SelectContent>
-                  {plans.map((p) => (
+                  {allPlans.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.tier} — {p.qty} seguidores ({p.price})
+                      {p.tier} — {p.qty} {p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
                     </SelectItem>
                   ))}
                 </SelectContent>
