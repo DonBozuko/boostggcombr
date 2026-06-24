@@ -454,7 +454,7 @@ function Landing() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">BoostGram</span>
+            <span className="font-display font-bold text-lg">BOOSTYGRAM</span>
           </div>
           <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
             <a href="#planos">Ver Planos</a>
@@ -593,7 +593,7 @@ function Landing() {
                   <h3 className="text-xl font-bold text-white">{p.tier}</h3>
                   <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
 
-                  <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">
+                  <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 px-2.5 py-1 text-[11px] font-semibold text-emerald-300">
                     <Eye className="size-3.5" />
                     {viewing} pessoas vendo agora
                   </div>
@@ -957,7 +957,7 @@ function Landing() {
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">BoostGram</span>
+            <span className="font-display font-semibold text-foreground">BOOSTYGRAM</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="/privacidade" className="hover:text-foreground">Privacidade & Segurança</a>
