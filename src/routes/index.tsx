@@ -233,7 +233,7 @@ type Plan = {
   highlight?: boolean;
 };
 
-type Categoria = "seguidores" | "curtidas";
+type Categoria = "seguidores" | "curtidas" | "visualizacoes";
 
 const plans: Plan[] = [
   { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Entrega rápida e segura" },
@@ -255,7 +255,16 @@ const likesPlans: Plan[] = [
   { id: "l5k",  tier: "5.000 Curtidas", tag: "+ PRO",     qty: "5.000", quantidade: 5000, valor: 39.0, price: "R$ 39,00", benefit: "Máximo impacto no post" },
 ];
 
-const allPlans: Plan[] = [...plans, ...likesPlans];
+const viewsPlans: Plan[] = [
+  { id: "v1k",  tier: "1.000 Views",   tag: "+ MINI",    qty: "1.000",  quantidade: 1000,  valor: 5.0,  price: "R$ 5,00",  benefit: "Entrega rápida no vídeo/reels" },
+  { id: "v5k",  tier: "5.000 Views",   tag: "+ STARTER", qty: "5.000",  quantidade: 5000,  valor: 12.0, price: "R$ 12,00", benefit: "Mais alcance imediato" },
+  { id: "v10k", tier: "10.000 Views",  tag: "+ BASIC",   qty: "10.000", quantidade: 10000, valor: 19.0, price: "R$ 19,00", benefit: "Mais recomendado", highlight: true },
+  { id: "v25k", tier: "25.000 Views",  tag: "+ PRO",     qty: "25.000", quantidade: 25000, valor: 39.0, price: "R$ 39,00", benefit: "Boost máximo no Reels" },
+  { id: "v50k", tier: "50.000 Views",  tag: "+ ELITE",   qty: "50.000", quantidade: 50000, valor: 69.0, price: "R$ 69,00", benefit: "Viralize seu conteúdo" },
+];
+
+const allPlans: Plan[] = [...plans, ...likesPlans, ...viewsPlans];
+
 
 
 const trustBadges = [
