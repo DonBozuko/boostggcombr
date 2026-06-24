@@ -708,7 +708,9 @@ function AdminPage() {
               ))}
             </div>
           </div>
-        )}
+          );
+        })()}
+
 
 
 
