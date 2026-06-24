@@ -165,6 +165,7 @@ export type Database = {
       }
       pedidos: {
         Row: {
+          abandono_notificado_at: string | null
           created_at: string
           error_detail: string | null
           id: string
@@ -176,6 +177,7 @@ export type Database = {
           valor: number
         }
         Insert: {
+          abandono_notificado_at?: string | null
           created_at?: string
           error_detail?: string | null
           id?: string
@@ -187,6 +189,7 @@ export type Database = {
           valor: number
         }
         Update: {
+          abandono_notificado_at?: string | null
           created_at?: string
           error_detail?: string | null
           id?: string
