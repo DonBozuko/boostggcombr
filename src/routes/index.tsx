@@ -573,9 +573,10 @@ function Landing() {
             transition={{ duration: 0.35, ease: "easeOut" }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch"
           >
-            {(categoria === "seguidores" ? plans : likesPlans).map((p, i) => {
+            {(categoria === "seguidores" ? plans : categoria === "curtidas" ? likesPlans : viewsPlans).map((p, i) => {
               const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
               const isLikes = p.id.startsWith("l");
+              const isViews = p.id.startsWith("v");
               return (
                 <motion.div
                   key={p.id}
@@ -599,12 +600,15 @@ function Landing() {
                   </div>
 
                   <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
-                    {isLikes ? (
+                    {isViews ? (
+                      <Eye className="size-7 text-white" strokeWidth={2.2} />
+                    ) : isLikes ? (
                       <Heart className="size-7 text-white fill-white" strokeWidth={2.2} />
                     ) : (
                       <Instagram className="size-7 text-white" strokeWidth={2.2} />
                     )}
                   </div>
+
 
                   <h3 className="text-xl font-bold text-white">{p.tier}</h3>
                   <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
