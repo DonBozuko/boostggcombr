@@ -300,6 +300,26 @@ function AdminPage() {
     }
   };
 
+  const salvarCotacao = async () => {
+    const id = monitor?.fornecedor.id;
+    if (!token) return toast.error("Informe o token");
+    if (!id) return toast.error("Fornecedor não carregado");
+    const v = parseFloat(cotacaoDraft.replace(",", "."));
+    if (!Number.isFinite(v) || v <= 0 || v > 100) return toast.error("Cotação inválida");
+    setSavingCotacao(true);
+    try {
+      const res = await updateCotacao({ data: { token, id, cotacao_brl: v } });
+      if (!res.ok) toast.error("Falha ao salvar cotação");
+      else {
+        toast.success(`Cotação salva: R$ ${v.toFixed(2)}/USD`);
+        await loadMonitor();
+      }
+    } finally {
+      setSavingCotacao(false);
+    }
+  };
+
+
 
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
