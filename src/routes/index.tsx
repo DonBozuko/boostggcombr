@@ -551,73 +551,83 @@ function Landing() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch">
-          {(categoria === "seguidores" ? plans : likesPlans).map((p, i) => {
-            const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
-            return (
-              <motion.div
-                key={p.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: Math.min(i * 0.05, 0.3) }}
-                className={`relative rounded-2xl border bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 p-6 pt-8 flex flex-col items-center text-center ${
-                  p.highlight
-                    ? "border-transparent lg:scale-105 lg:-my-2 z-10 shadow-[0_0_50px_-8px_rgba(236,72,153,0.75)] [background:linear-gradient(#0a0a0a,#0a0a0a)_padding-box,linear-gradient(135deg,#feda77,#f58529,#dd2a7b,#8134af)_border-box] border-2"
-                    : "border-white/10 hover:border-fuchsia-500/40 transition-colors"
-                }`}
-              >
-                {p.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_25px_rgba(249,115,22,0.8)]">
-                    ⭐ Mais Vendido
-                  </div>
-                )}
-
-                {/* Tag */}
-                <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.7)]`}>
-                  {p.tag}
-                </div>
-
-                {/* Instagram neon circle */}
-                <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
-                  <Instagram className="size-7 text-white" strokeWidth={2.2} />
-                </div>
-
-                <h3 className="text-xl font-bold text-white">{p.tier}</h3>
-                <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
-
-                {/* Urgency counter */}
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">
-                  <Eye className="size-3.5" />
-                  {viewing} vendo agora
-                </div>
-
-                <div className="mt-5 text-4xl font-extrabold text-white tracking-tight">
-                  {p.price}
-                </div>
-
-                <a
-                  href="#pedido"
-                  onClick={() => {
-                    setForm((f) => ({ ...f, plan: p.id }));
-                    trackEvent("cta_plan_click", {
-                      plan_id: p.id,
-                      plan_tier: p.tier,
-                      plan_quantity: p.quantidade,
-                      plan_value: p.valor,
-                      highlight: p.highlight ?? false,
-                    });
-                  }}
-                  className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
-                  aria-label={`Comprar pacote ${p.tier} por ${p.price}`}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={categoria}
+            initial={{ opacity: 0, x: categoria === "seguidores" ? -24 : 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: categoria === "seguidores" ? 24 : -24 }}
+            transition={{ duration: 0.35, ease: "easeOut" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto items-stretch"
+          >
+            {(categoria === "seguidores" ? plans : likesPlans).map((p, i) => {
+              const viewing = 100 + ((p.quantidade * 7 + i * 53) % 500);
+              const isLikes = p.id.startsWith("l");
+              return (
+                <motion.div
+                  key={p.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: Math.min(i * 0.05, 0.3) }}
+                  className={`relative rounded-2xl border bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 p-6 pt-8 flex flex-col items-center text-center ${
+                    p.highlight
+                      ? "border-transparent lg:scale-105 lg:-my-2 z-10 shadow-[0_0_50px_-8px_rgba(236,72,153,0.75)] [background:linear-gradient(#0a0a0a,#0a0a0a)_padding-box,linear-gradient(135deg,#feda77,#f58529,#dd2a7b,#8134af)_border-box] border-2"
+                      : "border-white/10 hover:border-fuchsia-500/40 transition-colors"
+                  }`}
                 >
-                  <Zap className="size-4 fill-white" /> COMPRAR AGORA
-                </a>
+                  {p.highlight && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_25px_rgba(249,115,22,0.8)]">
+                      ⭐ Mais Vendido
+                    </div>
+                  )}
 
-              </motion.div>
-            );
-          })}
-        </div>
+                  <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.7)]`}>
+                    {p.tag}
+                  </div>
+
+                  <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
+                    {isLikes ? (
+                      <Heart className="size-7 text-white fill-white" strokeWidth={2.2} />
+                    ) : (
+                      <Instagram className="size-7 text-white" strokeWidth={2.2} />
+                    )}
+                  </div>
+
+                  <h3 className="text-xl font-bold text-white">{p.tier}</h3>
+                  <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
+
+                  <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">
+                    <Eye className="size-3.5" />
+                    {viewing} pessoas vendo agora
+                  </div>
+
+                  <div className="mt-5 text-4xl font-extrabold text-white tracking-tight">
+                    {p.price}
+                  </div>
+
+                  <a
+                    href="#pedido"
+                    onClick={() => {
+                      setForm((f) => ({ ...f, plan: p.id }));
+                      trackEvent("cta_plan_click", {
+                        plan_id: p.id,
+                        plan_tier: p.tier,
+                        plan_quantity: p.quantidade,
+                        plan_value: p.valor,
+                        highlight: p.highlight ?? false,
+                      });
+                    }}
+                    className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
+                    aria-label={`Comprar pacote ${p.tier} por ${p.price}`}
+                  >
+                    <Zap className="size-4 fill-white" /> COMPRAR AGORA
+                  </a>
+                </motion.div>
+              );
+            })}
+          </motion.div>
+        </AnimatePresence>
+
       </section>
 
 
