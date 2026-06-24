@@ -216,6 +216,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadFaturamento = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getFaturamento({ data: { token: tk } });
+      if (res.ok) setFaturamento({ geral: res.geral, count: res.count, totais: res.totais });
+    } catch {}
+  };
+
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
     setCacheBusy(true);
@@ -237,9 +245,11 @@ function AdminPage() {
     loadFalhos();
     loadPendentes();
     loadCaixa();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); }, 30000);
+    loadFaturamento();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
+
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
