@@ -77,12 +77,79 @@ export async function checkSmmhypeBalance() {
     })
     .eq("id", fornecedor.id);
 
+  const saldoBrl = saldoUsd != null ? saldoUsd * USD_TO_BRL : null;
+
+  // ---- Previsão de consumo (últimas 24h) + alertas preventivos ----
+  let previsao24hBrl = 0;
+  let alertaCriado: { nivel: number; mensagem: string } | null = null;
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { data: pedidos24h } = await supabaseAdmin
+      .from("pedidos")
+      .select("valor")
+      .eq("status", "approved")
+      .gte("created_at", since);
+    // valor em centavos (BRL)
+    const totalCentavos = (pedidos24h ?? []).reduce((s, p: any) => s + (Number(p.valor) || 0), 0);
+    previsao24hBrl = totalCentavos / 100;
+
+    // Sincroniza saldo na tabela suppliers (BRL)
+    if (saldoBrl != null) {
+      await supabaseAdmin
+        .from("suppliers")
+        .update({ saldo_atual: saldoBrl, ultimo_update: new Date().toISOString() })
+        .eq("nome", "SMMhype");
+    }
+
+    if (saldoBrl != null) {
+      if (saldoBrl < 100) {
+        alertaCriado = {
+          nivel: 2,
+          mensagem: `🚨 URGENTE: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.`,
+        };
+      } else if (saldoBrl < 300) {
+        alertaCriado = {
+          nivel: 1,
+          mensagem: `⚠️ Atenção: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.`,
+        };
+      }
+    }
+
+    if (alertaCriado) {
+      // Dedup: não criar outro alerta aberto do mesmo nível na última 1h
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { data: existing } = await supabaseAdmin
+        .from("alerts")
+        .select("id")
+        .eq("tipo", "smmhype_saldo")
+        .eq("nivel", alertaCriado.nivel)
+        .eq("status", "open")
+        .gte("created_at", oneHourAgo)
+        .limit(1);
+
+      if (!existing || existing.length === 0) {
+        await supabaseAdmin.from("alerts").insert({
+          tipo: "smmhype_saldo",
+          nivel: alertaCriado.nivel,
+          mensagem: alertaCriado.mensagem,
+          status: "open",
+        });
+        const { dispatchWhatsappAlert, buildSmmhypeAlertMessage } = await import("@/lib/whatsapp-alert.server");
+        await dispatchWhatsappAlert(buildSmmhypeAlertMessage(saldoBrl));
+      }
+    }
+  } catch (e) {
+    console.error("[monitor-saldo] previsao/alerta error", e);
+  }
+
   return {
     ok: status === "Online",
     saldoUsd,
-    saldoBrl: saldoUsd != null ? saldoUsd * USD_TO_BRL : null,
+    saldoBrl,
     status: statusPersistido,
     erro,
     tempo_resposta_ms: elapsed,
+    previsao24hBrl,
+    alerta: alertaCriado,
   };
 }

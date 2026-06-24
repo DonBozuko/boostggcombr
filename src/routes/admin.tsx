@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, listarPedidosFalhos, reprocessarPedido } from "@/lib/admin.functions";
-import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron } from "@/lib/monitor.functions";
+import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,6 +113,7 @@ function AdminPage() {
   const runCron = useServerFn(testarCron);
   const getCache = useServerFn(getServicesCacheStatus);
   const syncCache = useServerFn(sincronizarServicosAgora);
+  const getCaixa = useServerFn(getCaixaAssistente);
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -133,6 +134,11 @@ function AdminPage() {
     total: number; last_sync: string | null; missing_monitored: number[]; monitorados: number[];
   } | null>(null);
   const [cacheBusy, setCacheBusy] = useState(false);
+  const [caixa, setCaixa] = useState<{
+    supplier: { nome: string; saldo_atual: number; saldo_minimo: number; meta_ideal: number; falta_depositar: number; ultimo_update: string } | null;
+    bank: { nome: string; saldo_atual: number; saldo_minimo_seguranca: number; ok: boolean; status_text: string } | null;
+    alerts: { id: string; tipo: string; nivel: number; mensagem: string; created_at: string }[];
+  } | null>(null);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
@@ -170,6 +176,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadCaixa = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getCaixa({ data: { token: tk } });
+      if (res.ok) setCaixa({ supplier: res.supplier, bank: res.bank, alerts: res.alerts });
+    } catch {}
+  };
+
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
     setCacheBusy(true);
@@ -189,7 +203,8 @@ function AdminPage() {
     loadCron();
     loadCache();
     loadFalhos();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); }, 30000);
+    loadCaixa();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadCaixa(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -307,6 +322,63 @@ function AdminPage() {
             {loading ? "Carregando..." : "Listar pagos"}
           </Button>
         </div>
+
+        {/* Assistente de Caixa Inteligente */}
+        {caixa && (
+          <div className="rounded-2xl border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-950/60 to-slate-950/60 p-6 shadow-[0_0_40px_rgba(99,102,241,0.35)] space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl font-extrabold tracking-tight">💡 Assistente de Caixa Inteligente</h2>
+              {caixa.alerts.length > 0 && (
+                <span className="text-xs font-semibold rounded-full px-3 py-1 bg-red-600/80 text-white">
+                  {caixa.alerts.length} alerta(s) aberto(s)
+                </span>
+              )}
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-xl bg-black/30 border border-white/10 p-4">
+                <div className="text-xs uppercase text-muted-foreground">SMMhype</div>
+                <div className="mt-1 text-2xl font-bold">
+                  R$ {caixa.supplier?.saldo_atual.toFixed(2) ?? "0.00"}
+                </div>
+                <div className="mt-2 text-sm">
+                  Custo para atingir a Meta Ideal (R$ {caixa.supplier?.meta_ideal.toFixed(2) ?? "1000.00"}):{" "}
+                  <span className="font-semibold text-emerald-400">
+                    Falta depositar R$ {caixa.supplier?.falta_depositar.toFixed(2) ?? "0.00"} no SMMhype
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-xl bg-black/30 border border-white/10 p-4">
+                <div className="text-xs uppercase text-muted-foreground">{caixa.bank?.nome ?? "Caixa"}</div>
+                <div className="mt-1 text-2xl font-bold">
+                  R$ {caixa.bank?.saldo_atual.toFixed(2) ?? "0.00"}
+                </div>
+                <div className={`mt-2 text-sm font-semibold ${caixa.bank?.ok ? "text-emerald-400" : "text-red-400"}`}>
+                  {caixa.bank?.status_text}
+                </div>
+              </div>
+            </div>
+            {caixa.alerts.length > 0 && (
+              <div className="space-y-2">
+                {caixa.alerts.slice(0, 5).map((a) => (
+                  <div
+                    key={a.id}
+                    className={`rounded-lg border p-3 text-sm ${
+                      a.nivel >= 2
+                        ? "border-red-500 bg-red-950/40 text-red-100"
+                        : "border-yellow-500 bg-yellow-950/40 text-yellow-100"
+                    }`}
+                  >
+                    <div className="font-semibold">
+                      {a.nivel >= 2 ? "🚨 Nível 2 · URGENTE" : "⚠️ Nível 1"} · {new Date(a.created_at).toLocaleString("pt-BR")}
+                    </div>
+                    <div>{a.mensagem}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
 
         {/* Widget Monitor de Saldo */}
         {f && style && (
