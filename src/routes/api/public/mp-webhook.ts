@@ -123,24 +123,50 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // 3) Dispara pedido no SMMhype via helper compartilhado
-          const { dispatchSmmhype } = await import("@/lib/smmhype.server");
-          const smm = await dispatchSmmhype({
-            pacote: pedido.pacote,
-            quantidade: pedido.quantidade,
-            instagram_user: pedido.instagram_user,
-          });
-          if (!smm.ok) {
-            console.error("[mp-webhook] SMMhype falhou", { pedidoId: pedido.id, ...smm });
-            const detail = `${smm.error}${smm.status ? ` (HTTP ${smm.status})` : ""}${
-              smm.body ? ` · ${typeof smm.body === "string" ? smm.body : JSON.stringify(smm.body)}` : ""
-            }`.slice(0, 500);
+          // 3) Dispara pedido no fornecedor ATIVO (flag ativo:true, menor prioridade)
+          const { data: fornecedorAtivo } = await supabaseAdmin
+            .from("fornecedores")
+            .select("slug, nome")
+            .eq("ativo", true)
+            .order("prioridade", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+
+          if (!fornecedorAtivo) {
+            console.error("[mp-webhook] nenhum fornecedor ativo", { pedidoId: pedido.id });
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: detail })
+              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ativo no painel" })
               .eq("id", pedido.id);
+            return new Response("ok", { status: 200 });
+          }
+
+          if (fornecedorAtivo.slug === "smmhype") {
+            const { dispatchSmmhype } = await import("@/lib/smmhype.server");
+            const smm = await dispatchSmmhype({
+              pacote: pedido.pacote,
+              quantidade: pedido.quantidade,
+              instagram_user: pedido.instagram_user,
+            });
+            if (!smm.ok) {
+              console.error("[mp-webhook] SMMhype falhou", { pedidoId: pedido.id, ...smm });
+              const detail = `${smm.error}${smm.status ? ` (HTTP ${smm.status})` : ""}${
+                smm.body ? ` · ${typeof smm.body === "string" ? smm.body : JSON.stringify(smm.body)}` : ""
+              }`.slice(0, 500);
+              await supabaseAdmin
+                .from("pedidos")
+                .update({ status: "SMM_FAILED", error_detail: detail })
+                .eq("id", pedido.id);
+            } else {
+              console.log("[mp-webhook] SMMhype ok", { pedidoId: pedido.id, orderId: smm.orderId });
+            }
           } else {
-            console.log("[mp-webhook] SMMhype ok", { pedidoId: pedido.id, orderId: smm.orderId });
+            const msg = `Fornecedor ativo '${fornecedorAtivo.nome}' ainda não tem dispatcher implementado. Reative o SMMhype.`;
+            console.error("[mp-webhook]", msg, { pedidoId: pedido.id });
+            await supabaseAdmin
+              .from("pedidos")
+              .update({ status: "SMM_FAILED", error_detail: msg })
+              .eq("id", pedido.id);
           }
 
           return new Response("ok", { status: 200 });
