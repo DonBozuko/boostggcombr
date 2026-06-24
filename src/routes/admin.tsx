@@ -616,16 +616,20 @@ function AdminPage() {
         )}
 
         {/* Auditoria de falhas (SMM + MP recusado + valor divergente) */}
-        {falhos.length > 0 && (
+        {(() => {
+          const lista = falhos.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
+          if (lista.length === 0) return null;
+          return (
           <div className="rounded-2xl border-2 border-red-600 bg-red-950/40 shadow-[0_0_40px_rgba(239,68,68,0.45)] p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-red-200 flex items-center gap-2">
-                🚨 {falhos.length} pedido(s) com falha — requer ação
+                🚨 {lista.length} pedido(s) com falha — requer ação
               </h2>
               <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
             </div>
             <div className="divide-y divide-red-900/60">
-              {falhos.map((p) => {
+              {lista.map((p) => {
+
                 const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
                 const isSmm = p.status === "SMM_FAILED";
                 return (
