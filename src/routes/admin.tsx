@@ -114,6 +114,7 @@ function AdminPage() {
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [filtro, setFiltro] = useState<"todos" | "seguidores" | "curtidas">("todos");
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [monitor, setMonitor] = useState<MonitorState>(null);
@@ -415,11 +416,42 @@ function AdminPage() {
           </div>
         )}
 
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs uppercase tracking-wider text-muted-foreground mr-1">Filtrar:</span>
+          {(["todos", "seguidores", "curtidas"] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setFiltro(f)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
+                filtro === f
+                  ? "bg-fuchsia-500/20 text-fuchsia-200 border-fuchsia-500/50"
+                  : "bg-background/40 text-muted-foreground border-border hover:text-foreground"
+              }`}
+            >
+              {f === "todos" ? "Todos" : f === "seguidores" ? "Seguidores" : "Curtidas"}
+            </button>
+          ))}
+          <span className="text-xs text-muted-foreground ml-auto">
+            {pedidos.filter((p) => {
+              if (filtro === "todos") return true;
+              const isC = p.pacote?.toLowerCase().startsWith("l");
+              return filtro === "curtidas" ? isC : !isC;
+            }).length} pedido(s)
+          </span>
+        </div>
+
         <div className="border border-border rounded-lg divide-y divide-border">
           {pedidos.length === 0 && (
             <div className="p-4 text-sm text-muted-foreground">Nenhum pedido carregado.</div>
           )}
-          {pedidos.map((p) => {
+          {pedidos
+            .filter((p) => {
+              if (filtro === "todos") return true;
+              const isC = p.pacote?.toLowerCase().startsWith("l");
+              return filtro === "curtidas" ? isC : !isC;
+            })
+            .map((p) => {
             const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
             return (
               <div key={p.id} className="p-4 flex items-center justify-between gap-4 text-sm">
