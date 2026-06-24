@@ -34,12 +34,12 @@ export function validateDispatcherConfig(): { ok: boolean; missing: string[]; as
     ["p100", 100], ["p500", 500], ["p1k", 1000], ["p2k", 2000],
     ["p5k", 5000], ["p10k", 10000], ["p20k", 20000], ["p50k", 50000], ["p100k", 100000],
     ["l100", 100], ["l500", 500], ["l1k", 1000], ["l2k", 2000], ["l5k", 5000],
+    ["v1k", 1000], ["v5k", 5000], ["v10k", 10000], ["v25k", 25000], ["v50k", 50000],
   ];
   const missing = known
     .filter(([pkg, qty]) => resolveServiceId(pkg, qty) == null)
     .map(([pkg]) => pkg);
 
-  // Asserts específicos do roteamento 'l*' → 18860 (Curtidas)
   const assertions: string[] = [];
   for (const [pkg, qty] of known.filter(([p]) => p.startsWith("l"))) {
     const sid = resolveServiceId(pkg, qty);
@@ -47,15 +47,21 @@ export function validateDispatcherConfig(): { ok: boolean; missing: string[]; as
       assertions.push(`prefixo 'l*' quebrado: ${pkg}(${qty}) → ${sid}, esperado ${LIKES_SERVICE_ID}`);
     }
   }
-  // Asserts de Seguidores
+  for (const [pkg, qty] of known.filter(([p]) => p.startsWith("v"))) {
+    const sid = resolveServiceId(pkg, qty);
+    if (sid !== VIEWS_SERVICE_ID) {
+      assertions.push(`prefixo 'v*' quebrado: ${pkg}(${qty}) → ${sid}, esperado ${VIEWS_SERVICE_ID}`);
+    }
+  }
   if (resolveServiceId("p500", 500) !== 14325) assertions.push("p500 deveria → 14325");
   if (resolveServiceId("p10k", 10000) !== 14225) assertions.push("p10k deveria → 14225");
 
   if (missing.length) console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
   if (assertions.length) console.error("[smmhype] asserts falharam:", assertions);
-  else console.log("[smmhype] self-check OK · 14 pacotes (9 seguidores + 5 curtidas) · prefixo 'l*' → 18860");
+  else console.log("[smmhype] self-check OK · 19 pacotes (9 seg + 5 likes + 5 views)");
   return { ok: missing.length === 0 && assertions.length === 0, missing, assertions };
 }
+
 // roda na inicialização do módulo no servidor
 validateDispatcherConfig();
 
