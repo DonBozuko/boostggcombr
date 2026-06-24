@@ -1,0 +1,1 @@
+ALTER TABLE public.fornecedores ADD COLUMN IF NOT EXISTS cotacao_brl numeric NOT NULL DEFAULT 7.0;

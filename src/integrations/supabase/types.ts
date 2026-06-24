@@ -91,6 +91,7 @@ export type Database = {
           api_key_secret: string
           api_url: string
           ativo: boolean
+          cotacao_brl: number
           created_at: string
           falhas_consecutivas: number
           id: string
@@ -107,6 +108,7 @@ export type Database = {
           api_key_secret: string
           api_url: string
           ativo?: boolean
+          cotacao_brl?: number
           created_at?: string
           falhas_consecutivas?: number
           id?: string
@@ -123,6 +125,7 @@ export type Database = {
           api_key_secret?: string
           api_url?: string
           ativo?: boolean
+          cotacao_brl?: number
           created_at?: string
           falhas_consecutivas?: number
           id?: string

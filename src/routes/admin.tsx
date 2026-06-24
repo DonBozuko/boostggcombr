@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede } from "@/lib/admin.functions";
-import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente } from "@/lib/monitor.functions";
+import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
 import { Button } from "@/components/ui/button";
@@ -65,6 +65,7 @@ type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null
 
 type MonitorState = {
   fornecedor: {
+    id?: string;
     nome: string;
     status: string;
     saldo_usd: number | null;
@@ -73,6 +74,7 @@ type MonitorState = {
     ultima_verificacao: string | null;
     falhas_consecutivas: number;
     usd_to_brl: number;
+    cotacao_brl?: number;
   };
   historico: Historico[];
 } | null;
@@ -173,6 +175,7 @@ function AdminPage() {
   const getCaixa = useServerFn(getCaixaAssistente);
   const listFornecedores = useServerFn(listarFornecedores);
   const toggleFornecedor = useServerFn(toggleFornecedorAtivo);
+  const updateCotacao = useServerFn(atualizarCotacaoFornecedor);
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
 
@@ -206,13 +209,18 @@ function AdminPage() {
   } | null>(null);
   const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string }[]>([]);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [cotacaoDraft, setCotacaoDraft] = useState<string>("");
+  const [savingCotacao, setSavingCotacao] = useState(false);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
     if (!tk) return;
     try {
       const res = await getMonitor({ data: { token: tk } });
-      if (res.ok) setMonitor({ fornecedor: res.fornecedor, historico: res.historico });
+      if (res.ok) {
+        setMonitor({ fornecedor: res.fornecedor, historico: res.historico });
+        setCotacaoDraft((prev) => (prev ? prev : (res.fornecedor.cotacao_brl ?? res.fornecedor.usd_to_brl).toFixed(2)));
+      }
     } catch {}
   };
 
@@ -294,6 +302,26 @@ function AdminPage() {
       setTogglingId(null);
     }
   };
+
+  const salvarCotacao = async () => {
+    const id = monitor?.fornecedor.id;
+    if (!token) return toast.error("Informe o token");
+    if (!id) return toast.error("Fornecedor não carregado");
+    const v = parseFloat(cotacaoDraft.replace(",", "."));
+    if (!Number.isFinite(v) || v <= 0 || v > 100) return toast.error("Cotação inválida");
+    setSavingCotacao(true);
+    try {
+      const res = await updateCotacao({ data: { token, id, cotacao_brl: v } });
+      if (!res.ok) toast.error("Falha ao salvar cotação");
+      else {
+        toast.success(`Cotação salva: R$ ${v.toFixed(2)}/USD`);
+        await loadMonitor();
+      }
+    } finally {
+      setSavingCotacao(false);
+    }
+  };
+
 
 
   const sincronizarAgora = async () => {
@@ -687,7 +715,32 @@ function AdminPage() {
                 />
                 <Info label="Falhas consecutivas" value={String(f.falhas_consecutivas)} />
               </div>
+
+              {/* Cotação USD→BRL configurável */}
+              <div className="mt-4 flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-background/40 p-3">
+                <div className="flex-1 min-w-[180px]">
+                  <label className="text-xs uppercase text-muted-foreground">Cotação USD→BRL (manual)</label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    max="100"
+                    inputMode="decimal"
+                    value={cotacaoDraft}
+                    onChange={(e) => setCotacaoDraft(e.target.value)}
+                    placeholder={f.usd_to_brl.toFixed(2)}
+                    className="mt-1"
+                  />
+                </div>
+                <Button onClick={salvarCotacao} disabled={savingCotacao || !monitor?.fornecedor.id}>
+                  {savingCotacao ? "Salvando…" : "Salvar cotação"}
+                </Button>
+                <p className="basis-full text-xs text-muted-foreground">
+                  Atual: <strong>R$ {f.usd_to_brl.toFixed(2)}</strong> por USD. Ajuste para bater com o painel do fornecedor.
+                </p>
+              </div>
             </div>
+
 
             {/* Status do Cron */}
             <CronCard cron={cron} busy={cronBusy} onTest={testarCronAgora} falhas={f.falhas_consecutivas} />
