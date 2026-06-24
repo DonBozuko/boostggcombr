@@ -14,6 +14,7 @@ import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
+  id: '/api/public/sync-services',
+  path: '/api/public/sync-services',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
   id: '/api/public/mp-webhook',
   path: '/api/public/mp-webhook',
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
+  '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
+  '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
+  '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
+    | '/api/public/sync-services'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
+    | '/api/public/sync-services'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
+    | '/api/public/sync-services'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
+  ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sync-services': {
+      id: '/api/public/sync-services'
+      path: '/api/public/sync-services'
+      fullPath: '/api/public/sync-services'
+      preLoaderRoute: typeof ApiPublicSyncServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/mp-webhook': {
       id: '/api/public/mp-webhook'
       path: '/api/public/mp-webhook'
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
+  ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron } from "@/lib/monitor.functions";
+import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -108,6 +109,8 @@ function AdminPage() {
   const checkAgora = useServerFn(verificarSaldoAgora);
   const getCron = useServerFn(getCronStatus);
   const runCron = useServerFn(testarCron);
+  const getCache = useServerFn(getServicesCacheStatus);
+  const syncCache = useServerFn(sincronizarServicosAgora);
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -122,6 +125,10 @@ function AdminPage() {
     last_status: string | null; last_return: string | null;
   } | null>(null);
   const [cronBusy, setCronBusy] = useState(false);
+  const [cache, setCache] = useState<{
+    total: number; last_sync: string | null; missing_monitored: number[]; monitorados: number[];
+  } | null>(null);
+  const [cacheBusy, setCacheBusy] = useState(false);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
@@ -140,11 +147,36 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadCache = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getCache({ data: { token: tk } });
+      if (res.ok) setCache({
+        total: res.total, last_sync: res.last_sync,
+        missing_monitored: res.missing_monitored, monitorados: res.monitorados,
+      });
+    } catch {}
+  };
+
+  const sincronizarAgora = async () => {
+    if (!token) return toast.error("Informe o token");
+    setCacheBusy(true);
+    try {
+      const res = await syncCache({ data: { token } });
+      if (res.ok) toast.success(`Sync OK · ${res.result.total} serviços`);
+      else toast.error(`Falha: ${res.error}`);
+      await loadCache();
+    } finally {
+      setCacheBusy(false);
+    }
+  };
+
   useEffect(() => {
     if (!token) return;
     loadMonitor();
     loadCron();
-    const i = setInterval(() => { loadMonitor(); loadCron(); }, 30000);
+    loadCache();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
