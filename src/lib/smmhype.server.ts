@@ -10,9 +10,15 @@ const VIEWS_SERVICE_ID = 18855;
 const TT_FOLLOWERS_SERVICE_ID = 14330;
 const TT_LIKES_SERVICE_ID = 19191;
 const TT_VIEWS_SERVICE_ID = 14907;
+// YouTube (SMMhype)
+const YT_SUBSCRIBERS_SERVICE_ID = 14343;
+const YT_VIEWS_SERVICE_ID = 997;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // YouTube prefixes: ys* (subscribers), yv* (views)
+  if (p.startsWith("ys")) return YT_SUBSCRIBERS_SERVICE_ID;
+  if (p.startsWith("yv")) return YT_VIEWS_SERVICE_ID;
   // TikTok prefixes: tf* / tl* / tv*
   if (p.startsWith("tf")) return TT_FOLLOWERS_SERVICE_ID;
   if (p.startsWith("tl")) return TT_LIKES_SERVICE_ID;
