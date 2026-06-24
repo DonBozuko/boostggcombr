@@ -12,29 +12,38 @@ const pedidoSchema = z.object({
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 
-// Tabela oficial (fonte de verdade no servidor) — evita preço adulterado pelo cliente.
-const PRICE_TABLE: Record<number, number> = {
-  100: 5.0,
-  500: 12.0,
-  1000: 18.0,
-  2000: 30.0,
-  5000: 65.0,
-  10000: 120.0,
-  20000: 220.0,
-  50000: 490.0,
-  100000: 890.0,
+// Tabela oficial (fonte de verdade no servidor) — keyed por pacote id.
+// Evita preço adulterado pelo cliente e diferencia seguidores vs curtidas.
+const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
+  // Seguidores
+  p100:   { quantidade: 100,    valor: 5.0 },
+  p500:   { quantidade: 500,    valor: 12.0 },
+  p1k:    { quantidade: 1000,   valor: 18.0 },
+  p2k:    { quantidade: 2000,   valor: 30.0 },
+  p5k:    { quantidade: 5000,   valor: 65.0 },
+  p10k:   { quantidade: 10000,  valor: 120.0 },
+  p20k:   { quantidade: 20000,  valor: 220.0 },
+  p50k:   { quantidade: 50000,  valor: 490.0 },
+  p100k:  { quantidade: 100000, valor: 890.0 },
+  // Curtidas (service 18860)
+  l100:   { quantidade: 100,  valor: 3.0 },
+  l500:   { quantidade: 500,  valor: 7.0 },
+  l1k:    { quantidade: 1000, valor: 12.0 },
+  l2k:    { quantidade: 2000, valor: 19.0 },
+  l5k:    { quantidade: 5000, valor: 39.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {
-    // Força o valor oficial do servidor (ignora qualquer preço enviado pelo client).
-    const oficial = PRICE_TABLE[data.quantidade];
-    if (!oficial) {
-      console.error("[criarPedido] quantidade inválida:", data.quantidade);
-      return { ok: false as const, error: "INVALID_QTY" as const };
+    const oficial = PRICE_TABLE[data.pacote];
+    if (!oficial || oficial.quantidade !== data.quantidade) {
+      console.error("[criarPedido] pacote/quantidade inválidos:", data.pacote, data.quantidade);
+      return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
-    const valorCobrar = oficial;
+    const valorCobrar = oficial.valor;
+    const categoria = data.pacote.startsWith("l") ? "curtidas" : "seguidores";
+
 
     const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
     if (!mpToken) {
