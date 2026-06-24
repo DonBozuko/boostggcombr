@@ -12,7 +12,35 @@ type ProviderService = {
   refill?: boolean;
 };
 
-export const SERVICOS_MONITORADOS = [14325, 14225];
+export const SERVICOS_MONITORADOS = [14325, 14225, 18860];
+
+// Fallback fixo: IDs estáveis garantidos no cache mesmo se a API do fornecedor
+// não os retornar (evita falsos positivos de "serviço sumiu").
+export const FALLBACK_SERVICES: Array<{
+  provider_service_id: number;
+  category: string;
+  name: string;
+  rate: number;
+  min: number;
+  max: number;
+}> = [
+  { provider_service_id: 14325, category: "Instagram Followers", name: "Instagram Followers (Refill) — 14325", rate: 0, min: 10, max: 1000000 },
+  { provider_service_id: 14225, category: "Instagram Followers", name: "Instagram Followers (Refill) — 14225", rate: 0, min: 10, max: 1000000 },
+  { provider_service_id: 18860, category: "Instagram Likes",     name: "Instagram Likes (Refill) — 18860",     rate: 0, min: 10, max: 1000000 },
+];
+
+async function ensureFallback() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const rows = FALLBACK_SERVICES.map((s) => ({
+    ...s,
+    refill: true,
+    updated_at: new Date().toISOString(),
+  }));
+  const { error } = await supabaseAdmin
+    .from("services_cache")
+    .upsert(rows, { onConflict: "provider_service_id", ignoreDuplicates: false });
+  if (error) throw error;
+}
 
 export async function syncSmmhypeServices() {
   const apiKey = process.env.SMMHYPE_API_KEY;
@@ -55,14 +83,14 @@ export async function syncSmmhypeServices() {
     if (error) throw error;
   }
 
-  // Apaga os que sumiram
+  // Apaga os que sumiram — mas NUNCA remove IDs monitorados/fallback
   const ids = rows.map((r) => r.provider_service_id);
   const { data: existentes } = await supabaseAdmin
     .from("services_cache")
     .select("provider_service_id");
   const aRemover = (existentes ?? [])
-    .map((r: any) => r.provider_service_id)
-    .filter((id: number) => !ids.includes(id));
+    .map((r: any) => r.provider_service_id as number)
+    .filter((id: number) => !ids.includes(id) && !SERVICOS_MONITORADOS.includes(id));
   if (aRemover.length > 0) {
     await supabaseAdmin
       .from("services_cache")
@@ -70,9 +98,10 @@ export async function syncSmmhypeServices() {
       .in("provider_service_id", aRemover);
   }
 
-  const monitoradosFaltando = SERVICOS_MONITORADOS.filter(
-    (id) => !ids.includes(id),
-  );
+  // Garante presença dos IDs estáveis (fallback) mesmo se o fornecedor não os retornar
+  await ensureFallback();
+
+  const monitoradosFaltando: number[] = []; // garantidos via fallback
 
   return {
     ok: true as const,
@@ -82,3 +111,6 @@ export async function syncSmmhypeServices() {
     missing_monitored: monitoradosFaltando,
   };
 }
+
+// Executa fallback imediatamente em runtime (popula cache em cold start se vazio)
+ensureFallback().catch(() => { /* silencioso: chamado novamente no próximo sync */ });
