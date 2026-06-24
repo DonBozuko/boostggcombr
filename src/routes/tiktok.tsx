@@ -215,7 +215,7 @@ function TiktokLanding() {
             border: `1px solid ${CYAN}`,
           }}
         >
-          <Music2 className="size-10" style={{ color: CYAN }} />
+          <TikTokIcon size={42} />
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
           <span style={{ color: "#fff", textShadow: `0 0 18px ${CYAN}` }}>O Neto</span>{" "}
