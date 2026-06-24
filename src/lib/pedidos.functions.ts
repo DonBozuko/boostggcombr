@@ -67,7 +67,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           transaction_amount: Number(valorCobrar.toFixed(2)),
-          description: `BoostGram - Pacote ${clean(data.pacote)} (${data.quantidade} seguidores) para ${clean(data.instagram_user)}`,
+          description: `BoostGram - Pacote ${clean(data.pacote)} (${data.quantidade} ${categoria}) para ${clean(data.instagram_user)}`,
           payment_method_id: "pix",
           payer: { email: data.email.trim().toLowerCase() },
         }),
