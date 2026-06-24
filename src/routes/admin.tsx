@@ -717,28 +717,51 @@ function AdminPage() {
               </div>
 
               {/* Cotação USD→BRL configurável */}
-              <div className="mt-4 flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-background/40 p-3">
-                <div className="flex-1 min-w-[180px]">
-                  <label className="text-xs uppercase text-muted-foreground">Cotação USD→BRL (manual)</label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    max="100"
-                    inputMode="decimal"
-                    value={cotacaoDraft}
-                    onChange={(e) => setCotacaoDraft(e.target.value)}
-                    placeholder={f.usd_to_brl.toFixed(2)}
-                    className="mt-1"
-                  />
-                </div>
-                <Button onClick={salvarCotacao} disabled={savingCotacao || !monitor?.fornecedor.id}>
-                  {savingCotacao ? "Salvando…" : "Salvar cotação"}
-                </Button>
-                <p className="basis-full text-xs text-muted-foreground">
-                  Atual: <strong>R$ {f.usd_to_brl.toFixed(2)}</strong> por USD. Ajuste para bater com o painel do fornecedor.
-                </p>
-              </div>
+              {(() => {
+                const parsed = parseFloat(cotacaoDraft.replace(",", "."));
+                const valid = Number.isFinite(parsed) && parsed > 0 && parsed <= 100;
+                const current = Number(f.usd_to_brl.toFixed(2));
+                const dirty = valid && parsed !== current;
+                return (
+                  <div className="mt-4 flex flex-wrap items-end gap-2 rounded-xl border border-border/60 bg-background/40 p-3">
+                    <div className="flex-1 min-w-[180px]">
+                      <label className="text-xs uppercase text-muted-foreground">Cotação USD→BRL (manual)</label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        max="100"
+                        inputMode="decimal"
+                        value={cotacaoDraft}
+                        onChange={(e) => setCotacaoDraft(e.target.value)}
+                        placeholder={f.usd_to_brl.toFixed(2)}
+                        aria-invalid={!valid && cotacaoDraft.length > 0}
+                        className={`mt-1 ${!valid && cotacaoDraft.length > 0 ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                      />
+                    </div>
+                    <Button onClick={salvarCotacao} disabled={savingCotacao || !valid || !dirty || !monitor?.fornecedor.id}>
+                      {savingCotacao ? "Salvando…" : "Salvar cotação"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setCotacaoDraft(current.toFixed(2))}
+                      disabled={savingCotacao || !dirty}
+                      title="Reverter para o valor salvo"
+                    >
+                      Resetar
+                    </Button>
+                    <p className="basis-full text-xs text-muted-foreground">
+                      {!valid && cotacaoDraft.length > 0 ? (
+                        <span className="text-red-400">Informe um número entre 0,01 e 100.</span>
+                      ) : dirty ? (
+                        <span className="text-yellow-400">Alterações não salvas (atual: R$ {current.toFixed(2)}/USD).</span>
+                      ) : (
+                        <>Atual: <strong className="text-emerald-400">R$ {current.toFixed(2)}</strong> por USD ✓</>
+                      )}
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
 
 
