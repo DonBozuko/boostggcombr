@@ -47,7 +47,6 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
-import instagramHero from "@/assets/instagram-hero-cyberpunk.jpg";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
@@ -465,22 +464,10 @@ function Landing() {
 
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <img
-            src={instagramHero}
-            alt="Boostygram Instagram cyberpunk neon banner"
-            width={1920}
-            height={1024}
-            className="w-full h-full object-cover opacity-70"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(10,10,10,0.55) 0%, rgba(10,10,10,0.85) 70%, #0a0a0a 100%)",
-            }}
-          />
-        </div>
+        <div
+          className="absolute inset-0 -z-10"
+          style={{ background: "var(--gradient-hero)" }}
+        />
         <div className="container mx-auto px-6 pt-20 pb-20 text-center max-w-3xl">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
