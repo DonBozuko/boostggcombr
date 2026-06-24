@@ -40,34 +40,34 @@
 
 :root {
   --radius: 0.875rem;
-  /* Dark graphite base */
-  --background: oklch(0.16 0.015 270);
-  --foreground: oklch(0.98 0.005 260);
-  --card: oklch(0.21 0.02 270);
-  --card-foreground: oklch(0.98 0.005 260);
-  --popover: oklch(0.21 0.02 270);
-  --popover-foreground: oklch(0.98 0.005 260);
-  --primary: oklch(0.65 0.28 295);     /* neon purple */
-  --primary-foreground: oklch(0.1 0 0);
-  --secondary: oklch(0.27 0.03 270);
-  --secondary-foreground: oklch(0.98 0.005 260);
-  --muted: oklch(0.24 0.02 270);
-  --muted-foreground: oklch(0.72 0.02 265);
-  --accent: oklch(0.7 0.22 250);       /* electric blue */
-  --accent-foreground: oklch(0.1 0 0);
+  /* Cyberpunk Canarinho — graphite + neon yellow + neon green */
+  --background: oklch(0.13 0.01 150);
+  --foreground: oklch(0.98 0.01 110);
+  --card: oklch(0.17 0.015 150);
+  --card-foreground: oklch(0.98 0.01 110);
+  --popover: oklch(0.17 0.015 150);
+  --popover-foreground: oklch(0.98 0.01 110);
+  --primary: oklch(0.9 0.21 105);          /* neon canarinho yellow */
+  --primary-foreground: oklch(0.12 0.01 150);
+  --secondary: oklch(0.22 0.02 150);
+  --secondary-foreground: oklch(0.98 0.01 110);
+  --muted: oklch(0.2 0.015 150);
+  --muted-foreground: oklch(0.72 0.03 130);
+  --accent: oklch(0.78 0.24 145);          /* neon brazil green */
+  --accent-foreground: oklch(0.1 0.01 150);
   --destructive: oklch(0.62 0.24 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(1 0 0 / 8%);
-  --input: oklch(1 0 0 / 10%);
-  --ring: oklch(0.65 0.28 295);
-  --neon: oklch(0.68 0.3 305);
-  --electric: oklch(0.72 0.22 245);
+  --border: oklch(0.9 0.21 105 / 12%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.9 0.21 105);
+  --neon: oklch(0.9 0.21 105);             /* yellow */
+  --electric: oklch(0.78 0.24 145);        /* green */
 
-  --gradient-hero: radial-gradient(ellipse at top, oklch(0.3 0.15 290 / 0.5), transparent 60%),
-                   radial-gradient(ellipse at bottom right, oklch(0.35 0.18 250 / 0.4), transparent 60%);
+  --gradient-hero: radial-gradient(ellipse at top, oklch(0.5 0.22 110 / 0.35), transparent 60%),
+                   radial-gradient(ellipse at bottom right, oklch(0.45 0.22 145 / 0.3), transparent 60%);
   --gradient-cta: linear-gradient(135deg, var(--neon), var(--electric));
-  --shadow-glow: 0 0 60px -10px oklch(0.65 0.28 295 / 0.6);
-  --shadow-glow-blue: 0 0 60px -10px oklch(0.72 0.22 245 / 0.6);
+  --shadow-glow: 0 0 60px -10px oklch(0.9 0.21 105 / 0.55);
+  --shadow-glow-blue: 0 0 60px -10px oklch(0.78 0.24 145 / 0.55);
 }
 
 @layer base {
@@ -78,8 +78,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(circle at 20% 0%, oklch(0.3 0.15 290 / 0.25), transparent 50%),
-      radial-gradient(circle at 80% 100%, oklch(0.3 0.18 245 / 0.2), transparent 50%);
+      radial-gradient(circle at 20% 0%, oklch(0.45 0.22 110 / 0.18), transparent 50%),
+      radial-gradient(circle at 80% 100%, oklch(0.45 0.22 145 / 0.16), transparent 50%);
     background-attachment: fixed;
   }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
@@ -93,10 +93,10 @@
 }
 
 @utility bg-graphite {
-  background-color: oklch(0.21 0.02 270);
+  background-color: oklch(0.17 0.015 150);
   background-image:
-    linear-gradient(135deg, oklch(1 0 0 / 0.03) 1px, transparent 1px),
-    linear-gradient(45deg, oklch(1 0 0 / 0.02) 1px, transparent 1px);
+    linear-gradient(135deg, oklch(0.9 0.21 105 / 0.04) 1px, transparent 1px),
+    linear-gradient(45deg, oklch(0.78 0.24 145 / 0.03) 1px, transparent 1px);
   background-size: 8px 8px, 8px 8px;
 }
 
@@ -104,8 +104,8 @@
 @utility shadow-glow-blue { box-shadow: var(--shadow-glow-blue); }
 
 @keyframes cta-pulse {
-  0%, 100% { box-shadow: 0 0 18px -2px rgba(221,42,123,0.55), 0 0 0 0 rgba(245,133,41,0.45); transform: translateY(0); }
-  50%      { box-shadow: 0 0 38px -2px rgba(221,42,123,0.95), 0 0 0 8px rgba(245,133,41,0); transform: translateY(-1px); }
+  0%, 100% { box-shadow: 0 0 18px -2px oklch(0.9 0.21 105 / 0.6), 0 0 0 0 oklch(0.78 0.24 145 / 0.45); transform: translateY(0); }
+  50%      { box-shadow: 0 0 38px -2px oklch(0.9 0.21 105 / 0.95), 0 0 0 8px oklch(0.78 0.24 145 / 0); transform: translateY(-1px); }
 }
 @utility cta-pulse {
   animation: cta-pulse 2.2s ease-in-out infinite;
