@@ -1,0 +1,1 @@
+UPDATE public.fornecedores SET falhas_consecutivas=0, status='Online', updated_at=now() WHERE nome='SMMhype';
