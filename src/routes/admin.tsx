@@ -40,6 +40,7 @@ type Pedido = {
   quantidade: number;
   instagram_user: string;
   mercado_pago_id: string | null;
+  error_detail?: string | null;
 };
 
 type Historico = { t: string; saldo_usd: number | null; saldo_brl: number | null; status: string };
