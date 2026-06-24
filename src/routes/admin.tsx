@@ -401,36 +401,64 @@ function AdminPage() {
           </Button>
         </div>
 
-        {/* ⛽ Central de Abastecimento Rápido */}
-        <div className="rounded-2xl border-2 border-amber-500/60 bg-gradient-to-br from-amber-950/50 via-orange-950/40 to-slate-950/60 p-6 shadow-[0_0_45px_rgba(245,158,11,0.45)] space-y-4">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <h2 className="text-xl font-extrabold tracking-tight">⛽ Abastecimento de Combustível</h2>
-            <span className="text-xs text-muted-foreground">Recarga expressa via PIX</span>
+        {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
+        <div className="rounded-xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-950/40 to-emerald-950/20 backdrop-blur-md p-3 shadow-[0_0_30px_rgba(245,158,11,0.25),inset_0_0_20px_rgba(16,185,129,0.05)]">
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {[
-              { nome: "SMMhype",         emoji: "🚀", url: "https://smmhype.com/addfunds" },
-              { nome: "SMMPainel",       emoji: "⚙️", url: "https://smmpainel.com/addfunds" },
-              { nome: "Verified Atacado", emoji: "✅", url: "https://verifiedatacado.com/addfunds" },
-            ].map((p) => (
-              <div
-                key={p.nome}
-                className="rounded-xl bg-black/40 border border-amber-500/30 p-4 flex flex-col gap-3 hover:border-amber-400/70 hover:shadow-[0_0_25px_rgba(251,191,36,0.4)] transition-all"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{p.emoji}</span>
-                  <span className="font-bold text-amber-100">{p.nome}</span>
-                </div>
-                <a
-                  href={p.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-sm py-2 px-3 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {(fornecedores.length > 0 ? fornecedores : [
+              { id: "_smmhype", nome: "SMMhype", ativo: false, slug: "smmhype" },
+              { id: "_smmpainel", nome: "SMMPainel", ativo: false, slug: "smmpainel" },
+              { id: "_verified", nome: "Verified Atacado", ativo: false, slug: "verified" },
+            ]).map((p) => {
+              const urlMap: Record<string, string> = {
+                smmhype: "https://smmhype.com/addfunds",
+                smmpainel: "https://smmpainel.com/addfunds",
+                verified: "https://verifiedatacado.com/addfunds",
+              };
+              const url = urlMap[p.slug] ?? "#";
+              const emoji = p.slug === "smmhype" ? "🚀" : p.slug === "smmpainel" ? "⚙️" : "✅";
+              const isReal = !p.id.startsWith("_");
+              return (
+                <div
+                  key={p.id}
+                  className={`rounded-lg border backdrop-blur-sm p-2.5 flex flex-col gap-2 transition-all ${
+                    p.ativo
+                      ? "border-emerald-400/60 bg-emerald-950/20 shadow-[0_0_18px_rgba(16,185,129,0.35)]"
+                      : "border-white/10 bg-black/30 hover:border-amber-400/50"
+                  }`}
                 >
-                  ⚡ RECARREGAR VIA PIX
-                </a>
-              </div>
-            ))}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-lg leading-none">{emoji}</span>
+                      <span className="font-bold text-xs text-amber-50 truncate">{p.nome}</span>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={!isReal || togglingId === p.id}
+                      onClick={() => isReal && handleToggleAtivo(p.id, p.ativo)}
+                      className={`shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full border transition-all ${
+                        p.ativo
+                          ? "bg-emerald-500/20 text-emerald-200 border-emerald-400/60 shadow-[0_0_10px_rgba(16,185,129,0.6)]"
+                          : "bg-slate-800/60 text-slate-400 border-slate-600/60"
+                      } ${!isReal ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+                    >
+                      {p.ativo ? "🟢 ATIVO" : "⚪ INATIVO"}
+                    </button>
+                  </div>
+                  <a
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-[11px] py-1.5 px-2 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_12px_rgba(245,158,11,0.45)]"
+                  >
+                    ⚡ Recarregar PIX
+                  </a>
+                </div>
+              );
+            })}
           </div>
         </div>
 
