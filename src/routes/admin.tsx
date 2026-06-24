@@ -106,6 +106,7 @@ function useAlertBeep() {
 function AdminPage() {
   const listar = useServerFn(listarPedidosPagos);
   const listarFalhos = useServerFn(listarPedidosFalhos);
+  const listarPendentes = useServerFn(listarPedidosPendentes);
   const reprocessar = useServerFn(reprocessarPedido);
   const getMonitor = useServerFn(getMonitorSaldo);
   const checkAgora = useServerFn(verificarSaldoAgora);
