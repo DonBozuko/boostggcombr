@@ -213,8 +213,9 @@ function AdminPage() {
     loadCron();
     loadCache();
     loadFalhos();
+    loadPendentes();
     loadCaixa();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadCaixa(); }, 30000);
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
