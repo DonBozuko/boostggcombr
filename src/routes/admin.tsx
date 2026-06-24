@@ -366,6 +366,40 @@ function AdminPage() {
           </Button>
         </div>
 
+        {/* ⛽ Central de Abastecimento Rápido */}
+        <div className="rounded-2xl border-2 border-amber-500/60 bg-gradient-to-br from-amber-950/50 via-orange-950/40 to-slate-950/60 p-6 shadow-[0_0_45px_rgba(245,158,11,0.45)] space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h2 className="text-xl font-extrabold tracking-tight">⛽ Abastecimento de Combustível</h2>
+            <span className="text-xs text-muted-foreground">Recarga expressa via PIX</span>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[
+              { nome: "SMMhype",         emoji: "🚀", url: "https://smmhype.com/addfunds" },
+              { nome: "SMMPainel",       emoji: "⚙️", url: "https://smmpainel.com/addfunds" },
+              { nome: "Verified Atacado", emoji: "✅", url: "https://verifiedatacado.com/addfunds" },
+            ].map((p) => (
+              <div
+                key={p.nome}
+                className="rounded-xl bg-black/40 border border-amber-500/30 p-4 flex flex-col gap-3 hover:border-amber-400/70 hover:shadow-[0_0_25px_rgba(251,191,36,0.4)] transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{p.emoji}</span>
+                  <span className="font-bold text-amber-100">{p.nome}</span>
+                </div>
+                <a
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-black font-bold text-sm py-2 px-3 hover:from-amber-400 hover:to-orange-400 shadow-[0_0_20px_rgba(245,158,11,0.5)]"
+                >
+                  ⚡ RECARREGAR VIA PIX
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+
         {/* Navegação Multi-Painel (Casa dos Avós) */}
         <div className="rounded-2xl border border-border bg-card/30 p-2 flex flex-wrap gap-2">
           {REDES.map((r) => {
