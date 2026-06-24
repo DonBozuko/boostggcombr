@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
+import { getMonitorSaldo, verificarSaldoAgora } from "@/lib/monitor.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -21,13 +22,54 @@ type Pedido = {
   mercado_pago_id: string | null;
 };
 
+type MonitorState = {
+  fornecedor: {
+    nome: string;
+    status: string;
+    saldo_usd: number | null;
+    saldo_brl: number | null;
+    nivel_alerta: "verde" | "amarelo" | "laranja" | "vermelho" | "critico";
+    ultima_verificacao: string | null;
+    falhas_consecutivas: number;
+    usd_to_brl: number;
+  };
+} | null;
+
+const NIVEL_STYLE: Record<string, { bg: string; border: string; glow: string; label: string; emoji: string }> = {
+  verde:    { bg: "bg-emerald-950/40", border: "border-emerald-500", glow: "shadow-[0_0_40px_rgba(16,185,129,0.45)]", label: "Saldo Saudável", emoji: "🟢" },
+  amarelo:  { bg: "bg-yellow-950/40",  border: "border-yellow-500",  glow: "shadow-[0_0_40px_rgba(234,179,8,0.45)]",  label: "Saldo Baixo", emoji: "🟡" },
+  laranja:  { bg: "bg-orange-950/40",  border: "border-orange-500",  glow: "shadow-[0_0_40px_rgba(249,115,22,0.55)]", label: "Saldo Muito Baixo", emoji: "🟠" },
+  vermelho: { bg: "bg-red-950/40",     border: "border-red-500",     glow: "shadow-[0_0_45px_rgba(239,68,68,0.6)]",   label: "Recarregar Imediatamente", emoji: "🔴" },
+  critico:  { bg: "bg-red-950/60",     border: "border-red-600",     glow: "shadow-[0_0_60px_rgba(239,68,68,0.8)]",   label: "CRÍTICO", emoji: "🚨" },
+};
+
 function AdminPage() {
   const listar = useServerFn(listarPedidosPagos);
   const reprocessar = useServerFn(reprocessarPedido);
+  const getMonitor = useServerFn(getMonitorSaldo);
+  const checkAgora = useServerFn(verificarSaldoAgora);
+
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [monitor, setMonitor] = useState<MonitorState>(null);
+  const [monitorBusy, setMonitorBusy] = useState(false);
+
+  const loadMonitor = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getMonitor({ data: { token: tk } });
+      if (res.ok) setMonitor({ fornecedor: res.fornecedor });
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (!token) return;
+    loadMonitor();
+    const i = setInterval(() => loadMonitor(), 30000);
+    return () => clearInterval(i);
+  }, [token]);
 
   const load = async () => {
     if (!token) return toast.error("Informe o token");
@@ -36,6 +78,7 @@ function AdminPage() {
       const res = await listar({ data: { token } });
       if (!res.ok) return toast.error(`Falhou: ${res.error}`);
       setPedidos(res.pedidos as Pedido[]);
+      loadMonitor();
     } finally {
       setLoading(false);
     }
@@ -52,10 +95,28 @@ function AdminPage() {
     }
   };
 
+  const verificarAgora = async () => {
+    if (!token) return toast.error("Informe o token");
+    setMonitorBusy(true);
+    try {
+      const res = await checkAgora({ data: { token } });
+      if (!res.ok) return toast.error("Falha ao verificar");
+      toast.success("Saldo verificado");
+      await loadMonitor();
+    } finally {
+      setMonitorBusy(false);
+    }
+  };
+
+  const f = monitor?.fornecedor;
+  const style = f ? NIVEL_STYLE[f.nivel_alerta] : null;
+  const online = f?.status === "Online";
+
   return (
     <div className="dark min-h-screen bg-background text-foreground p-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-2xl font-bold">Admin · Reprocessar pedidos</h1>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <h1 className="text-2xl font-bold">Admin · BoostGram</h1>
+
         <div className="flex gap-2">
           <Input
             type="password"
@@ -68,6 +129,58 @@ function AdminPage() {
             {loading ? "Carregando..." : "Listar pagos"}
           </Button>
         </div>
+
+        {/* Widget Monitor de Saldo */}
+        {f && style && (
+          <div className="space-y-3">
+            {!online && (
+              <div className="rounded-lg border-2 border-red-600 bg-red-950/60 p-4 text-center font-black tracking-wide text-red-300 uppercase shadow-[0_0_30px_rgba(239,68,68,0.6)]">
+                ⚠ ATENÇÃO: NÃO FOI POSSÍVEL CONSULTAR O SALDO DO FORNECEDOR SMMHYPE
+              </div>
+            )}
+
+            <div className={`rounded-2xl border-2 ${style.border} ${style.bg} ${style.glow} p-6 transition-all`}>
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground">Status do Estoque Atacadista</div>
+                  <div className="mt-1 flex items-center gap-3 text-3xl font-extrabold">
+                    <span>{style.emoji}</span>
+                    <span>{style.label}</span>
+                  </div>
+                </div>
+                <Button variant="secondary" size="sm" onClick={verificarAgora} disabled={monitorBusy}>
+                  {monitorBusy ? "Verificando..." : "Verificar agora"}
+                </Button>
+              </div>
+
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Info label="Fornecedor" value={f.nome} />
+                <Info
+                  label="Servidor"
+                  value={
+                    <span className="inline-flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.9)]" : "bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.9)]"}`} />
+                      {f.status}
+                    </span>
+                  }
+                />
+                <Info
+                  label="Saldo (USD)"
+                  value={f.saldo_usd != null ? `$ ${f.saldo_usd.toFixed(2)}` : "—"}
+                />
+                <Info
+                  label={`Saldo (BRL · ${f.usd_to_brl.toFixed(2)})`}
+                  value={f.saldo_brl != null ? `R$ ${f.saldo_brl.toFixed(2)}` : "—"}
+                />
+                <Info
+                  label="Última verificação"
+                  value={f.ultima_verificacao ? new Date(f.ultima_verificacao).toLocaleString("pt-BR") : "—"}
+                />
+                <Info label="Falhas consecutivas" value={String(f.falhas_consecutivas)} />
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="border border-border rounded-lg divide-y divide-border">
           {pedidos.length === 0 && (
@@ -84,17 +197,22 @@ function AdminPage() {
                   {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
                 </div>
               </div>
-              <Button
-                size="sm"
-                onClick={() => reenviar(p.id)}
-                disabled={busyId === p.id}
-              >
+              <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
                 {busyId === p.id ? "Enviando..." : "Reenviar SMM"}
               </Button>
             </div>
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+function Info({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-lg bg-background/40 border border-border/60 p-3">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
+      <div className="mt-1 font-semibold text-foreground">{value}</div>
     </div>
   );
 }
