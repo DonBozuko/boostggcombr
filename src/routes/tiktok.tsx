@@ -61,9 +61,24 @@ const viewsPlans: Plan[] = [
 ];
 const allPlans = [...followersPlans, ...likesPlans, ...viewsPlans];
 
-const orderSchema = z.object({
+const followersSchema = z.object({
   plan: z.string().min(1),
-  profile: z.string().trim().min(2, "Informe o @ ou link do vídeo").max(300),
+  profile: z
+    .string()
+    .trim()
+    .min(2, "Informe o @ do perfil do TikTok")
+    .max(120, "Máximo 120 caracteres")
+    .regex(/^[@a-zA-Z0-9._/:-]+$/, "Use apenas o @ ou link do perfil"),
+});
+
+const videoSchema = z.object({
+  plan: z.string().min(1),
+  profile: z
+    .string()
+    .trim()
+    .min(10, "Cole o link completo do vídeo do TikTok")
+    .max(300, "Máximo 300 caracteres")
+    .regex(/tiktok\.com\//i, "Link inválido — use a URL do vídeo do TikTok"),
 });
 
 type PedidoInfo = {
@@ -77,6 +92,25 @@ type PedidoInfo = {
 
 const CYAN = "#00f2fe";
 const PINK = "#fe0979";
+
+// Ícone oficial do TikTok (SVG inline).
+function TikTokIcon({ size = 28, className }: { size?: number; className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      className={className}
+      aria-hidden="true"
+    >
+      <path fill="#fff" d="M33.5 6.5c.5 3.4 2.4 6 5.8 7v5.1c-2.2.2-4.1-.4-6.3-1.6v10.7c0 5.5-4 9.7-9.4 9.7-5.4 0-9.4-4.2-9.4-9.4 0-5.3 4.2-9.5 9.5-9.5h.9v5.4c-.4-.1-.8-.1-1.2-.1-2.3 0-4.2 1.9-4.2 4.2 0 2.3 1.9 4.2 4.2 4.2s4.2-1.9 4.2-4.2V6.5h5.9z"/>
+      <path fill="#fe0979" d="M33.5 6.5c.5 3.4 2.4 6 5.8 7v5.1c-2.2.2-4.1-.4-6.3-1.6v10.7c0 5.5-4 9.7-9.4 9.7-5.4 0-9.4-4.2-9.4-9.4 0-5.3 4.2-9.5 9.5-9.5h.9v5.4c-.4-.1-.8-.1-1.2-.1-2.3 0-4.2 1.9-4.2 4.2 0 2.3 1.9 4.2 4.2 4.2s4.2-1.9 4.2-4.2V6.5h5.9z" opacity=".55" transform="translate(2 0)"/>
+      <path fill="#00f2fe" d="M33.5 6.5c.5 3.4 2.4 6 5.8 7v5.1c-2.2.2-4.1-.4-6.3-1.6v10.7c0 5.5-4 9.7-9.4 9.7-5.4 0-9.4-4.2-9.4-9.4 0-5.3 4.2-9.5 9.5-9.5h.9v5.4c-.4-.1-.8-.1-1.2-.1-2.3 0-4.2 1.9-4.2 4.2 0 2.3 1.9 4.2 4.2 4.2s4.2-1.9 4.2-4.2V6.5h5.9z" opacity=".55" transform="translate(-2 0)"/>
+    </svg>
+  );
+}
+
 
 function TiktokLanding() {
   const [categoria, setCategoria] = useState<Categoria>("seguidores");
