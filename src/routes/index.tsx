@@ -454,7 +454,7 @@ function Landing() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">BoostGram</span>
+            <span className="font-display font-bold text-lg">BOOSTYGRAM</span>
           </div>
           <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
             <a href="#planos">Ver Planos</a>
@@ -473,7 +473,7 @@ function Landing() {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
-            className="mx-auto mb-8 size-20 rounded-2xl grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_60px_-5px_rgba(236,72,153,0.7)]"
+            className="mx-auto mb-8 size-20 rounded-2xl grid place-items-center bg-gradient-to-br from-yellow-200 via-yellow-400 to-amber-600 shadow-[0_0_60px_-5px_rgba(234,179,8,0.75)]"
           >
             <Instagram className="size-10 text-white" strokeWidth={2.2} />
           </motion.div>
@@ -485,7 +485,7 @@ function Landing() {
             className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight"
           >
             Impulsione seu Perfil com{" "}
-            <span className="bg-gradient-to-r from-fuchsia-400 via-pink-400 to-orange-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-yellow-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
               Seguidores Reais
             </span>
           </motion.h1>
@@ -531,7 +531,7 @@ function Landing() {
                   }}
                   className={`inline-flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide transition-all ${
                     active
-                      ? "bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] text-white shadow-[0_0_25px_rgba(249,115,22,0.6)]"
+                      ? "bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] text-white shadow-[0_0_25px_rgba(234,179,8,0.7)]"
                       : "text-zinc-400 hover:text-white"
                   }`}
                 >
@@ -565,21 +565,21 @@ function Landing() {
                   transition={{ duration: 0.35, delay: Math.min(i * 0.05, 0.3) }}
                   className={`relative rounded-2xl border bg-gradient-to-b from-zinc-900/90 to-zinc-950/90 p-6 pt-8 flex flex-col items-center text-center ${
                     p.highlight
-                      ? "border-transparent lg:scale-105 lg:-my-2 z-10 shadow-[0_0_50px_-8px_rgba(236,72,153,0.75)] [background:linear-gradient(#0a0a0a,#0a0a0a)_padding-box,linear-gradient(135deg,#feda77,#f58529,#dd2a7b,#8134af)_border-box] border-2"
-                      : "border-white/10 hover:border-fuchsia-500/40 transition-colors"
+                      ? "border-transparent lg:scale-105 lg:-my-2 z-10 shadow-[0_0_50px_-8px_rgba(234,179,8,0.75)] [background:linear-gradient(#0a0a0a,#0a0a0a)_padding-box,linear-gradient(135deg,#fff3a3,#ffd700,#f5b800,#8a6a00)_border-box] border-2"
+                      : "border-white/10 hover:border-emerald-400/50 transition-colors"
                   }`}
                 >
                   {p.highlight && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_25px_rgba(249,115,22,0.8)]">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-200 via-yellow-400 to-amber-600 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_25px_rgba(234,179,8,0.7)]">
                       ⭐ Mais Vendido
                     </div>
                   )}
 
-                  <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(236,72,153,0.7)]`}>
+                  <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-amber-600 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(234,179,8,0.75)]`}>
                     {p.tag}
                   </div>
 
-                  <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 shadow-[0_0_30px_-2px_rgba(236,72,153,0.8)]">
+                  <div className="mt-4 mb-4 size-16 rounded-full grid place-items-center bg-gradient-to-br from-yellow-200 via-yellow-400 to-amber-600 shadow-[0_0_30px_-2px_rgba(234,179,8,0.75)]">
                     {isViews ? (
                       <Eye className="size-7 text-white" strokeWidth={2.2} />
                     ) : isLikes ? (
@@ -593,7 +593,7 @@ function Landing() {
                   <h3 className="text-xl font-bold text-white">{p.tier}</h3>
                   <p className="mt-1 text-xs text-zinc-300">{p.benefit}</p>
 
-                  <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-red-500/15 border border-red-500/30 px-2.5 py-1 text-[11px] font-semibold text-red-300">
+                  <div className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 px-2.5 py-1 text-[11px] font-semibold text-emerald-300">
                     <Eye className="size-3.5" />
                     {viewing} pessoas vendo agora
                   </div>
@@ -614,7 +614,7 @@ function Landing() {
                         highlight: p.highlight ?? false,
                       });
                     }}
-                    className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
+                    className="cta-pulse mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-sm font-extrabold uppercase tracking-wide text-white bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] transition-all"
                     aria-label={`Comprar pacote ${p.tier} por ${p.price}`}
                   >
                     <Zap className="size-4 fill-white" /> COMPRAR AGORA
@@ -714,7 +714,7 @@ function Landing() {
               type="submit"
               size="lg"
               disabled={loading}
-              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] transition-all"
+              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] transition-all"
             >
 
               {loading ? (
@@ -865,7 +865,7 @@ function Landing() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-10">
           {socialStats.map((s) => (
             <div key={s.label} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5 text-center">
-              <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-fuchsia-400 via-pink-400 to-orange-300 bg-clip-text text-transparent">
+              <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-yellow-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
                 {s.value}
               </div>
               <div className="mt-1 text-xs md:text-sm text-zinc-300">{s.label}</div>
@@ -890,7 +890,7 @@ function Landing() {
               </div>
               <p className="text-sm text-zinc-200 leading-relaxed flex-1">"{t.text}"</p>
               <div className="mt-5 flex items-center gap-3 pt-4 border-t border-white/10">
-                <div className="size-10 shrink-0 rounded-full bg-gradient-to-br from-fuchsia-500 via-pink-500 to-orange-400 grid place-items-center text-white font-bold">
+                <div className="size-10 shrink-0 rounded-full bg-gradient-to-br from-yellow-200 via-yellow-400 to-amber-600 grid place-items-center text-white font-bold">
                   {t.name[0]}
                 </div>
                 <div className="min-w-0">
@@ -957,7 +957,7 @@ function Landing() {
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">BoostGram</span>
+            <span className="font-display font-semibold text-foreground">BOOSTYGRAM</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="/privacidade" className="hover:text-foreground">Privacidade & Segurança</a>
