@@ -366,6 +366,75 @@ function AdminPage() {
           </Button>
         </div>
 
+        {/* Navegação Multi-Painel (Casa dos Avós) */}
+        <div className="rounded-2xl border border-border bg-card/30 p-2 flex flex-wrap gap-2">
+          {REDES.map((r) => {
+            const active = aba === r.key;
+            return (
+              <button
+                key={r.key}
+                type="button"
+                onClick={() => !r.disabled && setAba(r.key)}
+                disabled={r.disabled}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                  active
+                    ? "bg-fuchsia-500/20 text-fuchsia-100 border-fuchsia-500/60 shadow-[0_0_20px_rgba(217,70,239,0.35)]"
+                    : r.disabled
+                    ? "bg-background/30 text-muted-foreground/60 border-border/50 cursor-not-allowed"
+                    : "bg-background/40 text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                <span className="mr-1.5">{r.icon}</span>{r.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Visão Geral — faturamento somado de todas as redes */}
+        {aba === "overview" && (
+          <div className="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-950/50 to-slate-950/60 p-6 shadow-[0_0_30px_rgba(16,185,129,0.25)] space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl font-extrabold tracking-tight">🌐 Visão Geral — Casa dos Avós</h2>
+              <span className="text-xs text-muted-foreground">{faturamento?.count ?? 0} pedido(s) pagos</span>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-black/30 border border-emerald-500/30 p-4">
+                <div className="text-xs uppercase text-muted-foreground">Faturamento Total</div>
+                <div className="mt-1 text-2xl font-bold text-emerald-300">
+                  R$ {(faturamento?.geral ?? 0).toFixed(2)}
+                </div>
+              </div>
+              {REDES.filter((r) => r.key !== "overview").map((r) => {
+                const t = faturamento?.totais[r.key];
+                return (
+                  <div key={r.key} className={`rounded-xl bg-black/30 border p-4 ${r.disabled ? "border-border/40 opacity-60" : "border-border"}`}>
+                    <div className="text-xs uppercase text-muted-foreground">{r.icon} {r.label}</div>
+                    <div className="mt-1 text-2xl font-bold">R$ {(t?.total ?? 0).toFixed(2)}</div>
+                    <div className="text-[10px] text-muted-foreground">{t?.count ?? 0} pedido(s)</div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="rounded-xl bg-black/30 border border-border p-4">
+              <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo</div>
+              {f ? (
+                <div className="flex items-center gap-3 text-sm flex-wrap">
+                  <span className="inline-flex items-center gap-2">
+                    <span className={`h-2.5 w-2.5 rounded-full ${f.status === "Online" ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                    {f.nome}: <strong>{f.status}</strong>
+                  </span>
+                  <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
+                  <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
+                </div>
+              ) : (
+                <div className="text-sm text-muted-foreground">Carregando status...</div>
+              )}
+            </div>
+          </div>
+        )}
+
+
+
         {/* Assistente de Caixa Inteligente */}
         {caixa && (
           <div className="rounded-2xl border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-950/60 to-slate-950/60 p-6 shadow-[0_0_40px_rgba(99,102,241,0.35)] space-y-4">
