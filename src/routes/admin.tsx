@@ -403,7 +403,9 @@ function AdminPage() {
   };
 
   const style = f ? NIVEL_STYLE[f.nivel_alerta] : null;
-  const online = f?.status === "Online";
+  // Deriva Online no frontend: se não houve falhas consecutivas e o saldo veio,
+  // tratamos como Online mesmo que o backend ainda tenha um status stale.
+  const online = !!f && (f.status === "Online" || (f.falhas_consecutivas === 0 && f.saldo_brl != null));
 
   const chartData = useMemo(
     () =>
