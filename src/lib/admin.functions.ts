@@ -31,8 +31,24 @@ export const listarPedidosPagos = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
-      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id")
+      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail")
       .eq("status", "paid")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) return { ok: false as const, error: "DB_FAILED" as const };
+    return { ok: true as const, pedidos: rows ?? [] };
+  });
+
+// Lista pedidos com falha (SMM_FAILED, amount_mismatch, mp_rejected, etc) p/ auditoria.
+export const listarPedidosFalhos = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("pedidos")
+      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail")
+      .or("status.eq.SMM_FAILED,status.eq.amount_mismatch,status.like.mp_%")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
