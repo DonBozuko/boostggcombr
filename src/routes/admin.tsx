@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron } from "@/lib/monitor.functions";
+import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -108,6 +109,8 @@ function AdminPage() {
   const checkAgora = useServerFn(verificarSaldoAgora);
   const getCron = useServerFn(getCronStatus);
   const runCron = useServerFn(testarCron);
+  const getCache = useServerFn(getServicesCacheStatus);
+  const syncCache = useServerFn(sincronizarServicosAgora);
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -122,6 +125,10 @@ function AdminPage() {
     last_status: string | null; last_return: string | null;
   } | null>(null);
   const [cronBusy, setCronBusy] = useState(false);
+  const [cache, setCache] = useState<{
+    total: number; last_sync: string | null; missing_monitored: number[]; monitorados: number[];
+  } | null>(null);
+  const [cacheBusy, setCacheBusy] = useState(false);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
@@ -140,11 +147,36 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadCache = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getCache({ data: { token: tk } });
+      if (res.ok) setCache({
+        total: res.total, last_sync: res.last_sync,
+        missing_monitored: res.missing_monitored, monitorados: res.monitorados,
+      });
+    } catch {}
+  };
+
+  const sincronizarAgora = async () => {
+    if (!token) return toast.error("Informe o token");
+    setCacheBusy(true);
+    try {
+      const res = await syncCache({ data: { token } });
+      if (res.ok) toast.success(`Sync OK · ${res.result.total} serviços`);
+      else toast.error(`Falha: ${res.error}`);
+      await loadCache();
+    } finally {
+      setCacheBusy(false);
+    }
+  };
+
   useEffect(() => {
     if (!token) return;
     loadMonitor();
     loadCron();
-    const i = setInterval(() => { loadMonitor(); loadCron(); }, 30000);
+    loadCache();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -318,6 +350,10 @@ function AdminPage() {
             {/* Status do Cron */}
             <CronCard cron={cron} busy={cronBusy} onTest={testarCronAgora} falhas={f.falhas_consecutivas} />
 
+            {/* Cache de Serviços do Instagram */}
+            <ServicesCacheCard cache={cache} busy={cacheBusy} onSync={sincronizarAgora} />
+
+
 
 
             {/* Histórico 24h */}
@@ -490,4 +526,50 @@ function CronCard({
     </div>
   );
 }
+
+function ServicesCacheCard({
+  cache,
+  busy,
+  onSync,
+}: {
+  cache: { total: number; last_sync: string | null; missing_monitored: number[]; monitorados: number[] } | null;
+  busy: boolean;
+  onSync: () => void;
+}) {
+  const hasMissing = (cache?.missing_monitored.length ?? 0) > 0;
+  return (
+    <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${hasMissing ? "bg-red-500 animate-pulse" : "bg-emerald-400 animate-pulse"}`} />
+            Cache de Serviços · Instagram (Refill)
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Sincroniza com SMMhype a cada 6h. Apenas serviços de Instagram com garantia de reposição.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onSync} disabled={busy}>
+          {busy ? "Sincronizando..." : "Sincronizar agora"}
+        </Button>
+      </div>
+
+      {hasMissing && (
+        <div className="rounded-md border-2 border-red-600 bg-red-950/60 p-3 text-sm font-bold text-red-200">
+          🚨 ATENÇÃO: serviço(s) monitorado(s) sumiram do fornecedor: {cache!.missing_monitored.join(", ")}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
+        <Info label="Serviços ativos no cache" value={String(cache?.total ?? 0)} />
+        <Info
+          label="Última sincronização"
+          value={cache?.last_sync ? new Date(cache.last_sync).toLocaleString("pt-BR") : "—"}
+        />
+        <Info label="IDs monitorados" value={cache?.monitorados.join(", ") ?? "—"} />
+      </div>
+    </div>
+  );
+}
+
 

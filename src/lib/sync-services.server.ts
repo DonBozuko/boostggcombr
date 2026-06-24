@@ -1,0 +1,84 @@
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
+const SMMHYPE_URL = "https://smmhype.com/api/v2";
+
+type ProviderService = {
+  service: number | string;
+  name: string;
+  category: string;
+  rate: string | number;
+  min: string | number;
+  max: string | number;
+  refill?: boolean;
+};
+
+export const SERVICOS_MONITORADOS = [14325, 14225];
+
+export async function syncSmmhypeServices() {
+  const apiKey = process.env.SMMHYPE_API_KEY;
+  if (!apiKey) throw new Error("SMMHYPE_API_KEY ausente");
+
+  const body = new URLSearchParams({ key: apiKey, action: "services" });
+  const resp = await fetch(SMMHYPE_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  if (!resp.ok) throw new Error(`SMMhype HTTP ${resp.status}`);
+  const json = (await resp.json()) as ProviderService[];
+  if (!Array.isArray(json)) throw new Error("Resposta inesperada do fornecedor");
+
+  // Filtra apenas Instagram + refill
+  const filtered = json.filter(
+    (s) =>
+      typeof s.category === "string" &&
+      /instagram/i.test(s.category) &&
+      s.refill === true,
+  );
+
+  const rows = filtered.map((s) => ({
+    provider_service_id: Number(s.service),
+    category: String(s.category),
+    name: String(s.name),
+    rate: Number(s.rate),
+    refill: true,
+    min: Number(s.min) || 0,
+    max: Number(s.max) || 0,
+    updated_at: new Date().toISOString(),
+  }));
+
+  // Upsert
+  if (rows.length > 0) {
+    const { error } = await supabaseAdmin
+      .from("services_cache")
+      .upsert(rows, { onConflict: "provider_service_id" });
+    if (error) throw error;
+  }
+
+  // Apaga os que sumiram
+  const ids = rows.map((r) => r.provider_service_id);
+  const { data: existentes } = await supabaseAdmin
+    .from("services_cache")
+    .select("provider_service_id");
+  const aRemover = (existentes ?? [])
+    .map((r: any) => r.provider_service_id)
+    .filter((id: number) => !ids.includes(id));
+  if (aRemover.length > 0) {
+    await supabaseAdmin
+      .from("services_cache")
+      .delete()
+      .in("provider_service_id", aRemover);
+  }
+
+  const monitoradosFaltando = SERVICOS_MONITORADOS.filter(
+    (id) => !ids.includes(id),
+  );
+
+  return {
+    ok: true as const,
+    total: rows.length,
+    synced_at: new Date().toISOString(),
+    removed: aRemover.length,
+    missing_monitored: monitoradosFaltando,
+  };
+}
