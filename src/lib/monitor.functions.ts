@@ -62,3 +62,43 @@ export const verificarSaldoAgora = createServerFn({ method: "POST" })
     const res = await checkSmmhypeBalance();
     return { ok: true as const, result: res };
   });
+
+export const getCronStatus = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await (supabaseAdmin as any).rpc("get_cron_status", {
+      _jobname: "check-smmhype-saldo",
+    });
+    if (error) return { ok: false as const, error: error.message };
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    return { ok: true as const, cron: row ?? null };
+  });
+
+export const testarCron = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const url = `${process.env.SUPABASE_URL?.includes("localhost") ? "" : ""}https://project--c88c4437-6c11-4710-b369-9cb46d021440.lovable.app/api/public/check-saldo`;
+    const t0 = Date.now();
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": process.env.ADMIN_TOKEN ?? "",
+        },
+        body: "{}",
+      });
+      const text = await resp.text();
+      return {
+        ok: resp.ok,
+        status: resp.status,
+        elapsed_ms: Date.now() - t0,
+        body: text.slice(0, 500),
+      };
+    } catch (e: any) {
+      return { ok: false, status: 0, elapsed_ms: Date.now() - t0, body: e?.message ?? String(e) };
+    }
+  });
