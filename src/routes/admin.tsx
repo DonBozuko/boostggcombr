@@ -280,7 +280,8 @@ function AdminPage() {
     loadPendentes();
     loadCaixa();
     loadFaturamento();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); }, 30000);
+    loadFornecedores();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
