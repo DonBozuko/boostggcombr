@@ -331,10 +331,12 @@ function AdminPage() {
     falhos.length > 0;
 
   useEffect(() => {
-    if (!isAlerta || !soundOn) return;
-    alert.beep();
-    const i = setInterval(() => alert.beep(), 30000);
-    return () => clearInterval(i);
+    if (!isAlerta || !soundOn) {
+      alert.stopLoop();
+      return;
+    }
+    alert.startLoop(30000);
+    return () => alert.stopLoop();
   }, [isAlerta, soundOn]);
 
   const toggleSound = () => {
