@@ -1,7 +1,8 @@
-// Server-only: dispatch alerts to our own WhatsApp Business via Meta Cloud API.
-// Secrets required: WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID, ADMIN_WHATSAPP_NUMBER.
+// Server-only: dispatch alerts via Telegram (Lovable connector gateway).
+// Secrets: LOVABLE_API_KEY + TELEGRAM_API_KEY (auto), ADMIN_TELEGRAM_CHAT_ID (user-provided).
+// Name kept for backward compatibility with existing call sites.
 
-const GRAPH_VERSION = "v21.0";
+const GATEWAY_URL = "https://connector-gateway.lovable.dev/telegram";
 
 export function buildSmmhypeAlertMessage(saldoBrl: number | null): string {
   const valor = saldoBrl == null ? "indisponível" : `R$ ${saldoBrl.toFixed(2)}`;
@@ -9,33 +10,33 @@ export function buildSmmhypeAlertMessage(saldoBrl: number | null): string {
 }
 
 export async function dispatchWhatsappAlert(message: string): Promise<{ ok: boolean; detail?: string }> {
-  const token = process.env.WHATSAPP_ACCESS_TOKEN;
-  const phoneId = process.env.WHATSAPP_PHONE_NUMBER_ID;
-  const to = process.env.ADMIN_WHATSAPP_NUMBER;
+  const lovableKey = process.env.LOVABLE_API_KEY;
+  const tgKey = process.env.TELEGRAM_API_KEY;
+  const chatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
 
-  console.warn("[whatsapp-alert]", { to: to ?? "MISSING", message });
+  console.warn("[telegram-alert]", { chatId: chatId ?? "MISSING", message });
 
-  if (!token || !phoneId || !to) {
-    return { ok: false, detail: "WHATSAPP_ENV_MISSING" };
+  if (!lovableKey || !tgKey || !chatId) {
+    return { ok: false, detail: "TELEGRAM_ENV_MISSING" };
   }
 
   try {
-    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${phoneId}/messages`, {
+    const res = await fetch(`${GATEWAY_URL}/sendMessage`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${lovableKey}`,
+        "X-Connection-Api-Key": tgKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to,
-        type: "text",
-        text: { preview_url: false, body: message },
+        chat_id: chatId,
+        text: message,
+        parse_mode: "HTML",
       }),
     });
     const text = await res.text();
     if (!res.ok) {
-      console.error("[whatsapp-alert] HTTP", res.status, text.slice(0, 300));
+      console.error("[telegram-alert] HTTP", res.status, text.slice(0, 300));
       return { ok: false, detail: `HTTP ${res.status}: ${text.slice(0, 200)}` };
     }
     return { ok: true };
