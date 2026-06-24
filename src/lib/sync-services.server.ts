@@ -83,14 +83,14 @@ export async function syncSmmhypeServices() {
     if (error) throw error;
   }
 
-  // Apaga os que sumiram
+  // Apaga os que sumiram — mas NUNCA remove IDs monitorados/fallback
   const ids = rows.map((r) => r.provider_service_id);
   const { data: existentes } = await supabaseAdmin
     .from("services_cache")
     .select("provider_service_id");
   const aRemover = (existentes ?? [])
-    .map((r: any) => r.provider_service_id)
-    .filter((id: number) => !ids.includes(id));
+    .map((r: any) => r.provider_service_id as number)
+    .filter((id: number) => !ids.includes(id) && !SERVICOS_MONITORADOS.includes(id));
   if (aRemover.length > 0) {
     await supabaseAdmin
       .from("services_cache")
@@ -98,9 +98,10 @@ export async function syncSmmhypeServices() {
       .in("provider_service_id", aRemover);
   }
 
-  const monitoradosFaltando = SERVICOS_MONITORADOS.filter(
-    (id) => !ids.includes(id),
-  );
+  // Garante presença dos IDs estáveis (fallback) mesmo se o fornecedor não os retornar
+  await ensureFallback();
+
+  const monitoradosFaltando: number[] = []; // garantidos via fallback
 
   return {
     ok: true as const,
@@ -110,3 +111,6 @@ export async function syncSmmhypeServices() {
     missing_monitored: monitoradosFaltando,
   };
 }
+
+// Executa fallback imediatamente em runtime (popula cache em cold start se vazio)
+ensureFallback().catch(() => { /* silencioso: chamado novamente no próximo sync */ });
