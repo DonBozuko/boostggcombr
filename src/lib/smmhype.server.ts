@@ -89,13 +89,24 @@ function normalizeInstagramUser(raw: string): string {
 
 function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
   const trimmed = raw.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (isFollowers) {
-    const handle = trimmed.replace(/^@+/, "").replace(/^tiktok\.com\//i, "");
-    return `https://tiktok.com/@${handle}`;
+    // Aceita: @user, user, tiktok.com/@user, https://(www.)tiktok.com/@user
+    const handle = trimmed
+      .replace(/^https?:\/\//i, "")
+      .replace(/^www\./i, "")
+      .replace(/^(m\.|vm\.)?tiktok\.com\//i, "")
+      .replace(/^@+/, "")
+      .replace(/[/?#].*$/, "")
+      .trim();
+    if (!handle) return trimmed;
+    return `https://www.tiktok.com/@${handle}`;
   }
+  // Curtidas/Views: precisa ser URL de vídeo. Garante protocolo.
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.)?(m\.|vm\.)?tiktok\.com\//i.test(trimmed)) return `https://${trimmed.replace(/^www\./i, "")}`;
   return trimmed;
 }
+
 
 
 export type SmmDispatchResult =
