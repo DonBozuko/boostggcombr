@@ -29,6 +29,13 @@ export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.ativo) {
+      const { error: offErr } = await supabaseAdmin
+        .from("fornecedores")
+        .update({ ativo: false })
+        .neq("id", data.id);
+      if (offErr) return { ok: false as const, error: "DB_FAILED" as const };
+    }
     const { error } = await supabaseAdmin
       .from("fornecedores")
       .update({ ativo: data.ativo })
