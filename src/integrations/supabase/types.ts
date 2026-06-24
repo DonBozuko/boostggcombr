@@ -174,6 +174,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_cron_status: {
+        Args: { _jobname?: string }
+        Returns: {
+          active: boolean
+          jobname: string
+          last_end: string
+          last_return: string
+          last_start: string
+          last_status: string
+          schedule: string
+        }[]
+      }
       get_public_schema: {
         Args: never
         Returns: {

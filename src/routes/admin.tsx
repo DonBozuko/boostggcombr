@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, reprocessarPedido } from "@/lib/admin.functions";
-import { getMonitorSaldo, verificarSaldoAgora } from "@/lib/monitor.functions";
+import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron } from "@/lib/monitor.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -106,6 +106,8 @@ function AdminPage() {
   const reprocessar = useServerFn(reprocessarPedido);
   const getMonitor = useServerFn(getMonitorSaldo);
   const checkAgora = useServerFn(verificarSaldoAgora);
+  const getCron = useServerFn(getCronStatus);
+  const runCron = useServerFn(testarCron);
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -114,6 +116,12 @@ function AdminPage() {
   const [monitor, setMonitor] = useState<MonitorState>(null);
   const [monitorBusy, setMonitorBusy] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const [cron, setCron] = useState<{
+    jobname: string; schedule: string; active: boolean;
+    last_start: string | null; last_end: string | null;
+    last_status: string | null; last_return: string | null;
+  } | null>(null);
+  const [cronBusy, setCronBusy] = useState(false);
   const alert = useAlertBeep();
 
   const loadMonitor = async (tk = token) => {
@@ -124,10 +132,19 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadCron = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getCron({ data: { token: tk } });
+      if (res.ok) setCron(res.cron);
+    } catch {}
+  };
+
   useEffect(() => {
     if (!token) return;
     loadMonitor();
-    const i = setInterval(() => loadMonitor(), 30000);
+    loadCron();
+    const i = setInterval(() => { loadMonitor(); loadCron(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -188,6 +205,19 @@ function AdminPage() {
       await loadMonitor();
     } finally {
       setMonitorBusy(false);
+    }
+  };
+
+  const testarCronAgora = async () => {
+    if (!token) return toast.error("Informe o token");
+    setCronBusy(true);
+    try {
+      const res = await runCron({ data: { token } });
+      if (res.ok) toast.success(`Cron OK · HTTP ${res.status} · ${res.elapsed_ms}ms`);
+      else toast.error(`Cron falhou · HTTP ${res.status} · ${res.body?.slice(0, 120) ?? ""}`);
+      await Promise.all([loadCron(), loadMonitor()]);
+    } finally {
+      setCronBusy(false);
     }
   };
 
@@ -285,6 +315,11 @@ function AdminPage() {
               </div>
             </div>
 
+            {/* Status do Cron */}
+            <CronCard cron={cron} busy={cronBusy} onTest={testarCronAgora} falhas={f.falhas_consecutivas} />
+
+
+
             {/* Histórico 24h */}
             <div className="rounded-2xl border border-border bg-card/40 p-4">
               <div className="flex items-center justify-between mb-3">
@@ -378,3 +413,81 @@ function Info({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
+
+function CronCard({
+  cron,
+  busy,
+  onTest,
+  falhas,
+}: {
+  cron: {
+    jobname: string; schedule: string; active: boolean;
+    last_start: string | null; last_end: string | null;
+    last_status: string | null; last_return: string | null;
+  } | null;
+  busy: boolean;
+  onTest: () => void;
+  falhas: number;
+}) {
+  const lastOk = cron?.last_status === "succeeded";
+  const lastFail = cron?.last_status && cron.last_status !== "succeeded";
+  const stale = cron?.last_start
+    ? Date.now() - new Date(cron.last_start).getTime() > 10 * 60 * 1000
+    : true;
+  const healthy = !!cron?.active && lastOk && !stale;
+  const dot = healthy ? "bg-emerald-400" : lastFail ? "bg-red-500" : "bg-yellow-400";
+  const label = !cron
+    ? "Sem dados"
+    : !cron.active
+    ? "Inativo"
+    : lastFail
+    ? "Falhou"
+    : stale
+    ? "Atrasado"
+    : "Rodando";
+
+  return (
+    <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h3 className="font-semibold flex items-center gap-2">
+            <span className={`h-2.5 w-2.5 rounded-full ${dot} animate-pulse`} />
+            Status do Cron · {label}
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Agendamento automático que chama <code>/api/public/check-saldo</code> a cada 5 min.
+          </p>
+        </div>
+        <Button variant="outline" size="sm" onClick={onTest} disabled={busy}>
+          {busy ? "Testando..." : "Testar Cron"}
+        </Button>
+      </div>
+
+      {falhas >= 3 && (
+        <div className="rounded-md border border-red-600 bg-red-950/50 p-3 text-sm text-red-200 font-semibold">
+          ⚠ {falhas} falhas consecutivas detectadas — verifique logs e token.
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+        <Info label="Job" value={cron?.jobname ?? "—"} />
+        <Info label="Schedule" value={cron?.schedule ?? "—"} />
+        <Info label="Ativo" value={cron?.active ? "Sim" : "Não"} />
+        <Info
+          label="Última execução"
+          value={cron?.last_start ? new Date(cron.last_start).toLocaleString("pt-BR") : "—"}
+        />
+        <Info label="Status" value={cron?.last_status ?? "—"} />
+        <Info
+          label="Retorno"
+          value={
+            <span className="font-mono text-xs break-all line-clamp-2">
+              {cron?.last_return ?? "—"}
+            </span>
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
