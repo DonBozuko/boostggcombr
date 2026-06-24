@@ -449,7 +449,7 @@ function AdminPage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {(fornecedores.length > 0 ? fornecedores : [
-              { id: "_smmhype", nome: "SMMhype", ativo: false, slug: "smmhype" },
+              { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype" },
               { id: "_smmpainel", nome: "SMMPainel", ativo: false, slug: "smmpainel" },
               { id: "_verified", nome: "Verified Atacado", ativo: false, slug: "verified" },
             ]).map((p) => {
@@ -459,7 +459,7 @@ function AdminPage() {
                 verified: "https://verifiedatacado.com/addfunds",
               };
               const url = urlMap[p.slug] ?? "#";
-              const emoji = p.slug === "smmhype" ? "🚀" : p.slug === "smmpainel" ? "⚙️" : "✅";
+              const emoji = p.slug === "smmhype" ? "🚀" : p.slug === "smmpainel" ? "⚙️" : "🛒";
               const isReal = !p.id.startsWith("_");
               return (
                 <div
@@ -477,15 +477,17 @@ function AdminPage() {
                     </div>
                     <button
                       type="button"
+                      role="switch"
+                      aria-checked={p.ativo}
                       disabled={!isReal || togglingId === p.id}
                       onClick={() => isReal && handleToggleAtivo(p.id, p.ativo)}
                       className={`shrink-0 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-full border transition-all ${
                         p.ativo
-                          ? "bg-emerald-500/20 text-emerald-200 border-emerald-400/60 shadow-[0_0_10px_rgba(16,185,129,0.6)]"
+                          ? "bg-emerald-500/30 text-emerald-100 border-emerald-400 shadow-[0_0_14px_rgba(16,185,129,0.85)] animate-pulse"
                           : "bg-slate-800/60 text-slate-400 border-slate-600/60"
-                      } ${!isReal ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+                      } ${!isReal ? "opacity-50 cursor-not-allowed" : "hover:scale-105 cursor-pointer"}`}
                     >
-                      {p.ativo ? "🟢 ATIVO" : "⚪ INATIVO"}
+                      {togglingId === p.id ? "..." : p.ativo ? "🟢 ATIVO" : "⚫ INATIVO"}
                     </button>
                   </div>
                   <a
