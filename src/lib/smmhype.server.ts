@@ -115,7 +115,14 @@ function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
   return trimmed;
 }
 
-
+function normalizeYoutubeTarget(raw: string): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.)?(m\.|music\.)?youtube\.com\//i.test(trimmed) || /^youtu\.be\//i.test(trimmed)) {
+    return `https://${trimmed.replace(/^www\./i, "")}`;
+  }
+  return trimmed;
+}
 
 export type SmmDispatchResult =
   | { ok: true; orderId?: string | number; body: unknown }
@@ -141,8 +148,11 @@ export async function dispatchSmmhype(args: {
   }
 
   const pkg = String(args.pacote ?? "").trim().toLowerCase();
-  const isTiktok = pkg.startsWith("t");
-  const link = isTiktok
+  const isYoutube = pkg.startsWith("y");
+  const isTiktok = !isYoutube && pkg.startsWith("t");
+  const link = isYoutube
+    ? normalizeYoutubeTarget(args.instagram_user)
+    : isTiktok
     ? normalizeTiktokTarget(args.instagram_user, pkg.startsWith("tf"))
     : normalizeInstagramUser(args.instagram_user);
   const body = new URLSearchParams({
