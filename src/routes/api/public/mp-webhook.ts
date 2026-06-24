@@ -57,7 +57,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.error("[mp-webhook] MP fetch falhou", mpRes.status, paymentId);
             return new Response("ok", { status: 200 });
           }
-          const payment = (await mpRes.json()) as { status?: string; id?: string | number };
+          const payment = (await mpRes.json()) as {
+            status?: string;
+            id?: string | number;
+            transaction_amount?: number;
+          };
           if (payment.status !== "approved") {
             console.log("[mp-webhook] status != approved", payment.status, paymentId);
             return new Response("ok", { status: 200 });
@@ -67,12 +71,26 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { data: pedido, error: selErr } = await supabaseAdmin
             .from("pedidos")
-            .select("id, status, pacote, quantidade, instagram_user")
+            .select("id, status, pacote, quantidade, instagram_user, valor")
             .eq("mercado_pago_id", String(paymentId))
             .maybeSingle();
 
           if (selErr || !pedido) {
             console.error("[mp-webhook] pedido não encontrado", paymentId, selErr);
+            return new Response("ok", { status: 200 });
+          }
+
+          // SEGURANÇA: valor pago tem que bater com o valor do plano salvo (centavos)
+          const expectedCents = Math.round(Number(pedido.valor) * 100);
+          const paidCents = Math.round(Number(payment.transaction_amount ?? 0) * 100);
+          if (expectedCents !== paidCents) {
+            console.error("[mp-webhook] valor divergente — NÃO disparando SMM", {
+              pedidoId: pedido.id, expected: pedido.valor, paid: payment.transaction_amount,
+            });
+            await supabaseAdmin
+              .from("pedidos")
+              .update({ status: "amount_mismatch" })
+              .eq("id", pedido.id);
             return new Response("ok", { status: 200 });
           }
 
