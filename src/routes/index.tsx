@@ -515,17 +515,18 @@ function Landing() {
       </section>
 
       {/* PLANS */}
-      <section id="planos" className="container mx-auto px-6 py-16">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white">Escolha seu pacote</h2>
-          <p className="mt-3 text-zinc-300">
+      <section id="planos" className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Escolha seu pacote</h2>
+          <p className="mt-3 text-sm sm:text-base text-zinc-300">
             Preço fixo, sem pegadinha. Pague uma vez e veja o resultado.
           </p>
         </div>
 
-        {/* Tabs categoria */}
-        <div className="flex justify-center mb-10">
-          <div className="inline-flex p-1 rounded-full border border-white/10 bg-zinc-900/70 backdrop-blur">
+        {/* Tabs categoria — full width no mobile */}
+        <div className="flex justify-center mb-8 sm:mb-10 px-2">
+          <div className="inline-flex w-full sm:w-auto p-1 rounded-full border border-white/10 bg-zinc-900/70 backdrop-blur">
+
             {(["seguidores", "curtidas"] as Categoria[]).map((c) => {
               const active = categoria === c;
               const Icon = c === "seguidores" ? User : Heart;
@@ -538,7 +539,7 @@ function Landing() {
                     setForm((f) => ({ ...f, plan: "" }));
                     trackEvent("tab_category_change", { category: c });
                   }}
-                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all ${
+                  className={`inline-flex flex-1 sm:flex-none items-center justify-center gap-2 px-4 sm:px-6 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide transition-all ${
                     active
                       ? "bg-[linear-gradient(135deg,#feda77_0%,#f58529_25%,#dd2a7b_60%,#8134af_100%)] text-white shadow-[0_0_25px_rgba(249,115,22,0.6)]"
                       : "text-zinc-400 hover:text-white"
@@ -634,18 +635,18 @@ function Landing() {
 
 
       {/* ORDER FORM */}
-      <section id="pedido" className="py-24 border-y border-border bg-card/30">
-        <div className="container mx-auto px-6 max-w-2xl">
-          <div className="text-center mb-10">
-            <h2 className="text-4xl font-bold">Faça seu pedido</h2>
-            <p className="mt-3 text-zinc-300">
+      <section id="pedido" className="py-16 sm:py-24 border-y border-border bg-card/30">
+        <div className="container mx-auto px-4 sm:px-6 max-w-2xl">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-3xl sm:text-4xl font-bold">Faça seu pedido</h2>
+            <p className="mt-3 text-sm sm:text-base text-zinc-300">
               Preencha os dados abaixo. Em segundos você recebe o Pix no WhatsApp.
             </p>
           </div>
 
           <form
             onSubmit={onSubmit}
-            className="rounded-2xl border border-border bg-card p-8 space-y-6 shadow-glow-blue"
+            className="rounded-2xl border border-border bg-card p-4 sm:p-8 space-y-6 shadow-glow-blue"
           >
             <div className="space-y-2">
               <Label htmlFor="plan">Pacote escolhido</Label>

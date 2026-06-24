@@ -682,8 +682,8 @@ function AdminPage() {
             </div>
 
             {/* Fornecedores (multi — placeholder) */}
-            <div className="rounded-2xl border border-border bg-card/40 p-4 flex items-center justify-between">
-              <div>
+            <div className="rounded-2xl border border-border bg-card/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="min-w-0">
                 <h3 className="font-semibold">Fornecedores</h3>
                 <p className="text-xs text-muted-foreground">Atualmente: SMMhype. Suporte a múltiplos fornecedores em breve.</p>
               </div>
@@ -852,9 +852,9 @@ function AdminPage() {
             .map((p) => {
             const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
             return (
-              <div key={p.id} className="p-4 flex items-center justify-between gap-4 text-sm">
-                <div className="space-y-1">
-                  <div className="font-mono text-xs text-muted-foreground">{p.id}</div>
+              <div key={p.id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="font-mono text-xs text-muted-foreground break-all">{p.id}</div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
                       {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
