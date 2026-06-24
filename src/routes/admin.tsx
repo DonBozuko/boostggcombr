@@ -175,6 +175,7 @@ function AdminPage() {
   const getCaixa = useServerFn(getCaixaAssistente);
   const listFornecedores = useServerFn(listarFornecedores);
   const toggleFornecedor = useServerFn(toggleFornecedorAtivo);
+  const updateCotacao = useServerFn(atualizarCotacaoFornecedor);
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
 
