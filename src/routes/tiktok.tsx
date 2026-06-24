@@ -19,14 +19,17 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Comprar Seguidores, Curtidas e Views no TikTok | Boostygram";
+    const title = "Comprar Seguidores no TikTok Barato e Real | Boostygram";
     const description =
-      "Pacotes de TikTok via Pix com entrega imediata: seguidores, curtidas e visualizações. Sem senha, 100% seguro.";
+      "Comprar seguidores no TikTok e visualizações com entrega imediata via Pix automático. Pacotes reais com reposição garantida para bater os requisitos de monetização rápido.";
+    const keywords =
+      "comprar seguidores tiktok, comprar views tiktok, visualizações tiktok barato, comprar curtidas tiktok, monetizar tiktok rápido, seguidores tiktok pix, impulsionar tiktok, agência smm brasil tiktok, como ganhar seguidores no tiktok";
     const url = "https://boostygram.lovable.app/tiktok";
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        { name: "keywords", content: keywords },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
