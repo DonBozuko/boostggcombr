@@ -162,6 +162,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadFalhos = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await listarFalhos({ data: { token: tk } });
+      if (res.ok) setFalhos(res.pedidos as Pedido[]);
+    } catch {}
+  };
+
   const sincronizarAgora = async () => {
     if (!token) return toast.error("Informe o token");
     setCacheBusy(true);
