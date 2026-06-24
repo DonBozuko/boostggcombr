@@ -217,7 +217,10 @@ function AdminPage() {
     if (!tk) return;
     try {
       const res = await getMonitor({ data: { token: tk } });
-      if (res.ok) setMonitor({ fornecedor: res.fornecedor, historico: res.historico });
+      if (res.ok) {
+        setMonitor({ fornecedor: res.fornecedor, historico: res.historico });
+        setCotacaoDraft((prev) => (prev ? prev : (res.fornecedor.cotacao_brl ?? res.fornecedor.usd_to_brl).toFixed(2)));
+      }
     } catch {}
   };
 
