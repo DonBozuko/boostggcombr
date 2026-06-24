@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, reprocessarPedido } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { Button } from "@/components/ui/button";
@@ -106,6 +106,7 @@ function useAlertBeep() {
 function AdminPage() {
   const listar = useServerFn(listarPedidosPagos);
   const listarFalhos = useServerFn(listarPedidosFalhos);
+  const listarPendentes = useServerFn(listarPedidosPendentes);
   const reprocessar = useServerFn(reprocessarPedido);
   const getMonitor = useServerFn(getMonitorSaldo);
   const checkAgora = useServerFn(verificarSaldoAgora);
@@ -118,6 +119,7 @@ function AdminPage() {
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
+  const [pendentes, setPendentes] = useState<(Pedido & { abandono_notificado_at: string | null })[]>([]);
   const [filtro, setFiltro] = useState<"todos" | "seguidores" | "curtidas">("todos");
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -176,6 +178,14 @@ function AdminPage() {
     } catch {}
   };
 
+  const loadPendentes = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await listarPendentes({ data: { token: tk } });
+      if (res.ok) setPendentes(res.pedidos as any);
+    } catch {}
+  };
+
   const loadCaixa = async (tk = token) => {
     if (!tk) return;
     try {
@@ -203,8 +213,9 @@ function AdminPage() {
     loadCron();
     loadCache();
     loadFalhos();
+    loadPendentes();
     loadCaixa();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadCaixa(); }, 30000);
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); }, 30000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -546,6 +557,42 @@ function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* Pedidos pendentes (Pix gerado, aguardando pagamento) */}
+        {pendentes.length > 0 && (
+          <div className="rounded-2xl border border-yellow-700/60 bg-yellow-950/20 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-bold text-yellow-200 flex items-center gap-2">
+                ⏳ {pendentes.length} pedido(s) pendente(s)
+              </h2>
+              <Button size="sm" variant="outline" onClick={() => loadPendentes()}>Atualizar</Button>
+            </div>
+            <div className="divide-y divide-yellow-900/40">
+              {pendentes.map((p) => (
+                <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
+                  <div className="space-y-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+                      {p.abandono_notificado_at && (
+                        <span
+                          title={`Enviado em ${new Date(p.abandono_notificado_at).toLocaleString("pt-BR")}`}
+                          className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-500/10 text-emerald-300 border-emerald-500/40"
+                        >
+                          ✓ Notificação de Abandono Enviada
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
 
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs uppercase tracking-wider text-muted-foreground mr-1">Filtrar:</span>

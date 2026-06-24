@@ -92,3 +92,19 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
       .eq("id", pedido.id);
     return { ok: true as const, orderId: smm.orderId ?? null };
   });
+
+// Lista pedidos pendentes (Pix gerado, ainda não pago) com flag de notificação de abandono.
+export const listarPedidosPendentes = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("pedidos")
+      .select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, abandono_notificado_at")
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) return { ok: false as const, error: "DB_FAILED" as const };
+    return { ok: true as const, pedidos: rows ?? [] };
+  });

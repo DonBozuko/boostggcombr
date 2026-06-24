@@ -1,0 +1,2 @@
+ALTER TABLE public.pedidos ADD COLUMN IF NOT EXISTS abandono_notificado_at timestamptz;
+CREATE INDEX IF NOT EXISTS idx_pedidos_pending_abandono ON public.pedidos (created_at) WHERE status = 'pending' AND abandono_notificado_at IS NULL;
