@@ -33,16 +33,27 @@ export async function checkSmmhypeBalance() {
   try {
     if (!apiKey) throw new Error("API key ausente: " + fornecedor.api_key_secret);
     const body = new URLSearchParams({ key: apiKey, action: "balance" });
-    const res = await fetch(fornecedor.api_url, {
+
+    const doFetch = () => fetch(fornecedor.api_url, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "application/json, text/plain, */*",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
       },
       body: body.toString(),
       signal: AbortSignal.timeout(15000),
     });
+
+    let res = await doFetch();
+    // Retry on rate-limit / transient server errors
+    if (res.status === 429 || res.status === 503 || res.status === 502) {
+      await new Promise((r) => setTimeout(r, 2500));
+      res = await doFetch();
+    }
+
     const text = await res.text();
     let json: any = null;
     try { json = JSON.parse(text); } catch {}
@@ -56,6 +67,7 @@ export async function checkSmmhypeBalance() {
     status = "Offline";
     erro = e?.message ?? String(e);
   }
+
 
   const elapsed = Date.now() - t0;
 
