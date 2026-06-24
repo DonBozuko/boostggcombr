@@ -22,6 +22,25 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
 };
 
+// Self-check: garante que todo pacote conhecido resolve para um service id válido.
+// Roda em runtime no servidor; loga e lança em DEV se algo estiver quebrado.
+export function validateDispatcherConfig(): { ok: boolean; missing: string[] } {
+  const known: Array<[string, number]> = [
+    ["p100", 100], ["p500", 500], ["p1k", 1000], ["p2k", 2000],
+    ["p5k", 5000], ["p10k", 10000], ["p20k", 20000], ["p50k", 50000], ["p100k", 100000],
+    ["l100", 100], ["l500", 500], ["l1k", 1000], ["l2k", 2000], ["l5k", 5000],
+  ];
+  const missing = known
+    .filter(([pkg, qty]) => resolveServiceId(pkg, qty) == null)
+    .map(([pkg]) => pkg);
+  if (missing.length) {
+    console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
+  }
+  return { ok: missing.length === 0, missing };
+}
+// roda na inicialização do módulo no servidor
+validateDispatcherConfig();
+
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
