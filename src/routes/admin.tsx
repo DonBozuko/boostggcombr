@@ -133,6 +133,8 @@ function AdminPage() {
   const getCache = useServerFn(getServicesCacheStatus);
   const syncCache = useServerFn(sincronizarServicosAgora);
   const getCaixa = useServerFn(getCaixaAssistente);
+  const listFornecedores = useServerFn(listarFornecedores);
+  const toggleFornecedor = useServerFn(toggleFornecedorAtivo);
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
 
