@@ -19,7 +19,7 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Comprar Seguidores, Curtidas e Views no TikTok | O Neto do TikTok";
+    const title = "Comprar Seguidores, Curtidas e Views no TikTok | Boostygram";
     const description =
       "Pacotes de TikTok via Pix com entrega imediata: seguidores, curtidas e visualizações. Sem senha, 100% seguro.";
     const url = "https://boostygram.lovable.app/tiktok";
