@@ -218,8 +218,8 @@ function TiktokLanding() {
           <TikTokIcon size={42} />
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          <span style={{ color: "#fff", textShadow: `0 0 18px ${CYAN}` }}>O Neto</span>{" "}
-          <span style={{ color: PINK, textShadow: `0 0 18px ${PINK}` }}>do TikTok</span>
+          <span style={{ color: "#fff", textShadow: `0 0 18px ${CYAN}` }}>BOOSTYGRAM</span>{" "}
+          <span style={{ color: PINK, textShadow: `0 0 18px ${PINK}` }}>| ALAVANQUE SEU TIKTOK ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">
           Seguidores, curtidas e views via Pix · entrega automática · sem senha
