@@ -350,6 +350,10 @@ function AdminPage() {
             {/* Status do Cron */}
             <CronCard cron={cron} busy={cronBusy} onTest={testarCronAgora} falhas={f.falhas_consecutivas} />
 
+            {/* Cache de Serviços do Instagram */}
+            <ServicesCacheCard cache={cache} busy={cacheBusy} onSync={sincronizarAgora} />
+
+
 
 
             {/* Histórico 24h */}
