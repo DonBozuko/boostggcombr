@@ -133,10 +133,15 @@ function AdminPage() {
   const syncCache = useServerFn(sincronizarServicosAgora);
   const getCaixa = useServerFn(getCaixaAssistente);
 
+  const getFaturamento = useServerFn(getFaturamentoPorRede);
+
   const [token, setToken] = useState("");
+  const [aba, setAba] = useState<RedeKey>("overview");
+  const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
   const [pendentes, setPendentes] = useState<(Pedido & { abandono_notificado_at: string | null })[]>([]);
+
   const [filtro, setFiltro] = useState<"todos" | "seguidores" | "curtidas">("todos");
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
