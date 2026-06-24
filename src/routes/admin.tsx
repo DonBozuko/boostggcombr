@@ -116,6 +116,7 @@ function AdminPage() {
 
   const [token, setToken] = useState("");
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [falhos, setFalhos] = useState<Pedido[]>([]);
   const [filtro, setFiltro] = useState<"todos" | "seguidores" | "curtidas">("todos");
   const [loading, setLoading] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
