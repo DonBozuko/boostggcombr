@@ -436,6 +436,7 @@ function FacebookLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/facebook" />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
