@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
