@@ -317,7 +317,11 @@ const orderSchema = z.object({
     .string()
     .trim()
     .min(2, "Informe o link ou @ do Instagram")
-    .max(200, "Máximo 200 caracteres"),
+    .max(200, "Máximo 200 caracteres")
+    .refine(
+      (v) => v.startsWith("@") || /^https?:\/\//i.test(v),
+      "Por favor, insira o link completo do perfil, vídeo ou publicação.",
+    ),
 
   email: z
     .string()
