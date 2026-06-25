@@ -270,3 +270,82 @@ export const sincronizarIdsApi = createServerFn({ method: "POST" })
       picks: cheapest,
     };
   });
+
+// 📈 Central de Growth: funil por rede + margem estimada (custo cache vs venda BRL/1000).
+// Preço representativo por rede vem do PRICE_TABLE (1k unidades) — fonte estável.
+const VENDA_BRL_POR_MIL: Record<string, number> = {
+  instagram: 18,   // p1k
+  tiktok: 49,      // tf1k
+  youtube: 189,    // ys1k
+  facebook: 29,    // ff1k
+  trafego: 19,     // wbr1k
+  telegram: 35,    // tgm1k
+};
+
+export const getGrowthCentral = createServerFn({ method: "POST" })
+  .inputValidator((i) => adminInput.parse(i))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: pedidos } = await supabaseAdmin
+      .from("pedidos")
+      .select("rede_social, status, valor")
+      .order("created_at", { ascending: false })
+      .limit(2000);
+
+    type Buck = { paid: number; pending: number; cancelled: number; failed: number; total: number; revenue: number };
+    const funil: Record<string, Buck> = {};
+    let totalGeral = 0;
+    for (const p of pedidos ?? []) {
+      const r = ((p as any).rede_social ?? "instagram") as string;
+      funil[r] ??= { paid: 0, pending: 0, cancelled: 0, failed: 0, total: 0, revenue: 0 };
+      funil[r].total++;
+      totalGeral++;
+      const s = String((p as any).status);
+      if (s === "paid") { funil[r].paid++; funil[r].revenue += Number((p as any).valor) || 0; }
+      else if (s === "pending" || s === "mp_pending" || s === "mp_in_process") funil[r].pending++;
+      else if (s === "mp_cancelled" || s === "mp_expired") funil[r].cancelled++;
+      else if (s === "SMM_FAILED" || s === "amount_mismatch" || s === "mp_rejected") funil[r].failed++;
+    }
+
+    const { data: cot } = await supabaseAdmin
+      .from("fornecedores").select("cotacao_brl, usd_to_brl").eq("slug", "smmhype").maybeSingle();
+    const cotacao = Number((cot as any)?.cotacao_brl ?? (cot as any)?.usd_to_brl) || 7;
+
+    const { data: services } = await supabaseAdmin
+      .from("services_cache").select("provider_service_id, name, category, rate");
+
+    const NETS: Record<string, RegExp> = {
+      instagram: /instagram/i,
+      tiktok: /tiktok|tik\s*tok/i,
+      youtube: /youtube|you\s*tube/i,
+      facebook: /facebook/i,
+    };
+    const margem: Record<string, { custo_brl_mil: number | null; venda_brl_mil: number; margem_pct: number | null }> = {};
+    for (const net of Object.keys(VENDA_BRL_POR_MIL)) {
+      const venda = VENDA_BRL_POR_MIL[net];
+      const rx = NETS[net];
+      let best: number | null = null;
+      if (rx) {
+        for (const s of services ?? []) {
+          const blob = `${(s as any).category} ${(s as any).name}`;
+          if (!rx.test(blob)) continue;
+          const rate = Number((s as any).rate);
+          if (!Number.isFinite(rate) || rate <= 0) continue;
+          if (best == null || rate < best) best = rate;
+        }
+      }
+      const custoBrl = best != null ? +(best * cotacao).toFixed(2) : null;
+      const pct = custoBrl != null && venda > 0 ? +(((venda - custoBrl) / venda) * 100).toFixed(1) : null;
+      margem[net] = { custo_brl_mil: custoBrl, venda_brl_mil: venda, margem_pct: pct };
+    }
+
+    return {
+      ok: true as const,
+      funil,
+      total_pedidos: totalGeral,
+      margem,
+      cotacao,
+    };
+  });
