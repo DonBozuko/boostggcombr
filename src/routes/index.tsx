@@ -460,8 +460,8 @@ function Landing() {
     <div className="dark min-h-screen text-foreground">
       <FabianoBadge variant="instagram" />
       {/* NAV */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b border-border">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+      <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
+        <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>
           <div className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
