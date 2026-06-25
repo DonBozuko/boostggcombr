@@ -27,6 +27,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { toast } from "sonner";
+import { useJarvis } from "@/hooks/useJarvis";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
@@ -315,6 +316,7 @@ Ref: ${p.id.slice(0, 8)}`;
   const [monitor, setMonitor] = useState<MonitorState>(null);
   const [monitorBusy, setMonitorBusy] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
+  const jarvis = useJarvis(soundOn);
   const [cron, setCron] = useState<{
     jobname: string; schedule: string; active: boolean;
     last_start: string | null; last_end: string | null;
@@ -497,11 +499,26 @@ Ref: ${p.id.slice(0, 8)}`;
       alert.enable();
       setSoundOn(true);
       toast.success("Alerta sonoro ativado");
+      // Jarvis: boot do painel
+      setTimeout(() => jarvis.play("welcome"), 50);
     } else {
       setSoundOn(false);
       toast("Alerta sonoro desativado");
     }
   };
+
+  // Jarvis · warning: novo carrinho abandonado (estado laranja)
+  useEffect(() => {
+    if (!soundOn) return;
+    if (pendentes.length > 0) jarvis.playOnce("warning", `cart-${pendentes.length}`);
+  }, [pendentes.length, soundOn, jarvis]);
+
+  // Jarvis · critical: saldo do fornecedor < R$ 50
+  useEffect(() => {
+    if (!soundOn) return;
+    const brl = monitor?.fornecedor?.saldo_brl;
+    if (brl != null && brl < 50) jarvis.playOnce("critical", `low-${Math.floor(brl)}`);
+  }, [monitor?.fornecedor?.saldo_brl, soundOn, jarvis]);
 
   const load = async () => {
     if (!token) return toast.error("Informe o token");
@@ -1144,6 +1161,7 @@ Ref: ${p.id.slice(0, 8)}`;
                                 toast.success(`✅ ${res.approved} redes calibradas para menor custo`, {
                                   description: `${res.blocked} bloqueadas (revisão humana) · ${res.skipped} já otimizadas. Telegram notificado.`,
                                 });
+                                jarvis.play("optimized");
                                 await syncIdsApi({ data: { token } }).catch(() => {});
                               }
                             } catch (e) {
