@@ -616,7 +616,7 @@ function AdminPage() {
                 </span>
               )}
             </div>
-            {(() => null)()}
+            
             <div className="grid sm:grid-cols-2 gap-4">
               {(() => {
                 // Fonte de verdade: saldo BRL do monitor (saldo_usd × cotação ao vivo).
