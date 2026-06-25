@@ -312,15 +312,18 @@ function TiktokLanding() {
 
                 <button
                   type="button"
+                  disabled={tipoBloqueado}
                   onClick={() => { setPlanId(p.id); document.getElementById("tt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide"
-                  style={{
-                    background: planId === p.id ? PINK : `linear-gradient(135deg, ${CYAN}, ${PINK})`,
-                    color: "#0a0a0a",
-                    boxShadow: `0 0 22px ${PINK}88`,
-                  }}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={tipoBloqueado
+                    ? { background: "#222", color: "#888", border: `1px solid ${CYAN}44` }
+                    : {
+                        background: planId === p.id ? PINK : `linear-gradient(135deg, ${CYAN}, ${PINK})`,
+                        color: "#0a0a0a",
+                        boxShadow: `0 0 22px ${PINK}88`,
+                      }}
                 >
-                  <Zap className="size-4" /> Comprar agora
+                  <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
                 </button>
               </div>
             );

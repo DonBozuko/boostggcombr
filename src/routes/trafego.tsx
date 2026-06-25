@@ -69,6 +69,9 @@ function TrafegoLanding() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const trType = categoria === "brasil" ? "br" : "global";
+  const tipoBloqueado = isBlocked(blockedMap, "trafego", trType);
 
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
@@ -179,10 +182,13 @@ function TrafegoLanding() {
               <div className="mt-3 text-4xl font-extrabold tracking-tight" style={{ color: "#fff", textShadow: `0 0 14px ${NEON}` }}>{p.price}</div>
               <p className="mt-2 text-xs text-zinc-400">Visitas reais com geo-segmentação</p>
               <button type="button"
+                disabled={tipoBloqueado}
                 onClick={() => { setPlanId(p.id); document.getElementById("tw-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide"
-                style={{ background: NEON, color: "#fff", boxShadow: `0 0 22px ${NEON}aa` }}>
-                <Zap className="size-4" /> Comprar agora
+                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                style={tipoBloqueado
+                  ? { background: "#222", color: "#888", border: `1px solid ${NEON}44` }
+                  : { background: NEON, color: "#fff", boxShadow: `0 0 22px ${NEON}aa` }}>
+                <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
               </button>
             </div>
           ))}

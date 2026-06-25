@@ -300,15 +300,14 @@ function YoutubeLanding() {
 
                 <button
                   type="button"
+                  disabled={tipoBloqueado}
                   onClick={() => { setPlanId(p.id); document.getElementById("yt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide"
-                  style={{
-                    background: RED,
-                    color: "#fff",
-                    boxShadow: `0 0 22px ${RED}aa`,
-                  }}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={tipoBloqueado
+                    ? { background: "#222", color: "#888", border: `1px solid ${RED}44` }
+                    : { background: RED, color: "#fff", boxShadow: `0 0 22px ${RED}aa` }}
                 >
-                  <Zap className="size-4" /> Comprar agora
+                  <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
                 </button>
               </div>
             );
