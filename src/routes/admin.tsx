@@ -181,9 +181,30 @@ function AdminPage() {
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
+  const syncIdsApi = useServerFn(sincronizarIdsApi);
 
   const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
+  const [syncIdsBusy, setSyncIdsBusy] = useState(false);
+  const [syncIdsResult, setSyncIdsResult] = useState<any>(null);
+  const handleSyncIds = async () => {
+    if (!token) return toast.error("Informe o token");
+    setSyncIdsBusy(true);
+    try {
+      const r = await syncIdsApi({ data: { token } });
+      if (r.ok) {
+        setSyncIdsResult(r.picks);
+        const count = Object.values(r.picks).flatMap((n: any) => Object.values(n)).filter(Boolean).length;
+        toast.success(`🤖 ${count} IDs mais baratos mapeados de ${r.total_scanned} serviços`);
+      } else {
+        toast.error(`Sync falhou: ${r.error}`);
+      }
+    } catch (e) {
+      toast.error(`Erro: ${(e as Error).message}`);
+    } finally {
+      setSyncIdsBusy(false);
+    }
+  };
   const handlePingSmm = async () => {
     if (!token) return toast.error("Informe o token");
     setPingBusy(true);
