@@ -211,7 +211,7 @@ function YoutubeLanding() {
 
   return (
     // v2: solid bg, no glitch
-    <div className="min-h-screen text-white" style={{ background: "#0a0a0a" }}>
+    <MobileFrame bg="#0a0a0a">
       <FabianoBadge variant="youtube" />
       {/* HERO */}
       <div

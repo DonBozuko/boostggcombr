@@ -219,10 +219,7 @@ function TiktokLanding() {
 
   return (
     // v2: solid bg, no glitch
-    <div
-      className="min-h-screen text-white"
-      style={{ background: "#0a0a0a" }}
-    >
+    <MobileFrame bg="#0a0a0a">
       <FabianoBadge variant="tiktok" />
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${

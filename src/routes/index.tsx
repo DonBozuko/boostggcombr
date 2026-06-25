@@ -459,7 +459,7 @@ function Landing() {
     : "";
 
   return (
-    <div className="dark min-h-screen text-foreground">
+    <MobileFrame bg="hsl(var(--background))">
       <FabianoBadge variant="instagram" />
       {/* NAV */}
       <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>

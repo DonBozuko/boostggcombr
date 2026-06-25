@@ -140,7 +140,7 @@ function TrafegoLanding() {
   const qrCodeUrl = pedidoInfo?.qrCodeBase64 ? `data:image/png;base64,${pedidoInfo.qrCodeBase64}` : "";
 
   return (
-    <div className="min-h-screen text-white" style={{ background: BG }}>
+    <MobileFrame bg={BG}>
       <FabianoBadge variant="trafego" />
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
