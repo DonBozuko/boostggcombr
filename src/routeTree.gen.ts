@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
+import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as FacebookRouteImport } from './routes/facebook'
@@ -27,9 +29,19 @@ const YoutubeRoute = YoutubeRouteImport.update({
   path: '/youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrafegoRoute = TrafegoRouteImport.update({
+  id: '/trafego',
+  path: '/trafego',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TiktokRoute = TiktokRouteImport.update({
   id: '/tiktok',
   path: '/tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TelegramRoute = TelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -91,7 +103,9 @@ export interface FileRoutesByFullPath {
   '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telegram': typeof TelegramRoute
   '/tiktok': typeof TiktokRoute
+  '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -105,7 +119,9 @@ export interface FileRoutesByTo {
   '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telegram': typeof TelegramRoute
   '/tiktok': typeof TiktokRoute
+  '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -120,7 +136,9 @@ export interface FileRoutesById {
   '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telegram': typeof TelegramRoute
   '/tiktok': typeof TiktokRoute
+  '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -136,7 +154,9 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/telegram'
     | '/tiktok'
+    | '/trafego'
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
@@ -150,7 +170,9 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/telegram'
     | '/tiktok'
+    | '/trafego'
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
@@ -164,7 +186,9 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/telegram'
     | '/tiktok'
+    | '/trafego'
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
@@ -179,7 +203,9 @@ export interface RootRouteChildren {
   FacebookRoute: typeof FacebookRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TelegramRoute: typeof TelegramRoute
   TiktokRoute: typeof TiktokRoute
+  TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
@@ -196,11 +222,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof YoutubeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/trafego': {
+      id: '/trafego'
+      path: '/trafego'
+      fullPath: '/trafego'
+      preLoaderRoute: typeof TrafegoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tiktok': {
       id: '/tiktok'
       path: '/tiktok'
       fullPath: '/tiktok'
       preLoaderRoute: typeof TiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/telegram': {
+      id: '/telegram'
+      path: '/telegram'
+      fullPath: '/telegram'
+      preLoaderRoute: typeof TelegramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -283,7 +323,9 @@ const rootRouteChildren: RootRouteChildren = {
   FacebookRoute: FacebookRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TelegramRoute: TelegramRoute,
   TiktokRoute: TiktokRoute,
+  TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
@@ -293,13 +335,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

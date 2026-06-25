@@ -8,7 +8,7 @@ const pedidoSchema = z.object({
   valor: z.number().positive(),
   email: z.string().email().max(200),
   whatsapp_contato: z.string().min(5).max(50).optional(),
-  rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook"]).optional(),
+  rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram"]).optional(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
@@ -67,6 +67,16 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   fl500:  { quantidade: 500,  valor: 9.0 },
   fl1k:   { quantidade: 1000, valor: 15.0 },
   fl2k:   { quantidade: 2000, valor: 27.0 },
+  // Tráfego Web — ID 9313 (Brasil) e 10351 (Mundial)
+  wbr1k:  { quantidade: 1000,  valor: 19.0 },
+  wbr5k:  { quantidade: 5000,  valor: 69.0 },
+  wbr10k: { quantidade: 10000, valor: 119.0 },
+  wgl1k:  { quantidade: 1000,  valor: 9.0 },
+  wgl5k:  { quantidade: 5000,  valor: 29.0 },
+  wgl10k: { quantidade: 10000, valor: 49.0 },
+  // Telegram — IDs pendentes (checkout desabilitado na UI até provisionamento)
+  tgm500: { quantidade: 500,  valor: 19.0 },
+  tgm1k:  { quantidade: 1000, valor: 35.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
@@ -79,14 +89,23 @@ export const criarPedido = createServerFn({ method: "POST" })
     }
     const valorCobrar = oficial.valor;
     const pkg = data.pacote.toLowerCase();
-    const isTiktok = pkg.startsWith("t");
+    const isTelegram = pkg.startsWith("tg");
+    const isTrafego = !isTelegram && pkg.startsWith("w");
+    const isTiktok = !isTelegram && !isTrafego && pkg.startsWith("t");
     const isYoutube = pkg.startsWith("y");
     const isFacebook = pkg.startsWith("f");
     const rede =
       data.rede_social ??
-      (isFacebook ? "facebook" : isYoutube ? "youtube" : isTiktok ? "tiktok" : "instagram");
+      (isTelegram ? "telegram"
+        : isTrafego ? "trafego"
+        : isFacebook ? "facebook"
+        : isYoutube ? "youtube"
+        : isTiktok ? "tiktok"
+        : "instagram");
     const categoria =
-      isFacebook
+      isTelegram ? "membros"
+        : isTrafego ? (pkg.startsWith("wbr") ? "trafego_br" : "trafego_global")
+        : isFacebook
         ? (pkg.startsWith("fl") ? "curtidas" : "seguidores")
         : isYoutube
         ? (pkg.startsWith("yv") ? "visualizacoes" : "inscritos")

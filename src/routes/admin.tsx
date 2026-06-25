@@ -45,14 +45,16 @@ type Pedido = {
   rede_social?: string | null;
 };
 
-type RedeKey = "overview" | "instagram" | "tiktok" | "youtube" | "facebook";
+type RedeKey = "overview" | "instagram" | "tiktok" | "youtube" | "facebook" | "trafego" | "telegram";
 
 const REDES: { key: RedeKey; label: string; icon: string; disabled?: boolean }[] = [
-  { key: "overview",  label: "Visão Geral",      icon: "🌐" },
-  { key: "instagram", label: "Instagram",        icon: "📸" },
-  { key: "tiktok",    label: "TikTok",           icon: "🎵" },
-  { key: "youtube",   label: "YouTube",          icon: "📺" },
-  { key: "facebook",  label: "Facebook",         icon: "🔵" },
+  { key: "overview",  label: "Visão Geral", icon: "🌐" },
+  { key: "instagram", label: "Instagram",   icon: "📸" },
+  { key: "tiktok",    label: "TikTok",      icon: "🎵" },
+  { key: "youtube",   label: "YouTube",     icon: "📺" },
+  { key: "facebook",  label: "Facebook",    icon: "🔵" },
+  { key: "trafego",   label: "Tráfego Web", icon: "🌐" },
+  { key: "telegram",  label: "Telegram",    icon: "✈️" },
 ];
 
 const REDE_ICON: Record<string, string> = {
@@ -60,6 +62,8 @@ const REDE_ICON: Record<string, string> = {
   tiktok: "🎵",
   youtube: "📺",
   facebook: "🔵",
+  trafego: "🌐",
+  telegram: "✈️",
 };
 
 
@@ -231,6 +235,9 @@ function AdminPage() {
   // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
   const resolveServiceIdClient = (pacote: string, qty: number): number | null => {
     const p = String(pacote ?? "").trim().toLowerCase();
+    if (p.startsWith("tg")) return null;
+    if (p.startsWith("wbr")) return 9313;
+    if (p.startsWith("wgl")) return 10351;
     if (p.startsWith("ff")) return 18870;
     if (p.startsWith("fl")) return 7593;
     if (p.startsWith("ys")) return 19440;
@@ -248,6 +255,15 @@ function AdminPage() {
 
   const [token, setToken] = useState("");
   const [aba, setAba] = useState<RedeKey>("overview");
+  const [sandbox, setSandbox] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("BOOSTYGRAM_SANDBOX") === "1";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sandbox) window.localStorage.setItem("BOOSTYGRAM_SANDBOX", "1");
+    else window.localStorage.removeItem("BOOSTYGRAM_SANDBOX");
+  }, [sandbox]);
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
@@ -640,6 +656,8 @@ function AdminPage() {
               tiktok:    "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 text-cyan-100 border-cyan-400/70 shadow-[0_0_20px_rgba(0,242,254,0.5)]",
               youtube:   "bg-red-600/20 text-red-100 border-red-500/80 shadow-[0_0_22px_rgba(255,0,0,0.55)]",
               facebook:  "bg-blue-600/20 text-blue-100 border-blue-500/80 shadow-[0_0_20px_rgba(24,119,242,0.55)]",
+              trafego:   "bg-purple-600/20 text-purple-100 border-purple-500/80 shadow-[0_0_22px_rgba(176,38,255,0.55)]",
+              telegram:  "bg-sky-500/20 text-sky-100 border-sky-400/80 shadow-[0_0_22px_rgba(0,204,255,0.55)]",
             };
             const brandIdle: Record<string, string> = {
               overview:  "hover:text-emerald-200 hover:border-emerald-500/40",
@@ -647,6 +665,8 @@ function AdminPage() {
               tiktok:    "hover:text-cyan-200 hover:border-cyan-500/40",
               youtube:   "hover:text-red-200 hover:border-red-500/40",
               facebook:  "hover:text-blue-200 hover:border-blue-500/40",
+              trafego:   "hover:text-purple-200 hover:border-purple-500/40",
+              telegram:  "hover:text-sky-200 hover:border-sky-500/40",
             };
             return (
               <button
@@ -904,14 +924,41 @@ function AdminPage() {
                     mais barato de Instagram, TikTok, YouTube e Facebook (Seguidores, Curtidas, Views).
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleSyncIds}
-                  disabled={syncIdsBusy}
-                  className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold hover:opacity-90"
-                >
-                  {syncIdsBusy ? "Sincronizando…" : "Sincronizar IDs da API"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSyncIds}
+                    disabled={syncIdsBusy}
+                    className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold hover:opacity-90"
+                  >
+                    {syncIdsBusy ? "Sincronizando…" : "Sincronizar IDs da API"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!syncIdsResult}
+                    onClick={() => {
+                      if (!syncIdsResult) return;
+                      const rows = [["rede", "tipo", "service_id", "rate", "name"]];
+                      (["instagram", "tiktok", "youtube", "facebook"] as const).forEach((net) => {
+                        (["followers", "likes", "views"] as const).forEach((t) => {
+                          const p = syncIdsResult?.[net]?.[t];
+                          if (p) rows.push([net, t, String(p.service ?? ""), String(p.rate ?? ""), String(p.name ?? "").replace(/[\r\n,;]+/g, " ")]);
+                        });
+                      });
+                      const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+                      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `auditoria-ids-${new Date().toISOString().slice(0, 10)}.csv`;
+                      document.body.appendChild(a); a.click(); a.remove();
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    ⬇️ Exportar Auditoria CSV
+                  </Button>
+                </div>
               </div>
               {syncIdsResult && (
                 <div className="rounded-md border border-border bg-background/60 p-3 text-xs font-mono overflow-x-auto">
@@ -930,6 +977,32 @@ function AdminPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* 🧪 Modo Sandbox (frontend-only) */}
+            <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${sandbox ? "border-red-500/60 bg-red-500/10" : "border-border bg-card/40"}`}>
+              <div className="min-w-0">
+                <h3 className="font-semibold flex items-center gap-2">
+                  🧪 Modo Sandbox <span className="text-xs text-muted-foreground">(localStorage · frontend-only)</span>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Quando ligado, os checkouts públicos simulam Pix aprovado localmente — <b>nenhuma cobrança real</b> é criada nem ordem é enviada à API. Use só para validar fluxo visual.
+                </p>
+                {sandbox && (
+                  <p className="text-[11px] text-red-300 mt-1 font-semibold">
+                    ⚠️ MODO TESTE ATIVO neste navegador. Desligue antes de publicar para clientes.
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={sandbox}
+                onClick={() => setSandbox((v) => !v)}
+                className={`relative h-7 w-12 rounded-full transition-colors ${sandbox ? "bg-red-500" : "bg-zinc-700"}`}
+              >
+                <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${sandbox ? "left-6" : "left-1"}`} />
+              </button>
             </div>
 
 

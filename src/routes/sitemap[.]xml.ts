@@ -18,6 +18,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/tiktok", changefreq: "weekly", priority: "0.9" },
           { path: "/youtube", changefreq: "weekly", priority: "0.9" },
           { path: "/facebook", changefreq: "weekly", priority: "0.9" },
+          { path: "/trafego", changefreq: "weekly", priority: "0.8" },
+          { path: "/telegram", changefreq: "weekly", priority: "0.7" },
           { path: "/privacidade", changefreq: "yearly", priority: "0.3" },
         ];
 

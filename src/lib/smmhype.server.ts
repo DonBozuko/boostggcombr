@@ -16,9 +16,17 @@ const YT_VIEWS_SERVICE_ID = 14321;
 // Facebook (SMMhype)
 const FB_FOLLOWERS_SERVICE_ID = 18870;
 const FB_LIKES_SERVICE_ID = 7593;
+// Tráfego Web (SMMhype)
+const WEB_TRAFFIC_BR_SERVICE_ID = 9313;
+const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // Telegram prefixes: tgm* (members) — IDs ainda pendentes de provisionamento
+  if (p.startsWith("tg")) return null;
+  // Tráfego Web prefixes: wbr* (Brasil), wgl* (Global)
+  if (p.startsWith("wbr")) return WEB_TRAFFIC_BR_SERVICE_ID;
+  if (p.startsWith("wgl")) return WEB_TRAFFIC_WORLD_SERVICE_ID;
   // Facebook prefixes: ff* (followers), fl* (likes)
   if (p.startsWith("ff")) return FB_FOLLOWERS_SERVICE_ID;
   if (p.startsWith("fl")) return FB_LIKES_SERVICE_ID;
@@ -51,6 +59,8 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   yv1k: YT_VIEWS_SERVICE_ID, yv5k: YT_VIEWS_SERVICE_ID, yv10k: YT_VIEWS_SERVICE_ID,
   ff500: FB_FOLLOWERS_SERVICE_ID, ff1k: FB_FOLLOWERS_SERVICE_ID, ff2k5: FB_FOLLOWERS_SERVICE_ID,
   fl500: FB_LIKES_SERVICE_ID, fl1k: FB_LIKES_SERVICE_ID, fl2k: FB_LIKES_SERVICE_ID,
+  wbr1k: WEB_TRAFFIC_BR_SERVICE_ID, wbr5k: WEB_TRAFFIC_BR_SERVICE_ID, wbr10k: WEB_TRAFFIC_BR_SERVICE_ID,
+  wgl1k: WEB_TRAFFIC_WORLD_SERVICE_ID, wgl5k: WEB_TRAFFIC_WORLD_SERVICE_ID, wgl10k: WEB_TRAFFIC_WORLD_SERVICE_ID,
 };
 
 
@@ -168,10 +178,16 @@ export async function dispatchSmmhype(args: {
   }
 
   const pkg = String(args.pacote ?? "").trim().toLowerCase();
-  const isFacebook = pkg.startsWith("f");
-  const isYoutube = !isFacebook && pkg.startsWith("y");
-  const isTiktok = !isFacebook && !isYoutube && pkg.startsWith("t");
-  const link = isFacebook
+  const isTrafego = pkg.startsWith("w");
+  const isTelegram = pkg.startsWith("tg");
+  const isFacebook = !isTrafego && !isTelegram && pkg.startsWith("f");
+  const isYoutube = !isFacebook && !isTrafego && !isTelegram && pkg.startsWith("y");
+  const isTiktok = !isFacebook && !isYoutube && !isTrafego && !isTelegram && pkg.startsWith("t");
+  // Tráfego/Telegram: link já é URL completa http(s)://; só passa adiante
+  const passthrough = (raw: string) => raw.trim();
+  const link = isTrafego || isTelegram
+    ? passthrough(args.instagram_user)
+    : isFacebook
     ? normalizeFacebookTarget(args.instagram_user)
     : isYoutube
     ? normalizeYoutubeTarget(args.instagram_user)
