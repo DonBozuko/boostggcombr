@@ -723,11 +723,13 @@ function Landing() {
             <Button
               type="submit"
               size="lg"
-              disabled={loading}
-              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] transition-all"
+              disabled={loading || tipoBloqueado}
+              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
 
-              {loading ? (
+              {tipoBloqueado ? (
+                <span>Instabilidade Temporária - Reposição de Estoque</span>
+              ) : loading ? (
                 <span className="flex items-center gap-2">
                   <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                   Gerando seu código Pix de pagamento... Por favor, aguarde
