@@ -180,6 +180,47 @@ function AdminPage() {
   const updateCotacao = useServerFn(atualizarCotacaoFornecedor);
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
+  const pingSmm = useServerFn(pingSmmhype);
+
+  const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [pingBusy, setPingBusy] = useState(false);
+  const handlePingSmm = async () => {
+    if (!token) return toast.error("Informe o token");
+    setPingBusy(true);
+    try {
+      const r = await pingSmm({ data: { token } });
+      if (r.ok) {
+        const msg = `✅ Comunicação OK · saldo=${r.balance ?? "?"} ${r.currency ?? ""}`.trim();
+        setPingResult({ ok: true, msg });
+        toast.success(msg);
+      } else {
+        setPingResult({ ok: false, msg: `❌ ${r.error}` });
+        toast.error(`Ping falhou: ${r.error}`);
+      }
+    } catch (e) {
+      setPingResult({ ok: false, msg: `❌ ${(e as Error).message}` });
+    } finally {
+      setPingBusy(false);
+    }
+  };
+
+  // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
+  const resolveServiceIdClient = (pacote: string, qty: number): number | null => {
+    const p = String(pacote ?? "").trim().toLowerCase();
+    if (p.startsWith("ff")) return 18870;
+    if (p.startsWith("fl")) return 7593;
+    if (p.startsWith("ys")) return 19440;
+    if (p.startsWith("yv")) return 14321;
+    if (p.startsWith("tf")) return 14330;
+    if (p.startsWith("tl")) return 19191;
+    if (p.startsWith("tv")) return 14907;
+    if (p.startsWith("v")) return 18855;
+    if (p.startsWith("l")) return 18860;
+    if (qty >= 100 && qty <= 2000) return 14325;
+    if (qty >= 5000 && qty <= 100000) return 14225;
+    return null;
+  };
+
 
   const [token, setToken] = useState("");
   const [aba, setAba] = useState<RedeKey>("overview");
