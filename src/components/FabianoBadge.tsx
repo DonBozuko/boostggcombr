@@ -126,10 +126,8 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         rel="noopener noreferrer"
         onClick={handleClick}
         aria-label="Fabiano Santiago — Falar no Telegram"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onFocus={() => setHovered(true)}
-        onBlur={() => setHovered(false)}
+
+
         className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
       >
         {imgOk ? (
