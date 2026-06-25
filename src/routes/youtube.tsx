@@ -211,7 +211,7 @@ function YoutubeLanding() {
 
   return (
     // v2: solid bg, no glitch
-    <MobileFrame bg="#0a0a0a">
+    <MobileFrame bg="#0a0a0a" route="/youtube">
       <FabianoBadge variant="youtube" />
       {/* HERO */}
       <div
