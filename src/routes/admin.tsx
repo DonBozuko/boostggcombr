@@ -393,7 +393,7 @@ function AdminPage() {
     loadCaixa();
     loadFaturamento();
     loadFornecedores();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); }, 30000);
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); load(); }, 60000);
     return () => clearInterval(i);
   }, [token]);
 
