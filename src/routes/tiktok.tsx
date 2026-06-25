@@ -1,4 +1,5 @@
 import { FabianoBadge } from "@/components/FabianoBadge";
+import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -123,6 +124,7 @@ function TikTokIcon({ size = 28, className }: { size?: number; className?: strin
 
 
 function TiktokLanding() {
+  const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("seguidores");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");
@@ -220,6 +222,20 @@ function TiktokLanding() {
       style={{ background: "#0a0a0a" }}
     >
       <FabianoBadge variant="tiktok" />
+      <div
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
+          scrolled ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
+        }`}
+        style={{ borderColor: `${CYAN}66` }}
+      >
+        <div className="container mx-auto px-6 h-12 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TikTokIcon size={18} />
+            <span className="font-bold text-sm text-white">BOOSTYGRAM</span>
+          </div>
+          <span className="text-xs" style={{ color: PINK }}>TIKTOK ⚡</span>
+        </div>
+      </div>
       {/* HERO */}
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div

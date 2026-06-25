@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import fabiano from "@/assets/fabiano.png.asset.json";
 import { User } from "lucide-react";
+import { useScrolledPercent } from "@/hooks/useScroll";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
 
@@ -88,7 +89,9 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
 };
 
 export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
-  const [open, setOpen] = useState(true);
+  const scrolled = useScrolledPercent(0.15);
+  const [hovered, setHovered] = useState(false);
+  const open = scrolled || hovered;
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
   const { native, web } = buildLinks(variant);
@@ -123,8 +126,10 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         rel="noopener noreferrer"
         onClick={handleClick}
         aria-label="Fabiano Santiago — Falar no Telegram"
-        onMouseEnter={() => setOpen(true)}
-        onFocus={() => setOpen(true)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
         className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
       >
         {imgOk ? (
@@ -147,8 +152,10 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-300 hover:bg-white/15 hover:scale-[1.02] ${
-          open ? "opacity-100 translate-x-0 animate-[fade-in_0.4s_ease-out]" : "opacity-0 -translate-x-2 pointer-events-none"
+        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-500 ease-out hover:bg-white/15 ${
+          open
+            ? "opacity-100 translate-x-0 scale-100 animate-[fade-in_0.5s_ease-out]"
+            : "opacity-0 -translate-x-2 scale-90 pointer-events-none"
         }`}
         role="tooltip"
       >
