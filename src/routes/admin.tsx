@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi, getGrowthCentral } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
@@ -186,6 +186,44 @@ function AdminPage() {
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
   const syncIdsApi = useServerFn(sincronizarIdsApi);
+  const getGrowth = useServerFn(getGrowthCentral);
+
+  type GrowthState = {
+    funil: Record<string, { paid: number; pending: number; cancelled: number; failed: number; total: number; revenue: number }>;
+    total_pedidos: number;
+    margem: Record<string, { custo_brl_mil: number | null; venda_brl_mil: number; margem_pct: number | null }>;
+    cotacao: number;
+  };
+  const [growth, setGrowth] = useState<GrowthState | null>(null);
+  const loadGrowth = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getGrowth({ data: { token: tk } });
+      if (res.ok) setGrowth({ funil: res.funil, total_pedidos: res.total_pedidos, margem: res.margem, cotacao: res.cotacao });
+    } catch {}
+  };
+
+  // Recuperação de carrinho abandonado: gera template + abre wa.me em branco.
+  const recuperarVenda = (p: { instagram_user: string; pacote: string; quantidade: number; rede_social?: string | null; id: string }) => {
+    const rede = p.rede_social ?? "instagram";
+    const handle = p.instagram_user?.startsWith("@") ? p.instagram_user : `@${p.instagram_user}`;
+    const tpl =
+`Oi! Aqui é da Boostygram 👋
+
+Vi que você iniciou um pedido de ${p.quantidade.toLocaleString("pt-BR")} ${p.pacote.toLowerCase().startsWith("l") ? "curtidas" : p.pacote.toLowerCase().startsWith("v") || p.pacote.toLowerCase().startsWith("tv") || p.pacote.toLowerCase().startsWith("yv") ? "visualizações" : "seguidores"} pro perfil ${handle} (${rede.toUpperCase()}) mas o Pix expirou antes da confirmação.
+
+Posso gerar um novo Pix com a mesma condição agora — entrega começa em minutos. Quer que eu reenvie?
+
+Ref: ${p.id.slice(0, 8)}`;
+    try {
+      navigator.clipboard?.writeText(tpl);
+      toast.success("Template copiado. Cole no WhatsApp do cliente.");
+    } catch {
+      toast("Template gerado", { description: tpl.slice(0, 80) + "…" });
+    }
+    const url = `https://wa.me/?text=${encodeURIComponent(tpl)}`;
+    window.open(url, "_blank", "noopener");
+  };
 
   const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
