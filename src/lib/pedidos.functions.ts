@@ -8,7 +8,7 @@ const pedidoSchema = z.object({
   valor: z.number().positive(),
   email: z.string().email().max(200),
   whatsapp_contato: z.string().min(5).max(50).optional(),
-  rede_social: z.enum(["instagram", "tiktok", "youtube"]).optional(),
+  rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook"]).optional(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
