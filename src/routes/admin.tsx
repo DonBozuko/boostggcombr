@@ -235,6 +235,9 @@ function AdminPage() {
   // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
   const resolveServiceIdClient = (pacote: string, qty: number): number | null => {
     const p = String(pacote ?? "").trim().toLowerCase();
+    if (p.startsWith("tg")) return null;
+    if (p.startsWith("wbr")) return 9313;
+    if (p.startsWith("wgl")) return 10351;
     if (p.startsWith("ff")) return 18870;
     if (p.startsWith("fl")) return 7593;
     if (p.startsWith("ys")) return 19440;
