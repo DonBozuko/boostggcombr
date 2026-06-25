@@ -1,5 +1,6 @@
 import { useState } from "react";
 import fabiano from "@/assets/fabiano.png.asset.json";
+import { User } from "lucide-react";
 
 export function FabianoBadge() {
   const [open, setOpen] = useState(false);
