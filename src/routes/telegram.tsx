@@ -22,6 +22,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
+import ogTelegram from "@/assets/og-telegram.jpg";
 
 const AERO = "#00CCFF";
 const BG = "#0a0a0a";
@@ -32,14 +33,19 @@ export const Route = createFileRoute("/telegram")({
     const description =
       "Comprar membros reais para grupo e canal do Telegram com entrega via Pix automático. Crescimento real, recarga estável e suporte humano.";
     const url = "https://boostygram.lovable.app/telegram";
+    const ogImage = `https://boostygram.lovable.app${ogTelegram}?v=2`;
     return {
       meta: [
         { title }, { name: "description", content: description },
         { name: "keywords", content: "comprar membros telegram, comprar inscritos canal telegram, membros grupo telegram, smm telegram brasil" },
         { property: "og:title", content: title }, { property: "og:description", content: description },
         { property: "og:url", content: url }, { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title }, { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
     };
