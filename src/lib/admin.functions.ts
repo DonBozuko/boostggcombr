@@ -168,3 +168,105 @@ export const pingSmmhype = createServerFn({ method: "POST" })
     }
   });
 
+
+// 🤖 Sincronizar IDs da API: lê services do SMMhype, filtra por refill/recarga/reposicion
+// para Instagram, TikTok, YouTube e Facebook, e devolve os MAIS BARATOS por rede/tipo.
+// Persiste candidatos em services_cache para auditoria futura.
+export const sincronizarIdsApi = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const key = process.env.SMMHYPE_API_KEY;
+    if (!key) return { ok: false as const, error: "SMMHYPE_API_KEY ausente" };
+
+    const body = new URLSearchParams({ key, action: "services" });
+    const res = await fetch("https://smmhype.com/api/v2", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+    });
+    if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
+    const list = (await res.json()) as Array<{
+      service: number | string; name: string; category: string; rate: string | number;
+      min?: any; max?: any; refill?: boolean;
+    }>;
+    if (!Array.isArray(list)) return { ok: false as const, error: "Resposta inválida" };
+
+    const REFILL_RX = /(refill|recarga|reposicion)/i;
+    const NETWORKS: Record<string, RegExp> = {
+      instagram: /instagram/i,
+      tiktok: /tiktok|tik\s*tok/i,
+      youtube: /youtube|you\s*tube/i,
+      facebook: /facebook/i,
+    };
+    const TYPES: Record<string, RegExp> = {
+      followers: /follower|seguidor|subscriber|inscrit|curtid.*p[áa]gina|page.*like/i,
+      likes: /like|curtid/i,
+      views: /view|visualiza/i,
+    };
+
+    type Pick = { service: number; name: string; category: string; rate: number };
+    const cheapest: Record<string, Record<string, Pick | null>> = {};
+    for (const net of Object.keys(NETWORKS)) {
+      cheapest[net] = { followers: null, likes: null, views: null };
+    }
+
+    for (const s of list) {
+      const cat = String(s.category ?? "");
+      const name = String(s.name ?? "");
+      const blob = `${cat} ${name}`;
+      const hasRefillFlag = s.refill === true;
+      const hasRefillWord = REFILL_RX.test(blob);
+      if (!hasRefillFlag && !hasRefillWord) continue;
+      const rate = Number(s.rate);
+      if (!Number.isFinite(rate) || rate <= 0) continue;
+      const sid = Number(s.service);
+      if (!Number.isFinite(sid)) continue;
+
+      for (const [net, netRx] of Object.entries(NETWORKS)) {
+        if (!netRx.test(blob)) continue;
+        // determinar tipo (ordem importa: followers antes de likes p/ "page likes")
+        let type: string | null = null;
+        if (net === "facebook" && /page.*like|curtid.*p[áa]gina/i.test(blob)) type = "followers";
+        else if (TYPES.followers.test(blob)) type = "followers";
+        else if (TYPES.views.test(blob)) type = "views";
+        else if (TYPES.likes.test(blob)) type = "likes";
+        if (!type) continue;
+        const cur = cheapest[net][type];
+        if (!cur || rate < cur.rate) {
+          cheapest[net][type] = { service: sid, name, category: cat, rate };
+        }
+      }
+    }
+
+    // Persiste candidatos descobertos em services_cache (auditoria)
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const rows: any[] = [];
+    for (const net of Object.keys(cheapest)) {
+      for (const type of Object.keys(cheapest[net])) {
+        const p = cheapest[net][type];
+        if (!p) continue;
+        rows.push({
+          provider_service_id: p.service,
+          category: p.category,
+          name: p.name,
+          rate: p.rate,
+          refill: true,
+          min: 0, max: 0,
+          updated_at: new Date().toISOString(),
+        });
+      }
+    }
+    if (rows.length > 0) {
+      await supabaseAdmin
+        .from("services_cache")
+        .upsert(rows, { onConflict: "provider_service_id" });
+    }
+
+    return {
+      ok: true as const,
+      synced_at: new Date().toISOString(),
+      total_scanned: list.length,
+      picks: cheapest,
+    };
+  });
