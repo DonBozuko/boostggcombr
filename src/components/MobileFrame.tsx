@@ -85,7 +85,7 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden lg:flex flex-1 relative overflow-hidden items-center justify-center"
+      className="hidden lg:flex flex-1 relative overflow-hidden"
       style={{ background: data.gradient }}
     >
       <div
@@ -95,19 +95,11 @@ function Billboard({
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
         }}
       />
-      {character && (
-        <img
-          src={character}
-          alt=""
-          loading="lazy"
-          className={`hidden md:block absolute bottom-0 h-[90vh] max-h-[900px] object-contain pointer-events-none z-20 ${
-            side === "left" ? "right-0 translate-x-[10%]" : "left-0 -translate-x-[10%]"
-          }`}
-          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}55)` }}
-        />
-      )}
+      {/* CTA harmonizado no topo, acima da cabeça do personagem */}
       <div
-        className={`relative z-10 max-w-xs px-8 text-${side === "left" ? "right" : "left"}`}
+        className={`absolute top-10 z-30 max-w-[280px] px-6 text-center ${
+          side === "left" ? "right-4" : "left-4"
+        }`}
       >
         <span
           className="text-[10px] font-black tracking-[0.4em]"
@@ -115,22 +107,34 @@ function Billboard({
         >
           {data.tag}
         </span>
-        <h2 className="text-3xl font-black text-white mt-3 leading-tight">
+        <h2 className="text-2xl font-black text-white mt-2 leading-tight">
           {data.title}
         </h2>
-        <p className="text-sm text-white/70 mt-3">{data.sub}</p>
+        <p className="text-xs text-white/70 mt-2">{data.sub}</p>
         {cta && (
           <p
-            className="text-xs font-bold mt-4 tracking-wide"
+            className="text-[11px] font-bold mt-3 tracking-wide"
             style={{ color: data.accent }}
           >
             ✦ {cta}
           </p>
         )}
       </div>
+      {character && (
+        <img
+          src={character}
+          alt=""
+          loading="lazy"
+          className={`absolute bottom-0 h-[75vh] max-h-[800px] object-contain pointer-events-none z-20 ${
+            side === "left" ? "right-0 translate-x-[8%]" : "left-0 -translate-x-[8%]"
+          }`}
+          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}55)` }}
+        />
+      )}
     </aside>
   );
 }
+
 
 export function MobileFrame({
   bg = "#0a0a0a",
