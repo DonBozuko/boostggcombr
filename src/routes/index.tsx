@@ -18,6 +18,7 @@ import {
   Eye,
   Star,
 } from "lucide-react";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 
 
 import { Button } from "@/components/ui/button";
