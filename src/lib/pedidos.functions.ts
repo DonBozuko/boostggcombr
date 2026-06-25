@@ -74,9 +74,12 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   wgl1k:  { quantidade: 1000,  valor: 9.0 },
   wgl5k:  { quantidade: 5000,  valor: 29.0 },
   wgl10k: { quantidade: 10000, valor: 49.0 },
-  // Telegram — IDs pendentes (checkout desabilitado na UI até provisionamento)
-  tgm500: { quantidade: 500,  valor: 19.0 },
-  tgm1k:  { quantidade: 1000, valor: 35.0 },
+  // Telegram — Canal (service 19106)
+  tgc500: { quantidade: 500,  valor: 19.0 },
+  tgc1k:  { quantidade: 1000, valor: 35.0 },
+  // Telegram — Grupo (service 19107)
+  tgg500: { quantidade: 500,  valor: 19.0 },
+  tgg1k:  { quantidade: 1000, valor: 35.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
