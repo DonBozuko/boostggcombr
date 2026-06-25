@@ -1,3 +1,4 @@
+import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
@@ -463,6 +464,7 @@ function TiktokLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/tiktok" />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"

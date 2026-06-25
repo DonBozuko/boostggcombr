@@ -1,3 +1,4 @@
+import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
@@ -266,6 +267,7 @@ function TrafegoLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/trafego" />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: NEON, color: "#fff" }} onClick={() => setModalOpen(false)}>Fechar</Button>
             </>
           ) : (

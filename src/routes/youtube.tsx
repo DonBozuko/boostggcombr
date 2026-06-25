@@ -1,3 +1,4 @@
+import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
@@ -448,6 +449,7 @@ function YoutubeLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/youtube" />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"

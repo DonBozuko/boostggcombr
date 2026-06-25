@@ -1,3 +1,4 @@
+import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
@@ -342,6 +343,7 @@ function TelegramLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/telegram" />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar
               </Button>

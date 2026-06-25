@@ -1,3 +1,4 @@
+import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
@@ -435,6 +436,7 @@ function FacebookLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/facebook" />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
