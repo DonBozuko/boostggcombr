@@ -468,7 +468,8 @@ Ref: ${p.id.slice(0, 8)}`;
     loadCaixa();
     loadFaturamento();
     loadFornecedores();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); load(); }, 60000);
+    loadGrowth();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); loadGrowth(); load(); }, 60000);
     return () => clearInterval(i);
   }, [token]);
 
