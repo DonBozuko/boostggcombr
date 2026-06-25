@@ -4,11 +4,16 @@ import { User } from "lucide-react";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
 
-// Build-time validation: warn (não quebra o caixa) se a variável estiver vazia.
-const BOT_USERNAME = (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string | undefined)?.trim() || "";
-if (!BOT_USERNAME && typeof window === "undefined") {
+// Build-time validation: VITE_TELEGRAM_BOT_USERNAME pode ser definido no .env do workspace
+// para sobrescrever o handle padrão. Se vazio, avisa sem quebrar o caixa.
+const DEFAULT_BOT_USERNAME = "boostygram_bot";
+const BOT_USERNAME =
+  (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string | undefined)?.trim() || DEFAULT_BOT_USERNAME;
+if (!import.meta.env.VITE_TELEGRAM_BOT_USERNAME && typeof window === "undefined") {
   // eslint-disable-next-line no-console
-  console.warn("[FabianoBadge] VITE_TELEGRAM_BOT_USERNAME vazio — usando fallback https://t.me sem deep link.");
+  console.warn(
+    `[FabianoBadge] VITE_TELEGRAM_BOT_USERNAME não definido — usando default "${DEFAULT_BOT_USERNAME}".`,
+  );
 }
 
 const START_PARAM: Record<FabianoVariant, string> = {
