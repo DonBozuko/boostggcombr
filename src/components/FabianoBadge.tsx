@@ -150,7 +150,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-500 ease-out hover:bg-white/15 ${
+        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-500 ease-out hover:bg-white/15 animate-pulse ${
           open
             ? "opacity-100 translate-x-0 scale-100 animate-[fade-in_0.5s_ease-out]"
             : "opacity-0 -translate-x-2 scale-90 pointer-events-none"
