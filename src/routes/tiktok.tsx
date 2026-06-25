@@ -463,6 +463,7 @@ function TiktokLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/tiktok" />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
