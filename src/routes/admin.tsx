@@ -610,7 +610,7 @@ function AdminPage() {
           <div className="rounded-2xl border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-950/60 to-slate-950/60 p-6 shadow-[0_0_40px_rgba(99,102,241,0.35)] space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h2 className="text-xl font-extrabold tracking-tight">💡 Assistente de Caixa Inteligente</h2>
-              {caixa.alerts.length > 0 && (
+              {caixa.alerts.length > 0 && (f?.falhas_consecutivas ?? 0) > 0 && (
                 <span className="text-xs font-semibold rounded-full px-3 py-1 bg-red-600/80 text-white">
                   {caixa.alerts.length} alerta(s) aberto(s)
                 </span>
