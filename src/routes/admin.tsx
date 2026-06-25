@@ -949,9 +949,18 @@ function AdminPage() {
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-background/40 text-muted-foreground">
                           {isCurtidas ? "Curtidas" : "Seguidores"}
                         </span>
+                        {(() => {
+                          const sid = resolveServiceIdClient(p.pacote, p.quantidade);
+                          return sid ? (
+                            <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
+                              SVC #{sid}
+                            </span>
+                          ) : null;
+                        })()}
                         <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
 
                       </div>
+
                       {p.error_detail && (() => {
                         const raw = p.error_detail!;
                         const low = raw.toLowerCase();
