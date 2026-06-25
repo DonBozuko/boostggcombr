@@ -517,10 +517,27 @@ function AdminPage() {
 
         {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
-          <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePingSmm}
+                disabled={pingBusy}
+                className="h-7 text-[11px] border-emerald-500/50 text-emerald-200 hover:bg-emerald-500/10"
+              >
+                {pingBusy ? "Pingando..." : "🛰️ Ping SMMhype (Dry-Run)"}
+              </Button>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
+            </div>
           </div>
+          {pingResult && (
+            <div className={`mb-2 text-[11px] font-mono px-2 py-1 rounded border ${pingResult.ok ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : "bg-red-950/40 border-red-500/40 text-red-200"}`}>
+              {pingResult.msg}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {(fornecedores.length > 0 ? fornecedores : [
               { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype" },
