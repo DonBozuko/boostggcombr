@@ -647,6 +647,8 @@ function AdminPage() {
               tiktok:    "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 text-cyan-100 border-cyan-400/70 shadow-[0_0_20px_rgba(0,242,254,0.5)]",
               youtube:   "bg-red-600/20 text-red-100 border-red-500/80 shadow-[0_0_22px_rgba(255,0,0,0.55)]",
               facebook:  "bg-blue-600/20 text-blue-100 border-blue-500/80 shadow-[0_0_20px_rgba(24,119,242,0.55)]",
+              trafego:   "bg-purple-600/20 text-purple-100 border-purple-500/80 shadow-[0_0_22px_rgba(176,38,255,0.55)]",
+              telegram:  "bg-sky-500/20 text-sky-100 border-sky-400/80 shadow-[0_0_22px_rgba(0,204,255,0.55)]",
             };
             const brandIdle: Record<string, string> = {
               overview:  "hover:text-emerald-200 hover:border-emerald-500/40",
@@ -654,6 +656,8 @@ function AdminPage() {
               tiktok:    "hover:text-cyan-200 hover:border-cyan-500/40",
               youtube:   "hover:text-red-200 hover:border-red-500/40",
               facebook:  "hover:text-blue-200 hover:border-blue-500/40",
+              trafego:   "hover:text-purple-200 hover:border-purple-500/40",
+              telegram:  "hover:text-sky-200 hover:border-sky-500/40",
             };
             return (
               <button
