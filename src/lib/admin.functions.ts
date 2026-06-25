@@ -512,11 +512,14 @@ export const smartApproveIds = createServerFn({ method: "POST" })
       const tgKey = process.env.TELEGRAM_API_KEY;
       const chatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
       const lovKey = process.env.LOVABLE_API_KEY;
-      if (tgKey && chatId && lovKey && approvals.length > 0) {
+      if (tgKey && chatId && lovKey && (approvals.length > 0 || marginBlocks.length > 0)) {
         const lines = approvals.map((a) =>
           `• ${a.network}/${a.type}: #${a.from ?? "—"} → #${a.to}  (rate ${a.from_rate} → ${a.to_rate})`
         ).join("\n");
-        const text = `🔄 AUDITORIA DE IDs — Boostygram\n${approvals.length} serviços calibrados (apenas menor custo). Margem protegida.\n\n${lines}${blocked.length ? `\n\n🟡 ${blocked.length} bloqueados (revisão humana).` : ""}`;
+        const mbLines = marginBlocks.map((b) =>
+          `⛔ ${b.network}/${b.type}: margem ${b.margem_pct}% < ${MARGEM_MINIMA_PCT}% → BLOQUEADO`
+        ).join("\n");
+        const text = `🔄 AUDITORIA DE IDs — Boostygram\n${approvals.length} calibrados · ${marginBlocks.length} bloqueados por margem\n\n${lines}${mbLines ? `\n\n${mbLines}` : ""}${blocked.length ? `\n\n🟡 ${blocked.length} divergências para revisão humana.` : ""}`;
         await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
           method: "POST",
           headers: {
@@ -538,6 +541,22 @@ export const smartApproveIds = createServerFn({ method: "POST" })
       skipped: skipped.length,
       approvals,
       blocked_list: blocked,
+      margin_blocks: marginBlocks,
     };
   });
+
+// 🔓 Leitura pública: mapa de serviços bloqueados (por network/service_type).
+// Usado pelas lojas para desativar o botão de checkout. Não expõe IDs nem rates.
+export const getBlockedMap = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("service_id_overrides")
+      .select("network, service_type, bloqueado")
+      .eq("bloqueado", true);
+    if (error) return { ok: false as const, blocked: [] as Array<{ network: string; service_type: string }> };
+    const blocked = (data ?? []).map((r: any) => ({ network: r.network, service_type: r.service_type }));
+    return { ok: true as const, blocked };
+  });
+
 
