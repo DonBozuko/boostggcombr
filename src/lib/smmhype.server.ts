@@ -207,10 +207,8 @@ export async function dispatchSmmhype(args: {
   const smmKey = process.env.SMMHYPE_API_KEY;
   if (!smmKey) return { ok: false, error: "SMMHYPE_API_KEY ausente" };
 
-  // Resolve service por pacote+quantidade; fallback no map por pacote.
-  const serviceId =
-    resolveServiceId(args.pacote, args.quantidade) ??
-    SMMHYPE_SERVICE_IDS[String(args.pacote ?? "").trim().toLowerCase()];
+  // Resolve service: 1º override aprovado em DB; 2º hardcoded.
+  const serviceId = await resolveServiceIdAsync(args.pacote, args.quantidade);
   if (!serviceId) {
     return {
       ok: false,
