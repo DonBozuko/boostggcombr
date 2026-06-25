@@ -19,6 +19,9 @@ const FB_LIKES_SERVICE_ID = 14222;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // Facebook prefixes: ff* (followers), fl* (likes)
+  if (p.startsWith("ff")) return FB_FOLLOWERS_SERVICE_ID;
+  if (p.startsWith("fl")) return FB_LIKES_SERVICE_ID;
   // YouTube prefixes: ys* (subscribers), yv* (views)
   if (p.startsWith("ys")) return YT_SUBSCRIBERS_SERVICE_ID;
   if (p.startsWith("yv")) return YT_VIEWS_SERVICE_ID;
