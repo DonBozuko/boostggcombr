@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
@@ -180,6 +180,47 @@ function AdminPage() {
   const updateCotacao = useServerFn(atualizarCotacaoFornecedor);
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
+  const pingSmm = useServerFn(pingSmmhype);
+
+  const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [pingBusy, setPingBusy] = useState(false);
+  const handlePingSmm = async () => {
+    if (!token) return toast.error("Informe o token");
+    setPingBusy(true);
+    try {
+      const r = await pingSmm({ data: { token } });
+      if (r.ok) {
+        const msg = `✅ Comunicação OK · saldo=${r.balance ?? "?"} ${r.currency ?? ""}`.trim();
+        setPingResult({ ok: true, msg });
+        toast.success(msg);
+      } else {
+        setPingResult({ ok: false, msg: `❌ ${r.error}` });
+        toast.error(`Ping falhou: ${r.error}`);
+      }
+    } catch (e) {
+      setPingResult({ ok: false, msg: `❌ ${(e as Error).message}` });
+    } finally {
+      setPingBusy(false);
+    }
+  };
+
+  // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
+  const resolveServiceIdClient = (pacote: string, qty: number): number | null => {
+    const p = String(pacote ?? "").trim().toLowerCase();
+    if (p.startsWith("ff")) return 18870;
+    if (p.startsWith("fl")) return 7593;
+    if (p.startsWith("ys")) return 19440;
+    if (p.startsWith("yv")) return 14321;
+    if (p.startsWith("tf")) return 14330;
+    if (p.startsWith("tl")) return 19191;
+    if (p.startsWith("tv")) return 14907;
+    if (p.startsWith("v")) return 18855;
+    if (p.startsWith("l")) return 18860;
+    if (qty >= 100 && qty <= 2000) return 14325;
+    if (qty >= 5000 && qty <= 100000) return 14225;
+    return null;
+  };
+
 
   const [token, setToken] = useState("");
   const [aba, setAba] = useState<RedeKey>("overview");
@@ -476,10 +517,27 @@ function AdminPage() {
 
         {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
-          <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePingSmm}
+                disabled={pingBusy}
+                className="h-7 text-[11px] border-emerald-500/50 text-emerald-200 hover:bg-emerald-500/10"
+              >
+                {pingBusy ? "Pingando..." : "🛰️ Ping SMMhype (Dry-Run)"}
+              </Button>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
+            </div>
           </div>
+          {pingResult && (
+            <div className={`mb-2 text-[11px] font-mono px-2 py-1 rounded border ${pingResult.ok ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : "bg-red-950/40 border-red-500/40 text-red-200"}`}>
+              {pingResult.msg}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {(fornecedores.length > 0 ? fornecedores : [
               { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype" },
@@ -891,9 +949,18 @@ function AdminPage() {
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-background/40 text-muted-foreground">
                           {isCurtidas ? "Curtidas" : "Seguidores"}
                         </span>
+                        {(() => {
+                          const sid = resolveServiceIdClient(p.pacote, p.quantidade);
+                          return sid ? (
+                            <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
+                              SVC #{sid}
+                            </span>
+                          ) : null;
+                        })()}
                         <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
 
                       </div>
+
                       {p.error_detail && (() => {
                         const raw = p.error_detail!;
                         const low = raw.toLowerCase();
@@ -1052,7 +1119,16 @@ function AdminPage() {
                     }`}>
                       {isCurtidas ? "Curtidas" : "Seguidores"}
                     </span>
+                    {(() => {
+                      const sid = resolveServiceIdClient(p.pacote, p.quantidade);
+                      return sid ? (
+                        <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
+                          SVC #{sid}
+                        </span>
+                      ) : null;
+                    })()}
                     <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+
                   </div>
 
                   <div className="text-xs text-muted-foreground">

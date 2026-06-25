@@ -137,3 +137,34 @@ export const getFaturamentoPorRede = createServerFn({ method: "POST" })
     }
     return { ok: true as const, geral, count, totais };
   });
+
+// Dry-run ping no SMMhype: valida que o token responde no endpoint /balance.
+export const pingSmmhype = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const key = process.env.SMMHYPE_API_KEY;
+    if (!key) return { ok: false as const, error: "SMMHYPE_API_KEY ausente" };
+    try {
+      const body = new URLSearchParams({ key, action: "balance" });
+      const res = await fetch("https://smmhype.com/api/v2", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      const text = await res.text();
+      let json: any = null;
+      try { json = JSON.parse(text); } catch { /* */ }
+      if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}`, body: text.slice(0, 200) };
+      if (json?.error) return { ok: false as const, error: String(json.error), body: text.slice(0, 200) };
+      return {
+        ok: true as const,
+        balance: json?.balance ?? null,
+        currency: json?.currency ?? null,
+        status: res.status,
+      };
+    } catch (e) {
+      return { ok: false as const, error: (e as Error).message };
+    }
+  });
+

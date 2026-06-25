@@ -123,20 +123,23 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // 3) Cadeia de fallback: principal → B → C (todos por prioridade)
+          // 3) Apenas o fornecedor marcado como ATIVO recebe o pedido.
+          //    Os demais ficam latentes (1 clique no /admin para promover).
           const { data: fornecedores } = await supabaseAdmin
             .from("fornecedores")
-            .select("slug, nome")
+            .select("slug, nome, ativo")
+            .eq("ativo", true)
             .order("prioridade", { ascending: true });
 
           const cadeia = fornecedores ?? [];
           if (!cadeia.length) {
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor cadastrado" })
+              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO no /admin (ative o toggle)" })
               .eq("id", pedido.id);
             return new Response("ok", { status: 200 });
           }
+
 
           const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
           const tentativas: string[] = [];
