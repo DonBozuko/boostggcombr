@@ -1,6 +1,23 @@
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { createFileRoute } from "@tanstack/react-router";
-import { Send, Users } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
+import { Send, Copy, CheckCircle2, Zap, Users, Megaphone } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { z } from "zod";
+import { criarPedido } from "@/lib/pedidos.functions";
+import { getPedidoStatus } from "@/lib/admin.functions";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 
 const AERO = "#00CCFF";
 const BG = "#0a0a0a";
@@ -8,14 +25,17 @@ const BG = "#0a0a0a";
 export const Route = createFileRoute("/telegram")({
   head: () => {
     const title = "Comprar Membros para Grupo e Canal do Telegram | Boostygram";
-    const description = "Em breve: compra de membros reais para grupos e canais do Telegram com entrega via Pix automática.";
+    const description =
+      "Comprar membros reais para grupo e canal do Telegram com entrega via Pix automático. Crescimento real, recarga estável e suporte humano.";
     const url = "https://boostygram.lovable.app/telegram";
     return {
       meta: [
         { title }, { name: "description", content: description },
-        { name: "keywords", content: "comprar membros telegram, comprar inscritos canal telegram, smm telegram brasil" },
+        { name: "keywords", content: "comprar membros telegram, comprar inscritos canal telegram, membros grupo telegram, smm telegram brasil" },
         { property: "og:title", content: title }, { property: "og:description", content: description },
         { property: "og:url", content: url }, { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title }, { name: "twitter:description", content: description },
       ],
       links: [{ rel: "canonical", href: url }],
     };
@@ -23,11 +43,38 @@ export const Route = createFileRoute("/telegram")({
   component: TelegramLanding,
 });
 
-type Plan = { id: string; tier: string; price: string };
-const plans: Plan[] = [
-  { id: "tgm500", tier: "500 Membros",   price: "R$ 19,00" },
-  { id: "tgm1k",  tier: "1.000 Membros", price: "R$ 35,00" },
+type Categoria = "canal" | "grupo";
+type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
+
+const canalPlans: Plan[] = [
+  { id: "tgc500", tier: "500 Membros (Canal)",   quantidade: 500,  valor: 19.0, price: "R$ 19,00" },
+  { id: "tgc1k",  tier: "1.000 Membros (Canal)", quantidade: 1000, valor: 35.0, price: "R$ 35,00" },
 ];
+const grupoPlans: Plan[] = [
+  { id: "tgg500", tier: "500 Membros (Grupo)",   quantidade: 500,  valor: 19.0, price: "R$ 19,00" },
+  { id: "tgg1k",  tier: "1.000 Membros (Grupo)", quantidade: 1000, valor: 35.0, price: "R$ 35,00" },
+];
+const allPlans = [...canalPlans, ...grupoPlans];
+
+const linkSchema = z.object({
+  plan: z.string().min(1),
+  profile: z
+    .string()
+    .trim()
+    .min(8, "Cole o link do canal ou grupo do Telegram")
+    .max(300, "Máximo 300 caracteres")
+    .regex(/^https?:\/\//i, "Use a URL completa do Telegram (https://t.me/...)")
+    .regex(/(t\.me|telegram\.me)\//i, "Link inválido — use a URL do canal/grupo no Telegram"),
+});
+
+type PedidoInfo = {
+  price: string;
+  tier: string;
+  profile: string;
+  pixCode: string;
+  qrCodeBase64: string;
+  pedidoId: string | null;
+};
 
 function TelegramIcon({ size = 28 }: { size?: number }) {
   return (
@@ -38,6 +85,94 @@ function TelegramIcon({ size = 28 }: { size?: number }) {
 }
 
 function TelegramLanding() {
+  const [categoria, setCategoria] = useState<Categoria>("canal");
+  const [planId, setPlanId] = useState<string>("");
+  const [profile, setProfile] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
+  const [paid, setPaid] = useState(false);
+  const criarPedidoFn = useServerFn(criarPedido);
+  const getStatusFn = useServerFn(getPedidoStatus);
+  const blocked = useBlockedMap();
+
+  useEffect(() => {
+    if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
+    const id = pedidoInfo.pedidoId;
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const res = await getStatusFn({ data: { id } });
+        if (!cancelled && res.ok && res.status === "paid") setPaid(true);
+      } catch (err) {
+        console.error("[tg poll]", err);
+      }
+    };
+    tick();
+    const interval = setInterval(tick, 3000);
+    return () => { cancelled = true; clearInterval(interval); };
+  }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
+
+  const currentPlans = categoria === "canal" ? canalPlans : grupoPlans;
+  const tipoBloqueado = isBlocked(blocked, "telegram", categoria);
+
+  const submit = async (selected: Plan) => {
+    if (isBlocked(blocked, "telegram", categoria)) {
+      toast.error("Estoque em reposição. Tente novamente em instantes.");
+      return;
+    }
+    const parsed = linkSchema.safeParse({ plan: selected.id, profile });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    setPlanId(selected.id);
+    setLoading(true);
+    try {
+      const res = await criarPedidoFn({
+        data: {
+          instagram_user: parsed.data.profile,
+          pacote: selected.id,
+          quantidade: selected.quantidade,
+          valor: selected.valor,
+          email: "cliente@telegram.boostygram.com",
+          rede_social: "telegram",
+        },
+      });
+      if (!res?.ok) {
+        toast.error("Não foi possível gerar o Pix. Tente novamente.");
+        return;
+      }
+      setPaid(false);
+      setPedidoInfo({
+        price: selected.price,
+        tier: selected.tier,
+        profile: parsed.data.profile,
+        pixCode: res.qrCode,
+        qrCodeBase64: res.qrCodeBase64,
+        pedidoId: res.pedidoId,
+      });
+      setModalOpen(true);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao registrar pedido.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyPix = async () => {
+    if (!pedidoInfo) return;
+    try {
+      await navigator.clipboard.writeText(pedidoInfo.pixCode);
+      toast.success("Código Pix copiado!");
+    } catch {
+      toast.error("Não foi possível copiar.");
+    }
+  };
+
+  const qrCodeUrl = pedidoInfo?.qrCodeBase64 ? `data:image/png;base64,${pedidoInfo.qrCodeBase64}` : "";
+
   return (
     <div className="min-h-screen text-white" style={{ background: BG }}>
       <FabianoBadge variant="telegram" />
@@ -53,34 +188,182 @@ function TelegramLanding() {
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Membros reais para canais e grupos · entrega automática via Pix</p>
       </header>
 
-      <div className="container mx-auto px-4 max-w-2xl">
-        <div className="rounded-2xl p-4 text-center text-sm font-semibold"
-          style={{ background: `${AERO}11`, border: `1px solid ${AERO}66`, color: AERO, boxShadow: `0 0 20px ${AERO}33` }}>
-          ⚙️ Estamos em fase final de homologação dos pacotes. Disponível em breve.
+      <div className="flex justify-center mb-10 px-4">
+        <div className="inline-flex w-full sm:w-auto p-1 rounded-full" style={{ background: "#111", border: `1px solid ${AERO}55` }}>
+          {(["canal", "grupo"] as Categoria[]).map((c) => {
+            const active = categoria === c;
+            const label = c === "canal" ? "📣 Canal" : "👥 Grupo";
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => { setCategoria(c); setPlanId(""); setProfile(""); }}
+                className="inline-flex flex-1 sm:flex-none items-center justify-center gap-2 px-5 sm:px-7 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide transition-all"
+                style={active
+                  ? { background: AERO, color: "#000", boxShadow: `0 0 22px ${AERO}, 0 0 30px ${AERO}88` }
+                  : { color: "#a1a1aa", background: "transparent" }}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <section className="container mx-auto px-4 sm:px-6 py-12">
+      <section className="container mx-auto px-4 sm:px-6 pb-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {plans.map((p) => (
-            <div key={p.id} className="relative rounded-2xl p-6 flex flex-col items-center text-center opacity-70"
-              style={{ background: "#0f0f10", border: `1px solid ${AERO}66`, boxShadow: `0 0 24px ${AERO}33` }}>
-              <div className="mb-4 size-16 rounded-2xl grid place-items-center"
-                style={{ background: BG, border: `1px solid ${AERO}`, boxShadow: `0 0 24px ${AERO}, 0 0 40px ${AERO}aa` }}>
-                <Users className="size-7" style={{ color: AERO }} strokeWidth={2.2} />
+          {currentPlans.map((p) => {
+            const Icon = categoria === "canal" ? Megaphone : Users;
+            return (
+              <div key={p.id} className="relative rounded-2xl p-6 flex flex-col items-center text-center"
+                style={{ background: "#0f0f10", border: `1px solid ${AERO}66`, boxShadow: `0 0 24px ${AERO}33` }}>
+                <div className="mb-4 size-16 rounded-2xl grid place-items-center"
+                  style={{ background: BG, border: `1px solid ${AERO}`, boxShadow: `0 0 24px ${AERO}, 0 0 40px ${AERO}aa` }}>
+                  <Icon className="size-7" style={{ color: AERO }} strokeWidth={2.2} />
+                </div>
+                <h3 className="text-xl font-bold">{p.tier}</h3>
+                <div className="mt-3 text-4xl font-extrabold tracking-tight" style={{ color: "#fff", textShadow: `0 0 14px ${AERO}` }}>{p.price}</div>
+                <p className="mt-2 text-xs text-zinc-400">Entrega gradual no {categoria}</p>
+                <button
+                  type="button"
+                  disabled={tipoBloqueado}
+                  onClick={() => { setPlanId(p.id); document.getElementById("tg-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={tipoBloqueado
+                    ? { background: "#222", color: "#888", border: `1px solid ${AERO}44` }
+                    : { background: AERO, color: "#000", boxShadow: `0 0 22px ${AERO}aa` }}
+                >
+                  <Zap className="size-4" />
+                  {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
+                </button>
               </div>
-              <h3 className="text-xl font-bold">{p.tier}</h3>
-              <div className="mt-3 text-4xl font-extrabold tracking-tight" style={{ color: "#fff", textShadow: `0 0 14px ${AERO}` }}>{p.price}</div>
-              <p className="mt-2 text-xs text-zinc-400">Entrega gradual no canal/grupo</p>
-              <button type="button" disabled
-                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide cursor-not-allowed"
-                style={{ background: "#222", color: "#888", border: `1px solid ${AERO}44` }}>
-                <Send className="size-4" /> Em breve
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
+
+      <section id="tg-pedido" className="py-12 border-y" style={{ borderColor: `${AERO}44`, background: "#0d0d0e" }}>
+        <div className="container mx-auto px-4 sm:px-6 max-w-xl">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center">Finalizar pedido</h2>
+          <p className="mt-2 text-center text-sm text-zinc-400">
+            Cole o link público do seu {categoria} no Telegram (ex: https://t.me/seucanal).
+          </p>
+          <div className="mt-6 rounded-2xl p-6 space-y-5"
+            style={{ background: BG, border: `1px solid ${AERO}66`, boxShadow: `0 0 30px ${AERO}33` }}>
+            <div className="space-y-2">
+              <Label>Pacote</Label>
+              <div className="grid grid-cols-1 gap-2">
+                {currentPlans.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setPlanId(p.id)}
+                    className="flex items-center justify-between rounded-lg px-4 py-3 text-sm font-semibold transition-all"
+                    style={planId === p.id
+                      ? { background: `${AERO}22`, border: `1px solid ${AERO}`, color: "#fff", boxShadow: `0 0 18px ${AERO}66` }
+                      : { background: "#111", border: "1px solid #222", color: "#d4d4d8" }}
+                  >
+                    <span>{p.tier}</span>
+                    <span style={{ color: AERO }}>{p.price}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tg-profile">Link do {categoria}</Label>
+              <Input
+                id="tg-profile"
+                value={profile}
+                onChange={(e) => setProfile(e.target.value)}
+                placeholder="https://t.me/seucanal"
+                className="h-12"
+                style={{ background: "#111", borderColor: `${AERO}66`, color: "#fff" }}
+                maxLength={300}
+              />
+            </div>
+            <Button
+              type="button"
+              size="lg"
+              disabled={loading || !planId || tipoBloqueado}
+              onClick={() => {
+                const sel = allPlans.find((p) => p.id === planId);
+                if (!sel) { toast.error("Selecione um pacote."); return; }
+                submit(sel);
+              }}
+              className="w-full h-12 font-extrabold uppercase tracking-wide border-0 disabled:opacity-60"
+              style={tipoBloqueado
+                ? { background: "#222", color: "#888" }
+                : { background: AERO, color: "#000", boxShadow: `0 0 25px ${AERO}aa` }}
+            >
+              {tipoBloqueado
+                ? "Instabilidade Temporária - Reposição de Estoque"
+                : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+            </Button>
+            <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · sem senha · entrega automática</p>
+          </div>
+        </div>
+      </section>
+
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-md border-0"
+          style={{ background: BG, border: `1px solid ${AERO}`, boxShadow: `0 0 40px ${AERO}88` }}>
+          {paid ? (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl text-white">🎉 Pagamento confirmado!</DialogTitle>
+                <DialogDescription className="text-center text-zinc-400">
+                  Pedido enviado. Entrega gradual nos próximos minutos.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-center gap-4 py-4">
+                <CheckCircle2 className="size-20" style={{ color: AERO }} />
+                {pedidoInfo && (
+                  <div className="text-center">
+                    <div className="text-xs uppercase text-zinc-400">{pedidoInfo.tier} · {pedidoInfo.profile}</div>
+                    <div className="text-3xl font-extrabold mt-1" style={{ color: AERO }}>{pedidoInfo.price}</div>
+                  </div>
+                )}
+              </div>
+              <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
+                Fechar
+              </Button>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-center text-xl text-white">Pague com Pix para liberar</DialogTitle>
+                <DialogDescription className="text-center text-zinc-400">
+                  Escaneie o QR ou copie o código. A entrega inicia ao confirmar.
+                </DialogDescription>
+              </DialogHeader>
+              {pedidoInfo && (
+                <div className="space-y-4">
+                  <div className="rounded-lg p-3 text-center" style={{ background: "#111", border: `1px solid ${AERO}66` }}>
+                    <div className="text-xs uppercase text-zinc-400">{pedidoInfo.tier} · {pedidoInfo.profile}</div>
+                    <div className="text-2xl font-extrabold mt-1" style={{ color: AERO }}>{pedidoInfo.price}</div>
+                  </div>
+                  <div className="flex justify-center">
+                    <div className="rounded-xl bg-white p-3" style={{ boxShadow: `0 0 25px ${AERO}aa` }}>
+                      <img src={qrCodeUrl} alt="QR Code Pix" width={220} height={220} className="block" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-zinc-300">Pix Copia e Cola</Label>
+                    <div className="rounded-lg p-3 text-xs break-all font-mono max-h-24 overflow-y-auto"
+                      style={{ background: "#111", border: `1px solid ${AERO}66`, color: "#e4e4e7" }}>
+                      {pedidoInfo.pixCode}
+                    </div>
+                    <Button type="button" onClick={copyPix} variant="outline" className="w-full h-11"
+                      style={{ background: "#111", borderColor: AERO, color: "#fff" }}>
+                      <Copy className="size-4 mr-2" /> Copiar Código
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
