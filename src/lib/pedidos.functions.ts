@@ -58,11 +58,12 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   yv1k:   { quantidade: 1000,  valor: 19.0 },
   yv5k:   { quantidade: 5000,  valor: 59.0 },
   yv10k:  { quantidade: 10000, valor: 99.0 },
-  // Facebook — Seguidores (service 14220)
+  // Facebook — Seguidores (service 18870)
   ff500:  { quantidade: 500,  valor: 19.0 },
   ff1k:   { quantidade: 1000, valor: 29.0 },
   ff2k5:  { quantidade: 2500, valor: 69.0 },
-  // Facebook — Curtidas (service 14222)
+  // Facebook — Curtidas (service 7593)
+
   fl500:  { quantidade: 500,  valor: 9.0 },
   fl1k:   { quantidade: 1000, valor: 15.0 },
   fl2k:   { quantidade: 2000, valor: 27.0 },
