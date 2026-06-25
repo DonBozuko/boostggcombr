@@ -777,6 +777,7 @@ function Landing() {
                     Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.
                   </p>
                 </div>
+                <ViralShare route="/" />
                 <Button
                   size="lg"
                   className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-bold"
