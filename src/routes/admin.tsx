@@ -542,6 +542,20 @@ function AdminPage() {
         <div className="rounded-2xl border border-border bg-card/30 p-2 flex flex-wrap gap-2">
           {REDES.map((r) => {
             const active = aba === r.key;
+            const brandActive: Record<string, string> = {
+              overview:  "bg-emerald-500/15 text-emerald-100 border-emerald-400/60 shadow-[0_0_18px_rgba(16,185,129,0.45)]",
+              instagram: "bg-gradient-to-r from-yellow-500/20 to-amber-400/20 text-amber-100 border-amber-400/70 shadow-[0_0_20px_rgba(245,158,11,0.55)]",
+              tiktok:    "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 text-cyan-100 border-cyan-400/70 shadow-[0_0_20px_rgba(0,242,254,0.5)]",
+              youtube:   "bg-red-600/20 text-red-100 border-red-500/80 shadow-[0_0_22px_rgba(255,0,0,0.55)]",
+              facebook:  "bg-blue-600/20 text-blue-100 border-blue-500/80 shadow-[0_0_20px_rgba(24,119,242,0.55)]",
+            };
+            const brandIdle: Record<string, string> = {
+              overview:  "hover:text-emerald-200 hover:border-emerald-500/40",
+              instagram: "hover:text-amber-200 hover:border-amber-500/40",
+              tiktok:    "hover:text-cyan-200 hover:border-cyan-500/40",
+              youtube:   "hover:text-red-200 hover:border-red-500/40",
+              facebook:  "hover:text-blue-200 hover:border-blue-500/40",
+            };
             return (
               <button
                 key={r.key}
@@ -550,10 +564,10 @@ function AdminPage() {
                 disabled={r.disabled}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
                   active
-                    ? "bg-fuchsia-500/20 text-fuchsia-100 border-fuchsia-500/60 shadow-[0_0_20px_rgba(217,70,239,0.35)]"
+                    ? brandActive[r.key] ?? "bg-foreground/10 border-foreground/40"
                     : r.disabled
                     ? "bg-background/30 text-muted-foreground/60 border-border/50 cursor-not-allowed"
-                    : "bg-background/40 text-muted-foreground border-border hover:text-foreground"
+                    : `bg-background/40 text-muted-foreground border-border ${brandIdle[r.key] ?? "hover:text-foreground"}`
                 }`}
               >
                 <span className="mr-1.5">{r.icon}</span>{r.label}
@@ -880,9 +894,28 @@ function AdminPage() {
                         <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
 
                       </div>
-                      {p.error_detail && (
-                        <div className="text-xs text-red-300/90 font-mono break-all">{p.error_detail}</div>
-                      )}
+                      {p.error_detail && (() => {
+                        const raw = p.error_detail!;
+                        const low = raw.toLowerCase();
+                        let origem = "Fornecedor (SMMhype)";
+                        let prefix = "Falha";
+                        let tone = "text-red-300/90 border-red-500/40 bg-red-950/40";
+                        if (/(invalid|private|not.?found|link|url|username|user not|perfil)/.test(low)) {
+                          origem = "Cliente (Link Inválido)"; prefix = "Ação Requerida";
+                          tone = "text-amber-200 border-amber-500/40 bg-amber-950/30";
+                        } else if (/(timeout|econn|database|supabase|postgres|fetch failed|network)/.test(low)) {
+                          origem = "Seu Sistema"; prefix = "Erro Técnico";
+                          tone = "text-orange-200 border-orange-500/40 bg-orange-950/30";
+                        } else if (/(smmhype|provider|api|service|saldo|balance|429|503|502)/.test(low)) {
+                          origem = "Fornecedor (SMMhype)"; prefix = "Falha";
+                        }
+                        return (
+                          <div className={`text-xs font-mono break-all rounded-md border px-2 py-1 ${tone}`}>
+                            <span className="font-bold not-italic mr-1">{prefix}: {raw}</span>
+                            <span className="opacity-80">• {origem}</span>
+                          </div>
+                        );
+                      })()}
                       <div className="text-xs text-muted-foreground">
                         {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
                       </div>
