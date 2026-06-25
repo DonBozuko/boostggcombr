@@ -1119,7 +1119,16 @@ function AdminPage() {
                     }`}>
                       {isCurtidas ? "Curtidas" : "Seguidores"}
                     </span>
+                    {(() => {
+                      const sid = resolveServiceIdClient(p.pacote, p.quantidade);
+                      return sid ? (
+                        <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
+                          SVC #{sid}
+                        </span>
+                      ) : null;
+                    })()}
                     <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+
                   </div>
 
                   <div className="text-xs text-muted-foreground">
