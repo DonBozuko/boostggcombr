@@ -127,6 +127,9 @@ function YoutubeLanding() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const ytType = categoria === "inscritos" ? "followers" : "views";
+  const tipoBloqueado = isBlocked(blockedMap, "youtube", ytType);
 
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
