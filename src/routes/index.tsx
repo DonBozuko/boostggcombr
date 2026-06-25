@@ -1,4 +1,6 @@
 import { FabianoBadge } from "@/components/FabianoBadge";
+import { MobileFrame } from "@/components/MobileFrame";
+import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
