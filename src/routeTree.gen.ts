@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
+import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as FacebookRouteImport } from './routes/facebook'
@@ -36,6 +37,11 @@ const TrafegoRoute = TrafegoRouteImport.update({
 const TiktokRoute = TiktokRouteImport.update({
   id: '/tiktok',
   path: '/tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TelegramRoute = TelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telegram': typeof TelegramRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telegram': typeof TelegramRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/telegram': typeof TelegramRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/telegram'
     | '/tiktok'
     | '/trafego'
     | '/youtube'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/telegram'
     | '/tiktok'
     | '/trafego'
     | '/youtube'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
+    | '/telegram'
     | '/tiktok'
     | '/trafego'
     | '/youtube'
@@ -191,6 +203,7 @@ export interface RootRouteChildren {
   FacebookRoute: typeof FacebookRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TelegramRoute: typeof TelegramRoute
   TiktokRoute: typeof TiktokRoute
   TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/tiktok'
       fullPath: '/tiktok'
       preLoaderRoute: typeof TiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/telegram': {
+      id: '/telegram'
+      path: '/telegram'
+      fullPath: '/telegram'
+      preLoaderRoute: typeof TelegramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -303,6 +323,7 @@ const rootRouteChildren: RootRouteChildren = {
   FacebookRoute: FacebookRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TelegramRoute: TelegramRoute,
   TiktokRoute: TiktokRoute,
   TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,

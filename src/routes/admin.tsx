@@ -45,14 +45,16 @@ type Pedido = {
   rede_social?: string | null;
 };
 
-type RedeKey = "overview" | "instagram" | "tiktok" | "youtube" | "facebook";
+type RedeKey = "overview" | "instagram" | "tiktok" | "youtube" | "facebook" | "trafego" | "telegram";
 
 const REDES: { key: RedeKey; label: string; icon: string; disabled?: boolean }[] = [
-  { key: "overview",  label: "Visão Geral",      icon: "🌐" },
-  { key: "instagram", label: "Instagram",        icon: "📸" },
-  { key: "tiktok",    label: "TikTok",           icon: "🎵" },
-  { key: "youtube",   label: "YouTube",          icon: "📺" },
-  { key: "facebook",  label: "Facebook",         icon: "🔵" },
+  { key: "overview",  label: "Visão Geral", icon: "🌐" },
+  { key: "instagram", label: "Instagram",   icon: "📸" },
+  { key: "tiktok",    label: "TikTok",      icon: "🎵" },
+  { key: "youtube",   label: "YouTube",     icon: "📺" },
+  { key: "facebook",  label: "Facebook",    icon: "🔵" },
+  { key: "trafego",   label: "Tráfego Web", icon: "🌐" },
+  { key: "telegram",  label: "Telegram",    icon: "✈️" },
 ];
 
 const REDE_ICON: Record<string, string> = {
@@ -60,6 +62,8 @@ const REDE_ICON: Record<string, string> = {
   tiktok: "🎵",
   youtube: "📺",
   facebook: "🔵",
+  trafego: "🌐",
+  telegram: "✈️",
 };
 
 
