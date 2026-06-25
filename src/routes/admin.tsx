@@ -651,7 +651,7 @@ function AdminPage() {
                 </div>
               </div>
             </div>
-            {caixa.alerts.length > 0 && (
+            {caixa.alerts.length > 0 && (f?.falhas_consecutivas ?? 0) > 0 && (
               <div className="space-y-2">
                 {caixa.alerts.slice(0, 5).map((a) => (
                   <div
