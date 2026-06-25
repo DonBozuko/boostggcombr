@@ -182,6 +182,7 @@ export type Database = {
         Row: {
           abandono_notificado_at: string | null
           created_at: string
+          custo_real: number | null
           error_detail: string | null
           id: string
           instagram_user: string
@@ -195,6 +196,7 @@ export type Database = {
         Insert: {
           abandono_notificado_at?: string | null
           created_at?: string
+          custo_real?: number | null
           error_detail?: string | null
           id?: string
           instagram_user: string
@@ -208,6 +210,7 @@ export type Database = {
         Update: {
           abandono_notificado_at?: string | null
           created_at?: string
+          custo_real?: number | null
           error_detail?: string | null
           id?: string
           instagram_user?: string
