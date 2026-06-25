@@ -349,3 +349,141 @@ export const getGrowthCentral = createServerFn({ method: "POST" })
       cotacao,
     };
   });
+
+// 🤖 Smart Auto-Approve Gate — aprova em massa apenas onde rate recomendado <= rate atual.
+// Lê services_cache + override atual; grava overrides; notifica Telegram com resumo.
+const PROD_BASELINE: Record<string, Record<string, number | null>> = {
+  instagram: { followers: null, likes: 18860, views: 18855 },
+  tiktok:    { followers: 14330, likes: 19191, views: 14907 },
+  youtube:   { followers: 19440, likes: null,  views: 14321 },
+  facebook:  { followers: 18870, likes: 7593,  views: null  },
+};
+
+export const smartApproveIds = createServerFn({ method: "POST" })
+  .inputValidator((i) => adminInput.parse(i))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // 1) Snapshot do cache (todos os candidatos por nome/categoria)
+    const { data: cache } = await supabaseAdmin
+      .from("services_cache")
+      .select("provider_service_id, name, category, rate");
+    const cacheRows = (cache ?? []) as Array<{ provider_service_id: number; name: string; category: string; rate: number | string }>;
+    const rateById = new Map<number, number>();
+    for (const r of cacheRows) {
+      const n = Number(r.rate);
+      if (Number.isFinite(n)) rateById.set(Number(r.provider_service_id), n);
+    }
+
+    // 2) Recomputa MAIS BARATO por rede/tipo (mesma lógica do sincronizarIdsApi)
+    const NETWORKS: Record<string, RegExp> = {
+      instagram: /instagram/i, tiktok: /tiktok|tik\s*tok/i,
+      youtube: /youtube|you\s*tube/i, facebook: /facebook/i,
+    };
+    const TYPES = {
+      followers: /follower|seguidor|subscriber|inscrit|curtid.*p[áa]gina|page.*like/i,
+      likes: /like|curtid/i,
+      views: /view|visualiza/i,
+    };
+    const cheapest: Record<string, Record<string, { service: number; rate: number } | null>> = {};
+    for (const net of Object.keys(NETWORKS)) cheapest[net] = { followers: null, likes: null, views: null };
+    for (const s of cacheRows) {
+      const blob = `${s.category ?? ""} ${s.name ?? ""}`;
+      const rate = Number(s.rate);
+      const sid = Number(s.provider_service_id);
+      if (!Number.isFinite(rate) || rate <= 0 || !Number.isFinite(sid)) continue;
+      for (const [net, rx] of Object.entries(NETWORKS)) {
+        if (!rx.test(blob)) continue;
+        let type: string | null = null;
+        if (net === "facebook" && /page.*like|curtid.*p[áa]gina/i.test(blob)) type = "followers";
+        else if (TYPES.followers.test(blob)) type = "followers";
+        else if (TYPES.views.test(blob)) type = "views";
+        else if (TYPES.likes.test(blob)) type = "likes";
+        if (!type) continue;
+        const cur = cheapest[net][type];
+        if (!cur || rate < cur.rate) cheapest[net][type] = { service: sid, rate };
+      }
+    }
+
+    // 3) Override atual (se existir) — define ID/rate vigente em produção
+    const { data: existingOverrides } = await supabaseAdmin
+      .from("service_id_overrides")
+      .select("network, service_type, service_id, rate");
+    const overrideMap = new Map<string, { service_id: number; rate: number | null }>();
+    for (const o of (existingOverrides ?? []) as any[]) {
+      overrideMap.set(`${o.network}/${o.service_type}`, { service_id: Number(o.service_id), rate: o.rate != null ? Number(o.rate) : null });
+    }
+
+    // 4) Decide aprovações
+    const approvals: Array<{ network: string; type: string; from: number | null; to: number; from_rate: number | null; to_rate: number }> = [];
+    const blocked: Array<{ network: string; type: string; reason: string }> = [];
+    const skipped: Array<{ network: string; type: string; reason: string }> = [];
+    for (const net of Object.keys(cheapest)) {
+      for (const type of Object.keys(cheapest[net])) {
+        const rec = cheapest[net][type];
+        if (!rec) { skipped.push({ network: net, type, reason: "sem candidato" }); continue; }
+        const ovr = overrideMap.get(`${net}/${type}`);
+        const currentId = ovr?.service_id ?? PROD_BASELINE[net]?.[type] ?? null;
+        const currentRate = ovr?.rate ?? (currentId != null ? rateById.get(currentId) ?? null : null);
+        if (currentId === rec.service) { skipped.push({ network: net, type, reason: "já está no mais barato" }); continue; }
+        if (currentRate == null) {
+          blocked.push({ network: net, type, reason: "rate atual desconhecido — requer revisão" });
+          continue;
+        }
+        if (rec.rate > currentRate) {
+          blocked.push({ network: net, type, reason: `aumento de custo (${currentRate} → ${rec.rate})` });
+          continue;
+        }
+        approvals.push({ network: net, type, from: currentId, to: rec.service, from_rate: currentRate, to_rate: rec.rate });
+      }
+    }
+
+    // 5) Persiste overrides aprovados
+    if (approvals.length > 0) {
+      const rows = approvals.map((a) => ({
+        network: a.network, service_type: a.type,
+        service_id: a.to, rate: a.to_rate,
+        previous_service_id: a.from, previous_rate: a.from_rate,
+        approved_at: new Date().toISOString(),
+      }));
+      const { error: upErr } = await supabaseAdmin
+        .from("service_id_overrides")
+        .upsert(rows, { onConflict: "network,service_type" });
+      if (upErr) return { ok: false as const, error: `DB_UPSERT: ${upErr.message}` };
+    }
+
+    // 6) Telegram (best-effort)
+    try {
+      const tgKey = process.env.TELEGRAM_API_KEY;
+      const chatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
+      const lovKey = process.env.LOVABLE_API_KEY;
+      if (tgKey && chatId && lovKey && approvals.length > 0) {
+        const lines = approvals.map((a) =>
+          `• ${a.network}/${a.type}: #${a.from ?? "—"} → #${a.to}  (rate ${a.from_rate} → ${a.to_rate})`
+        ).join("\n");
+        const text = `🔄 AUDITORIA DE IDs — Boostygram\n${approvals.length} serviços calibrados (apenas menor custo). Margem protegida.\n\n${lines}${blocked.length ? `\n\n🟡 ${blocked.length} bloqueados (revisão humana).` : ""}`;
+        await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${lovKey}`,
+            "X-Connection-Api-Key": tgKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+        });
+      }
+    } catch (e) {
+      console.warn("[smartApproveIds] telegram falhou:", e);
+    }
+
+    return {
+      ok: true as const,
+      approved: approvals.length,
+      blocked: blocked.length,
+      skipped: skipped.length,
+      approvals,
+      blocked_list: blocked,
+    };
+  });
+

@@ -250,6 +250,36 @@ export type Database = {
         }
         Relationships: []
       }
+      service_id_overrides: {
+        Row: {
+          approved_at: string
+          network: string
+          previous_rate: number | null
+          previous_service_id: number | null
+          rate: number | null
+          service_id: number
+          service_type: string
+        }
+        Insert: {
+          approved_at?: string
+          network: string
+          previous_rate?: number | null
+          previous_service_id?: number | null
+          rate?: number | null
+          service_id: number
+          service_type: string
+        }
+        Update: {
+          approved_at?: string
+          network?: string
+          previous_rate?: number | null
+          previous_service_id?: number | null
+          rate?: number | null
+          service_id?: number
+          service_type?: string
+        }
+        Relationships: []
+      }
       services_cache: {
         Row: {
           category: string

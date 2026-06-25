@@ -158,8 +158,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               // custo_brl = (quantidade / 1000) × rate(USD) × cotacao_brl
               let custoReal: number | null = null;
               try {
-                const { resolveServiceId } = await import("@/lib/smmhype.server");
-                const sid = resolveServiceId(pedido.pacote, pedido.quantidade);
+                const { resolveServiceIdAsync } = await import("@/lib/smmhype.server");
+                const sid = await resolveServiceIdAsync(pedido.pacote, pedido.quantidade);
                 if (sid != null) {
                   const [{ data: svc }, { data: forn }] = await Promise.all([
                     supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", sid).maybeSingle(),
