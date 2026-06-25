@@ -16,9 +16,17 @@ const YT_VIEWS_SERVICE_ID = 14321;
 // Facebook (SMMhype)
 const FB_FOLLOWERS_SERVICE_ID = 18870;
 const FB_LIKES_SERVICE_ID = 7593;
+// Tráfego Web (SMMhype)
+const WEB_TRAFFIC_BR_SERVICE_ID = 9313;
+const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // Telegram prefixes: tgm* (members) — IDs ainda pendentes de provisionamento
+  if (p.startsWith("tg")) return null;
+  // Tráfego Web prefixes: wbr* (Brasil), wgl* (Global)
+  if (p.startsWith("wbr")) return WEB_TRAFFIC_BR_SERVICE_ID;
+  if (p.startsWith("wgl")) return WEB_TRAFFIC_WORLD_SERVICE_ID;
   // Facebook prefixes: ff* (followers), fl* (likes)
   if (p.startsWith("ff")) return FB_FOLLOWERS_SERVICE_ID;
   if (p.startsWith("fl")) return FB_LIKES_SERVICE_ID;
