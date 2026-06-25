@@ -73,6 +73,7 @@ const profileSchema = z.object({
     .trim()
     .min(5, "Cole o link do perfil/página do Facebook")
     .max(300, "Máximo 300 caracteres")
+    .regex(/^https?:\/\//i, "Por favor, insira o link completo do perfil, vídeo ou publicação.")
     .regex(/(facebook\.com|fb\.com|fb\.watch)\//i, "Link inválido — use a URL do perfil/página do Facebook"),
 });
 const postSchema = z.object({
@@ -82,6 +83,7 @@ const postSchema = z.object({
     .trim()
     .min(10, "Cole o link do post/foto do Facebook")
     .max(300, "Máximo 300 caracteres")
+    .regex(/^https?:\/\//i, "Por favor, insira o link completo do perfil, vídeo ou publicação.")
     .regex(/(facebook\.com|fb\.com|fb\.watch)\//i, "Link inválido — use a URL do post/foto do Facebook"),
 });
 
