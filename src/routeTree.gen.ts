@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
@@ -25,6 +26,11 @@ import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api
 const YoutubeRoute = YoutubeRouteImport.update({
   id: '/youtube',
   path: '/youtube',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrafegoRoute = TrafegoRouteImport.update({
+  id: '/trafego',
+  path: '/trafego',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TiktokRoute = TiktokRouteImport.update({
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
+  '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
+  '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
+  '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
+    | '/trafego'
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
+    | '/trafego'
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
@@ -165,6 +176,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
+    | '/trafego'
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
@@ -180,6 +192,7 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TiktokRoute: typeof TiktokRoute
+  TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/youtube'
       fullPath: '/youtube'
       preLoaderRoute: typeof YoutubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trafego': {
+      id: '/trafego'
+      path: '/trafego'
+      fullPath: '/trafego'
+      preLoaderRoute: typeof TrafegoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tiktok': {
@@ -284,6 +304,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TiktokRoute: TiktokRoute,
+  TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
