@@ -80,9 +80,14 @@ export const criarPedido = createServerFn({ method: "POST" })
     const pkg = data.pacote.toLowerCase();
     const isTiktok = pkg.startsWith("t");
     const isYoutube = pkg.startsWith("y");
-    const rede = data.rede_social ?? (isYoutube ? "youtube" : isTiktok ? "tiktok" : "instagram");
+    const isFacebook = pkg.startsWith("f");
+    const rede =
+      data.rede_social ??
+      (isFacebook ? "facebook" : isYoutube ? "youtube" : isTiktok ? "tiktok" : "instagram");
     const categoria =
-      isYoutube
+      isFacebook
+        ? (pkg.startsWith("fl") ? "curtidas" : "seguidores")
+        : isYoutube
         ? (pkg.startsWith("yv") ? "visualizacoes" : "inscritos")
         : isTiktok
         ? (pkg.startsWith("tl") ? "curtidas" : pkg.startsWith("tv") ? "visualizacoes" : "seguidores")
