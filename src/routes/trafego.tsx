@@ -220,11 +220,11 @@ function TrafegoLanding() {
                 placeholder="https://seusite.com.br/landing"
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }} maxLength={500} />
             </div>
-            <Button type="button" size="lg" disabled={loading || !planId}
+            <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
               onClick={() => { const sel = allPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
               className="w-full h-12 font-extrabold uppercase tracking-wide border-0"
               style={{ background: NEON, color: "#fff", boxShadow: `0 0 25px ${NEON}aa` }}>
-              {loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · entrega automática</p>
           </div>
