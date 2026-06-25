@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import ogYoutube from "@/assets/og-youtube.jpg";
 
 export const Route = createFileRoute("/youtube")({
   head: () => {
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/youtube")({
     const keywords =
       "comprar inscritos youtube, comprar views youtube, visualizações youtube barato, crescer canal youtube, monetizar canal youtube pix, agência smm youtube brasil";
     const url = "https://boostygram.lovable.app/youtube";
+    const ogImage = `https://boostygram.lovable.app${ogYoutube}`;
     return {
       meta: [
         { title },
@@ -34,9 +36,13 @@ export const Route = createFileRoute("/youtube")({
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "640" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
     };
