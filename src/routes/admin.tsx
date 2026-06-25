@@ -685,7 +685,37 @@ Ref: ${p.id.slice(0, 8)}`;
         </div>
 
 
+        {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
+        <div className="rounded-2xl border border-border bg-card/30 p-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+            🚀 Abrir Vitrines Públicas
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { href: "/",         label: "Instagram", icon: "📸", cls: "from-yellow-500 to-amber-500 text-black shadow-[0_0_14px_rgba(245,158,11,0.55)]" },
+              { href: "/tiktok",   label: "TikTok",    icon: "🎵", cls: "from-cyan-500 to-pink-500 text-black shadow-[0_0_14px_rgba(0,242,254,0.55)]" },
+              { href: "/youtube",  label: "YouTube",   icon: "📺", cls: "from-red-600 to-red-500 text-white shadow-[0_0_14px_rgba(255,0,0,0.55)]" },
+              { href: "/facebook", label: "Facebook",  icon: "🔵", cls: "from-blue-600 to-blue-500 text-white shadow-[0_0_14px_rgba(24,119,242,0.55)]" },
+              { href: "/telegram", label: "Telegram",  icon: "✈️", cls: "from-sky-500 to-sky-400 text-black shadow-[0_0_14px_rgba(0,204,255,0.55)]" },
+              { href: "/trafego",  label: "Tráfego",   icon: "🌐", cls: "from-purple-600 to-fuchsia-500 text-white shadow-[0_0_14px_rgba(176,38,255,0.55)]" },
+            ].map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r ${l.cls} font-bold text-xs px-3 py-2 hover:scale-105 transition-transform`}
+              >
+                <span>{l.icon}</span>
+                <span>{l.label}</span>
+                <span className="opacity-70">↗</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
         {/* Navegação Multi-Painel (Casa dos Avós) */}
+
         <div className="rounded-2xl border border-border bg-card/30 p-2 flex flex-wrap gap-2">
           {REDES.map((r) => {
             const active = aba === r.key;
