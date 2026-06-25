@@ -343,6 +343,7 @@ function TelegramLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/telegram" />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar
               </Button>
