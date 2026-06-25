@@ -200,7 +200,8 @@ function YoutubeLanding() {
   const qrCodeUrl = pedidoInfo?.qrCodeBase64 ? `data:image/png;base64,${pedidoInfo.qrCodeBase64}` : "";
 
   return (
-    <div className="min-h-screen text-white" style={{ background: BG }}>
+    {/* v2: solid bg, no glitch */}
+    <div className="min-h-screen text-white" style={{ background: "#0a0a0a" }}>
       <FabianoBadge />
       {/* HERO */}
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">

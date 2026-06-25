@@ -209,6 +209,7 @@ function TiktokLanding() {
   const qrCodeUrl = pedidoInfo?.qrCodeBase64 ? `data:image/png;base64,${pedidoInfo.qrCodeBase64}` : "";
 
   return (
+    {/* v2: solid bg, no glitch */}
     <div
       className="min-h-screen text-white"
       style={{ background: "#0a0a0a" }}
