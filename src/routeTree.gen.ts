@@ -13,6 +13,7 @@ import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as TiktokRouteImport } from './routes/tiktok'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -39,6 +40,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacebookRoute = FacebookRouteImport.update({
+  id: '/facebook',
+  path: '/facebook',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DiagnosticoRoute = DiagnosticoRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/diagnostico': typeof DiagnosticoRoute
+  '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/diagnostico': typeof DiagnosticoRoute
+  '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/diagnostico': typeof DiagnosticoRoute
+  '/facebook': typeof FacebookRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/tiktok': typeof TiktokRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/diagnostico'
+    | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/diagnostico'
+    | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/diagnostico'
+    | '/facebook'
     | '/privacidade'
     | '/sitemap.xml'
     | '/tiktok'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
+  FacebookRoute: typeof FacebookRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TiktokRoute: typeof TiktokRoute
@@ -202,6 +215,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/facebook': {
+      id: '/facebook'
+      path: '/facebook'
+      fullPath: '/facebook'
+      preLoaderRoute: typeof FacebookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/diagnostico': {
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   DiagnosticoRoute: DiagnosticoRoute,
+  FacebookRoute: FacebookRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TiktokRoute: TiktokRoute,
