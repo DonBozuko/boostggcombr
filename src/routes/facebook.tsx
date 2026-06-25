@@ -1,4 +1,6 @@
 import { FabianoBadge } from "@/components/FabianoBadge";
+import { MobileFrame } from "@/components/MobileFrame";
+import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -200,10 +202,10 @@ function FacebookLanding() {
   const qrCodeUrl = pedidoInfo?.qrCodeBase64 ? `data:image/png;base64,${pedidoInfo.qrCodeBase64}` : "";
 
   return (
-    <div className="min-h-screen text-white" style={{ background: BG }}>
+    <MobileFrame bg={BG}>
       <FabianoBadge variant="facebook" />
       <div
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
+        className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
           scrolled ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
         }`}
         style={{ borderColor: `${BLUE}66` }}
@@ -494,6 +496,7 @@ function FacebookLanding() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <BottomNav active="/facebook" />
+    </MobileFrame>
   );
 }
