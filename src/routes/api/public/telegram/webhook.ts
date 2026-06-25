@@ -137,8 +137,13 @@ export const Route = createFileRoute('/api/public/telegram/webhook')({
         if (!safeEqual(got, expected)) return new Response('Unauthorized', { status: 401 });
 
         const update = await request.json();
-        // Respond to Telegram immediately; process in background
-        handleUpdate(update).catch((e) => console.error('[telegram] handle', e));
+        console.log('[telegram] update', JSON.stringify(update).slice(0, 500));
+        // Must await: Cloudflare Workers terminate background promises after Response returns
+        try {
+          await handleUpdate(update);
+        } catch (e) {
+          console.error('[telegram] handle', e);
+        }
         return Response.json({ ok: true });
       },
     },
