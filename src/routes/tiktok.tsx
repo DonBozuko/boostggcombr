@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import ogTiktok from "@/assets/og-tiktok.jpg";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/tiktok")({
     const keywords =
       "comprar seguidores tiktok, comprar views tiktok, visualizações tiktok barato, comprar curtidas tiktok, monetizar tiktok rápido, seguidores tiktok pix, impulsionar tiktok, agência smm brasil tiktok, como ganhar seguidores no tiktok";
     const url = "https://boostygram.lovable.app/tiktok";
+    const ogImage = `https://boostygram.lovable.app${ogTiktok}`;
     return {
       meta: [
         { title },
@@ -34,9 +36,13 @@ export const Route = createFileRoute("/tiktok")({
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "640" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
     };
