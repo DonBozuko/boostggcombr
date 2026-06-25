@@ -202,6 +202,20 @@ function FacebookLanding() {
   return (
     <div className="min-h-screen text-white" style={{ background: BG }}>
       <FabianoBadge variant="facebook" />
+      <div
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
+          scrolled ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
+        }`}
+        style={{ borderColor: `${BLUE}66` }}
+      >
+        <div className="container mx-auto px-6 h-12 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FacebookIcon size={18} />
+            <span className="font-bold text-sm text-white">BOOSTYGRAM</span>
+          </div>
+          <span className="text-xs" style={{ color: BLUE }}>FACEBOOK ⚡</span>
+        </div>
+      </div>
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div
           className="mx-auto mb-6 size-20 rounded-2xl grid place-items-center"
