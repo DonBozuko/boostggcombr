@@ -186,6 +186,8 @@ function AdminPage() {
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
   const syncIdsApi = useServerFn(sincronizarIdsApi);
+  const smartApprove = useServerFn(smartApproveIds);
+  const [approving, setApproving] = useState(false);
   const getGrowth = useServerFn(getGrowthCentral);
 
   type GrowthState = {
