@@ -475,7 +475,7 @@ function AdminPage() {
         </div>
 
         {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
-        <div className="rounded-xl border border-amber-500/40 bg-gradient-to-br from-amber-950/30 via-slate-950/40 to-emerald-950/20 backdrop-blur-md p-3 shadow-[0_0_30px_rgba(245,158,11,0.25),inset_0_0_20px_rgba(16,185,129,0.05)]">
+        <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
             <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
@@ -564,7 +564,7 @@ function AdminPage() {
 
         {/* Visão Geral — faturamento somado de todas as redes */}
         {aba === "overview" && (
-          <div className="rounded-2xl border-2 border-emerald-500/50 bg-gradient-to-br from-emerald-950/50 to-slate-950/60 p-6 shadow-[0_0_30px_rgba(16,185,129,0.25)] space-y-4">
+          <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h2 className="text-xl font-extrabold tracking-tight">🌐 Visão Geral — Casa dos Avós</h2>
               <span className="text-xs text-muted-foreground">{faturamento?.count ?? 0} pedido(s) pagos</span>
@@ -609,7 +609,7 @@ function AdminPage() {
 
         {/* Assistente de Caixa Inteligente */}
         {caixa && (
-          <div className="rounded-2xl border-2 border-indigo-500/60 bg-gradient-to-br from-indigo-950/60 to-slate-950/60 p-6 shadow-[0_0_40px_rgba(99,102,241,0.35)] space-y-4">
+          <div className="rounded-2xl border border-indigo-500/30 bg-card/60 p-6 space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h2 className="text-xl font-extrabold tracking-tight">💡 Assistente de Caixa Inteligente</h2>
               {caixa.alerts.length > 0 && (f?.falhas_consecutivas ?? 0) > 0 && (
@@ -852,7 +852,7 @@ function AdminPage() {
           const lista = falhos.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
           if (lista.length === 0) return null;
           return (
-          <div className="rounded-2xl border-2 border-red-600 bg-red-950/40 shadow-[0_0_40px_rgba(239,68,68,0.45)] p-4 space-y-3">
+          <div className="rounded-2xl border border-red-600/60 bg-red-950/30 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-red-200 flex items-center gap-2">
                 🚨 {lista.length} pedido(s) com falha — requer ação
@@ -1015,8 +1015,13 @@ function AdminPage() {
             );
           })}
         </div>
+
+        <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
+          BoostyGram Admin · build v1.4.0-production
+        </footer>
       </div>
     </div>
+
   );
 }
 
