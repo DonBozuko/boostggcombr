@@ -452,7 +452,7 @@ function Landing() {
 
   return (
     <div className="dark min-h-screen text-foreground">
-      <FabianoBadge />
+      <FabianoBadge variant="instagram" />
       {/* NAV */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b border-border">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">

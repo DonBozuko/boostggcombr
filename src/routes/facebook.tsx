@@ -195,7 +195,7 @@ function FacebookLanding() {
 
   return (
     <div className="min-h-screen text-white" style={{ background: BG }}>
-      <FabianoBadge />
+      <FabianoBadge variant="facebook" />
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div
           className="mx-auto mb-6 size-20 rounded-2xl grid place-items-center"
