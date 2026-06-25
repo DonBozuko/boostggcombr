@@ -19,11 +19,16 @@ const FB_LIKES_SERVICE_ID = 7593;
 // Tráfego Web (SMMhype)
 const WEB_TRAFFIC_BR_SERVICE_ID = 9313;
 const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
+// Telegram (SMMhype) — homologados
+const TG_CHANNEL_SERVICE_ID = 19106; // Membros para Canal
+const TG_GROUP_SERVICE_ID = 19107;   // Membros para Grupo
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
-  // Telegram prefixes: tgm* (members) — IDs ainda pendentes de provisionamento
-  if (p.startsWith("tg")) return null;
+  // Telegram: tgc* (canal), tgg* (grupo); tgm* legado → canal por padrão
+  if (p.startsWith("tgc")) return TG_CHANNEL_SERVICE_ID;
+  if (p.startsWith("tgg")) return TG_GROUP_SERVICE_ID;
+  if (p.startsWith("tgm")) return TG_CHANNEL_SERVICE_ID;
   // Tráfego Web prefixes: wbr* (Brasil), wgl* (Global)
   if (p.startsWith("wbr")) return WEB_TRAFFIC_BR_SERVICE_ID;
   if (p.startsWith("wgl")) return WEB_TRAFFIC_WORLD_SERVICE_ID;
