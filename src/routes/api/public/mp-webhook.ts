@@ -123,50 +123,63 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // 3) Dispara pedido no fornecedor ATIVO (flag ativo:true, menor prioridade)
-          const { data: fornecedorAtivo } = await supabaseAdmin
+          // 3) Cadeia de fallback: principal → B → C (todos por prioridade)
+          const { data: fornecedores } = await supabaseAdmin
             .from("fornecedores")
             .select("slug, nome")
-            .eq("ativo", true)
-            .order("prioridade", { ascending: true })
-            .limit(1)
-            .maybeSingle();
+            .order("prioridade", { ascending: true });
 
-          if (!fornecedorAtivo) {
-            console.error("[mp-webhook] nenhum fornecedor ativo", { pedidoId: pedido.id });
+          const cadeia = fornecedores ?? [];
+          if (!cadeia.length) {
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ativo no painel" })
+              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor cadastrado" })
               .eq("id", pedido.id);
             return new Response("ok", { status: 200 });
           }
 
-          if (fornecedorAtivo.slug === "smmhype") {
-            const { dispatchSmmhype } = await import("@/lib/smmhype.server");
-            const smm = await dispatchSmmhype({
+          const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+          const tentativas: string[] = [];
+          let sucesso = false;
+
+          for (const f of cadeia) {
+            const r = await dispatchByFornecedor(f.slug, {
               pacote: pedido.pacote,
               quantidade: pedido.quantidade,
               instagram_user: pedido.instagram_user,
             });
-            if (!smm.ok) {
-              console.error("[mp-webhook] SMMhype falhou", { pedidoId: pedido.id, ...smm });
-              const detail = `${smm.error}${smm.status ? ` (HTTP ${smm.status})` : ""}${
-                smm.body ? ` · ${typeof smm.body === "string" ? smm.body : JSON.stringify(smm.body)}` : ""
-              }`.slice(0, 500);
+            if (r.ok) {
+              console.log("[mp-webhook] dispatch OK", { pedidoId: pedido.id, fornecedor: f.slug, orderId: r.orderId });
               await supabaseAdmin
                 .from("pedidos")
-                .update({ status: "SMM_FAILED", error_detail: detail })
+                .update({ status: "paid", error_detail: `Enviado via ${f.nome} (order ${r.orderId ?? "?"})` })
                 .eq("id", pedido.id);
-            } else {
-              console.log("[mp-webhook] SMMhype ok", { pedidoId: pedido.id, orderId: smm.orderId });
+              sucesso = true;
+              break;
             }
-          } else {
-            const msg = `Fornecedor ativo '${fornecedorAtivo.nome}' ainda não tem dispatcher implementado. Reative o SMMhype.`;
-            console.error("[mp-webhook]", msg, { pedidoId: pedido.id });
+            const det = `${r.error}${r.status ? ` HTTP ${r.status}` : ""}`;
+            tentativas.push(`${f.nome}: ${det}`);
+            console.warn("[mp-webhook] fallback", { pedidoId: pedido.id, fornecedor: f.slug, ...r });
+          }
+
+          if (!sucesso) {
+            const falhaResumo = tentativas.join(" | ").slice(0, 400);
+            console.error("[mp-webhook] todos fornecedores falharam → estorno", { pedidoId: pedido.id, tentativas });
+            const refund = await refundMercadoPago(String(paymentId));
+            const novoStatus = refund.ok ? "mp_refunded" : "SMM_FAILED";
+            const logDetail = refund.ok
+              ? `Estorno automático executado via Pix devido a falha geral de entrega. Tentativas: ${falhaResumo}`
+              : `Falha geral + estorno falhou (${refund.detail}). Tentativas: ${falhaResumo}`;
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: msg })
+              .update({ status: novoStatus, error_detail: logDetail.slice(0, 500) })
               .eq("id", pedido.id);
+
+            const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+            const alertMsg = refund.ok
+              ? `🚨 Pedido ${pedido.id} falhou em todos os fornecedores. Pix estornado automaticamente para o cliente.`
+              : `🚨 Pedido ${pedido.id} falhou em todos os fornecedores E o estorno automático falhou (${refund.detail}). Ação manual necessária.`;
+            await dispatchWhatsappAlert(alertMsg).catch((e) => console.error("[mp-webhook] alerta tg", e));
           }
 
           return new Response("ok", { status: 200 });
