@@ -616,19 +616,27 @@ function AdminPage() {
                 </span>
               )}
             </div>
+            {(() => null)()}
             <div className="grid sm:grid-cols-2 gap-4">
-              <div className="rounded-xl bg-black/30 border border-white/10 p-4">
-                <div className="text-xs uppercase text-muted-foreground">SMMhype</div>
-                <div className="mt-1 text-2xl font-bold">
-                  R$ {caixa.supplier?.saldo_atual.toFixed(2) ?? "0.00"}
-                </div>
-                <div className="mt-2 text-sm">
-                  Custo para atingir a Meta Ideal (R$ {caixa.supplier?.meta_ideal.toFixed(2) ?? "1000.00"}):{" "}
-                  <span className="font-semibold text-emerald-400">
-                    Falta depositar R$ {caixa.supplier?.falta_depositar.toFixed(2) ?? "0.00"} no SMMhype
-                  </span>
-                </div>
-              </div>
+              {(() => {
+                // Fonte de verdade: saldo BRL do monitor (saldo_usd × cotação ao vivo).
+                // Fallback: snapshot da tabela suppliers.
+                const saldoSmm = f?.saldo_brl ?? caixa.supplier?.saldo_atual ?? 0;
+                const metaIdeal = caixa.supplier?.meta_ideal ?? 1000;
+                const falta = Math.max(0, metaIdeal - saldoSmm);
+                return (
+                  <div className="rounded-xl bg-black/30 border border-white/10 p-4">
+                    <div className="text-xs uppercase text-muted-foreground">SMMhype</div>
+                    <div className="mt-1 text-2xl font-bold">R$ {saldoSmm.toFixed(2)}</div>
+                    <div className="mt-2 text-sm">
+                      Custo para atingir a Meta Ideal (R$ {metaIdeal.toFixed(2)}):{" "}
+                      <span className="font-semibold text-emerald-400">
+                        {falta > 0 ? `Falta depositar R$ ${falta.toFixed(2)} no SMMhype` : "Meta atingida ✅"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
               <div className="rounded-xl bg-black/30 border border-white/10 p-4">
                 <div className="text-xs uppercase text-muted-foreground">{caixa.bank?.nome ?? "Caixa"}</div>
                 <div className="mt-1 text-2xl font-bold">
