@@ -524,6 +524,7 @@ function TiktokLanding() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <BottomNav active="/tiktok" />
+    </MobileFrame>
   );
 }

@@ -496,6 +496,7 @@ function FacebookLanding() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <BottomNav active="/facebook" />
+    </MobileFrame>
   );
 }

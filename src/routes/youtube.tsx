@@ -509,6 +509,7 @@ function YoutubeLanding() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <BottomNav active="/youtube" />
+    </MobileFrame>
   );
 }

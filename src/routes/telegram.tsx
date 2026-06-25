@@ -382,6 +382,7 @@ function TelegramLanding() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <BottomNav active="/telegram" />
+    </MobileFrame>
   );
 }

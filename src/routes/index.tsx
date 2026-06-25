@@ -981,6 +981,7 @@ function Landing() {
           </div>
         </div>
       </footer>
-    </div>
+      <BottomNav active="/" />
+    </MobileFrame>
   );
 }

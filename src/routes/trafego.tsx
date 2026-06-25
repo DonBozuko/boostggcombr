@@ -302,6 +302,7 @@ function TrafegoLanding() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      <BottomNav active="/trafego" />
+    </MobileFrame>
   );
 }
