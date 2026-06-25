@@ -88,6 +88,7 @@ const videoSchema = z.object({
     .trim()
     .min(10, "Cole o link completo do vídeo do TikTok")
     .max(300, "Máximo 300 caracteres")
+    .regex(/^https?:\/\//i, "Por favor, insira o link completo do perfil, vídeo ou publicação.")
     .regex(/tiktok\.com\//i, "Link inválido — use a URL do vídeo do TikTok"),
 });
 
