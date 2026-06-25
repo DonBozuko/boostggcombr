@@ -1,6 +1,21 @@
 import type { ReactNode } from "react";
+import igLeft from "@/assets/char-ig-left.png";
+import igRight from "@/assets/char-ig-right.png";
+import ttLeft from "@/assets/char-tt-left.png";
+import ttRight from "@/assets/char-tt-right.png";
+import ytLeft from "@/assets/char-yt-left.png";
+import ytRight from "@/assets/char-yt-right.png";
+import tfLeft from "@/assets/char-tf-left.png";
+import tfRight from "@/assets/char-tf-right.png";
 
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
+
+const characters: Partial<Record<RouteKey, { left: string; right: string; leftCta: string; rightCta: string }>> = {
+  "/": { left: igLeft, right: igRight, leftCta: "Marcas reconhecem autoridade.", rightCta: "Glamour que converte parcerias." },
+  "/tiktok": { left: ttLeft, right: ttRight, leftCta: "Algoritmo dominado.", rightCta: "FYP em retenção máxima." },
+  "/youtube": { left: ytLeft, right: ytRight, leftCta: "WatchTime que monetiza.", rightCta: "YPP aprovado em tempo recorde." },
+  "/trafego": { left: tfLeft, right: tfRight, leftCta: "SEO local que domina.", rightCta: "Visitas Google em escala." },
+};
 
 const billboards: Record<
   RouteKey,
