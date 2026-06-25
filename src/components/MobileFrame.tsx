@@ -1,6 +1,21 @@
 import type { ReactNode } from "react";
+import igLeft from "@/assets/char-ig-left.png";
+import igRight from "@/assets/char-ig-right.png";
+import ttLeft from "@/assets/char-tt-left.png";
+import ttRight from "@/assets/char-tt-right.png";
+import ytLeft from "@/assets/char-yt-left.png";
+import ytRight from "@/assets/char-yt-right.png";
+import tfLeft from "@/assets/char-tf-left.png";
+import tfRight from "@/assets/char-tf-right.png";
 
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
+
+const characters: Partial<Record<RouteKey, { left: string; right: string; leftCta: string; rightCta: string }>> = {
+  "/": { left: igLeft, right: igRight, leftCta: "Marcas reconhecem autoridade.", rightCta: "Glamour que converte parcerias." },
+  "/tiktok": { left: ttLeft, right: ttRight, leftCta: "Algoritmo dominado.", rightCta: "FYP em retenção máxima." },
+  "/youtube": { left: ytLeft, right: ytRight, leftCta: "WatchTime que monetiza.", rightCta: "YPP aprovado em tempo recorde." },
+  "/trafego": { left: tfLeft, right: tfRight, leftCta: "SEO local que domina.", rightCta: "Visitas Google em escala." },
+};
 
 const billboards: Record<
   RouteKey,
@@ -59,9 +74,13 @@ const billboards: Record<
 function Billboard({
   side,
   data,
+  character,
+  cta,
 }: {
   side: "left" | "right";
   data: (typeof billboards)[RouteKey];
+  character?: string;
+  cta?: string;
 }) {
   return (
     <aside
@@ -76,6 +95,17 @@ function Billboard({
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
         }}
       />
+      {character && (
+        <img
+          src={character}
+          alt=""
+          loading="lazy"
+          className={`hidden md:block absolute bottom-0 h-[90vh] max-h-[900px] object-contain pointer-events-none z-20 ${
+            side === "left" ? "right-0 translate-x-[10%]" : "left-0 -translate-x-[10%]"
+          }`}
+          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}55)` }}
+        />
+      )}
       <div
         className={`relative z-10 max-w-xs px-8 text-${side === "left" ? "right" : "left"}`}
       >
@@ -89,6 +119,14 @@ function Billboard({
           {data.title}
         </h2>
         <p className="text-sm text-white/70 mt-3">{data.sub}</p>
+        {cta && (
+          <p
+            className="text-xs font-bold mt-4 tracking-wide"
+            style={{ color: data.accent }}
+          >
+            ✦ {cta}
+          </p>
+        )}
       </div>
     </aside>
   );
@@ -104,19 +142,20 @@ export function MobileFrame({
   children: ReactNode;
 }) {
   const data = billboards[route] ?? billboards["/"];
+  const chars = characters[route];
   return (
     <div
       className="min-h-screen flex justify-center"
       style={{ background: "#050505" }}
     >
-      <Billboard side="left" data={data} />
+      <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
-        className="w-full sm:max-w-full md:max-w-[450px] min-h-screen text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative pb-20 overflow-x-hidden"
+        className="w-full sm:max-w-full md:max-w-[450px] min-h-screen text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative pb-20 overflow-x-hidden z-10"
         style={{ background: bg }}
       >
         {children}
       </div>
-      <Billboard side="right" data={data} />
+      <Billboard side="right" data={data} character={chars?.right} cta={chars?.rightCta} />
     </div>
   );
 }
