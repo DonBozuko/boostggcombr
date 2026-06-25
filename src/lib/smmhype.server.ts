@@ -13,9 +13,15 @@ const TT_VIEWS_SERVICE_ID = 14907;
 // YouTube (SMMhype)
 const YT_SUBSCRIBERS_SERVICE_ID = 14343;
 const YT_VIEWS_SERVICE_ID = 997;
+// Facebook (SMMhype)
+const FB_FOLLOWERS_SERVICE_ID = 14220;
+const FB_LIKES_SERVICE_ID = 14222;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  // Facebook prefixes: ff* (followers), fl* (likes)
+  if (p.startsWith("ff")) return FB_FOLLOWERS_SERVICE_ID;
+  if (p.startsWith("fl")) return FB_LIKES_SERVICE_ID;
   // YouTube prefixes: ys* (subscribers), yv* (views)
   if (p.startsWith("ys")) return YT_SUBSCRIBERS_SERVICE_ID;
   if (p.startsWith("yv")) return YT_VIEWS_SERVICE_ID;
@@ -43,6 +49,8 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   tv5k: TT_VIEWS_SERVICE_ID, tv10k: TT_VIEWS_SERVICE_ID, tv50k: TT_VIEWS_SERVICE_ID,
   ys100: YT_SUBSCRIBERS_SERVICE_ID, ys500: YT_SUBSCRIBERS_SERVICE_ID, ys1k: YT_SUBSCRIBERS_SERVICE_ID,
   yv1k: YT_VIEWS_SERVICE_ID, yv5k: YT_VIEWS_SERVICE_ID, yv10k: YT_VIEWS_SERVICE_ID,
+  ff500: FB_FOLLOWERS_SERVICE_ID, ff1k: FB_FOLLOWERS_SERVICE_ID, ff2k5: FB_FOLLOWERS_SERVICE_ID,
+  fl500: FB_LIKES_SERVICE_ID, fl1k: FB_LIKES_SERVICE_ID, fl2k: FB_LIKES_SERVICE_ID,
 };
 
 
@@ -124,6 +132,18 @@ function normalizeYoutubeTarget(raw: string): string {
   return trimmed;
 }
 
+function normalizeFacebookTarget(raw: string): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.|m\.|web\.)?facebook\.com\//i.test(trimmed) || /^fb\.com\//i.test(trimmed) || /^fb\.watch\//i.test(trimmed)) {
+    return `https://${trimmed.replace(/^www\./i, "")}`;
+  }
+  // handle simples: trata como página
+  const handle = trimmed.replace(/^@+/, "").replace(/[/?#].*$/, "");
+  if (handle) return `https://www.facebook.com/${handle}`;
+  return trimmed;
+}
+
 export type SmmDispatchResult =
   | { ok: true; orderId?: string | number; body: unknown }
   | { ok: false; error: string; status?: number; body?: unknown };
@@ -148,9 +168,12 @@ export async function dispatchSmmhype(args: {
   }
 
   const pkg = String(args.pacote ?? "").trim().toLowerCase();
-  const isYoutube = pkg.startsWith("y");
-  const isTiktok = !isYoutube && pkg.startsWith("t");
-  const link = isYoutube
+  const isFacebook = pkg.startsWith("f");
+  const isYoutube = !isFacebook && pkg.startsWith("y");
+  const isTiktok = !isFacebook && !isYoutube && pkg.startsWith("t");
+  const link = isFacebook
+    ? normalizeFacebookTarget(args.instagram_user)
+    : isYoutube
     ? normalizeYoutubeTarget(args.instagram_user)
     : isTiktok
     ? normalizeTiktokTarget(args.instagram_user, pkg.startsWith("tf"))

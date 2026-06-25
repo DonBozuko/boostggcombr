@@ -8,7 +8,7 @@ const pedidoSchema = z.object({
   valor: z.number().positive(),
   email: z.string().email().max(200),
   whatsapp_contato: z.string().min(5).max(50).optional(),
-  rede_social: z.enum(["instagram", "tiktok", "youtube"]).optional(),
+  rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook"]).optional(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
@@ -58,6 +58,14 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   yv1k:   { quantidade: 1000,  valor: 19.0 },
   yv5k:   { quantidade: 5000,  valor: 59.0 },
   yv10k:  { quantidade: 10000, valor: 99.0 },
+  // Facebook — Seguidores (service 14220)
+  ff500:  { quantidade: 500,  valor: 19.0 },
+  ff1k:   { quantidade: 1000, valor: 29.0 },
+  ff2k5:  { quantidade: 2500, valor: 69.0 },
+  // Facebook — Curtidas (service 14222)
+  fl500:  { quantidade: 500,  valor: 9.0 },
+  fl1k:   { quantidade: 1000, valor: 15.0 },
+  fl2k:   { quantidade: 2000, valor: 27.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
@@ -72,9 +80,14 @@ export const criarPedido = createServerFn({ method: "POST" })
     const pkg = data.pacote.toLowerCase();
     const isTiktok = pkg.startsWith("t");
     const isYoutube = pkg.startsWith("y");
-    const rede = data.rede_social ?? (isYoutube ? "youtube" : isTiktok ? "tiktok" : "instagram");
+    const isFacebook = pkg.startsWith("f");
+    const rede =
+      data.rede_social ??
+      (isFacebook ? "facebook" : isYoutube ? "youtube" : isTiktok ? "tiktok" : "instagram");
     const categoria =
-      isYoutube
+      isFacebook
+        ? (pkg.startsWith("fl") ? "curtidas" : "seguidores")
+        : isYoutube
         ? (pkg.startsWith("yv") ? "visualizacoes" : "inscritos")
         : isTiktok
         ? (pkg.startsWith("tl") ? "curtidas" : pkg.startsWith("tv") ? "visualizacoes" : "seguidores")
