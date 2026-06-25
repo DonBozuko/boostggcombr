@@ -1354,6 +1354,17 @@ Ref: ${p.id.slice(0, 8)}`;
                     </div>
                   );
                 })()}
+                {(p.status === "mp_pending" || p.status === "mp_cancelled" || p.status === "mp_expired") && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
+                    onClick={() => recuperarVenda(p)}
+                    title="Gera template e abre wa.me"
+                  >
+                    🟢 Recuperar
+                  </Button>
+                )}
               </div>
             );
           };
