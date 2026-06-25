@@ -40,7 +40,7 @@ function TelegramIcon({ size = 28 }: { size?: number }) {
 function TelegramLanding() {
   return (
     <div className="min-h-screen text-white" style={{ background: BG }}>
-      <FabianoBadge />
+      <FabianoBadge variant="telegram" />
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div className="mx-auto mb-6 size-20 rounded-2xl grid place-items-center"
           style={{ background: BG, boxShadow: `0 0 30px ${AERO}, 0 0 60px ${AERO}aa`, border: `1px solid ${AERO}` }}>

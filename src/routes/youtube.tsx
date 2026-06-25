@@ -204,7 +204,7 @@ function YoutubeLanding() {
   return (
     // v2: solid bg, no glitch
     <div className="min-h-screen text-white" style={{ background: "#0a0a0a" }}>
-      <FabianoBadge />
+      <FabianoBadge variant="youtube" />
       {/* HERO */}
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div

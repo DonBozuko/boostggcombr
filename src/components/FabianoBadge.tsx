@@ -2,20 +2,76 @@ import { useState } from "react";
 import fabiano from "@/assets/fabiano.png.asset.json";
 import { User } from "lucide-react";
 
-export function FabianoBadge() {
-  const [open, setOpen] = useState(false);
+export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
+
+const TELEGRAM_URL = "https://t.me/boostygram_bot";
+
+const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string; border: string; ring: string; dot: string }> = {
+  instagram: {
+    text: "Aproveite o Canarinho Ouro! Quer bônus exclusivo? Clique aqui!",
+    accent: "text-emerald-400",
+    glow: "drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]",
+    border: "border-emerald-400/80",
+    ring: "shadow-[0_0_24px_rgba(16,185,129,0.55)] ring-emerald-400/20",
+    dot: "bg-emerald-400",
+  },
+  tiktok: {
+    text: "O algoritmo está entregando tudo! Clique para destravar combos secretos!",
+    accent: "text-[#00f2fe]",
+    glow: "drop-shadow-[0_0_6px_rgba(0,242,254,0.8)]",
+    border: "border-[#00f2fe]/80",
+    ring: "shadow-[0_0_24px_rgba(0,242,254,0.55)] ring-[#00f2fe]/20",
+    dot: "bg-[#fe0979]",
+  },
+  youtube: {
+    text: "Quer monetizar mais rápido? Clique e libere o combo Inscritos + Views!",
+    accent: "text-red-500",
+    glow: "drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]",
+    border: "border-red-500/80",
+    ring: "shadow-[0_0_24px_rgba(239,68,68,0.55)] ring-red-500/20",
+    dot: "bg-red-500",
+  },
+  facebook: {
+    text: "Bora dominar o feed? Clique aqui e fale comigo no privado!",
+    accent: "text-[#1877F2]",
+    glow: "drop-shadow-[0_0_6px_rgba(24,119,242,0.8)]",
+    border: "border-[#1877F2]/80",
+    ring: "shadow-[0_0_24px_rgba(24,119,242,0.55)] ring-[#1877F2]/20",
+    dot: "bg-[#1877F2]",
+  },
+  telegram: {
+    text: "Vem pro grupo VIP! Clique e receba os pacotes em primeira mão.",
+    accent: "text-cyan-300",
+    glow: "drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]",
+    border: "border-cyan-300/80",
+    ring: "shadow-[0_0_24px_rgba(34,211,238,0.55)] ring-cyan-300/20",
+    dot: "bg-cyan-300",
+  },
+  trafego: {
+    text: "Tráfego real esperando você. Clique e libere o combo cyberpunk!",
+    accent: "text-purple-400",
+    glow: "drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]",
+    border: "border-purple-400/80",
+    ring: "shadow-[0_0_24px_rgba(168,85,247,0.55)] ring-purple-400/20",
+    dot: "bg-purple-400",
+  },
+};
+
+export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
+  const [open, setOpen] = useState(true);
   const [imgOk, setImgOk] = useState(true);
+  const c = COPY[variant];
+
   return (
     <div className="fixed bottom-5 left-5 z-50 flex items-end gap-3">
-      <button
-        type="button"
-        aria-label="Fabiano Santiago — Suporte"
+      <a
+        href={TELEGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Fabiano Santiago — Falar no Telegram"
         onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
         onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
-        onClick={() => setOpen((v) => !v)}
-        className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-emerald-400/80 shadow-[0_0_24px_rgba(16,185,129,0.55)] ring-2 ring-emerald-400/20 hover:scale-105 transition-transform"
+        className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
       >
         {imgOk ? (
           <img
@@ -30,23 +86,27 @@ export function FabianoBadge() {
             <User className="absolute h-5 w-5 opacity-0" aria-hidden />
           </div>
         )}
-        <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 border-2 border-black animate-pulse" />
-      </button>
-      <div
-        className={`max-w-[240px] rounded-xl px-3 py-2 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-200 ${
-          open ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"
+        <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black animate-pulse`} />
+      </a>
+      <a
+        href={TELEGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-300 hover:bg-white/15 hover:scale-[1.02] ${
+          open ? "opacity-100 translate-x-0 animate-[fade-in_0.4s_ease-out]" : "opacity-0 -translate-x-2 pointer-events-none"
         }`}
         role="tooltip"
       >
-        <div className="font-semibold text-emerald-400 drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]">
-          Fabiano Santiago
+        <span
+          className="absolute -left-1.5 bottom-4 h-3 w-3 rotate-45 bg-white/10 border-l border-b border-white/20"
+          aria-hidden
+        />
+        <div className={`font-semibold ${c.accent} ${c.glow}`}>Fabiano Santiago</div>
+        <div className="text-white/95 mt-0.5">{c.text}</div>
+        <div className={`mt-1 text-[10px] font-bold uppercase tracking-wider ${c.accent}`}>
+          → Falar no Telegram
         </div>
-        <div className="text-white/90">
-          Diretor de Crescimento Online
-          <br />
-          <span className="text-emerald-300">(Suporte Ativo via WhatsApp)</span>
-        </div>
-      </div>
+      </a>
     </div>
   );
 }
