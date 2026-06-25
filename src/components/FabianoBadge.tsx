@@ -6,7 +6,7 @@ export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "
 
 // Build-time validation: VITE_TELEGRAM_BOT_USERNAME pode ser definido no .env do workspace
 // para sobrescrever o handle padrão. Se vazio, avisa sem quebrar o caixa.
-const DEFAULT_BOT_USERNAME = "boostygram_bot";
+const DEFAULT_BOT_USERNAME = "boostgramseguidores_bot";
 const BOT_USERNAME =
   (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string | undefined)?.trim() || DEFAULT_BOT_USERNAME;
 if (!import.meta.env.VITE_TELEGRAM_BOT_USERNAME && typeof window === "undefined") {
