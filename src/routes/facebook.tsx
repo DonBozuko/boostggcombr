@@ -32,7 +32,7 @@ export const Route = createFileRoute("/facebook")({
     const keywords =
       "comprar seguidores facebook, comprar curtidas facebook, seguidores facebook barato, curtidas post facebook, crescer pagina facebook, agência smm facebook brasil";
     const url = "https://boostygram.lovable.app/facebook";
-    const ogImage = `https://boostygram.lovable.app${ogFacebook}?v=1`;
+    const ogImage = `https://boostygram.lovable.app${ogFacebook}?v=2`;
     return {
       meta: [
         { title },

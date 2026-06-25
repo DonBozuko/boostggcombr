@@ -16,6 +16,7 @@ import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import ogTrafego from "@/assets/og-trafego.jpg";
 
 const NEON = "#B026FF";
 const BG = "#0a0a0a";
@@ -25,12 +26,19 @@ export const Route = createFileRoute("/trafego")({
     const title = "Comprar Tráfego Web Real Brasil e Mundial | Boostygram";
     const description = "Compre tráfego web real para seu site ou landing page. Visitas geo-segmentadas Brasil ou Global, entrega automática via Pix.";
     const url = "https://boostygram.lovable.app/trafego";
+    const ogImage = `https://boostygram.lovable.app${ogTrafego}?v=2`;
     return {
       meta: [
         { title }, { name: "description", content: description },
         { name: "keywords", content: "comprar tráfego web, comprar visitas site, tráfego brasileiro, tráfego mundial, smm tráfego, comprar visitantes landing page" },
         { property: "og:title", content: title }, { property: "og:description", content: description },
         { property: "og:url", content: url }, { property: "og:type", content: "website" },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title }, { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
     };
