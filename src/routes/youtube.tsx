@@ -449,6 +449,7 @@ function YoutubeLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/youtube" />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
