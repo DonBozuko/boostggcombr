@@ -4,7 +4,7 @@ import { User } from "lucide-react";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
 
-const TELEGRAM_URL = "https://t.me/boostygram_bot";
+const TELEGRAM_URL = "https://t.me";
 
 const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string; border: string; ring: string; dot: string }> = {
   instagram: {
