@@ -920,11 +920,29 @@ function AdminPage() {
                         {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
                       </div>
                     </div>
-                    {isSmm && (
-                      <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
-                        {busyId === p.id ? "..." : "Tentar de novo"}
-                      </Button>
-                    )}
+                    {isSmm && (() => {
+                      const redeKey = p.rede_social ?? "instagram";
+                      const countRede = falhos.filter((x) => (x.rede_social ?? "instagram") === redeKey && x.status === "SMM_FAILED").length;
+                      const badgeTone: Record<string, string> = {
+                        instagram: "bg-amber-500/15 text-amber-200 border-amber-500/50",
+                        tiktok:    "bg-cyan-500/15 text-cyan-200 border-cyan-500/50",
+                        youtube:   "bg-red-500/15 text-red-200 border-red-500/50",
+                        facebook:  "bg-blue-500/15 text-blue-200 border-blue-500/50",
+                      };
+                      return (
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span
+                            title={`Total de falhas em ${redeKey}`}
+                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeTone[redeKey] ?? "bg-muted text-muted-foreground border-border"}`}
+                          >
+                            {REDE_ICON[redeKey] ?? "📸"} {countRede}
+                          </span>
+                          <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
+                            {busyId === p.id ? "..." : "Tentar de novo"}
+                          </Button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
