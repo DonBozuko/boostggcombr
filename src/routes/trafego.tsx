@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
@@ -68,6 +69,9 @@ function TrafegoLanding() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const trType = categoria === "brasil" ? "br" : "global";
+  const tipoBloqueado = isBlocked(blockedMap, "trafego", trType);
 
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
@@ -178,10 +182,13 @@ function TrafegoLanding() {
               <div className="mt-3 text-4xl font-extrabold tracking-tight" style={{ color: "#fff", textShadow: `0 0 14px ${NEON}` }}>{p.price}</div>
               <p className="mt-2 text-xs text-zinc-400">Visitas reais com geo-segmentação</p>
               <button type="button"
+                disabled={tipoBloqueado}
                 onClick={() => { setPlanId(p.id); document.getElementById("tw-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide"
-                style={{ background: NEON, color: "#fff", boxShadow: `0 0 22px ${NEON}aa` }}>
-                <Zap className="size-4" /> Comprar agora
+                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                style={tipoBloqueado
+                  ? { background: "#222", color: "#888", border: `1px solid ${NEON}44` }
+                  : { background: NEON, color: "#fff", boxShadow: `0 0 22px ${NEON}aa` }}>
+                <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
               </button>
             </div>
           ))}
@@ -213,11 +220,11 @@ function TrafegoLanding() {
                 placeholder="https://seusite.com.br/landing"
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }} maxLength={500} />
             </div>
-            <Button type="button" size="lg" disabled={loading || !planId}
+            <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
               onClick={() => { const sel = allPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
               className="w-full h-12 font-extrabold uppercase tracking-wide border-0"
               style={{ background: NEON, color: "#fff", boxShadow: `0 0 25px ${NEON}aa` }}>
-              {loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · entrega automática</p>
           </div>

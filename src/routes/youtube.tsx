@@ -14,6 +14,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
@@ -126,6 +127,9 @@ function YoutubeLanding() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const ytType = categoria === "inscritos" ? "followers" : "views";
+  const tipoBloqueado = isBlocked(blockedMap, "youtube", ytType);
 
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
@@ -296,15 +300,14 @@ function YoutubeLanding() {
 
                 <button
                   type="button"
+                  disabled={tipoBloqueado}
                   onClick={() => { setPlanId(p.id); document.getElementById("yt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide"
-                  style={{
-                    background: RED,
-                    color: "#fff",
-                    boxShadow: `0 0 22px ${RED}aa`,
-                  }}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={tipoBloqueado
+                    ? { background: "#222", color: "#888", border: `1px solid ${RED}44` }
+                    : { background: RED, color: "#fff", boxShadow: `0 0 22px ${RED}aa` }}
                 >
-                  <Zap className="size-4" /> Comprar agora
+                  <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
                 </button>
               </div>
             );
@@ -377,7 +380,7 @@ function YoutubeLanding() {
             <Button
               type="button"
               size="lg"
-              disabled={loading || !planId}
+              disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
                 const sel = allPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
@@ -390,7 +393,7 @@ function YoutubeLanding() {
                 boxShadow: `0 0 25px ${RED}aa`,
               }}
             >
-              {loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática

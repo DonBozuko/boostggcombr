@@ -19,11 +19,16 @@ const FB_LIKES_SERVICE_ID = 7593;
 // Tráfego Web (SMMhype)
 const WEB_TRAFFIC_BR_SERVICE_ID = 9313;
 const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
+// Telegram (SMMhype) — homologados
+const TG_CHANNEL_SERVICE_ID = 19106; // Membros para Canal
+const TG_GROUP_SERVICE_ID = 19107;   // Membros para Grupo
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
-  // Telegram prefixes: tgm* (members) — IDs ainda pendentes de provisionamento
-  if (p.startsWith("tg")) return null;
+  // Telegram: tgc* (canal), tgg* (grupo); tgm* legado → canal por padrão
+  if (p.startsWith("tgc")) return TG_CHANNEL_SERVICE_ID;
+  if (p.startsWith("tgg")) return TG_GROUP_SERVICE_ID;
+  if (p.startsWith("tgm")) return TG_CHANNEL_SERVICE_ID;
   // Tráfego Web prefixes: wbr* (Brasil), wgl* (Global)
   if (p.startsWith("wbr")) return WEB_TRAFFIC_BR_SERVICE_ID;
   if (p.startsWith("wgl")) return WEB_TRAFFIC_WORLD_SERVICE_ID;
@@ -47,6 +52,8 @@ export function resolveServiceId(pacote: string, quantidade: number): number | n
 // Mapeia prefixo do pacote para (rede, tipo) usado na chave de override.
 export function packageToNetworkType(pacote: string): { network: string; type: string } | null {
   const p = String(pacote ?? "").trim().toLowerCase();
+  if (p.startsWith("tgc") || p.startsWith("tgm")) return { network: "telegram", type: "canal" };
+  if (p.startsWith("tgg")) return { network: "telegram", type: "grupo" };
   if (p.startsWith("tf")) return { network: "tiktok", type: "followers" };
   if (p.startsWith("tl")) return { network: "tiktok", type: "likes" };
   if (p.startsWith("tv")) return { network: "tiktok", type: "views" };
@@ -54,6 +61,8 @@ export function packageToNetworkType(pacote: string): { network: string; type: s
   if (p.startsWith("yv")) return { network: "youtube", type: "views" };
   if (p.startsWith("ff")) return { network: "facebook", type: "followers" };
   if (p.startsWith("fl")) return { network: "facebook", type: "likes" };
+  if (p.startsWith("wbr")) return { network: "trafego", type: "br" };
+  if (p.startsWith("wgl")) return { network: "trafego", type: "global" };
   if (p.startsWith("v"))  return { network: "instagram", type: "views" };
   if (p.startsWith("l"))  return { network: "instagram", type: "likes" };
   if (p.startsWith("p"))  return { network: "instagram", type: "followers" };
@@ -102,6 +111,8 @@ export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   fl500: FB_LIKES_SERVICE_ID, fl1k: FB_LIKES_SERVICE_ID, fl2k: FB_LIKES_SERVICE_ID,
   wbr1k: WEB_TRAFFIC_BR_SERVICE_ID, wbr5k: WEB_TRAFFIC_BR_SERVICE_ID, wbr10k: WEB_TRAFFIC_BR_SERVICE_ID,
   wgl1k: WEB_TRAFFIC_WORLD_SERVICE_ID, wgl5k: WEB_TRAFFIC_WORLD_SERVICE_ID, wgl10k: WEB_TRAFFIC_WORLD_SERVICE_ID,
+  tgc500: TG_CHANNEL_SERVICE_ID, tgc1k: TG_CHANNEL_SERVICE_ID,
+  tgg500: TG_GROUP_SERVICE_ID,   tgg1k: TG_GROUP_SERVICE_ID,
 };
 
 

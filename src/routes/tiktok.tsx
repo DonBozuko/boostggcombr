@@ -14,6 +14,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
@@ -131,6 +132,9 @@ function TiktokLanding() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const ttType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
+  const tipoBloqueado = isBlocked(blockedMap, "tiktok", ttType);
 
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
@@ -308,15 +312,18 @@ function TiktokLanding() {
 
                 <button
                   type="button"
+                  disabled={tipoBloqueado}
                   onClick={() => { setPlanId(p.id); document.getElementById("tt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide"
-                  style={{
-                    background: planId === p.id ? PINK : `linear-gradient(135deg, ${CYAN}, ${PINK})`,
-                    color: "#0a0a0a",
-                    boxShadow: `0 0 22px ${PINK}88`,
-                  }}
+                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={tipoBloqueado
+                    ? { background: "#222", color: "#888", border: `1px solid ${CYAN}44` }
+                    : {
+                        background: planId === p.id ? PINK : `linear-gradient(135deg, ${CYAN}, ${PINK})`,
+                        color: "#0a0a0a",
+                        boxShadow: `0 0 22px ${PINK}88`,
+                      }}
                 >
-                  <Zap className="size-4" /> Comprar agora
+                  <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
                 </button>
               </div>
             );
@@ -391,7 +398,7 @@ function TiktokLanding() {
             <Button
               type="button"
               size="lg"
-              disabled={loading || !planId}
+              disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
                 const sel = allPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
@@ -404,7 +411,7 @@ function TiktokLanding() {
                 boxShadow: `0 0 25px ${PINK}88, 0 0 25px ${CYAN}88`,
               }}
             >
-              {loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática

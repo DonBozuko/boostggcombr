@@ -359,6 +359,15 @@ const PROD_BASELINE: Record<string, Record<string, number | null>> = {
   facebook:  { followers: 18870, likes: 7593,  views: null  },
 };
 
+// Venda BRL por 1.000 unidades — usado para checar margem líquida.
+const VENDA_BRL_POR_MIL_TIPO: Record<string, Record<string, number>> = {
+  instagram: { followers: 18, likes: 12, views: 5 },
+  tiktok:    { followers: 49, likes: 15, views: 7 },
+  youtube:   { followers: 189, views: 19 },
+  facebook:  { followers: 29, likes: 15 },
+};
+const MARGEM_MINIMA_PCT = 20;
+
 export const smartApproveIds = createServerFn({ method: "POST" })
   .inputValidator((i) => adminInput.parse(i))
   .handler(async ({ data }) => {
@@ -439,18 +448,63 @@ export const smartApproveIds = createServerFn({ method: "POST" })
       }
     }
 
-    // 5) Persiste overrides aprovados
+    // 4.5) Trava anti-prejuízo: para cada candidato, calcula margem usando cotação BRL e venda alvo.
+    //      Se margem líquida < 20%, marca o serviço como bloqueado no banco.
+    const { data: cot } = await supabaseAdmin
+      .from("fornecedores").select("cotacao_brl, usd_to_brl").eq("slug", "smmhype").maybeSingle();
+    const cotacao = Number((cot as any)?.cotacao_brl ?? (cot as any)?.usd_to_brl) || 7;
+
+    const marginBlocks: Array<{ network: string; type: string; margem_pct: number; venda: number; custo_brl: number }> = [];
+    for (const net of Object.keys(cheapest)) {
+      for (const type of Object.keys(cheapest[net])) {
+        const rec = cheapest[net][type];
+        if (!rec) continue;
+        const venda = VENDA_BRL_POR_MIL_TIPO[net]?.[type];
+        if (!venda || venda <= 0) continue;
+        const custoBrl = rec.rate * cotacao; // rate = USD por 1000 → BRL por 1000
+        const pct = ((venda - custoBrl) / venda) * 100;
+        if (pct < MARGEM_MINIMA_PCT) {
+          marginBlocks.push({ network: net, type, margem_pct: +pct.toFixed(1), venda, custo_brl: +custoBrl.toFixed(2) });
+        }
+      }
+    }
+
+    // 5) Persiste overrides aprovados (com bloqueio por margem se aplicável)
     if (approvals.length > 0) {
-      const rows = approvals.map((a) => ({
-        network: a.network, service_type: a.type,
-        service_id: a.to, rate: a.to_rate,
-        previous_service_id: a.from, previous_rate: a.from_rate,
-        approved_at: new Date().toISOString(),
-      }));
+      const blockedSet = new Set(marginBlocks.map((b) => `${b.network}/${b.type}`));
+      const rows = approvals.map((a) => {
+        const mb = marginBlocks.find((b) => b.network === a.network && b.type === a.type);
+        const isBlocked = blockedSet.has(`${a.network}/${a.type}`);
+        return {
+          network: a.network, service_type: a.type,
+          service_id: a.to, rate: a.to_rate,
+          previous_service_id: a.from, previous_rate: a.from_rate,
+          approved_at: new Date().toISOString(),
+          bloqueado: isBlocked,
+          bloqueado_motivo: isBlocked && mb
+            ? `margem ${mb.margem_pct}% < ${MARGEM_MINIMA_PCT}% (custo R$${mb.custo_brl}/mil vs venda R$${mb.venda})`
+            : null,
+        };
+      });
       const { error: upErr } = await supabaseAdmin
         .from("service_id_overrides")
         .upsert(rows, { onConflict: "network,service_type" });
       if (upErr) return { ok: false as const, error: `DB_UPSERT: ${upErr.message}` };
+    }
+
+    // 5.5) Para itens não-aprovados mas com margem ruim, também bloqueia upsertando linha de bloqueio (se já existir override).
+    for (const mb of marginBlocks) {
+      const wasApproved = approvals.some((a) => a.network === mb.network && a.type === mb.type);
+      if (wasApproved) continue;
+      const existing = overrideMap.get(`${mb.network}/${mb.type}`);
+      if (!existing) continue; // só bloqueia o que já está em produção via override
+      await supabaseAdmin
+        .from("service_id_overrides")
+        .update({
+          bloqueado: true,
+          bloqueado_motivo: `margem ${mb.margem_pct}% < ${MARGEM_MINIMA_PCT}% (custo R$${mb.custo_brl}/mil vs venda R$${mb.venda})`,
+        })
+        .eq("network", mb.network).eq("service_type", mb.type);
     }
 
     // 6) Telegram (best-effort)
@@ -458,11 +512,14 @@ export const smartApproveIds = createServerFn({ method: "POST" })
       const tgKey = process.env.TELEGRAM_API_KEY;
       const chatId = process.env.ADMIN_TELEGRAM_CHAT_ID;
       const lovKey = process.env.LOVABLE_API_KEY;
-      if (tgKey && chatId && lovKey && approvals.length > 0) {
+      if (tgKey && chatId && lovKey && (approvals.length > 0 || marginBlocks.length > 0)) {
         const lines = approvals.map((a) =>
           `• ${a.network}/${a.type}: #${a.from ?? "—"} → #${a.to}  (rate ${a.from_rate} → ${a.to_rate})`
         ).join("\n");
-        const text = `🔄 AUDITORIA DE IDs — Boostygram\n${approvals.length} serviços calibrados (apenas menor custo). Margem protegida.\n\n${lines}${blocked.length ? `\n\n🟡 ${blocked.length} bloqueados (revisão humana).` : ""}`;
+        const mbLines = marginBlocks.map((b) =>
+          `⛔ ${b.network}/${b.type}: margem ${b.margem_pct}% < ${MARGEM_MINIMA_PCT}% → BLOQUEADO`
+        ).join("\n");
+        const text = `🔄 AUDITORIA DE IDs — Boostygram\n${approvals.length} calibrados · ${marginBlocks.length} bloqueados por margem\n\n${lines}${mbLines ? `\n\n${mbLines}` : ""}${blocked.length ? `\n\n🟡 ${blocked.length} divergências para revisão humana.` : ""}`;
         await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
           method: "POST",
           headers: {
@@ -484,6 +541,22 @@ export const smartApproveIds = createServerFn({ method: "POST" })
       skipped: skipped.length,
       approvals,
       blocked_list: blocked,
+      margin_blocks: marginBlocks,
     };
   });
+
+// 🔓 Leitura pública: mapa de serviços bloqueados (por network/service_type).
+// Usado pelas lojas para desativar o botão de checkout. Não expõe IDs nem rates.
+export const getBlockedMap = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("service_id_overrides")
+      .select("network, service_type, bloqueado")
+      .eq("bloqueado", true);
+    if (error) return { ok: false as const, blocked: [] as Array<{ network: string; service_type: string }> };
+    const blocked = (data ?? []).map((r: any) => ({ network: r.network, service_type: r.service_type }));
+    return { ok: true as const, blocked };
+  });
+
 

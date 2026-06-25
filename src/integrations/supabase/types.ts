@@ -253,6 +253,8 @@ export type Database = {
       service_id_overrides: {
         Row: {
           approved_at: string
+          bloqueado: boolean
+          bloqueado_motivo: string | null
           network: string
           previous_rate: number | null
           previous_service_id: number | null
@@ -262,6 +264,8 @@ export type Database = {
         }
         Insert: {
           approved_at?: string
+          bloqueado?: boolean
+          bloqueado_motivo?: string | null
           network: string
           previous_rate?: number | null
           previous_service_id?: number | null
@@ -271,6 +275,8 @@ export type Database = {
         }
         Update: {
           approved_at?: string
+          bloqueado?: boolean
+          bloqueado_motivo?: string | null
           network?: string
           previous_rate?: number | null
           previous_service_id?: number | null
