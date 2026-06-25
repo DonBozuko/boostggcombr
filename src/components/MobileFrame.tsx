@@ -131,6 +131,8 @@ function Billboard({
     </aside>
   );
 }
+
+export function MobileFrame({
   bg = "#0a0a0a",
   route = "/",
   children,
@@ -140,19 +142,20 @@ function Billboard({
   children: ReactNode;
 }) {
   const data = billboards[route] ?? billboards["/"];
+  const chars = characters[route];
   return (
     <div
       className="min-h-screen flex justify-center"
       style={{ background: "#050505" }}
     >
-      <Billboard side="left" data={data} />
+      <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
-        className="w-full sm:max-w-full md:max-w-[450px] min-h-screen text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative pb-20 overflow-x-hidden"
+        className="w-full sm:max-w-full md:max-w-[450px] min-h-screen text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative pb-20 overflow-x-hidden z-10"
         style={{ background: bg }}
       >
         {children}
       </div>
-      <Billboard side="right" data={data} />
+      <Billboard side="right" data={data} character={chars?.right} cta={chars?.rightCta} />
     </div>
   );
 }
