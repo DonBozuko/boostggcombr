@@ -4,6 +4,7 @@ import { User } from "lucide-react";
 
 export function FabianoBadge() {
   const [open, setOpen] = useState(false);
+  const [imgOk, setImgOk] = useState(true);
   return (
     <div className="fixed bottom-5 left-5 z-50 flex items-end gap-3">
       <button
