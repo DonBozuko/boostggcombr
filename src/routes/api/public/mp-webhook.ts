@@ -153,9 +153,35 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             });
             if (r.ok) {
               console.log("[mp-webhook] dispatch OK", { pedidoId: pedido.id, fornecedor: f.slug, orderId: r.orderId });
+
+              // ===== Cálculo de custo real (atacado) =====
+              // custo_brl = (quantidade / 1000) × rate(USD) × cotacao_brl
+              let custoReal: number | null = null;
+              try {
+                const { resolveServiceId } = await import("@/lib/smmhype.server");
+                const sid = resolveServiceId(pedido.pacote, pedido.quantidade);
+                if (sid != null) {
+                  const [{ data: svc }, { data: forn }] = await Promise.all([
+                    supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", sid).maybeSingle(),
+                    supabaseAdmin.from("fornecedores").select("cotacao_brl").eq("slug", f.slug).maybeSingle(),
+                  ]);
+                  const rate = Number(svc?.rate);
+                  const cot = Number((forn as any)?.cotacao_brl ?? 7.0) || 7.0;
+                  if (Number.isFinite(rate) && rate > 0) {
+                    custoReal = (Number(pedido.quantidade) / 1000) * rate * cot;
+                  }
+                }
+              } catch (e) {
+                console.warn("[mp-webhook] custo_real calc falhou", e);
+              }
+
               await supabaseAdmin
                 .from("pedidos")
-                .update({ status: "paid", error_detail: `Enviado via ${f.nome} (order ${r.orderId ?? "?"})` })
+                .update({
+                  status: "paid",
+                  error_detail: `Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+                  ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
+                })
                 .eq("id", pedido.id);
               sucesso = true;
               break;
