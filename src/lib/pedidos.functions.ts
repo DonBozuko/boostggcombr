@@ -89,14 +89,23 @@ export const criarPedido = createServerFn({ method: "POST" })
     }
     const valorCobrar = oficial.valor;
     const pkg = data.pacote.toLowerCase();
-    const isTiktok = pkg.startsWith("t");
+    const isTelegram = pkg.startsWith("tg");
+    const isTrafego = !isTelegram && pkg.startsWith("w");
+    const isTiktok = !isTelegram && !isTrafego && pkg.startsWith("t");
     const isYoutube = pkg.startsWith("y");
     const isFacebook = pkg.startsWith("f");
     const rede =
       data.rede_social ??
-      (isFacebook ? "facebook" : isYoutube ? "youtube" : isTiktok ? "tiktok" : "instagram");
+      (isTelegram ? "telegram"
+        : isTrafego ? "trafego"
+        : isFacebook ? "facebook"
+        : isYoutube ? "youtube"
+        : isTiktok ? "tiktok"
+        : "instagram");
     const categoria =
-      isFacebook
+      isTelegram ? "membros"
+        : isTrafego ? (pkg.startsWith("wbr") ? "trafego_br" : "trafego_global")
+        : isFacebook
         ? (pkg.startsWith("fl") ? "curtidas" : "seguidores")
         : isYoutube
         ? (pkg.startsWith("yv") ? "visualizacoes" : "inscritos")
