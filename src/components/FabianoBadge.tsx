@@ -89,12 +89,12 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
 };
 
 export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
-  const scrolled = useScrolledPercent(0.15);
-  const [hovered, setHovered] = useState(false);
-  const open = scrolled || hovered;
+  useScrolledPercent(0.15);
+  const open = true;
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
   const { native, web } = buildLinks(variant);
+
 
   // Fallback inteligente: tenta tg://, e se em ~600ms a página ainda estiver visível,
   // assume que o app não abriu e redireciona para a web.
