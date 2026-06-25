@@ -255,6 +255,15 @@ function AdminPage() {
 
   const [token, setToken] = useState("");
   const [aba, setAba] = useState<RedeKey>("overview");
+  const [sandbox, setSandbox] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("BOOSTYGRAM_SANDBOX") === "1";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (sandbox) window.localStorage.setItem("BOOSTYGRAM_SANDBOX", "1");
+    else window.localStorage.removeItem("BOOSTYGRAM_SANDBOX");
+  }, [sandbox]);
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
