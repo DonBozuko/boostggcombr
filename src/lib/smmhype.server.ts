@@ -44,6 +44,47 @@ export function resolveServiceId(pacote: string, quantidade: number): number | n
   return null;
 }
 
+// Mapeia prefixo do pacote para (rede, tipo) usado na chave de override.
+export function packageToNetworkType(pacote: string): { network: string; type: string } | null {
+  const p = String(pacote ?? "").trim().toLowerCase();
+  if (p.startsWith("tf")) return { network: "tiktok", type: "followers" };
+  if (p.startsWith("tl")) return { network: "tiktok", type: "likes" };
+  if (p.startsWith("tv")) return { network: "tiktok", type: "views" };
+  if (p.startsWith("ys")) return { network: "youtube", type: "followers" };
+  if (p.startsWith("yv")) return { network: "youtube", type: "views" };
+  if (p.startsWith("ff")) return { network: "facebook", type: "followers" };
+  if (p.startsWith("fl")) return { network: "facebook", type: "likes" };
+  if (p.startsWith("v"))  return { network: "instagram", type: "views" };
+  if (p.startsWith("l"))  return { network: "instagram", type: "likes" };
+  if (p.startsWith("p"))  return { network: "instagram", type: "followers" };
+  return null;
+}
+
+// Consulta service_id_overrides; se não houver override válido, cai no resolveServiceId hardcoded.
+export async function resolveServiceIdAsync(pacote: string, quantidade: number): Promise<number | null> {
+  const nt = packageToNetworkType(pacote);
+  if (nt) {
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data } = await supabaseAdmin
+        .from("service_id_overrides")
+        .select("service_id")
+        .eq("network", nt.network)
+        .eq("service_type", nt.type)
+        .maybeSingle();
+      const sid = Number((data as any)?.service_id);
+      if (Number.isFinite(sid) && sid > 0) return sid;
+    } catch (e) {
+      console.warn("[smmhype] override lookup failed:", e);
+    }
+  }
+  return (
+    resolveServiceId(pacote, quantidade) ??
+    SMMHYPE_SERVICE_IDS[String(pacote ?? "").trim().toLowerCase()] ??
+    null
+  );
+}
+
 // Compat: map por pacote id (inclui curtidas e visualizações).
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
   p100: 14325, p500: 14325, p1k: 14325, p2k: 14325,
