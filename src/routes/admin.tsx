@@ -1126,9 +1126,37 @@ Ref: ${p.id.slice(0, 8)}`;
                 });
                 return (
                   <div className="rounded-xl border border-border bg-background/60 overflow-hidden">
-                    <div className="px-4 py-3 border-b border-border bg-background/40 flex items-center justify-between">
+                    <div className="px-4 py-3 border-b border-border bg-background/40 flex items-center justify-between flex-wrap gap-2">
                       <h4 className="font-semibold text-sm">🔍 Auditoria de Integridade · IDs em Produção vs API</h4>
-                      <span className="text-[11px] text-muted-foreground">{rows.length} serviços comparados</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          disabled={approving || !token}
+                          className="h-7 text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/60"
+                          onClick={async () => {
+                            if (!token) return;
+                            setApproving(true);
+                            try {
+                              const res = await smartApprove({ data: { token } });
+                              if (!res.ok) {
+                                toast.error(`Falha: ${res.error}`);
+                              } else {
+                                toast.success(`✅ ${res.approved} redes calibradas para menor custo`, {
+                                  description: `${res.blocked} bloqueadas (revisão humana) · ${res.skipped} já otimizadas. Telegram notificado.`,
+                                });
+                                await syncIdsApi({ data: { token } }).catch(() => {});
+                              }
+                            } catch (e) {
+                              toast.error(`Erro: ${(e as Error).message}`);
+                            } finally {
+                              setApproving(false);
+                            }
+                          }}
+                        >
+                          {approving ? "Calibrando…" : "⚡ Aprovar Todas as Divergências (Apenas Menor Custo)"}
+                        </Button>
+                        <span className="text-[11px] text-muted-foreground">{rows.length} serviços comparados</span>
+                      </div>
                     </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs">
