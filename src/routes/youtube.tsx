@@ -118,6 +118,7 @@ function YouTubeIcon({ size = 28, className }: { size?: number; className?: stri
 }
 
 function YoutubeLanding() {
+  const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("inscritos");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");

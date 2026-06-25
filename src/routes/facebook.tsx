@@ -110,6 +110,7 @@ function FacebookIcon({ size = 28 }: { size?: number }) {
 }
 
 function FacebookLanding() {
+  const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("seguidores");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");

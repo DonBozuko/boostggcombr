@@ -85,6 +85,7 @@ function TelegramIcon({ size = 28 }: { size?: number }) {
 }
 
 function TelegramLanding() {
+  const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("canal");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");
