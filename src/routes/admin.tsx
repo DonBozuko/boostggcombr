@@ -532,7 +532,17 @@ function AdminPage() {
               >
                 {pingBusy ? "Pingando..." : "🛰️ Ping SMMhype (Dry-Run)"}
               </Button>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePingSmm}
+                disabled={pingBusy}
+                className="h-7 text-[11px] border-cyan-500/50 text-cyan-200 hover:bg-cyan-500/10"
+                title="Forçar nova checagem de conexão"
+              >
+                🔄 Repetir Dry-Run
+              </Button>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">auto-refresh 60s</span>
             </div>
           </div>
           {pingResult && (
