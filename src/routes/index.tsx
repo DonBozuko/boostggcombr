@@ -353,6 +353,9 @@ function Landing() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const igType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
+  const tipoBloqueado = isBlocked(blockedMap, "instagram", igType);
 
   // Polling: a cada 3s consulta o status do pedido até detectar 'paid'.
   useEffect(() => {
