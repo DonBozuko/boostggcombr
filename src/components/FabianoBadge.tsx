@@ -89,12 +89,12 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
 };
 
 export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
-  const scrolled = useScrolledPercent(0.15);
-  const [hovered, setHovered] = useState(false);
-  const open = scrolled || hovered;
+  useScrolledPercent(0.15);
+  const open = true;
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
   const { native, web } = buildLinks(variant);
+
 
   // Fallback inteligente: tenta tg://, e se em ~600ms a página ainda estiver visível,
   // assume que o app não abriu e redireciona para a web.
@@ -126,10 +126,8 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         rel="noopener noreferrer"
         onClick={handleClick}
         aria-label="Fabiano Santiago — Falar no Telegram"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        onFocus={() => setHovered(true)}
-        onBlur={() => setHovered(false)}
+
+
         className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
       >
         {imgOk ? (
@@ -152,7 +150,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
-        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-500 ease-out hover:bg-white/15 ${
+        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-500 ease-out hover:bg-white/15 animate-pulse ${
           open
             ? "opacity-100 translate-x-0 scale-100 animate-[fade-in_0.5s_ease-out]"
             : "opacity-0 -translate-x-2 scale-90 pointer-events-none"
