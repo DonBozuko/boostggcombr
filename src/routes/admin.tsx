@@ -1426,6 +1426,15 @@ Ref: ${p.id.slice(0, 8)}`;
                       {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
                     </div>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
+                    onClick={() => recuperarVenda(p)}
+                    title="Abre wa.me em branco com o template colado — cole o número do lead"
+                  >
+                    🟢 Recuperar Venda
+                  </Button>
                 </div>
               ))}
             </div>
