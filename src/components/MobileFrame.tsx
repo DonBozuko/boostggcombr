@@ -135,6 +135,8 @@ function Billboard({
           src={character}
           alt=""
           loading="lazy"
+          decoding="async"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           className={`absolute bottom-0 h-[75vh] max-h-[800px] object-contain pointer-events-none z-[1] ${
             side === "left" ? "right-0 translate-x-[8%]" : "left-0 -translate-x-[8%]"
           }`}
