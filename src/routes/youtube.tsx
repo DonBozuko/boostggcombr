@@ -1,3 +1,4 @@
+import { FabianoBadge } from "@/components/FabianoBadge";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -200,6 +201,7 @@ function YoutubeLanding() {
 
   return (
     <div className="min-h-screen text-white" style={{ background: BG }}>
+      <FabianoBadge />
       {/* HERO */}
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div

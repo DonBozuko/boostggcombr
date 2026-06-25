@@ -621,7 +621,11 @@ function AdminPage() {
               {(() => {
                 // Fonte de verdade: saldo BRL do monitor (saldo_usd × cotação ao vivo).
                 // Fallback: snapshot da tabela suppliers.
-                const saldoSmm = f?.saldo_brl ?? caixa.supplier?.saldo_atual ?? 0;
+                // Prefer the live monitor balance (saldo_usd × cotação). Only fall back
+                // to the suppliers snapshot when the monitor row is missing entirely.
+                const liveBrl = f?.saldo_brl;
+                const snapshot = caixa.supplier?.saldo_atual ?? 0;
+                const saldoSmm = liveBrl != null ? liveBrl : snapshot;
                 const metaIdeal = caixa.supplier?.meta_ideal ?? 1000;
                 const falta = Math.max(0, metaIdeal - saldoSmm);
                 return (

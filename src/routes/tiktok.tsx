@@ -1,3 +1,4 @@
+import { FabianoBadge } from "@/components/FabianoBadge";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -214,6 +215,7 @@ function TiktokLanding() {
       className="min-h-screen text-white"
       style={{ background: "#0a0a0a" }}
     >
+      <FabianoBadge />
       {/* HERO */}
       <header className="container mx-auto px-6 pt-10 pb-6 text-center">
         <div
