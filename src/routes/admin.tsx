@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
@@ -181,9 +181,30 @@ function AdminPage() {
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
+  const syncIdsApi = useServerFn(sincronizarIdsApi);
 
   const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
+  const [syncIdsBusy, setSyncIdsBusy] = useState(false);
+  const [syncIdsResult, setSyncIdsResult] = useState<any>(null);
+  const handleSyncIds = async () => {
+    if (!token) return toast.error("Informe o token");
+    setSyncIdsBusy(true);
+    try {
+      const r = await syncIdsApi({ data: { token } });
+      if (r.ok) {
+        setSyncIdsResult(r.picks);
+        const count = Object.values(r.picks).flatMap((n: any) => Object.values(n)).filter(Boolean).length;
+        toast.success(`🤖 ${count} IDs mais baratos mapeados de ${r.total_scanned} serviços`);
+      } else {
+        toast.error(`Sync falhou: ${r.error}`);
+      }
+    } catch (e) {
+      toast.error(`Erro: ${(e as Error).message}`);
+    } finally {
+      setSyncIdsBusy(false);
+    }
+  };
   const handlePingSmm = async () => {
     if (!token) return toast.error("Informe o token");
     setPingBusy(true);
@@ -869,6 +890,47 @@ function AdminPage() {
 
             {/* Cache de Serviços do Instagram */}
             <ServicesCacheCard cache={cache} busy={cacheBusy} onSync={sincronizarAgora} />
+
+            {/* 🤖 Sincronização automática de IDs via API */}
+            <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse" />
+                    🤖 Robô de Leitura Inteligente · IDs (Refill / Recarga / Reposición)
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Consulta <code>action=services</code> do fornecedor ativo, filtra por refill e devolve o ID
+                    mais barato de Instagram, TikTok, YouTube e Facebook (Seguidores, Curtidas, Views).
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleSyncIds}
+                  disabled={syncIdsBusy}
+                  className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold hover:opacity-90"
+                >
+                  {syncIdsBusy ? "Sincronizando…" : "Sincronizar IDs da API"}
+                </Button>
+              </div>
+              {syncIdsResult && (
+                <div className="rounded-md border border-border bg-background/60 p-3 text-xs font-mono overflow-x-auto">
+                  {(["instagram", "tiktok", "youtube", "facebook"] as const).map((net) => (
+                    <div key={net} className="mb-1">
+                      <span className="text-muted-foreground">{net.toUpperCase()}:</span>{" "}
+                      {(["followers", "likes", "views"] as const).map((t) => {
+                        const p = syncIdsResult?.[net]?.[t];
+                        return p ? (
+                          <span key={t} className="inline-block mr-3">
+                            {t}=<b>#{p.service}</b> @ {p.rate}
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
 
 
