@@ -74,9 +74,13 @@ const billboards: Record<
 function Billboard({
   side,
   data,
+  character,
+  cta,
 }: {
   side: "left" | "right";
   data: (typeof billboards)[RouteKey];
+  character?: string;
+  cta?: string;
 }) {
   return (
     <aside
@@ -91,6 +95,17 @@ function Billboard({
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
         }}
       />
+      {character && (
+        <img
+          src={character}
+          alt=""
+          loading="lazy"
+          className={`hidden md:block absolute bottom-0 h-[90vh] max-h-[900px] object-contain pointer-events-none z-20 ${
+            side === "left" ? "right-0 translate-x-[10%]" : "left-0 -translate-x-[10%]"
+          }`}
+          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}55)` }}
+        />
+      )}
       <div
         className={`relative z-10 max-w-xs px-8 text-${side === "left" ? "right" : "left"}`}
       >
@@ -104,12 +119,18 @@ function Billboard({
           {data.title}
         </h2>
         <p className="text-sm text-white/70 mt-3">{data.sub}</p>
+        {cta && (
+          <p
+            className="text-xs font-bold mt-4 tracking-wide"
+            style={{ color: data.accent }}
+          >
+            ✦ {cta}
+          </p>
+        )}
       </div>
     </aside>
   );
 }
-
-export function MobileFrame({
   bg = "#0a0a0a",
   route = "/",
   children,
