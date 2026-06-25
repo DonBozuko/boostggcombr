@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi } from "@/lib/admin.functions";
+import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi, getGrowthCentral } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
@@ -186,6 +186,44 @@ function AdminPage() {
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
   const syncIdsApi = useServerFn(sincronizarIdsApi);
+  const getGrowth = useServerFn(getGrowthCentral);
+
+  type GrowthState = {
+    funil: Record<string, { paid: number; pending: number; cancelled: number; failed: number; total: number; revenue: number }>;
+    total_pedidos: number;
+    margem: Record<string, { custo_brl_mil: number | null; venda_brl_mil: number; margem_pct: number | null }>;
+    cotacao: number;
+  };
+  const [growth, setGrowth] = useState<GrowthState | null>(null);
+  const loadGrowth = async (tk = token) => {
+    if (!tk) return;
+    try {
+      const res = await getGrowth({ data: { token: tk } });
+      if (res.ok) setGrowth({ funil: res.funil, total_pedidos: res.total_pedidos, margem: res.margem, cotacao: res.cotacao });
+    } catch {}
+  };
+
+  // Recuperação de carrinho abandonado: gera template + abre wa.me em branco.
+  const recuperarVenda = (p: { instagram_user: string; pacote: string; quantidade: number; rede_social?: string | null; id: string }) => {
+    const rede = p.rede_social ?? "instagram";
+    const handle = p.instagram_user?.startsWith("@") ? p.instagram_user : `@${p.instagram_user}`;
+    const tpl =
+`Oi! Aqui é da Boostygram 👋
+
+Vi que você iniciou um pedido de ${p.quantidade.toLocaleString("pt-BR")} ${p.pacote.toLowerCase().startsWith("l") ? "curtidas" : p.pacote.toLowerCase().startsWith("v") || p.pacote.toLowerCase().startsWith("tv") || p.pacote.toLowerCase().startsWith("yv") ? "visualizações" : "seguidores"} pro perfil ${handle} (${rede.toUpperCase()}) mas o Pix expirou antes da confirmação.
+
+Posso gerar um novo Pix com a mesma condição agora — entrega começa em minutos. Quer que eu reenvie?
+
+Ref: ${p.id.slice(0, 8)}`;
+    try {
+      navigator.clipboard?.writeText(tpl);
+      toast.success("Template copiado. Cole no WhatsApp do cliente.");
+    } catch {
+      toast("Template gerado", { description: tpl.slice(0, 80) + "…" });
+    }
+    const url = `https://wa.me/?text=${encodeURIComponent(tpl)}`;
+    window.open(url, "_blank", "noopener");
+  };
 
   const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
@@ -430,7 +468,8 @@ function AdminPage() {
     loadCaixa();
     loadFaturamento();
     loadFornecedores();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); load(); }, 60000);
+    loadGrowth();
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); loadGrowth(); load(); }, 60000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -800,6 +839,81 @@ function AdminPage() {
             )}
           </div>
         )}
+
+        {/* 📈 Central de Growth — funil por porta de entrada + margem real */}
+        {growth && (
+          <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-5">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl font-extrabold tracking-tight">📈 Central de Growth</h2>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Cotação: R$ {growth.cotacao.toFixed(2)}/USD · {growth.total_pedidos} pedidos analisados
+              </span>
+            </div>
+
+            {/* Margem por rede */}
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Margem de Lucro Estimada (BRL/1k)</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                {Object.entries(growth.margem).map(([rede, m]) => {
+                  const pct = m.margem_pct;
+                  const tone =
+                    pct == null ? "border-white/10 bg-black/30 text-muted-foreground"
+                    : pct >= 60 ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-200"
+                    : pct >= 30 ? "border-amber-500/40 bg-amber-950/30 text-amber-200"
+                    : "border-red-500/40 bg-red-950/30 text-red-200";
+                  return (
+                    <div key={rede} className={`rounded-xl border p-3 ${tone}`}>
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase">
+                        <span>{REDE_ICON[rede] ?? "•"}</span><span>{rede}</span>
+                      </div>
+                      <div className="mt-1 text-2xl font-extrabold">
+                        {pct != null ? `${pct.toFixed(1)}%` : "—"}
+                      </div>
+                      <div className="text-[11px] opacity-80 mt-1">
+                        Venda R$ {m.venda_brl_mil.toFixed(2)}
+                        {m.custo_brl_mil != null ? ` · Custo R$ ${m.custo_brl_mil.toFixed(2)}` : " · sem cache"}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-2">
+                Custo = rate mais barato em <span className="font-mono">services_cache</span> × cotação. Robô permanece read-only.
+              </div>
+            </div>
+
+            {/* Portas de Entrada */}
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Portas de Entrada (pedidos por rede)</div>
+              <div className="space-y-1.5">
+                {Object.entries(growth.funil)
+                  .sort((a, b) => b[1].total - a[1].total)
+                  .map(([rede, b]) => {
+                    const pct = growth.total_pedidos > 0 ? (b.total / growth.total_pedidos) * 100 : 0;
+                    return (
+                      <div key={rede} className="flex items-center gap-3 text-sm">
+                        <div className="w-28 flex items-center gap-2 shrink-0">
+                          <span>{REDE_ICON[rede] ?? "•"}</span>
+                          <span className="font-semibold uppercase text-xs">{rede}</span>
+                        </div>
+                        <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style={{ width: `${pct.toFixed(1)}%` }} />
+                        </div>
+                        <div className="w-44 text-right text-xs text-muted-foreground tabular-nums">
+                          {b.total} ({pct.toFixed(1)}%) · ✓{b.paid} ⏳{b.pending} ✗{b.cancelled + b.failed}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-2">
+                Métrica baseada em pedidos persistidos (não cliques anônimos — pixel/eventos não instrumentados).
+              </div>
+            </div>
+          </div>
+        )}
+
+
 
 
         {/* Widget Monitor de Saldo */}
@@ -1240,6 +1354,17 @@ function AdminPage() {
                     </div>
                   );
                 })()}
+                {(p.status === "mp_pending" || p.status === "mp_cancelled" || p.status === "mp_expired") && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
+                    onClick={() => recuperarVenda(p)}
+                    title="Gera template e abre wa.me"
+                  >
+                    🟢 Recuperar
+                  </Button>
+                )}
               </div>
             );
           };
@@ -1312,6 +1437,15 @@ function AdminPage() {
                       {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
                     </div>
                   </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
+                    onClick={() => recuperarVenda(p)}
+                    title="Abre wa.me em branco com o template colado — cole o número do lead"
+                  >
+                    🟢 Recuperar Venda
+                  </Button>
                 </div>
               ))}
             </div>
