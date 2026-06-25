@@ -178,10 +178,16 @@ export async function dispatchSmmhype(args: {
   }
 
   const pkg = String(args.pacote ?? "").trim().toLowerCase();
-  const isFacebook = pkg.startsWith("f");
-  const isYoutube = !isFacebook && pkg.startsWith("y");
-  const isTiktok = !isFacebook && !isYoutube && pkg.startsWith("t");
-  const link = isFacebook
+  const isTrafego = pkg.startsWith("w");
+  const isTelegram = pkg.startsWith("tg");
+  const isFacebook = !isTrafego && !isTelegram && pkg.startsWith("f");
+  const isYoutube = !isFacebook && !isTrafego && !isTelegram && pkg.startsWith("y");
+  const isTiktok = !isFacebook && !isYoutube && !isTrafego && !isTelegram && pkg.startsWith("t");
+  // Tráfego/Telegram: link já é URL completa http(s)://; só passa adiante
+  const passthrough = (raw: string) => raw.trim();
+  const link = isTrafego || isTelegram
+    ? passthrough(args.instagram_user)
+    : isFacebook
     ? normalizeFacebookTarget(args.instagram_user)
     : isYoutube
     ? normalizeYoutubeTarget(args.instagram_user)
