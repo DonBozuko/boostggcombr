@@ -182,23 +182,26 @@ function AdminPage() {
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
 
-  const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
   const handlePingSmm = async () => {
     if (!token) return toast.error("Informe o token");
     setPingBusy(true);
+    const t0 = performance.now();
     try {
       const r = await pingSmm({ data: { token } });
+      const ms = Math.round(performance.now() - t0);
       if (r.ok) {
-        const msg = `✅ Comunicação OK · saldo=${r.balance ?? "?"} ${r.currency ?? ""}`.trim();
-        setPingResult({ ok: true, msg });
+        const msg = `🟢 Conectado • ${ms}ms · saldo=${r.balance ?? "?"} ${r.currency ?? ""}`.trim();
+        setPingResult({ ok: true, msg, ms });
         toast.success(msg);
       } else {
-        setPingResult({ ok: false, msg: `❌ ${r.error}` });
+        setPingResult({ ok: false, msg: `🔴 Falhou • ${ms}ms · ${r.error}`, ms });
         toast.error(`Ping falhou: ${r.error}`);
       }
     } catch (e) {
-      setPingResult({ ok: false, msg: `❌ ${(e as Error).message}` });
+      const ms = Math.round(performance.now() - t0);
+      setPingResult({ ok: false, msg: `🔴 Erro • ${ms}ms · ${(e as Error).message}`, ms });
     } finally {
       setPingBusy(false);
     }
@@ -390,7 +393,7 @@ function AdminPage() {
     loadCaixa();
     loadFaturamento();
     loadFornecedores();
-    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); }, 30000);
+    const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); load(); }, 60000);
     return () => clearInterval(i);
   }, [token]);
 
@@ -529,7 +532,17 @@ function AdminPage() {
               >
                 {pingBusy ? "Pingando..." : "🛰️ Ping SMMhype (Dry-Run)"}
               </Button>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">PIX expresso · liga/desliga</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePingSmm}
+                disabled={pingBusy}
+                className="h-7 text-[11px] border-cyan-500/50 text-cyan-200 hover:bg-cyan-500/10"
+                title="Forçar nova checagem de conexão"
+              >
+                🔄 Repetir Dry-Run
+              </Button>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">auto-refresh 60s</span>
             </div>
           </div>
           {pingResult && (

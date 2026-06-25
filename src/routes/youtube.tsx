@@ -73,6 +73,7 @@ const channelSchema = z.object({
     .trim()
     .min(10, "Cole o link completo do canal do YouTube")
     .max(300, "Máximo 300 caracteres")
+    .regex(/^https?:\/\//i, "Por favor, insira o link completo do perfil, vídeo ou publicação.")
     .regex(/(youtube\.com|youtu\.be)\//i, "Link inválido — use a URL do canal do YouTube"),
 });
 
@@ -83,6 +84,7 @@ const videoSchema = z.object({
     .trim()
     .min(10, "Cole o link completo do vídeo do YouTube")
     .max(300, "Máximo 300 caracteres")
+    .regex(/^https?:\/\//i, "Por favor, insira o link completo do perfil, vídeo ou publicação.")
     .regex(/(youtube\.com|youtu\.be)\//i, "Link inválido — use a URL do vídeo do YouTube"),
 });
 
