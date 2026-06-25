@@ -267,6 +267,7 @@ function TrafegoLanding() {
                   </div>
                 )}
               </div>
+              <ViralShare route="/trafego" />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: NEON, color: "#fff" }} onClick={() => setModalOpen(false)}>Fechar</Button>
             </>
           ) : (
