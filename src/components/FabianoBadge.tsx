@@ -1,8 +1,10 @@
 import { useState } from "react";
 import fabiano from "@/assets/fabiano.png.asset.json";
+import { User } from "lucide-react";
 
 export function FabianoBadge() {
   const [open, setOpen] = useState(false);
+  const [imgOk, setImgOk] = useState(true);
   return (
     <div className="fixed bottom-5 left-5 z-50 flex items-end gap-3">
       <button
@@ -15,7 +17,19 @@ export function FabianoBadge() {
         onClick={() => setOpen((v) => !v)}
         className="relative h-14 w-14 rounded-full overflow-hidden border-2 border-emerald-400/80 shadow-[0_0_24px_rgba(16,185,129,0.55)] ring-2 ring-emerald-400/20 hover:scale-105 transition-transform"
       >
-        <img src={fabiano.url} alt="Fabiano Santiago" className="h-full w-full object-cover" />
+        {imgOk ? (
+          <img
+            src={fabiano.url}
+            alt="Fabiano Santiago"
+            onError={() => setImgOk(false)}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="h-full w-full grid place-items-center bg-zinc-800 text-zinc-300">
+            <span className="text-sm font-bold tracking-wide">FS</span>
+            <User className="absolute h-5 w-5 opacity-0" aria-hidden />
+          </div>
+        )}
         <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-400 border-2 border-black animate-pulse" />
       </button>
       <div
