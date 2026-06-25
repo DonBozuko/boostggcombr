@@ -359,6 +359,15 @@ const PROD_BASELINE: Record<string, Record<string, number | null>> = {
   facebook:  { followers: 18870, likes: 7593,  views: null  },
 };
 
+// Venda BRL por 1.000 unidades — usado para checar margem líquida.
+const VENDA_BRL_POR_MIL_TIPO: Record<string, Record<string, number>> = {
+  instagram: { followers: 18, likes: 12, views: 5 },
+  tiktok:    { followers: 49, likes: 15, views: 7 },
+  youtube:   { followers: 189, views: 19 },
+  facebook:  { followers: 29, likes: 15 },
+};
+const MARGEM_MINIMA_PCT = 20;
+
 export const smartApproveIds = createServerFn({ method: "POST" })
   .inputValidator((i) => adminInput.parse(i))
   .handler(async ({ data }) => {
