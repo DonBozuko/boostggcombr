@@ -45,19 +45,21 @@ type Pedido = {
   rede_social?: string | null;
 };
 
-type RedeKey = "overview" | "instagram" | "tiktok" | "youtube";
+type RedeKey = "overview" | "instagram" | "tiktok" | "youtube" | "facebook";
 
 const REDES: { key: RedeKey; label: string; icon: string; disabled?: boolean }[] = [
   { key: "overview",  label: "Visão Geral",      icon: "🌐" },
   { key: "instagram", label: "Instagram",        icon: "📸" },
   { key: "tiktok",    label: "TikTok",           icon: "🎵" },
   { key: "youtube",   label: "YouTube",          icon: "📺" },
+  { key: "facebook",  label: "Facebook",         icon: "🔵" },
 ];
 
 const REDE_ICON: Record<string, string> = {
   instagram: "📸",
   tiktok: "🎵",
   youtube: "📺",
+  facebook: "🔵",
 };
 
 
