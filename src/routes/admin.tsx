@@ -840,6 +840,81 @@ Ref: ${p.id.slice(0, 8)}`;
           </div>
         )}
 
+        {/* 📈 Central de Growth — funil por porta de entrada + margem real */}
+        {growth && (
+          <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-5">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <h2 className="text-xl font-extrabold tracking-tight">📈 Central de Growth</h2>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Cotação: R$ {growth.cotacao.toFixed(2)}/USD · {growth.total_pedidos} pedidos analisados
+              </span>
+            </div>
+
+            {/* Margem por rede */}
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Margem de Lucro Estimada (BRL/1k)</div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+                {Object.entries(growth.margem).map(([rede, m]) => {
+                  const pct = m.margem_pct;
+                  const tone =
+                    pct == null ? "border-white/10 bg-black/30 text-muted-foreground"
+                    : pct >= 60 ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-200"
+                    : pct >= 30 ? "border-amber-500/40 bg-amber-950/30 text-amber-200"
+                    : "border-red-500/40 bg-red-950/30 text-red-200";
+                  return (
+                    <div key={rede} className={`rounded-xl border p-3 ${tone}`}>
+                      <div className="flex items-center gap-2 text-xs font-semibold uppercase">
+                        <span>{REDE_ICON[rede] ?? "•"}</span><span>{rede}</span>
+                      </div>
+                      <div className="mt-1 text-2xl font-extrabold">
+                        {pct != null ? `${pct.toFixed(1)}%` : "—"}
+                      </div>
+                      <div className="text-[11px] opacity-80 mt-1">
+                        Venda R$ {m.venda_brl_mil.toFixed(2)}
+                        {m.custo_brl_mil != null ? ` · Custo R$ ${m.custo_brl_mil.toFixed(2)}` : " · sem cache"}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-2">
+                Custo = rate mais barato em <span className="font-mono">services_cache</span> × cotação. Robô permanece read-only.
+              </div>
+            </div>
+
+            {/* Portas de Entrada */}
+            <div>
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Portas de Entrada (pedidos por rede)</div>
+              <div className="space-y-1.5">
+                {Object.entries(growth.funil)
+                  .sort((a, b) => b[1].total - a[1].total)
+                  .map(([rede, b]) => {
+                    const pct = growth.total_pedidos > 0 ? (b.total / growth.total_pedidos) * 100 : 0;
+                    return (
+                      <div key={rede} className="flex items-center gap-3 text-sm">
+                        <div className="w-28 flex items-center gap-2 shrink-0">
+                          <span>{REDE_ICON[rede] ?? "•"}</span>
+                          <span className="font-semibold uppercase text-xs">{rede}</span>
+                        </div>
+                        <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style={{ width: `${pct.toFixed(1)}%` }} />
+                        </div>
+                        <div className="w-44 text-right text-xs text-muted-foreground tabular-nums">
+                          {b.total} ({pct.toFixed(1)}%) · ✓{b.paid} ⏳{b.pending} ✗{b.cancelled + b.failed}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-2">
+                Métrica baseada em pedidos persistidos (não cliques anônimos — pixel/eventos não instrumentados).
+              </div>
+            </div>
+          </div>
+        )}
+
+
+
 
         {/* Widget Monitor de Saldo */}
         {f && style && (
