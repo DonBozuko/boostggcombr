@@ -168,9 +168,12 @@ export async function dispatchSmmhype(args: {
   }
 
   const pkg = String(args.pacote ?? "").trim().toLowerCase();
-  const isYoutube = pkg.startsWith("y");
-  const isTiktok = !isYoutube && pkg.startsWith("t");
-  const link = isYoutube
+  const isFacebook = pkg.startsWith("f");
+  const isYoutube = !isFacebook && pkg.startsWith("y");
+  const isTiktok = !isFacebook && !isYoutube && pkg.startsWith("t");
+  const link = isFacebook
+    ? normalizeFacebookTarget(args.instagram_user)
+    : isYoutube
     ? normalizeYoutubeTarget(args.instagram_user)
     : isTiktok
     ? normalizeTiktokTarget(args.instagram_user, pkg.startsWith("tf"))
