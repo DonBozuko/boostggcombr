@@ -891,6 +891,47 @@ function AdminPage() {
             {/* Cache de Serviços do Instagram */}
             <ServicesCacheCard cache={cache} busy={cacheBusy} onSync={sincronizarAgora} />
 
+            {/* 🤖 Sincronização automática de IDs via API */}
+            <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <div>
+                  <h3 className="font-semibold flex items-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400 animate-pulse" />
+                    🤖 Robô de Leitura Inteligente · IDs (Refill / Recarga / Reposición)
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Consulta <code>action=services</code> do fornecedor ativo, filtra por refill e devolve o ID
+                    mais barato de Instagram, TikTok, YouTube e Facebook (Seguidores, Curtidas, Views).
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  onClick={handleSyncIds}
+                  disabled={syncIdsBusy}
+                  className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold hover:opacity-90"
+                >
+                  {syncIdsBusy ? "Sincronizando…" : "Sincronizar IDs da API"}
+                </Button>
+              </div>
+              {syncIdsResult && (
+                <div className="rounded-md border border-border bg-background/60 p-3 text-xs font-mono overflow-x-auto">
+                  {(["instagram", "tiktok", "youtube", "facebook"] as const).map((net) => (
+                    <div key={net} className="mb-1">
+                      <span className="text-muted-foreground">{net.toUpperCase()}:</span>{" "}
+                      {(["followers", "likes", "views"] as const).map((t) => {
+                        const p = syncIdsResult?.[net]?.[t];
+                        return p ? (
+                          <span key={t} className="inline-block mr-3">
+                            {t}=<b>#{p.service}</b> @ {p.rate}
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
 
 
 
