@@ -915,14 +915,41 @@ function AdminPage() {
                     mais barato de Instagram, TikTok, YouTube e Facebook (Seguidores, Curtidas, Views).
                   </p>
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleSyncIds}
-                  disabled={syncIdsBusy}
-                  className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold hover:opacity-90"
-                >
-                  {syncIdsBusy ? "Sincronizando…" : "Sincronizar IDs da API"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSyncIds}
+                    disabled={syncIdsBusy}
+                    className="bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-semibold hover:opacity-90"
+                  >
+                    {syncIdsBusy ? "Sincronizando…" : "Sincronizar IDs da API"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!syncIdsResult}
+                    onClick={() => {
+                      if (!syncIdsResult) return;
+                      const rows = [["rede", "tipo", "service_id", "rate", "name"]];
+                      (["instagram", "tiktok", "youtube", "facebook"] as const).forEach((net) => {
+                        (["followers", "likes", "views"] as const).forEach((t) => {
+                          const p = syncIdsResult?.[net]?.[t];
+                          if (p) rows.push([net, t, String(p.service ?? ""), String(p.rate ?? ""), String(p.name ?? "").replace(/[\r\n,;]+/g, " ")]);
+                        });
+                      });
+                      const csv = rows.map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(",")).join("\n");
+                      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `auditoria-ids-${new Date().toISOString().slice(0, 10)}.csv`;
+                      document.body.appendChild(a); a.click(); a.remove();
+                      URL.revokeObjectURL(url);
+                    }}
+                  >
+                    ⬇️ Exportar Auditoria CSV
+                  </Button>
+                </div>
               </div>
               {syncIdsResult && (
                 <div className="rounded-md border border-border bg-background/60 p-3 text-xs font-mono overflow-x-auto">
