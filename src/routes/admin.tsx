@@ -894,9 +894,28 @@ function AdminPage() {
                         <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
 
                       </div>
-                      {p.error_detail && (
-                        <div className="text-xs text-red-300/90 font-mono break-all">{p.error_detail}</div>
-                      )}
+                      {p.error_detail && (() => {
+                        const raw = p.error_detail!;
+                        const low = raw.toLowerCase();
+                        let origem = "Fornecedor (SMMhype)";
+                        let prefix = "Falha";
+                        let tone = "text-red-300/90 border-red-500/40 bg-red-950/40";
+                        if (/(invalid|private|not.?found|link|url|username|user not|perfil)/.test(low)) {
+                          origem = "Cliente (Link Inválido)"; prefix = "Ação Requerida";
+                          tone = "text-amber-200 border-amber-500/40 bg-amber-950/30";
+                        } else if (/(timeout|econn|database|supabase|postgres|fetch failed|network)/.test(low)) {
+                          origem = "Seu Sistema"; prefix = "Erro Técnico";
+                          tone = "text-orange-200 border-orange-500/40 bg-orange-950/30";
+                        } else if (/(smmhype|provider|api|service|saldo|balance|429|503|502)/.test(low)) {
+                          origem = "Fornecedor (SMMhype)"; prefix = "Falha";
+                        }
+                        return (
+                          <div className={`text-xs font-mono break-all rounded-md border px-2 py-1 ${tone}`}>
+                            <span className="font-bold not-italic mr-1">{prefix}: {raw}</span>
+                            <span className="opacity-80">• {origem}</span>
+                          </div>
+                        );
+                      })()}
                       <div className="text-xs text-muted-foreground">
                         {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
                       </div>
