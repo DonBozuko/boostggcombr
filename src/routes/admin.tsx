@@ -182,23 +182,26 @@ function AdminPage() {
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
 
-  const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
   const handlePingSmm = async () => {
     if (!token) return toast.error("Informe o token");
     setPingBusy(true);
+    const t0 = performance.now();
     try {
       const r = await pingSmm({ data: { token } });
+      const ms = Math.round(performance.now() - t0);
       if (r.ok) {
-        const msg = `✅ Comunicação OK · saldo=${r.balance ?? "?"} ${r.currency ?? ""}`.trim();
-        setPingResult({ ok: true, msg });
+        const msg = `🟢 Conectado • ${ms}ms · saldo=${r.balance ?? "?"} ${r.currency ?? ""}`.trim();
+        setPingResult({ ok: true, msg, ms });
         toast.success(msg);
       } else {
-        setPingResult({ ok: false, msg: `❌ ${r.error}` });
+        setPingResult({ ok: false, msg: `🔴 Falhou • ${ms}ms · ${r.error}`, ms });
         toast.error(`Ping falhou: ${r.error}`);
       }
     } catch (e) {
-      setPingResult({ ok: false, msg: `❌ ${(e as Error).message}` });
+      const ms = Math.round(performance.now() - t0);
+      setPingResult({ ok: false, msg: `🔴 Erro • ${ms}ms · ${(e as Error).message}`, ms });
     } finally {
       setPingBusy(false);
     }
