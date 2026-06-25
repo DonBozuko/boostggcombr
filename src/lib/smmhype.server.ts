@@ -132,6 +132,18 @@ function normalizeYoutubeTarget(raw: string): string {
   return trimmed;
 }
 
+function normalizeFacebookTarget(raw: string): string {
+  const trimmed = raw.trim();
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (/^(www\.|m\.|web\.)?facebook\.com\//i.test(trimmed) || /^fb\.com\//i.test(trimmed) || /^fb\.watch\//i.test(trimmed)) {
+    return `https://${trimmed.replace(/^www\./i, "")}`;
+  }
+  // handle simples: trata como página
+  const handle = trimmed.replace(/^@+/, "").replace(/[/?#].*$/, "");
+  if (handle) return `https://www.facebook.com/${handle}`;
+  return trimmed;
+}
+
 export type SmmDispatchResult =
   | { ok: true; orderId?: string | number; body: unknown }
   | { ok: false; error: string; status?: number; body?: unknown };
