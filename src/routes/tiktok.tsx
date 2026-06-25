@@ -131,6 +131,9 @@ function TiktokLanding() {
   const [paid, setPaid] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
+  const blockedMap = useBlockedMap();
+  const ttType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
+  const tipoBloqueado = isBlocked(blockedMap, "tiktok", ttType);
 
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
