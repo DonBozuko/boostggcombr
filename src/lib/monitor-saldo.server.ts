@@ -123,7 +123,12 @@ export async function checkSmmhypeBalance() {
     }
 
     if (saldoBrl != null) {
-      if (saldoBrl < 100) {
+      if (saldoBrl < 50) {
+        alertaCriado = {
+          nivel: 2,
+          mensagem: `🚨 CRÍTICO: SMMhype com R$ ${saldoBrl.toFixed(2)} (abaixo de R$ 50). Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}. Deposite manualmente AGORA no painel do fornecedor.`,
+        };
+      } else if (saldoBrl < 100) {
         alertaCriado = {
           nivel: 2,
           mensagem: `🚨 URGENTE: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.`,

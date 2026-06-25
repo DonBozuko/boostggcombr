@@ -784,40 +784,35 @@ Ref: ${p.id.slice(0, 8)}`;
               )}
             </div>
             
-            <div className="grid sm:grid-cols-2 gap-4">
-              {(() => {
-                // Fonte de verdade: saldo BRL do monitor (saldo_usd × cotação ao vivo).
-                // Fallback: snapshot da tabela suppliers.
-                // Prefer the live monitor balance (saldo_usd × cotação). Only fall back
-                // to the suppliers snapshot when the monitor row is missing entirely.
-                const liveBrl = f?.saldo_brl;
-                const snapshot = caixa.supplier?.saldo_atual ?? 0;
-                const saldoSmm = liveBrl != null ? liveBrl : snapshot;
-                const metaIdeal = caixa.supplier?.meta_ideal ?? 1000;
-                const falta = Math.max(0, metaIdeal - saldoSmm);
-                return (
-                  <div className="rounded-xl bg-black/30 border border-white/10 p-4">
-                    <div className="text-xs uppercase text-muted-foreground">SMMhype</div>
-                    <div className="mt-1 text-2xl font-bold">R$ {saldoSmm.toFixed(2)}</div>
-                    <div className="mt-2 text-sm">
-                      Custo para atingir a Meta Ideal (R$ {metaIdeal.toFixed(2)}):{" "}
-                      <span className="font-semibold text-emerald-400">
-                        {falta > 0 ? `Falta depositar R$ ${falta.toFixed(2)} no SMMhype` : "Meta atingida ✅"}
-                      </span>
-                    </div>
+            {(() => {
+              // Fonte única de verdade: saldo BRL ao vivo (USD × cotação do fornecedor).
+              // Removido o card "Caixa Principal" — não havia API real de saldo MP, era placebo de R$ 0,00.
+              const liveBrl = f?.saldo_brl;
+              const snapshot = caixa.supplier?.saldo_atual ?? 0;
+              const saldoSmm = liveBrl != null ? liveBrl : snapshot;
+              const metaIdeal = caixa.supplier?.meta_ideal ?? 1000;
+              const falta = Math.max(0, metaIdeal - saldoSmm);
+              const baixo = saldoSmm < 50;
+              return (
+                <div className={`rounded-xl bg-black/30 border p-4 ${baixo ? "border-red-500/60" : "border-white/10"}`}>
+                  <div className="text-xs uppercase text-muted-foreground">Saldo Atual no Fornecedor · SMMhype</div>
+                  <div className={`mt-1 text-3xl font-extrabold ${baixo ? "text-red-400" : "text-emerald-300"}`}>
+                    R$ {saldoSmm.toFixed(2)}
                   </div>
-                );
-              })()}
-              <div className="rounded-xl bg-black/30 border border-white/10 p-4">
-                <div className="text-xs uppercase text-muted-foreground">{caixa.bank?.nome ?? "Caixa"}</div>
-                <div className="mt-1 text-2xl font-bold">
-                  R$ {caixa.bank?.saldo_atual.toFixed(2) ?? "0.00"}
+                  <div className="mt-2 text-sm">
+                    Meta Ideal R$ {metaIdeal.toFixed(2)}:{" "}
+                    <span className="font-semibold text-emerald-400">
+                      {falta > 0 ? `falta depositar R$ ${falta.toFixed(2)}` : "atingida ✅"}
+                    </span>
+                  </div>
+                  {baixo && (
+                    <div className="mt-2 text-xs font-semibold text-red-300">
+                      🚨 Abaixo de R$ 50 — alerta Telegram disparado. Deposite manualmente no painel do fornecedor.
+                    </div>
+                  )}
                 </div>
-                <div className={`mt-2 text-sm font-semibold ${caixa.bank?.ok ? "text-emerald-400" : "text-red-400"}`}>
-                  {caixa.bank?.status_text}
-                </div>
-              </div>
-            </div>
+              );
+            })()}
             {caixa.alerts.length > 0 && (f?.falhas_consecutivas ?? 0) > 0 && (
               <div className="space-y-2">
                 {caixa.alerts.slice(0, 5).map((a) => (
