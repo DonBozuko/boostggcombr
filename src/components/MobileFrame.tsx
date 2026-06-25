@@ -85,8 +85,12 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden lg:flex flex-1 relative overflow-hidden"
-      style={{ background: data.gradient }}
+      className="hidden lg:block fixed top-1/2 -translate-y-1/2 z-0 h-[92vh] w-[calc((100vw-450px)/2)] max-w-[560px] overflow-hidden pointer-events-none"
+      style={{
+        background: data.gradient,
+        left: side === "left" ? 0 : "auto",
+        right: side === "right" ? 0 : "auto",
+      }}
     >
       <div
         className="absolute inset-0 backdrop-blur-md"
@@ -97,7 +101,7 @@ function Billboard({
       />
       {/* CTA harmonizado no topo, acima da cabeça do personagem */}
       <div
-        className={`absolute top-10 z-30 max-w-[280px] px-6 text-center ${
+        className={`absolute top-10 z-[1] max-w-[280px] px-6 text-center ${
           side === "left" ? "right-4" : "left-4"
         }`}
       >
@@ -125,7 +129,7 @@ function Billboard({
           src={character}
           alt=""
           loading="lazy"
-          className={`absolute bottom-0 h-[75vh] max-h-[800px] object-contain pointer-events-none z-20 ${
+          className={`absolute bottom-0 h-[75vh] max-h-[800px] object-contain pointer-events-none z-[1] ${
             side === "left" ? "right-0 translate-x-[8%]" : "left-0 -translate-x-[8%]"
           }`}
           style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}55)` }}
@@ -134,6 +138,7 @@ function Billboard({
     </aside>
   );
 }
+
 
 
 export function MobileFrame({
