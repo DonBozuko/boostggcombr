@@ -14,8 +14,8 @@ const TT_VIEWS_SERVICE_ID = 14907;
 const YT_SUBSCRIBERS_SERVICE_ID = 14343;
 const YT_VIEWS_SERVICE_ID = 997;
 // Facebook (SMMhype)
-const FB_FOLLOWERS_SERVICE_ID = 14220;
-const FB_LIKES_SERVICE_ID = 14222;
+const FB_FOLLOWERS_SERVICE_ID = 18870;
+const FB_LIKES_SERVICE_ID = 7593;
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
