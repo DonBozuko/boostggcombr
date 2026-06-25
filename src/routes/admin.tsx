@@ -932,102 +932,142 @@ function AdminPage() {
           </div>
         )}
 
-        {/* Auditoria de falhas (SMM + MP recusado + valor divergente) */}
+        {/* Auditoria — separa Crítico (servidor/fornecedor) de Warning (cliente/pix) */}
         {(() => {
-          const lista = falhos.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
-          if (lista.length === 0) return null;
-          return (
-          <div className="rounded-2xl border border-red-600/60 bg-red-950/30 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-red-200 flex items-center gap-2">
-                🚨 {lista.length} pedido(s) com falha — requer ação
-              </h2>
-              <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
-            </div>
-            <div className="divide-y divide-red-900/60">
-              {lista.map((p) => {
+          const base = falhos
+            .filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba)
+            .slice()
+            .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
+          if (base.length === 0) return null;
 
-                const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
-                const isSmm = p.status === "SMM_FAILED";
-                return (
-                  <div key={p.id} className="py-3 flex items-start justify-between gap-3 text-sm">
-                    <div className="space-y-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
-                          {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-500/20 text-red-200 border border-red-500/50">
-                          {p.status}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-background/40 text-muted-foreground">
-                          {isCurtidas ? "Curtidas" : "Seguidores"}
-                        </span>
-                        {(() => {
-                          const sid = resolveServiceIdClient(p.pacote, p.quantidade);
-                          return sid ? (
-                            <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
-                              SVC #{sid}
-                            </span>
-                          ) : null;
-                        })()}
-                        <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
+          const CRITICAL = new Set(["SMM_FAILED", "amount_mismatch", "mp_rejected"]);
+          const criticos = base.filter((p) => CRITICAL.has(p.status));
+          const warnings = base.filter((p) => !CRITICAL.has(p.status));
 
-                      </div>
+          const STATUS_LABEL: Record<string, string> = {
+            SMM_FAILED: "Falha de Entrega",
+            amount_mismatch: "Valor Divergente",
+            mp_rejected: "Pagamento Recusado",
+            mp_pending: "Carrinho Abandonado • Pix Pendente",
+            mp_cancelled: "Pix Expirado",
+            mp_expired: "Pix Expirado",
+            mp_in_process: "Pix em Processamento",
+          };
 
-                      {p.error_detail && (() => {
-                        const raw = p.error_detail!;
-                        const low = raw.toLowerCase();
-                        let origem = "Fornecedor (SMMhype)";
-                        let prefix = "Falha";
-                        let tone = "text-red-300/90 border-red-500/40 bg-red-950/40";
-                        if (/(invalid|private|not.?found|link|url|username|user not|perfil)/.test(low)) {
-                          origem = "Cliente (Link Inválido)"; prefix = "Ação Requerida";
-                          tone = "text-amber-200 border-amber-500/40 bg-amber-950/30";
-                        } else if (/(timeout|econn|database|supabase|postgres|fetch failed|network)/.test(low)) {
-                          origem = "Seu Sistema"; prefix = "Erro Técnico";
-                          tone = "text-orange-200 border-orange-500/40 bg-orange-950/30";
-                        } else if (/(smmhype|provider|api|service|saldo|balance|429|503|502)/.test(low)) {
-                          origem = "Fornecedor (SMMhype)"; prefix = "Falha";
-                        }
-                        return (
-                          <div className={`text-xs font-mono break-all rounded-md border px-2 py-1 ${tone}`}>
-                            <span className="font-bold not-italic mr-1">{prefix}: {raw}</span>
-                            <span className="opacity-80">• {origem}</span>
-                          </div>
-                        );
-                      })()}
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
-                      </div>
-                    </div>
-                    {isSmm && (() => {
-                      const redeKey = p.rede_social ?? "instagram";
-                      const countRede = falhos.filter((x) => (x.rede_social ?? "instagram") === redeKey && x.status === "SMM_FAILED").length;
-                      const badgeTone: Record<string, string> = {
-                        instagram: "bg-amber-500/15 text-amber-200 border-amber-500/50",
-                        tiktok:    "bg-cyan-500/15 text-cyan-200 border-cyan-500/50",
-                        youtube:   "bg-red-500/15 text-red-200 border-red-500/50",
-                        facebook:  "bg-blue-500/15 text-blue-200 border-blue-500/50",
-                      };
-                      return (
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span
-                            title={`Total de falhas em ${redeKey}`}
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeTone[redeKey] ?? "bg-muted text-muted-foreground border-border"}`}
-                          >
-                            {REDE_ICON[redeKey] ?? "📸"} {countRede}
-                          </span>
-                          <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
-                            {busyId === p.id ? "..." : "Tentar de novo"}
-                          </Button>
-                        </div>
-                      );
+          const renderRow = (p: Pedido, severity: "critical" | "warning") => {
+            const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
+            const isSmm = p.status === "SMM_FAILED";
+            const badgeStatus =
+              severity === "critical"
+                ? "bg-red-500/20 text-red-200 border-red-500/50"
+                : "bg-amber-500/15 text-amber-200 border-amber-500/50";
+            const label = STATUS_LABEL[p.status] ?? p.status;
+            return (
+              <div key={p.id} className="py-3 flex items-start justify-between gap-3 text-sm">
+                <div className="space-y-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
+                      {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeStatus}`}>
+                      {label}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-background/40 text-muted-foreground">
+                      {isCurtidas ? "Curtidas" : "Seguidores"}
+                    </span>
+                    {(() => {
+                      const sid = resolveServiceIdClient(p.pacote, p.quantidade);
+                      return sid ? (
+                        <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
+                          SVC #{sid}
+                        </span>
+                      ) : null;
                     })()}
+                    <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
                   </div>
-                );
-              })}
+
+                  {p.error_detail && (() => {
+                    const raw = p.error_detail!;
+                    const low = raw.toLowerCase();
+                    let origem = "Fornecedor (SMMhype)";
+                    let prefix = "Falha";
+                    let tone = "text-red-300/90 border-red-500/40 bg-red-950/40";
+                    if (/(invalid|private|not.?found|link|url|username|user not|perfil)/.test(low)) {
+                      origem = "Cliente (Link Inválido)"; prefix = "Ação Requerida";
+                      tone = "text-amber-200 border-amber-500/40 bg-amber-950/30";
+                    } else if (/(timeout|econn|database|supabase|postgres|fetch failed|network)/.test(low)) {
+                      origem = "Seu Sistema"; prefix = "Erro Técnico";
+                      tone = "text-orange-200 border-orange-500/40 bg-orange-950/30";
+                    } else if (/(smmhype|provider|api|service|saldo|balance|429|503|502)/.test(low)) {
+                      origem = "Fornecedor (SMMhype)"; prefix = "Falha";
+                    }
+                    return (
+                      <div className={`text-xs font-mono break-all rounded-md border px-2 py-1 ${tone}`}>
+                        <span className="font-bold not-italic mr-1">{prefix}: {raw}</span>
+                        <span className="opacity-80">• {origem}</span>
+                      </div>
+                    );
+                  })()}
+                  <div className="text-xs text-muted-foreground">
+                    {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
+                  </div>
+                </div>
+                {isSmm && (() => {
+                  const redeKey = p.rede_social ?? "instagram";
+                  const countRede = falhos.filter((x) => (x.rede_social ?? "instagram") === redeKey && x.status === "SMM_FAILED").length;
+                  const badgeTone: Record<string, string> = {
+                    instagram: "bg-amber-500/15 text-amber-200 border-amber-500/50",
+                    tiktok:    "bg-cyan-500/15 text-cyan-200 border-cyan-500/50",
+                    youtube:   "bg-red-500/15 text-red-200 border-red-500/50",
+                    facebook:  "bg-blue-500/15 text-blue-200 border-blue-500/50",
+                  };
+                  return (
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        title={`Total de falhas em ${redeKey}`}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeTone[redeKey] ?? "bg-muted text-muted-foreground border-border"}`}
+                      >
+                        {REDE_ICON[redeKey] ?? "📸"} {countRede}
+                      </span>
+                      <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
+                        {busyId === p.id ? "..." : "Tentar de novo"}
+                      </Button>
+                    </div>
+                  );
+                })()}
+              </div>
+            );
+          };
+
+          return (
+            <div className="space-y-4">
+              {criticos.length > 0 && (
+                <div className="rounded-2xl border border-red-600/60 bg-red-950/30 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-bold text-red-200 flex items-center gap-2">
+                      🚨 Crítico · {criticos.length} falha(s) de servidor/fornecedor
+                    </h2>
+                    <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
+                  </div>
+                  <div className="divide-y divide-red-900/60">
+                    {criticos.map((p) => renderRow(p, "critical"))}
+                  </div>
+                </div>
+              )}
+              {warnings.length > 0 && (
+                <div className="rounded-2xl border border-amber-600/50 bg-amber-950/20 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h2 className="font-bold text-amber-200 flex items-center gap-2">
+                      ⚠️ Atenção · {warnings.length} pedido(s) com pagamento pendente/expirado
+                    </h2>
+                    <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
+                  </div>
+                  <div className="divide-y divide-amber-900/40">
+                    {warnings.map((p) => renderRow(p, "warning"))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
           );
         })()}
 
