@@ -29,8 +29,16 @@ import {
 import { toast } from "sonner";
 import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
 
+import { redirect } from "@tanstack/react-router";
+
 export const Route = createFileRoute("/admin")({
+  ssr: false,
   head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && window.localStorage.getItem("boostygram_admin_session") !== "1") {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: AdminPage,
 });
 
@@ -494,13 +502,15 @@ Ref: ${p.id.slice(0, 8)}`;
     return () => alert.stopLoop();
   }, [isAlerta, soundOn]);
 
-  const toggleSound = () => {
+  const toggleSound = async () => {
     if (!soundOn) {
+      // Destrava AudioContext DENTRO do gesto do usuário
+      await jarvis.unlock();
       alert.enable();
       setSoundOn(true);
       toast.success("Alerta sonoro ativado");
-      // Jarvis: boot do painel
-      setTimeout(() => jarvis.play("welcome"), 50);
+      // Jarvis: boot do painel (já destravado)
+      jarvis.play("welcome");
     } else {
       setSoundOn(false);
       toast("Alerta sonoro desativado");

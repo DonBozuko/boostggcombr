@@ -16,6 +16,7 @@ import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -59,6 +60,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FacebookRoute = FacebookRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
+  '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
+  '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
+  '/login': typeof LoginRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/diagnostico'
     | '/facebook'
+    | '/login'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/diagnostico'
     | '/facebook'
+    | '/login'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/diagnostico'
     | '/facebook'
+    | '/login'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -226,6 +238,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   FacebookRoute: typeof FacebookRoute
+  LoginRoute: typeof LoginRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -289,6 +302,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/facebook': {
@@ -362,6 +382,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   FacebookRoute: FacebookRoute,
+  LoginRoute: LoginRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
