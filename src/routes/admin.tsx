@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi, getGrowthCentral, smartApproveIds } from "@/lib/admin.functions";
@@ -45,27 +45,38 @@ export const Route = createFileRoute("/admin")({
 function AdminGate() {
   const [mounted, setMounted] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const [adminToken, setAdminToken] = useState("");
   const fetchAdminToken = useServerFn(getAdminTokenForSession);
 
-  const hydrate = useCallback(async () => {
+  const hydrate = useCallback(async (): Promise<boolean> => {
     const { data } = await supabase.auth.getSession();
     const email = data.session?.user?.email?.toLowerCase() ?? null;
     if (!data.session || email !== ADMIN_EMAIL) {
       window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+      setAdminToken("");
       setAuthed(false);
-      return;
+      return false;
     }
+    // Sessão Supabase ativa é a credencial mestre do shell; o token legado é só ponte para funções internas.
+    setAuthed(true);
     try {
       const res = await fetchAdminToken({ data: {} as never });
       if (res.ok) {
         window.localStorage.setItem(ADMIN_TOKEN_KEY, res.token);
+        setAdminToken(res.token);
         setAuthed(true);
+        return true;
       } else {
         await supabase.auth.signOut();
+        window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+        setAdminToken("");
         setAuthed(false);
+        return false;
       }
     } catch {
-      setAuthed(false);
+      const cached = window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "";
+      setAdminToken(cached);
+      return true;
     }
   }, [fetchAdminToken]);
 
@@ -75,6 +86,7 @@ function AdminGate() {
     const { data: sub } = supabase.auth.onAuthStateChange((evt) => {
       if (evt === "SIGNED_OUT") {
         window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+        setAdminToken("");
         setAuthed(false);
       }
       if (evt === "SIGNED_IN" || evt === "TOKEN_REFRESHED") void hydrate();
@@ -83,11 +95,12 @@ function AdminGate() {
   }, [hydrate]);
 
   if (!mounted) return null;
-  if (!authed) return <AdminLogin onSuccess={() => void hydrate()} />;
-  return <AdminPage />;
+  if (!authed) return <AdminLogin onSuccess={hydrate} />;
+  return <AdminPage initialToken={adminToken} />;
 }
 
-function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
+function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
+  const navigate = useNavigate({ from: "/admin" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -100,7 +113,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     if (!email.trim() || !password || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=14");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=15");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -127,8 +140,20 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
         toast.error("Credenciais inválidas");
         return;
       }
+      const { data: sessionData } = await supabase.auth.getSession();
+      const sessionEmail = sessionData.session?.user?.email?.toLowerCase() ?? "";
+      if (!sessionData.session || sessionEmail !== ADMIN_EMAIL) {
+        await supabase.auth.signOut();
+        toast.error("Sessão administrativa não reconhecida");
+        return;
+      }
+      const ok = await onSuccess();
+      if (!ok) {
+        toast.error("Falha ao abrir sessão administrativa");
+        return;
+      }
       toast.success("Acesso autorizado · Jarvis online");
-      onSuccess();
+      await navigate({ to: "/admin", replace: true });
     } catch {
       toast.error("Falha ao validar");
     } finally {
@@ -367,7 +392,7 @@ function useAlertBeep() {
   return { enable, beep, startLoop, stopLoop, isEnabled: () => enabledRef.current };
 }
 
-function AdminPage() {
+function AdminPage({ initialToken }: { initialToken: string }) {
   const listar = useServerFn(listarPedidosPagos);
   const listarFalhos = useServerFn(listarPedidosFalhos);
   const listarPendentes = useServerFn(listarPedidosPendentes);
@@ -495,8 +520,11 @@ Ref: ${p.id.slice(0, 8)}`;
 
   const [token, setToken] = useState<string>(() => {
     if (typeof window === "undefined") return "";
-    return window.localStorage.getItem("eliteboost_prime_admin_token") ?? "";
+    return initialToken || (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "");
   });
+  useEffect(() => {
+    if (initialToken) setToken(initialToken);
+  }, [initialToken]);
   const [loaded, setLoaded] = useState(false);
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
