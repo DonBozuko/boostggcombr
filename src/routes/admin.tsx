@@ -1608,7 +1608,10 @@ Ref: ${p.id.slice(0, 8)}`;
           })}
         </div>
 
-        <WebhookHealthMonitor />
+        <WebhookHealthMonitor onFail={(label, code) => jarvis.play("fail", `${label} HTTP ${code}`)} />
+
+        <JarvisHistoryPanel />
+
 
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
           BoostyGram Admin · v1.0.0-LAUNCH
