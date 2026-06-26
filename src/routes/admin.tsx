@@ -37,6 +37,52 @@ import { supabase } from "@/integrations/supabase/client";
 const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 
+function AdminSettingsButton() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" aria-label="Configurações" className="px-2">
+          <Settings size={16} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>⚙️ Configurações Gerais</DialogTitle>
+          <DialogDescription>
+            Preferências do painel EliteBoost Prime · sessão atual.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">Administrador</span>
+            <span className="font-mono">{ADMIN_EMAIL}</span>
+          </div>
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">Cache áudio Jarvis</span>
+            <span className="font-mono">v=22</span>
+          </div>
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">RLS jarvis_alerts</span>
+            <span className="text-emerald-400 font-bold">Ativo</span>
+          </div>
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">Failover A→B→C</span>
+            <span className="text-emerald-400 font-bold">Ativo</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">BrandGuard</span>
+            <span className="text-emerald-400 font-bold">Ativo</span>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Admin · EliteBoost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
