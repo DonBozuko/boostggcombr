@@ -257,6 +257,8 @@ export const sincronizarIdsApi = createServerFn({ method: "POST" })
         });
       }
     }
+    // Reset stale candidates: limpa cache antes de gravar os novos vencedores do atacado
+    await supabaseAdmin.from("services_cache").delete().gte("provider_service_id", 0);
     if (rows.length > 0) {
       await supabaseAdmin
         .from("services_cache")
