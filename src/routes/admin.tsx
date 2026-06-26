@@ -113,7 +113,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
     if (!email.trim() || !password || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=15");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=18");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;

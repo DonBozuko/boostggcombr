@@ -2,18 +2,18 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { logJarvisAlert } from "@/lib/jarvis.functions";
 
 /**
- * Jarvis Sound System — native <audio> + cache v=15.
+ * Jarvis Sound System — native <audio> + cache v=18.
  * MIME audio/mpeg lido direto pelo browser, sem decode manual = fim do bipe.
  * Destravado obrigatoriamente por gesto do usuário (botão Som LIGADO).
  */
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/api/public/sfx/welcome.mp3?v=15",
-  optimized: "/api/public/sfx/optimized.mp3?v=15",
-  warning:   "/api/public/sfx/warning.mp3?v=15",
-  critical:  "/api/public/sfx/critical.mp3?v=15",
-  fail:      "/api/public/sfx/fail.mp3?v=15",
+  welcome:   "/api/public/sfx/welcome.mp3?v=18",
+  optimized: "/api/public/sfx/optimized.mp3?v=18",
+  warning:   "/api/public/sfx/warning.mp3?v=18",
+  critical:  "/api/public/sfx/critical.mp3?v=18",
+  fail:      "/api/public/sfx/fail.mp3?v=18",
 };
 
 
