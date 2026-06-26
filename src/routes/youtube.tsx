@@ -1,5 +1,6 @@
 import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
+import { JarvisBadge } from "@/components/JarvisBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
@@ -214,6 +215,7 @@ function YoutubeLanding() {
     // v2: solid bg, no glitch
     <MobileFrame bg="#0a0a0a" route="/youtube">
       <FabianoBadge variant="youtube" />
+      <JarvisBadge variant="youtube" />
       {/* HERO */}
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${

@@ -1,5 +1,6 @@
 import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
+import { JarvisBadge } from "@/components/JarvisBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
@@ -151,6 +152,7 @@ function TrafegoLanding() {
   return (
     <MobileFrame bg={BG} route="/trafego">
       <FabianoBadge variant="trafego" />
+      <JarvisBadge variant="trafego" />
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
           scrolled ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
