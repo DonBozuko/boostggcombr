@@ -105,13 +105,14 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [localSubtitle, setLocalSubtitle] = useState<string | null>(null);
   const liveSubtitle = useJarvisSubtitle();
   const subtitle = liveSubtitle ?? localSubtitle;
 
   const playWelcome = () => {
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=20");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=21");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
