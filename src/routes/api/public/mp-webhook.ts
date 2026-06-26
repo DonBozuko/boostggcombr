@@ -123,12 +123,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // 3) Apenas o fornecedor marcado como ATIVO recebe o pedido.
-          //    Os demais ficam latentes (1 clique no /admin para promover).
+          // 3) Smart Routing Matrix: cadeia de failover A→B→C.
+          //    Inclui apenas fornecedores ATIVO=true e saldo_atual > 0 (ordenado por prioridade).
           const { data: fornecedores } = await supabaseAdmin
             .from("fornecedores")
-            .select("slug, nome, ativo")
+            .select("slug, nome, ativo, saldo_atual")
             .eq("ativo", true)
+            .gt("saldo_atual", 0)
             .order("prioridade", { ascending: true });
 
           const cadeia = fornecedores ?? [];
