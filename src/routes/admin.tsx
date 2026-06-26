@@ -69,7 +69,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     if (!token.trim() || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=12");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=13");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -451,7 +451,12 @@ Ref: ${p.id.slice(0, 8)}`;
   };
 
 
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem("eliteboost_prime_admin_token") ?? "";
+  });
+  const [loaded, setLoaded] = useState(false);
+  void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -620,7 +625,7 @@ Ref: ${p.id.slice(0, 8)}`;
   };
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !loaded) return;
     loadMonitor();
     loadCron();
     loadCache();
@@ -630,9 +635,11 @@ Ref: ${p.id.slice(0, 8)}`;
     loadFaturamento();
     loadFornecedores();
     loadGrowth();
+    load();
     const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); loadGrowth(); load(); }, 60000);
     return () => clearInterval(i);
-  }, [token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, loaded]);
 
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
@@ -797,18 +804,23 @@ Ref: ${p.id.slice(0, 8)}`;
           </Button>
         </div>
 
-        <div className="flex gap-2">
-          <Input
-            type="password"
-            placeholder="ADMIN_TOKEN"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            className="flex-1"
-          />
-          <Button onClick={load} disabled={loading}>
-            {loading ? "Carregando..." : "Listar pagos"}
-          </Button>
-        </div>
+        {!loaded ? (
+          <div className="flex justify-center py-6">
+            <Button
+              onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
+              disabled={loading}
+              className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
+            >
+              ⚡ CARREGAR PEDIDOS E SERVIÇOS
+            </Button>
+          </div>
+        ) : (
+          <div className="flex justify-end">
+            <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+              {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
+            </Button>
+          </div>
+        )}
 
         {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">

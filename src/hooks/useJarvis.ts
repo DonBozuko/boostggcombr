@@ -9,11 +9,11 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/api/public/sfx/welcome.mp3?v=12",
-  optimized: "/api/public/sfx/optimized.mp3?v=12",
-  warning:   "/api/public/sfx/warning.mp3?v=12",
-  critical:  "/api/public/sfx/critical.mp3?v=12",
-  fail:      "/api/public/sfx/fail.mp3?v=12",
+  welcome:   "/api/public/sfx/welcome.mp3?v=13",
+  optimized: "/api/public/sfx/optimized.mp3?v=13",
+  warning:   "/api/public/sfx/warning.mp3?v=13",
+  critical:  "/api/public/sfx/critical.mp3?v=13",
+  fail:      "/api/public/sfx/fail.mp3?v=13",
 };
 
 export const SUBTITLES: Record<JarvisEvent, string> = {

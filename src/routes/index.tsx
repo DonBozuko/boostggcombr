@@ -81,7 +81,7 @@ export const Route = createFileRoute("/")({
     const description =
       "Comprar seguidores no Instagram com entrega imediata e 100% seguro. Pacotes de seguidores brasileiros, curtidas e engajamento real via Pix. Teste por R$ 5!";
     const url = "https://eliteboostprime.lovable.app/";
-    const ogImage = "https://eliteboostprime.lovable.app/__l5e/assets-v1/676afb5f-ed9d-49df-9171-6c3166ce217a/og-boostygram.jpg?v=10";
+    const ogImage = "https://eliteboostprime.lovable.app/__l5e/assets-v1/676afb5f-ed9d-49df-9171-6c3166ce217a/og-boostygram.jpg?v=13";
     return {
       meta: [
         { title },
