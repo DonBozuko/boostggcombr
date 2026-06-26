@@ -32,7 +32,7 @@ export const Route = createFileRoute("/facebook")({
     const keywords =
       "comprar seguidores facebook, comprar curtidas facebook, seguidores facebook barato, curtidas post facebook, crescer pagina facebook, agência smm facebook brasil";
     const url = "https://eliteboostprime.lovable.app/facebook";
-    const ogImage = `https://eliteboostprime.lovable.app${ogFacebook}?v=10`;
+    const ogImage = `https://eliteboostprime.lovable.app${ogFacebook}?v=13`;
     return {
       meta: [
         { title },
