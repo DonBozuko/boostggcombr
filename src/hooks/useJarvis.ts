@@ -9,12 +9,13 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=8",
-  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=8",
-  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=8",
-  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=8",
-  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=8",
+  welcome:   "/api/public/sfx/welcome.mp3?v=9",
+  optimized: "/api/public/sfx/optimized.mp3?v=9",
+  warning:   "/api/public/sfx/warning.mp3?v=9",
+  critical:  "/api/public/sfx/critical.mp3?v=9",
+  fail:      "/api/public/sfx/fail.mp3?v=9",
 };
+
 
 const LABELS: Record<JarvisEvent, string> = {
   welcome: "Boot do painel",
