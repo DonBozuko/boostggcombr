@@ -7,6 +7,7 @@ import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
