@@ -195,3 +195,47 @@
 .jarvis-hud .text-yellow-300 {
   color: #7df9ff !important;
 }
+
+/* ============================================================
+   VISUAL POLISH AGENT v1 — Heuristic Self-Healing UI Layer
+   Aplica alinhamento, suavização e harmonização global sem
+   alterar lógica, RLS, BrandGuard, Jarvis ou auth.
+   ============================================================ */
+
+/* 1. Suavização universal de bordas + sombras (premium feel) */
+:where(button, .card, [class*="rounded-lg"], [class*="rounded-xl"], [class*="rounded-2xl"]) {
+  border-radius: 0.85rem;
+  transition: box-shadow .25s ease, transform .25s ease, border-color .25s ease;
+}
+
+/* 2. Harmonização de gradientes neon (Ciano + Vermelho Jarvis) */
+:where(.jarvis-hud) {
+  background-image:
+    radial-gradient(1200px 600px at 50% -10%, rgba(255,0,40,0.10), transparent 60%),
+    radial-gradient(900px 500px at 50% 110%, rgba(0,242,254,0.08), transparent 60%);
+}
+
+/* 3. Enquadramento simétrico do MobileFrame (450px) */
+@media (max-width: 480px) {
+  main, section, header, footer {
+    padding-left: max(env(safe-area-inset-left), 12px);
+    padding-right: max(env(safe-area-inset-right), 12px);
+  }
+}
+
+/* 4. Centralização milimétrica de containers do /admin (1200px) */
+.jarvis-hud > * { margin-left: auto; margin-right: auto; }
+
+/* 5. Anti-quebra de texto desalinhado */
+h1, h2, h3 { text-wrap: balance; }
+p, li, span { text-wrap: pretty; }
+
+/* 6. Footer de versão (v1.0.0-LAUNCH) — preservado e refinado */
+footer[aria-label="Versão de lançamento"] span {
+  letter-spacing: 0.45em;
+  transition: color .3s ease, border-color .3s ease;
+}
+footer[aria-label="Versão de lançamento"]:hover span {
+  color: rgba(255,255,255,0.75);
+  border-color: rgba(255,255,255,0.25);
+}
