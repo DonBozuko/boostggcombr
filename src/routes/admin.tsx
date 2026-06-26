@@ -29,8 +29,16 @@ import {
 import { toast } from "sonner";
 import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
 
+import { redirect } from "@tanstack/react-router";
+
 export const Route = createFileRoute("/admin")({
+  ssr: false,
   head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && window.localStorage.getItem("boostygram_admin_session") !== "1") {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: AdminPage,
 });
 
