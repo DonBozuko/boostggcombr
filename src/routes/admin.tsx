@@ -688,7 +688,7 @@ Ref: ${p.id.slice(0, 8)}`;
     <div className="dark min-h-screen bg-background text-foreground p-4">
       <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h1 className="text-2xl font-bold">Admin · BoostGram</h1>
+          <h1 className="text-2xl font-bold">Admin · EliteBoost Prime</h1>
           <Button
             variant={soundOn ? "default" : "outline"}
             size="sm"
