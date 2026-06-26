@@ -164,28 +164,32 @@ export function MobileFrame({
   const chars = characters[route];
   return (
     <div
-      className="min-h-screen flex justify-center"
+      className="h-screen h-dvh overflow-hidden flex justify-center"
       style={{ background: "#050505" }}
     >
       <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
-        className="w-full sm:max-w-full md:max-w-[450px] min-h-screen text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative pb-20 overflow-x-hidden z-10"
+        className="w-full sm:max-w-full md:max-w-[450px] h-screen h-dvh text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col"
         style={{ background: bg }}
       >
-        {children}
-        <ReviewsCarousel accent={data.accent} />
-        <LivePurchasesTicker accent={data.accent} />
-        <footer
-          className="mt-8 mb-4 px-4 text-center select-none"
-          aria-label="Versão de lançamento"
-        >
-          <span
-            className="inline-block text-[10px] tracking-[0.45em] font-mono uppercase text-white/40 border border-white/10 rounded-full px-3 py-1"
-            style={{ textShadow: "0 0 6px rgba(255,255,255,0.15)" }}
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {children}
+        </div>
+        <div className="shrink-0">
+          <ReviewsCarousel accent={data.accent} />
+          <LivePurchasesTicker accent={data.accent} />
+          <footer
+            className="mt-2 mb-2 px-4 text-center select-none"
+            aria-label="Versão de lançamento"
           >
-            Versão v1.0.0-LAUNCH
-          </span>
-        </footer>
+            <span
+              className="inline-block text-[9px] tracking-[0.4em] font-mono uppercase text-white/40 border border-white/10 rounded-full px-3 py-0.5"
+              style={{ textShadow: "0 0 6px rgba(255,255,255,0.15)" }}
+            >
+              Versão v1.0.0-LAUNCH
+            </span>
+          </footer>
+        </div>
       </div>
       <Billboard side="right" data={data} character={chars?.right} cta={chars?.rightCta} />
     </div>
