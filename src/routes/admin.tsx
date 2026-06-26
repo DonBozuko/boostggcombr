@@ -66,12 +66,14 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     if (!token.trim() || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/assets/sounds/jarvis-fx/welcome.mp3?v=8");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=9");
       a.crossOrigin = "anonymous";
-      a.volume = 0.9;
+      a.preload = "auto";
+      a.volume = 1.0;
       void a.play().catch(() => {});
     } catch {}
     void unlockJarvis();
+
     setLoading(true);
     try {
       const res = await verify({ data: { token: token.trim() } });
