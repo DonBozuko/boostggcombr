@@ -64,20 +64,20 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token.trim() || loading) return;
+    // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
+    try {
+      const a = new Audio("/assets/sounds/jarvis-fx/welcome.mp3?v=8");
+      a.crossOrigin = "anonymous";
+      a.volume = 0.9;
+      void a.play().catch(() => {});
+    } catch {}
+    void unlockJarvis();
     setLoading(true);
-    // Destrava áudio DENTRO do gesto do clique (síncrono ao submit).
-    const unlockPromise = unlockJarvis();
     try {
       const res = await verify({ data: { token: token.trim() } });
       if (res.ok) {
         window.localStorage.setItem(ADMIN_SESSION_KEY, "1");
         window.localStorage.setItem("boostygram_admin_token", token.trim());
-        await unlockPromise;
-        try {
-          const a = new Audio("/assets/sounds/jarvis-fx/welcome.mp3?v=7");
-          a.volume = 0.9;
-          void a.play().catch(() => {});
-        } catch {}
         toast.success("Acesso autorizado · Jarvis online");
         onSuccess();
       } else {

@@ -9,11 +9,11 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=7",
-  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=7",
-  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=7",
-  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=7",
-  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=7",
+  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=8",
+  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=8",
+  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=8",
+  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=8",
+  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=8",
 };
 
 const LABELS: Record<JarvisEvent, string> = {
@@ -69,6 +69,7 @@ let unlocked = false;
 
 function makeAudio(evt: JarvisEvent): HTMLAudioElement {
   const a = new Audio(SRC[evt]);
+  a.crossOrigin = "anonymous";
   a.preload = "auto";
   a.volume = 0.9;
   return a;
