@@ -31,8 +31,8 @@ export const Route = createFileRoute("/facebook")({
       "Comprar seguidores no Facebook e curtidas reais com entrega via Pix automático. Pacotes para crescer perfil, página e posts rapidamente.";
     const keywords =
       "comprar seguidores facebook, comprar curtidas facebook, seguidores facebook barato, curtidas post facebook, crescer pagina facebook, agência smm facebook brasil";
-    const url = "https://boostygram.lovable.app/facebook";
-    const ogImage = `https://boostygram.lovable.app${ogFacebook}?v=2`;
+    const url = "https://eliteboostprime.lovable.app/facebook";
+    const ogImage = `https://eliteboostprime.lovable.app${ogFacebook}?v=10`;
     return {
       meta: [
         { title },

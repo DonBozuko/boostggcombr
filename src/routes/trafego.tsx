@@ -25,8 +25,8 @@ export const Route = createFileRoute("/trafego")({
   head: () => {
     const title = "Comprar Tráfego Web Real Brasil e Mundial | EliteBoost Prime";
     const description = "Compre tráfego web real para seu site ou landing page. Visitas geo-segmentadas Brasil ou Global, entrega automática via Pix.";
-    const url = "https://boostygram.lovable.app/trafego";
-    const ogImage = `https://boostygram.lovable.app${ogTrafego}?v=2`;
+    const url = "https://eliteboostprime.lovable.app/trafego";
+    const ogImage = `https://eliteboostprime.lovable.app${ogTrafego}?v=10`;
     return {
       meta: [
         { title }, { name: "description", content: description },
