@@ -27,12 +27,8 @@ export const logJarvisAlert = createServerFn({ method: "POST" })
 export const listJarvisAlerts = createServerFn({ method: "GET" })
   .inputValidator((input: { severidade?: string; origem?: string; limit?: number } | undefined) => input ?? {})
   .handler(async ({ data }): Promise<{ rows: JarvisAlertRow[] }> => {
-    const supabase = createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-      { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-    );
-    let q = supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = supabaseAdmin
       .from("jarvis_alerts")
       .select("id, severidade, origem, mensagem, detalhe, created_at")
       .order("created_at", { ascending: false })
