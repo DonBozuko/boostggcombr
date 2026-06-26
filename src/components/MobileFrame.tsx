@@ -171,6 +171,17 @@ export function MobileFrame({
         style={{ background: bg }}
       >
         {children}
+        <footer
+          className="mt-8 mb-4 px-4 text-center select-none"
+          aria-label="Versão de lançamento"
+        >
+          <span
+            className="inline-block text-[10px] tracking-[0.45em] font-mono uppercase text-white/40 border border-white/10 rounded-full px-3 py-1"
+            style={{ textShadow: "0 0 6px rgba(255,255,255,0.15)" }}
+          >
+            Versão v1.0.0-LAUNCH
+          </span>
+        </footer>
       </div>
       <Billboard side="right" data={data} character={chars?.right} cta={chars?.rightCta} />
     </div>
