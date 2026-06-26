@@ -1608,8 +1608,10 @@ Ref: ${p.id.slice(0, 8)}`;
           })}
         </div>
 
+        <WebhookHealthMonitor />
+
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
-          BoostyGram Admin · build v1.4.0-production
+          BoostyGram Admin · v1.0.0-LAUNCH
         </footer>
       </div>
     </div>
