@@ -1,9 +1,0 @@
-Faça upload dos 4 arquivos MP3 nesta pasta:
-
-- welcome.mp3    → inicialização do painel /admin
-- optimized.mp3  → botão master ⚡ Aprovar Todas as Divergências
-- warning.mp3    → carrinho abandonado detectado
-- critical.mp3   → saldo do fornecedor < R$ 50
-
-Formato: MP3, voz metálica estilo Jarvis, 1–3s, mono, 128 kbps.
-O sistema falha silenciosamente se algum arquivo estiver ausente.
