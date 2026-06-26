@@ -9,12 +9,35 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/api/public/sfx/welcome.mp3?v=11",
-  optimized: "/api/public/sfx/optimized.mp3?v=11",
-  warning:   "/api/public/sfx/warning.mp3?v=11",
-  critical:  "/api/public/sfx/critical.mp3?v=11",
-  fail:      "/api/public/sfx/fail.mp3?v=11",
+  welcome:   "/api/public/sfx/welcome.mp3?v=12",
+  optimized: "/api/public/sfx/optimized.mp3?v=12",
+  warning:   "/api/public/sfx/warning.mp3?v=12",
+  critical:  "/api/public/sfx/critical.mp3?v=12",
+  fail:      "/api/public/sfx/fail.mp3?v=12",
 };
+
+export const SUBTITLES: Record<JarvisEvent, string> = {
+  welcome: "Bem-vindo de volta, comandante. Painel EliteBoost Prime online.",
+  optimized: "Calibração concluída. Sistemas operando em performance máxima.",
+  warning: "Alerta: carrinho abandonado detectado no funil.",
+  critical: "Atenção crítica: saldo do fornecedor abaixo de cinquenta reais.",
+  fail: "Falha de API detectada. Iniciando diagnóstico imediato.",
+};
+
+let subtitle: string | null = null;
+const SUB_LISTENERS = new Set<(s: string | null) => void>();
+function setSubtitle(s: string | null) {
+  subtitle = s;
+  SUB_LISTENERS.forEach((l) => l(s));
+}
+export function useJarvisSubtitle(): string | null {
+  const [s, setS] = useState<string | null>(subtitle);
+  useEffect(() => {
+    SUB_LISTENERS.add(setS);
+    return () => { SUB_LISTENERS.delete(setS); };
+  }, []);
+  return s;
+}
 
 
 const LABELS: Record<JarvisEvent, string> = {
@@ -114,7 +137,13 @@ function playNative(evt: JarvisEvent) {
   try {
     a.pause();
     a.currentTime = 0;
-    void a.play().catch(() => {});
+    setSubtitle(SUBTITLES[evt]);
+    const clear = () => setSubtitle(null);
+    a.onended = clear;
+    a.onerror = clear;
+    void a.play().catch(() => setSubtitle(null));
+    // Fallback fade-out caso onended não dispare
+    window.setTimeout(() => { if (subtitle === SUBTITLES[evt]) setSubtitle(null); }, 8000);
   } catch {}
 }
 
