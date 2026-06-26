@@ -29,18 +29,104 @@ import {
 import { toast } from "sonner";
 import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
 
-import { redirect } from "@tanstack/react-router";
+import { verifyAdminToken } from "@/lib/admin-auth.functions";
+import { unlockJarvis } from "@/hooks/useJarvis";
+
+const ADMIN_SESSION_KEY = "boostygram_admin_session";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
-  beforeLoad: () => {
-    if (typeof window !== "undefined" && window.localStorage.getItem("boostygram_admin_session") !== "1") {
-      throw redirect({ to: "/login" });
-    }
-  },
-  component: AdminPage,
+  component: AdminGate,
 });
+
+function AdminGate() {
+  const [mounted, setMounted] = useState(false);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window !== "undefined" && window.localStorage.getItem(ADMIN_SESSION_KEY) === "1") {
+      setAuthed(true);
+    }
+  }, []);
+
+  if (!mounted) return null;
+  if (!authed) return <AdminLogin onSuccess={() => setAuthed(true)} />;
+  return <AdminPage />;
+}
+
+function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
+  const verify = useServerFn(verifyAdminToken);
+  const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token.trim() || loading) return;
+    setLoading(true);
+    // Destrava áudio DENTRO do gesto do clique (síncrono ao submit).
+    const unlockPromise = unlockJarvis();
+    try {
+      const res = await verify({ data: { token: token.trim() } });
+      if (res.ok) {
+        window.localStorage.setItem(ADMIN_SESSION_KEY, "1");
+        window.localStorage.setItem("boostygram_admin_token", token.trim());
+        await unlockPromise;
+        try {
+          const a = new Audio("/assets/sounds/jarvis-fx/welcome.mp3?v=7");
+          a.volume = 0.9;
+          void a.play().catch(() => {});
+        } catch {}
+        toast.success("Acesso autorizado · Jarvis online");
+        onSuccess();
+      } else {
+        toast.error("Token inválido");
+      }
+    } catch {
+      toast.error("Falha ao validar");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="dark min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-[450px] mx-auto">
+        <form
+          onSubmit={submit}
+          className="rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-zinc-950 to-black p-8 shadow-[0_0_60px_rgba(0,242,254,0.25)] space-y-6"
+        >
+          <div className="text-center space-y-2">
+            <div className="text-4xl">🔐</div>
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 to-fuchsia-400 bg-clip-text text-transparent">
+              Painel Boostygram
+            </h1>
+            <p className="text-xs text-zinc-400">Acesso restrito · Token obrigatório</p>
+          </div>
+          <Input
+            type="password"
+            placeholder="ADMIN_TOKEN"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            autoFocus
+            className="bg-black/60 border-cyan-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest"
+          />
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full h-12 font-bold bg-gradient-to-r from-cyan-500 to-fuchsia-500 hover:from-cyan-400 hover:to-fuchsia-400 text-black shadow-[0_0_30px_rgba(0,242,254,0.5)] hover:shadow-[0_0_45px_rgba(254,9,121,0.6)] transition-all"
+          >
+            {loading ? "Validando..." : "Entrar no Painel"}
+          </Button>
+          <p className="text-[10px] text-center text-zinc-600">
+            Read-Only · RLS Ativo · Jarvis em standby
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 type Pedido = {
   id: string;
