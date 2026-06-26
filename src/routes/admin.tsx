@@ -520,7 +520,7 @@ Ref: ${p.id.slice(0, 8)}`;
 
   const [token, setToken] = useState<string>(() => {
     if (typeof window === "undefined") return "";
-    return initialToken || window.localStorage.getItem("eliteboost_prime_admin_token") ?? "";
+    return initialToken || (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "");
   });
   useEffect(() => {
     if (initialToken) setToken(initialToken);
