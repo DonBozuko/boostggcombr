@@ -31,8 +31,8 @@ export const Route = createFileRoute("/youtube")({
       "Comprar inscritos no YouTube e visualizações reais com entrega via Pix automático. Pacotes para crescer e monetizar seu canal rápido.";
     const keywords =
       "comprar inscritos youtube, comprar views youtube, visualizações youtube barato, crescer canal youtube, monetizar canal youtube pix, agência smm youtube brasil";
-    const url = "https://boostygram.lovable.app/youtube";
-    const ogImage = `https://boostygram.lovable.app${ogYoutube}?v=3`;
+    const url = "https://eliteboostprime.lovable.app/youtube";
+    const ogImage = `https://eliteboostprime.lovable.app${ogYoutube}?v=10`;
     return {
       meta: [
         { title },

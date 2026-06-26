@@ -31,8 +31,8 @@ export const Route = createFileRoute("/tiktok")({
       "Comprar seguidores no TikTok e visualizações com entrega imediata via Pix automático. Pacotes reais com reposição garantida para bater os requisitos de monetização rápido.";
     const keywords =
       "comprar seguidores tiktok, comprar views tiktok, visualizações tiktok barato, comprar curtidas tiktok, monetizar tiktok rápido, seguidores tiktok pix, impulsionar tiktok, agência smm brasil tiktok, como ganhar seguidores no tiktok";
-    const url = "https://boostygram.lovable.app/tiktok";
-    const ogImage = `https://boostygram.lovable.app${ogTiktok}?v=3`;
+    const url = "https://eliteboostprime.lovable.app/tiktok";
+    const ogImage = `https://eliteboostprime.lovable.app${ogTiktok}?v=10`;
     return {
       meta: [
         { title },

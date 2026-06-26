@@ -80,8 +80,8 @@ export const Route = createFileRoute("/")({
     const title = "Comprar Seguidores no Instagram Orgânicos e Reais | EliteBoost Prime";
     const description =
       "Comprar seguidores no Instagram com entrega imediata e 100% seguro. Pacotes de seguidores brasileiros, curtidas e engajamento real via Pix. Teste por R$ 5!";
-    const url = "https://boostygram.lovable.app/";
-    const ogImage = "https://boostygram.lovable.app/__l5e/assets-v1/676afb5f-ed9d-49df-9171-6c3166ce217a/og-boostygram.jpg";
+    const url = "https://eliteboostprime.lovable.app/";
+    const ogImage = "https://eliteboostprime.lovable.app/__l5e/assets-v1/676afb5f-ed9d-49df-9171-6c3166ce217a/og-boostygram.jpg?v=10";
     return {
       meta: [
         { title },
@@ -117,9 +117,9 @@ export const Route = createFileRoute("/")({
             "@graph": [
               {
                 "@type": "Organization",
-                "@id": "https://boostygram.lovable.app/#organization",
+                "@id": "https://eliteboostprime.lovable.app/#organization",
                 name: "EliteBoost Prime",
-                url: "https://boostygram.lovable.app/",
+                url: "https://eliteboostprime.lovable.app/",
                 logo: ogImage,
                 description,
                 sameAs: [],
@@ -128,16 +128,16 @@ export const Route = createFileRoute("/")({
               },
               {
                 "@type": "WebSite",
-                "@id": "https://boostygram.lovable.app/#website",
-                url: "https://boostygram.lovable.app/",
+                "@id": "https://eliteboostprime.lovable.app/#website",
+                url: "https://eliteboostprime.lovable.app/",
                 name: "EliteBoost Prime",
                 inLanguage: "pt-BR",
-                publisher: { "@id": "https://boostygram.lovable.app/#organization" },
+                publisher: { "@id": "https://eliteboostprime.lovable.app/#organization" },
               },
               {
                 "@type": "Service",
                 serviceType: "Marketing de Instagram e Engajamento Social",
-                provider: { "@id": "https://boostygram.lovable.app/#organization" },
+                provider: { "@id": "https://eliteboostprime.lovable.app/#organization" },
                 areaServed: { "@type": "Country", name: "Brasil" },
                 name: "Compra de Seguidores Reais no Instagram",
                 description,
@@ -181,7 +181,7 @@ export const Route = createFileRoute("/")({
               },
               {
                 "@type": "Product",
-                "@id": "https://boostygram.lovable.app/#product",
+                "@id": "https://eliteboostprime.lovable.app/#product",
                 name: "Seguidores Reais para Instagram - EliteBoost Prime",
                 description,
                 brand: { "@type": "Brand", name: "EliteBoost Prime" },
