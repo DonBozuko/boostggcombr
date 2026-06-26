@@ -339,7 +339,7 @@ function TiktokLanding() {
                         boxShadow: `0 0 22px ${PINK}88`,
                       }}
                 >
-                  <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
+                  <Zap className="size-4" /> {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : "Comprar agora"}
                 </button>
               </div>
             );
@@ -427,7 +427,7 @@ function TiktokLanding() {
                 boxShadow: `0 0 25px ${PINK}88, 0 0 25px ${CYAN}88`,
               }}
             >
-              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática
