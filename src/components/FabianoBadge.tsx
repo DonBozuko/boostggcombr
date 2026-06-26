@@ -39,7 +39,7 @@ function buildLinks(variant: FabianoVariant) {
 
 const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string; border: string; ring: string; dot: string }> = {
   instagram: {
-    text: "Aproveite o Canarinho Ouro! Quer bônus exclusivo? Clique aqui!",
+    text: "Quer destravar vendas e bombar seu perfil com o algoritmo hoje? Me chama no Telegram que te entrego um cupom secreto! ⚡",
     accent: "text-emerald-400",
     glow: "drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]",
     border: "border-emerald-400/80",
@@ -47,7 +47,7 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
     dot: "bg-emerald-400",
   },
   tiktok: {
-    text: "O algoritmo está entregando tudo! Clique para destravar combos secretos!",
+    text: "Quer destravar vendas e bombar seu perfil com o algoritmo hoje? Me chama no Telegram que te entrego um cupom secreto! ⚡",
     accent: "text-[#00f2fe]",
     glow: "drop-shadow-[0_0_6px_rgba(0,242,254,0.8)]",
     border: "border-[#00f2fe]/80",
@@ -55,7 +55,7 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
     dot: "bg-[#fe0979]",
   },
   youtube: {
-    text: "Quer monetizar mais rápido? Clique e libere o combo Inscritos + Views!",
+    text: "Quer destravar vendas e bombar seu perfil com o algoritmo hoje? Me chama no Telegram que te entrego um cupom secreto! ⚡",
     accent: "text-red-500",
     glow: "drop-shadow-[0_0_6px_rgba(239,68,68,0.8)]",
     border: "border-red-500/80",
@@ -63,7 +63,7 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
     dot: "bg-red-500",
   },
   facebook: {
-    text: "Bora dominar o feed? Clique aqui e fale comigo no privado!",
+    text: "Quer destravar vendas e bombar seu perfil com o algoritmo hoje? Me chama no Telegram que te entrego um cupom secreto! ⚡",
     accent: "text-[#1877F2]",
     glow: "drop-shadow-[0_0_6px_rgba(24,119,242,0.8)]",
     border: "border-[#1877F2]/80",
@@ -71,7 +71,7 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
     dot: "bg-[#1877F2]",
   },
   telegram: {
-    text: "Vem pro grupo VIP! Clique e receba os pacotes em primeira mão.",
+    text: "Quer destravar vendas e bombar seu perfil com o algoritmo hoje? Me chama no Telegram que te entrego um cupom secreto! ⚡",
     accent: "text-cyan-300",
     glow: "drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]",
     border: "border-cyan-300/80",
@@ -79,7 +79,7 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
     dot: "bg-cyan-300",
   },
   trafego: {
-    text: "Tráfego real esperando você. Clique e libere o combo cyberpunk!",
+    text: "Quer destravar vendas e bombar seu perfil com o algoritmo hoje? Me chama no Telegram que te entrego um cupom secreto! ⚡",
     accent: "text-purple-400",
     glow: "drop-shadow-[0_0_6px_rgba(168,85,247,0.8)]",
     border: "border-purple-400/80",
