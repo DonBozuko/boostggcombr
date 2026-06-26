@@ -451,7 +451,12 @@ Ref: ${p.id.slice(0, 8)}`;
   };
 
 
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem("eliteboost_prime_admin_token") ?? "";
+  });
+  const [loaded, setLoaded] = useState(false);
+  void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
