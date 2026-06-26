@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { LivePurchasesTicker } from "./LivePurchasesTicker";
+import { ReviewsCarousel } from "./ReviewsCarousel";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
 import ttLeft from "@/assets/char-tt-left.png";
