@@ -29,10 +29,12 @@ import {
 import { toast } from "sonner";
 import { useJarvis, useJarvisHistory, useJarvisSubtitle, SUBTITLES } from "@/hooks/useJarvis";
 
-import { verifyAdminToken } from "@/lib/admin-auth.functions";
+import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
+import { supabase } from "@/integrations/supabase/client";
 
-const ADMIN_SESSION_KEY = "eliteboost_prime_admin_session";
+const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
+const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -43,22 +45,51 @@ export const Route = createFileRoute("/admin")({
 function AdminGate() {
   const [mounted, setMounted] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const fetchAdminToken = useServerFn(getAdminTokenForSession);
+
+  const hydrate = useCallback(async () => {
+    const { data } = await supabase.auth.getSession();
+    const email = data.session?.user?.email?.toLowerCase() ?? null;
+    if (!data.session || email !== ADMIN_EMAIL) {
+      window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+      setAuthed(false);
+      return;
+    }
+    try {
+      const res = await fetchAdminToken({ data: {} as never });
+      if (res.ok) {
+        window.localStorage.setItem(ADMIN_TOKEN_KEY, res.token);
+        setAuthed(true);
+      } else {
+        await supabase.auth.signOut();
+        setAuthed(false);
+      }
+    } catch {
+      setAuthed(false);
+    }
+  }, [fetchAdminToken]);
 
   useEffect(() => {
     setMounted(true);
-    if (typeof window !== "undefined" && window.localStorage.getItem(ADMIN_SESSION_KEY) === "1") {
-      setAuthed(true);
-    }
-  }, []);
+    void hydrate();
+    const { data: sub } = supabase.auth.onAuthStateChange((evt) => {
+      if (evt === "SIGNED_OUT") {
+        window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+        setAuthed(false);
+      }
+      if (evt === "SIGNED_IN" || evt === "TOKEN_REFRESHED") void hydrate();
+    });
+    return () => { sub.subscription.unsubscribe(); };
+  }, [hydrate]);
 
   if (!mounted) return null;
-  if (!authed) return <AdminLogin onSuccess={() => setAuthed(true)} />;
+  if (!authed) return <AdminLogin onSuccess={() => void hydrate()} />;
   return <AdminPage />;
 }
 
 function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
-  const verify = useServerFn(verifyAdminToken);
-  const [token, setToken] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [localSubtitle, setLocalSubtitle] = useState<string | null>(null);
   const liveSubtitle = useJarvisSubtitle();
@@ -66,7 +97,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!token.trim() || loading) return;
+    if (!email.trim() || !password || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
       const a = new Audio("/api/public/sfx/welcome.mp3?v=14");
@@ -84,15 +115,20 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
 
     setLoading(true);
     try {
-      const res = await verify({ data: { token: token.trim() } });
-      if (res.ok) {
-        window.localStorage.setItem(ADMIN_SESSION_KEY, "1");
-        window.localStorage.setItem("eliteboost_prime_admin_token", token.trim());
-        toast.success("Acesso autorizado · Jarvis online");
-        onSuccess();
-      } else {
-        toast.error("Token inválido");
+      if (email.trim().toLowerCase() !== ADMIN_EMAIL) {
+        toast.error("Acesso restrito ao administrador-mestre");
+        return;
       }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) {
+        toast.error("Credenciais inválidas");
+        return;
+      }
+      toast.success("Acesso autorizado · Jarvis online");
+      onSuccess();
     } catch {
       toast.error("Falha ao validar");
     } finally {
@@ -121,13 +157,11 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
             "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,0,40,0.28), transparent 70%)",
         }}
       />
-      {/* Cyber face silhouettes — left & right (desktop only) */}
       <div aria-hidden className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 opacity-30">
         <svg width="280" height="380" viewBox="0 0 200 280" fill="none" stroke="#ff0028" strokeWidth="1">
           <path d="M100 20 C60 20 40 60 40 110 L40 180 C40 220 70 250 100 250 C130 250 160 220 160 180 L160 110 C160 60 140 20 100 20 Z" />
           <circle cx="75" cy="130" r="14" /><circle cx="125" cy="130" r="14" />
           <path d="M70 175 L130 175" /><path d="M40 110 L20 110" /><path d="M160 110 L180 110" />
-          <path d="M100 20 L100 0" /><path d="M55 250 L40 280" /><path d="M145 250 L160 280" />
         </svg>
       </div>
       <div aria-hidden className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 opacity-30 scale-x-[-1]">
@@ -138,7 +172,6 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
         </svg>
       </div>
 
-      {/* Subtitle bubble — colado ao lado do holograma */}
       {subtitle && (
         <div className="hidden lg:flex absolute left-[330px] top-1/2 -translate-y-1/2 max-w-[280px] z-20 animate-fade-in">
           <div className="relative rounded-2xl border border-red-500/60 bg-black/80 backdrop-blur-md px-4 py-3 text-sm text-red-100 shadow-[0_0_30px_rgba(255,0,40,0.5)]">
@@ -158,21 +191,30 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       <div className="w-full max-w-[450px] mx-auto relative z-10">
         <form
           onSubmit={submit}
-          className="rounded-2xl border border-red-500/40 bg-gradient-to-b from-zinc-950 to-black p-8 shadow-[0_0_60px_rgba(255,0,40,0.35)] space-y-6"
+          className="rounded-2xl border border-red-500/40 bg-gradient-to-b from-zinc-950 to-black p-8 shadow-[0_0_60px_rgba(255,0,40,0.35)] space-y-5"
         >
           <div className="text-center space-y-2">
             <div className="text-4xl">🔐</div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
               Painel EliteBoost Prime
             </h1>
-            <p className="text-xs text-zinc-400">Acesso restrito · Token obrigatório</p>
+            <p className="text-xs text-zinc-400">Supabase Auth · Administrador-Mestre</p>
           </div>
           <Input
-            type="password"
-            placeholder="ADMIN_TOKEN"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
+            type="email"
+            placeholder="E-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             autoFocus
+            autoComplete="email"
+            className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center"
+          />
+          <Input
+            type="password"
+            placeholder="Senha"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
             className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest"
           />
           <Button
