@@ -184,6 +184,26 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
                 })
                 .eq("id", pedido.id);
+              // === Notificação Telegram: sucesso / auto-reparo ===
+              try {
+                const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+                const lucro = custoReal != null ? (Number(pedido.valor) - custoReal) : null;
+                const isFailover = tentativas.length > 0;
+                const header = isFailover
+                  ? "🚨 AUTO-REPARO ATIVADO: Pedido migrado e resolvido com sucesso no Fornecedor de Backup"
+                  : "🟢 OK · Venda confirmada e despachada";
+                const msg = [
+                  header,
+                  `🧾 Pedido: ${pedido.id}`,
+                  `👤 ${pedido.instagram_user} · ${pedido.pacote} (${pedido.quantidade})`,
+                  `💰 Venda: R$ ${Number(pedido.valor).toFixed(2)}`,
+                  custoReal != null ? `📦 Custo real: R$ ${custoReal.toFixed(2)}` : null,
+                  lucro != null ? `💎 Lucro: R$ ${lucro.toFixed(2)}` : null,
+                  `🏷️ Fornecedor: ${f.nome} (order ${r.orderId ?? "?"})`,
+                  isFailover ? `↩️ Tentativas anteriores: ${tentativas.join(" | ").slice(0, 300)}` : null,
+                ].filter(Boolean).join("\n");
+                await dispatchWhatsappAlert(msg);
+              } catch (e) { console.error("[mp-webhook] tg success notify", e); }
               sucesso = true;
               break;
             }
