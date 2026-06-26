@@ -7,6 +7,7 @@ import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -104,13 +105,14 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [localSubtitle, setLocalSubtitle] = useState<string | null>(null);
   const liveSubtitle = useJarvisSubtitle();
   const subtitle = liveSubtitle ?? localSubtitle;
 
   const playWelcome = () => {
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=20");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=21");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -222,14 +224,25 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
             autoComplete="email"
             className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center"
           />
-          <Input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest"
-          />
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest pr-12"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-red-400 transition-colors p-1"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
           <Button
             type="submit"
             disabled={loading}
