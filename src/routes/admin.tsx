@@ -243,18 +243,27 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
-              className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest pr-12"
+              className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest pr-14"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-red-400 transition-colors p-1"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-md bg-black/70 border border-red-500/40 text-red-300 hover:text-white hover:bg-red-600/30 transition-colors"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={18} strokeWidth={2.4} /> : <Eye size={18} strokeWidth={2.4} />}
             </button>
           </div>
+          <label className="flex items-center gap-2 text-xs text-zinc-300 select-none cursor-pointer">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded border-red-500/50 bg-black/60 accent-red-500 cursor-pointer"
+            />
+            Lembrar de mim neste dispositivo
+          </label>
           <Button
             type="submit"
             disabled={loading}
