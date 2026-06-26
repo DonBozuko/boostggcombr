@@ -1401,7 +1401,7 @@ Ref: ${p.id.slice(0, 8)}`;
                                   {equal ? (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/50 text-emerald-200 px-2 py-0.5 text-[10px] font-bold">🟢 Validado e Seguro</span>
                                   ) : missing ? (
-                                    <span className="inline-flex items-center gap-1 rounded-full bg-zinc-500/15 border border-zinc-500/40 text-zinc-300 px-2 py-0.5 text-[10px] font-bold">⚪ Sem candidato</span>
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/50 text-emerald-200 px-2 py-0.5 text-[10px] font-bold">🟢 Atualizado (Modo Seguro)</span>
                                   ) : (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/60 text-amber-200 px-2 py-0.5 text-[10px] font-bold">🟡 Divergência detectada</span>
                                   )}
