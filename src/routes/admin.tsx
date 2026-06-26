@@ -100,19 +100,25 @@ function AdminGate() {
   return <AdminPage initialToken={adminToken} />;
 }
 
+const REMEMBER_KEY = "eliteboost_remember_me";
+
 function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
   const navigate = useNavigate({ from: "/admin" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.localStorage.getItem(REMEMBER_KEY) !== "0";
+  });
   const [localSubtitle, setLocalSubtitle] = useState<string | null>(null);
   const liveSubtitle = useJarvisSubtitle();
   const subtitle = liveSubtitle ?? localSubtitle;
 
   const playWelcome = () => {
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=21");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=22");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -137,6 +143,12 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
       if (error || !data?.user) {
         toast.error("Credenciais inválidas");
         return;
+      }
+      // Remember-me: se desmarcado, derruba sessão ao fechar a aba.
+      window.localStorage.setItem(REMEMBER_KEY, remember ? "1" : "0");
+      if (!remember) {
+        const drop = () => { void supabase.auth.signOut(); };
+        window.addEventListener("beforeunload", drop, { once: true });
       }
       // ✅ Áudio APÓS sucesso real da autenticação
       playWelcome();
