@@ -4,7 +4,7 @@ import type { FabianoVariant } from "./FabianoBadge";
 const SPEECH =
   "Diretor Fabiano, os parâmetros de engajamento da EliteBoost Prime foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar este cliente. É impressionante a eficiência da sua rede, senhor!";
 
-const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=24";
+const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=25";
 
 const THEME: Record<FabianoVariant, { ring: string; border: string; accent: string; glow: string; dot: string }> = {
   instagram: { ring: "shadow-[0_0_24px_rgba(34,211,238,0.65)] ring-cyan-300/30", border: "border-cyan-300/80", accent: "text-cyan-300", glow: "drop-shadow-[0_0_6px_rgba(34,211,238,0.9)]", dot: "bg-cyan-300" },
@@ -71,15 +71,11 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
       cleanup();
     };
 
+    const events: Array<keyof WindowEventMap> = ["touchstart", "pointerdown", "scroll", "keydown", "wheel"];
     const cleanup = () => {
-      window.removeEventListener("pointerdown", fire);
-      window.removeEventListener("keydown", fire);
-      window.removeEventListener("touchstart", fire);
+      events.forEach((e) => window.removeEventListener(e, fire as EventListener));
     };
-
-    window.addEventListener("pointerdown", fire, { once: true });
-    window.addEventListener("keydown", fire, { once: true });
-    window.addEventListener("touchstart", fire, { once: true });
+    events.forEach((e) => window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions));
     return cleanup;
   }, []);
 
