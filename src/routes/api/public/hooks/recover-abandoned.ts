@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/hooks/recover-abandoned")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+        const { dispatchWhatsappAlert, buildRecoveryWhatsappUrl } = await import("@/lib/whatsapp-alert.server");
 
         // Busca pedidos pendentes >15min, ainda não notificados.
         const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
@@ -33,12 +33,17 @@ export const Route = createFileRoute("/api/public/hooks/recover-abandoned")({
 
         const results: { id: string; sent: boolean; detail?: string }[] = [];
         for (const p of rows ?? []) {
+          const handle = p.instagram_user?.startsWith("@") ? p.instagram_user : `@${p.instagram_user}`;
           const msg =
-            `🔍 <b>Aviso de Pedido Pendente na EliteBoost Prime</b>\n` +
-            `O usuário <b>@${p.instagram_user}</b> gerou o Pix do pacote ` +
-            `<b>${p.pacote} (${p.quantidade})</b> mas a transação ainda não foi concluída.\n` +
-            `💡 Mande um direct de ajuda para ele!`;
-          const r = await dispatchWhatsappAlert(msg);
+            `🔍 <b>Carrinho abandonado — EliteBoost Prime</b>\n` +
+            `Cliente: <b>${handle}</b>\n` +
+            `Pacote: <b>${p.pacote} (${p.quantidade})</b>\n` +
+            `Ref: <code>${p.id.slice(0, 8)}</code>\n\n` +
+            `💡 Toque no botão abaixo para abrir o WhatsApp com a mensagem de recuperação já pronta.`;
+          const waUrl = buildRecoveryWhatsappUrl(null);
+          const r = await dispatchWhatsappAlert(msg, {
+            inlineKeyboard: [[{ text: "🟢 Recuperar venda no WhatsApp", url: waUrl }]],
+          });
           if (r.ok) {
             await supabaseAdmin
               .from("pedidos")

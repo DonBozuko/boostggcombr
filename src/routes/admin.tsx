@@ -498,25 +498,22 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     } catch {}
   };
 
-  // Recuperação de carrinho abandonado: gera template + abre wa.me em branco.
-  const recuperarVenda = (p: { instagram_user: string; pacote: string; quantidade: number; rede_social?: string | null; id: string }) => {
-    const rede = p.rede_social ?? "instagram";
-    const handle = p.instagram_user?.startsWith("@") ? p.instagram_user : `@${p.instagram_user}`;
+  // Recuperação de carrinho abandonado: copy oficial + WhatsApp API (encodeURIComponent).
+  // Espelha src/lib/whatsapp-alert.server.ts → buildRecoveryWhatsappText/Url.
+  const recuperarVenda = (_p: { instagram_user: string; pacote: string; quantidade: number; rede_social?: string | null; id: string }) => {
     const tpl =
-`Oi! Aqui é da EliteBoost Prime 👋
-
-Vi que você iniciou um pedido de ${p.quantidade.toLocaleString("pt-BR")} ${p.pacote.toLowerCase().startsWith("l") ? "curtidas" : p.pacote.toLowerCase().startsWith("v") || p.pacote.toLowerCase().startsWith("tv") || p.pacote.toLowerCase().startsWith("yv") ? "visualizações" : "seguidores"} pro perfil ${handle} (${rede.toUpperCase()}) mas o Pix expirou antes da confirmação.
-
-Posso gerar um novo Pix com a mesma condição agora — entrega começa em minutos. Quer que eu reenvie?
-
-Ref: ${p.id.slice(0, 8)}`;
+      "Olá! Identificamos uma instabilidade temporária no nosso checkout de Pix " +
+      "enquanto você finalizava o seu pedido na EliteBoost Prime. Pedimos sinceras " +
+      "desculpas pelo inconveniente! 🙏 Para garantir que você não perca os seus " +
+      "bônus de crescimento de algoritmo, geramos um link de contingência direto e " +
+      "seguro. Basta clicar para finalizar com ativação imediata: https://t.me";
     try {
       navigator.clipboard?.writeText(tpl);
-      toast.success("Template copiado. Cole no WhatsApp do cliente.");
+      toast.success("Copy oficial copiada. Cole no WhatsApp do cliente.");
     } catch {
       toast("Template gerado", { description: tpl.slice(0, 80) + "…" });
     }
-    const url = `https://wa.me/?text=${encodeURIComponent(tpl)}`;
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(tpl)}`;
     window.open(url, "_blank", "noopener");
   };
 
