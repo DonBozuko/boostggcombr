@@ -2,17 +2,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { logJarvisAlert } from "@/lib/jarvis.functions";
 
 /**
- * Jarvis Sound System — pré-carregamento com new Audio() + cache-buster v=5.
- * Persistência em banco (jarvis_alerts) + trava anti-spam (debounce 60s).
+ * Jarvis Sound System — destravamento por User Gesture (cache v=6).
+ * AudioContext + GainNode híbrido para quebrar autoplay e eliminar bipes.
  */
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=5",
-  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=5",
-  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=5",
-  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=5",
-  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=5",
+  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=6",
+  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=6",
+  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=6",
+  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=6",
+  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=6",
 };
 
 const LABELS: Record<JarvisEvent, string> = {
@@ -31,7 +31,7 @@ const SEVERITY: Record<JarvisEvent, string> = {
   fail: "critical",
 };
 
-// ----- Histórico global (in-memory pub/sub para UI viva) -----
+// ----- Histórico in-memory (admin) -----
 export type JarvisHistoryEntry = { id: string; evt: JarvisEvent; label: string; detail?: string; at: string };
 const HISTORY: JarvisHistoryEntry[] = [];
 const LISTENERS = new Set<() => void>();
@@ -47,14 +47,8 @@ function pushHistory(evt: JarvisEvent, detail?: string) {
   });
   if (HISTORY.length > MAX) HISTORY.length = MAX;
   LISTENERS.forEach((l) => l());
-  // fire-and-forget persistência
   void logJarvisAlert({
-    data: {
-      severidade: SEVERITY[evt],
-      origem: evt,
-      mensagem: LABELS[evt],
-      detalhe: detail,
-    },
+    data: { severidade: SEVERITY[evt], origem: evt, mensagem: LABELS[evt], detalhe: detail },
   }).catch(() => {});
 }
 
@@ -68,24 +62,63 @@ export function useJarvisHistory(): JarvisHistoryEntry[] {
   return HISTORY;
 }
 
-// ----- Pré-carregamento com new Audio() -----
-const audioCache: Partial<Record<JarvisEvent, HTMLAudioElement>> = {};
-let preloaded = false;
+// ----- AudioContext + GainNode (destravado via gesto) -----
+let audioCtx: AudioContext | null = null;
+let gainNode: GainNode | null = null;
+let unlocked = false;
+const buffers: Partial<Record<JarvisEvent, AudioBuffer>> = {};
 
-function preloadAll() {
-  if (preloaded || typeof window === "undefined") return;
-  preloaded = true;
-  (Object.keys(SRC) as JarvisEvent[]).forEach((evt) => {
-    try {
-      const a = new Audio(SRC[evt]);
-      a.preload = "auto";
-      a.volume = 0.85;
-      audioCache[evt] = a;
-    } catch {}
-  });
+async function decodeAll() {
+  if (!audioCtx) return;
+  await Promise.all(
+    (Object.keys(SRC) as JarvisEvent[]).map(async (evt) => {
+      if (buffers[evt]) return;
+      try {
+        const res = await fetch(SRC[evt]);
+        const arr = await res.arrayBuffer();
+        buffers[evt] = await audioCtx!.decodeAudioData(arr);
+      } catch {}
+    }),
+  );
 }
 
-// ----- Debounce anti-spam (60s) para warning/fail -----
+/** Deve ser chamado DENTRO do handler do clique do usuário. */
+export async function unlockJarvis(): Promise<boolean> {
+  if (unlocked) return true;
+  if (typeof window === "undefined") return false;
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    audioCtx = new Ctx();
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0.9;
+    gainNode.connect(audioCtx.destination);
+    if (audioCtx.state === "suspended") await audioCtx.resume();
+    // Toque silencioso síncrono para destravar (gesture chain)
+    const silent = audioCtx.createBufferSource();
+    silent.buffer = audioCtx.createBuffer(1, 1, 22050);
+    silent.connect(gainNode);
+    silent.start(0);
+    unlocked = true;
+    void decodeAll();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function playBuffer(evt: JarvisEvent) {
+  if (!audioCtx || !gainNode) return;
+  const buf = buffers[evt];
+  if (!buf) return;
+  try {
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf;
+    src.connect(gainNode);
+    src.start(0);
+  } catch {}
+}
+
+// ----- Debounce anti-spam -----
 const DEBOUNCE_MS = 60_000;
 const DEBOUNCED: Set<JarvisEvent> = new Set(["warning", "fail"]);
 const lastPlayedAt: Partial<Record<JarvisEvent, number>> = {};
@@ -93,24 +126,20 @@ const lastPlayedAt: Partial<Record<JarvisEvent, number>> = {};
 export function useJarvis(enabled: boolean = true) {
   const firedRef = useRef<Partial<Record<string, boolean>>>({});
 
-  useEffect(() => { if (enabled) preloadAll(); }, [enabled]);
-
   const play = useCallback((evt: JarvisEvent, detail?: string) => {
     pushHistory(evt, detail);
-    if (!enabled) return;
+    if (!enabled || !unlocked) return;
     if (DEBOUNCED.has(evt)) {
       const last = lastPlayedAt[evt] ?? 0;
-      if (Date.now() - last < DEBOUNCE_MS) return; // bloqueia som, mantém log
+      if (Date.now() - last < DEBOUNCE_MS) return;
     }
     lastPlayedAt[evt] = Date.now();
-    preloadAll();
-    const a = audioCache[evt];
-    if (!a) return;
-    try {
-      a.currentTime = 0;
-      const p = a.play();
-      if (p && typeof p.catch === "function") p.catch(() => {});
-    } catch {}
+    // Se ainda não tem o buffer decodificado, tenta carregar e tocar
+    if (!buffers[evt]) {
+      void decodeAll().then(() => playBuffer(evt));
+      return;
+    }
+    playBuffer(evt);
   }, [enabled]);
 
   const playOnce = useCallback((evt: JarvisEvent, key: string, detail?: string) => {
@@ -120,7 +149,7 @@ export function useJarvis(enabled: boolean = true) {
     play(evt, detail);
   }, [play]);
 
-  return { play, playOnce };
+  return { play, playOnce, unlock: unlockJarvis, isUnlocked: () => unlocked };
 }
 
 export function useJarvisWelcome(enabled: boolean) {
