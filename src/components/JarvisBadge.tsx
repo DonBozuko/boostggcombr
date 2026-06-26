@@ -32,40 +32,23 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
     audio.volume = 0.95;
     audioRef.current = audio;
 
-    const speak = () => {
-      try {
-        const synth = window.speechSynthesis;
-        if (!synth) return;
-        const u = new SpeechSynthesisUtterance(SPEECH);
-        u.lang = "pt-BR";
-        u.rate = 1;
-        u.pitch = 1.05;
-        const voices = synth.getVoices();
-        const pt = voices.find((v) => /pt[-_]BR/i.test(v.lang)) || voices.find((v) => /^pt/i.test(v.lang));
-        if (pt) u.voice = pt;
-        u.onend = () => setOpen(false);
-        synth.cancel();
-        synth.speak(u);
-      } catch {
-        window.setTimeout(() => setOpen(false), 12000);
-      }
-    };
-
     const fire = () => {
       if (firedRef.current) return;
       firedRef.current = true;
       setOpen(true);
+      audio.onended = () => setOpen(false);
+      // SEM fallback de voz do navegador — apenas o MP3 local oficial.
+      audio.onerror = () => {
+        // mantém balão por ~12s mesmo se o áudio falhar, sem usar speechSynthesis
+        window.setTimeout(() => setOpen(false), 12000);
+      };
       const p = audio.play();
-      if (p && typeof p.then === "function") {
-        p.then(() => {
-          audio.onended = () => setOpen(false);
-          audio.onerror = () => speak();
-          window.setTimeout(() => {
-            if (audio.paused && audio.currentTime === 0) speak();
-          }, 600);
-        }).catch(() => speak());
-      } else {
-        speak();
+      if (p && typeof p.catch === "function") {
+        p.catch(() => {
+          // bloqueado pelo navegador — destrava no próximo gesto
+          firedRef.current = false;
+          setOpen(false);
+        });
       }
       cleanup();
     };
@@ -86,7 +69,7 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
   }, []);
 
   return (
-    <div className="fixed bottom-20 right-5 z-50 flex items-end gap-3 flex-row-reverse">
+    <div className="fixed bottom-40 right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-3 flex-row-reverse">
       <div
         aria-label="J.A.R.V.I.S."
         className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${t.border} ${t.ring} ring-2 bg-black animate-pulse`}
@@ -102,7 +85,7 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
       <div
         role="status"
         aria-live="polite"
-        className={`relative max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-red-950/20 border border-red-500/40 shadow-2xl transition-all duration-500 ease-out ${
+        className={`relative max-w-[240px] sm:max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-red-950/30 border border-red-500/40 shadow-2xl transition-all duration-500 ease-out ${
           open ? "opacity-100 translate-x-0 scale-100 animate-[fade-in_0.4s_ease-out]" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
         }`}
       >
