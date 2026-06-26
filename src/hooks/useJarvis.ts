@@ -72,9 +72,10 @@ function makeAudio(evt: JarvisEvent): HTMLAudioElement {
   const a = new Audio(SRC[evt]);
   a.crossOrigin = "anonymous";
   a.preload = "auto";
-  a.volume = 0.9;
+  a.volume = 1.0;
   return a;
 }
+
 
 /** DEVE ser chamado DENTRO do handler de clique do usuário. */
 export async function unlockJarvis(): Promise<boolean> {
