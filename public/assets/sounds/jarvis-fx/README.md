@@ -1,11 +1,10 @@
-# Jarvis FX (textura metalizada)
+# Jarvis Sound FX
 
-Drop-in dos 4 mp3 fixos (sem rename):
+Faça upload manual dos 4 arquivos MP3 (voz PT-BR, textura metalizada Jarvis) nesta pasta com os nomes EXATOS abaixo:
 
-- `jarvis-welcome.mp3`   — inicialização do painel (toggle Som ON)
-- `jarvis-optimized.mp3` — botão master ⚡ "Aprovar Divergências" OK
-- `jarvis-warning.mp3`   — carrinho abandonado entra no painel (laranja)
-- `jarvis-critical.mp3`  — saldo do fornecedor < R$ 50
+- `welcome.mp3`   → Inicialização do painel `/admin` (ou toggle Som ON)
+- `optimized.mp3` → Botão master de aprovação em 1 clique (⚡ Smart Approve)
+- `warning.mp3`   → Novo carrinho abandonado detectado (linha laranja)
+- `critical.mp3`  → Saldo do fornecedor ativo abaixo de R$ 50
 
-Fluxo é tolerante: se o arquivo não existir, o `play()` falha em silêncio
-e nenhuma outra trava do `/admin` é afetada (modo Read-Only preservado).
+Falha silenciosa: se um arquivo faltar, o sistema não quebra — apenas não toca.
