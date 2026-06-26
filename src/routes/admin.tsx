@@ -1628,6 +1628,53 @@ function Info({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function WebhookHealthMonitor() {
+  const endpoints = [
+    { label: "Mercado Pago", url: "/api/public/mp-webhook" },
+    { label: "Telegram Bot", url: "/api/public/telegram/webhook" },
+  ];
+  const [pings, setPings] = useState<Record<string, { code: number; at: string } | null>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    const ping = async () => {
+      const out: Record<string, { code: number; at: string } | null> = {};
+      await Promise.all(endpoints.map(async (e) => {
+        try {
+          const res = await fetch(e.url, { method: "HEAD" });
+          out[e.url] = { code: res.status, at: new Date().toISOString() };
+        } catch {
+          out[e.url] = null;
+        }
+      }));
+      if (!cancelled) setPings(out);
+    };
+    ping();
+    const i = setInterval(ping, 30_000);
+    return () => { cancelled = true; clearInterval(i); };
+  }, []);
+
+  return (
+    <div className="mt-6 rounded-lg border border-border/60 bg-background/40 p-4">
+      <h3 className="text-sm font-semibold mb-3">📡 Monitor de Webhooks (produção)</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+        {endpoints.map((e) => {
+          const p = pings[e.url];
+          const ok = p && (p.code === 200 || p.code === 401 || p.code === 405);
+          return (
+            <div key={e.url} className="flex justify-between items-center px-3 py-2 rounded bg-background/60 border border-border/40">
+              <span className="font-mono">{e.label}</span>
+              <span className={ok ? "text-green-500" : p ? "text-red-500" : "text-muted-foreground"}>
+                {p ? `${ok ? "🟢" : "🔴"} HTTP ${p.code} · ${new Date(p.at).toLocaleTimeString("pt-BR")}` : "⏳"}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function CronCard({
   cron,
   busy,
