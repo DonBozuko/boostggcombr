@@ -7,7 +7,7 @@ import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -36,6 +36,52 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
+
+function AdminSettingsButton() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="outline" aria-label="Configurações" className="px-2">
+          <Settings size={16} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>⚙️ Configurações Gerais</DialogTitle>
+          <DialogDescription>
+            Preferências do painel EliteBoost Prime · sessão atual.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">Administrador</span>
+            <span className="font-mono">{ADMIN_EMAIL}</span>
+          </div>
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">Cache áudio Jarvis</span>
+            <span className="font-mono">v=22</span>
+          </div>
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">RLS jarvis_alerts</span>
+            <span className="text-emerald-400 font-bold">Ativo</span>
+          </div>
+          <div className="flex justify-between border-b border-border/40 pb-2">
+            <span className="text-muted-foreground">Failover A→B→C</span>
+            <span className="text-emerald-400 font-bold">Ativo</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">BrandGuard</span>
+            <span className="text-emerald-400 font-bold">Ativo</span>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>Fechar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -100,19 +146,25 @@ function AdminGate() {
   return <AdminPage initialToken={adminToken} />;
 }
 
+const REMEMBER_KEY = "eliteboost_remember_me";
+
 function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
   const navigate = useNavigate({ from: "/admin" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [remember, setRemember] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.localStorage.getItem(REMEMBER_KEY) !== "0";
+  });
   const [localSubtitle, setLocalSubtitle] = useState<string | null>(null);
   const liveSubtitle = useJarvisSubtitle();
   const subtitle = liveSubtitle ?? localSubtitle;
 
   const playWelcome = () => {
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=21");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=22");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -137,6 +189,12 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
       if (error || !data?.user) {
         toast.error("Credenciais inválidas");
         return;
+      }
+      // Remember-me: se desmarcado, derruba sessão ao fechar a aba.
+      window.localStorage.setItem(REMEMBER_KEY, remember ? "1" : "0");
+      if (!remember) {
+        const drop = () => { void supabase.auth.signOut(); };
+        window.addEventListener("beforeunload", drop, { once: true });
       }
       // ✅ Áudio APÓS sucesso real da autenticação
       playWelcome();
@@ -231,18 +289,27 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
-              className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest pr-12"
+              className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest pr-14"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
               aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-red-400 transition-colors p-1"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex h-9 w-9 items-center justify-center rounded-md bg-black/70 border border-red-500/40 text-red-300 hover:text-white hover:bg-red-600/30 transition-colors"
               tabIndex={-1}
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? <EyeOff size={18} strokeWidth={2.4} /> : <Eye size={18} strokeWidth={2.4} />}
             </button>
           </div>
+          <label className="flex items-center gap-2 text-xs text-zinc-300 select-none cursor-pointer">
+            <input
+              type="checkbox"
+              checked={remember}
+              onChange={(e) => setRemember(e.target.checked)}
+              className="h-4 w-4 rounded border-red-500/50 bg-black/60 accent-red-500 cursor-pointer"
+            />
+            Lembrar de mim neste dispositivo
+          </label>
           <Button
             type="submit"
             disabled={loading}
@@ -866,14 +933,30 @@ Ref: ${p.id.slice(0, 8)}`;
       <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-2xl font-bold">Admin · EliteBoost Prime</h1>
-          <Button
-            variant={soundOn ? "default" : "outline"}
-            size="sm"
-            onClick={toggleSound}
-          >
-            {soundOn ? "🔔 Som ON" : "🔕 Ativar alerta sonoro"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={soundOn ? "default" : "outline"}
+              size="sm"
+              onClick={toggleSound}
+            >
+              {soundOn ? "🔔 Som ON" : "🔕 Ativar alerta sonoro"}
+            </Button>
+            <AdminSettingsButton />
+            <Button
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+                toast.success("Sessão encerrada");
+                window.location.href = "/admin";
+              }}
+              className="bg-gradient-to-r from-red-700 to-red-500 hover:from-red-600 hover:to-red-400 text-white font-bold shadow-[0_0_20px_rgba(255,0,40,0.5)]"
+            >
+              🔴 SAIR DO PAINEL
+            </Button>
+          </div>
         </div>
+
 
         {!loaded ? (
           <div className="flex justify-center py-6">
