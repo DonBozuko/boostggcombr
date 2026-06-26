@@ -119,3 +119,78 @@
 }
 
 
+
+/* ============ JARVIS HUD (admin only) ============ */
+@keyframes jarvis-grid-pan {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 60px 60px, 60px 60px; }
+}
+@keyframes jarvis-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+@keyframes jarvis-pulse-ring {
+  0%,100% { opacity: 0.35; }
+  50%     { opacity: 0.75; }
+}
+
+.jarvis-hud {
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(0,255,255,0.10), transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(0,140,255,0.08), transparent 55%),
+    #02060b;
+  position: relative;
+  isolation: isolate;
+}
+.jarvis-hud::before {
+  content: "";
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,255,0.06) 1px, transparent 1px);
+  background-size: 60px 60px, 60px 60px;
+  animation: jarvis-grid-pan 18s linear infinite;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+.jarvis-hud::after {
+  content: "";
+  position: fixed; left: 0; right: 0; top: 0; height: 2px; z-index: 0;
+  background: linear-gradient(90deg, transparent, rgba(0,255,255,0.55), transparent);
+  filter: blur(1px);
+  animation: jarvis-scan 6s linear infinite;
+  pointer-events: none;
+}
+
+.jarvis-armor {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  width: calc((100vw - 450px) / 2); max-width: 540px;
+  height: 90vh; z-index: 0; pointer-events: none;
+  opacity: 0.55;
+}
+.jarvis-armor.left  { left: 0; }
+.jarvis-armor.right { right: 0; transform: translateY(-50%) scaleX(-1); }
+
+.jarvis-hud .max-w-7xl { position: relative; z-index: 1; }
+
+/* Re-skin shadcn cards / panels inside admin */
+.jarvis-hud [class*="bg-card"],
+.jarvis-hud [class*="bg-background"],
+.jarvis-hud .rounded-xl,
+.jarvis-hud .rounded-lg {
+  background-color: rgba(2,10,18,0.55) !important;
+  backdrop-filter: blur(10px) saturate(140%);
+  border-color: rgba(0,255,255,0.28) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,255,255,0.06),
+    0 0 24px -8px rgba(0,255,255,0.35);
+}
+.jarvis-hud h1, .jarvis-hud h2 {
+  color: #aef9ff;
+  text-shadow: 0 0 12px rgba(0,255,255,0.45);
+  letter-spacing: 0.02em;
+}
+.jarvis-hud .text-amber-100,
+.jarvis-hud .text-amber-200,
+.jarvis-hud .text-yellow-300 {
+  color: #7df9ff !important;
+}

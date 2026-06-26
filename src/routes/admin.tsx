@@ -685,7 +685,45 @@ Ref: ${p.id.slice(0, 8)}`;
   );
 
   return (
-    <div className="dark min-h-screen bg-background text-foreground p-4">
+    <div className="dark jarvis-hud min-h-screen text-foreground p-4">
+      {/* Holographic armor outlines — desktop only */}
+      <svg className="jarvis-armor left hidden lg:block" viewBox="0 0 400 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+        <defs>
+          <linearGradient id="jrv-l" x1="0" x2="1">
+            <stop offset="0" stopColor="#00ffff" stopOpacity="0.0"/>
+            <stop offset="1" stopColor="#00ffff" stopOpacity="0.9"/>
+          </linearGradient>
+        </defs>
+        <g stroke="url(#jrv-l)" strokeWidth="1.2">
+          <path d="M40 80 L260 60 L340 180 L320 360 L360 460 L320 620 L260 760 L60 740" fill="none"/>
+          <path d="M80 140 L240 130 L300 220 L280 360" />
+          <path d="M120 380 L300 380 M120 420 L300 420 M120 460 L260 460" />
+          <circle cx="220" cy="300" r="48" />
+          <circle cx="220" cy="300" r="20" />
+          <path d="M40 80 L20 200 L20 540 L60 740" />
+          <path d="M200 540 L320 540 L340 600 L260 760" />
+        </g>
+        <g fill="#00ffff" opacity="0.6">
+          <circle cx="220" cy="300" r="3"/>
+          <circle cx="80" cy="200" r="2"/>
+          <circle cx="320" cy="540" r="2"/>
+        </g>
+      </svg>
+      <svg className="jarvis-armor right hidden lg:block" viewBox="0 0 400 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+        <defs>
+          <linearGradient id="jrv-r" x1="0" x2="1">
+            <stop offset="0" stopColor="#00ffff" stopOpacity="0.0"/>
+            <stop offset="1" stopColor="#00ffff" stopOpacity="0.9"/>
+          </linearGradient>
+        </defs>
+        <g stroke="url(#jrv-r)" strokeWidth="1.2">
+          <path d="M40 80 L260 60 L340 180 L320 360 L360 460 L320 620 L260 760 L60 740" fill="none"/>
+          <path d="M80 140 L240 130 L300 220 L280 360" />
+          <path d="M120 380 L300 380 M120 420 L300 420 M120 460 L260 460" />
+          <circle cx="220" cy="300" r="48" />
+          <circle cx="220" cy="300" r="20" />
+        </g>
+      </svg>
       <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-2xl font-bold">Admin · EliteBoost Prime</h1>
