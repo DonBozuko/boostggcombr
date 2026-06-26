@@ -1,4 +1,4 @@
-# System Architecture — Boostygram
+# System Architecture — EliteBoost Prime
 
 Árvore genealógica do ecossistema. **Isolamento estrito por rota.** Não misturar identidades visuais, ícones, textos ou IDs de serviço entre as vitrines públicas.
 

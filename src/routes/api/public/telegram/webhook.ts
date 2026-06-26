@@ -54,7 +54,7 @@ function welcomeFor(start: string | null) {
   const ctx = r ? ` Vi que tu veio da vitrine do ${r.label.split(' ')[1]}.` : '';
   return (
     `🔥 Eaí parceiro, aqui é o <b>Fabiano Santiago</b>.${ctx}\n\n` +
-    `Bem-vindo à <b>elite Boostygram</b> — direto ao ponto, sem enrolação.\n\n` +
+    `Bem-vindo à <b>EliteBoost Prime</b> — direto ao ponto, sem enrolação.\n\n` +
     `Me conta: em qual rede tu quer alavancar agora?`
   );
 }

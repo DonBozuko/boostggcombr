@@ -29,7 +29,7 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/telegram")({
   head: () => {
-    const title = "Comprar Membros para Grupo e Canal do Telegram | Boostygram";
+    const title = "Comprar Membros para Grupo e Canal do Telegram | EliteBoost Prime";
     const description =
       "Comprar membros reais para grupo e canal do Telegram com entrega via Pix automático. Crescimento real, recarga estável e suporte humano.";
     const url = "https://boostygram.lovable.app/telegram";
@@ -196,7 +196,7 @@ function TelegramLanding() {
         <div className="container mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TelegramIcon size={18} />
-            <span className="font-bold text-sm text-white">BOOSTYGRAM</span>
+            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
           </div>
           <span className="text-xs" style={{ color: AERO }}>TELEGRAM ⚡</span>
         </div>
@@ -207,7 +207,7 @@ function TelegramLanding() {
           <TelegramIcon size={42} />
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          <span style={{ color: "#fff", textShadow: `0 0 18px ${AERO}` }}>BOOSTYGRAM</span>{" "}
+          <span style={{ color: "#fff", textShadow: `0 0 18px ${AERO}` }}>ELITEBOOST PRIME</span>{" "}
           <span style={{ color: AERO, textShadow: `0 0 18px ${AERO}` }}>| TELEGRAM ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Membros reais para canais e grupos · entrega automática via Pix</p>

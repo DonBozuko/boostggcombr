@@ -139,7 +139,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           transaction_amount: Number(valorCobrar.toFixed(2)),
-          description: `BoostGram - ${rede.toUpperCase()} pacote ${clean(data.pacote)} (${data.quantidade} ${categoria}) para ${clean(data.instagram_user)}`,
+          description: `EliteBoost Prime - ${rede.toUpperCase()} pacote ${clean(data.pacote)} (${data.quantidade} ${categoria}) para ${clean(data.instagram_user)}`,
           payment_method_id: "pix",
           payer: { email: data.email.trim().toLowerCase() },
         }),

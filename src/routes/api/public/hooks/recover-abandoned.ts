@@ -34,7 +34,7 @@ export const Route = createFileRoute("/api/public/hooks/recover-abandoned")({
         const results: { id: string; sent: boolean; detail?: string }[] = [];
         for (const p of rows ?? []) {
           const msg =
-            `🔍 <b>Aviso de Pedido Pendente no Boostygram</b>\n` +
+            `🔍 <b>Aviso de Pedido Pendente na EliteBoost Prime</b>\n` +
             `O usuário <b>@${p.instagram_user}</b> gerou o Pix do pacote ` +
             `<b>${p.pacote} (${p.quantidade})</b> mas a transação ainda não foi concluída.\n` +
             `💡 Mande um direct de ajuda para ele!`;

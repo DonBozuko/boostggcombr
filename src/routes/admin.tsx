@@ -32,11 +32,11 @@ import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
 import { verifyAdminToken } from "@/lib/admin-auth.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
 
-const ADMIN_SESSION_KEY = "boostygram_admin_session";
+const ADMIN_SESSION_KEY = "eliteboost_prime_admin_session";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
+  head: () => ({ meta: [{ title: "Admin · EliteBoost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: AdminGate,
 });
 
@@ -79,7 +79,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       const res = await verify({ data: { token: token.trim() } });
       if (res.ok) {
         window.localStorage.setItem(ADMIN_SESSION_KEY, "1");
-        window.localStorage.setItem("boostygram_admin_token", token.trim());
+        window.localStorage.setItem("eliteboost_prime_admin_token", token.trim());
         toast.success("Acesso autorizado · Jarvis online");
         onSuccess();
       } else {
@@ -102,7 +102,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
           <div className="text-center space-y-2">
             <div className="text-4xl">🔐</div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 to-fuchsia-400 bg-clip-text text-transparent">
-              Painel Boostygram
+              Painel EliteBoost Prime
             </h1>
             <p className="text-xs text-zinc-400">Acesso restrito · Token obrigatório</p>
           </div>
@@ -307,7 +307,7 @@ function AdminPage() {
     const rede = p.rede_social ?? "instagram";
     const handle = p.instagram_user?.startsWith("@") ? p.instagram_user : `@${p.instagram_user}`;
     const tpl =
-`Oi! Aqui é da Boostygram 👋
+`Oi! Aqui é da EliteBoost Prime 👋
 
 Vi que você iniciou um pedido de ${p.quantidade.toLocaleString("pt-BR")} ${p.pacote.toLowerCase().startsWith("l") ? "curtidas" : p.pacote.toLowerCase().startsWith("v") || p.pacote.toLowerCase().startsWith("tv") || p.pacote.toLowerCase().startsWith("yv") ? "visualizações" : "seguidores"} pro perfil ${handle} (${rede.toUpperCase()}) mas o Pix expirou antes da confirmação.
 
@@ -394,12 +394,12 @@ Ref: ${p.id.slice(0, 8)}`;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("BOOSTYGRAM_SANDBOX") === "1";
+    return window.localStorage.getItem("ELITEBOOST_PRIME_SANDBOX") === "1";
   });
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (sandbox) window.localStorage.setItem("BOOSTYGRAM_SANDBOX", "1");
-    else window.localStorage.removeItem("BOOSTYGRAM_SANDBOX");
+    if (sandbox) window.localStorage.setItem("ELITEBOOST_PRIME_SANDBOX", "1");
+    else window.localStorage.removeItem("ELITEBOOST_PRIME_SANDBOX");
   }, [sandbox]);
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -688,7 +688,7 @@ Ref: ${p.id.slice(0, 8)}`;
     <div className="dark min-h-screen bg-background text-foreground p-4">
       <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <h1 className="text-2xl font-bold">Admin · BoostGram</h1>
+          <h1 className="text-2xl font-bold">Admin · EliteBoost Prime</h1>
           <Button
             variant={soundOn ? "default" : "outline"}
             size="sm"
