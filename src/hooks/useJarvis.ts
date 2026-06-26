@@ -137,7 +137,13 @@ function playNative(evt: JarvisEvent) {
   try {
     a.pause();
     a.currentTime = 0;
-    void a.play().catch(() => {});
+    setSubtitle(SUBTITLES[evt]);
+    const clear = () => setSubtitle(null);
+    a.onended = clear;
+    a.onerror = clear;
+    void a.play().catch(() => setSubtitle(null));
+    // Fallback fade-out caso onended não dispare
+    window.setTimeout(() => { if (subtitle === SUBTITLES[evt]) setSubtitle(null); }, 8000);
   } catch {}
 }
 
