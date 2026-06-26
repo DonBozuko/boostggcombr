@@ -164,22 +164,34 @@ export function MobileFrame({
   const chars = characters[route];
   return (
     <div
-      className="h-screen h-dvh overflow-hidden flex justify-center"
+      className="h-[100dvh] overflow-hidden flex justify-center"
       style={{ background: "#050505" }}
     >
+      <style>{`
+        .mf-compact > * { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
+        .mf-compact section, .mf-compact header { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
+        .mf-compact .space-y-5 > * + * { margin-top: 0.85rem !important; }
+        .mf-compact .space-y-6 > * + * { margin-top: 1rem !important; }
+        .mf-compact .gap-6 { gap: 1rem !important; }
+        .mf-compact .gap-5 { gap: 0.85rem !important; }
+        .mf-compact .p-6 { padding: 1rem !important; }
+        .mf-compact .mt-6 { margin-top: 0.85rem !important; }
+        .mf-compact .mt-10 { margin-top: 1.25rem !important; }
+        .mf-compact { font-size: 95%; }
+      `}</style>
       <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
-        className="w-full sm:max-w-full md:max-w-[450px] h-screen h-dvh text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col"
+        className="w-full sm:max-w-full md:max-w-[450px] h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col"
         style={{ background: bg }}
       >
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {children}
         </div>
         <div className="shrink-0">
           <ReviewsCarousel accent={data.accent} />
           <LivePurchasesTicker accent={data.accent} />
           <footer
-            className="mt-1 mb-1 px-3 text-center select-none"
+            className="mt-0.5 mb-1 px-3 text-center select-none"
             aria-label="Versão de lançamento"
           >
             <span
