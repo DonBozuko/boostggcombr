@@ -9,12 +9,13 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/api/public/sfx/welcome.mp3?v=13",
-  optimized: "/api/public/sfx/optimized.mp3?v=13",
-  warning:   "/api/public/sfx/warning.mp3?v=13",
-  critical:  "/api/public/sfx/critical.mp3?v=13",
-  fail:      "/api/public/sfx/fail.mp3?v=13",
+  welcome:   "/api/public/sfx/welcome.mp3?v=14",
+  optimized: "/api/public/sfx/optimized.mp3?v=14",
+  warning:   "/api/public/sfx/warning.mp3?v=14",
+  critical:  "/api/public/sfx/critical.mp3?v=14",
+  fail:      "/api/public/sfx/fail.mp3?v=14",
 };
+
 
 export const SUBTITLES: Record<JarvisEvent, string> = {
   welcome: "Bem-vindo de volta, comandante. Painel EliteBoost Prime online.",
