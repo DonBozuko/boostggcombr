@@ -112,5 +112,3 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
   );
 }
 
-// alias to avoid accidental typo above
-type FarianvisVariant = FabianoVariant;
