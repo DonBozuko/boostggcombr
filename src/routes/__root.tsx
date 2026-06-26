@@ -132,6 +132,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <BrandGuard />
       <Outlet />
       <Toaster theme="dark" position="top-center" richColors />
     </QueryClientProvider>
