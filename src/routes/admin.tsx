@@ -8,6 +8,7 @@ import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.fu
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Settings } from "lucide-react";
+import jarvisHud from "@/assets/jarvis-hud.png";
 import {
   Dialog,
   DialogContent,
