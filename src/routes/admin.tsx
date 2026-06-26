@@ -66,7 +66,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
     if (!token.trim() || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=9");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=11");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
