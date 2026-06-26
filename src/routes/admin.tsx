@@ -27,7 +27,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { toast } from "sonner";
-import { useJarvis } from "@/hooks/useJarvis";
+import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
