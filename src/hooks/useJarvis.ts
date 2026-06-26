@@ -69,6 +69,7 @@ let unlocked = false;
 
 function makeAudio(evt: JarvisEvent): HTMLAudioElement {
   const a = new Audio(SRC[evt]);
+  a.crossOrigin = "anonymous";
   a.preload = "auto";
   a.volume = 0.9;
   return a;
