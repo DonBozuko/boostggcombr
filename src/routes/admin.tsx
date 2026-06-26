@@ -887,14 +887,30 @@ Ref: ${p.id.slice(0, 8)}`;
       <div className="max-w-7xl mx-auto space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-2xl font-bold">Admin · EliteBoost Prime</h1>
-          <Button
-            variant={soundOn ? "default" : "outline"}
-            size="sm"
-            onClick={toggleSound}
-          >
-            {soundOn ? "🔔 Som ON" : "🔕 Ativar alerta sonoro"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={soundOn ? "default" : "outline"}
+              size="sm"
+              onClick={toggleSound}
+            >
+              {soundOn ? "🔔 Som ON" : "🔕 Ativar alerta sonoro"}
+            </Button>
+            <AdminSettingsButton />
+            <Button
+              size="sm"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+                toast.success("Sessão encerrada");
+                window.location.href = "/admin";
+              }}
+              className="bg-gradient-to-r from-red-700 to-red-500 hover:from-red-600 hover:to-red-400 text-white font-bold shadow-[0_0_20px_rgba(255,0,40,0.5)]"
+            >
+              🔴 SAIR DO PAINEL
+            </Button>
+          </div>
         </div>
+
 
         {!loaded ? (
           <div className="flex justify-center py-6">
