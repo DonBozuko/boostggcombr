@@ -136,7 +136,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           if (!cadeia.length) {
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO no /admin (ative o toggle)" })
+              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO com saldo > 0 (failover esgotado)" })
               .eq("id", pedido.id);
             return new Response("ok", { status: 200 });
           }
