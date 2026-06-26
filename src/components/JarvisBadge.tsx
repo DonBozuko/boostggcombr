@@ -15,7 +15,7 @@ const THEME: Record<FabianoVariant, { ring: string; border: string; accent: stri
   trafego:   { ring: "shadow-[0_0_24px_rgba(168,85,247,0.65)] ring-purple-400/30", border: "border-purple-400/80", accent: "text-purple-300", glow: "drop-shadow-[0_0_6px_rgba(168,85,247,0.9)]", dot: "bg-purple-400" },
 };
 
-export function JarvisBadge({ variant = "instagram" }: { variant?: FarianvisVariant | FabianoVariant }) {
+export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
   const t = THEME[variant as FabianoVariant] ?? THEME.instagram;
   const [open, setOpen] = useState(false);
   const firedRef = useRef(false);
