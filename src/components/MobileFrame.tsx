@@ -168,16 +168,16 @@ export function MobileFrame({
       style={{ background: "#050505" }}
     >
       <style>{`
-        .mf-compact > * { padding-top: 0.625rem !important; padding-bottom: 0.625rem !important; }
-        .mf-compact section, .mf-compact header { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
-        .mf-compact .space-y-5 > * + * { margin-top: 0.85rem !important; }
-        .mf-compact .space-y-6 > * + * { margin-top: 1rem !important; }
-        .mf-compact .gap-6 { gap: 1rem !important; }
-        .mf-compact .gap-5 { gap: 0.85rem !important; }
-        .mf-compact .p-6 { padding: 1rem !important; }
-        .mf-compact .mt-6 { margin-top: 0.85rem !important; }
-        .mf-compact .mt-10 { margin-top: 1.25rem !important; }
-        .mf-compact { font-size: 95%; }
+        .mf-compact > * { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+        .mf-compact section, .mf-compact header { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
+        .mf-compact .space-y-5 > * + * { margin-top: 0.6rem !important; }
+        .mf-compact .space-y-6 > * + * { margin-top: 0.7rem !important; }
+        .mf-compact .gap-6 { gap: 0.7rem !important; }
+        .mf-compact .gap-5 { gap: 0.6rem !important; }
+        .mf-compact .p-6 { padding: 0.75rem !important; }
+        .mf-compact .mt-6 { margin-top: 0.6rem !important; }
+        .mf-compact .mt-10 { margin-top: 0.85rem !important; }
+        .mf-compact { font-size: 92%; }
       `}</style>
       <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
