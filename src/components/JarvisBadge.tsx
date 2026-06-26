@@ -71,15 +71,11 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
       cleanup();
     };
 
+    const events: Array<keyof WindowEventMap> = ["touchstart", "pointerdown", "scroll", "keydown", "wheel"];
     const cleanup = () => {
-      window.removeEventListener("pointerdown", fire);
-      window.removeEventListener("keydown", fire);
-      window.removeEventListener("touchstart", fire);
+      events.forEach((e) => window.removeEventListener(e, fire as EventListener));
     };
-
-    window.addEventListener("pointerdown", fire, { once: true });
-    window.addEventListener("keydown", fire, { once: true });
-    window.addEventListener("touchstart", fire, { once: true });
+    events.forEach((e) => window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions));
     return cleanup;
   }, []);
 
