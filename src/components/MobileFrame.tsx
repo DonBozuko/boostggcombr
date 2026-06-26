@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { LivePurchasesTicker } from "./LivePurchasesTicker";
+import { ReviewsCarousel } from "./ReviewsCarousel";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
 import ttLeft from "@/assets/char-tt-left.png";
@@ -171,6 +173,8 @@ export function MobileFrame({
         style={{ background: bg }}
       >
         {children}
+        <ReviewsCarousel accent={data.accent} />
+        <LivePurchasesTicker accent={data.accent} />
         <footer
           className="mt-8 mb-4 px-4 text-center select-none"
           aria-label="Versão de lançamento"
