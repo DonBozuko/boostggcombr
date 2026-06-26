@@ -108,12 +108,9 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
   const liveSubtitle = useJarvisSubtitle();
   const subtitle = liveSubtitle ?? localSubtitle;
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !password || loading) return;
-    // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
+  const playWelcome = () => {
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=19");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=20");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -124,18 +121,24 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
       void a.play().catch(clear);
       window.setTimeout(clear, 8000);
     } catch {}
-    void unlockJarvis();
+  };
 
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password || loading) return;
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
-      if (error) {
+      if (error || !data?.user) {
         toast.error("Credenciais inválidas");
         return;
       }
+      // ✅ Áudio APÓS sucesso real da autenticação
+      playWelcome();
+      void unlockJarvis();
       await onSuccess();
       toast.success("Acesso autorizado · Jarvis online");
       await navigate({ to: "/admin", replace: true });
