@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { logJarvisAlert } from "@/lib/jarvis.functions";
 
 /**
- * Jarvis Sound System — decodificação via AudioContext (fim dos bipes).
- * Cache-buster v=4. Falha silenciosa se mp3 ausente.
+ * Jarvis Sound System — pré-carregamento com new Audio() + cache-buster v=5.
+ * Persistência em banco (jarvis_alerts) + trava anti-spam (debounce 60s).
  */
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=4",
-  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=4",
-  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=4",
-  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=4",
-  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=4",
+  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3?v=5",
+  optimized: "/assets/sounds/jarvis-fx/optimized.mp3?v=5",
+  warning:   "/assets/sounds/jarvis-fx/warning.mp3?v=5",
+  critical:  "/assets/sounds/jarvis-fx/critical.mp3?v=5",
+  fail:      "/assets/sounds/jarvis-fx/fail.mp3?v=5",
 };
 
 const LABELS: Record<JarvisEvent, string> = {
@@ -22,7 +23,15 @@ const LABELS: Record<JarvisEvent, string> = {
   fail: "Falha de API / Webhook",
 };
 
-// ----- Histórico global de alertas (in-memory, com pub/sub) -----
+const SEVERITY: Record<JarvisEvent, string> = {
+  welcome: "info",
+  optimized: "success",
+  warning: "warning",
+  critical: "critical",
+  fail: "critical",
+};
+
+// ----- Histórico global (in-memory pub/sub para UI viva) -----
 export type JarvisHistoryEntry = { id: string; evt: JarvisEvent; label: string; detail?: string; at: string };
 const HISTORY: JarvisHistoryEntry[] = [];
 const LISTENERS = new Set<() => void>();
@@ -38,6 +47,15 @@ function pushHistory(evt: JarvisEvent, detail?: string) {
   });
   if (HISTORY.length > MAX) HISTORY.length = MAX;
   LISTENERS.forEach((l) => l());
+  // fire-and-forget persistência
+  void logJarvisAlert({
+    data: {
+      severidade: SEVERITY[evt],
+      origem: evt,
+      mensagem: LABELS[evt],
+      detalhe: detail,
+    },
+  }).catch(() => {});
 }
 
 export function useJarvisHistory(): JarvisHistoryEntry[] {
@@ -50,63 +68,49 @@ export function useJarvisHistory(): JarvisHistoryEntry[] {
   return HISTORY;
 }
 
-// ----- AudioContext singleton + buffer cache -----
-let ctx: AudioContext | null = null;
-const buffers: Partial<Record<JarvisEvent, AudioBuffer | null>> = {};
-const loading: Partial<Record<JarvisEvent, Promise<AudioBuffer | null>>> = {};
+// ----- Pré-carregamento com new Audio() -----
+const audioCache: Partial<Record<JarvisEvent, HTMLAudioElement>> = {};
+let preloaded = false;
 
-function getCtx(): AudioContext | null {
-  if (typeof window === "undefined") return null;
-  if (ctx) return ctx;
-  const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext | undefined;
-  if (!AC) return null;
-  try { ctx = new AC(); } catch { ctx = null; }
-  return ctx;
-}
-
-async function loadBuffer(evt: JarvisEvent): Promise<AudioBuffer | null> {
-  if (buffers[evt] !== undefined) return buffers[evt] ?? null;
-  if (loading[evt]) return loading[evt]!;
-  const c = getCtx();
-  if (!c) return null;
-  loading[evt] = (async () => {
+function preloadAll() {
+  if (preloaded || typeof window === "undefined") return;
+  preloaded = true;
+  (Object.keys(SRC) as JarvisEvent[]).forEach((evt) => {
     try {
-      const res = await fetch(SRC[evt], { cache: "reload" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const buf = await res.arrayBuffer();
-      const decoded = await c.decodeAudioData(buf);
-      buffers[evt] = decoded;
-      return decoded;
-    } catch {
-      buffers[evt] = null;
-      return null;
-    } finally {
-      delete loading[evt];
-    }
-  })();
-  return loading[evt]!;
+      const a = new Audio(SRC[evt]);
+      a.preload = "auto";
+      a.volume = 0.85;
+      audioCache[evt] = a;
+    } catch {}
+  });
 }
+
+// ----- Debounce anti-spam (60s) para warning/fail -----
+const DEBOUNCE_MS = 60_000;
+const DEBOUNCED: Set<JarvisEvent> = new Set(["warning", "fail"]);
+const lastPlayedAt: Partial<Record<JarvisEvent, number>> = {};
 
 export function useJarvis(enabled: boolean = true) {
   const firedRef = useRef<Partial<Record<string, boolean>>>({});
 
+  useEffect(() => { if (enabled) preloadAll(); }, [enabled]);
+
   const play = useCallback((evt: JarvisEvent, detail?: string) => {
     pushHistory(evt, detail);
     if (!enabled) return;
-    const c = getCtx();
-    if (!c) return;
-    if (c.state === "suspended") c.resume().catch(() => {});
-    loadBuffer(evt).then((decoded) => {
-      if (!decoded) return;
-      try {
-        const src = c.createBufferSource();
-        src.buffer = decoded;
-        const gain = c.createGain();
-        gain.gain.value = 0.8;
-        src.connect(gain).connect(c.destination);
-        src.start(0);
-      } catch {}
-    });
+    if (DEBOUNCED.has(evt)) {
+      const last = lastPlayedAt[evt] ?? 0;
+      if (Date.now() - last < DEBOUNCE_MS) return; // bloqueia som, mantém log
+    }
+    lastPlayedAt[evt] = Date.now();
+    preloadAll();
+    const a = audioCache[evt];
+    if (!a) return;
+    try {
+      a.currentTime = 0;
+      const p = a.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    } catch {}
   }, [enabled]);
 
   const playOnce = useCallback((evt: JarvisEvent, key: string, detail?: string) => {

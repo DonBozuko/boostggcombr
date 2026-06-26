@@ -140,6 +140,33 @@ export type Database = {
         }
         Relationships: []
       }
+      jarvis_alerts: {
+        Row: {
+          created_at: string
+          detalhe: string | null
+          id: string
+          mensagem: string
+          origem: string
+          severidade: string
+        }
+        Insert: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          mensagem: string
+          origem?: string
+          severidade: string
+        }
+        Update: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          mensagem?: string
+          origem?: string
+          severidade?: string
+        }
+        Relationships: []
+      }
       monitoramento_saldo: {
         Row: {
           data_hora: string

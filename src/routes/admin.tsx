@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, sincronizarIdsApi, getGrowthCentral, smartApproveIds } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
@@ -1690,32 +1690,66 @@ function WebhookHealthMonitor({ onFail }: { onFail?: (label: string, code: numbe
 }
 
 function JarvisHistoryPanel() {
-  const history = useJarvisHistory();
-  const color: Record<string, string> = {
-    welcome: "text-sky-400",
-    optimized: "text-emerald-400",
-    warning: "text-amber-400",
-    critical: "text-red-400",
-    fail: "text-fuchsia-400",
+  const live = useJarvisHistory();
+  const [sev, setSev] = useState<string>("");
+  const [origem, setOrigem] = useState<string>("");
+  const [rows, setRows] = useState<{ id: string; severidade: string; origem: string; mensagem: string; detalhe: string | null; created_at: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { listJarvisAlerts } = await import("@/lib/jarvis.functions");
+      const res = await listJarvisAlerts({ data: { severidade: sev || undefined, origem: origem || undefined, limit: 50 } });
+      setRows(res.rows);
+    } finally { setLoading(false); }
+  }, [sev, origem]);
+
+  useEffect(() => { reload(); }, [reload, live.length]);
+
+  const sevColor: Record<string, string> = {
+    info: "text-sky-400", success: "text-emerald-400", warning: "text-amber-400", critical: "text-red-400",
   };
-  const icon: Record<string, string> = {
-    welcome: "👋", optimized: "✅", warning: "⚠️", critical: "🚨", fail: "💥",
-  };
+  const sevIcon: Record<string, string> = { info: "👋", success: "✅", warning: "⚠️", critical: "🚨" };
+
   return (
     <div className="mt-4 rounded-lg border border-border/60 bg-background/40 p-4">
-      <h3 className="text-sm font-semibold mb-3">🤖 Histórico de Alertas do Jarvis <span className="text-[10px] text-muted-foreground">({history.length})</span></h3>
-      {history.length === 0 ? (
-        <div className="text-xs text-muted-foreground">Sem eventos registrados nesta sessão.</div>
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
+        <h3 className="text-sm font-semibold">🤖 Histórico de Alertas do Jarvis <span className="text-[10px] text-muted-foreground">({rows.length})</span></h3>
+        <div className="flex gap-2 items-center text-xs">
+          <select value={sev} onChange={(e) => setSev(e.target.value)} className="bg-background border border-border/60 rounded px-2 py-1">
+            <option value="">Severidade: todas</option>
+            <option value="info">Info</option>
+            <option value="success">Success</option>
+            <option value="warning">Warning</option>
+            <option value="critical">Critical</option>
+          </select>
+          <select value={origem} onChange={(e) => setOrigem(e.target.value)} className="bg-background border border-border/60 rounded px-2 py-1">
+            <option value="">Origem: todas</option>
+            <option value="welcome">welcome</option>
+            <option value="optimized">optimized</option>
+            <option value="warning">warning</option>
+            <option value="critical">critical</option>
+            <option value="fail">fail</option>
+          </select>
+          <button onClick={reload} className="px-2 py-1 border border-border/60 rounded hover:bg-background">↻</button>
+        </div>
+      </div>
+      {loading ? (
+        <div className="text-xs text-muted-foreground">Carregando…</div>
+      ) : rows.length === 0 ? (
+        <div className="text-xs text-muted-foreground">Nenhum alerta para o filtro selecionado.</div>
       ) : (
         <ul className="max-h-56 overflow-y-auto divide-y divide-border/40 text-xs font-mono">
-          {history.map((h) => (
+          {rows.map((h) => (
             <li key={h.id} className="flex items-center justify-between py-1.5 px-1">
               <span className="flex items-center gap-2">
-                <span>{icon[h.evt] ?? "•"}</span>
-                <span className={color[h.evt] ?? "text-foreground"}>{h.label}</span>
-                {h.detail && <span className="text-muted-foreground">· {h.detail}</span>}
+                <span>{sevIcon[h.severidade] ?? "•"}</span>
+                <span className={sevColor[h.severidade] ?? "text-foreground"}>{h.mensagem}</span>
+                <span className="text-muted-foreground">[{h.origem}]</span>
+                {h.detalhe && <span className="text-muted-foreground">· {h.detalhe}</span>}
               </span>
-              <span className="text-muted-foreground">{new Date(h.at).toLocaleTimeString("pt-BR")}</span>
+              <span className="text-muted-foreground">{new Date(h.created_at).toLocaleTimeString("pt-BR")}</span>
             </li>
           ))}
         </ul>
