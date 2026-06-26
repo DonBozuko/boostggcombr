@@ -101,6 +101,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           alternateName: "Boostygram",
           url: "https://boostygram.lovable.app",
           logo: "https://boostygram.lovable.app/favicon.ico",
+          taxID: "47.363.210/0001-08",
+          identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47.363.210/0001-08" },
         }),
       },
     ],
