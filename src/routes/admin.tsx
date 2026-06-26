@@ -27,7 +27,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { toast } from "sonner";
-import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
+import { useJarvis, useJarvisHistory, useJarvisSubtitle, SUBTITLES } from "@/hooks/useJarvis";
 
 import { verifyAdminToken } from "@/lib/admin-auth.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
@@ -60,17 +60,25 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   const verify = useServerFn(verifyAdminToken);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
+  const [localSubtitle, setLocalSubtitle] = useState<string | null>(null);
+  const liveSubtitle = useJarvisSubtitle();
+  const subtitle = liveSubtitle ?? localSubtitle;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token.trim() || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=11");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=12");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
-      void a.play().catch(() => {});
+      setLocalSubtitle(SUBTITLES.welcome);
+      const clear = () => setLocalSubtitle(null);
+      a.onended = clear;
+      a.onerror = clear;
+      void a.play().catch(clear);
+      window.setTimeout(clear, 8000);
     } catch {}
     void unlockJarvis();
 
@@ -93,15 +101,68 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="dark min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center p-4">
-      <div className="w-full max-w-[450px] mx-auto">
+    <div className="dark min-h-screen relative overflow-hidden bg-black text-white flex items-center justify-center p-4">
+      {/* Red HUD background — digital mesh + cyber face glow */}
+      <div
+        aria-hidden
+        className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,0,40,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,40,0.18) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 75%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,0,40,0.28), transparent 70%)",
+        }}
+      />
+      {/* Cyber face silhouettes — left & right (desktop only) */}
+      <div aria-hidden className="hidden lg:block absolute left-8 top-1/2 -translate-y-1/2 opacity-30">
+        <svg width="280" height="380" viewBox="0 0 200 280" fill="none" stroke="#ff0028" strokeWidth="1">
+          <path d="M100 20 C60 20 40 60 40 110 L40 180 C40 220 70 250 100 250 C130 250 160 220 160 180 L160 110 C160 60 140 20 100 20 Z" />
+          <circle cx="75" cy="130" r="14" /><circle cx="125" cy="130" r="14" />
+          <path d="M70 175 L130 175" /><path d="M40 110 L20 110" /><path d="M160 110 L180 110" />
+          <path d="M100 20 L100 0" /><path d="M55 250 L40 280" /><path d="M145 250 L160 280" />
+        </svg>
+      </div>
+      <div aria-hidden className="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 opacity-30 scale-x-[-1]">
+        <svg width="280" height="380" viewBox="0 0 200 280" fill="none" stroke="#ff0028" strokeWidth="1">
+          <path d="M100 20 C60 20 40 60 40 110 L40 180 C40 220 70 250 100 250 C130 250 160 220 160 180 L160 110 C160 60 140 20 100 20 Z" />
+          <circle cx="75" cy="130" r="14" /><circle cx="125" cy="130" r="14" />
+          <path d="M70 175 L130 175" />
+        </svg>
+      </div>
+
+      {/* Subtitle bubble — colado ao lado do holograma */}
+      {subtitle && (
+        <div className="hidden lg:flex absolute left-[330px] top-1/2 -translate-y-1/2 max-w-[280px] z-20 animate-fade-in">
+          <div className="relative rounded-2xl border border-red-500/60 bg-black/80 backdrop-blur-md px-4 py-3 text-sm text-red-100 shadow-[0_0_30px_rgba(255,0,40,0.5)]">
+            <span className="absolute -left-2 top-1/2 -translate-y-1/2 w-3 h-3 rotate-45 border-l border-b border-red-500/60 bg-black/80" />
+            🎙️ {subtitle}
+          </div>
+        </div>
+      )}
+      {subtitle && (
+        <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 max-w-[90%] z-20 animate-fade-in">
+          <div className="rounded-2xl border border-red-500/60 bg-black/80 backdrop-blur-md px-4 py-2 text-xs text-red-100 shadow-[0_0_30px_rgba(255,0,40,0.5)] text-center">
+            🎙️ {subtitle}
+          </div>
+        </div>
+      )}
+
+      <div className="w-full max-w-[450px] mx-auto relative z-10">
         <form
           onSubmit={submit}
-          className="rounded-2xl border border-cyan-500/30 bg-gradient-to-b from-zinc-950 to-black p-8 shadow-[0_0_60px_rgba(0,242,254,0.25)] space-y-6"
+          className="rounded-2xl border border-red-500/40 bg-gradient-to-b from-zinc-950 to-black p-8 shadow-[0_0_60px_rgba(255,0,40,0.35)] space-y-6"
         >
           <div className="text-center space-y-2">
             <div className="text-4xl">🔐</div>
-            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 to-fuchsia-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
               Painel EliteBoost Prime
             </h1>
             <p className="text-xs text-zinc-400">Acesso restrito · Token obrigatório</p>
@@ -112,12 +173,12 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
             value={token}
             onChange={(e) => setToken(e.target.value)}
             autoFocus
-            className="bg-black/60 border-cyan-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest"
+            className="bg-black/60 border-red-500/30 text-white placeholder:text-zinc-600 h-12 text-center tracking-widest"
           />
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 font-bold bg-gradient-to-r from-cyan-500 to-fuchsia-500 hover:from-cyan-400 hover:to-fuchsia-400 text-black shadow-[0_0_30px_rgba(0,242,254,0.5)] hover:shadow-[0_0_45px_rgba(254,9,121,0.6)] transition-all"
+            className="w-full h-12 font-bold bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-[0_0_30px_rgba(255,0,40,0.6)] hover:shadow-[0_0_45px_rgba(255,0,40,0.8)] transition-all"
           >
             {loading ? "Validando..." : "Entrar no Painel"}
           </Button>
