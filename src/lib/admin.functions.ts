@@ -548,16 +548,26 @@ export const smartApproveIds = createServerFn({ method: "POST" })
   });
 
 // 🔓 Leitura pública: mapa de serviços bloqueados (por network/service_type).
-// Usado pelas lojas para desativar o botão de checkout. Não expõe IDs nem rates.
+// Bloqueia quando: (a) override marcado como bloqueado, (b) service_id nulo/zero (sem candidato),
+// ou (c) nenhum fornecedor ATIVO com saldo > 0 existe (failover esgotado).
 export const getBlockedMap = createServerFn({ method: "GET" })
   .handler(async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: forn } = await supabaseAdmin
+      .from("fornecedores")
+      .select("slug, ativo, saldo_atual")
+      .eq("ativo", true);
+    const algumDisponivel = (forn ?? []).some((f: any) => Number(f.saldo_atual) > 0);
+
     const { data, error } = await supabaseAdmin
       .from("service_id_overrides")
-      .select("network, service_type, bloqueado")
-      .eq("bloqueado", true);
+      .select("network, service_type, bloqueado, service_id");
     if (error) return { ok: false as const, blocked: [] as Array<{ network: string; service_type: string }> };
-    const blocked = (data ?? []).map((r: any) => ({ network: r.network, service_type: r.service_type }));
+
+    const blocked = (data ?? [])
+      .filter((r: any) => !algumDisponivel || r.bloqueado === true || r.service_id == null || Number(r.service_id) === 0)
+      .map((r: any) => ({ network: r.network, service_type: r.service_type }));
     return { ok: true as const, blocked };
   });
 

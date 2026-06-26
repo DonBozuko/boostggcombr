@@ -735,7 +735,7 @@ function Landing() {
             >
 
               {tipoBloqueado ? (
-                <span>Instabilidade Temporária - Reposição de Estoque</span>
+                <span>⚠️ Indisponível Temporariamente (Manutenção do Servidor)</span>
               ) : loading ? (
                 <span className="flex items-center gap-2">
                   <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
