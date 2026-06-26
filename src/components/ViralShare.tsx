@@ -5,12 +5,12 @@ import { Share2, Check } from "lucide-react";
 const SITE = "https://boostygram.lovable.app";
 
 const messagesByRoute: Record<string, string> = {
-  "/": "Comprei seguidores no @boostygram e meu Instagram disparou de verdade. Entrega rápida e real:",
-  "/tiktok": "Boostygram fez meu TikTok bombar no FYP. Views reais em horas:",
-  "/youtube": "WatchTime real e inscritos com a Boostygram. Canal monetizando:",
-  "/facebook": "Boostygram subiu o engajamento da minha página no Facebook de forma orgânica:",
-  "/telegram": "Meu canal do Telegram lotou com a Boostygram. Membros reais:",
-  "/trafego": "Tráfego orgânico real no meu site com a Boostygram. SEO local funcionou:",
+  "/": "Comprei seguidores na EliteBoost Prime e meu Instagram disparou de verdade. Entrega rápida e real:",
+  "/tiktok": "EliteBoost Prime fez meu TikTok bombar no FYP. Views reais em horas:",
+  "/youtube": "WatchTime real e inscritos com a EliteBoost Prime. Canal monetizando:",
+  "/facebook": "EliteBoost Prime subiu o engajamento da minha página no Facebook de forma orgânica:",
+  "/telegram": "Meu canal do Telegram lotou com a EliteBoost Prime. Membros reais:",
+  "/trafego": "Tráfego orgânico real no meu site com a EliteBoost Prime. SEO local funcionou:",
 };
 
 export function ViralShare({ route = "/" }: { route?: string }) {
@@ -20,7 +20,7 @@ export function ViralShare({ route = "/" }: { route?: string }) {
   const handleShare = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "Boostygram", text, url: SITE });
+        await navigator.share({ title: "EliteBoost Prime", text, url: SITE });
         return;
       }
     } catch {}
@@ -37,7 +37,7 @@ export function ViralShare({ route = "/" }: { route?: string }) {
         🎁 Compartilhamento Premiado
       </div>
       <p className="text-xs text-zinc-300 mt-1">
-        Compartilhe a Boostygram e ganhe <b>bônus exclusivo</b> na sua próxima compra.
+        Compartilhe a EliteBoost Prime e ganhe <b>bônus exclusivo</b> na sua próxima compra.
       </p>
       <Button
         type="button"

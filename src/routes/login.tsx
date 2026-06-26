@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-export const ADMIN_SESSION_KEY = "boostygram_admin_session";
+export const ADMIN_SESSION_KEY = "eliteboost_prime_admin_session";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -33,7 +33,7 @@ function LoginPage() {
       const res = await verify({ data: { token: token.trim() } });
       if (res.ok) {
         window.localStorage.setItem(ADMIN_SESSION_KEY, "1");
-        window.localStorage.setItem("boostygram_admin_token", token.trim());
+        window.localStorage.setItem("eliteboost_prime_admin_token", token.trim());
         toast.success("Acesso autorizado");
         navigate({ to: "/admin" });
       } else {
@@ -51,7 +51,7 @@ function LoginPage() {
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card">
         <div>
           <h1 className="text-xl font-bold">🔐 Login Admin</h1>
-          <p className="text-sm text-muted-foreground">Acesso restrito · Boostygram</p>
+          <p className="text-sm text-muted-foreground">Acesso restrito · EliteBoost Prime</p>
         </div>
         <Input
           type="password"

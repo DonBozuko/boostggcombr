@@ -77,7 +77,7 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Comprar Seguidores no Instagram Orgânicos e Reais | Boostygram";
+    const title = "Comprar Seguidores no Instagram Orgânicos e Reais | EliteBoost Prime";
     const description =
       "Comprar seguidores no Instagram com entrega imediata e 100% seguro. Pacotes de seguidores brasileiros, curtidas e engajamento real via Pix. Teste por R$ 5!";
     const url = "https://boostygram.lovable.app/";
@@ -100,8 +100,8 @@ export const Route = createFileRoute("/")({
         { property: "og:image", content: ogImage },
         { property: "og:image:width", content: "1216" },
         { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "Boostygram — Seguidores reais no Instagram via Pix" },
-        { property: "og:site_name", content: "Boostygram" },
+        { property: "og:image:alt", content: "EliteBoost Prime — Seguidores reais no Instagram via Pix" },
+        { property: "og:site_name", content: "EliteBoost Prime" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
@@ -118,17 +118,19 @@ export const Route = createFileRoute("/")({
               {
                 "@type": "Organization",
                 "@id": "https://boostygram.lovable.app/#organization",
-                name: "Boostygram",
+                name: "EliteBoost Prime",
                 url: "https://boostygram.lovable.app/",
                 logo: ogImage,
                 description,
                 sameAs: [],
+                taxID: "47363210000108",
+                identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47363210000108" },
               },
               {
                 "@type": "WebSite",
                 "@id": "https://boostygram.lovable.app/#website",
                 url: "https://boostygram.lovable.app/",
-                name: "Boostygram",
+                name: "EliteBoost Prime",
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://boostygram.lovable.app/#organization" },
               },
@@ -180,9 +182,9 @@ export const Route = createFileRoute("/")({
               {
                 "@type": "Product",
                 "@id": "https://boostygram.lovable.app/#product",
-                name: "Seguidores Reais para Instagram - Boostygram",
+                name: "Seguidores Reais para Instagram - EliteBoost Prime",
                 description,
-                brand: { "@type": "Brand", name: "Boostygram" },
+                brand: { "@type": "Brand", name: "EliteBoost Prime" },
                 image: ogImage,
                 aggregateRating: {
                   "@type": "AggregateRating",
@@ -469,7 +471,7 @@ function Landing() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">BOOSTYGRAM</span>
+            <span className="font-display font-bold text-lg">ELITEBOOST PRIME</span>
           </div>
           <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
             <a href="#planos">Ver Planos</a>
@@ -975,11 +977,11 @@ function Landing() {
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">BOOSTYGRAM</span>
+            <span className="font-display font-semibold text-foreground">ELITEBOOST PRIME</span>
           </div>
           <div className="flex items-center gap-4">
             <a href="/privacidade" className="hover:text-foreground">Privacidade & Segurança</a>
-            <span>© 2026 BoostGram. Não somos afiliados ao Instagram ou Meta.</span>
+            <span>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</span>
           </div>
         </div>
       </footer>

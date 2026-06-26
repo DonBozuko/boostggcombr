@@ -519,7 +519,7 @@ export const smartApproveIds = createServerFn({ method: "POST" })
         const mbLines = marginBlocks.map((b) =>
           `⛔ ${b.network}/${b.type}: margem ${b.margem_pct}% < ${MARGEM_MINIMA_PCT}% → BLOQUEADO`
         ).join("\n");
-        const text = `🔄 AUDITORIA DE IDs — Boostygram\n${approvals.length} calibrados · ${marginBlocks.length} bloqueados por margem\n\n${lines}${mbLines ? `\n\n${mbLines}` : ""}${blocked.length ? `\n\n🟡 ${blocked.length} divergências para revisão humana.` : ""}`;
+        const text = `🔄 AUDITORIA DE IDs — EliteBoost Prime\n${approvals.length} calibrados · ${marginBlocks.length} bloqueados por margem\n\n${lines}${mbLines ? `\n\n${mbLines}` : ""}${blocked.length ? `\n\n🟡 ${blocked.length} divergências para revisão humana.` : ""}`;
         await fetch("https://connector-gateway.lovable.dev/telegram/sendMessage", {
           method: "POST",
           headers: {

@@ -26,7 +26,7 @@ import ogFacebook from "@/assets/og-facebook.jpg";
 
 export const Route = createFileRoute("/facebook")({
   head: () => {
-    const title = "Comprar Seguidores no Facebook e Curtidas | Boostygram";
+    const title = "Comprar Seguidores no Facebook e Curtidas | EliteBoost Prime";
     const description =
       "Comprar seguidores no Facebook e curtidas reais com entrega via Pix automático. Pacotes para crescer perfil, página e posts rapidamente.";
     const keywords =
@@ -214,7 +214,7 @@ function FacebookLanding() {
         <div className="container mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FacebookIcon size={18} />
-            <span className="font-bold text-sm text-white">BOOSTYGRAM</span>
+            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
           </div>
           <span className="text-xs" style={{ color: BLUE }}>FACEBOOK ⚡</span>
         </div>
@@ -231,7 +231,7 @@ function FacebookLanding() {
           <FacebookIcon size={42} />
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          <span style={{ color: "#fff", textShadow: `0 0 18px ${BLUE}` }}>BOOSTYGRAM</span>{" "}
+          <span style={{ color: "#fff", textShadow: `0 0 18px ${BLUE}` }}>ELITEBOOST PRIME</span>{" "}
           <span style={{ color: BLUE, textShadow: `0 0 18px ${BLUE}` }}>| DOMINE O FACEBOOK ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">

@@ -23,7 +23,7 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/trafego")({
   head: () => {
-    const title = "Comprar Tráfego Web Real Brasil e Mundial | Boostygram";
+    const title = "Comprar Tráfego Web Real Brasil e Mundial | EliteBoost Prime";
     const description = "Compre tráfego web real para seu site ou landing page. Visitas geo-segmentadas Brasil ou Global, entrega automática via Pix.";
     const url = "https://boostygram.lovable.app/trafego";
     const ogImage = `https://boostygram.lovable.app${ogTrafego}?v=2`;
@@ -108,7 +108,7 @@ function TrafegoLanding() {
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
 
     // Sandbox Mode (admin-only flag em localStorage)
-    if (typeof window !== "undefined" && window.localStorage.getItem("BOOSTYGRAM_SANDBOX") === "1") {
+    if (typeof window !== "undefined" && window.localStorage.getItem("ELITEBOOST_PRIME_SANDBOX") === "1") {
       setPaid(false);
       setPedidoInfo({
         price: selected.price, tier: selected.tier, profile: parsed.data.profile,
@@ -160,7 +160,7 @@ function TrafegoLanding() {
         <div className="container mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Globe2 size={18} style={{ color: NEON }} />
-            <span className="font-bold text-sm text-white">BOOSTYGRAM</span>
+            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
           </div>
           <span className="text-xs" style={{ color: NEON }}>TRÁFEGO WEB ⚡</span>
         </div>
@@ -171,7 +171,7 @@ function TrafegoLanding() {
           <Globe2 size={42} style={{ color: NEON }} />
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          <span style={{ color: "#fff", textShadow: `0 0 18px ${NEON}` }}>BOOSTYGRAM</span>{" "}
+          <span style={{ color: "#fff", textShadow: `0 0 18px ${NEON}` }}>ELITEBOOST PRIME</span>{" "}
           <span style={{ color: NEON, textShadow: `0 0 18px ${NEON}` }}>| TRÁFEGO WEB ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Visitas reais para seu site · entrega automática via Pix · geo-segmentado</p>
