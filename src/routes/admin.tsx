@@ -27,7 +27,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { toast } from "sonner";
-import { useJarvis } from "@/hooks/useJarvis";
+import { useJarvis, useJarvisHistory } from "@/hooks/useJarvis";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin · BoostGram" }, { name: "robots", content: "noindex,nofollow" }] }),
@@ -1608,7 +1608,10 @@ Ref: ${p.id.slice(0, 8)}`;
           })}
         </div>
 
-        <WebhookHealthMonitor />
+        <WebhookHealthMonitor onFail={(label, code) => jarvis.play("fail", `${label} HTTP ${code}`)} />
+
+        <JarvisHistoryPanel />
+
 
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
           BoostyGram Admin · v1.0.0-LAUNCH
@@ -1628,12 +1631,13 @@ function Info({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function WebhookHealthMonitor() {
+function WebhookHealthMonitor({ onFail }: { onFail?: (label: string, code: number) => void }) {
   const endpoints = [
     { label: "Mercado Pago", url: "/api/public/mp-webhook" },
     { label: "Telegram Bot", url: "/api/public/telegram/webhook" },
   ];
   const [pings, setPings] = useState<Record<string, { code: number; at: string } | null>>({});
+  const firedRef = useRef<Record<string, boolean>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -1643,8 +1647,18 @@ function WebhookHealthMonitor() {
         try {
           const res = await fetch(e.url, { method: "HEAD" });
           out[e.url] = { code: res.status, at: new Date().toISOString() };
+          if (res.status >= 500 && onFail && !firedRef.current[e.url]) {
+            firedRef.current[e.url] = true;
+            onFail(e.label, res.status);
+          } else if (res.status < 500) {
+            firedRef.current[e.url] = false;
+          }
         } catch {
           out[e.url] = null;
+          if (onFail && !firedRef.current[e.url]) {
+            firedRef.current[e.url] = true;
+            onFail(e.label, 0);
+          }
         }
       }));
       if (!cancelled) setPings(out);
@@ -1652,7 +1666,7 @@ function WebhookHealthMonitor() {
     ping();
     const i = setInterval(ping, 30_000);
     return () => { cancelled = true; clearInterval(i); };
-  }, []);
+  }, [onFail]);
 
   return (
     <div className="mt-6 rounded-lg border border-border/60 bg-background/40 p-4">
@@ -1674,6 +1688,42 @@ function WebhookHealthMonitor() {
     </div>
   );
 }
+
+function JarvisHistoryPanel() {
+  const history = useJarvisHistory();
+  const color: Record<string, string> = {
+    welcome: "text-sky-400",
+    optimized: "text-emerald-400",
+    warning: "text-amber-400",
+    critical: "text-red-400",
+    fail: "text-fuchsia-400",
+  };
+  const icon: Record<string, string> = {
+    welcome: "👋", optimized: "✅", warning: "⚠️", critical: "🚨", fail: "💥",
+  };
+  return (
+    <div className="mt-4 rounded-lg border border-border/60 bg-background/40 p-4">
+      <h3 className="text-sm font-semibold mb-3">🤖 Histórico de Alertas do Jarvis <span className="text-[10px] text-muted-foreground">({history.length})</span></h3>
+      {history.length === 0 ? (
+        <div className="text-xs text-muted-foreground">Sem eventos registrados nesta sessão.</div>
+      ) : (
+        <ul className="max-h-56 overflow-y-auto divide-y divide-border/40 text-xs font-mono">
+          {history.map((h) => (
+            <li key={h.id} className="flex items-center justify-between py-1.5 px-1">
+              <span className="flex items-center gap-2">
+                <span>{icon[h.evt] ?? "•"}</span>
+                <span className={color[h.evt] ?? "text-foreground"}>{h.label}</span>
+                {h.detail && <span className="text-muted-foreground">· {h.detail}</span>}
+              </span>
+              <span className="text-muted-foreground">{new Date(h.at).toLocaleTimeString("pt-BR")}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 
 function CronCard({
   cron,
