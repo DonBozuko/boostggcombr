@@ -61,7 +61,7 @@ function AdminSettingsButton() {
           </div>
           <div className="flex justify-between border-b border-border/40 pb-2">
             <span className="text-muted-foreground">Cache áudio Jarvis</span>
-            <span className="font-mono">v=22</span>
+            <span className="font-mono">v=23</span>
           </div>
           <div className="flex justify-between border-b border-border/40 pb-2">
             <span className="text-muted-foreground">RLS jarvis_alerts</span>
@@ -165,7 +165,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
 
   const playWelcome = () => {
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=22");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=23");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
