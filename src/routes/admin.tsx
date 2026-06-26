@@ -889,7 +889,18 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   );
 
   return (
-    <div className="dark jarvis-hud min-h-screen text-foreground p-4">
+    <div className="dark jarvis-hud min-h-screen text-foreground p-4 relative">
+      {/* Holographic translucent JARVIS background — fixed, behind everything */}
+      <img
+        src={jarvisHud}
+        alt=""
+        aria-hidden
+        loading="lazy"
+        width={1024}
+        height={1024}
+        className="hidden lg:block fixed inset-0 z-0 w-full h-full object-contain opacity-40 pointer-events-none mix-blend-screen"
+        style={{ filter: "drop-shadow(0 0 60px rgba(255,0,40,0.5))" }}
+      />
       {/* Holographic armor outlines — desktop only */}
       <svg className="jarvis-armor left hidden lg:block" viewBox="0 0 400 800" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
         <defs>
@@ -928,7 +939,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           <circle cx="220" cy="300" r="20" />
         </g>
       </svg>
-      <div className="max-w-7xl mx-auto space-y-4">
+      <div className="max-w-[1200px] mx-auto space-y-4 relative z-10">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="text-2xl font-bold">Admin · EliteBoost Prime</h1>
           <div className="flex items-center gap-2">
