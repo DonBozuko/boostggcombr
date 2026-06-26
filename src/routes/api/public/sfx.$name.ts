@@ -8,26 +8,42 @@ import { createFileRoute } from "@tanstack/react-router";
 const ALLOW = new Set(["welcome", "optimized", "warning", "critical", "fail", "jarvis-interacao"]);
 
 async function serve(request: Request, name: string) {
-  const clean = name.replace(/\?.*$/, "").replace(/\.mp3$/i, "");
-  if (!ALLOW.has(clean)) return new Response("not found", { status: 404 });
+  try {
+    const clean = name.replace(/\?.*$/, "").replace(/\.mp3$/i, "");
+    if (!ALLOW.has(clean)) return new Response("not found", { status: 404 });
 
-  const upstream = new URL(`/assets/sounds/jarvis-fx/${clean}.mp3`, request.url);
-  const range = request.headers.get("range");
-  const res = await fetch(upstream.toString(), {
-    headers: range ? { range } : {},
-  });
-  if (!res.ok && res.status !== 206) {
-    return new Response("upstream error", { status: 502 });
+    const upstream = new URL(`/assets/sounds/jarvis-fx/${clean}.mp3`, request.url);
+    const range = request.headers.get("range");
+    let res: Response;
+    try {
+      res = await fetch(upstream.toString(), { headers: range ? { range } : {} });
+    } catch {
+      return new Response(JSON.stringify({ error: "UPSTREAM_FAIL", fallback: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+    if (!res.ok && res.status !== 206) {
+      return new Response(JSON.stringify({ error: "NOT_FOUND", fallback: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
+    const headers = new Headers(res.headers);
+    headers.set("Content-Type", "audio/mpeg");
+    headers.set("Accept-Ranges", "bytes");
+    headers.set("Cache-Control", "public, max-age=31536000, immutable");
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+
+    return new Response(res.body, { status: res.status, headers });
+  } catch {
+    return new Response(JSON.stringify({ error: "HANDLER_FAIL", fallback: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    });
   }
-
-  const headers = new Headers(res.headers);
-  headers.set("Content-Type", "audio/mpeg");
-  headers.set("Accept-Ranges", "bytes");
-  headers.set("Cache-Control", "public, max-age=31536000, immutable");
-  headers.set("Access-Control-Allow-Origin", "*");
-  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
-
-  return new Response(res.body, { status: res.status, headers });
 }
 
 export const Route = createFileRoute("/api/public/sfx/$name")({
