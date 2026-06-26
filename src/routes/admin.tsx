@@ -502,13 +502,15 @@ Ref: ${p.id.slice(0, 8)}`;
     return () => alert.stopLoop();
   }, [isAlerta, soundOn]);
 
-  const toggleSound = () => {
+  const toggleSound = async () => {
     if (!soundOn) {
+      // Destrava AudioContext DENTRO do gesto do usuário
+      await jarvis.unlock();
       alert.enable();
       setSoundOn(true);
       toast.success("Alerta sonoro ativado");
-      // Jarvis: boot do painel
-      setTimeout(() => jarvis.play("welcome"), 50);
+      // Jarvis: boot do painel (já destravado)
+      jarvis.play("welcome");
     } else {
       setSoundOn(false);
       toast("Alerta sonoro desativado");
