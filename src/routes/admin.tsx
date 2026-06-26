@@ -625,7 +625,7 @@ Ref: ${p.id.slice(0, 8)}`;
   };
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !loaded) return;
     loadMonitor();
     loadCron();
     loadCache();
@@ -635,9 +635,11 @@ Ref: ${p.id.slice(0, 8)}`;
     loadFaturamento();
     loadFornecedores();
     loadGrowth();
+    load();
     const i = setInterval(() => { loadMonitor(); loadCron(); loadCache(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); loadGrowth(); load(); }, 60000);
     return () => clearInterval(i);
-  }, [token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, loaded]);
 
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
