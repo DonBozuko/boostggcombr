@@ -173,6 +173,8 @@ export function MobileFrame({
         style={{ background: bg }}
       >
         {children}
+        <ReviewsCarousel accent={data.accent} />
+        <LivePurchasesTicker accent={data.accent} />
         <footer
           className="mt-8 mb-4 px-4 text-center select-none"
           aria-label="Versão de lançamento"
