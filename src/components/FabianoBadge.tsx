@@ -119,7 +119,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
   );
 
   return (
-    <div className="fixed bottom-20 left-5 z-50 flex items-end gap-3">
+    <div className="fixed bottom-16 left-3 z-50 flex items-end gap-2">
       <a
         href={web}
         target="_blank"
@@ -128,7 +128,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         aria-label="Fabiano Santiago — Falar no Telegram"
 
 
-        className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
+        className={`relative h-11 w-11 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
       >
         {imgOk ? (
           <img

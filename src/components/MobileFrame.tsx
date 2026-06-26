@@ -179,12 +179,12 @@ export function MobileFrame({
           <ReviewsCarousel accent={data.accent} />
           <LivePurchasesTicker accent={data.accent} />
           <footer
-            className="mt-2 mb-2 px-4 text-center select-none"
+            className="mt-1 mb-1 px-3 text-center select-none"
             aria-label="Versão de lançamento"
           >
             <span
-              className="inline-block text-[9px] tracking-[0.4em] font-mono uppercase text-white/40 border border-white/10 rounded-full px-3 py-0.5"
-              style={{ textShadow: "0 0 6px rgba(255,255,255,0.15)" }}
+              className="inline-block text-[8px] tracking-[0.35em] font-mono uppercase text-white/40 border border-white/10 rounded-full px-2 py-0.5"
+              style={{ textShadow: "0 0 5px rgba(255,255,255,0.15)" }}
             >
               Versão v1.0.0-LAUNCH
             </span>

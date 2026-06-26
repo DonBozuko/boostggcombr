@@ -9,27 +9,27 @@ export function LivePurchasesTicker({ accent = "#00f2fe" }: { accent?: string })
   const loop = [...MESSAGES, ...MESSAGES];
   return (
     <div
-      className="mx-3 mt-4 mb-2 overflow-hidden rounded-xl border backdrop-blur-md"
+      className="mx-2 mt-1 mb-1 overflow-hidden rounded-lg border backdrop-blur-md"
       style={{
         borderColor: `${accent}40`,
         background: "rgba(255,255,255,0.03)",
-        boxShadow: `0 0 18px ${accent}22 inset`,
+        boxShadow: `0 0 12px ${accent}22 inset`,
       }}
       aria-label="Compras em tempo real"
     >
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-white/5">
+      <div className="flex items-center gap-1.5 px-2 py-0.5 border-b border-white/5">
         <span
-          className="inline-block h-2 w-2 rounded-full animate-pulse"
-          style={{ background: accent, boxShadow: `0 0 8px ${accent}` }}
+          className="inline-block h-1.5 w-1.5 rounded-full animate-pulse"
+          style={{ background: accent, boxShadow: `0 0 6px ${accent}` }}
         />
         <span
-          className="text-[10px] font-bold tracking-[0.35em] uppercase"
-          style={{ color: accent, textShadow: `0 0 6px ${accent}` }}
+          className="text-[8px] font-bold tracking-[0.3em] uppercase"
+          style={{ color: accent, textShadow: `0 0 4px ${accent}` }}
         >
           Compras ao vivo
         </span>
       </div>
-      <div className="relative h-7 overflow-hidden">
+      <div className="relative h-5 overflow-hidden">
         <div
           className="absolute left-0 top-0 flex whitespace-nowrap will-change-transform"
           style={{ animation: "lp-marquee 28s linear infinite" }}
@@ -37,7 +37,7 @@ export function LivePurchasesTicker({ accent = "#00f2fe" }: { accent?: string })
           {loop.map((m, i) => (
             <span
               key={i}
-              className="px-6 py-1.5 text-[11px] font-medium text-white/85"
+              className="px-4 py-1 text-[10px] font-medium text-white/85"
               style={{ textShadow: `0 0 6px ${accent}55` }}
             >
               ✦ {m}
