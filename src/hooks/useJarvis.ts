@@ -8,10 +8,10 @@ import { useCallback, useEffect, useRef } from "react";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/assets/sounds/jarvis-fx/jarvis-welcome.mp3",
-  optimized: "/assets/sounds/jarvis-fx/jarvis-optimized.mp3",
-  warning:   "/assets/sounds/jarvis-fx/jarvis-warning.mp3",
-  critical:  "/assets/sounds/jarvis-fx/jarvis-critical.mp3",
+  welcome:   "/assets/sounds/jarvis-fx/welcome.mp3",
+  optimized: "/assets/sounds/jarvis-fx/optimized.mp3",
+  warning:   "/assets/sounds/jarvis-fx/warning.mp3",
+  critical:  "/assets/sounds/jarvis-fx/critical.mp3",
 };
 
 export function useJarvis(enabled: boolean = true) {
