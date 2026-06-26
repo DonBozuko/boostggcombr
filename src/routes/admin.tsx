@@ -113,7 +113,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
     if (!email.trim() || !password || loading) return;
     // 🔊 Toca DENTRO do gesto, ANTES de qualquer await — preserva user-gesture chain.
     try {
-      const a = new Audio("/api/public/sfx/welcome.mp3?v=18");
+      const a = new Audio("/api/public/sfx/welcome.mp3?v=19");
       a.crossOrigin = "anonymous";
       a.preload = "auto";
       a.volume = 1.0;
@@ -128,10 +128,6 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
 
     setLoading(true);
     try {
-      if (email.trim().toLowerCase() !== ADMIN_EMAIL) {
-        toast.error("Acesso restrito ao administrador-mestre");
-        return;
-      }
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -140,18 +136,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
         toast.error("Credenciais inválidas");
         return;
       }
-      const { data: sessionData } = await supabase.auth.getSession();
-      const sessionEmail = sessionData.session?.user?.email?.toLowerCase() ?? "";
-      if (!sessionData.session || sessionEmail !== ADMIN_EMAIL) {
-        await supabase.auth.signOut();
-        toast.error("Sessão administrativa não reconhecida");
-        return;
-      }
-      const ok = await onSuccess();
-      if (!ok) {
-        toast.error("Falha ao abrir sessão administrativa");
-        return;
-      }
+      await onSuccess();
       toast.success("Acesso autorizado · Jarvis online");
       await navigate({ to: "/admin", replace: true });
     } catch {
