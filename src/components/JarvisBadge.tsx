@@ -91,7 +91,7 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
     if (typeof window === "undefined") return;
     stopAllJarvis();
 
-    const audio = new Audio(AUDIO_SRC);
+    const audio = new Audio(AUDIO_BY_VARIANT[variant] ?? AUDIO_BY_VARIANT.instagram);
     audio.crossOrigin = "anonymous";
     audio.preload = "auto";
     audio.volume = 0.95;
