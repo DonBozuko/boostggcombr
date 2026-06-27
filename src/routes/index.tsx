@@ -1,3 +1,4 @@
+import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
@@ -375,7 +376,7 @@ function Landing() {
     const tick = async () => {
       try {
         const res = await getStatusFn({ data: { id } });
-        if (!cancelled && res.ok && res.status === "paid") setPaid(true);
+        if (!cancelled && res.ok && res.status === "paid") { setPaid(true); playSuccessAudio(); }
       } catch (err) {
         console.error("[poll status]", err);
       }
