@@ -248,7 +248,10 @@ function YoutubeLanding() {
           <span style={{ color: RED, textShadow: `0 0 18px ${RED}` }}>| DOMINE O YOUTUBE ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">
-          Inscritos e visualizações reais via Pix · entrega automática · sem senha
+          Crescimento real para monetização e autoridade.
+        </p>
+        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">
+          Inscritos · Watch Time · Monetização
         </p>
       </header>
 

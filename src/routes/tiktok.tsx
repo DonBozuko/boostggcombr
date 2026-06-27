@@ -253,10 +253,13 @@ function TiktokLanding() {
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
           <span style={{ color: "#fff", textShadow: `0 0 18px ${CYAN}` }}>ELITEBOOST PRIME</span>{" "}
-          <span style={{ color: PINK, textShadow: `0 0 18px ${PINK}` }}>| ALAVANQUE SEU TIKTOK ⚡</span>
+          <span style={{ color: PINK, textShadow: `0 0 18px ${PINK}` }}>| DOMINE O TIKTOK ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">
-          Seguidores, curtidas e views via Pix · entrega automática · sem senha
+          Crescimento real para monetização e autoridade.
+        </p>
+        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">
+          Views FYP · Curtidas · Retenção
         </p>
       </header>
 

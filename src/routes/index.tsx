@@ -503,11 +503,11 @@ function Landing() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight"
+            className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight uppercase"
           >
-            Impulsione seu Perfil com{" "}
+            <span className="text-white">ELITEBOOST PRIME |</span>{" "}
             <span className="bg-gradient-to-r from-yellow-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
-              Seguidores Reais
+              DOMINE O INSTAGRAM ⚡
             </span>
           </motion.h1>
 
@@ -517,8 +517,11 @@ function Landing() {
             transition={{ duration: 0.6, delay: 0.25 }}
             className="mt-5 text-base md:text-lg text-zinc-300 max-w-xl mx-auto"
           >
-            Entrega automática · 100% seguro · Sem senha · Garantia de reposição 30 dias.
+            Crescimento real para monetização e autoridade.
           </motion.p>
+          <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">
+            Seguidores Reais · Curtidas · Autoridade
+          </p>
 
 
         </div>
