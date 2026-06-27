@@ -279,34 +279,46 @@ export type Database = {
       }
       scheduled_posts: {
         Row: {
+          approval_token: string | null
+          approved: boolean
           caption_text: string
           created_at: string
           created_by: string | null
+          format: string
           id: string
           image_url: string | null
           logs: Json
+          network: string
           post_date: string
           status: string
           updated_at: string
         }
         Insert: {
+          approval_token?: string | null
+          approved?: boolean
           caption_text?: string
           created_at?: string
           created_by?: string | null
+          format?: string
           id?: string
           image_url?: string | null
           logs?: Json
+          network?: string
           post_date: string
           status?: string
           updated_at?: string
         }
         Update: {
+          approval_token?: string | null
+          approved?: boolean
           caption_text?: string
           created_at?: string
           created_by?: string | null
+          format?: string
           id?: string
           image_url?: string | null
           logs?: Json
+          network?: string
           post_date?: string
           status?: string
           updated_at?: string

@@ -11,6 +11,7 @@ import { Eye, EyeOff, Settings } from "lucide-react";
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
+import { IntegrityVerifier } from "@/components/IntegrityVerifier";
 import {
   Dialog,
   DialogContent,
@@ -969,6 +970,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         </div>
 
+        <IntegrityVerifier />
         <JarvisAlertCenter />
         <AdminCostAlert />
 
