@@ -136,16 +136,14 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-export type AdminTab = "buscar" | "ofertas" | "explorar" | "pedidos" | "servicos" | "jarvis" | "rls";
+export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis";
 
 const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
-  { id: "ofertas", icon: Tag, label: "Ofertas", hint: "Cupons de ativação" },
-  { id: "explorar", icon: Compass, label: "Explorar", hint: "Telemetria das 6 lojas" },
-  { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "⚡ CARREGAR PEDIDOS" },
+  { id: "explorar", icon: Compass, label: "Explorar", hint: "Vitrines públicas" },
+  { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "Visão Geral · Casa dos Avós" },
   { id: "servicos", icon: Briefcase, label: "Serviços", badge: "NOVIDADE" },
   { id: "jarvis", icon: Bot, label: "Central J.A.R.V.I.S.", hint: "Agendador omnichannel" },
-  { id: "rls", icon: Lock, label: "Privacidade e RLS", hint: "Travas de segurança" },
 ];
 
 function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: AdminTab) => void }) {
@@ -1074,31 +1072,66 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         )}
 
-        {activeTab === "ofertas" && (
-          <div className="rounded-2xl border border-fuchsia-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
-            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-fuchsia-200">🏷️ Cupons de Ativação</h2>
-            <p className="text-xs text-white/60">Controle de cupons promocionais — módulo em provisionamento. Tabela <code>service_id_overrides</code> e fluxo de aplicação no checkout serão liberados em fase 2.</p>
-          </div>
-        )}
-
         {activeTab === "pedidos" && (
-          !loaded ? (
-            <div className="flex justify-center py-6">
-              <Button
-                onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
-                disabled={loading}
-                className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
-              >
-                ⚡ CARREGAR PEDIDOS E SERVIÇOS
-              </Button>
+          <div className="space-y-4">
+            {!loaded ? (
+              <div className="flex justify-center py-6">
+                <Button
+                  onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
+                  disabled={loading}
+                  className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
+                >
+                  ⚡ CARREGAR PEDIDOS E SERVIÇOS
+                </Button>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+                  {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
+                </Button>
+              </div>
+            )}
+
+            <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="text-xl font-extrabold tracking-tight">🌐 Visão Geral — Casa dos Avós</h2>
+                <span className="text-xs text-muted-foreground">{faturamento?.count ?? 0} pedido(s) pagos</span>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="rounded-xl bg-black/30 border border-emerald-500/30 p-4">
+                  <div className="text-xs uppercase text-muted-foreground">Faturamento Total</div>
+                  <div className="mt-1 text-2xl font-bold text-emerald-300">
+                    R$ {(faturamento?.geral ?? 0).toFixed(2)}
+                  </div>
+                </div>
+                {REDES.filter((r) => r.key !== "overview").map((r) => {
+                  const t = faturamento?.totais[r.key];
+                  return (
+                    <div key={r.key} className={`rounded-xl bg-black/30 border p-4 ${r.disabled ? "border-border/40 opacity-60" : "border-border"}`}>
+                      <div className="text-xs uppercase text-muted-foreground">{r.icon} {r.label}</div>
+                      <div className="mt-1 text-2xl font-bold">R$ {(t?.total ?? 0).toFixed(2)}</div>
+                      <div className="text-[10px] text-muted-foreground">{t?.count ?? 0} pedido(s)</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="rounded-xl bg-black/30 border border-border p-4">
+                <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo · Tráfego Web</div>
+                {f ? (
+                  <div className="flex items-center gap-3 text-sm flex-wrap">
+                    <span className="inline-flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                      {f.nome}: <strong>{online ? "Online" : f.status}</strong>
+                    </span>
+                    <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
+                    <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground">Carregando status...</div>
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="flex justify-end">
-              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-                {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
-              </Button>
-            </div>
-          )
+          </div>
         )}
 
         {activeTab === "servicos" && (
@@ -1223,234 +1256,12 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         </div>
 
-        {/* Navegação Multi-Painel (Casa dos Avós) */}
-
-        <div className="rounded-2xl border border-border bg-card/30 p-2 flex flex-wrap gap-2">
-          {REDES.map((r) => {
-            const active = aba === r.key;
-            const brandActive: Record<string, string> = {
-              overview:  "bg-emerald-500/15 text-emerald-100 border-emerald-400/60 shadow-[0_0_18px_rgba(16,185,129,0.45)]",
-              instagram: "bg-gradient-to-r from-yellow-500/20 to-amber-400/20 text-amber-100 border-amber-400/70 shadow-[0_0_20px_rgba(245,158,11,0.55)]",
-              tiktok:    "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 text-cyan-100 border-cyan-400/70 shadow-[0_0_20px_rgba(0,242,254,0.5)]",
-              youtube:   "bg-red-600/20 text-red-100 border-red-500/80 shadow-[0_0_22px_rgba(255,0,0,0.55)]",
-              facebook:  "bg-blue-600/20 text-blue-100 border-blue-500/80 shadow-[0_0_20px_rgba(24,119,242,0.55)]",
-              trafego:   "bg-purple-600/20 text-purple-100 border-purple-500/80 shadow-[0_0_22px_rgba(176,38,255,0.55)]",
-              telegram:  "bg-sky-500/20 text-sky-100 border-sky-400/80 shadow-[0_0_22px_rgba(0,204,255,0.55)]",
-            };
-            const brandIdle: Record<string, string> = {
-              overview:  "hover:text-emerald-200 hover:border-emerald-500/40",
-              instagram: "hover:text-amber-200 hover:border-amber-500/40",
-              tiktok:    "hover:text-cyan-200 hover:border-cyan-500/40",
-              youtube:   "hover:text-red-200 hover:border-red-500/40",
-              facebook:  "hover:text-blue-200 hover:border-blue-500/40",
-              trafego:   "hover:text-purple-200 hover:border-purple-500/40",
-              telegram:  "hover:text-sky-200 hover:border-sky-500/40",
-            };
-            return (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => !r.disabled && setAba(r.key)}
-                disabled={r.disabled}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
-                  active
-                    ? brandActive[r.key] ?? "bg-foreground/10 border-foreground/40"
-                    : r.disabled
-                    ? "bg-background/30 text-muted-foreground/60 border-border/50 cursor-not-allowed"
-                    : `bg-background/40 text-muted-foreground border-border ${brandIdle[r.key] ?? "hover:text-foreground"}`
-                }`}
-              >
-                <span className="mr-1.5">{r.icon}</span>{r.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Visão Geral — faturamento somado de todas as redes */}
-        {aba === "overview" && (
-          <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <h2 className="text-xl font-extrabold tracking-tight">🌐 Visão Geral — Casa dos Avós</h2>
-              <span className="text-xs text-muted-foreground">{faturamento?.count ?? 0} pedido(s) pagos</span>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="rounded-xl bg-black/30 border border-emerald-500/30 p-4">
-                <div className="text-xs uppercase text-muted-foreground">Faturamento Total</div>
-                <div className="mt-1 text-2xl font-bold text-emerald-300">
-                  R$ {(faturamento?.geral ?? 0).toFixed(2)}
-                </div>
-              </div>
-              {REDES.filter((r) => r.key !== "overview").map((r) => {
-                const t = faturamento?.totais[r.key];
-                return (
-                  <div key={r.key} className={`rounded-xl bg-black/30 border p-4 ${r.disabled ? "border-border/40 opacity-60" : "border-border"}`}>
-                    <div className="text-xs uppercase text-muted-foreground">{r.icon} {r.label}</div>
-                    <div className="mt-1 text-2xl font-bold">R$ {(t?.total ?? 0).toFixed(2)}</div>
-                    <div className="text-[10px] text-muted-foreground">{t?.count ?? 0} pedido(s)</div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="rounded-xl bg-black/30 border border-border p-4">
-              <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo</div>
-              {f ? (
-                <div className="flex items-center gap-3 text-sm flex-wrap">
-                  <span className="inline-flex items-center gap-2">
-                    <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
-                    {f.nome}: <strong>{online ? "Online" : f.status}</strong>
-                  </span>
-                  <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
-                  <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
-                </div>
-              ) : (
-                <div className="text-sm text-muted-foreground">Carregando status...</div>
-              )}
-            </div>
-          </div>
-        )}
         </div>
 
 
 
 
 
-        <div hidden={activeTab !== "pedidos"} className="space-y-4">
-        {/* Assistente de Caixa Inteligente */}
-        {caixa && (
-          <div className="rounded-2xl border border-indigo-500/30 bg-card/60 p-6 space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <h2 className="text-xl font-extrabold tracking-tight">💡 Assistente de Caixa Inteligente</h2>
-              {caixa.alerts.length > 0 && (f?.falhas_consecutivas ?? 0) > 0 && (
-                <span className="text-xs font-semibold rounded-full px-3 py-1 bg-red-600/80 text-white">
-                  {caixa.alerts.length} alerta(s) aberto(s)
-                </span>
-              )}
-            </div>
-            
-            {(() => {
-              // Fonte única de verdade: saldo BRL ao vivo (USD × cotação do fornecedor).
-              // Removido o card "Caixa Principal" — não havia API real de saldo MP, era placebo de R$ 0,00.
-              const liveBrl = f?.saldo_brl;
-              const snapshot = caixa.supplier?.saldo_atual ?? 0;
-              const saldoSmm = liveBrl != null ? liveBrl : snapshot;
-              const metaIdeal = caixa.supplier?.meta_ideal ?? 1000;
-              const falta = Math.max(0, metaIdeal - saldoSmm);
-              const baixo = saldoSmm < 50;
-              return (
-                <div className={`rounded-xl bg-black/30 border p-4 ${baixo ? "border-red-500/60" : "border-white/10"}`}>
-                  <div className="text-xs uppercase text-muted-foreground">Saldo Atual no Fornecedor · SMMhype</div>
-                  <div className={`mt-1 text-3xl font-extrabold ${baixo ? "text-red-400" : "text-emerald-300"}`}>
-                    R$ {saldoSmm.toFixed(2)}
-                  </div>
-                  <div className="mt-2 text-sm">
-                    Meta Ideal R$ {metaIdeal.toFixed(2)}:{" "}
-                    <span className="font-semibold text-emerald-400">
-                      {falta > 0 ? `falta depositar R$ ${falta.toFixed(2)}` : "atingida ✅"}
-                    </span>
-                  </div>
-                  {baixo && (
-                    <div className="mt-2 text-xs font-semibold text-red-300">
-                      🚨 Abaixo de R$ 50 — alerta Telegram disparado. Deposite manualmente no painel do fornecedor.
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-            {caixa.alerts.length > 0 && (f?.falhas_consecutivas ?? 0) > 0 && (
-              <div className="space-y-2">
-                {caixa.alerts.slice(0, 5).map((a) => (
-                  <div
-                    key={a.id}
-                    className={`rounded-lg border p-3 text-sm ${
-                      a.nivel >= 2
-                        ? "border-red-500 bg-red-950/40 text-red-100"
-                        : "border-yellow-500 bg-yellow-950/40 text-yellow-100"
-                    }`}
-                  >
-                    <div className="font-semibold">
-                      {a.nivel >= 2 ? "🚨 Nível 2 · URGENTE" : "⚠️ Nível 1"} · {new Date(a.created_at).toLocaleString("pt-BR")}
-                    </div>
-                    <div>{a.mensagem}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 📈 Central de Growth — funil por porta de entrada + margem real */}
-        {growth && (
-          <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-5">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <h2 className="text-xl font-extrabold tracking-tight">📈 Central de Growth</h2>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Cotação: R$ {growth.cotacao.toFixed(2)}/USD · {growth.total_pedidos} pedidos analisados
-              </span>
-            </div>
-
-            {/* Margem por rede */}
-            <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Margem de Lucro Estimada (BRL/1k)</div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                {Object.entries(growth.margem).map(([rede, m]) => {
-                  const pct = m.margem_pct;
-                  const tone =
-                    pct == null ? "border-white/10 bg-black/30 text-muted-foreground"
-                    : pct >= 60 ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-200"
-                    : pct >= 30 ? "border-amber-500/40 bg-amber-950/30 text-amber-200"
-                    : "border-red-500/40 bg-red-950/30 text-red-200";
-                  return (
-                    <div key={rede} className={`rounded-xl border p-3 ${tone}`}>
-                      <div className="flex items-center gap-2 text-xs font-semibold uppercase">
-                        <span>{REDE_ICON[rede] ?? "•"}</span><span>{rede}</span>
-                      </div>
-                      <div className="mt-1 text-2xl font-extrabold">
-                        {pct != null ? `${pct.toFixed(1)}%` : "—"}
-                      </div>
-                      <div className="text-[11px] opacity-80 mt-1">
-                        Venda R$ {m.venda_brl_mil.toFixed(2)}
-                        {m.custo_brl_mil != null ? ` · Custo R$ ${m.custo_brl_mil.toFixed(2)}` : " · sem cache"}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="text-[10px] text-muted-foreground mt-2">
-                Custo = rate mais barato em <span className="font-mono">services_cache</span> × cotação. Robô permanece read-only.
-              </div>
-            </div>
-
-            {/* Portas de Entrada */}
-            <div>
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Portas de Entrada (pedidos por rede)</div>
-              <div className="space-y-1.5">
-                {Object.entries(growth.funil)
-                  .sort((a, b) => b[1].total - a[1].total)
-                  .map(([rede, b]) => {
-                    const pct = growth.total_pedidos > 0 ? (b.total / growth.total_pedidos) * 100 : 0;
-                    return (
-                      <div key={rede} className="flex items-center gap-3 text-sm">
-                        <div className="w-28 flex items-center gap-2 shrink-0">
-                          <span>{REDE_ICON[rede] ?? "•"}</span>
-                          <span className="font-semibold uppercase text-xs">{rede}</span>
-                        </div>
-                        <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400" style={{ width: `${pct.toFixed(1)}%` }} />
-                        </div>
-                        <div className="w-44 text-right text-xs text-muted-foreground tabular-nums">
-                          {b.total} ({pct.toFixed(1)}%) · ✓{b.paid} ⏳{b.pending} ✗{b.cancelled + b.failed}
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-              <div className="text-[10px] text-muted-foreground mt-2">
-                Métrica baseada em pedidos persistidos (não cliques anônimos — pixel/eventos não instrumentados).
-              </div>
-            </div>
-          </div>
-        )}
-        </div>
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler */}
@@ -1825,297 +1636,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         )}
         </div>
 
-        <div hidden={activeTab !== "pedidos"} className="space-y-4">
-        {/* Auditoria — separa Crítico (servidor/fornecedor) de Warning (cliente/pix) */}
-        {(() => {
-          const base = falhos
-            .filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba)
-            .slice()
-            .sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
-          if (base.length === 0) return null;
 
-          const CRITICAL = new Set(["SMM_FAILED", "amount_mismatch", "mp_rejected"]);
-          const criticos = base.filter((p) => CRITICAL.has(p.status));
-          const warnings = base.filter((p) => !CRITICAL.has(p.status));
-
-          const STATUS_LABEL: Record<string, string> = {
-            SMM_FAILED: "Falha de Entrega",
-            amount_mismatch: "Valor Divergente",
-            mp_rejected: "Pagamento Recusado",
-            mp_pending: "Carrinho Abandonado • Pix Pendente",
-            mp_cancelled: "Pix Expirado",
-            mp_expired: "Pix Expirado",
-            mp_in_process: "Pix em Processamento",
-          };
-
-          const renderRow = (p: Pedido, severity: "critical" | "warning") => {
-            const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
-            const isSmm = p.status === "SMM_FAILED";
-            const badgeStatus =
-              severity === "critical"
-                ? "bg-red-500/20 text-red-200 border-red-500/50"
-                : "bg-amber-500/15 text-amber-200 border-amber-500/50";
-            const label = STATUS_LABEL[p.status] ?? p.status;
-            return (
-              <div key={p.id} className="py-3 flex items-start justify-between gap-3 text-sm">
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
-                      {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeStatus}`}>
-                      {label}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border bg-background/40 text-muted-foreground">
-                      {isCurtidas ? "Curtidas" : "Seguidores"}
-                    </span>
-                    {(() => {
-                      const sid = resolveServiceIdClient(p.pacote, p.quantidade);
-                      return sid ? (
-                        <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
-                          SVC #{sid}
-                        </span>
-                      ) : null;
-                    })()}
-                    <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
-                  </div>
-
-                  {p.error_detail && (() => {
-                    const raw = p.error_detail!;
-                    const low = raw.toLowerCase();
-                    let origem = "Fornecedor (SMMhype)";
-                    let prefix = "Falha";
-                    let tone = "text-red-300/90 border-red-500/40 bg-red-950/40";
-                    if (/(invalid|private|not.?found|link|url|username|user not|perfil)/.test(low)) {
-                      origem = "Cliente (Link Inválido)"; prefix = "Ação Requerida";
-                      tone = "text-amber-200 border-amber-500/40 bg-amber-950/30";
-                    } else if (/(timeout|econn|database|supabase|postgres|fetch failed|network)/.test(low)) {
-                      origem = "Seu Sistema"; prefix = "Erro Técnico";
-                      tone = "text-orange-200 border-orange-500/40 bg-orange-950/30";
-                    } else if (/(smmhype|provider|api|service|saldo|balance|429|503|502)/.test(low)) {
-                      origem = "Fornecedor (SMMhype)"; prefix = "Falha";
-                    }
-                    return (
-                      <div className={`text-xs font-mono break-all rounded-md border px-2 py-1 ${tone}`}>
-                        <span className="font-bold not-italic mr-1">{prefix}: {raw}</span>
-                        <span className="opacity-80">• {origem}</span>
-                      </div>
-                    );
-                  })()}
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"} · {p.id}
-                  </div>
-                </div>
-                {isSmm && (() => {
-                  const redeKey = p.rede_social ?? "instagram";
-                  const countRede = falhos.filter((x) => (x.rede_social ?? "instagram") === redeKey && x.status === "SMM_FAILED").length;
-                  const badgeTone: Record<string, string> = {
-                    instagram: "bg-amber-500/15 text-amber-200 border-amber-500/50",
-                    tiktok:    "bg-cyan-500/15 text-cyan-200 border-cyan-500/50",
-                    youtube:   "bg-red-500/15 text-red-200 border-red-500/50",
-                    facebook:  "bg-blue-500/15 text-blue-200 border-blue-500/50",
-                  };
-                  return (
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        title={`Total de falhas em ${redeKey}`}
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${badgeTone[redeKey] ?? "bg-muted text-muted-foreground border-border"}`}
-                      >
-                        {REDE_ICON[redeKey] ?? "📸"} {countRede}
-                      </span>
-                      <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
-                        {busyId === p.id ? "..." : "Tentar de novo"}
-                      </Button>
-                    </div>
-                  );
-                })()}
-                {(p.status === "mp_pending" || p.status === "mp_cancelled" || p.status === "mp_expired") && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="shrink-0 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
-                    onClick={() => recuperarVenda(p)}
-                    title="Gera template e abre wa.me"
-                  >
-                    🟢 Recuperar
-                  </Button>
-                )}
-              </div>
-            );
-          };
-
-          return (
-            <div className="space-y-4">
-              {criticos.length > 0 && (
-                <div className="rounded-2xl border border-red-600/60 bg-red-950/30 p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-bold text-red-200 flex items-center gap-2">
-                      🚨 Crítico · {criticos.length} falha(s) de servidor/fornecedor
-                    </h2>
-                    <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
-                  </div>
-                  <div className="divide-y divide-red-900/60">
-                    {criticos.map((p) => renderRow(p, "critical"))}
-                  </div>
-                </div>
-              )}
-              {warnings.length > 0 && (
-                <div className="rounded-2xl border border-amber-600/50 bg-amber-950/20 p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="font-bold text-amber-200 flex items-center gap-2">
-                      ⚠️ Atenção · {warnings.length} pedido(s) com pagamento pendente/expirado
-                    </h2>
-                    <Button size="sm" variant="outline" onClick={() => loadFalhos()}>Atualizar</Button>
-                  </div>
-                  <div className="divide-y divide-amber-900/40">
-                    {warnings.map((p) => renderRow(p, "warning"))}
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })()}
-
-        {/* Pedidos pendentes (Pix gerado, aguardando pagamento) */}
-        {(() => {
-          const lista = pendentes.filter((p) => aba === "overview" || (p.rede_social ?? "instagram") === aba);
-          if (lista.length === 0) return null;
-          return (
-          <div className="rounded-2xl border border-yellow-700/60 bg-yellow-950/20 p-4 space-y-3">
-
-            <div className="flex items-center justify-between">
-              <h2 className="font-bold text-yellow-200 flex items-center gap-2">
-                ⏳ {lista.length} pedido(s) pendente(s)
-              </h2>
-              <Button size="sm" variant="outline" onClick={() => loadPendentes()}>Atualizar</Button>
-            </div>
-            <div className="divide-y divide-yellow-900/40">
-              {lista.map((p) => (
-                <div key={p.id} className="py-2 flex items-start justify-between gap-3 text-sm">
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
-                        {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
-                      </span>
-                      <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
-
-                      {p.abandono_notificado_at && (
-                        <span
-                          title={`Enviado em ${new Date(p.abandono_notificado_at).toLocaleString("pt-BR")}`}
-                          className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-emerald-500/10 text-emerald-300 border-emerald-500/40"
-                        >
-                          ✓ Notificação de Abandono Enviada
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="shrink-0 border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10"
-                    onClick={() => recuperarVenda(p)}
-                    title="Abre wa.me em branco com o template colado — cole o número do lead"
-                  >
-                    🟢 Recuperar Venda
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-          );
-        })()}
-
-
-
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground mr-1">Filtrar:</span>
-          {(["todos", "seguidores", "curtidas"] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFiltro(f)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors ${
-                filtro === f
-                  ? "bg-fuchsia-500/20 text-fuchsia-200 border-fuchsia-500/50"
-                  : "bg-background/40 text-muted-foreground border-border hover:text-foreground"
-              }`}
-            >
-              {f === "todos" ? "Todos" : f === "seguidores" ? "Seguidores" : "Curtidas"}
-            </button>
-          ))}
-          <span className="text-xs text-muted-foreground ml-auto">
-            {pedidos.filter((p) => {
-              if (aba !== "overview" && (p.rede_social ?? "instagram") !== aba) return false;
-              if (filtro === "todos") return true;
-              const isC = p.pacote?.toLowerCase().startsWith("l");
-              return filtro === "curtidas" ? isC : !isC;
-            }).length} pedido(s)
-          </span>
-        </div>
-
-        <div className="border border-border rounded-lg divide-y divide-border">
-          {pedidos.length === 0 && (
-            <div className="p-4 text-sm text-muted-foreground">Nenhum pedido carregado.</div>
-          )}
-          {pedidos
-            .filter((p) => {
-              if (aba !== "overview" && (p.rede_social ?? "instagram") !== aba) return false;
-              if (filtro === "todos") return true;
-              const isC = p.pacote?.toLowerCase().startsWith("l");
-              return filtro === "curtidas" ? isC : !isC;
-            })
-
-            .map((p) => {
-            const isCurtidas = p.pacote?.toLowerCase().startsWith("l");
-            return (
-              <div key={p.id} className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-sm">
-                <div className="space-y-1 min-w-0 flex-1">
-                  <div className="font-mono text-xs text-muted-foreground break-all">{p.id}</div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span title={p.rede_social ?? "instagram"} className="text-base leading-none">
-                      {REDE_ICON[p.rede_social ?? "instagram"] ?? "📸"}
-                    </span>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      isCurtidas
-                        ? "bg-pink-500/15 text-pink-300 border border-pink-500/40"
-                        : "bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/40"
-                    }`}>
-                      {isCurtidas ? "Curtidas" : "Seguidores"}
-                    </span>
-                    {(() => {
-                      const sid = resolveServiceIdClient(p.pacote, p.quantidade);
-                      return sid ? (
-                        <span title="Service ID enviado ao SMMhype" className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-cyan-500/40 bg-cyan-950/30 text-cyan-200">
-                          SVC #{sid}
-                        </span>
-                      ) : null;
-                    })()}
-                    <span className="font-semibold">{p.pacote}</span> · {p.quantidade} · @{p.instagram_user}
-
-                  </div>
-
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(p.created_at).toLocaleString("pt-BR")} · MP: {p.mercado_pago_id ?? "-"}
-                  </div>
-                </div>
-                <Button size="sm" onClick={() => reenviar(p.id)} disabled={busyId === p.id}>
-                  {busyId === p.id ? "Enviando..." : "Reenviar SMM"}
-                </Button>
-              </div>
-            );
-          })}
-        </div>
-        </div>
-
-        <div hidden={activeTab !== "rls"} className="space-y-4">
-        <WebhookHealthMonitor onFail={(label, code) => jarvis.play("fail", `${label} HTTP ${code}`)} />
-
-        <JarvisHistoryPanel />
-        </div>
 
 
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
