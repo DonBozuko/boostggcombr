@@ -3,6 +3,8 @@ import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { MobileFrame } from "@/components/MobileFrame";
+import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
+import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
@@ -241,95 +243,29 @@ function TiktokLanding() {
         </div>
       </div>
 
-      {/* TABS */}
-      <div className="flex justify-center mb-10 px-4">
-        <div
-          className="inline-flex w-full sm:w-auto p-1 rounded-full"
-          style={{ background: "#111", border: `1px solid ${CYAN}40` }}
-        >
-          {(["seguidores", "curtidas", "visualizacoes"] as Categoria[]).map((c) => {
-            const active = categoria === c;
-            const label = c === "seguidores" ? "🎵 Seguidores" : c === "curtidas" ? "❤️ Curtidas" : "🎬 Visualizações";
-            return (
-              <button
-                key={c}
-                type="button"
-                onClick={() => { setCategoria(c); setPlanId(""); setProfile(""); }}
-                className="inline-flex flex-1 sm:flex-none items-center justify-center gap-2 px-5 sm:px-7 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide transition-all"
-                style={
-                  active
-                    ? {
-                        background: `linear-gradient(135deg, ${CYAN}, ${PINK})`,
-                        color: "#0a0a0a",
-                        boxShadow: `0 0 22px ${CYAN}88, 0 0 30px ${PINK}66`,
-                      }
-                    : { color: "#a1a1aa", background: "transparent" }
-                }
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* PLANS */}
-      <section className="container mx-auto px-4 sm:px-6 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {currentPlans.map((p) => {
-            const isSeg = categoria === "seguidores";
-            const Icon = categoria === "curtidas" ? Heart : Eye;
-            return (
-              <div
-                key={p.id}
-                className="relative rounded-2xl p-6 flex flex-col items-center text-center"
-                style={{
-                  background: "#0f0f10",
-                  border: `1px solid ${CYAN}55`,
-                  boxShadow: `0 0 24px ${CYAN}22, inset 0 0 20px ${PINK}10`,
-                }}
-              >
-                <div
-                  className="mb-4 size-16 rounded-2xl grid place-items-center"
-                  style={{
-                    background: "#0a0a0a",
-                    border: `1px solid ${CYAN}`,
-                    boxShadow: `0 0 24px ${CYAN}, 0 0 40px ${PINK}88`,
-                  }}
-                >
-                  {isSeg ? <TikTokIcon size={28} /> : <Icon className="size-7 text-white" strokeWidth={2.2} />}
-                </div>
-                <h3 className="text-xl font-bold">{p.tier}</h3>
-                <div
-                  className="mt-3 text-4xl font-extrabold tracking-tight"
-                  style={{ color: "#fff", textShadow: `0 0 14px ${CYAN}` }}
-                >
-                  {p.price}
-                </div>
-                <p className="mt-2 text-xs text-zinc-400">
-                  {categoria === "seguidores" ? "Entrega imediata no perfil" : "Disparo direto no vídeo"}
-                </p>
-
-                <button
-                  type="button"
-                  disabled={tipoBloqueado}
-                  onClick={() => { setPlanId(p.id); document.getElementById("tt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                  className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
-                  style={tipoBloqueado
-                    ? { background: "#222", color: "#888", border: `1px solid ${CYAN}44` }
-                    : {
-                        background: planId === p.id ? PINK : `linear-gradient(135deg, ${CYAN}, ${PINK})`,
-                        color: "#0a0a0a",
-                        boxShadow: `0 0 22px ${PINK}88`,
-                      }}
-                >
-                  <Zap className="size-4" /> {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : "Comprar agora"}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+      <PremiumCategorySelector
+        accent={CYAN}
+        active={categoria}
+        onChange={(k) => { setCategoria(k as Categoria); setPlanId(""); setProfile(""); }}
+        items={[
+          { key: "seguidores",    label: "Seguidores",    emoji: "🎵", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
+          { key: "curtidas",      label: "Curtidas",      emoji: "❤️", badge: "Em Alta",          badgeColor: PINK },
+          { key: "visualizacoes", label: "Visualizações", emoji: "🎬", badge: "Recomendado",      badgeColor: CYAN },
+        ]}
+      />
+      <PremiumPricingGrid
+        accent={CYAN}
+        disabled={tipoBloqueado}
+        disabledLabel="⚠️ Em manutenção"
+        unit={categoria === "seguidores" ? "Seguidores" : categoria === "curtidas" ? "Curtidas" : "Visualizações"}
+        plans={currentPlans.map((p, i) => ({
+          id: p.id,
+          qty: p.quantidade.toLocaleString("pt-BR"),
+          price: p.price,
+          fire: i === 1,
+        }))}
+        onBuy={(id) => { setPlanId(id); document.getElementById("tt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
+      />
 
       {/* FORM */}
       <section

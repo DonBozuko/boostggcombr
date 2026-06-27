@@ -3,6 +3,8 @@ import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { MobileFrame } from "@/components/MobileFrame";
+import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
+import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
@@ -170,50 +172,29 @@ function TrafegoLanding() {
         </div>
       </div>
 
-      <div className="flex justify-center mb-10 px-4">
-        <div className="inline-flex w-full sm:w-auto p-1 rounded-full" style={{ background: "#111", border: `1px solid ${NEON}55` }}>
-          {(["brasil", "mundial"] as Categoria[]).map((c) => {
-            const active = categoria === c;
-            const label = c === "brasil" ? "🇧🇷 Brasil" : "🌎 Mundial";
-            return (
-              <button key={c} type="button"
-                onClick={() => { setCategoria(c); setPlanId(""); setProfile(""); }}
-                className="inline-flex flex-1 sm:flex-none items-center justify-center gap-2 px-5 sm:px-7 py-2.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wide transition-all"
-                style={active
-                  ? { background: NEON, color: "#fff", boxShadow: `0 0 22px ${NEON}, 0 0 30px ${NEON}88` }
-                  : { color: "#a1a1aa", background: "transparent" }}>
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <section className="container mx-auto px-4 sm:px-6 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {currentPlans.map((p) => (
-            <div key={p.id} className="relative rounded-2xl p-6 flex flex-col items-center text-center"
-              style={{ background: "#0f0f10", border: `1px solid ${NEON}66`, boxShadow: `0 0 24px ${NEON}33` }}>
-              <div className="mb-4 size-16 rounded-2xl grid place-items-center"
-                style={{ background: BG, border: `1px solid ${NEON}`, boxShadow: `0 0 24px ${NEON}, 0 0 40px ${NEON}aa` }}>
-                <MapPin className="size-7" style={{ color: NEON }} strokeWidth={2.2} />
-              </div>
-              <h3 className="text-xl font-bold">{p.tier}</h3>
-              <div className="mt-3 text-4xl font-extrabold tracking-tight" style={{ color: "#fff", textShadow: `0 0 14px ${NEON}` }}>{p.price}</div>
-              <p className="mt-2 text-xs text-zinc-400">Visitas reais com geo-segmentação</p>
-              <button type="button"
-                disabled={tipoBloqueado}
-                onClick={() => { setPlanId(p.id); document.getElementById("tw-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
-                className="mt-5 w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-extrabold uppercase tracking-wide disabled:opacity-60 disabled:cursor-not-allowed"
-                style={tipoBloqueado
-                  ? { background: "#222", color: "#888", border: `1px solid ${NEON}44` }
-                  : { background: NEON, color: "#fff", boxShadow: `0 0 22px ${NEON}aa` }}>
-                <Zap className="size-4" /> {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : "Comprar agora"}
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
+      <PremiumCategorySelector
+        accent={NEON}
+        active={categoria}
+        onChange={(k) => { setCategoria(k as Categoria); setPlanId(""); setProfile(""); }}
+        items={[
+          { key: "brasil",  label: "Brasil",   emoji: "🇧🇷", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
+          { key: "mundial", label: "Mundial",  emoji: "🌎", badge: "Em Alta",         badgeColor: "#fe0979" },
+          { key: "_geo",    label: "Geo-Alvo", emoji: "📍", badge: "Recomendado",     badgeColor: NEON },
+        ]}
+      />
+      <PremiumPricingGrid
+        accent={NEON}
+        disabled={tipoBloqueado}
+        disabledLabel="⚠️ Em manutenção"
+        unit="Visitas"
+        plans={currentPlans.map((p, i) => ({
+          id: p.id,
+          qty: p.quantidade.toLocaleString("pt-BR"),
+          price: p.price,
+          fire: i === 1,
+        }))}
+        onBuy={(id) => { setPlanId(id); document.getElementById("tw-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
+      />
 
       <section id="tw-pedido" className="py-12 border-y" style={{ borderColor: `${NEON}44`, background: "#0d0d0e" }}>
         <div className="container mx-auto px-4 sm:px-6 max-w-xl">
