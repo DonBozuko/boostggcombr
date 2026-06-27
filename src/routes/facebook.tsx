@@ -24,6 +24,7 @@ import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import { CouponField } from "@/components/CouponField";
 import ogFacebook from "@/assets/og-facebook.jpg";
 
 export const Route = createFileRoute("/facebook")({
@@ -367,6 +368,8 @@ function FacebookLanding() {
               />
             </div>
 
+            <CouponField accent="#1877F2" />
+
             <Button
               type="button"
               size="lg"
@@ -376,14 +379,14 @@ function FacebookLanding() {
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}
-              className="w-full h-12 font-extrabold uppercase tracking-wide border-0"
+              className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{
                 background: BLUE,
                 color: "#fff",
-                boxShadow: `0 0 25px ${BLUE}aa`,
+                boxShadow: `0 0 35px ${BLUE}`,
               }}
             >
-              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática

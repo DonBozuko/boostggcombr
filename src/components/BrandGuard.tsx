@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 
 const OFFICIAL_HOSTS = [
-  "boostygram.lovable.app",
+  "eliteboostprime.lovable.app",
   "localhost",
   "127.0.0.1",
 ];
-const OFFICIAL_URL = "https://boostygram.lovable.app";
+const OFFICIAL_URL = "https://eliteboostprime.lovable.app";
 
 export function BrandGuard() {
   useEffect(() => {

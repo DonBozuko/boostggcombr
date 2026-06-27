@@ -18,6 +18,7 @@ import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import { CouponField } from "@/components/CouponField";
 import ogTrafego from "@/assets/og-trafego.jpg";
 
 const NEON = "#B026FF";
@@ -239,11 +240,12 @@ function TrafegoLanding() {
                 placeholder="https://seusite.com.br/landing"
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }} maxLength={500} />
             </div>
+            <CouponField accent={NEON} />
             <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
               onClick={() => { const sel = allPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
-              className="w-full h-12 font-extrabold uppercase tracking-wide border-0"
-              style={{ background: NEON, color: "#fff", boxShadow: `0 0 25px ${NEON}aa` }}>
-              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
+              style={{ background: NEON, color: "#fff", boxShadow: `0 0 35px ${NEON}` }}>
+              {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · entrega automática</p>
           </div>

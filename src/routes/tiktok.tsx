@@ -24,6 +24,7 @@ import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import { CouponField } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
 
 export const Route = createFileRoute("/tiktok")({
@@ -394,6 +395,8 @@ function TiktokLanding() {
               />
             </div>
 
+            <CouponField accent="#00f2fe" />
+
             <Button
               type="button"
               size="lg"
@@ -403,14 +406,14 @@ function TiktokLanding() {
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}
-              className="w-full h-12 font-extrabold uppercase tracking-wide border-0"
+              className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{
                 background: `linear-gradient(135deg, ${CYAN}, ${PINK})`,
                 color: "#0a0a0a",
-                boxShadow: `0 0 25px ${PINK}88, 0 0 25px ${CYAN}88`,
+                boxShadow: `0 0 35px ${PINK}, 0 0 35px ${CYAN}`,
               }}
             >
-              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática
