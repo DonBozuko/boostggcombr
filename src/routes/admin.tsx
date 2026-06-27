@@ -1459,6 +1459,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
 
 
+        <div hidden={activeTab !== "servicos"} className="space-y-4">
         {/* Widget Monitor de Saldo */}
         {f && style && (
           <div className="space-y-3">
