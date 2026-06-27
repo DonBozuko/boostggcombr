@@ -3,6 +3,7 @@ import { LivePurchasesTicker } from "./LivePurchasesTicker";
 import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
+import { WelcomeDiscountPopup } from "./WelcomeDiscountPopup";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
 import ttLeft from "@/assets/char-tt-left.png";
