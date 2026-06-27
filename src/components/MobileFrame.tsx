@@ -227,9 +227,10 @@ export function MobileFrame({
       `}</style>
       <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
-        className="w-full sm:max-w-full md:max-w-[450px] h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col"
-        style={{ background: bg }}
+        className="w-full sm:max-w-full md:max-w-[450px] h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col font-sans"
+        style={{ background: bg, fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
+        <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} />
         <div className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-auto flex flex-col">
           {children}
         </div>
