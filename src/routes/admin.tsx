@@ -136,7 +136,9 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-const MENU_ITEMS: Array<{ id: string; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
+export type AdminTab = "buscar" | "ofertas" | "explorar" | "pedidos" | "servicos" | "jarvis" | "rls";
+
+const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
   { id: "ofertas", icon: Tag, label: "Ofertas", hint: "Cupons de ativação" },
   { id: "explorar", icon: Compass, label: "Explorar", hint: "Telemetria das 6 lojas" },
@@ -146,32 +148,41 @@ const MENU_ITEMS: Array<{ id: string; icon: typeof Search; label: string; hint?:
   { id: "rls", icon: Lock, label: "Privacidade e RLS", hint: "Travas de segurança" },
 ];
 
-function LuxuryMenuList() {
+function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: AdminTab) => void }) {
   return (
     <nav className="rounded-2xl border border-cyan-400/20 bg-black/40 backdrop-blur-xl overflow-hidden divide-y divide-cyan-400/10 shadow-[0_0_30px_rgba(0,242,254,0.12)]">
-      {MENU_ITEMS.map(({ id, icon: Icon, label, hint, badge }) => (
-        <a
-          key={id}
-          href={`#${id}`}
-          className="group flex items-center gap-3 px-4 py-3.5 hover:bg-cyan-400/5 transition-colors"
-        >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400/10 border border-cyan-400/30 text-cyan-300">
-            <Icon size={18} />
-          </span>
-          <span className="flex-1 min-w-0">
-            <span className="flex items-center gap-2">
-              <span className="font-semibold text-white">{label}</span>
-              {badge ? (
-                <span className="text-[9px] font-extrabold tracking-[0.18em] px-1.5 py-0.5 rounded bg-fuchsia-500/15 border border-fuchsia-400/60 text-fuchsia-300 shadow-[0_0_10px_rgba(255,0,200,0.4)]">
-                  {badge}
-                </span>
-              ) : null}
+      {MENU_ITEMS.map(({ id, icon: Icon, label, hint, badge }) => {
+        const isActive = active === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={isActive}
+            onClick={() => onChange(id)}
+            className={`group w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+              isActive ? "bg-cyan-400/10 border-l-2 border-cyan-300" : "hover:bg-cyan-400/5"
+            }`}
+          >
+            <span className={`flex h-9 w-9 items-center justify-center rounded-lg border ${
+              isActive ? "bg-cyan-400/25 border-cyan-300 text-cyan-100 shadow-[0_0_14px_rgba(0,242,254,0.55)]" : "bg-cyan-400/10 border-cyan-400/30 text-cyan-300"
+            }`}>
+              <Icon size={18} />
             </span>
-            {hint ? <span className="block text-[11px] text-white/50 truncate">{hint}</span> : null}
-          </span>
-          <ChevronRight size={16} className="text-cyan-300/70 group-hover:translate-x-0.5 transition-transform" />
-        </a>
-      ))}
+            <span className="flex-1 min-w-0">
+              <span className="flex items-center gap-2">
+                <span className={`font-semibold ${isActive ? "text-cyan-100" : "text-white"}`}>{label}</span>
+                {badge ? (
+                  <span className="text-[9px] font-extrabold tracking-[0.18em] px-1.5 py-0.5 rounded bg-fuchsia-500/15 border border-fuchsia-400/60 text-fuchsia-300 shadow-[0_0_10px_rgba(255,0,200,0.4)]">
+                    {badge}
+                  </span>
+                ) : null}
+              </span>
+              {hint ? <span className="block text-[11px] text-white/50 truncate">{hint}</span> : null}
+            </span>
+            <ChevronRight size={16} className={`${isActive ? "text-cyan-200 translate-x-0.5" : "text-cyan-300/70"} group-hover:translate-x-0.5 transition-transform`} />
+          </button>
+        );
+      })}
       <button
         onClick={async () => {
           await supabase.auth.signOut();
