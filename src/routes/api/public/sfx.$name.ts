@@ -5,7 +5,7 @@ import { createFileRoute } from "@tanstack/react-router";
  * Resolve bloqueio silencioso de navegadores em mp3 sem MIME explícito.
  * Suporta Range → responde 206 Partial Content quando solicitado.
  */
-const ALLOW = new Set(["welcome", "optimized", "warning", "critical", "fail", "jarvis-interacao", "jarvis-pix", "jarvis-sucesso"]);
+const ALLOW = new Set(["welcome", "optimized", "warning", "critical", "fail", "jarvis-interacao", "jarvis-pix", "jarvis-sucesso", "jarvis-instagram", "jarvis-tiktok", "jarvis-youtube", "jarvis-facebook", "jarvis-telegram", "jarvis-trafego"]);
 
 async function serve(request: Request, name: string) {
   try {
