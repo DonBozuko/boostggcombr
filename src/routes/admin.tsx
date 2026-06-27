@@ -968,6 +968,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         </div>
 
+        <JarvisAlertCenter />
         <AdminCostAlert />
 
 
