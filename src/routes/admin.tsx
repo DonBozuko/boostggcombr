@@ -136,7 +136,7 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-const MENU_ITEMS = [
+const MENU_ITEMS: Array<{ id: string; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
   { id: "ofertas", icon: Tag, label: "Ofertas", hint: "Cupons de ativação" },
   { id: "explorar", icon: Compass, label: "Explorar", hint: "Telemetria das 6 lojas" },
@@ -144,7 +144,7 @@ const MENU_ITEMS = [
   { id: "servicos", icon: Briefcase, label: "Serviços", badge: "NOVIDADE" },
   { id: "jarvis", icon: Bot, label: "Central J.A.R.V.I.S.", hint: "Agendador omnichannel" },
   { id: "rls", icon: Lock, label: "Privacidade e RLS", hint: "Travas de segurança" },
-] as const;
+];
 
 function LuxuryMenuList() {
   return (
