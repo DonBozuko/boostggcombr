@@ -5,8 +5,14 @@ import armorAsset from "@/assets/jarvis-armor.png.asset.json";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
 import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
 
-const DEFAULT_SPEECH =
-  "Diretor Fabiano, os parâmetros de engajamento da EliteBoost Prime foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar este cliente. É impressionante a eficiência da sua rede, senhor!";
+const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
+  instagram: "Diretor, o algoritmo do Instagram está aquecido. Seguidores reais, curtidas e visualizações entregues em minutos para escalar este perfil ao topo da explore page.",
+  tiktok:    "Senhor, o For You Page do TikTok favorece engajamento explosivo. Disparando seguidores, curtidas e views virais para detonar o algoritmo agora.",
+  youtube:   "Diretor, o YouTube recompensa retenção e inscritos ativos. Subindo o canal nas recomendações com inscritos reais e views de alta qualidade.",
+  facebook:  "Senhor, o Facebook ainda domina a confiança de compra. Reforçando seguidores e curtidas para blindar a autoridade da página imediatamente.",
+  telegram:  "Diretor, o Telegram é o canal de conversão mais alto do mercado. Inflando membros reais para destravar prova social e vendas no grupo.",
+  trafego:   "Senhor, tráfego web qualificado em rota. Visitantes reais direcionados ao funil para multiplicar conversão e ranqueamento orgânico.",
+};
 
 const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
   instagram: "/api/public/sfx/jarvis-instagram.mp3?v=34",
