@@ -34,6 +34,7 @@ import { useJarvis, useJarvisHistory, useJarvisSubtitle, SUBTITLES } from "@/hoo
 import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminCostAlert } from "@/components/AdminCostAlert";
 
 const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
@@ -965,6 +966,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </Button>
           </div>
         </div>
+
+        <AdminCostAlert />
+
 
 
         {!loaded ? (
