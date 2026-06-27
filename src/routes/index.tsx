@@ -483,49 +483,6 @@ function Landing() {
         </div>
       </header>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 -z-10"
-          style={{ background: "var(--gradient-hero)" }}
-        />
-        <div className="container mx-auto px-6 pt-20 pb-20 text-center max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="mx-auto mb-8 size-20 rounded-2xl grid place-items-center bg-gradient-to-br from-yellow-200 via-yellow-400 to-amber-600 shadow-[0_0_60px_-5px_rgba(234,179,8,0.75)]"
-          >
-            <Instagram className="size-10 text-white" strokeWidth={2.2} />
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight uppercase"
-          >
-            <span className="text-white">ELITEBOOST PRIME |</span>{" "}
-            <span className="bg-gradient-to-r from-yellow-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
-              DOMINE O INSTAGRAM ⚡
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="mt-5 text-base md:text-lg text-zinc-300 max-w-xl mx-auto"
-          >
-            Crescimento real para monetização e autoridade.
-          </motion.p>
-          <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">
-            Seguidores Reais · Curtidas · Autoridade
-          </p>
-
-
-        </div>
-      </section>
 
       {/* PLANS */}
       <section id="planos" className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">

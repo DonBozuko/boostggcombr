@@ -239,29 +239,6 @@ function TiktokLanding() {
           <span className="text-xs" style={{ color: PINK }}>TIKTOK ⚡</span>
         </div>
       </div>
-      {/* HERO */}
-      <header className="container mx-auto px-6 pt-10 pb-6 text-center">
-        <div
-          className="mx-auto mb-6 size-20 rounded-2xl grid place-items-center"
-          style={{
-            background: "#0a0a0a",
-            boxShadow: `0 0 30px ${CYAN}, 0 0 60px ${PINK}`,
-            border: `1px solid ${CYAN}`,
-          }}
-        >
-          <TikTokIcon size={42} />
-        </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          <span style={{ color: "#fff", textShadow: `0 0 18px ${CYAN}` }}>ELITEBOOST PRIME</span>{" "}
-          <span style={{ color: PINK, textShadow: `0 0 18px ${PINK}` }}>| DOMINE O TIKTOK ⚡</span>
-        </h1>
-        <p className="mt-4 text-zinc-300 max-w-xl mx-auto">
-          Crescimento real para monetização e autoridade.
-        </p>
-        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">
-          Views FYP · Curtidas · Retenção
-        </p>
-      </header>
 
       {/* TABS */}
       <div className="flex justify-center mb-10 px-4">

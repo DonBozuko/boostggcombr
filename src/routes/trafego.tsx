@@ -168,18 +168,6 @@ function TrafegoLanding() {
           <span className="text-xs" style={{ color: NEON }}>TRÁFEGO WEB ⚡</span>
         </div>
       </div>
-      <header className="container mx-auto px-6 pt-10 pb-6 text-center">
-        <div className="mx-auto mb-6 size-20 rounded-2xl grid place-items-center"
-          style={{ background: BG, boxShadow: `0 0 30px ${NEON}, 0 0 60px ${NEON}aa`, border: `1px solid ${NEON}` }}>
-          <Globe2 size={42} style={{ color: NEON }} />
-        </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-          <span style={{ color: "#fff", textShadow: `0 0 18px ${NEON}` }}>ELITEBOOST PRIME</span>{" "}
-          <span style={{ color: NEON, textShadow: `0 0 18px ${NEON}` }}>| DOMINE O TRÁFEGO ⚡</span>
-        </h1>
-        <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Crescimento real para monetização e autoridade.</p>
-        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">Visitas BR · Visitas Global · SEO Local</p>
-      </header>
 
       <div className="flex justify-center mb-10 px-4">
         <div className="inline-flex w-full sm:w-auto p-1 rounded-full" style={{ background: "#111", border: `1px solid ${NEON}55` }}>
