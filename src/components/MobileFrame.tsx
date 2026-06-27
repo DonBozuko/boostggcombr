@@ -3,6 +3,7 @@ import { LivePurchasesTicker } from "./LivePurchasesTicker";
 import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
+import { WelcomeDiscountPopup } from "./WelcomeDiscountPopup";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
 import ttLeft from "@/assets/char-tt-left.png";
@@ -231,6 +232,7 @@ export function MobileFrame({
         style={{ background: bg, fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} />
+        <WelcomeDiscountPopup route={route} />
         <div className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-auto flex flex-col">
           {children}
         </div>
