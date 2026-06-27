@@ -226,7 +226,7 @@ function FacebookLanding() {
         </div>
       </div>
 
-      <div className="flex justify-center mb-10 px-4">
+      
       <PremiumCategorySelector
         accent={BLUE}
         active={categoria}
