@@ -9,16 +9,16 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/api/public/sfx/welcome.mp3?v=31",
-  optimized: "/api/public/sfx/optimized.mp3?v=31",
-  warning:   "/api/public/sfx/warning.mp3?v=31",
-  critical:  "/api/public/sfx/critical.mp3?v=31",
-  fail:      "/api/public/sfx/fail.mp3?v=31",
+  welcome:   "/api/public/sfx/welcome.mp3?v=32",
+  optimized: "/api/public/sfx/optimized.mp3?v=32",
+  warning:   "/api/public/sfx/warning.mp3?v=32",
+  critical:  "/api/public/sfx/critical.mp3?v=32",
+  fail:      "/api/public/sfx/fail.mp3?v=32",
 };
 
 
 export const SUBTITLES: Record<JarvisEvent, string> = {
-  welcome: "Bem-vindo de volta, comandante. Painel EliteBoost Prime online.",
+  welcome: "Sessão iniciada com sucesso. Bem-vindo de volta ao comando central, Diretor Fabiano. Todos os sistemas de auto-reparo e o monitor de Uptime das 6 rotas públicas da EliteBoost Prime estão operando com 100% de estabilidade.",
   optimized: "Calibração concluída. Sistemas operando em performance máxima.",
   warning: "Alerta: carrinho abandonado detectado no funil.",
   critical: "Atenção crítica: saldo do fornecedor abaixo de cinquenta reais.",
