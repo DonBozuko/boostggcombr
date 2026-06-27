@@ -8,7 +8,14 @@ import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
 const DEFAULT_SPEECH =
   "Diretor Fabiano, os parâmetros de engajamento da EliteBoost Prime foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar este cliente. É impressionante a eficiência da sua rede, senhor!";
 
-const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=33";
+const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
+  instagram: "/api/public/sfx/jarvis-instagram.mp3?v=34",
+  tiktok:    "/api/public/sfx/jarvis-tiktok.mp3?v=34",
+  youtube:   "/api/public/sfx/jarvis-youtube.mp3?v=34",
+  facebook:  "/api/public/sfx/jarvis-facebook.mp3?v=34",
+  telegram:  "/api/public/sfx/jarvis-telegram.mp3?v=34",
+  trafego:   "/api/public/sfx/jarvis-trafego.mp3?v=34",
+};
 const AUTO_FIRE_MS = 2000;
 
 // Dynamic Omnichannel Glow Filters por rede social.
