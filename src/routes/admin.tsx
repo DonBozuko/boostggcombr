@@ -1064,29 +1064,45 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <JarvisAlertCenter />
         <AdminCostAlert />
 
-        <LuxuryMenuList />
+        <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
 
-
-
-        {!loaded ? (
-          <div className="flex justify-center py-6">
-            <Button
-              onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
-              disabled={loading}
-              className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
-            >
-              ⚡ CARREGAR PEDIDOS E SERVIÇOS
-            </Button>
-          </div>
-        ) : (
-          <div className="flex justify-end">
-            <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-              {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
-            </Button>
+        {activeTab === "buscar" && (
+          <div className="rounded-2xl border border-cyan-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
+            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 Buscar Pedido</h2>
+            <Input placeholder="ID do pedido, @user ou MP id…" className="bg-black/40 border-cyan-400/30" />
+            <p className="text-[11px] text-white/50">Busca rápida — filtra a listagem da aba <strong>Pedidos</strong> após carregar.</p>
           </div>
         )}
 
-        {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
+        {activeTab === "ofertas" && (
+          <div className="rounded-2xl border border-fuchsia-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
+            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-fuchsia-200">🏷️ Cupons de Ativação</h2>
+            <p className="text-xs text-white/60">Controle de cupons promocionais — módulo em provisionamento. Tabela <code>service_id_overrides</code> e fluxo de aplicação no checkout serão liberados em fase 2.</p>
+          </div>
+        )}
+
+        {activeTab === "pedidos" && (
+          !loaded ? (
+            <div className="flex justify-center py-6">
+              <Button
+                onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
+                disabled={loading}
+                className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
+              >
+                ⚡ CARREGAR PEDIDOS E SERVIÇOS
+              </Button>
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+                {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
+              </Button>
+            </div>
+          )
+        )}
+
+        {activeTab === "servicos" && (
+        /* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
