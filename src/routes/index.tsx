@@ -594,6 +594,7 @@ function Landing() {
                       ⭐ Mais Vendido
                     </div>
                   )}
+                  {p.highlight && <RecommendedBadge color="#10b981" />}
 
                   <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-amber-600 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(234,179,8,0.75)]`}>
                     {p.tag}
