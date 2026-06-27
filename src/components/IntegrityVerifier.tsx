@@ -24,6 +24,25 @@ async function probe(url: string, kind: "html" | "audio"): Promise<{ ok: boolean
 export function IntegrityVerifier() {
   const [checks, setChecks] = useState<Check[]>([]);
   const [running, setRunning] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyReport = async () => {
+    const ts = new Date().toISOString();
+    const lines = [
+      `EliteBoost Prime · Diagnóstico Integral · ${ts}`,
+      `Status: ${checks.filter((c) => !c.ok).length === 0 ? "TUDO OK" : "FALHAS DETECTADAS"} (${checks.filter((c) => c.ok).length}/${checks.length})`,
+      "",
+      "— Tabelas & Mídias v=33 —",
+      ...checks.map((c) => `${c.ok ? "[OK]" : "[FAIL]"} ${c.label} · ${c.detail}`),
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(lines);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const run = async () => {
     setRunning(true);
