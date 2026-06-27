@@ -54,6 +54,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
+import { RecommendedBadge } from "@/components/RecommendedBadge";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
@@ -593,6 +594,7 @@ function Landing() {
                       ⭐ Mais Vendido
                     </div>
                   )}
+                  {p.highlight && <RecommendedBadge color="#10b981" />}
 
                   <div className={`${p.highlight ? "mt-3" : ""} px-4 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-amber-600 text-white text-[11px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-[0_0_20px_rgba(234,179,8,0.75)]`}>
                     {p.tag}
