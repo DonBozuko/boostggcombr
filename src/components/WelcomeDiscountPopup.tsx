@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
 const COUPON = "PRIME10";
-const STORAGE_KEY = "eb_welcome_popup_v1";
+const STORAGE_PREFIX = "eb_welcome_popup_v2:";
 const DELAY_MS = 4000;
 
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
 
 const ACCENTS: Record<RouteKey, { color: string; soft: string; label: string }> = {
-  "/":         { color: "#FFD700", soft: "rgba(255,215,0,0.25)",  label: "INSTAGRAM" },
+  "/":         { color: "#FF3B5C", soft: "rgba(255,215,0,0.30)",  label: "INSTAGRAM" },
   "/tiktok":   { color: "#00f2fe", soft: "rgba(0,242,254,0.25)",  label: "TIKTOK"    },
   "/youtube":  { color: "#FF0000", soft: "rgba(255,0,0,0.25)",    label: "YOUTUBE"   },
   "/facebook": { color: "#1877F2", soft: "rgba(24,119,242,0.25)", label: "FACEBOOK"  },
@@ -22,15 +22,16 @@ export function WelcomeDiscountPopup({ route = "/" }: { route?: RouteKey }) {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const key = STORAGE_PREFIX + route;
     try {
-      if (sessionStorage.getItem(STORAGE_KEY)) return;
+      if (sessionStorage.getItem(key)) return;
     } catch {}
     const id = window.setTimeout(() => {
       setOpen(true);
-      try { sessionStorage.setItem(STORAGE_KEY, "1"); } catch {}
+      try { sessionStorage.setItem(key, "1"); } catch {}
     }, DELAY_MS);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [route]);
 
   if (!open) return null;
 
