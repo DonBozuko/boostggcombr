@@ -22,19 +22,20 @@ export function ConversionAnalytics() {
       try {
         const { data } = await supabase
           .from("pedidos")
-          .select("status, valor_brl, recovered")
+          .select("status, valor, abandono_notificado_at")
           .limit(2000);
-        const rows = (data as Array<{ status: string; valor_brl: number | null; recovered: boolean | null }> | null) ?? [];
+        const rows = (data as Array<{ status: string | null; valor: number | null; abandono_notificado_at: string | null }> | null) ?? [];
         const total = rows.length;
         const pagos = rows.filter((r) => r.status === "pago").length;
         const pendentes = rows.filter((r) => r.status === "pendente").length;
         const falhos = rows.filter((r) => r.status === "falho" || r.status === "erro").length;
-        const recuperados = rows.filter((r) => r.recovered === true).length;
+        const abandonadosNotificados = rows.filter((r) => !!r.abandono_notificado_at).length;
+        const recuperados = rows.filter((r) => !!r.abandono_notificado_at && r.status === "pago").length;
         const faturamento = rows
           .filter((r) => r.status === "pago")
-          .reduce((acc, r) => acc + (Number(r.valor_brl) || 0), 0);
+          .reduce((acc, r) => acc + (Number(r.valor) || 0), 0);
         const conversao = total > 0 ? (pagos / total) * 100 : 0;
-        const recuperacao = pendentes + recuperados > 0 ? (recuperados / (pendentes + recuperados)) * 100 : 0;
+        const recuperacao = abandonadosNotificados > 0 ? (recuperados / abandonadosNotificados) * 100 : 0;
         if (alive) setS({ total, pagos, pendentes, falhos, conversao, recuperacao, faturamento });
       } catch {
         if (alive) setS(null);
