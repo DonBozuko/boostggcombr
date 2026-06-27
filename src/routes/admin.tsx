@@ -88,6 +88,109 @@ function AdminSettingsButton() {
   );
 }
 
+function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSound: () => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="flex items-center justify-between flex-wrap gap-3 rounded-2xl border border-cyan-400/20 bg-black/50 backdrop-blur-xl px-4 py-3 shadow-[0_0_30px_rgba(0,242,254,0.15)]">
+      <div className="flex flex-col">
+        <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Olá, Fabiano</span>
+        <span className="text-xs sm:text-sm font-mono text-cyan-300/90 drop-shadow-[0_0_6px_rgba(0,242,254,0.6)]">{ADMIN_EMAIL}</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button variant={soundOn ? "default" : "outline"} size="sm" onClick={toggleSound}>
+          {soundOn ? "🔔" : "🔕"}
+        </Button>
+        <AdminSettingsButton />
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button
+              size="sm"
+              aria-label="Console do Desenvolvedor (TI)"
+              className="bg-black border border-cyan-400/60 text-cyan-300 hover:text-cyan-100 hover:border-cyan-300 shadow-[0_0_18px_rgba(0,242,254,0.45)]"
+            >
+              <Terminal size={16} />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl bg-black/90 border-cyan-400/30">
+            <DialogHeader>
+              <DialogTitle className="text-cyan-300">🖥️ Console TI · Verificador de Integridade</DialogTitle>
+              <DialogDescription>Auditoria real de rotas, mídias v=33 e tabelas do banco.</DialogDescription>
+            </DialogHeader>
+            <IntegrityVerifier />
+          </DialogContent>
+        </Dialog>
+        <Button
+          size="sm"
+          onClick={async () => {
+            await supabase.auth.signOut();
+            window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+            toast.success("Sessão encerrada");
+            window.location.href = "/admin";
+          }}
+          className="bg-gradient-to-r from-red-700 to-red-500 hover:from-red-600 hover:to-red-400 text-white font-bold shadow-[0_0_20px_rgba(255,0,40,0.5)]"
+        >
+          <LogOut size={14} className="mr-1" /> SAIR
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+const MENU_ITEMS = [
+  { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
+  { id: "ofertas", icon: Tag, label: "Ofertas", hint: "Cupons de ativação" },
+  { id: "explorar", icon: Compass, label: "Explorar", hint: "Telemetria das 6 lojas" },
+  { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "⚡ CARREGAR PEDIDOS" },
+  { id: "servicos", icon: Briefcase, label: "Serviços", badge: "NOVIDADE" },
+  { id: "jarvis", icon: Bot, label: "Central J.A.R.V.I.S.", hint: "Agendador omnichannel" },
+  { id: "rls", icon: Lock, label: "Privacidade e RLS", hint: "Travas de segurança" },
+] as const;
+
+function LuxuryMenuList() {
+  return (
+    <nav className="rounded-2xl border border-cyan-400/20 bg-black/40 backdrop-blur-xl overflow-hidden divide-y divide-cyan-400/10 shadow-[0_0_30px_rgba(0,242,254,0.12)]">
+      {MENU_ITEMS.map(({ id, icon: Icon, label, hint, badge }) => (
+        <a
+          key={id}
+          href={`#${id}`}
+          className="group flex items-center gap-3 px-4 py-3.5 hover:bg-cyan-400/5 transition-colors"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400/10 border border-cyan-400/30 text-cyan-300">
+            <Icon size={18} />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="flex items-center gap-2">
+              <span className="font-semibold text-white">{label}</span>
+              {badge ? (
+                <span className="text-[9px] font-extrabold tracking-[0.18em] px-1.5 py-0.5 rounded bg-fuchsia-500/15 border border-fuchsia-400/60 text-fuchsia-300 shadow-[0_0_10px_rgba(255,0,200,0.4)]">
+                  {badge}
+                </span>
+              ) : null}
+            </span>
+            {hint ? <span className="block text-[11px] text-white/50 truncate">{hint}</span> : null}
+          </span>
+          <ChevronRight size={16} className="text-cyan-300/70 group-hover:translate-x-0.5 transition-transform" />
+        </a>
+      ))}
+      <button
+        onClick={async () => {
+          await supabase.auth.signOut();
+          window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+          toast.success("Sessão encerrada");
+          window.location.href = "/admin";
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-red-500/10 transition-colors text-left"
+      >
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-500/15 border border-red-400/40 text-red-300">
+          <LogOut size={18} />
+        </span>
+        <span className="flex-1 font-semibold text-red-200">🔴 Sair do Painel</span>
+        <ChevronRight size={16} className="text-red-300/70" />
+      </button>
+    </nav>
+  );
+}
+
 export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Admin · EliteBoost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
