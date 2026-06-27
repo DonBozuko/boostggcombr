@@ -1450,10 +1450,13 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler */}
-        <JarvisContentScheduler />
+        <div hidden={activeTab !== "jarvis"}>
+          <JarvisContentScheduler />
+        </div>
 
 
         {/* Widget Monitor de Saldo */}
