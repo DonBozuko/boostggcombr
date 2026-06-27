@@ -487,7 +487,33 @@ function Landing() {
       </header>
 
 
-      {/* PLANS */}
+      <PremiumCategorySelector
+        accent="#FFD700"
+        active={categoria}
+        onChange={(k) => { setCategoria(k as Categoria); setForm((f) => ({ ...f, plan: "" })); }}
+        items={[
+          { key: "seguidores",    label: "Seguidores",    emoji: "👤", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
+          { key: "curtidas",      label: "Curtidas",      emoji: "❤️", badge: "Em Alta",          badgeColor: "#fe0979" },
+          { key: "visualizacoes", label: "Visualizações", emoji: "🎬", badge: "Recomendado",      badgeColor: "#00f2fe" },
+        ]}
+      />
+      <PremiumPricingGrid
+        accent="#FFD700"
+        disabled={tipoBloqueado}
+        disabledLabel="⚠️ Em manutenção"
+        unit={categoria === "seguidores" ? "Seguidores" : categoria === "curtidas" ? "Curtidas" : "Visualizações"}
+        plans={(categoria === "seguidores" ? plans : categoria === "curtidas" ? likesPlans : viewsPlans).map((p) => ({
+          id: p.id,
+          qty: p.quantidade.toLocaleString("pt-BR"),
+          price: p.price,
+          fire: p.highlight,
+        }))}
+        onBuy={(id) => {
+          setForm((f) => ({ ...f, plan: id }));
+          document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
+
       <section id="planos" className="container mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Escolha seu pacote</h2>
