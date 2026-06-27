@@ -180,6 +180,11 @@ export function MobileFrame({
         .mf-compact .mt-6 { margin-top: 0.6rem !important; }
         .mf-compact .mt-10 { margin-top: 0.85rem !important; }
         .mf-compact { font-size: 92%; }
+        .mf-scroll { scrollbar-gutter: stable both-edges; scrollbar-color: rgba(255,255,255,0.35) transparent; scrollbar-width: thin; }
+        .mf-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .mf-scroll::-webkit-scrollbar-track { background: transparent; }
+        .mf-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2)); border-radius: 999px; }
+        .mf-scroll::-webkit-scrollbar-corner { background: transparent; }
       `}</style>
       <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
