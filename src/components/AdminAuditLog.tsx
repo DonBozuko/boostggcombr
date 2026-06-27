@@ -8,7 +8,7 @@ export async function logAdminAction(action: string, detail?: Record<string, unk
     const { data: u } = await supabase.auth.getUser();
     const email = u.user?.email;
     if (!email) return;
-    await supabase.from("admin_audit_logs").insert({ admin_email: email, action, detail: detail ?? null });
+    await supabase.from("admin_audit_logs").insert({ admin_email: email, action, detail: (detail ?? null) as never });
   } catch {
     /* silent */
   }
