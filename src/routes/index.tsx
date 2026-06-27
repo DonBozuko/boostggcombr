@@ -54,6 +54,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
+import { RecommendedBadge } from "@/components/RecommendedBadge";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
