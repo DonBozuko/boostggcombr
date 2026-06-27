@@ -1823,7 +1823,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
+        <div hidden={activeTab !== "pedidos"} className="space-y-4">
         {/* Auditoria — separa Crítico (servidor/fornecedor) de Warning (cliente/pix) */}
         {(() => {
           const base = falhos
