@@ -970,6 +970,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         </div>
 
+        <IntegrityVerifier />
         <JarvisAlertCenter />
         <AdminCostAlert />
 
