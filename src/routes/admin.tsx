@@ -136,16 +136,14 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-export type AdminTab = "buscar" | "ofertas" | "explorar" | "pedidos" | "servicos" | "jarvis" | "rls";
+export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis";
 
 const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
-  { id: "ofertas", icon: Tag, label: "Ofertas", hint: "Cupons de ativação" },
-  { id: "explorar", icon: Compass, label: "Explorar", hint: "Telemetria das 6 lojas" },
-  { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "⚡ CARREGAR PEDIDOS" },
+  { id: "explorar", icon: Compass, label: "Explorar", hint: "Vitrines públicas" },
+  { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "Visão Geral · Casa dos Avós" },
   { id: "servicos", icon: Briefcase, label: "Serviços", badge: "NOVIDADE" },
   { id: "jarvis", icon: Bot, label: "Central J.A.R.V.I.S.", hint: "Agendador omnichannel" },
-  { id: "rls", icon: Lock, label: "Privacidade e RLS", hint: "Travas de segurança" },
 ];
 
 function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: AdminTab) => void }) {
