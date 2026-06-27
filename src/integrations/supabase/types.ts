@@ -277,6 +277,42 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_posts: {
+        Row: {
+          caption_text: string
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string | null
+          logs: Json
+          post_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          caption_text?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          logs?: Json
+          post_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          caption_text?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string | null
+          logs?: Json
+          post_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_id_overrides: {
         Row: {
           approved_at: string
