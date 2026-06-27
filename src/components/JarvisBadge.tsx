@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import type { FabianoVariant } from "./FabianoBadge";
-import jarvisHud from "@/assets/jarvis-hud.png";
+import armorAsset from "@/assets/jarvis-armor.png.asset.json";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
 import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
 
@@ -11,17 +11,68 @@ const DEFAULT_SPEECH =
 const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=33";
 const AUTO_FIRE_MS = 2000;
 
-// Red Neon HUD — idêntico ao plano de fundo do /admin
-const RED = {
-  ring: "shadow-[0_0_28px_rgba(255,0,40,0.85)] ring-red-500/40",
-  border: "border-red-500/90",
-  accent: "text-red-400",
-  glow: "drop-shadow-[0_0_8px_rgba(255,0,40,1)]",
-  dot: "bg-red-500",
+// Dynamic Omnichannel Glow Filters por rede social.
+// `filter` aplica matiz/saturação sobre a armadura base (vermelha+dourada).
+// `arc` é a cor do reator + LEDs. `ring` controla o halo externo.
+const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string; border: string; accent: string; glow: string; bubble: string }> = {
+  instagram: {
+    filter: "none",
+    arc: "#ffffff",
+    ring: "0 0 32px rgba(255,0,40,0.85), 0 0 14px rgba(255,215,0,0.6)",
+    border: "border-red-500/90",
+    accent: "text-red-400",
+    glow: "drop-shadow-[0_0_8px_rgba(255,0,40,1)]",
+    bubble: "bg-red-950/30 border-red-500/40",
+  },
+  tiktok: {
+    filter: "hue-rotate(280deg) saturate(1.4)",
+    arc: "#00f2fe",
+    ring: "0 0 32px rgba(0,242,254,0.85), 0 0 18px rgba(254,9,121,0.7)",
+    border: "border-[#00f2fe]/90",
+    accent: "text-[#00f2fe]",
+    glow: "drop-shadow-[0_0_8px_rgba(0,242,254,1)]",
+    bubble: "bg-[#1a0a2a]/40 border-[#00f2fe]/40",
+  },
+  youtube: {
+    filter: "hue-rotate(-10deg) saturate(1.6) brightness(1.05)",
+    arc: "#ffffff",
+    ring: "0 0 34px rgba(255,0,0,0.95)",
+    border: "border-red-600/90",
+    accent: "text-red-500",
+    glow: "drop-shadow-[0_0_8px_rgba(255,0,0,1)]",
+    bubble: "bg-red-950/30 border-red-600/40",
+  },
+  facebook: {
+    filter: "hue-rotate(190deg) saturate(1.3)",
+    arc: "#1877F2",
+    ring: "0 0 32px rgba(24,119,242,0.95)",
+    border: "border-[#1877F2]/90",
+    accent: "text-[#4ea0ff]",
+    glow: "drop-shadow-[0_0_8px_rgba(24,119,242,1)]",
+    bubble: "bg-blue-950/30 border-[#1877F2]/40",
+  },
+  telegram: {
+    filter: "hue-rotate(210deg) saturate(1.2) brightness(0.95)",
+    arc: "#22d3ee",
+    ring: "0 0 32px rgba(34,211,238,0.85), 0 0 14px rgba(15,42,112,0.8)",
+    border: "border-cyan-300/90",
+    accent: "text-cyan-300",
+    glow: "drop-shadow-[0_0_8px_rgba(34,211,238,1)]",
+    bubble: "bg-[#06143a]/40 border-cyan-300/40",
+  },
+  trafego: {
+    filter: "hue-rotate(90deg) saturate(1.5)",
+    arc: "#22ff7a",
+    ring: "0 0 32px rgba(34,255,122,0.9)",
+    border: "border-green-400/90",
+    accent: "text-green-400",
+    glow: "drop-shadow-[0_0_8px_rgba(34,255,122,1)]",
+    bubble: "bg-green-950/30 border-green-400/40",
+  },
 };
 
-export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: FabianoVariant }) {
-  const t = RED;
+export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
+  const t = SKINS[variant];
   const [open, setOpen] = useState(false);
   const [speech, setSpeech] = useState(DEFAULT_SPEECH);
   const [pedidoId, setPedidoId] = useState("");
@@ -31,8 +82,6 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    // Anti-concorrência: mata qualquer áudio Jarvis em curso ao montar nova rota
     stopAllJarvis();
 
     const audio = new Audio(AUDIO_SRC);
@@ -87,40 +136,67 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
   }
 
   return (
-    <div className="fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse">
-      <div
-        aria-label="J.A.R.V.I.S."
-        className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${t.border} ${t.ring} ring-2 bg-black animate-pulse`}
-      >
-        <img src={jarvisHud} alt="J.A.R.V.I.S." className={`h-full w-full object-cover ${t.glow}`} draggable={false} />
-        <span className={`absolute bottom-0 left-0 h-2.5 w-2.5 rounded-full ${t.dot} border-2 border-black animate-pulse`} />
-      </div>
-      <div
-        role="status"
-        aria-live="polite"
-        className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl bg-red-950/30 border border-red-500/40 shadow-2xl transition-all duration-500 ease-out ${
-          open ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
-        }`}
-      >
-        <span className="absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 bg-red-950/30 border-r border-b border-red-500/40" aria-hidden />
-        <div className={`font-semibold ${t.accent} ${t.glow}`}>J.A.R.V.I.S.</div>
-        <div className="text-white/95 mt-0.5">{speech}</div>
-        <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
-          <input
-            value={pedidoId}
-            onChange={(e) => setPedidoId(e.target.value)}
-            placeholder="ID do pedido"
-            className="flex-1 min-w-0 rounded bg-black/50 border border-red-500/50 px-1.5 py-0.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-red-400"
+    <>
+      <style>{`
+        @keyframes jb-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
+        @keyframes jb-arc { 0%,100% { opacity:.85; transform: translate(-50%,-50%) scale(1) } 50% { opacity:1; transform: translate(-50%,-50%) scale(1.18) } }
+      `}</style>
+      <div className="fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse">
+        <div
+          aria-label="J.A.R.V.I.S."
+          className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${t.border} ring-2 ring-white/10 bg-black`}
+          style={{ boxShadow: t.ring, animation: "jb-float 3.4s ease-in-out infinite" }}
+        >
+          <img
+            src={armorAsset.url}
+            alt="J.A.R.V.I.S. Armor"
+            draggable={false}
+            loading="lazy"
+            width={64}
+            height={64}
+            className="h-full w-full object-cover"
+            style={{ filter: t.filter }}
           />
-          <button
-            type="submit"
-            disabled={consulting}
-            className="rounded bg-red-600/80 hover:bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white disabled:opacity-50"
-          >
-            {consulting ? "…" : "Consultar"}
-          </button>
-        </form>
+          {/* Arc Reactor pulsante */}
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-1/2 rounded-full"
+            style={{
+              width: 10,
+              height: 10,
+              background: t.arc,
+              boxShadow: `0 0 12px ${t.arc}, 0 0 4px #fff inset`,
+              animation: "jb-arc 1.6s ease-in-out infinite",
+            }}
+          />
+        </div>
+        <div
+          role="status"
+          aria-live="polite"
+          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl ${t.bubble} border shadow-2xl transition-all duration-500 ease-out ${
+            open ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
+          }`}
+        >
+          <span className={`absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 ${t.bubble} border-r border-b`} aria-hidden />
+          <div className={`font-semibold ${t.accent} ${t.glow}`}>J.A.R.V.I.S.</div>
+          <div className="text-white/95 mt-0.5">{speech}</div>
+          <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
+            <input
+              value={pedidoId}
+              onChange={(e) => setPedidoId(e.target.value)}
+              placeholder="ID do pedido"
+              className="flex-1 min-w-0 rounded bg-black/50 border border-white/20 px-1.5 py-0.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-white/50"
+            />
+            <button
+              type="submit"
+              disabled={consulting}
+              className="rounded bg-white/15 hover:bg-white/25 px-1.5 py-0.5 text-[10px] font-bold text-white disabled:opacity-50"
+            >
+              {consulting ? "…" : "Consultar"}
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
