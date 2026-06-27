@@ -56,6 +56,7 @@ import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 import { RecommendedBadge } from "@/components/RecommendedBadge";
+import { CouponField } from "@/components/CouponField";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
@@ -692,11 +693,13 @@ function Landing() {
               />
             </div>
 
+            <CouponField accent="#FFD700" />
+
             <Button
               type="submit"
               size="lg"
               disabled={loading || tipoBloqueado}
-              className="cta-pulse w-full h-12 text-white font-bold uppercase tracking-wide bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              className="cta-pulse w-full h-16 text-lg sm:text-xl text-white font-black uppercase tracking-wider bg-[linear-gradient(135deg,#fff3a3_0%,#ffd700_25%,#f5b800_60%,#8a6a00_100%)] shadow-[0_0_30px_rgba(255,215,0,0.6)] sticky bottom-2 z-30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
             >
 
               {tipoBloqueado ? (
@@ -708,7 +711,7 @@ function Landing() {
                 </span>
               ) : (
                 <>
-                  Gerar Pix <Send className="size-4" />
+                  💎 PAGAR COM PIX AGORA <Send className="size-5" />
                 </>
               )}
             </Button>
