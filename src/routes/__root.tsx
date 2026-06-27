@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandGuard } from "@/components/BrandGuard";
+import { CyberDeceptionShield } from "@/components/CyberDeceptionShield";
 
 
 function NotFoundComponent() {
@@ -98,10 +99,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "EliteBoost Prime",
-          url: "https://boostygram.lovable.app",
-          logo: "https://boostygram.lovable.app/favicon.ico",
-          taxID: "47363210000108",
-          identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47363210000108" },
+          legalName: "EliteBoost Prime",
+          url: "https://eliteboostprime.lovable.app",
+          logo: "https://eliteboostprime.lovable.app/favicon.ico",
+          taxID: "47.363.210/0001-08",
+          vatID: "47363210000108",
+          identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47.363.210/0001-08" },
+          address: { "@type": "PostalAddress", addressCountry: "BR" },
+          sameAs: [
+            "https://eliteboostprime.lovable.app/",
+            "https://eliteboostprime.lovable.app/tiktok",
+            "https://eliteboostprime.lovable.app/youtube",
+            "https://eliteboostprime.lovable.app/facebook",
+            "https://eliteboostprime.lovable.app/telegram",
+            "https://eliteboostprime.lovable.app/trafego",
+          ],
         }),
       },
     ],
@@ -143,6 +155,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrandGuard />
+      <CyberDeceptionShield />
       <Outlet />
       <Toaster theme="dark" position="top-center" richColors />
     </QueryClientProvider>

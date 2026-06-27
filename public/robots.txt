@@ -5,4 +5,4 @@ Disallow: /admin
 Disallow: /api/
 Disallow: /diagnostico
 
-Sitemap: https://boostygram.lovable.app/sitemap.xml
+Sitemap: https://eliteboostprime.lovable.app/sitemap.xml
