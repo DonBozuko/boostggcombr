@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Settings } from "lucide-react";
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
+import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
 import {
   Dialog,
   DialogContent,
