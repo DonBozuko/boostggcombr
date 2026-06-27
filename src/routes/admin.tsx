@@ -1314,6 +1314,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
 
+        <div hidden={activeTab !== "pedidos"} className="space-y-4">
         {/* Assistente de Caixa Inteligente */}
         {caixa && (
           <div className="rounded-2xl border border-indigo-500/30 bg-card/60 p-6 space-y-4">
