@@ -24,6 +24,7 @@ import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import { CouponField } from "@/components/CouponField";
 import ogYoutube from "@/assets/og-youtube.jpg";
 
 export const Route = createFileRoute("/youtube")({
@@ -380,6 +381,8 @@ function YoutubeLanding() {
               />
             </div>
 
+            <CouponField accent="#FF0000" />
+
             <Button
               type="button"
               size="lg"
@@ -389,14 +392,14 @@ function YoutubeLanding() {
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}
-              className="w-full h-12 font-extrabold uppercase tracking-wide border-0"
+              className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{
                 background: RED,
                 color: "#fff",
-                boxShadow: `0 0 25px ${RED}aa`,
+                boxShadow: `0 0 35px ${RED}`,
               }}
             >
-              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+              {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática

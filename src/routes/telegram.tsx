@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import { CouponField } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import ogTelegram from "@/assets/og-telegram.jpg";
 
@@ -298,6 +299,7 @@ function TelegramLanding() {
                 maxLength={300}
               />
             </div>
+            <CouponField accent={AERO} />
             <Button
               type="button"
               size="lg"
@@ -307,14 +309,14 @@ function TelegramLanding() {
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}
-              className="w-full h-12 font-extrabold uppercase tracking-wide border-0 disabled:opacity-60"
+              className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 disabled:opacity-60 sticky bottom-2 z-30"
               style={tipoBloqueado
                 ? { background: "#222", color: "#888" }
-                : { background: AERO, color: "#000", boxShadow: `0 0 25px ${AERO}aa` }}
+                : { background: AERO, color: "#000", boxShadow: `0 0 35px ${AERO}` }}
             >
               {tipoBloqueado
                 ? "Instabilidade Temporária - Reposição de Estoque"
-                : loading ? "Gerando Pix..." : (<>Gerar Pix <Send className="size-4 ml-2" /></>)}
+                : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · sem senha · entrega automática</p>
           </div>
