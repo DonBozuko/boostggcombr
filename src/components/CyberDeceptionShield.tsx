@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 
-const URL_BLOCK_PATTERNS = [/\.\.\//, /<script/i, /javascript:/i, /onerror=/i, /union\s+select/i, /%3Cscript/i];
+const URL_BLOCK_PATTERNS = [/<script/i, /javascript:/i, /onerror=/i, /union\s+select/i, /%3Cscript/i];
 
 function isMalicious(): boolean {
   if (typeof window === "undefined") return false;
   const url = window.location.href;
-  if (URL_BLOCK_PATTERNS.some((r) => r.test(url))) return true;
-  // DevTools heuristic: huge window vs inner size
-  const threshold = 200;
-  if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-    return true;
-  }
-  return false;
+  // Only trip on real injection patterns inside the URL (query/hash).
+  // DevTools heuristics removed — they produced false positives on
+  // browsers with sidebars, zoom, or non-standard chrome.
+  return URL_BLOCK_PATTERNS.some((r) => r.test(url));
 }
 
 export function CyberDeceptionShield() {
@@ -20,15 +17,14 @@ export function CyberDeceptionShield() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    let strikes = Number(sessionStorage.getItem("eb_strikes") ?? "0");
+    // Hard exemption: never trip inside the admin panel — owner must
+    // always be able to reach /admin even if a stale strike persists.
+    if (window.location.pathname.startsWith("/admin")) {
+      sessionStorage.removeItem("eb_strikes");
+      return;
+    }
 
-    const check = () => {
-      if (isMalicious()) {
-        strikes += 1;
-        sessionStorage.setItem("eb_strikes", String(strikes));
-        if (strikes >= 2) trip();
-      }
-    };
+    let strikes = Number(sessionStorage.getItem("eb_strikes") ?? "0");
 
     const trip = () => {
       setTripped(true);
@@ -38,18 +34,24 @@ export function CyberDeceptionShield() {
           .then((d) => setIp(d.ip ?? "0.0.0.0"))
           .catch(() => {});
       } catch {}
-      // Lock scroll & disable interaction beneath
       document.body.style.overflow = "hidden";
     };
 
+    const check = () => {
+      if (isMalicious()) {
+        strikes += 1;
+        sessionStorage.setItem("eb_strikes", String(strikes));
+        if (strikes >= 2) trip();
+      }
+    };
+
     check();
-    const id = window.setInterval(check, 1500);
     window.addEventListener("eb-brand-violation", trip as EventListener);
     return () => {
-      window.clearInterval(id);
       window.removeEventListener("eb-brand-violation", trip as EventListener);
     };
   }, []);
+
 
   if (!tripped) return null;
 
