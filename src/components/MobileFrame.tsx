@@ -29,7 +29,7 @@ const characters: Partial<Record<RouteKey, { left: string; right: string; leftCt
 
 const billboards: Record<
   RouteKey,
-  { gradient: string; accent: string; title: string; sub: string; tag: string }
+  { gradient: string; accent: string; title: string; sub: string; tag: string; brand: string; dominio: string }
 > = {
   "/": {
     gradient:
@@ -38,6 +38,8 @@ const billboards: Record<
     title: "Autoridade que marcas reconhecem",
     sub: "Parcerias premium · Selo de prova social · Crescimento real",
     tag: "INSTAGRAM",
+    brand: "INSTAGRAM",
+    dominio: "Domine o Instagram",
   },
   "/tiktok": {
     gradient:
@@ -46,6 +48,8 @@ const billboards: Record<
     title: "Algoritmo a seu favor",
     sub: "Views explosivas · Retenção alta · FYP garantido",
     tag: "TIKTOK",
+    brand: "TIKTOK",
+    dominio: "Domine o TikTok",
   },
   "/youtube": {
     gradient:
@@ -54,6 +58,8 @@ const billboards: Record<
     title: "Monetização em tempo recorde",
     sub: "Inscritos reais · Horas de WatchTime · Aprovação YPP",
     tag: "YOUTUBE",
+    brand: "YOUTUBE",
+    dominio: "Domine o YouTube",
   },
   "/facebook": {
     gradient:
@@ -62,6 +68,8 @@ const billboards: Record<
     title: "Presença que converte",
     sub: "Seguidores reais · Engajamento estável · Confiança da marca",
     tag: "FACEBOOK",
+    brand: "FACEBOOK",
+    dominio: "Domine o Facebook",
   },
   "/telegram": {
     gradient:
@@ -70,6 +78,8 @@ const billboards: Record<
     title: "Comunidades que vendem",
     sub: "Membros reais · Canais aquecidos · Cross-sell instantâneo",
     tag: "TELEGRAM",
+    brand: "TELEGRAM",
+    dominio: "Domine o Telegram",
   },
   "/trafego": {
     gradient:
@@ -78,8 +88,37 @@ const billboards: Record<
     title: "SEO local que domina o Google",
     sub: "Visitas orgânicas · Autoridade · Conversão sustentável",
     tag: "TRÁFEGO",
+    brand: "TRÁFEGO WEB",
+    dominio: "Domine o Tráfego Web",
   },
 };
+
+function RouteHeader({ brand, dominio, accent }: { brand: string; dominio: string; accent: string }) {
+  return (
+    <header
+      className="px-3 pt-2 pb-1 text-center select-none"
+      style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
+    >
+      <span
+        className="inline-block text-[10px] font-bold tracking-[0.45em] uppercase border rounded-full px-3 py-0.5"
+        style={{
+          color: accent,
+          borderColor: `${accent}55`,
+          background: "rgba(255,255,255,0.03)",
+          textShadow: `0 0 8px ${accent}`,
+        }}
+      >
+        {brand}
+      </span>
+      <h1
+        className="mt-1.5 text-[20px] sm:text-[22px] font-extrabold tracking-tight text-white leading-tight"
+        style={{ fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", letterSpacing: "-0.01em" }}
+      >
+        {dominio}
+      </h1>
+    </header>
+  );
+}
 
 function Billboard({
   side,
