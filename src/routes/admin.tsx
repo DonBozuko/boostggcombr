@@ -2109,10 +2109,13 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             );
           })}
         </div>
+        </div>
 
+        <div hidden={activeTab !== "rls"} className="space-y-4">
         <WebhookHealthMonitor onFail={(label, code) => jarvis.play("fail", `${label} HTTP ${code}`)} />
 
         <JarvisHistoryPanel />
+        </div>
 
 
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
