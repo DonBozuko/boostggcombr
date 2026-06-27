@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { LivePurchasesTicker } from "./LivePurchasesTicker";
 import { ReviewsCarousel } from "./ReviewsCarousel";
+import { TrustBadges } from "./TrustBadges";
+import { BenefitsGrid } from "./BenefitsGrid";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
 import ttLeft from "@/assets/char-tt-left.png";
@@ -188,6 +190,8 @@ export function MobileFrame({
           {children}
         </div>
         <div className="shrink-0">
+          <BenefitsGrid route={route} accent={data.accent} />
+          <TrustBadges accent={data.accent} />
           <ReviewsCarousel accent={data.accent} />
           <LivePurchasesTicker accent={data.accent} />
           <footer
