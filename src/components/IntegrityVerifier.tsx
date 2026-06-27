@@ -115,6 +115,17 @@ export function IntegrityVerifier() {
           {running ? "verificando..." : "↻ revalidar"}
         </button>
       </div>
+      <button
+        onClick={copyReport}
+        disabled={checks.length === 0}
+        className={`w-full mb-2 rounded-md px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] border transition-all ${
+          copied
+            ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_18px_rgba(16,185,129,0.6)]"
+            : "bg-cyan-500/10 border-cyan-400/60 text-cyan-200 hover:bg-cyan-500/20 hover:shadow-[0_0_14px_rgba(34,211,238,0.5)] disabled:opacity-40"
+        }`}
+      >
+        {copied ? "✓ Copiado com Sucesso!" : "📋 Copiar Diagnóstico Integral"}
+      </button>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto">
         {checks.map((c) => (
           <div
