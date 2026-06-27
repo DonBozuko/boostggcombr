@@ -1193,7 +1193,6 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
         )}
 
-        {activeTab === "explorar" && (<>
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
         <div className="rounded-2xl border border-border bg-card/30 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
