@@ -57,6 +57,8 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 import { RecommendedBadge } from "@/components/RecommendedBadge";
 import { CouponField } from "@/components/CouponField";
+import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
+import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
