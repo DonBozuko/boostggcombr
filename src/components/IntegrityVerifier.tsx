@@ -24,6 +24,25 @@ async function probe(url: string, kind: "html" | "audio"): Promise<{ ok: boolean
 export function IntegrityVerifier() {
   const [checks, setChecks] = useState<Check[]>([]);
   const [running, setRunning] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyReport = async () => {
+    const ts = new Date().toISOString();
+    const lines = [
+      `EliteBoost Prime · Diagnóstico Integral · ${ts}`,
+      `Status: ${checks.filter((c) => !c.ok).length === 0 ? "TUDO OK" : "FALHAS DETECTADAS"} (${checks.filter((c) => c.ok).length}/${checks.length})`,
+      "",
+      "— Tabelas & Mídias v=33 —",
+      ...checks.map((c) => `${c.ok ? "[OK]" : "[FAIL]"} ${c.label} · ${c.detail}`),
+    ].join("\n");
+    try {
+      await navigator.clipboard.writeText(lines);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const run = async () => {
     setRunning(true);
@@ -96,6 +115,17 @@ export function IntegrityVerifier() {
           {running ? "verificando..." : "↻ revalidar"}
         </button>
       </div>
+      <button
+        onClick={copyReport}
+        disabled={checks.length === 0}
+        className={`w-full mb-2 rounded-md px-3 py-2 text-xs font-bold uppercase tracking-[0.18em] border transition-all ${
+          copied
+            ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_18px_rgba(16,185,129,0.6)]"
+            : "bg-cyan-500/10 border-cyan-400/60 text-cyan-200 hover:bg-cyan-500/20 hover:shadow-[0_0_14px_rgba(34,211,238,0.5)] disabled:opacity-40"
+        }`}
+      >
+        {copied ? "✓ Copiado com Sucesso!" : "📋 Copiar Diagnóstico Integral"}
+      </button>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-56 overflow-y-auto">
         {checks.map((c) => (
           <div
