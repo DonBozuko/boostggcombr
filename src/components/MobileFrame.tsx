@@ -237,10 +237,10 @@ export function MobileFrame({
           {children}
         </div>
         <div className="shrink-0">
-          <BenefitsGrid route={route} accent={data.accent} />
           <TrustBadges accent={data.accent} />
           <ReviewsCarousel accent={data.accent} />
           <LivePurchasesTicker accent={data.accent} />
+          <BenefitsGrid route={route} accent={data.accent} />
           <footer
             className="mt-0.5 mb-1 px-3 text-center select-none"
             aria-label="Versão de lançamento"
@@ -253,6 +253,7 @@ export function MobileFrame({
             </span>
           </footer>
         </div>
+
       </div>
       <Billboard side="right" data={data} character={chars?.right} cta={chars?.rightCta} />
     </div>
