@@ -172,8 +172,6 @@ function TrafegoLanding() {
         </div>
       </div>
 
-      <div className="flex justify-center mb-10 px-4">
-        <div className="inline-flex w-full sm:w-auto p-1 rounded-full" style={{ background: "#111", border: `1px solid ${NEON}55` }}>
       <PremiumCategorySelector
         accent={NEON}
         active={categoria}
