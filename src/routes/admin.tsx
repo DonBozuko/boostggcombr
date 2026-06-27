@@ -38,6 +38,8 @@ import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
+import { ConversionAnalytics } from "@/components/ConversionAnalytics";
+import { AdminAuditLog } from "@/components/AdminAuditLog";
 
 const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
@@ -1074,6 +1076,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         {activeTab === "pedidos" && (
           <div className="space-y-4">
+            <ConversionAnalytics />
             {!loaded ? (
               <div className="flex justify-center py-6">
                 <Button
@@ -1264,8 +1267,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
 
-        {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler */}
-        <div hidden={activeTab !== "jarvis"}>
+        {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler + Auditor RLS */}
+        <div hidden={activeTab !== "jarvis"} className="space-y-4">
+          <AdminAuditLog />
           <JarvisContentScheduler />
         </div>
 
