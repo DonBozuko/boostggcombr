@@ -1,6 +1,8 @@
+import { BadgeCheck } from "lucide-react";
+
 const REVIEWS = [
-  { n: "Camila R.", t: "Entrega absurda de rápida, meu Insta bombou em horas." },
-  { n: "Lucas M.", t: "Engajamento real, fechei parceria na semana seguinte." },
+  { n: "Camila R.", t: "Bati minha meta de 10k seguidores em 2 semanas. Surreal!", verified: true },
+  { n: "Lucas M.", t: "Monetizei o canal em tempo recorde, meta batida.", verified: true },
   { n: "Priscila A.", t: "Atendimento humano e premium. Recomendo de olhos fechados." },
   { n: "Rodrigo S.", t: "Melhor custo-benefício que já testei no mercado." },
   { n: "Tatiana V.", t: "Resultado consistente, nada de queda. Top demais." },
@@ -10,14 +12,14 @@ export function ReviewsCarousel({ accent = "#00f2fe" }: { accent?: string }) {
   return (
     <section
       className="mx-2 mt-1 mb-0.5"
-      aria-label="Avaliações 5 estrelas de clientes"
+      aria-label="Avaliações de quem já cresceu"
     >
       <div className="flex items-center justify-between px-1 mb-1">
         <span
           className="text-[8px] font-black tracking-[0.3em] uppercase"
           style={{ color: accent, textShadow: `0 0 5px ${accent}` }}
         >
-          ★★★★★ Mural Premium
+          ★★★★★ AVALIAÇÕES DE QUEM JÁ CRESCEU
         </span>
         <span className="text-[8px] text-white/40">arraste →</span>
       </div>
@@ -42,8 +44,17 @@ export function ReviewsCarousel({ accent = "#00f2fe" }: { accent?: string }) {
               >
                 {r.n[0]}
               </div>
-              <div className="min-w-0">
-                <p className="text-[10px] font-bold text-white truncate leading-tight">{r.n}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-bold text-white truncate leading-tight flex items-center gap-1">
+                  {r.n}
+                  {r.verified && (
+                    <BadgeCheck
+                      size={10}
+                      className="shrink-0"
+                      style={{ color: accent, filter: `drop-shadow(0 0 3px ${accent})` }}
+                    />
+                  )}
+                </p>
                 <p className="text-[8px] tracking-widest leading-tight" style={{ color: accent }}>★★★★★</p>
               </div>
             </div>
