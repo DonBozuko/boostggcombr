@@ -136,7 +136,9 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-const MENU_ITEMS: Array<{ id: string; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
+export type AdminTab = "buscar" | "ofertas" | "explorar" | "pedidos" | "servicos" | "jarvis" | "rls";
+
+const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
   { id: "ofertas", icon: Tag, label: "Ofertas", hint: "Cupons de ativação" },
   { id: "explorar", icon: Compass, label: "Explorar", hint: "Telemetria das 6 lojas" },
@@ -146,32 +148,41 @@ const MENU_ITEMS: Array<{ id: string; icon: typeof Search; label: string; hint?:
   { id: "rls", icon: Lock, label: "Privacidade e RLS", hint: "Travas de segurança" },
 ];
 
-function LuxuryMenuList() {
+function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: AdminTab) => void }) {
   return (
     <nav className="rounded-2xl border border-cyan-400/20 bg-black/40 backdrop-blur-xl overflow-hidden divide-y divide-cyan-400/10 shadow-[0_0_30px_rgba(0,242,254,0.12)]">
-      {MENU_ITEMS.map(({ id, icon: Icon, label, hint, badge }) => (
-        <a
-          key={id}
-          href={`#${id}`}
-          className="group flex items-center gap-3 px-4 py-3.5 hover:bg-cyan-400/5 transition-colors"
-        >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-400/10 border border-cyan-400/30 text-cyan-300">
-            <Icon size={18} />
-          </span>
-          <span className="flex-1 min-w-0">
-            <span className="flex items-center gap-2">
-              <span className="font-semibold text-white">{label}</span>
-              {badge ? (
-                <span className="text-[9px] font-extrabold tracking-[0.18em] px-1.5 py-0.5 rounded bg-fuchsia-500/15 border border-fuchsia-400/60 text-fuchsia-300 shadow-[0_0_10px_rgba(255,0,200,0.4)]">
-                  {badge}
-                </span>
-              ) : null}
+      {MENU_ITEMS.map(({ id, icon: Icon, label, hint, badge }) => {
+        const isActive = active === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={isActive}
+            onClick={() => onChange(id)}
+            className={`group w-full flex items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+              isActive ? "bg-cyan-400/10 border-l-2 border-cyan-300" : "hover:bg-cyan-400/5"
+            }`}
+          >
+            <span className={`flex h-9 w-9 items-center justify-center rounded-lg border ${
+              isActive ? "bg-cyan-400/25 border-cyan-300 text-cyan-100 shadow-[0_0_14px_rgba(0,242,254,0.55)]" : "bg-cyan-400/10 border-cyan-400/30 text-cyan-300"
+            }`}>
+              <Icon size={18} />
             </span>
-            {hint ? <span className="block text-[11px] text-white/50 truncate">{hint}</span> : null}
-          </span>
-          <ChevronRight size={16} className="text-cyan-300/70 group-hover:translate-x-0.5 transition-transform" />
-        </a>
-      ))}
+            <span className="flex-1 min-w-0">
+              <span className="flex items-center gap-2">
+                <span className={`font-semibold ${isActive ? "text-cyan-100" : "text-white"}`}>{label}</span>
+                {badge ? (
+                  <span className="text-[9px] font-extrabold tracking-[0.18em] px-1.5 py-0.5 rounded bg-fuchsia-500/15 border border-fuchsia-400/60 text-fuchsia-300 shadow-[0_0_10px_rgba(255,0,200,0.4)]">
+                    {badge}
+                  </span>
+                ) : null}
+              </span>
+              {hint ? <span className="block text-[11px] text-white/50 truncate">{hint}</span> : null}
+            </span>
+            <ChevronRight size={16} className={`${isActive ? "text-cyan-200 translate-x-0.5" : "text-cyan-300/70"} group-hover:translate-x-0.5 transition-transform`} />
+          </button>
+        );
+      })}
       <button
         onClick={async () => {
           await supabase.auth.signOut();
@@ -699,6 +710,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     if (initialToken) setToken(initialToken);
   }, [initialToken]);
   const [loaded, setLoaded] = useState(false);
+  const [activeTab, setActiveTab] = useState<AdminTab>("explorar");
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(() => {
@@ -1052,29 +1064,45 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <JarvisAlertCenter />
         <AdminCostAlert />
 
-        <LuxuryMenuList />
+        <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
 
-
-
-        {!loaded ? (
-          <div className="flex justify-center py-6">
-            <Button
-              onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
-              disabled={loading}
-              className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
-            >
-              ⚡ CARREGAR PEDIDOS E SERVIÇOS
-            </Button>
-          </div>
-        ) : (
-          <div className="flex justify-end">
-            <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-              {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
-            </Button>
+        {activeTab === "buscar" && (
+          <div className="rounded-2xl border border-cyan-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
+            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 Buscar Pedido</h2>
+            <Input placeholder="ID do pedido, @user ou MP id…" className="bg-black/40 border-cyan-400/30" />
+            <p className="text-[11px] text-white/50">Busca rápida — filtra a listagem da aba <strong>Pedidos</strong> após carregar.</p>
           </div>
         )}
 
-        {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
+        {activeTab === "ofertas" && (
+          <div className="rounded-2xl border border-fuchsia-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
+            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-fuchsia-200">🏷️ Cupons de Ativação</h2>
+            <p className="text-xs text-white/60">Controle de cupons promocionais — módulo em provisionamento. Tabela <code>service_id_overrides</code> e fluxo de aplicação no checkout serão liberados em fase 2.</p>
+          </div>
+        )}
+
+        {activeTab === "pedidos" && (
+          !loaded ? (
+            <div className="flex justify-center py-6">
+              <Button
+                onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
+                disabled={loading}
+                className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
+              >
+                ⚡ CARREGAR PEDIDOS E SERVIÇOS
+              </Button>
+            </div>
+          ) : (
+            <div className="flex justify-end">
+              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+                {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
+              </Button>
+            </div>
+          )
+        )}
+
+        {activeTab === "servicos" && (
+        /* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
@@ -1163,8 +1191,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             })}
           </div>
         </div>
+        )}
 
-
+        <div hidden={activeTab !== "explorar"} className="space-y-4">
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
         <div className="rounded-2xl border border-border bg-card/30 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -1279,9 +1308,13 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
 
 
+
+
+        <div hidden={activeTab !== "pedidos"} className="space-y-4">
         {/* Assistente de Caixa Inteligente */}
         {caixa && (
           <div className="rounded-2xl border border-indigo-500/30 bg-card/60 p-6 space-y-4">
@@ -1417,12 +1450,16 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler */}
-        <JarvisContentScheduler />
+        <div hidden={activeTab !== "jarvis"}>
+          <JarvisContentScheduler />
+        </div>
 
 
+        <div hidden={activeTab !== "servicos"} className="space-y-4">
         {/* Widget Monitor de Saldo */}
         {f && style && (
           <div className="space-y-3">
@@ -1786,7 +1823,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
+        <div hidden={activeTab !== "pedidos"} className="space-y-4">
         {/* Auditoria — separa Crítico (servidor/fornecedor) de Warning (cliente/pix) */}
         {(() => {
           const base = falhos
@@ -2070,10 +2109,13 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             );
           })}
         </div>
+        </div>
 
+        <div hidden={activeTab !== "rls"} className="space-y-4">
         <WebhookHealthMonitor onFail={(label, code) => jarvis.play("fail", `${label} HTTP ${code}`)} />
 
         <JarvisHistoryPanel />
+        </div>
 
 
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
