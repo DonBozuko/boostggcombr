@@ -186,7 +186,7 @@ export function MobileFrame({
         className="w-full sm:max-w-full md:max-w-[450px] h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col"
         style={{ background: bg }}
       >
-        <div className="mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-auto flex flex-col">
           {children}
         </div>
         <div className="shrink-0">
