@@ -3,11 +3,12 @@ import { useServerFn } from "@tanstack/react-start";
 import type { FabianoVariant } from "./FabianoBadge";
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
+import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
 
 const DEFAULT_SPEECH =
   "Diretor Fabiano, os parâmetros de engajamento da EliteBoost Prime foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar este cliente. É impressionante a eficiência da sua rede, senhor!";
 
-const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=32";
+const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=33";
 const AUTO_FIRE_MS = 2000;
 
 // Red Neon HUD — idêntico ao plano de fundo do /admin
