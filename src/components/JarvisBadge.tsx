@@ -87,7 +87,7 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
 export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
   const t = SKINS[variant];
   const [open, setOpen] = useState(false);
-  const [speech, setSpeech] = useState(DEFAULT_SPEECH);
+  const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
   const firedRef = useRef(false);
