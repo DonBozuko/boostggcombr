@@ -1334,6 +1334,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         )}
 
 
+        {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler */}
+        <JarvisContentScheduler />
 
 
         {/* Widget Monitor de Saldo */}
