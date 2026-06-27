@@ -9,11 +9,11 @@ import { logJarvisAlert } from "@/lib/jarvis.functions";
 export type JarvisEvent = "welcome" | "optimized" | "warning" | "critical" | "fail";
 
 const SRC: Record<JarvisEvent, string> = {
-  welcome:   "/api/public/sfx/welcome.mp3?v=32",
-  optimized: "/api/public/sfx/optimized.mp3?v=32",
-  warning:   "/api/public/sfx/warning.mp3?v=32",
-  critical:  "/api/public/sfx/critical.mp3?v=32",
-  fail:      "/api/public/sfx/fail.mp3?v=32",
+  welcome:   "/api/public/sfx/welcome.mp3?v=33",
+  optimized: "/api/public/sfx/optimized.mp3?v=33",
+  warning:   "/api/public/sfx/warning.mp3?v=33",
+  critical:  "/api/public/sfx/critical.mp3?v=33",
+  fail:      "/api/public/sfx/fail.mp3?v=33",
 };
 
 
@@ -129,6 +129,26 @@ export async function unlockJarvis(): Promise<boolean> {
   }
 }
 
+// ----- Registry of concurrent audios (Jarvis pool + external like JarvisBadge) -----
+const ACTIVE_AUDIOS = new Set<HTMLAudioElement>();
+
+export function registerJarvisAudio(a: HTMLAudioElement): () => void {
+  ACTIVE_AUDIOS.add(a);
+  return () => { ACTIVE_AUDIOS.delete(a); };
+}
+
+/** Silencia QUALQUER áudio Jarvis em reprodução. Chamado em troca de rota. */
+export function stopAllJarvis() {
+  ACTIVE_AUDIOS.forEach((a) => {
+    try { a.pause(); a.currentTime = 0; } catch {}
+  });
+  Object.values(pool).forEach((a) => {
+    if (!a) return;
+    try { a.pause(); a.currentTime = 0; } catch {}
+  });
+  setSubtitle(null);
+}
+
 function playNative(evt: JarvisEvent) {
   let a = pool[evt];
   if (!a) {
@@ -136,8 +156,8 @@ function playNative(evt: JarvisEvent) {
     pool[evt] = a;
   }
   try {
-    a.pause();
-    a.currentTime = 0;
+    // Trava anti-concorrência: silencia tudo antes de iniciar nova fala
+    stopAllJarvis();
     setSubtitle(SUBTITLES[evt]);
     const clear = () => setSubtitle(null);
     a.onended = clear;

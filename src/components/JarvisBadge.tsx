@@ -3,11 +3,12 @@ import { useServerFn } from "@tanstack/react-start";
 import type { FabianoVariant } from "./FabianoBadge";
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
+import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
 
 const DEFAULT_SPEECH =
   "Diretor Fabiano, os parâmetros de engajamento da EliteBoost Prime foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar este cliente. É impressionante a eficiência da sua rede, senhor!";
 
-const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=32";
+const AUDIO_SRC = "/api/public/sfx/jarvis-interacao.mp3?v=33";
 const AUTO_FIRE_MS = 2000;
 
 // Red Neon HUD — idêntico ao plano de fundo do /admin
@@ -31,10 +32,14 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Anti-concorrência: mata qualquer áudio Jarvis em curso ao montar nova rota
+    stopAllJarvis();
+
     const audio = new Audio(AUDIO_SRC);
     audio.crossOrigin = "anonymous";
     audio.preload = "auto";
     audio.volume = 0.95;
+    const unregister = registerJarvisAudio(audio);
 
     const fire = () => {
       if (firedRef.current) return;
@@ -58,7 +63,11 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
     events.forEach((e) =>
       window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions),
     );
-    return cleanup;
+    return () => {
+      cleanup();
+      try { audio.pause(); audio.currentTime = 0; } catch {}
+      unregister();
+    };
   }, []);
 
   async function handleConsult(e: React.FormEvent) {

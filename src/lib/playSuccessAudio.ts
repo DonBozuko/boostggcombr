@@ -4,7 +4,7 @@ export function playSuccessAudio() {
   if (played) return;
   played = true;
   try {
-    const audio = new Audio("/api/public/sfx/jarvis-sucesso.mp3?v=32");
+    const audio = new Audio("/api/public/sfx/jarvis-sucesso.mp3?v=33");
     audio.crossOrigin = "anonymous";
     audio.preload = "auto";
     audio.play().catch(() => {});

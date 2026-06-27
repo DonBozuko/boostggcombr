@@ -130,6 +130,15 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Trava silenciadora de áudio concorrente: pausa Jarvis em qualquer troca de rota
+    const unsub = router.subscribe("onBeforeNavigate", () => {
+      import("@/hooks/useJarvis").then((m) => m.stopAllJarvis()).catch(() => {});
+    });
+    return () => { unsub(); };
+  }, [router]);
 
   return (
     <QueryClientProvider client={queryClient}>
