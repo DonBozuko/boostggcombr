@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Settings } from "lucide-react";
 import jarvisHud from "@/assets/jarvis-hud.png";
+import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import {
   Dialog,
   DialogContent,
@@ -1334,6 +1335,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         )}
 
 
+        {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler */}
+        <JarvisContentScheduler />
 
 
         {/* Widget Monitor de Saldo */}
