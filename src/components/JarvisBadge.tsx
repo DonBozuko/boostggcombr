@@ -69,10 +69,10 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
   }, []);
 
   return (
-    <div className="fixed bottom-40 right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-3 flex-row-reverse">
+    <div className="fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse">
       <div
         aria-label="J.A.R.V.I.S."
-        className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${t.border} ${t.ring} ring-2 bg-black animate-pulse`}
+        className={`relative h-14 w-14 rounded-full overflow-hidden border-2 ${t.border} ${t.ring} ring-2 bg-black animate-pulse`}
       >
         <img
           src={jarvisHud}
@@ -80,12 +80,12 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
           className={`h-full w-full object-cover ${t.glow}`}
           draggable={false}
         />
-        <span className={`absolute bottom-0 left-0 h-3 w-3 rounded-full ${t.dot} border-2 border-black animate-pulse`} />
+        <span className={`absolute bottom-0 left-0 h-2.5 w-2.5 rounded-full ${t.dot} border-2 border-black animate-pulse`} />
       </div>
       <div
         role="status"
         aria-live="polite"
-        className={`relative max-w-[240px] sm:max-w-[260px] rounded-2xl px-3.5 py-2.5 text-xs leading-snug backdrop-blur-xl bg-red-950/30 border border-red-500/40 shadow-2xl transition-all duration-500 ease-out ${
+        className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl bg-red-950/30 border border-red-500/40 shadow-2xl transition-all duration-500 ease-out ${
           open ? "opacity-100 translate-x-0 scale-100 animate-[fade-in_0.4s_ease-out]" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
         }`}
       >
