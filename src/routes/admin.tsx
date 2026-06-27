@@ -1072,31 +1072,66 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         )}
 
-        {activeTab === "ofertas" && (
-          <div className="rounded-2xl border border-fuchsia-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
-            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-fuchsia-200">🏷️ Cupons de Ativação</h2>
-            <p className="text-xs text-white/60">Controle de cupons promocionais — módulo em provisionamento. Tabela <code>service_id_overrides</code> e fluxo de aplicação no checkout serão liberados em fase 2.</p>
-          </div>
-        )}
-
         {activeTab === "pedidos" && (
-          !loaded ? (
-            <div className="flex justify-center py-6">
-              <Button
-                onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
-                disabled={loading}
-                className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
-              >
-                ⚡ CARREGAR PEDIDOS E SERVIÇOS
-              </Button>
+          <div className="space-y-4">
+            {!loaded ? (
+              <div className="flex justify-center py-6">
+                <Button
+                  onClick={() => { setLoaded(true); toast.success("Carregando painel..."); }}
+                  disabled={loading}
+                  className="h-14 px-8 text-base font-extrabold tracking-wide bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-black shadow-[0_0_30px_rgba(255,200,0,0.55)] hover:brightness-110"
+                >
+                  ⚡ CARREGAR PEDIDOS E SERVIÇOS
+                </Button>
+              </div>
+            ) : (
+              <div className="flex justify-end">
+                <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+                  {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
+                </Button>
+              </div>
+            )}
+
+            <div className="rounded-2xl border border-emerald-500/30 bg-card/60 p-6 space-y-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h2 className="text-xl font-extrabold tracking-tight">🌐 Visão Geral — Casa dos Avós</h2>
+                <span className="text-xs text-muted-foreground">{faturamento?.count ?? 0} pedido(s) pagos</span>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="rounded-xl bg-black/30 border border-emerald-500/30 p-4">
+                  <div className="text-xs uppercase text-muted-foreground">Faturamento Total</div>
+                  <div className="mt-1 text-2xl font-bold text-emerald-300">
+                    R$ {(faturamento?.geral ?? 0).toFixed(2)}
+                  </div>
+                </div>
+                {REDES.filter((r) => r.key !== "overview").map((r) => {
+                  const t = faturamento?.totais[r.key];
+                  return (
+                    <div key={r.key} className={`rounded-xl bg-black/30 border p-4 ${r.disabled ? "border-border/40 opacity-60" : "border-border"}`}>
+                      <div className="text-xs uppercase text-muted-foreground">{r.icon} {r.label}</div>
+                      <div className="mt-1 text-2xl font-bold">R$ {(t?.total ?? 0).toFixed(2)}</div>
+                      <div className="text-[10px] text-muted-foreground">{t?.count ?? 0} pedido(s)</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="rounded-xl bg-black/30 border border-border p-4">
+                <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo · Tráfego Web</div>
+                {f ? (
+                  <div className="flex items-center gap-3 text-sm flex-wrap">
+                    <span className="inline-flex items-center gap-2">
+                      <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                      {f.nome}: <strong>{online ? "Online" : f.status}</strong>
+                    </span>
+                    <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
+                    <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
+                  </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground">Carregando status...</div>
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="flex justify-end">
-              <Button size="sm" variant="outline" onClick={load} disabled={loading}>
-                {loading ? "Atualizando..." : "🔄 Atualizar pedidos"}
-              </Button>
-            </div>
-          )
+          </div>
         )}
 
         {activeTab === "servicos" && (
