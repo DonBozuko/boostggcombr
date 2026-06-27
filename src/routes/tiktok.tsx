@@ -34,7 +34,7 @@ export const Route = createFileRoute("/tiktok")({
     const keywords =
       "comprar seguidores tiktok, comprar views tiktok, visualizações tiktok barato, comprar curtidas tiktok, monetizar tiktok rápido, seguidores tiktok pix, impulsionar tiktok, agência smm brasil tiktok, como ganhar seguidores no tiktok";
     const url = "https://eliteboostprime.lovable.app/tiktok";
-    const ogImage = `https://eliteboostprime.lovable.app${ogTiktok}?v=13`;
+    const ogImage = `https://eliteboostprime.lovable.app${ogTiktok}?v=33`;
     return {
       meta: [
         { title },
