@@ -32,10 +32,14 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Anti-concorrência: mata qualquer áudio Jarvis em curso ao montar nova rota
+    stopAllJarvis();
+
     const audio = new Audio(AUDIO_SRC);
     audio.crossOrigin = "anonymous";
     audio.preload = "auto";
     audio.volume = 0.95;
+    const unregister = registerJarvisAudio(audio);
 
     const fire = () => {
       if (firedRef.current) return;
@@ -59,7 +63,11 @@ export function JarvisBadge({ variant: _variant = "instagram" }: { variant?: Fab
     events.forEach((e) =>
       window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions),
     );
-    return cleanup;
+    return () => {
+      cleanup();
+      try { audio.pause(); audio.currentTime = 0; } catch {}
+      unregister();
+    };
   }, []);
 
   async function handleConsult(e: React.FormEvent) {
