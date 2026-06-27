@@ -175,9 +175,10 @@ function TrafegoLanding() {
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
           <span style={{ color: "#fff", textShadow: `0 0 18px ${NEON}` }}>ELITEBOOST PRIME</span>{" "}
-          <span style={{ color: NEON, textShadow: `0 0 18px ${NEON}` }}>| TRÁFEGO WEB ⚡</span>
+          <span style={{ color: NEON, textShadow: `0 0 18px ${NEON}` }}>| DOMINE O TRÁFEGO ⚡</span>
         </h1>
-        <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Visitas reais para seu site · entrega automática via Pix · geo-segmentado</p>
+        <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Crescimento real para monetização e autoridade.</p>
+        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">Visitas BR · Visitas Global · SEO Local</p>
       </header>
 
       <div className="flex justify-center mb-10 px-4">

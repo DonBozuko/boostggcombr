@@ -211,9 +211,10 @@ function TelegramLanding() {
         </div>
         <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
           <span style={{ color: "#fff", textShadow: `0 0 18px ${AERO}` }}>ELITEBOOST PRIME</span>{" "}
-          <span style={{ color: AERO, textShadow: `0 0 18px ${AERO}` }}>| TELEGRAM ⚡</span>
+          <span style={{ color: AERO, textShadow: `0 0 18px ${AERO}` }}>| DOMINE O TELEGRAM ⚡</span>
         </h1>
-        <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Membros reais para canais e grupos · entrega automática via Pix</p>
+        <p className="mt-4 text-zinc-300 max-w-xl mx-auto">Crescimento real para monetização e autoridade.</p>
+        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">Membros · Views · Engajamento</p>
       </header>
 
       <div className="flex justify-center mb-10 px-4">

@@ -238,7 +238,10 @@ function FacebookLanding() {
           <span style={{ color: BLUE, textShadow: `0 0 18px ${BLUE}` }}>| DOMINE O FACEBOOK ⚡</span>
         </h1>
         <p className="mt-4 text-zinc-300 max-w-xl mx-auto">
-          Seguidores e curtidas reais via Pix · entrega automática · sem senha
+          Crescimento real para monetização e autoridade.
+        </p>
+        <p className="mt-2 text-xs font-semibold tracking-wide text-white/70">
+          Seguidores · Curtidas · Confiança
         </p>
       </header>
 
