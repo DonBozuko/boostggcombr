@@ -555,6 +555,7 @@ function Landing() {
         ]}
       />
       <PremiumPricingGrid
+        cols={6}
         accent="#FFD700"
         disabled={tipoBloqueado}
         disabledLabel="⚠️ Em manutenção"
