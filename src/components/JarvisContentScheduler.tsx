@@ -211,21 +211,24 @@ export function JarvisContentScheduler() {
             />
           </div>
           <div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs uppercase tracking-wider text-muted-foreground">📝 Legenda (IA)</label>
-              <button onClick={aiSuggest} type="button" className="text-[10px] uppercase tracking-wider text-cyan-300 hover:text-cyan-200">
-                ✨ Gerar com J.A.R.V.I.S.
-              </button>
-            </div>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">📝 Legenda (IA)</label>
+            <button
+              type="button"
+              onClick={generateFacelessScript}
+              className="mt-1 w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_20px_rgba(34,211,238,0.5)] border border-cyan-300/60 hover:brightness-110"
+            >
+              🤖 Gerar Script Faceless (Gancho · Retenção · CTA)
+            </button>
             <textarea
               rows={5}
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Escreva ou gere a legenda..."
-              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm font-mono"
+              placeholder="Clique acima para gerar com J.A.R.V.I.S. ou escreva manualmente..."
+              className="mt-2 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm font-mono"
             />
           </div>
           <button
+            type="button"
             onClick={schedule}
             disabled={saving || !caption.trim() || networks.length === 0}
             className="w-full rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 px-4 py-3 text-sm font-extrabold uppercase tracking-wider text-black disabled:opacity-40 shadow-[0_0_28px_rgba(251,146,60,0.55)] border border-amber-300/60"
