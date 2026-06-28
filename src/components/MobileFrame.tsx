@@ -110,19 +110,8 @@ function RouteHeader({
       className="px-3 pt-2 pb-1 text-center select-none"
       style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
     >
-      <span
-        className="inline-block text-[10px] font-bold tracking-[0.45em] uppercase border rounded-full px-3 py-0.5"
-        style={{
-          color: accent,
-          borderColor: `${accent}55`,
-          background: "rgba(255,255,255,0.03)",
-          textShadow: `0 0 8px ${accent}`,
-        }}
-      >
-        {brand}
-      </span>
       <h1
-        className="mt-1.5 text-[20px] sm:text-[22px] font-extrabold tracking-tight text-white leading-tight"
+        className="text-[20px] sm:text-[22px] font-extrabold tracking-tight text-white leading-tight"
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", letterSpacing: "-0.01em" }}
       >
         {dominio}
