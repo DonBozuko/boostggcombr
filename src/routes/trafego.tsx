@@ -1,4 +1,5 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
+import { supabase } from "@/integrations/supabase/client";
 import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
