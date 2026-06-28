@@ -21,12 +21,12 @@ export function PremiumPricingGrid({
   unit?: string;
 }) {
   return (
-    <section className="mx-2 my-1 w-full max-w-7xl mx-auto" aria-label="Pacotes disponíveis">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5 md:gap-2">
+    <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Pacotes disponíveis">
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 lg:gap-4 auto-rows-fr">
         {plans.map((p) => (
           <div
             key={p.id}
-            className="rounded-lg px-2 py-1.5 md:py-2 flex flex-col items-center text-center"
+            className="rounded-lg px-2 py-2 flex flex-col items-center text-center h-full min-h-[140px] justify-between"
             style={{
               background: "#0f0f10",
               border: `1px solid ${accent}55`,
