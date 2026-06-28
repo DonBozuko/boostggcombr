@@ -170,7 +170,9 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         @keyframes jb-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
         @keyframes jb-arc { 0%,100% { opacity:.85; transform: translate(-50%,-50%) scale(1) } 50% { opacity:1; transform: translate(-50%,-50%) scale(1.18) } }
       `}</style>
-      <div className="fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse">
+      <div className={inline
+        ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
+        : "fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse"}>
         <div
           aria-label="J.A.R.V.I.S."
           className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${t.border} ring-2 ring-white/10 bg-black`}
