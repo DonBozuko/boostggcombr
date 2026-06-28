@@ -539,7 +539,7 @@ function Landing() {
         disabled={tipoBloqueado}
         disabledLabel="⚠️ Em manutenção"
         unit={categoria === "seguidores" ? "Seguidores" : categoria === "curtidas" ? "Curtidas" : "Visualizações"}
-        plans={(categoria === "seguidores" ? plans : categoria === "curtidas" ? likesPlans : viewsPlans).map((p) => ({
+        plans={(categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans).map((p) => ({
           id: p.id,
           qty: p.quantidade.toLocaleString("pt-BR"),
           price: p.price,
