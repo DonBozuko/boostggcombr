@@ -215,15 +215,18 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             <input
               value={pedidoId}
               onChange={(e) => setPedidoId(e.target.value)}
+              onFocus={clearAutoClose}
+              onPointerDown={clearAutoClose}
               placeholder="ID do pedido"
               className="flex-1 min-w-0 rounded bg-black/50 border border-white/20 px-1.5 py-0.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-white/50"
             />
             <button
               type="submit"
               disabled={consulting}
+              onPointerDown={clearAutoClose}
               className="rounded bg-white/15 hover:bg-white/25 px-1.5 py-0.5 text-[10px] font-bold text-white disabled:opacity-50"
             >
-              {consulting ? "…" : "Consultar"}
+              {consulting ? "…" : "Ver ID"}
             </button>
           </form>
         </div>
