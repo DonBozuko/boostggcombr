@@ -94,7 +94,17 @@ const billboards: Record<
   },
 };
 
-function RouteHeader({ brand, dominio, accent }: { brand: string; dominio: string; accent: string }) {
+function RouteHeader({
+  brand,
+  dominio,
+  accent,
+  tagline,
+}: {
+  brand: string;
+  dominio: string;
+  accent: string;
+  tagline: string;
+}) {
   return (
     <header
       className="px-3 pt-2 pb-1 text-center select-none"
@@ -117,6 +127,12 @@ function RouteHeader({ brand, dominio, accent }: { brand: string; dominio: strin
       >
         {dominio}
       </h1>
+      <p
+        className="mt-1 text-[11px] sm:text-[12px] font-semibold text-white/85 max-w-[520px] mx-auto"
+        style={{ textShadow: `0 0 10px ${accent}55` }}
+      >
+        {tagline}
+      </p>
     </header>
   );
 }
