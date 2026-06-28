@@ -8,7 +8,7 @@ import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Instagram,
   Zap,
@@ -59,6 +59,7 @@ import { CheckCircle2 } from "lucide-react";
 import { CouponField } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { getPricingGrid } from "@/lib/pricing.functions";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
@@ -371,6 +372,39 @@ function Landing() {
   const igType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
   const tipoBloqueado = isBlocked(blockedMap, "instagram", igType);
 
+  // Phase A — motor de preços dinâmico (isolado em /). Fallback automático server-side.
+  const getPricingGridFn = useServerFn(getPricingGrid);
+  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>({});
+  useEffect(() => {
+    let cancelled = false;
+    const cats = [
+      "instagram:seguidores",
+      "instagram:curtidas",
+      "instagram:visualizacoes",
+    ] as const;
+    Promise.all(cats.map((c) => getPricingGridFn({ data: { category: c } }).catch(() => null)))
+      .then((results) => {
+        if (cancelled) return;
+        const map: Record<string, { valor: number; price: string }> = {};
+        for (const r of results) {
+          if (!r?.items) continue;
+          for (const it of r.items) map[it.id] = { valor: it.valor, price: it.price };
+        }
+        setPriceOverrides(map);
+      });
+    return () => { cancelled = true; };
+  }, [getPricingGridFn]);
+
+  const applyOverrides = (arr: Plan[]): Plan[] =>
+    arr.map((p) => {
+      const o = priceOverrides[p.id];
+      return o ? { ...p, valor: o.valor, price: o.price } : p;
+    });
+  const dynPlans      = useMemo(() => applyOverrides(plans),      [priceOverrides]);
+  const dynLikesPlans = useMemo(() => applyOverrides(likesPlans), [priceOverrides]);
+  const dynViewsPlans = useMemo(() => applyOverrides(viewsPlans), [priceOverrides]);
+  const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
+
   // Polling: a cada 3s consulta o status do pedido até detectar 'paid'.
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
@@ -399,7 +433,7 @@ function Landing() {
       toast.error(result.error.issues[0].message);
       return;
     }
-    const selected = allPlans.find((p) => p.id === result.data.plan);
+    const selected = dynAllPlans.find((p) => p.id === result.data.plan);
     if (!selected) {
       toast.error("Pacote inválido.");
       return;
@@ -505,7 +539,7 @@ function Landing() {
         disabled={tipoBloqueado}
         disabledLabel="⚠️ Em manutenção"
         unit={categoria === "seguidores" ? "Seguidores" : categoria === "curtidas" ? "Curtidas" : "Visualizações"}
-        plans={(categoria === "seguidores" ? plans : categoria === "curtidas" ? likesPlans : viewsPlans).map((p) => ({
+        plans={(categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans).map((p) => ({
           id: p.id,
           qty: p.quantidade.toLocaleString("pt-BR"),
           price: p.price,
@@ -543,7 +577,7 @@ function Landing() {
                   <SelectValue placeholder="Selecione um pacote" />
                 </SelectTrigger>
                 <SelectContent>
-                  {allPlans.map((p) => (
+                  {dynAllPlans.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
                       {p.tier} — {p.qty} {p.id.startsWith("v") ? "views" : p.id.startsWith("l") ? "curtidas" : "seguidores"} ({p.price})
                     </SelectItem>
