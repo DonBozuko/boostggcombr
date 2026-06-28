@@ -165,31 +165,6 @@ function Billboard({
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
         }}
       />
-      {/* CTA harmonizado no topo, acima da cabeça do personagem */}
-      <div
-        className={`absolute top-10 z-[1] max-w-[280px] px-6 text-center ${
-          side === "left" ? "right-4" : "left-4"
-        }`}
-      >
-        <span
-          className="text-[10px] font-black tracking-[0.4em]"
-          style={{ color: data.accent, textShadow: `0 0 12px ${data.accent}` }}
-        >
-          {data.tag}
-        </span>
-        <h2 className="text-2xl font-black text-white mt-2 leading-tight">
-          {data.title}
-        </h2>
-        <p className="text-xs text-white/70 mt-2">{data.sub}</p>
-        {cta && (
-          <p
-            className="text-[11px] font-bold mt-3 tracking-wide"
-            style={{ color: data.accent }}
-          >
-            ✦ {cta}
-          </p>
-        )}
-      </div>
       {character && (
         <img
           src={character}
