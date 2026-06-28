@@ -458,7 +458,10 @@ function Landing() {
 
   const whatsappHref = pedidoInfo
     ? `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(
-        `Olá! Acabei de fazer o pagamento do pacote ${pedidoInfo.tier} para o perfil ${pedidoInfo.profile}. Segue o comprovante.`,
+        `Olá! Acabei de pagar o pacote *${pedidoInfo.tier}* (${pedidoInfo.price}) para o perfil *${pedidoInfo.profile}*.\n` +
+        `Order ID: ${pedidoInfo.pedidoId}\n` +
+        `Auditoria admin: https://eliteboostprime.lovable.app/admin?pid=${pedidoInfo.pedidoId}\n` +
+        `Segue o comprovante.`,
       )}`
     : `https://wa.me/${WHATSAPP_ADMIN}`;
 
