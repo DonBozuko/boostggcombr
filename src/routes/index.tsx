@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   RefreshCw,
   Check,
-  TrendingUp,
+  
   Send,
   Copy,
   MessageCircle,
