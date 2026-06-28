@@ -520,12 +520,12 @@ function Landing() {
           </div>
           <div className="flex items-center gap-2">
             <JarvisBadge variant="instagram" inline />
-            <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
-              <a href="#pedido">Ver Planos</a>
-            </Button>
+            <ShowcaseTrigger />
           </div>
         </div>
       </header>
+
+      <ShowcaseShell>
 
 
       <PremiumCategorySelector
