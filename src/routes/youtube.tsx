@@ -443,7 +443,9 @@ function YoutubeLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/youtube" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
