@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { LivePurchasesTicker } from "./LivePurchasesTicker";
+
 import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
@@ -246,7 +246,6 @@ export function MobileFrame({
         <div className="shrink-0">
           <TrustBadges accent={data.accent} />
           <ReviewsCarousel accent={data.accent} />
-          <LivePurchasesTicker accent={data.accent} />
           <BenefitsGrid route={route} accent={data.accent} />
           <footer
             className="mt-0.5 mb-1 px-3 text-center select-none"

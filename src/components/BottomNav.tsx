@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { LivePurchasesTicker } from "./LivePurchasesTicker";
 
 type Route = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
 
@@ -67,43 +68,48 @@ const items: { to: Route; Icon: React.FC; label: string; full: string; color: st
   { to: "/trafego", Icon: IconWeb, label: "WEB", full: "Tráfego Web", color: "#A855F7" },
 ];
 
-export function BottomNav({ active }: { active: Route }) {
+export function BottomNav({ active, accent }: { active: Route; accent?: string }) {
+  const activeColor = accent ?? items.find((i) => i.to === active)?.color ?? "#ffffff";
   return (
-    <nav
+    <div
       className="fixed bottom-0 left-0 right-0 w-full z-50 backdrop-blur-xl bg-black/80 border-t border-white/10"
-      aria-label="Navegação principal entre redes"
     >
-      <ul className="grid grid-cols-6 h-16 w-full max-w-7xl mx-auto px-2">
-        {items.map(({ to, Icon, label, full, color }) => {
-          const isActive = active === to;
-          return (
-            <li key={to} className="flex">
-              <Link
-                to={to}
-                className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md"
-                style={{
-                  color: isActive ? color : "#9ca3af",
-                  ['--tw-ring-color' as string]: color,
-                }}
-                aria-label={`Ir para ${full}`}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <span
+      <nav className="w-full" aria-label="Navegação principal entre redes">
+        <ul className="grid grid-cols-6 h-16 w-full max-w-7xl mx-auto px-2">
+          {items.map(({ to, Icon, label, full, color }) => {
+            const isActive = active === to;
+            return (
+              <li key={to} className="flex">
+                <Link
+                  to={to}
+                  className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-md"
                   style={{
-                    filter: isActive
-                      ? `drop-shadow(0 0 6px ${color}) drop-shadow(0 0 12px ${color})`
-                      : "grayscale(0.4) opacity(0.75)",
-                    transition: "filter 200ms ease",
+                    color: isActive ? color : "#9ca3af",
+                    ['--tw-ring-color' as string]: color,
                   }}
+                  aria-label={`Ir para ${full}`}
+                  aria-current={isActive ? "page" : undefined}
                 >
-                  <Icon />
-                </span>
-                <span className="text-[9px] font-bold tracking-wider">{label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+                  <span
+                    style={{
+                      filter: isActive
+                        ? `drop-shadow(0 0 6px ${color}) drop-shadow(0 0 12px ${color})`
+                        : "grayscale(0.4) opacity(0.75)",
+                      transition: "filter 200ms ease",
+                    }}
+                  >
+                    <Icon />
+                  </span>
+                  <span className="text-[9px] font-bold tracking-wider">{label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      <div className="w-full max-w-7xl mx-auto">
+        <LivePurchasesTicker accent={activeColor} />
+      </div>
+    </div>
   );
 }
