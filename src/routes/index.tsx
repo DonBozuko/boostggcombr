@@ -433,7 +433,7 @@ function Landing() {
       toast.error(result.error.issues[0].message);
       return;
     }
-    const selected = allPlans.find((p) => p.id === result.data.plan);
+    const selected = dynAllPlans.find((p) => p.id === result.data.plan);
     if (!selected) {
       toast.error("Pacote inválido.");
       return;
