@@ -1,6 +1,5 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
-import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
@@ -524,7 +523,6 @@ function Landing() {
   return (
     <MobileFrame bg="hsl(var(--background))" route="/">
       <PlansShowcaseProvider accent="#FFD700">
-      <FabianoBadge variant="instagram" />
       {/* NAV */}
       <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
         <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>

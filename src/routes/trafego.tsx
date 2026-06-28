@@ -1,7 +1,6 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { ViralShare } from "@/components/ViralShare";
-import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
@@ -169,7 +168,6 @@ function TrafegoLanding() {
   return (
     <MobileFrame bg={BG} route="/trafego">
       <PlansShowcaseProvider accent={NEON}>
-      <FabianoBadge variant="trafego" />
       <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="trafego" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       <div

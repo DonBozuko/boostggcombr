@@ -1,6 +1,5 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
-import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
@@ -221,7 +220,6 @@ function FacebookLanding() {
   return (
     <MobileFrame bg={BG} route="/facebook">
       <PlansShowcaseProvider accent={BLUE}>
-      <FabianoBadge variant="facebook" />
       <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="facebook" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       <div
