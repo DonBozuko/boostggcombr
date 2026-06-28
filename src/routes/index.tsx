@@ -375,7 +375,17 @@ function Landing() {
 
   // Phase A — motor de preços dinâmico (isolado em /). Fallback automático server-side.
   const getPricingGridFn = useServerFn(getPricingGrid);
-  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>({});
+  const PRICING_CACHE_KEY = "ebp_pricing_overrides_v1";
+  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>(() => {
+    // Strict Local Cache: hidrata instantaneamente do localStorage para evitar tela vazia.
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem(PRICING_CACHE_KEY);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch { return {}; }
+  });
   useEffect(() => {
     let cancelled = false;
     const cats = [
@@ -388,10 +398,13 @@ function Landing() {
         if (cancelled) return;
         const map: Record<string, { valor: number; price: string }> = {};
         for (const r of results) {
-          if (!r?.items) continue;
+          if (!r?.items || !Array.isArray(r.items) || r.items.length === 0) continue;
           for (const it of r.items) map[it.id] = { valor: it.valor, price: it.price };
         }
+        // Fallback Guard: rejeita resposta vazia/corrompida — mantém cache anterior.
+        if (Object.keys(map).length === 0) return;
         setPriceOverrides(map);
+        try { window.localStorage.setItem(PRICING_CACHE_KEY, JSON.stringify(map)); } catch { /* quota */ }
       });
     return () => { cancelled = true; };
   }, [getPricingGridFn]);
