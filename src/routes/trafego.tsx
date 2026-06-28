@@ -123,10 +123,9 @@ function TrafegoLanding() {
     const parsed = urlSchema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
 
-    // Sandbox Mode — flag global em admin_settings (RLS: leitura pública apenas desta chave)
-    const { data: sb } = await supabase
-      .from("admin_settings").select("value").eq("key", "sandbox_mode").maybeSingle();
-    if ((sb?.value as { enabled?: boolean } | null)?.enabled) {
+    // Sandbox Mode — flag global em admin_settings (server-only; nunca exposto publicamente)
+    const sb = await getSandboxFn().catch(() => ({ enabled: false }));
+    if (sb.enabled) {
       setPaid(false);
       setPedidoInfo({
         price: selected.price, tier: selected.tier, profile: parsed.data.profile,
