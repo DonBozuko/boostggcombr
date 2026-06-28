@@ -34,7 +34,9 @@ export function JarvisContentScheduler() {
   const [imageUrl, setImageUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [networks, setNetworks] = useState<Network[]>(["instagram"]);
-  const [format, setFormat] = useState<Format>("1:1");
+  const [format, setFormat] = useState<Format>("9:16");
+  const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
+  const [bgVideo, setBgVideo] = useState<string>("https://cdn.pixabay.com/video/2023/10/14/185247-874976358_large.mp4");
 
   const toggleNet = (n: Network) =>
     setNetworks((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
@@ -51,18 +53,54 @@ export function JarvisContentScheduler() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel("scheduled_posts_live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "scheduled_posts" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
-  const aiSuggest = () => {
-    const hooks = [
-      "🚀 Cresça no automático com a EliteBoost Prime.",
-      "🔥 Engajamento real, entrega blindada, suporte 24/7.",
-      "💎 Vire referência: Seguidores + Curtidas + Views premium.",
-      "⚡ Pix aprovado e bot dispara em segundos. Sem enrolação.",
-    ];
-    const tags = "#eliteboostprime #crescimentoreal #instagram #tiktok #youtube #facebook";
-    setCaption(`${hooks[Math.floor(Math.random() * hooks.length)]}\n\n${tags}`);
+  const ROUTE_BY_NET: Record<Network, { url: string; pitch: string }> = {
+    instagram: { url: "eliteboostprime.lovable.app",          pitch: "seguidores reais no Instagram" },
+    tiktok:    { url: "eliteboostprime.lovable.app/tiktok",   pitch: "views virais no TikTok" },
+    facebook:  { url: "eliteboostprime.lovable.app/facebook", pitch: "curtidas blindadas no Facebook" },
+    youtube:   { url: "eliteboostprime.lovable.app/youtube",  pitch: "inscritos premium no YouTube" },
+    telegram:  { url: "eliteboostprime.lovable.app/telegram", pitch: "membros ativos no Telegram" },
   };
+
+  const HASHTAGS: Record<Network, string> = {
+    instagram: "#instagram #seguidores #crescernoinsta #marketingdigital #eliteboostprime",
+    tiktok:    "#tiktok #viral #fyp #foryou #tiktokbrasil #eliteboostprime",
+    facebook:  "#facebook #marketingfb #engajamento #eliteboostprime",
+    youtube:   "#youtube #shorts #inscritos #criadordeconteudo #eliteboostprime",
+    telegram:  "#telegram #grupotelegram #canal #eliteboostprime",
+  };
+
+  const generateFacelessScript = () => {
+    const target = networks[0] ?? "instagram";
+    const info = ROUTE_BY_NET[target];
+    const hooks = [
+      "PARA AÍ 👀 ninguém te contou esse atalho de crescimento…",
+      "Se seu perfil tá travado, isso aqui é pra você 🚨",
+      "Como criadores estão explodindo em 48h sem aparecer 🤯",
+    ];
+    const retentions = [
+      `Algoritmo recompensa quem tem prova social desde o segundo 1 — por isso ${info.pitch} muda o jogo. Entrega blindada, sem queda, sem bot detectável.`,
+      `O segredo: empilhar ${info.pitch} ANTES do conteúdo viralizar. O algoritmo lê isso como autoridade e empurra orgânico em cima.`,
+    ];
+    const ctas = [
+      `🔗 Acessa ${info.url} agora, usa o cupom PRIME10 e ganha 10% imediato. Pix aprovado em 2 min.`,
+      `🚀 Link na bio → ${info.url} · cupom PRIME10 · entrega começa em segundos.`,
+    ];
+    const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+    const s = { hook: pick(hooks), retention: pick(retentions), cta: pick(ctas) };
+    setScript(s);
+    setCaption(`${s.hook}\n\n${s.retention}\n\n${s.cta}\n\n${HASHTAGS[target]}`);
+  };
+
+  const aiSuggest = generateFacelessScript;
 
   const schedule = async () => {
     if (networks.length === 0) { setErr("Selecione ao menos 1 rede."); return; }
@@ -190,20 +228,38 @@ export function JarvisContentScheduler() {
           <button
             onClick={schedule}
             disabled={saving || !caption.trim() || networks.length === 0}
-            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-red-500 px-4 py-3 text-sm font-extrabold uppercase tracking-wider text-white disabled:opacity-40 shadow-[0_0_24px_rgba(0,242,254,0.35)]"
+            className="w-full rounded-xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 px-4 py-3 text-sm font-extrabold uppercase tracking-wider text-black disabled:opacity-40 shadow-[0_0_28px_rgba(251,146,60,0.55)] border border-amber-300/60"
           >
-            {saving ? "Agendando..." : `🛡️ Agendar em modo seguro (${networks.length} rede${networks.length === 1 ? "" : "s"})`}
+            🤖 {saving ? "Agendando..." : `Agendar Conteúdo Omnichannel (${networks.length})`}
           </button>
           <p className="text-[10px] text-white/50">
-            🔒 Modo Seguro: os posts aguardam aprovação executiva de 1 clique no Telegram do administrador antes do envio real às plataformas.
+            🔒 Modo Seguro: posts aguardam aprovação executiva via Telegram antes do envio real.
           </p>
           {err && <div className="text-xs text-red-400">{err}</div>}
         </div>
 
         {/* Mockup multi-format */}
-        <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-            📱 Pré-visualização ({format}) — J.A.R.V.I.S. Luxury Frame
+        <div className="space-y-3">
+          {script && (
+            <div className="rounded-xl border border-amber-400/40 bg-black/60 p-3 text-[11px] space-y-1.5">
+              <div className="text-[10px] uppercase tracking-[0.18em] text-amber-300">🎬 Roteiro Faceless · J.A.R.V.I.S.</div>
+              <div><span className="text-cyan-300 font-bold">⚡ Gancho 3s:</span> <span className="text-white/90">{script.hook}</span></div>
+              <div><span className="text-fuchsia-300 font-bold">🎯 Retenção:</span> <span className="text-white/90">{script.retention}</span></div>
+              <div><span className="text-emerald-300 font-bold">💰 CTA:</span> <span className="text-white/90">{script.cta}</span></div>
+            </div>
+          )}
+          <div>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">🎥 Vídeo de Fundo (loop estético)</label>
+            <input
+              type="url"
+              value={bgVideo}
+              onChange={(e) => setBgVideo(e.target.value)}
+              placeholder="https://...mp4"
+              className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs"
+            />
+          </div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">
+            📱 Media Mockup Viewer ({format})
           </div>
           <div className={`rounded-xl border-2 border-red-500/40 bg-black/80 overflow-hidden shadow-[0_0_30px_rgba(255,0,40,0.25)] ${format === "9:16" ? "max-w-[280px] mx-auto" : ""}`}>
             <div className="flex items-center gap-2 p-2.5 border-b border-cyan-400/20 bg-gradient-to-r from-black to-red-950/40">
@@ -211,16 +267,25 @@ export function JarvisContentScheduler() {
               <div className="text-xs font-bold text-cyan-200">eliteboostprime</div>
               <div className="ml-auto text-[9px] text-white/40 uppercase tracking-wider">{format}</div>
             </div>
-            <div className={`${ratio} bg-black flex items-center justify-center relative`}>
-              {imageUrl ? (
-                <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-[10px] text-white/40 px-4 text-center">Cole uma URL para visualizar o criativo</div>
+            <div className={`${ratio} bg-black flex items-center justify-center relative overflow-hidden`}>
+              {bgVideo ? (
+                <video src={bgVideo} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-80" />
+              ) : null}
+              {imageUrl && (
+                <img src={imageUrl} alt="overlay" className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              {script && (
+                <div className="relative z-10 px-4 text-center">
+                  <div className="text-white text-base sm:text-lg font-black drop-shadow-[0_0_12px_rgba(0,242,254,0.8)] uppercase">
+                    {script.hook}
+                  </div>
+                </div>
               )}
               <div className="absolute inset-0 ring-1 ring-inset ring-cyan-400/20 pointer-events-none" />
             </div>
-            <div className="p-2.5 text-[11px] whitespace-pre-wrap min-h-[50px] text-white/90">
-              {caption || <span className="text-white/40">A legenda aparecerá aqui...</span>}
+            <div className="p-2.5 text-[11px] whitespace-pre-wrap min-h-[50px] text-white/90 max-h-40 overflow-y-auto">
+              {caption || <span className="text-white/40">Gere o roteiro Faceless para preencher legenda + hashtags…</span>}
             </div>
           </div>
         </div>
@@ -228,7 +293,7 @@ export function JarvisContentScheduler() {
 
       {/* Lista */}
       <div>
-        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">🗓️ Agenda Omnichannel</div>
+        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">🗓️ Agenda Omnichannel · Live</div>
         {loading ? (
           <div className="text-xs text-muted-foreground">Carregando...</div>
         ) : posts.length === 0 ? (
