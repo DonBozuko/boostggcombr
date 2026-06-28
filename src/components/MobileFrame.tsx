@@ -94,7 +94,17 @@ const billboards: Record<
   },
 };
 
-function RouteHeader({ brand, dominio, accent }: { brand: string; dominio: string; accent: string }) {
+function RouteHeader({
+  brand,
+  dominio,
+  accent,
+  tagline,
+}: {
+  brand: string;
+  dominio: string;
+  accent: string;
+  tagline: string;
+}) {
   return (
     <header
       className="px-3 pt-2 pb-1 text-center select-none"
@@ -117,6 +127,12 @@ function RouteHeader({ brand, dominio, accent }: { brand: string; dominio: strin
       >
         {dominio}
       </h1>
+      <p
+        className="mt-1 text-[11px] sm:text-[12px] font-semibold text-white/85 max-w-[520px] mx-auto"
+        style={{ textShadow: `0 0 10px ${accent}55` }}
+      >
+        {tagline}
+      </p>
     </header>
   );
 }
@@ -149,31 +165,6 @@ function Billboard({
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
         }}
       />
-      {/* CTA harmonizado no topo, acima da cabeça do personagem */}
-      <div
-        className={`absolute top-10 z-[1] max-w-[280px] px-6 text-center ${
-          side === "left" ? "right-4" : "left-4"
-        }`}
-      >
-        <span
-          className="text-[10px] font-black tracking-[0.4em]"
-          style={{ color: data.accent, textShadow: `0 0 12px ${data.accent}` }}
-        >
-          {data.tag}
-        </span>
-        <h2 className="text-2xl font-black text-white mt-2 leading-tight">
-          {data.title}
-        </h2>
-        <p className="text-xs text-white/70 mt-2">{data.sub}</p>
-        {cta && (
-          <p
-            className="text-[11px] font-bold mt-3 tracking-wide"
-            style={{ color: data.accent }}
-          >
-            ✦ {cta}
-          </p>
-        )}
-      </div>
       {character && (
         <img
           src={character}
@@ -234,7 +225,7 @@ export function MobileFrame({
         style={{ background: bg, fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
-        <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} />
+        <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
         <WelcomeDiscountPopup route={route} />
         <div
           className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col"
