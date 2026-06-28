@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CouponField } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";

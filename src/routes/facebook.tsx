@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CouponField } from "@/components/CouponField";
 import ogFacebook from "@/assets/og-facebook.jpg";
