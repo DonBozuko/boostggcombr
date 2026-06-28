@@ -529,8 +529,8 @@ function Landing() {
       <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
         <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>
           <div className="flex items-center gap-2">
-            <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
-              <TrendingUp className="size-4 text-background" />
+            <div className="size-8 rounded-full overflow-hidden ring-2 ring-[hsl(var(--primary))]/70 shadow-[0_0_12px_hsl(var(--primary)/0.6)]">
+              <img src="/__l5e/assets-v1/c4e83b18-e1c4-4191-88a1-8842c6097b8b/fabiano.png" alt="Fabiano Santiago" className="h-full w-full object-cover object-top" />
             </div>
             <span className="font-display font-bold text-lg">ELITEBOOST PRIME</span>
           </div>
