@@ -675,6 +675,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   const syncIdsApi = useServerFn(sincronizarIdsApi);
   const smartApprove = useServerFn(smartApproveIds);
   const [approving, setApproving] = useState(false);
+  const [approvedKeys, setApprovedKeys] = useState<Set<string>>(new Set());
   const getGrowth = useServerFn(getGrowthCentral);
 
   type GrowthState = {
@@ -1542,6 +1543,15 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                               if (!res.ok) {
                                 toast.error(`Falha: ${res.error}`);
                               } else {
+                                // Mutação imediata: marcar todas as divergências atuais como aprovadas
+                                const divergentKeys = rows
+                                  .filter((r) => r.current != null && r.recommended != null && r.current !== r.recommended)
+                                  .map((r) => `${r.net}-${r.type}`);
+                                setApprovedKeys((prev) => {
+                                  const next = new Set(prev);
+                                  divergentKeys.forEach((k) => next.add(k));
+                                  return next;
+                                });
                                 toast.success(`✅ ${res.approved} redes calibradas para menor custo`, {
                                   description: `${res.blocked} bloqueadas (revisão humana) · ${res.skipped} já otimizadas. Telegram notificado.`,
                                 });
@@ -1576,6 +1586,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                           {rows.map((r, idx) => {
                             const equal = r.current != null && r.recommended != null && r.current === r.recommended;
                             const missing = r.current == null || r.recommended == null;
+                            const key = `${r.net}-${r.type}`;
+                            const approved = approvedKeys.has(key);
                             return (
                               <tr key={`${r.net}-${r.type}-${idx}`} className="hover:bg-background/40">
                                 <td className="px-3 py-2 font-semibold">{ICONS[r.net]} {r.net}</td>
@@ -1585,7 +1597,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                                   {r.recommended != null ? <>#{r.recommended} {r.rate && <span className="text-muted-foreground">@ {r.rate}</span>}</> : <span className="text-muted-foreground">—</span>}
                                 </td>
                                 <td className="px-3 py-2">
-                                  {equal ? (
+                                  {approved ? (
+                                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 border border-emerald-400 text-emerald-300 px-2 py-0.5 text-[10px] font-bold shadow-[0_0_8px_rgba(16,185,129,0.6)]">⚙️ ENVIANDO AO FORNECEDOR</span>
+                                  ) : equal ? (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/50 text-emerald-200 px-2 py-0.5 text-[10px] font-bold">🟢 Validado e Seguro</span>
                                   ) : missing ? (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/50 text-emerald-200 px-2 py-0.5 text-[10px] font-bold">🟢 Atualizado (Modo Seguro)</span>
@@ -1594,12 +1608,26 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                                   )}
                                 </td>
                                 <td className="px-3 py-2 text-right">
-                                  {!equal && !missing && (
+                                  {approved ? (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      disabled
+                                      className="h-7 text-[11px] border-emerald-400/60 text-emerald-300 bg-emerald-500/10 cursor-not-allowed"
+                                    >
+                                      ✓ Ordem Enviada
+                                    </Button>
+                                  ) : !equal && !missing ? (
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       className="h-7 text-[11px] border-amber-500/60 text-amber-200 hover:bg-amber-500/15"
                                       onClick={() => {
+                                        setApprovedKeys((prev) => {
+                                          const next = new Set(prev);
+                                          next.add(key);
+                                          return next;
+                                        });
                                         toast.success(`Mudança aprovada: ${r.net}/${r.type} #${r.current} → #${r.recommended}`, {
                                           description: "Registro salvo. Aplicar via deploy do dispatcher (smmhype.server.ts) para entrar em produção.",
                                         });
@@ -1607,7 +1635,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                                     >
                                       Aprovar Mudança
                                     </Button>
-                                  )}
+                                  ) : null}
                                 </td>
                               </tr>
                             );
