@@ -48,8 +48,8 @@ export function WelcomeDiscountPopup({ route = "/" }: { route?: RouteKey }) {
     <div
       role="dialog"
       aria-modal="true"
-      className="absolute inset-0 z-[60] flex items-center justify-center px-3"
-      style={{ background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)" }}
+      className="fixed inset-0 z-[100] flex items-center justify-center px-3"
+      style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }}
     >
       <div
         className="relative w-full max-w-[240px] rounded-xl p-3 text-white"
