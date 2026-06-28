@@ -1066,13 +1066,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
 
-        {activeTab === "buscar" && (
-          <div className="rounded-2xl border border-cyan-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
-            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 Buscar Pedido</h2>
-            <Input placeholder="ID do pedido, @user ou MP id…" className="bg-black/40 border-cyan-400/30" />
-            <p className="text-[11px] text-white/50">Busca rápida — filtra a listagem da aba <strong>Pedidos</strong> após carregar.</p>
-          </div>
-        )}
+        {activeTab === "buscar" && <BuscarPedidoPanel />}
 
         {activeTab === "pedidos" && (
           <div className="space-y-4">
