@@ -119,7 +119,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
   );
 
   return (
-    <div className="fixed bottom-16 left-3 z-50 flex items-end gap-2">
+    <div className="fixed bottom-44 left-3 z-50 flex items-end gap-2">
       <a
         href={web}
         target="_blank"

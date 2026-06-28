@@ -84,14 +84,29 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
   },
 };
 
-export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
+export function JarvisBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
   const t = SKINS[variant];
   const [open, setOpen] = useState(false);
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
   const firedRef = useRef(false);
+  const lockOpenRef = useRef(false);
+  const errorTimerRef = useRef<number | null>(null);
   const consultar = useServerFn(consultarPedidoPublico);
+
+  const safeClose = () => {
+    if (lockOpenRef.current) return;
+    setOpen(false);
+  };
+  const clearAutoClose = () => {
+    lockOpenRef.current = true;
+    if (errorTimerRef.current != null) {
+      window.clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = null;
+    }
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -107,11 +122,11 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
       if (firedRef.current) return;
       firedRef.current = true;
       setOpen(true);
-      audio.onended = () => setOpen(false);
-      audio.onerror = () => { window.setTimeout(() => setOpen(false), 12000); };
+      audio.onended = () => safeClose();
+      audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
       const p = audio.play();
       if (p && typeof p.catch === "function") {
-        p.catch(() => { firedRef.current = false; setOpen(false); });
+        p.catch(() => { firedRef.current = false; safeClose(); });
       }
       cleanup();
     };
@@ -127,6 +142,7 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
     );
     return () => {
       cleanup();
+      if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
       try { audio.pause(); audio.currentTime = 0; } catch {}
       unregister();
     };
@@ -154,7 +170,9 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
         @keyframes jb-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
         @keyframes jb-arc { 0%,100% { opacity:.85; transform: translate(-50%,-50%) scale(1) } 50% { opacity:1; transform: translate(-50%,-50%) scale(1.18) } }
       `}</style>
-      <div className="fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse">
+      <div className={inline
+        ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
+        : "fixed bottom-[14rem] right-4 sm:bottom-20 sm:right-5 z-50 flex items-end gap-2 flex-row-reverse"}>
         <div
           aria-label="J.A.R.V.I.S."
           className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${t.border} ring-2 ring-white/10 bg-black`}
@@ -197,15 +215,18 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
             <input
               value={pedidoId}
               onChange={(e) => setPedidoId(e.target.value)}
+              onFocus={clearAutoClose}
+              onPointerDown={clearAutoClose}
               placeholder="ID do pedido"
               className="flex-1 min-w-0 rounded bg-black/50 border border-white/20 px-1.5 py-0.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-white/50"
             />
             <button
               type="submit"
               disabled={consulting}
+              onPointerDown={clearAutoClose}
               className="rounded bg-white/15 hover:bg-white/25 px-1.5 py-0.5 text-[10px] font-bold text-white disabled:opacity-50"
             >
-              {consulting ? "…" : "Consultar"}
+              {consulting ? "…" : "Ver ID"}
             </button>
           </form>
         </div>

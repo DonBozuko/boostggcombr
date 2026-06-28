@@ -507,7 +507,6 @@ function Landing() {
   return (
     <MobileFrame bg="hsl(var(--background))" route="/">
       <FabianoBadge variant="instagram" />
-      <JarvisBadge variant="instagram" />
       {/* NAV */}
       <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
         <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>
@@ -517,9 +516,12 @@ function Landing() {
             </div>
             <span className="font-display font-bold text-lg">ELITEBOOST PRIME</span>
           </div>
-          <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
-            <a href="#pedido">Ver Planos</a>
-          </Button>
+          <div className="flex items-center gap-2">
+            <JarvisBadge variant="instagram" inline />
+            <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
+              <a href="#pedido">Ver Planos</a>
+            </Button>
+          </div>
         </div>
       </header>
 
