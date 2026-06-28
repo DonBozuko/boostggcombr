@@ -88,7 +88,7 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
       </div>
       {applied && (
         <p className="mt-2 text-[12px] font-bold" style={{ color: "#34d399" }}>
-          ✓ Cupom <b>{VALID}</b> aplicado — 7% de desconto no Pix.
+          ✓ Cupom <b>{VALID}</b> aplicado — 10% de desconto no Pix.
         </p>
       )}
       {error && !applied && (
