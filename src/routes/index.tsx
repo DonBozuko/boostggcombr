@@ -468,6 +468,7 @@ function Landing() {
           valor: selected.valor,
           email: result.data.email,
           whatsapp_contato: result.data.contact,
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {
