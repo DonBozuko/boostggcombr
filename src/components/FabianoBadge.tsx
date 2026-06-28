@@ -118,9 +118,13 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
     [native, web],
   );
 
+  const halfW = variant === "instagram" ? 384 : 230;
   return (
-    <div className="fixed bottom-44 left-3 z-50 flex items-end gap-2">
-      <a
+    <div
+      className="fixed z-50 flex items-start gap-2"
+      style={{ left: `max(8px, calc(50vw - ${halfW}px + 6px))`, top: 6 }}
+    >
+      <
         href={web}
         target="_blank"
         rel="noopener noreferrer"
