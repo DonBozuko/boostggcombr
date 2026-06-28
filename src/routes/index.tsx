@@ -1,6 +1,7 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
+import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { BottomNav } from "@/components/BottomNav";
