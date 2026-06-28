@@ -789,15 +789,28 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   const [activeTab, setActiveTab] = useState<AdminTab>("explorar");
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
-  const [sandbox, setSandbox] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.localStorage.getItem("ELITEBOOST_PRIME_SANDBOX") === "1";
-  });
+  const [sandbox, setSandbox] = useState<boolean>(false);
+  const [sandboxBusy, setSandboxBusy] = useState(false);
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sandbox) window.localStorage.setItem("ELITEBOOST_PRIME_SANDBOX", "1");
-    else window.localStorage.removeItem("ELITEBOOST_PRIME_SANDBOX");
-  }, [sandbox]);
+    (async () => {
+      const { data } = await supabase.from("admin_settings").select("value").eq("key", "sandbox_mode").maybeSingle();
+      const enabled = !!(data?.value as { enabled?: boolean } | null)?.enabled;
+      setSandbox(enabled);
+      // Purge legacy localStorage flag — control now lives in admin_settings (RLS-gated).
+      if (typeof window !== "undefined") window.localStorage.removeItem("ELITEBOOST_PRIME_SANDBOX");
+    })();
+  }, []);
+  const toggleSandbox = async () => {
+    if (sandboxBusy) return;
+    setSandboxBusy(true);
+    const next = !sandbox;
+    const { error } = await supabase
+      .from("admin_settings")
+      .upsert({ key: "sandbox_mode", value: { enabled: next }, updated_at: new Date().toISOString() });
+    setSandboxBusy(false);
+    if (error) { alert("Falha ao salvar: " + error.message); return; }
+    setSandbox(next);
+  };
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
