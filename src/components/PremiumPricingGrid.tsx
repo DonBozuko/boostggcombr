@@ -5,7 +5,10 @@ type GridPlan = {
   fire?: boolean;
 };
 
+type Cols = 2 | 6;
+
 export function PremiumPricingGrid({
+  cols = 2,
   plans,
   onBuy,
   disabled,
