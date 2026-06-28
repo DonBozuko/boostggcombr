@@ -434,7 +434,9 @@ function FacebookLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/facebook" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
