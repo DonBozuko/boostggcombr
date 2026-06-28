@@ -445,6 +445,78 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
   );
 }
 
+function BuscarPedidoPanel() {
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [rows, setRows] = useState<Pedido[] | null>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const runSearch = async () => {
+    const term = q.trim();
+    if (!term) return;
+    setBusy(true); setErr(null); setRows(null);
+    try {
+      let query = supabase.from("pedidos").select("id, created_at, status, pacote, quantidade, instagram_user, mercado_pago_id, rede_social").order("created_at", { ascending: false }).limit(25);
+      // UUID-ish search by id; else by user/mp_id
+      if (/^[0-9a-f-]{8,}$/i.test(term)) {
+        query = query.or(`id.eq.${term},mercado_pago_id.eq.${term}`);
+      } else {
+        const like = `%${term.replace(/^@/, "")}%`;
+        query = query.or(`instagram_user.ilike.${like},mercado_pago_id.ilike.${like}`);
+      }
+      const { data, error } = await query;
+      if (error) throw error;
+      setRows((data as Pedido[]) ?? []);
+    } catch (e: any) {
+      setErr(e?.message ?? "Falha na busca");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-cyan-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
+      <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 Buscar Pedido</h2>
+      <div className="flex items-stretch gap-2">
+        <Input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void runSearch(); } }}
+          placeholder="ID do pedido, @user ou MP id…"
+          className="bg-black/40 border-cyan-400/30"
+          autoFocus
+        />
+        <Button
+          onClick={() => void runSearch()}
+          disabled={busy || !q.trim()}
+          className="h-10 px-5 font-extrabold tracking-wide bg-gradient-to-r from-cyan-400 to-cyan-200 text-black shadow-[0_0_18px_rgba(0,242,254,0.6)] hover:brightness-110"
+        >
+          <Search className="h-4 w-4 mr-1.5" /> BUSCAR
+        </Button>
+      </div>
+      <p className="text-[11px] text-white/50">Pressione <strong>Enter</strong> para varredura instantânea na tabela <code>pedidos</code>.</p>
+
+      {err && <div className="text-xs text-red-300 font-mono">⛔ {err}</div>}
+      {rows && rows.length === 0 && <div className="text-xs text-white/50 font-mono">// nenhum pedido encontrado</div>}
+      {rows && rows.length > 0 && (
+        <div className="space-y-2 max-h-[420px] overflow-y-auto">
+          {rows.map((p) => (
+            <div key={p.id} className="rounded-lg border border-cyan-400/20 bg-black/50 p-3 text-xs space-y-1">
+              <div className="flex justify-between flex-wrap gap-2">
+                <span className="font-mono text-cyan-200">#{p.id.slice(0, 8)}</span>
+                <span className={`uppercase font-bold ${p.status === "paid" || p.status === "approved" ? "text-emerald-300" : p.status === "pending" ? "text-amber-300" : "text-red-300"}`}>{p.status}</span>
+              </div>
+              <div className="text-white/80"><strong>{p.instagram_user}</strong> · {REDE_ICON[p.rede_social ?? ""] ?? "🌐"} {p.rede_social ?? "—"}</div>
+              <div className="text-white/60">Pacote {p.pacote} · {p.quantidade} un.</div>
+              <div className="text-white/40 font-mono text-[10px]">MP: {p.mercado_pago_id ?? "—"} · {new Date(p.created_at).toLocaleString("pt-BR")}</div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 type Pedido = {
   id: string;
   created_at: string;
@@ -1066,13 +1138,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
 
-        {activeTab === "buscar" && (
-          <div className="rounded-2xl border border-cyan-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
-            <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 Buscar Pedido</h2>
-            <Input placeholder="ID do pedido, @user ou MP id…" className="bg-black/40 border-cyan-400/30" />
-            <p className="text-[11px] text-white/50">Busca rápida — filtra a listagem da aba <strong>Pedidos</strong> após carregar.</p>
-          </div>
-        )}
+        {activeTab === "buscar" && <BuscarPedidoPanel />}
 
         {activeTab === "pedidos" && (
           <div className="space-y-4">
