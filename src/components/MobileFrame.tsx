@@ -231,7 +231,7 @@ export function MobileFrame({
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`w-full ${route === "/" ? "md:max-w-3xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl" : "md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px]"} min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible z-10 flex flex-col font-sans bg-white/[0.02] backdrop-blur-lg border-x border-white/10`}
+        className={`w-full md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
