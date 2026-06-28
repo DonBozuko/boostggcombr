@@ -138,6 +138,7 @@ function TrafegoLanding() {
     setPlanId(selected.id);
     setLoading(true);
     try {
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
       const res = await criarPedidoFn({
         data: {
           instagram_user: parsed.data.profile, pacote: selected.id,
