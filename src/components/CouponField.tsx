@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const VALID = "PRIME10";
 const KEY = "eb_coupon";
-const DISCOUNT = 0.07; // 7%
+const DISCOUNT = 0.10; // 10%
 
 export function getCouponDiscount(): number {
   if (typeof window === "undefined") return 0;
