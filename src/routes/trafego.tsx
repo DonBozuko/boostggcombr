@@ -169,7 +169,9 @@ function TrafegoLanding() {
   return (
     <MobileFrame bg={BG} route="/trafego">
       <PlansShowcaseProvider accent={NEON}>
-      <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="trafego" inline /><ShowcaseTrigger /></div>
+      <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><ShowcaseTrigger /></div>
+      <JarvisBadge variant="trafego" />
+      <FabianoBadge variant="trafego" />
       <ShowcaseShell>
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
