@@ -60,7 +60,7 @@ export function ReviewsCarousel({ accent = "#00f2fe" }: { accent?: string }) {
                 <p className="text-[8px] tracking-widest leading-tight" style={{ color: accent }}>★★★★★</p>
               </div>
             </div>
-            <p className="text-[10px] leading-snug text-white/80">"{r.t}"</p>
+            <p className="text-[10px] leading-snug text-white/80 mt-1 relative z-0">"{r.t}"</p>
           </article>
         ))}
       </div>
