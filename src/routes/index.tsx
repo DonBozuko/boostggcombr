@@ -372,6 +372,39 @@ function Landing() {
   const igType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
   const tipoBloqueado = isBlocked(blockedMap, "instagram", igType);
 
+  // Phase A — motor de preços dinâmico (isolado em /). Fallback automático server-side.
+  const getPricingGridFn = useServerFn(getPricingGrid);
+  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>({});
+  useEffect(() => {
+    let cancelled = false;
+    const cats = [
+      "instagram:seguidores",
+      "instagram:curtidas",
+      "instagram:visualizacoes",
+    ] as const;
+    Promise.all(cats.map((c) => getPricingGridFn({ data: { category: c } }).catch(() => null)))
+      .then((results) => {
+        if (cancelled) return;
+        const map: Record<string, { valor: number; price: string }> = {};
+        for (const r of results) {
+          if (!r?.items) continue;
+          for (const it of r.items) map[it.id] = { valor: it.valor, price: it.price };
+        }
+        setPriceOverrides(map);
+      });
+    return () => { cancelled = true; };
+  }, [getPricingGridFn]);
+
+  const applyOverrides = (arr: Plan[]): Plan[] =>
+    arr.map((p) => {
+      const o = priceOverrides[p.id];
+      return o ? { ...p, valor: o.valor, price: o.price } : p;
+    });
+  const dynPlans      = useMemo(() => applyOverrides(plans),      [priceOverrides]);
+  const dynLikesPlans = useMemo(() => applyOverrides(likesPlans), [priceOverrides]);
+  const dynViewsPlans = useMemo(() => applyOverrides(viewsPlans), [priceOverrides]);
+  const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
+
   // Polling: a cada 3s consulta o status do pedido até detectar 'paid'.
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
