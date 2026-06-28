@@ -1352,7 +1352,10 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler + Auditor RLS */}
         <div hidden={activeTab !== "jarvis"} className="space-y-4">
-          <AdminAuditLog />
+          {/* Auditor RLS — mantido montado para gravar logs em admin_audit_logs, ocultado visualmente */}
+          <div className="hidden" aria-hidden="true">
+            <AdminAuditLog />
+          </div>
           <JarvisContentScheduler />
         </div>
 
