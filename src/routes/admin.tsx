@@ -1680,8 +1680,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                 type="button"
                 role="switch"
                 aria-checked={sandbox}
-                onClick={() => setSandbox((v) => !v)}
-                className={`relative h-7 w-12 rounded-full transition-colors ${sandbox ? "bg-red-500" : "bg-zinc-700"}`}
+                onClick={toggleSandbox}
+                disabled={sandboxBusy}
+                className={`relative h-7 w-12 rounded-full transition-colors disabled:opacity-60 ${sandbox ? "bg-red-500" : "bg-zinc-700"}`}
               >
                 <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${sandbox ? "left-6" : "left-1"}`} />
               </button>
