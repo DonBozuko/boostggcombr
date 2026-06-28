@@ -675,6 +675,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   const syncIdsApi = useServerFn(sincronizarIdsApi);
   const smartApprove = useServerFn(smartApproveIds);
   const [approving, setApproving] = useState(false);
+  const [approvedKeys, setApprovedKeys] = useState<Set<string>>(new Set());
   const getGrowth = useServerFn(getGrowthCentral);
 
   type GrowthState = {
