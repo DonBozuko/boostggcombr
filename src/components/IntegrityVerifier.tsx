@@ -121,6 +121,23 @@ export function IntegrityVerifier() {
     setPings(ps);
     pushLog("PING", ps.map((p) => `${p.provider}=${p.ms}ms`).join(" · "));
 
+    // Contingência: alertas recentes do polling de backup do Mercado Pago
+    try {
+      const { data: alerts } = await supabase
+        .from("jarvis_alerts")
+        .select("mensagem, created_at")
+        .eq("origem", "contingency-pooling")
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (alerts && alerts.length > 0) {
+        for (const a of alerts) pushLog("CONTINGENCY", a.mensagem);
+      } else {
+        pushLog("CONTINGENCY", "Sem eventos de pooling de contingência (webhook estável)");
+      }
+    } catch (e) {
+      pushLog("CONTINGENCY", `Leitura falhou: ${(e as Error).message}`);
+    }
+
     setChecks(out);
     setRunning(false);
     pushLog("SCAN", `Concluído · ${out.filter((c) => c.ok).length}/${out.length} OK`);
