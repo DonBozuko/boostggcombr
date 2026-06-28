@@ -360,7 +360,9 @@ function TelegramLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/telegram" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
