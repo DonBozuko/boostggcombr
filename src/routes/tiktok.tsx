@@ -452,7 +452,9 @@ function TiktokLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/tiktok" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
