@@ -904,6 +904,7 @@ function Landing() {
         </div>
       </footer>
       <BottomNav active="/" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
