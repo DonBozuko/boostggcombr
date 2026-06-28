@@ -1665,14 +1665,14 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${sandbox ? "border-red-500/60 bg-red-500/10" : "border-border bg-card/40"}`}>
               <div className="min-w-0">
                 <h3 className="font-semibold flex items-center gap-2">
-                  🧪 Modo Sandbox <span className="text-xs text-muted-foreground">(localStorage · frontend-only)</span>
+                  🧪 Modo Sandbox <span className="text-xs text-muted-foreground">(admin_settings · RLS-gated)</span>
                 </h3>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Quando ligado, os checkouts públicos simulam Pix aprovado localmente — <b>nenhuma cobrança real</b> é criada nem ordem é enviada à API. Use só para validar fluxo visual.
+                  Quando ligado, os checkouts públicos simulam Pix aprovado — <b>nenhuma cobrança real</b> é criada nem ordem é enviada à API. Flag global gravada no banco, lida pelas 6 lojas.
                 </p>
                 {sandbox && (
                   <p className="text-[11px] text-red-300 mt-1 font-semibold">
-                    ⚠️ MODO TESTE ATIVO neste navegador. Desligue antes de publicar para clientes.
+                    ⚠️ MODO TESTE ATIVO globalmente. Desligue antes de divulgar para clientes.
                   </p>
                 )}
               </div>
