@@ -268,7 +268,7 @@ function TiktokLanding() {
       />
 
       {/* FORM */}
-      <section
+      {planId && (<section
         id="tt-pedido"
         className="py-12 border-y"
         style={{ borderColor: `${CYAN}33`, background: "#0d0d0e" }}
@@ -356,7 +356,7 @@ function TiktokLanding() {
             </p>
           </div>
         </div>
-      </section>
+      </section>)}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent

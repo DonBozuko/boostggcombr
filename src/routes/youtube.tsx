@@ -261,7 +261,7 @@ function YoutubeLanding() {
       />
 
       {/* FORM */}
-      <section
+      {planId && (<section
         id="yt-pedido"
         className="py-12 border-y"
         style={{ borderColor: `${RED}44`, background: "#0d0d0e" }}
@@ -347,7 +347,7 @@ function YoutubeLanding() {
             </p>
           </div>
         </div>
-      </section>
+      </section>)}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent
