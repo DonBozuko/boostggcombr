@@ -196,7 +196,7 @@ function TrafegoLanding() {
         onBuy={(id) => { setPlanId(id); document.getElementById("tw-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
       />
 
-      <section id="tw-pedido" className="py-12 border-y" style={{ borderColor: `${NEON}44`, background: "#0d0d0e" }}>
+      {planId && (<section id="tw-pedido" className="py-12 border-y" style={{ borderColor: `${NEON}44`, background: "#0d0d0e" }}>
         <div className="container mx-auto px-4 sm:px-6 max-w-xl">
           <h2 className="text-2xl sm:text-3xl font-bold text-center">Finalizar pedido</h2>
           <p className="mt-2 text-center text-sm text-zinc-400">Cole a URL completa do seu site ou landing page.</p>
@@ -231,7 +231,7 @@ function TrafegoLanding() {
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · entrega automática</p>
           </div>
         </div>
-      </section>
+      </section>)}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-md border-0" style={{ background: BG, border: `1px solid ${NEON}`, boxShadow: `0 0 40px ${NEON}88` }}>
