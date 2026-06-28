@@ -1543,6 +1543,15 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                               if (!res.ok) {
                                 toast.error(`Falha: ${res.error}`);
                               } else {
+                                // Mutação imediata: marcar todas as divergências atuais como aprovadas
+                                const divergentKeys = rows
+                                  .filter((r) => r.current != null && r.recommended != null && r.current !== r.recommended)
+                                  .map((r) => `${r.net}-${r.type}`);
+                                setApprovedKeys((prev) => {
+                                  const next = new Set(prev);
+                                  divergentKeys.forEach((k) => next.add(k));
+                                  return next;
+                                });
                                 toast.success(`✅ ${res.approved} redes calibradas para menor custo`, {
                                   description: `${res.blocked} bloqueadas (revisão humana) · ${res.skipped} já otimizadas. Telegram notificado.`,
                                 });
