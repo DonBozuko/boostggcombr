@@ -23,6 +23,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
+import { getSandboxEnabled } from "@/lib/sandbox.functions";
 import { CouponField } from "@/components/CouponField";
 import ogTrafego from "@/assets/og-trafego.jpg";
 
