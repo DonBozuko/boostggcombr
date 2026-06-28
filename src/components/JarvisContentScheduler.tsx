@@ -53,18 +53,54 @@ export function JarvisContentScheduler() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const ch = supabase
+      .channel("scheduled_posts_live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "scheduled_posts" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
-  const aiSuggest = () => {
-    const hooks = [
-      "🚀 Cresça no automático com a EliteBoost Prime.",
-      "🔥 Engajamento real, entrega blindada, suporte 24/7.",
-      "💎 Vire referência: Seguidores + Curtidas + Views premium.",
-      "⚡ Pix aprovado e bot dispara em segundos. Sem enrolação.",
-    ];
-    const tags = "#eliteboostprime #crescimentoreal #instagram #tiktok #youtube #facebook";
-    setCaption(`${hooks[Math.floor(Math.random() * hooks.length)]}\n\n${tags}`);
+  const ROUTE_BY_NET: Record<Network, { url: string; pitch: string }> = {
+    instagram: { url: "eliteboostprime.lovable.app",          pitch: "seguidores reais no Instagram" },
+    tiktok:    { url: "eliteboostprime.lovable.app/tiktok",   pitch: "views virais no TikTok" },
+    facebook:  { url: "eliteboostprime.lovable.app/facebook", pitch: "curtidas blindadas no Facebook" },
+    youtube:   { url: "eliteboostprime.lovable.app/youtube",  pitch: "inscritos premium no YouTube" },
+    telegram:  { url: "eliteboostprime.lovable.app/telegram", pitch: "membros ativos no Telegram" },
   };
+
+  const HASHTAGS: Record<Network, string> = {
+    instagram: "#instagram #seguidores #crescernoinsta #marketingdigital #eliteboostprime",
+    tiktok:    "#tiktok #viral #fyp #foryou #tiktokbrasil #eliteboostprime",
+    facebook:  "#facebook #marketingfb #engajamento #eliteboostprime",
+    youtube:   "#youtube #shorts #inscritos #criadordeconteudo #eliteboostprime",
+    telegram:  "#telegram #grupotelegram #canal #eliteboostprime",
+  };
+
+  const generateFacelessScript = () => {
+    const target = networks[0] ?? "instagram";
+    const info = ROUTE_BY_NET[target];
+    const hooks = [
+      "PARA AÍ 👀 ninguém te contou esse atalho de crescimento…",
+      "Se seu perfil tá travado, isso aqui é pra você 🚨",
+      "Como criadores estão explodindo em 48h sem aparecer 🤯",
+    ];
+    const retentions = [
+      `Algoritmo recompensa quem tem prova social desde o segundo 1 — por isso ${info.pitch} muda o jogo. Entrega blindada, sem queda, sem bot detectável.`,
+      `O segredo: empilhar ${info.pitch} ANTES do conteúdo viralizar. O algoritmo lê isso como autoridade e empurra orgânico em cima.`,
+    ];
+    const ctas = [
+      `🔗 Acessa ${info.url} agora, usa o cupom PRIME10 e ganha 10% imediato. Pix aprovado em 2 min.`,
+      `🚀 Link na bio → ${info.url} · cupom PRIME10 · entrega começa em segundos.`,
+    ];
+    const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
+    const s = { hook: pick(hooks), retention: pick(retentions), cta: pick(ctas) };
+    setScript(s);
+    setCaption(`${s.hook}\n\n${s.retention}\n\n${s.cta}\n\n${HASHTAGS[target]}`);
+  };
+
+  const aiSuggest = generateFacelessScript;
 
   const schedule = async () => {
     if (networks.length === 0) { setErr("Selecione ao menos 1 rede."); return; }
