@@ -119,16 +119,17 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
   );
 
   return (
-    <div className="fixed bottom-44 left-4 z-40 flex flex-col-reverse items-start gap-2">
+    <div
+      className="fixed top-2 z-40 flex flex-col items-start gap-1"
+      style={{ left: "max(8px, calc(50% - 225px))" }}
+    >
       <a
         href={web}
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleClick}
         aria-label="Fabiano Santiago — Falar no Telegram"
-
-
-        className={`relative h-11 w-11 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
+        className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
       >
         {imgOk ? (
           <img
@@ -145,6 +146,19 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         )}
         <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black animate-pulse`} />
       </a>
+      {open && (
+        <div
+          role="status"
+          aria-live="polite"
+          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl bg-black/40 border ${c.border} shadow-2xl`}
+        >
+          <div className={`font-semibold ${c.accent} ${c.glow}`}>Diretor Fabiano</div>
+          <div className="text-white/95 mt-0.5">{c.text.includes("Diretor") ? c.text : c.text}</div>
+          <div className="text-white/90 mt-0.5">
+            Garantindo velocidade máxima e entrega segura em seu pedido, senhor.
+          </div>
+        </div>
+      )}
     </div>
   );
 }
