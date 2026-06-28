@@ -172,12 +172,13 @@ function Billboard({
           loading="lazy"
           decoding="async"
           onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-          className={`absolute bottom-0 h-[75vh] max-h-[800px] object-contain pointer-events-none z-[1] ${
-            side === "left" ? "right-0 translate-x-[8%]" : "left-0 -translate-x-[8%]"
+          className={`absolute bottom-0 h-[78vh] max-h-[820px] object-contain pointer-events-none z-[2] ${
+            side === "left" ? "left-0" : "right-0 scale-x-[-1]"
           }`}
-          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}55)` }}
+          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)`, opacity: 0.98 }}
         />
       )}
+
     </aside>
   );
 }
