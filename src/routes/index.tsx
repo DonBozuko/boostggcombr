@@ -535,7 +535,7 @@ function Landing() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 384px + 6px))", top: 6 }}>
+      <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}>
         <JarvisBadge variant="instagram" inline />
       </div>
 

@@ -242,7 +242,7 @@ function TiktokLanding() {
     // v2: solid bg, no glitch
     <MobileFrame bg="#0a0a0a" route="/tiktok">
       <PlansShowcaseProvider accent={CYAN}>
-      <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="tiktok" inline /><ShowcaseTrigger /></div>
+      <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="tiktok" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${

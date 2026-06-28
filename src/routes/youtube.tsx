@@ -229,7 +229,7 @@ function YoutubeLanding() {
     // v2: solid bg, no glitch
     <MobileFrame bg="#0a0a0a" route="/youtube">
       <PlansShowcaseProvider accent={RED}>
-      <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="youtube" inline /><ShowcaseTrigger /></div>
+      <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="youtube" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       {/* HERO */}
       <div
