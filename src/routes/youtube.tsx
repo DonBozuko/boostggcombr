@@ -221,8 +221,7 @@ function YoutubeLanding() {
     <MobileFrame bg="#0a0a0a" route="/youtube">
       <PlansShowcaseProvider accent={RED}>
       <FabianoBadge variant="youtube" />
-      <JarvisBadge variant="youtube" />
-      <div className="fixed top-3 right-3 z-[60]"><ShowcaseTrigger /></div>
+      <div className="fixed top-3 right-3 z-[60] flex items-center gap-2"><JarvisBadge variant="youtube" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       {/* HERO */}
       <div

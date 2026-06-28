@@ -212,8 +212,7 @@ function FacebookLanding() {
     <MobileFrame bg={BG} route="/facebook">
       <PlansShowcaseProvider accent={BLUE}>
       <FabianoBadge variant="facebook" />
-      <JarvisBadge variant="facebook" />
-      <div className="fixed top-3 right-3 z-[60]"><ShowcaseTrigger /></div>
+      <div className="fixed top-3 right-3 z-[60] flex items-center gap-2"><JarvisBadge variant="facebook" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
