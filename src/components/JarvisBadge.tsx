@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { X } from "lucide-react";
 import type { FabianoVariant } from "./FabianoBadge";
 import armorAsset from "@/assets/jarvis-armor.png.asset.json";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
@@ -272,10 +273,18 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl ${t.bubble} border shadow-2xl transition-all duration-500 ease-out ${
+          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 pr-7 text-[11px] leading-snug backdrop-blur-xl ${t.bubble} border shadow-2xl transition-all duration-500 ease-out ${
             open ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
           }`}
         >
+          <button
+            type="button"
+            aria-label="Fechar"
+            onClick={() => { lockOpenRef.current = false; if (errorTimerRef.current != null) { window.clearTimeout(errorTimerRef.current); errorTimerRef.current = null; } setOpen(false); }}
+            className="absolute top-1 right-1 h-5 w-5 grid place-items-center rounded-full bg-white/10 hover:bg-white/25 text-white/80 hover:text-white"
+          >
+            <X className="h-3 w-3" />
+          </button>
           <span className={`absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 ${t.bubble} border-r border-b`} aria-hidden />
           <div className={`font-semibold ${t.accent} ${t.glow}`}>J.A.R.V.I.S.</div>
           <div className="text-white/95 mt-0.5">{speech}</div>
