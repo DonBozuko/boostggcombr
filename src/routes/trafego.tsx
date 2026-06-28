@@ -291,7 +291,9 @@ function TrafegoLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/trafego" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
