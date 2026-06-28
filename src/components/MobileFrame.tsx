@@ -222,8 +222,8 @@ export function MobileFrame({
       `}</style>
       <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
       <div
-        className="w-full md:max-w-3xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.95)] relative overflow-hidden z-10 flex flex-col font-sans"
-        style={{ background: bg, fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
+        className="w-full md:max-w-3xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-white/[0.02] backdrop-blur-lg border-x border-white/10"
+        style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
