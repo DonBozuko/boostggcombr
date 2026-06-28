@@ -225,7 +225,7 @@ export function MobileFrame({
         style={{ background: bg, fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
-        <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} />
+        <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
         <WelcomeDiscountPopup route={route} />
         <div
           className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col"
