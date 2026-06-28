@@ -52,50 +52,49 @@ export function WelcomeDiscountPopup({ route = "/" }: { route?: RouteKey }) {
       style={{ background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)" }}
     >
       <div
-        className="relative w-full max-w-[400px] rounded-2xl p-5 text-white"
+        className="relative w-full max-w-[240px] rounded-xl p-3 text-white"
         style={{
-          background: "rgba(8,8,12,0.85)",
-          border: `1.5px solid ${t.color}`,
-          boxShadow: `0 0 40px ${t.soft}, inset 0 0 30px rgba(0,0,0,0.6)`,
-          backdropFilter: "blur(16px) saturate(140%)",
+          background: "rgba(8,8,12,0.88)",
+          border: `1.2px solid ${t.color}`,
+          boxShadow: `0 0 24px ${t.soft}, inset 0 0 18px rgba(0,0,0,0.6)`,
+          backdropFilter: "blur(14px) saturate(140%)",
         }}
       >
         <button
           aria-label="Fechar"
           onClick={() => setOpen(false)}
-          className="absolute top-2 right-3 text-white/60 hover:text-white text-xl leading-none"
+          className="absolute top-1 right-2 text-white/60 hover:text-white text-base leading-none"
         >
           ×
         </button>
 
         <div className="text-center">
           <span
-            className="inline-block text-[9px] font-black tracking-[0.4em] px-2 py-0.5 rounded-full border"
-            style={{ color: t.color, borderColor: t.color, textShadow: `0 0 8px ${t.color}` }}
+            className="inline-block text-[8px] font-black tracking-[0.35em] px-1.5 py-0.5 rounded-full border"
+            style={{ color: t.color, borderColor: t.color, textShadow: `0 0 6px ${t.color}` }}
           >
-            {t.label} · J.A.R.V.I.S.
+            {t.label}
           </span>
           <h2
-            className="mt-2 text-[15px] font-extrabold leading-tight"
-            style={{ color: t.color, textShadow: `0 0 10px ${t.soft}` }}
+            className="mt-1 text-[11px] font-extrabold leading-tight"
+            style={{ color: t.color, textShadow: `0 0 8px ${t.soft}` }}
           >
-            ⚠️ ATIVAÇÃO DE PROTOCOLO DE BOOSTER EXTRA!
+            ⚡ DESCONTO 10% INSTANTÂNEO
           </h2>
-          <p className="mt-1.5 text-[11px] text-white/80 leading-snug">
-            Válido por <b className="text-white">30 minutos</b>, CORRE! O J.A.R.V.I.S. liberou uma vantagem
-            especial de boas-vindas para injetar autoridade no seu perfil agora mesmo.
+          <p className="mt-1 text-[9px] text-white/75 leading-snug">
+            Aplique no checkout Pix e ganhe <b className="text-white">10% off</b> na hora.
           </p>
         </div>
 
         <div
-          className="mt-4 flex items-stretch gap-2 rounded-xl p-2"
+          className="mt-2 flex items-stretch gap-1.5 rounded-lg p-1.5"
           style={{ background: "rgba(255,255,255,0.04)", border: `1px dashed ${t.color}80` }}
         >
           <div className="flex-1 flex flex-col items-center justify-center">
-            <span className="text-[9px] uppercase tracking-[0.3em] text-white/50">Cupom</span>
+            <span className="text-[7px] uppercase tracking-[0.25em] text-white/50">Cupom</span>
             <span
-              className="font-mono font-black text-xl tracking-[0.2em]"
-              style={{ color: t.color, textShadow: `0 0 10px ${t.color}` }}
+              className="font-mono font-black text-sm tracking-[0.18em]"
+              style={{ color: t.color, textShadow: `0 0 8px ${t.color}` }}
             >
               {COUPON}
             </span>
@@ -103,34 +102,32 @@ export function WelcomeDiscountPopup({ route = "/" }: { route?: RouteKey }) {
           <button
             type="button"
             onClick={copy}
-            className="px-4 rounded-lg text-[12px] font-extrabold uppercase tracking-wider transition-all"
+            className="px-2.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider transition-all"
             style={{
               background: copied ? "#10b981" : "#f97316",
               color: "#fff",
               boxShadow: copied
-                ? "0 0 18px rgba(16,185,129,0.7)"
-                : "0 0 18px rgba(249,115,22,0.6)",
+                ? "0 0 12px rgba(16,185,129,0.7)"
+                : "0 0 12px rgba(249,115,22,0.6)",
             }}
           >
-            {copied ? "✓ Copiado!" : "Copiar"}
+            {copied ? "✓" : "Copiar"}
           </button>
         </div>
 
         <button
           onClick={() => setOpen(false)}
-          className="mt-4 w-full py-2 rounded-lg text-[12px] font-bold uppercase tracking-wider"
+          className="mt-2 w-full py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider"
           style={{
             background: `linear-gradient(135deg, ${t.color}, ${t.color}aa)`,
             color: "#0a0a0a",
-            boxShadow: `0 0 20px ${t.soft}`,
+            boxShadow: `0 0 12px ${t.soft}`,
           }}
         >
-          Quero meu Booster Agora
+          Ativar Agora
         </button>
-        <p className="mt-2 text-center text-[9px] text-white/40">
-          Aplique no campo "Possui cupom?" do checkout Pix.
-        </p>
       </div>
+
     </div>
   );
 }
