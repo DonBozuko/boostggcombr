@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { X } from "lucide-react";
 import type { FabianoVariant } from "./FabianoBadge";
 import armorAsset from "@/assets/jarvis-armor.png.asset.json";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
