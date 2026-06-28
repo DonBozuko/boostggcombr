@@ -180,7 +180,9 @@ function TrafegoLanding() {
       >
         <div className="container mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Globe2 size={18} style={{ color: NEON }} />
+            <div className="size-7 rounded-full overflow-hidden ring-2 shadow-[0_0_12px_rgba(168,85,247,0.7)]" style={{ borderColor: "#a855f7" }}>
+              <img src="/__l5e/assets-v1/c4e83b18-e1c4-4191-88a1-8842c6097b8b/fabiano.png" alt="Fabiano Santiago" className="h-full w-full object-cover object-top" />
+            </div>
             <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
           </div>
           <span className="text-xs" style={{ color: NEON }}>TRÁFEGO WEB ⚡</span>
