@@ -236,7 +236,11 @@ export function MobileFrame({
 
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} />
         <WelcomeDiscountPopup route={route} />
-        <div className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-auto flex flex-col">
+        <div
+          className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col"
+          style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}
+        >
+
           {children}
         </div>
         <div className="shrink-0">
