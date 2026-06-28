@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
@@ -129,13 +130,9 @@ function RouteHeader({
 function Billboard({
   side,
   data,
-  character,
-  cta,
 }: {
   side: "left" | "right";
   data: (typeof billboards)[RouteKey];
-  character?: string;
-  cta?: string;
 }) {
   return (
     <aside
@@ -155,21 +152,42 @@ function Billboard({
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
         }}
       />
-      {character && (
-        <img
-          src={character}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-          className={`fixed bottom-0 h-auto max-h-[100dvh] w-auto max-w-[42vw] object-contain pointer-events-none z-[5] ${
-            side === "left" ? "left-0" : "right-0 scale-x-[-1]"
-          }`}
-          style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)`, opacity: 1 }}
-        />
-      )}
-
     </aside>
+  );
+}
+
+
+function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; chars?: { left: string; right: string } }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !chars || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden lg:block overflow-visible">
+      <img
+        src={chars.left}
+        alt=""
+        loading="eager"
+        decoding="async"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+        className="fixed bottom-0 left-0 h-[95vh] w-auto z-0 object-contain object-bottom select-none"
+        style={{ maxWidth: "none", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+      />
+      <img
+        src={chars.right}
+        alt=""
+        loading="eager"
+        decoding="async"
+        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+        className="fixed bottom-0 right-0 h-[95vh] w-auto z-0 object-contain object-bottom scale-x-[-1] select-none"
+        style={{ maxWidth: "none", transform: "scaleX(-1)", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+      />
+    </div>,
+    document.body,
   );
 }
 
@@ -188,11 +206,11 @@ export function MobileFrame({
   const chars = characters[route];
   return (
     <div
-      className="fixed inset-0 h-[100dvh] w-screen overflow-hidden flex justify-center"
-      style={{ background: "#050505", touchAction: "none", overscrollBehavior: "none" }}
+      className="relative min-h-screen h-auto w-screen overflow-y-auto overflow-x-visible flex justify-center"
+      style={{ background: "#050505", touchAction: "pan-y", overscrollBehaviorY: "auto" }}
     >
       <style>{`
-        html, body { overflow: hidden !important; overscroll-behavior: none !important; height: 100%; margin: 0; }
+        html, body { max-width: none !important; overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; }
 
         .mf-compact > * { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
         .mf-compact section, .mf-compact header { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
@@ -210,16 +228,17 @@ export function MobileFrame({
         .mf-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2)); border-radius: 999px; }
         .mf-scroll::-webkit-scrollbar-corner { background: transparent; }
       `}</style>
-      <Billboard side="left" data={data} character={chars?.left} cta={chars?.leftCta} />
+      <BodyCharacters data={data} chars={chars} />
+      <Billboard side="left" data={data} />
       <div
-        className={`w-full ${route === "/" ? "md:max-w-3xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl" : "md:max-w-[460px] lg:max-w-[460px] xl:max-w-[480px] 2xl:max-w-[480px]"} h-[100dvh] text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-white/[0.02] backdrop-blur-lg border-x border-white/10`}
+        className={`w-full ${route === "/" ? "md:max-w-3xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl" : "md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px]"} min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible z-10 flex flex-col font-sans bg-white/[0.02] backdrop-blur-lg border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
         <WelcomeDiscountPopup route={route} />
         <div
-          className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-hidden flex flex-col"
+          className="mf-scroll mf-compact flex-1 min-h-[850px] overflow-y-auto overflow-x-visible flex flex-col"
           style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}
         >
 
@@ -243,7 +262,7 @@ export function MobileFrame({
         </div>
 
       </div>
-      <Billboard side="right" data={data} character={chars?.right} cta={chars?.rightCta} />
+      <Billboard side="right" data={data} />
     </div>
   );
 }
