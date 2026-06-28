@@ -206,10 +206,12 @@ export function MobileFrame({
   const chars = characters[route];
   return (
     <div
-      className="h-[100dvh] overflow-hidden flex justify-center"
-      style={{ background: "#050505" }}
+      className="fixed inset-0 h-[100dvh] w-screen overflow-hidden flex justify-center"
+      style={{ background: "#050505", touchAction: "none", overscrollBehavior: "none" }}
     >
       <style>{`
+        html, body { overflow: hidden !important; overscroll-behavior: none !important; height: 100%; margin: 0; }
+
         .mf-compact > * { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
         .mf-compact section, .mf-compact header { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
         .mf-compact .space-y-5 > * + * { margin-top: 0.6rem !important; }
