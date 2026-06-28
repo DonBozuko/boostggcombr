@@ -55,7 +55,7 @@ export function IntegrityVerifier() {
       `EliteBoost Prime · Diagnóstico Integral · ${ts}`,
       `Status: ${checks.filter((c) => !c.ok).length === 0 ? "TUDO OK" : "FALHAS DETECTADAS"} (${checks.filter((c) => c.ok).length}/${checks.length})`,
       "",
-      "— Tabelas & Mídias v=33 —",
+      "— Tabelas & Mídias v=35 —",
       ...checks.map((c) => `${c.ok ? "[OK]" : "[FAIL]"} ${c.label} · ${c.detail}`),
       "",
       "— Latência de Provedores —",
