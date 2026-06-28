@@ -129,7 +129,8 @@ export function WelcomeDiscountPopup({ route = "/" }: { route?: RouteKey }) {
           Ativar Agora
         </button>
       </div>
-
+      </div>
     </div>
   );
 }
+
