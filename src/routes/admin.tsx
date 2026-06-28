@@ -808,7 +808,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       .from("admin_settings")
       .upsert({ key: "sandbox_mode", value: { enabled: next }, updated_at: new Date().toISOString() });
     setSandboxBusy(false);
-    if (error) { alert("Falha ao salvar: " + error.message); return; }
+    if (error) { window.alert("Falha ao salvar: " + error.message); return; }
     setSandbox(next);
   };
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
