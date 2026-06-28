@@ -63,12 +63,20 @@ type Categoria = "canal" | "grupo";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
 
 const canalPlans: Plan[] = [
-  { id: "tgc500", tier: "500 Membros (Canal)",   quantidade: 500,  valor: 19.0, price: "R$ 19,00" },
-  { id: "tgc1k",  tier: "1.000 Membros (Canal)", quantidade: 1000, valor: 35.0, price: "R$ 35,00" },
+  { id: "tgc100",  tier: "100 Membros (Canal)",     quantidade: 100,   valor: 7.0,   price: "R$ 7,00" },
+  { id: "tgc500",  tier: "500 Membros (Canal)",     quantidade: 500,   valor: 19.0,  price: "R$ 19,00" },
+  { id: "tgc1k",   tier: "1.000 Membros (Canal)",   quantidade: 1000,  valor: 35.0,  price: "R$ 35,00" },
+  { id: "tgc2k",   tier: "2.000 Membros (Canal)",   quantidade: 2000,  valor: 65.0,  price: "R$ 65,00" },
+  { id: "tgc5k",   tier: "5.000 Membros (Canal)",   quantidade: 5000,  valor: 149.0, price: "R$ 149,00" },
+  { id: "tgc10k",  tier: "10.000 Membros (Canal)",  quantidade: 10000, valor: 279.0, price: "R$ 279,00" },
 ];
 const grupoPlans: Plan[] = [
-  { id: "tgg500", tier: "500 Membros (Grupo)",   quantidade: 500,  valor: 19.0, price: "R$ 19,00" },
-  { id: "tgg1k",  tier: "1.000 Membros (Grupo)", quantidade: 1000, valor: 35.0, price: "R$ 35,00" },
+  { id: "tgg100",  tier: "100 Membros (Grupo)",     quantidade: 100,   valor: 7.0,   price: "R$ 7,00" },
+  { id: "tgg500",  tier: "500 Membros (Grupo)",     quantidade: 500,   valor: 19.0,  price: "R$ 19,00" },
+  { id: "tgg1k",   tier: "1.000 Membros (Grupo)",   quantidade: 1000,  valor: 35.0,  price: "R$ 35,00" },
+  { id: "tgg2k",   tier: "2.000 Membros (Grupo)",   quantidade: 2000,  valor: 65.0,  price: "R$ 65,00" },
+  { id: "tgg5k",   tier: "5.000 Membros (Grupo)",   quantidade: 5000,  valor: 149.0, price: "R$ 149,00" },
+  { id: "tgg10k",  tier: "10.000 Membros (Grupo)",  quantidade: 10000, valor: 279.0, price: "R$ 279,00" },
 ];
 const allPlans = [...canalPlans, ...grupoPlans];
 
