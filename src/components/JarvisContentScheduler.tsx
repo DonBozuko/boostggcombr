@@ -301,40 +301,6 @@ export function JarvisContentScheduler() {
         ) : (
           <div className="space-y-1.5 max-h-64 overflow-y-auto">
             {posts.map((p) => {
-          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
-            📱 Pré-visualização ({format}) — J.A.R.V.I.S. Luxury Frame
-          </div>
-          <div className={`rounded-xl border-2 border-red-500/40 bg-black/80 overflow-hidden shadow-[0_0_30px_rgba(255,0,40,0.25)] ${format === "9:16" ? "max-w-[280px] mx-auto" : ""}`}>
-            <div className="flex items-center gap-2 p-2.5 border-b border-cyan-400/20 bg-gradient-to-r from-black to-red-950/40">
-              <div className="h-7 w-7 rounded-full bg-gradient-to-tr from-red-500 via-fuchsia-500 to-cyan-400" />
-              <div className="text-xs font-bold text-cyan-200">eliteboostprime</div>
-              <div className="ml-auto text-[9px] text-white/40 uppercase tracking-wider">{format}</div>
-            </div>
-            <div className={`${ratio} bg-black flex items-center justify-center relative`}>
-              {imageUrl ? (
-                <img src={imageUrl} alt="preview" className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-[10px] text-white/40 px-4 text-center">Cole uma URL para visualizar o criativo</div>
-              )}
-              <div className="absolute inset-0 ring-1 ring-inset ring-cyan-400/20 pointer-events-none" />
-            </div>
-            <div className="p-2.5 text-[11px] whitespace-pre-wrap min-h-[50px] text-white/90">
-              {caption || <span className="text-white/40">A legenda aparecerá aqui...</span>}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Lista */}
-      <div>
-        <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">🗓️ Agenda Omnichannel</div>
-        {loading ? (
-          <div className="text-xs text-muted-foreground">Carregando...</div>
-        ) : posts.length === 0 ? (
-          <div className="text-xs text-muted-foreground">Nenhum post agendado.</div>
-        ) : (
-          <div className="space-y-1.5 max-h-64 overflow-y-auto">
-            {posts.map((p) => {
               const net = NETWORKS.find((n) => n.id === p.network);
               return (
                 <div key={p.id} className="flex items-center gap-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs">
