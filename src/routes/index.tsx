@@ -518,12 +518,12 @@ function Landing() {
             </div>
             <span className="font-display font-bold text-lg">ELITEBOOST PRIME</span>
           </div>
-          <div className="flex items-center gap-2">
-            <JarvisBadge variant="instagram" inline />
-            <ShowcaseTrigger />
-          </div>
+          <ShowcaseTrigger />
         </div>
       </header>
+      <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 384px + 6px))", top: 6 }}>
+        <JarvisBadge variant="instagram" inline />
+      </div>
 
       <ShowcaseShell>
 

@@ -66,14 +66,21 @@ type Categoria = "seguidores" | "curtidas";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
 
 const followersPlans: Plan[] = [
-  { id: "ff500", tier: "500 Seguidores",   quantidade: 500,  valor: 19.0, price: "R$ 19,00" },
-  { id: "ff1k",  tier: "1.000 Seguidores", quantidade: 1000, valor: 29.0, price: "R$ 29,00" },
-  { id: "ff2k5", tier: "2.500 Seguidores", quantidade: 2500, valor: 69.0, price: "R$ 69,00" },
+  { id: "ff100",  tier: "100 Seguidores",     quantidade: 100,   valor: 9.0,   price: "R$ 9,00" },
+  { id: "ff500",  tier: "500 Seguidores",     quantidade: 500,   valor: 19.0,  price: "R$ 19,00" },
+  { id: "ff1k",   tier: "1.000 Seguidores",   quantidade: 1000,  valor: 29.0,  price: "R$ 29,00" },
+  { id: "ff2k5",  tier: "2.500 Seguidores",   quantidade: 2500,  valor: 69.0,  price: "R$ 69,00" },
+  { id: "ff5k",   tier: "5.000 Seguidores",   quantidade: 5000,  valor: 129.0, price: "R$ 129,00" },
+  { id: "ff10k",  tier: "10.000 Seguidores",  quantidade: 10000, valor: 239.0, price: "R$ 239,00" },
+  { id: "ff25k",  tier: "25.000 Seguidores",  quantidade: 25000, valor: 549.0, price: "R$ 549,00" },
 ];
 const likesPlans: Plan[] = [
-  { id: "fl500", tier: "500 Curtidas",   quantidade: 500,  valor: 9.0,  price: "R$ 9,00" },
-  { id: "fl1k",  tier: "1.000 Curtidas", quantidade: 1000, valor: 15.0, price: "R$ 15,00" },
-  { id: "fl2k",  tier: "2.000 Curtidas", quantidade: 2000, valor: 27.0, price: "R$ 27,00" },
+  { id: "fl100",  tier: "100 Curtidas",   quantidade: 100,   valor: 4.0,   price: "R$ 4,00" },
+  { id: "fl500",  tier: "500 Curtidas",   quantidade: 500,   valor: 9.0,   price: "R$ 9,00" },
+  { id: "fl1k",   tier: "1.000 Curtidas", quantidade: 1000,  valor: 15.0,  price: "R$ 15,00" },
+  { id: "fl2k",   tier: "2.000 Curtidas", quantidade: 2000,  valor: 27.0,  price: "R$ 27,00" },
+  { id: "fl5k",   tier: "5.000 Curtidas", quantidade: 5000,  valor: 59.0,  price: "R$ 59,00" },
+  { id: "fl10k",  tier: "10.000 Curtidas",quantidade: 10000, valor: 109.0, price: "R$ 109,00" },
 ];
 const allPlans = [...followersPlans, ...likesPlans];
 
@@ -212,7 +219,7 @@ function FacebookLanding() {
     <MobileFrame bg={BG} route="/facebook">
       <PlansShowcaseProvider accent={BLUE}>
       <FabianoBadge variant="facebook" />
-      <div className="fixed top-3 right-3 z-[60] flex items-center gap-2"><JarvisBadge variant="facebook" inline /><ShowcaseTrigger /></div>
+      <div className="fixed z-[60] flex items-center gap-2" style={{ right: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><JarvisBadge variant="facebook" inline /><ShowcaseTrigger /></div>
       <ShowcaseShell>
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
