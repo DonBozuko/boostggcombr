@@ -16,6 +16,7 @@ export function PremiumPricingGrid({
   accent,
   unit = "",
 }: {
+  cols?: Cols;
   plans: GridPlan[];
   onBuy: (id: string) => void;
   disabled?: boolean;
@@ -23,12 +24,13 @@ export function PremiumPricingGrid({
   accent: string;
   unit?: string;
 }) {
+  const gridCols = cols === 6 ? "grid-cols-2 lg:grid-cols-6 gap-2 lg:gap-4" : "grid-cols-2 gap-2";
   // Hydration Guard: se a esteira chegar vazia (race condition / fetch atrasado),
   // segura o espaço físico com skeleton animado mantendo a grade simétrica.
   if (!plans || plans.length === 0) {
     return (
       <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Carregando pacotes">
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 lg:gap-4 auto-rows-fr">
+        <div className={`grid ${gridCols} auto-rows-fr`}>
           {Array.from({ length: 12 }).map((_, i) => (
             <div
               key={i}
@@ -51,7 +53,8 @@ export function PremiumPricingGrid({
   }
   return (
     <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Pacotes disponíveis">
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 lg:gap-4 auto-rows-fr">
+      <div className={`grid ${gridCols} auto-rows-fr`}>
+
         {plans.map((p) => (
           <div
             key={p.id}
