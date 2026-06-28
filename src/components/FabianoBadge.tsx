@@ -149,28 +149,6 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         )}
         <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black animate-pulse`} />
       </a>
-      <a
-        href={web}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={handleClick}
-        className={`relative max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl transition-all duration-500 ease-out hover:bg-white/15 animate-pulse ${
-          open
-            ? "opacity-100 translate-x-0 scale-100 animate-[fade-in_0.5s_ease-out]"
-            : "opacity-0 -translate-x-2 scale-90 pointer-events-none"
-        }`}
-        role="tooltip"
-      >
-        <span
-          className="absolute -left-1.5 bottom-4 h-3 w-3 rotate-45 bg-white/10 border-l border-b border-white/20"
-          aria-hidden
-        />
-        <div className={`font-semibold ${c.accent} ${c.glow}`}>Fabiano Santiago</div>
-        <div className="text-white/95 mt-0.5">{c.text}</div>
-        <div className={`mt-1 text-[10px] font-bold uppercase tracking-wider ${c.accent}`}>
-          → Falar no Telegram
-        </div>
-      </a>
     </div>
   );
 }

@@ -110,19 +110,8 @@ function RouteHeader({
       className="px-3 pt-2 pb-1 text-center select-none"
       style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
     >
-      <span
-        className="inline-block text-[10px] font-bold tracking-[0.45em] uppercase border rounded-full px-3 py-0.5"
-        style={{
-          color: accent,
-          borderColor: `${accent}55`,
-          background: "rgba(255,255,255,0.03)",
-          textShadow: `0 0 8px ${accent}`,
-        }}
-      >
-        {brand}
-      </span>
       <h1
-        className="mt-1.5 text-[20px] sm:text-[22px] font-extrabold tracking-tight text-white leading-tight"
+        className="text-[20px] sm:text-[22px] font-extrabold tracking-tight text-white leading-tight"
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", letterSpacing: "-0.01em" }}
       >
         {dominio}
@@ -151,11 +140,12 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden lg:block fixed top-1/2 -translate-y-1/2 z-0 h-[92vh] w-[calc((100vw-450px)/2)] max-w-[560px] overflow-hidden pointer-events-none"
+      className="hidden lg:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
       style={{
         background: data.gradient,
         left: side === "left" ? 0 : "auto",
         right: side === "right" ? 0 : "auto",
+        overflow: "visible",
       }}
     >
       <div
@@ -172,7 +162,7 @@ function Billboard({
           loading="lazy"
           decoding="async"
           onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-          className={`fixed bottom-0 h-[82vh] max-h-[860px] w-auto object-contain pointer-events-none z-[5] ${
+          className={`fixed bottom-0 h-auto max-h-[100dvh] w-auto max-w-[42vw] object-contain pointer-events-none z-[5] ${
             side === "left" ? "left-0" : "right-0 scale-x-[-1]"
           }`}
           style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)`, opacity: 1 }}
