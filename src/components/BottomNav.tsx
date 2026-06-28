@@ -70,10 +70,10 @@ const items: { to: Route; Icon: React.FC; label: string; full: string; color: st
 export function BottomNav({ active }: { active: Route }) {
   return (
     <nav
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-50 backdrop-blur-xl bg-black/80 border-t border-white/10"
+      className="fixed bottom-0 left-0 right-0 w-full z-50 backdrop-blur-xl bg-black/80 border-t border-white/10"
       aria-label="Navegação principal entre redes"
     >
-      <ul className="grid grid-cols-6 h-16">
+      <ul className="grid grid-cols-6 h-16 w-full max-w-7xl mx-auto px-2">
         {items.map(({ to, Icon, label, full, color }) => {
           const isActive = active === to;
           return (
