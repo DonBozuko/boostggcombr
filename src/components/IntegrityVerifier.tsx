@@ -7,9 +7,9 @@ type Ping = { provider: string; ms: number | null; ok: boolean };
 
 const ROUTE_PROBES = ["/", "/tiktok", "/youtube", "/facebook", "/telegram", "/trafego"];
 const AUDIO_PROBES = [
-  "/api/public/sfx/welcome.mp3?v=33",
-  "/api/public/sfx/jarvis-interacao.mp3?v=33",
-  "/api/public/sfx/jarvis-sucesso.mp3?v=33",
+  "/api/public/sfx/welcome.mp3?v=35",
+  "/api/public/sfx/jarvis-interacao.mp3?v=35",
+  "/api/public/sfx/jarvis-sucesso.mp3?v=35",
 ];
 const PING_TARGETS: Array<{ provider: string; url: string }> = [
   { provider: "SMMHype", url: "https://smmhype.com/api/v2" },
@@ -55,7 +55,7 @@ export function IntegrityVerifier() {
       `EliteBoost Prime · Diagnóstico Integral · ${ts}`,
       `Status: ${checks.filter((c) => !c.ok).length === 0 ? "TUDO OK" : "FALHAS DETECTADAS"} (${checks.filter((c) => c.ok).length}/${checks.length})`,
       "",
-      "— Tabelas & Mídias v=33 —",
+      "— Tabelas & Mídias v=35 —",
       ...checks.map((c) => `${c.ok ? "[OK]" : "[FAIL]"} ${c.label} · ${c.detail}`),
       "",
       "— Latência de Provedores —",
@@ -120,6 +120,23 @@ export function IntegrityVerifier() {
     }
     setPings(ps);
     pushLog("PING", ps.map((p) => `${p.provider}=${p.ms}ms`).join(" · "));
+
+    // Contingência: alertas recentes do polling de backup do Mercado Pago
+    try {
+      const { data: alerts } = await supabase
+        .from("jarvis_alerts")
+        .select("mensagem, created_at")
+        .eq("origem", "contingency-pooling")
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (alerts && alerts.length > 0) {
+        for (const a of alerts) pushLog("CONTINGENCY", a.mensagem);
+      } else {
+        pushLog("CONTINGENCY", "Sem eventos de pooling de contingência (webhook estável)");
+      }
+    } catch (e) {
+      pushLog("CONTINGENCY", `Leitura falhou: ${(e as Error).message}`);
+    }
 
     setChecks(out);
     setRunning(false);

@@ -12,6 +12,18 @@ export const getPedidoStatus = createServerFn({ method: "GET" })
       .eq("id", data.id)
       .maybeSingle();
     if (error || !row) return { ok: false as const, status: null };
+
+    // Contingência: se o webhook do MP ainda não chegou, consulta a API direta
+    // e despacha o pedido para evitar o looping "Aguardando pagamento...".
+    if (row.status === "pending") {
+      try {
+        const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
+        const r = await confirmAndDispatchIfPaid(data.id);
+        if (r.ok) return { ok: true as const, status: r.status };
+      } catch (e) {
+        console.warn("[getPedidoStatus] contingency falhou", e);
+      }
+    }
     return { ok: true as const, status: row.status as string };
   });
 
