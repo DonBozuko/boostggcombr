@@ -20,6 +20,32 @@ export function PremiumPricingGrid({
   accent: string;
   unit?: string;
 }) {
+  // Hydration Guard: se a esteira chegar vazia (race condition / fetch atrasado),
+  // segura o espaço físico com skeleton animado mantendo a grade simétrica.
+  if (!plans || plans.length === 0) {
+    return (
+      <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Carregando pacotes">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 lg:gap-4 auto-rows-fr">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-lg px-2 py-2 h-full min-h-[140px] animate-pulse"
+              style={{
+                background: "#0f0f10",
+                border: `1px solid ${accent}33`,
+                boxShadow: `0 0 8px ${accent}11`,
+              }}
+            >
+              <div className="h-4 w-3/4 mx-auto rounded bg-zinc-800 mb-2" />
+              <div className="h-2 w-1/2 mx-auto rounded bg-zinc-800/60 mb-3" />
+              <div className="h-6 w-2/3 mx-auto rounded bg-zinc-800 mb-3" />
+              <div className="h-6 w-full rounded bg-zinc-800" />
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Pacotes disponíveis">
       <div className="grid grid-cols-2 lg:grid-cols-6 gap-2 lg:gap-4 auto-rows-fr">
