@@ -124,7 +124,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
       className="fixed z-50 flex items-start gap-2"
       style={{ left: `max(8px, calc(50vw - ${halfW}px + 6px))`, top: 6 }}
     >
-      <
+      <a
         href={web}
         target="_blank"
         rel="noopener noreferrer"
