@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import fabiano from "@/assets/fabiano.png.asset.json";
-import { User } from "lucide-react";
+import { User, X } from "lucide-react";
+
 import { useScrolledPercent } from "@/hooks/useScroll";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
