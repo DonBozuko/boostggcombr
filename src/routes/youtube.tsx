@@ -2,6 +2,7 @@ import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
+import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
@@ -218,8 +219,11 @@ function YoutubeLanding() {
   return (
     // v2: solid bg, no glitch
     <MobileFrame bg="#0a0a0a" route="/youtube">
+      <PlansShowcaseProvider accent={RED}>
       <FabianoBadge variant="youtube" />
       <JarvisBadge variant="youtube" />
+      <div className="fixed top-3 right-3 z-[60]"><ShowcaseTrigger /></div>
+      <ShowcaseShell>
       {/* HERO */}
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
@@ -439,7 +443,9 @@ function YoutubeLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/youtube" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }

@@ -2,6 +2,7 @@ import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
+import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
@@ -155,8 +156,11 @@ function TrafegoLanding() {
 
   return (
     <MobileFrame bg={BG} route="/trafego">
+      <PlansShowcaseProvider accent={NEON}>
       <FabianoBadge variant="trafego" />
       <JarvisBadge variant="trafego" />
+      <div className="fixed top-3 right-3 z-[60]"><ShowcaseTrigger /></div>
+      <ShowcaseShell>
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
           scrolled ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
@@ -287,7 +291,9 @@ function TrafegoLanding() {
           )}
         </DialogContent>
       </Dialog>
+      </ShowcaseShell>
       <BottomNav active="/trafego" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }

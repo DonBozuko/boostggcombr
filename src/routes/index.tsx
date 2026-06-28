@@ -3,6 +3,7 @@ import { ViralShare } from "@/components/ViralShare";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { MobileFrame } from "@/components/MobileFrame";
+import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
@@ -506,6 +507,7 @@ function Landing() {
 
   return (
     <MobileFrame bg="hsl(var(--background))" route="/">
+      <PlansShowcaseProvider accent="#FFD700">
       <FabianoBadge variant="instagram" />
       {/* NAV */}
       <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
@@ -518,12 +520,12 @@ function Landing() {
           </div>
           <div className="flex items-center gap-2">
             <JarvisBadge variant="instagram" inline />
-            <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
-              <a href="#pedido">Ver Planos</a>
-            </Button>
+            <ShowcaseTrigger />
           </div>
         </div>
       </header>
+
+      <ShowcaseShell>
 
 
       <PremiumCategorySelector
@@ -781,6 +783,8 @@ function Landing() {
           </DialogContent>
         </Dialog>
       </section>)}
+      </ShowcaseShell>
+
 
 
       {/* SOCIAL PROOF */}
@@ -900,6 +904,7 @@ function Landing() {
         </div>
       </footer>
       <BottomNav active="/" />
+      </PlansShowcaseProvider>
     </MobileFrame>
   );
 }
