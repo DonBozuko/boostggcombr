@@ -31,7 +31,7 @@ export function PremiumPricingGrid({
   // segura o espaço físico com skeleton animado mantendo a grade simétrica.
   if (!plans || plans.length === 0) {
     return (
-      <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Carregando pacotes">
+      <section className="mx-auto my-1 w-full max-w-[550px] px-2" aria-label="Carregando pacotes">
         <div className={`grid ${gridCols} auto-rows-fr`}>
           {Array.from({ length: 12 }).map((_, i) => (
             <div
@@ -54,7 +54,7 @@ export function PremiumPricingGrid({
     );
   }
   return (
-    <section className="mx-auto my-1 w-full max-w-7xl px-2" aria-label="Pacotes disponíveis">
+    <section className="mx-auto my-1 w-full max-w-[550px] px-2" aria-label="Pacotes disponíveis">
       <div className={`grid ${gridCols} auto-rows-fr`}>
 
         {plans.map((p) => (
