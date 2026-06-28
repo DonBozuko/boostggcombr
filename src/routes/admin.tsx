@@ -476,14 +476,17 @@ function BuscarPedidoPanel() {
 
   return (
     <div className="rounded-2xl border border-cyan-400/30 bg-black/40 backdrop-blur-xl p-5 space-y-3">
-      <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 Buscar Pedido</h2>
+      <h2 className="text-sm font-extrabold tracking-[0.18em] uppercase text-cyan-200">🔍 BUSCAR PEDIDO POR ID OU @USER</h2>
       <div className="flex items-stretch gap-2">
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void runSearch(); } }}
-          placeholder="ID do pedido, @user ou MP id…"
+          placeholder="Digite o ID do pedido, @usuario ou MP id e pressione ENTER"
           className="bg-black/40 border-cyan-400/30"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
           autoFocus
         />
         <Button
@@ -494,7 +497,7 @@ function BuscarPedidoPanel() {
           <Search className="h-4 w-4 mr-1.5" /> BUSCAR
         </Button>
       </div>
-      <p className="text-[11px] text-white/50">Pressione <strong>Enter</strong> para varredura instantânea na tabela <code>pedidos</code>.</p>
+      <p className="text-[11px] text-white/50">Pressione <strong>ENTER</strong> ou clique em <strong>BUSCAR</strong> para varredura instantânea na tabela <code>pedidos</code>.</p>
 
       {err && <div className="text-xs text-red-300 font-mono">⛔ {err}</div>}
       {rows && rows.length === 0 && <div className="text-xs text-white/50 font-mono">// nenhum pedido encontrado</div>}
