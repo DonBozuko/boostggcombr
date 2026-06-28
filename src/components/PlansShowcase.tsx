@@ -40,8 +40,8 @@ export function ShowcaseShell({ children }: { children: ReactNode }) {
   const { open, setOpen, accent } = useShowcase();
   if (!open) return <>{children}</>;
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/95 backdrop-blur-xl">
-      <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/70 backdrop-blur-xl">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-black/40 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/60 backdrop-blur-md">
         <span
           className="text-sm font-black tracking-widest uppercase"
           style={{ color: accent, textShadow: `0 0 8px ${accent}88` }}
