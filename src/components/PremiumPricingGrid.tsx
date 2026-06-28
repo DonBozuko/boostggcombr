@@ -26,7 +26,7 @@ export function PremiumPricingGrid({
         {plans.map((p) => (
           <div
             key={p.id}
-            className="rounded-lg px-2 py-1.5 md:py-2 flex flex-col items-center text-center"
+            className="rounded-lg px-2 py-2 flex flex-col items-center text-center h-full min-h-[140px] justify-between"
             style={{
               background: "#0f0f10",
               border: `1px solid ${accent}55`,
