@@ -91,7 +91,8 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
 
 export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
   useScrolledPercent(0.15);
-  const open = true;
+  const [open, setOpen] = useState(true);
+
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
   const { native, web } = buildLinks(variant);
