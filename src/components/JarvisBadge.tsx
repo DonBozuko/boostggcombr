@@ -84,14 +84,29 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
   },
 };
 
-export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
+export function JarvisBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
   const t = SKINS[variant];
   const [open, setOpen] = useState(false);
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
   const firedRef = useRef(false);
+  const lockOpenRef = useRef(false);
+  const errorTimerRef = useRef<number | null>(null);
   const consultar = useServerFn(consultarPedidoPublico);
+
+  const safeClose = () => {
+    if (lockOpenRef.current) return;
+    setOpen(false);
+  };
+  const clearAutoClose = () => {
+    lockOpenRef.current = true;
+    if (errorTimerRef.current != null) {
+      window.clearTimeout(errorTimerRef.current);
+      errorTimerRef.current = null;
+    }
+    setOpen(true);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -107,11 +122,11 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
       if (firedRef.current) return;
       firedRef.current = true;
       setOpen(true);
-      audio.onended = () => setOpen(false);
-      audio.onerror = () => { window.setTimeout(() => setOpen(false), 12000); };
+      audio.onended = () => safeClose();
+      audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
       const p = audio.play();
       if (p && typeof p.catch === "function") {
-        p.catch(() => { firedRef.current = false; setOpen(false); });
+        p.catch(() => { firedRef.current = false; safeClose(); });
       }
       cleanup();
     };
@@ -127,6 +142,7 @@ export function JarvisBadge({ variant = "instagram" }: { variant?: FabianoVarian
     );
     return () => {
       cleanup();
+      if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
       try { audio.pause(); audio.currentTime = 0; } catch {}
       unregister();
     };
