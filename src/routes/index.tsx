@@ -59,6 +59,7 @@ import { CheckCircle2 } from "lucide-react";
 import { CouponField } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { getPricingGrid } from "@/lib/pricing.functions";
 
 const WHATSAPP_ADMIN = "5515997445388";
 
