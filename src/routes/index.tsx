@@ -484,7 +484,7 @@ function Landing() {
             <span className="font-display font-bold text-lg">ELITEBOOST PRIME</span>
           </div>
           <Button asChild size="sm" className="bg-[image:var(--gradient-cta)] text-background font-semibold hover:opacity-90">
-            <a href="#planos">Ver Planos</a>
+            <a href="#pedido">Ver Planos</a>
           </Button>
         </div>
       </header>
