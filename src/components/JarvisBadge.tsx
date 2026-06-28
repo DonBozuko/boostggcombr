@@ -14,6 +14,49 @@ const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
   trafego:   "Senhor, tráfego web qualificado em rota. Visitantes reais direcionados ao funil para multiplicar conversão e ranqueamento orgânico.",
 };
 
+// Rotação dinâmica de mensagens persuasivas legítimas por rede.
+const ROTATING: Record<FabianoVariant, string[]> = {
+  instagram: [
+    "Detectei janela ótima: perfis que sobem 1k seguidores nesta semana ganham +38% de alcance no Explore.",
+    "Recomendo blindar com curtidas e views junto — o algoritmo penaliza seguidores sem engajamento proporcional.",
+    "Cupom PRIME10 ativo: 10% off imediato no Pix. Aplique no checkout para garantir.",
+  ],
+  tiktok: [
+    "O FYP do TikTok premia 3 sinais em conjunto: seguidores, curtidas e watch-time. Pacotes combinados rendem 2,4× mais.",
+    "Vídeos com >5k views nas primeiras 6h têm 71% mais chance de viralizar. Acelere com views agora.",
+    "Cupom PRIME10 destrava 10% off imediato. Não perca a janela.",
+  ],
+  youtube: [
+    "Inscritos sem retenção derrubam o canal. Combine inscritos + views de qualidade para subir nas recomendações.",
+    "Canais que atingem 1k inscritos destravam monetização. Está perto? Eu acelero hoje.",
+    "PRIME10 reduz 10% do valor no Pix — válido só para sessão atual.",
+  ],
+  facebook: [
+    "Páginas com mais de 1k seguidores convertem 3× mais em anúncios. Aposta de retorno previsível.",
+    "Curtidas e seguidores juntos reforçam autoridade — algoritmo Meta prioriza esse par.",
+    "Cupom PRIME10: -10% imediato. Use antes de finalizar.",
+  ],
+  telegram: [
+    "Grupos com 500+ membros têm taxa de conversão de vendas 4,7× maior. Prova social pesa.",
+    "Membros reais brasileiros entregues em até 24h — sem queda.",
+    "PRIME10 ativo: -10% no Pix. Aplique no checkout.",
+  ],
+  trafego: [
+    "Tráfego BR converte melhor para e-commerce; tráfego global é ideal para SEO e ranqueamento.",
+    "Volumes de 5k+ visitas aceleram indexação no Google em até 60%.",
+    "Cupom PRIME10 ativo — 10% off direto no Pix.",
+  ],
+};
+
+const UPSELL_BY_VARIANT: Record<FabianoVariant, string> = {
+  instagram: "⚡ Atenção, Diretor: seguidores sem curtidas/views ficam expostos ao algoritmo. Recomendo adicionar um pacote de curtidas no mesmo checkout — economia de R$ 12 vs comprar separado.",
+  tiktok:    "⚡ Senhor, seguidores TikTok rendem 3× mais com views complementares no mesmo dia. Posso reservar agora com desconto combinado.",
+  youtube:   "⚡ Inscritos sem views = canal estagnado. Recomendo combo inscritos+views para destravar recomendações.",
+  facebook:  "⚡ Seguidores blindados por curtidas geram autoridade real. Adicione no mesmo Pix e economize.",
+  telegram:  "⚡ Membros + reações = grupo ativo aos olhos do Telegram. Combo blinda contra purgas.",
+  trafego:   "⚡ Tráfego puro converte pouco sem retargeting. Posso somar visitas globais para reforçar a base.",
+};
+
 const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
   instagram: "/api/public/sfx/jarvis-instagram.mp3?v=34",
   tiktok:    "/api/public/sfx/jarvis-tiktok.mp3?v=34",
@@ -147,6 +190,31 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       unregister();
     };
   }, []);
+
+  // Rotação dinâmica de mensagens persuasivas (a cada 11s, só quando o balão está aberto e não consultando).
+  useEffect(() => {
+    const pool = ROTATING[variant] ?? [];
+    if (pool.length === 0) return;
+    let idx = 0;
+    const id = window.setInterval(() => {
+      if (!open || consulting) return;
+      idx = (idx + 1) % pool.length;
+      setSpeech(pool[idx]);
+    }, 11_000);
+    return () => window.clearInterval(id);
+  }, [variant, open, consulting]);
+
+  // Gatilho de upsell: rotas disparam `eliteboost:upsell-intent` ao clicar pacote de seguidores.
+  useEffect(() => {
+    const onUpsell = () => {
+      lockOpenRef.current = true;
+      setOpen(true);
+      setSpeech(UPSELL_BY_VARIANT[variant] ?? UPSELL_BY_VARIANT.instagram);
+      window.setTimeout(() => { lockOpenRef.current = false; }, 8000);
+    };
+    window.addEventListener("eliteboost:upsell-intent", onUpsell);
+    return () => window.removeEventListener("eliteboost:upsell-intent", onUpsell);
+  }, [variant]);
 
   async function handleConsult(e: React.FormEvent) {
     e.preventDefault();

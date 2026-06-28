@@ -39,6 +39,7 @@ import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
+import { InsightsIA } from "@/components/InsightsIA";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
 
 const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
@@ -1159,6 +1160,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         {activeTab === "pedidos" && (
           <div className="space-y-4">
+            <InsightsIA token={token} />
             <ConversionAnalytics />
             {!loaded ? (
               <div className="flex justify-center py-6">

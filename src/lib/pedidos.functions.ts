@@ -9,6 +9,7 @@ const pedidoSchema = z.object({
   email: z.string().email().max(200),
   whatsapp_contato: z.string().min(5).max(50).optional(),
   rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram"]).optional(),
+  utm_source: z.string().max(60).optional().nullable(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
@@ -182,6 +183,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           status: "pending",
           mercado_pago_id: mpId,
           rede_social: rede,
+          utm_source: data.utm_source ? data.utm_source.toLowerCase().slice(0, 60) : null,
         })
         .select("id")
         .single();

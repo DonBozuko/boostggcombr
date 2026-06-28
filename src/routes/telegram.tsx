@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CouponField } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
@@ -154,6 +155,7 @@ function TelegramLanding() {
     setPlanId(selected.id);
     setLoading(true);
     try {
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
       const res = await criarPedidoFn({
         data: {
           instagram_user: parsed.data.profile,
@@ -162,6 +164,7 @@ function TelegramLanding() {
           valor: selected.valor,
           email: "cliente@telegram.boostygram.com",
           rede_social: "telegram",
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {

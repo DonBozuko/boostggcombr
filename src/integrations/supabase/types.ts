@@ -263,6 +263,7 @@ export type Database = {
           quantidade: number
           rede_social: string
           status: string
+          utm_source: string | null
           valor: number
         }
         Insert: {
@@ -277,6 +278,7 @@ export type Database = {
           quantidade: number
           rede_social?: string
           status?: string
+          utm_source?: string | null
           valor: number
         }
         Update: {
@@ -291,6 +293,7 @@ export type Database = {
           quantidade?: number
           rede_social?: string
           status?: string
+          utm_source?: string | null
           valor?: number
         }
         Relationships: []

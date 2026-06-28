@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CouponField } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
@@ -192,6 +193,7 @@ function TiktokLanding() {
     setPlanId(selected.id);
     setLoading(true);
     try {
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
       const res = await criarPedidoFn({
         data: {
           instagram_user: parsed.data.profile,
@@ -200,6 +202,7 @@ function TiktokLanding() {
           valor: selected.valor,
           email: "cliente@tiktok.boostygram.com",
           rede_social: "tiktok",
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {
