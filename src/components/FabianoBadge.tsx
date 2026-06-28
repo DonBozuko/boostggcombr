@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import fabiano from "@/assets/fabiano.png.asset.json";
-import { User } from "lucide-react";
+import { User, X } from "lucide-react";
+
 import { useScrolledPercent } from "@/hooks/useScroll";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
@@ -90,7 +91,8 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
 
 export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
   useScrolledPercent(0.15);
-  const open = true;
+  const [open, setOpen] = useState(true);
+
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
   const { native, web } = buildLinks(variant);
@@ -150,8 +152,17 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 text-[11px] leading-snug backdrop-blur-xl bg-black/40 border ${c.border} shadow-2xl`}
+          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 pr-7 text-[11px] leading-snug backdrop-blur-xl bg-black/40 border ${c.border} shadow-2xl`}
         >
+          <button
+            type="button"
+            aria-label="Fechar"
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); }}
+            className="absolute top-1 right-1 h-5 w-5 grid place-items-center rounded-full bg-white/10 hover:bg-white/25 text-white/80 hover:text-white"
+          >
+            <X className="h-3 w-3" />
+          </button>
+
           <div className={`font-semibold ${c.accent} ${c.glow}`}>Diretor Fabiano</div>
           <div className="text-white/95 mt-0.5">{c.text.includes("Diretor") ? c.text : c.text}</div>
           <div className="text-white/90 mt-0.5">
