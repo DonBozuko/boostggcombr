@@ -159,7 +159,7 @@ function TiktokLanding() {
       }
     };
     tick();
-    const interval = setInterval(tick, 3000);
+    const interval = setInterval(tick, 5000);
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
