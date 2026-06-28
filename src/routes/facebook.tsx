@@ -252,7 +252,7 @@ function FacebookLanding() {
       />
 
 
-      <section
+      {planId && (<section
         id="fb-pedido"
         className="py-12 border-y"
         style={{ borderColor: `${BLUE}44`, background: "#0d0d0e" }}
@@ -338,7 +338,7 @@ function FacebookLanding() {
             </p>
           </div>
         </div>
-      </section>
+      </section>)}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent

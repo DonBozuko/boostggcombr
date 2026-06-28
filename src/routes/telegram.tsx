@@ -232,7 +232,7 @@ function TelegramLanding() {
         onBuy={(id) => { setPlanId(id); document.getElementById("tg-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
       />
 
-      <section id="tg-pedido" className="py-12 border-y" style={{ borderColor: `${AERO}44`, background: "#0d0d0e" }}>
+      {planId && (<section id="tg-pedido" className="py-12 border-y" style={{ borderColor: `${AERO}44`, background: "#0d0d0e" }}>
         <div className="container mx-auto px-4 sm:px-6 max-w-xl">
           <h2 className="text-2xl sm:text-3xl font-bold text-center">Finalizar pedido</h2>
           <p className="mt-2 text-center text-sm text-zinc-400">
@@ -293,7 +293,7 @@ function TelegramLanding() {
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · sem senha · entrega automática</p>
           </div>
         </div>
-      </section>
+      </section>)}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
         <DialogContent className="max-w-md border-0"
