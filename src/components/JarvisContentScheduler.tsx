@@ -34,7 +34,9 @@ export function JarvisContentScheduler() {
   const [imageUrl, setImageUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [networks, setNetworks] = useState<Network[]>(["instagram"]);
-  const [format, setFormat] = useState<Format>("1:1");
+  const [format, setFormat] = useState<Format>("9:16");
+  const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
+  const [bgVideo, setBgVideo] = useState<string>("https://cdn.pixabay.com/video/2023/10/14/185247-874976358_large.mp4");
 
   const toggleNet = (n: Network) =>
     setNetworks((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
