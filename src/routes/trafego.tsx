@@ -142,7 +142,7 @@ function TrafegoLanding() {
         data: {
           instagram_user: parsed.data.profile, pacote: selected.id,
           quantidade: selected.quantidade, valor: selected.valor,
-          email: "cliente@trafego.boostygram.com", rede_social: "trafego",
+          email: "cliente@trafego.boostygram.com", rede_social: "trafego", utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) { toast.error("Não foi possível gerar o Pix."); return; }
