@@ -163,6 +163,7 @@ function TelegramLanding() {
           valor: selected.valor,
           email: "cliente@telegram.boostygram.com",
           rede_social: "telegram",
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {

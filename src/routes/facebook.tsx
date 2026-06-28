@@ -180,6 +180,7 @@ function FacebookLanding() {
           valor: selected.valor,
           email: "cliente@facebook.boostygram.com",
           rede_social: "facebook",
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {

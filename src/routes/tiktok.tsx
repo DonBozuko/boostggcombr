@@ -201,6 +201,7 @@ function TiktokLanding() {
           valor: selected.valor,
           email: "cliente@tiktok.boostygram.com",
           rede_social: "tiktok",
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {

@@ -188,6 +188,7 @@ function YoutubeLanding() {
           valor: selected.valor,
           email: "cliente@youtube.boostygram.com",
           rede_social: "youtube",
+          utm_source: getUtmSource(),
         },
       });
       if (!res?.ok) {
