@@ -175,7 +175,7 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
         className="fixed bottom-0 left-0 h-[95vh] w-auto z-0 object-contain object-bottom select-none"
-        style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+        style={{ maxWidth: "none", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
       />
       <img
         src={chars.right}
@@ -184,7 +184,7 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
         className="fixed bottom-0 right-0 h-[95vh] w-auto z-0 object-contain object-bottom scale-x-[-1] select-none"
-        style={{ filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+        style={{ maxWidth: "none", transform: "scaleX(-1)", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
       />
     </div>,
     document.body,
@@ -210,7 +210,7 @@ export function MobileFrame({
       style={{ background: "#050505", touchAction: "pan-y", overscrollBehaviorY: "auto" }}
     >
       <style>{`
-        html, body { overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; }
+        html, body { max-width: none !important; overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; }
 
         .mf-compact > * { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
         .mf-compact section, .mf-compact header { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
