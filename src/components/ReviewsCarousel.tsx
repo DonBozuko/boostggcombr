@@ -30,18 +30,20 @@ export function ReviewsCarousel({ accent = "#00f2fe" }: { accent?: string }) {
         {REVIEWS.map((r, i) => (
           <article
             key={i}
-            className="snap-start shrink-0 w-[78%] rounded-lg p-2 backdrop-blur-md border"
+            className="snap-start shrink-0 w-[78%] rounded-lg p-2 pt-3 backdrop-blur-md border relative"
             style={{
               background: "rgba(255,255,255,0.04)",
               borderColor: `${accent}33`,
               boxShadow: `0 0 10px ${accent}1f inset`,
+              isolation: "isolate",
             }}
           >
-            <div className="flex items-center gap-1.5 mb-1">
+            <div className="flex items-center gap-2 mb-1.5 relative z-10">
               <div
-                className="h-5 w-5 rounded-full grid place-items-center text-[9px] font-black text-black"
-                style={{ background: accent, boxShadow: `0 0 6px ${accent}` }}
+                className="h-7 w-7 shrink-0 rounded-full grid place-items-center text-[11px] font-black text-black"
+                style={{ background: accent, boxShadow: `0 0 8px ${accent}` }}
               >
+
                 {r.n[0]}
               </div>
               <div className="min-w-0 flex-1">
@@ -58,7 +60,7 @@ export function ReviewsCarousel({ accent = "#00f2fe" }: { accent?: string }) {
                 <p className="text-[8px] tracking-widest leading-tight" style={{ color: accent }}>★★★★★</p>
               </div>
             </div>
-            <p className="text-[10px] leading-snug text-white/80">"{r.t}"</p>
+            <p className="text-[10px] leading-snug text-white/80 mt-1 relative z-0">"{r.t}"</p>
           </article>
         ))}
       </div>
