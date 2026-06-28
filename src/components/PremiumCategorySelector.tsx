@@ -18,7 +18,11 @@ export function PremiumCategorySelector({
   accent?: string;
 }) {
   return (
-    <section className="mx-2 my-2" aria-label="Selecionar categoria">
+    <section
+      className="sticky top-0 z-40 px-2 py-2 backdrop-blur-md"
+      style={{ background: "rgba(10,10,10,0.92)", borderBottom: `1px solid ${accent}33` }}
+      aria-label="Selecionar categoria"
+    >
       <div className="grid grid-cols-3 gap-2">
         {items.map((it) => {
           const isActive = it.key === active;
