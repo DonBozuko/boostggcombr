@@ -7,9 +7,9 @@ type Ping = { provider: string; ms: number | null; ok: boolean };
 
 const ROUTE_PROBES = ["/", "/tiktok", "/youtube", "/facebook", "/telegram", "/trafego"];
 const AUDIO_PROBES = [
-  "/api/public/sfx/welcome.mp3?v=33",
-  "/api/public/sfx/jarvis-interacao.mp3?v=33",
-  "/api/public/sfx/jarvis-sucesso.mp3?v=33",
+  "/api/public/sfx/welcome.mp3?v=35",
+  "/api/public/sfx/jarvis-interacao.mp3?v=35",
+  "/api/public/sfx/jarvis-sucesso.mp3?v=35",
 ];
 const PING_TARGETS: Array<{ provider: string; url: string }> = [
   { provider: "SMMHype", url: "https://smmhype.com/api/v2" },
