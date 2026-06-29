@@ -58,10 +58,14 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 // cotacao_brl padrão usado no admin).
 const USD_TO_BRL = 7.0;
 
-// Strict 100% Profit + 15% Coupon Buffer Engine.
-// preço = (custo * 2.0) / 0.85  → após PRIME15 (-15%) ainda restam 100% de lucro.
-const PROFIT_MULT = 2.0;
+// High-CAC Anti-Fee Pricing Matrix — multiplicador por faixa de volume / 0.85 (PRIME15).
 const COUPON_BUFFER = 0.85; // 1 - 0.15
+
+function tierMultiplier(qty: number): number {
+  if (qty <= 1000) return 4.5;
+  if (qty <= 10000) return 3.2;
+  return 2.2;
+}
 
 function ceilTo(value: number, step: number): number {
   return Math.ceil(value / step) * step;
@@ -70,8 +74,7 @@ function ceilTo(value: number, step: number): number {
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
-  const raw = (baseCost * PROFIT_MULT) / COUPON_BUFFER;
-  // Arredonda para cima em R$ 0,50 para evitar centavos esquisitos.
+  const raw = (baseCost * tierMultiplier(qty)) / COUPON_BUFFER;
   return Math.max(3, ceilTo(raw, 0.5));
 }
 
