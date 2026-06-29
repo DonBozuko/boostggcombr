@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import jarvisBgAsset from "@/assets/jarvis-bg.mp4.asset.json";
 
 type Network = "instagram" | "tiktok" | "facebook" | "youtube" | "telegram";
 type Format = "1:1" | "9:16";
