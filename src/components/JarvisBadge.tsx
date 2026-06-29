@@ -232,6 +232,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     e.preventDefault();
     if (!pedidoId.trim() || consulting) return;
     setConsulting(true);
+    lockOpenRef.current = true;
+    setHudMode(false);
     setOpen(true);
     setSpeech("Consultando o pedido na malha de dados, senhor…");
     try {
