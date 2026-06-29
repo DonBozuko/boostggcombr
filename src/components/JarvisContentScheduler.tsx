@@ -1,18 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
-  const words = text.split(/\s+/);
-  let line = ""; const lines: string[] = [];
-  for (const w of words) {
-    const test = line ? line + " " + w : w;
-    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
-    else line = test;
-  }
-  if (line) lines.push(line);
-  const startY = y - ((lines.length - 1) * lineHeight) / 2;
-  lines.forEach((ln, i) => ctx.fillText(ln, x, startY + i * lineHeight));
-}
 
 type Network = "instagram" | "tiktok" | "facebook" | "youtube" | "telegram";
 type Format = "1:1" | "9:16";
@@ -50,111 +37,7 @@ export function JarvisContentScheduler() {
   const [format, setFormat] = useState<Format>("9:16");
   const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
   const [bgVideo, setBgVideo] = useState<string>("https://cdn.pixabay.com/video/2023/10/14/185247-874976358_large.mp4");
-  const [downloading, setDownloading] = useState(false);
-  const [downloadPct, setDownloadPct] = useState(0);
-
-  const downloadCompiled = async () => {
-    if (!bgVideo || downloading) return;
-    setDownloading(true); setDownloadPct(0); setErr(null);
-    try {
-      const isVertical = format === "9:16";
-      const W = isVertical ? 720 : 1080;
-      const H = isVertical ? 1280 : 1080;
-      const canvas = document.createElement("canvas");
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext("2d")!;
-      // Anti-CORS: passa pelo proxy same-origin e converte em blob URL local.
-      // Zero requisição cross-origin do canvas → zero taint.
-      let videoSrc = bgVideo;
-      try {
-        const isLocal = bgVideo.startsWith("/") || bgVideo.startsWith(window.location.origin) || bgVideo.startsWith("blob:") || bgVideo.startsWith("data:");
-        const fetchUrl = isLocal ? bgVideo : `/api/public/proxy-video?url=${encodeURIComponent(bgVideo)}`;
-        const resp = await fetch(fetchUrl, { credentials: "omit" });
-        if (!resp.ok) throw new Error("proxy " + resp.status);
-        const blob = await resp.blob();
-        videoSrc = URL.createObjectURL(blob);
-      } catch (e: any) {
-        throw new Error("Falha ao baixar vídeo de fundo via proxy: " + (e?.message ?? "erro"));
-      }
-      const video = document.createElement("video");
-      video.crossOrigin = "anonymous";
-      video.src = videoSrc;
-      video.muted = true; video.loop = true; video.playsInline = true;
-      await new Promise<void>((res, rej) => {
-        video.onloadeddata = () => res();
-        video.onerror = () => rej(new Error("Falha ao carregar vídeo de fundo (CORS bloqueou o proxy)"));
-      });
-      await video.play();
-
-      const stream = canvas.captureStream(30);
-      const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
-      const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 });
-      const chunks: Blob[] = [];
-      rec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-
-      const hook = (script?.hook ?? caption.split("\n")[0] ?? "ELITEBOOST PRIME").toUpperCase();
-      const cta = script?.cta ?? "eliteboostprime.lovable.app · PRIME15";
-      const DUR = 6000;
-      const start = performance.now();
-      let raf = 0;
-      const draw = () => {
-        const t = performance.now() - start;
-        const pct = Math.min(100, Math.round((t / DUR) * 100));
-        setDownloadPct(pct);
-        // background video cover
-        const vr = video.videoWidth / video.videoHeight;
-        const cr = W / H;
-        let sw = video.videoWidth, sh = video.videoHeight, sx = 0, sy = 0;
-        if (vr > cr) { sw = sh * cr; sx = (video.videoWidth - sw) / 2; }
-        else { sh = sw / cr; sy = (video.videoHeight - sh) / 2; }
-        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, W, H);
-        // dark gradient
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, "rgba(0,0,0,0.15)");
-        grad.addColorStop(1, "rgba(0,0,0,0.85)");
-        ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
-        // hook
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#00f2fe";
-        ctx.shadowColor = "rgba(0,242,254,0.85)";
-        ctx.shadowBlur = 24;
-        ctx.font = `900 ${Math.round(W * 0.075)}px system-ui, sans-serif`;
-        wrapText(ctx, hook, W / 2, H * 0.45, W * 0.85, Math.round(W * 0.09));
-        // cta
-        ctx.shadowBlur = 10;
-        ctx.fillStyle = "#ffffff";
-        ctx.font = `700 ${Math.round(W * 0.035)}px system-ui, sans-serif`;
-        wrapText(ctx, cta, W / 2, H * 0.82, W * 0.85, Math.round(W * 0.045));
-        ctx.shadowBlur = 0;
-        // brand
-        ctx.fillStyle = "#fe0979";
-        ctx.font = `800 ${Math.round(W * 0.028)}px system-ui, sans-serif`;
-        ctx.fillText("ELITEBOOST PRIME", W / 2, H * 0.93);
-
-        if (t < DUR) raf = requestAnimationFrame(draw);
-        else rec.stop();
-      };
-      rec.start();
-      raf = requestAnimationFrame(draw);
-
-      const blob: Blob = await new Promise((res) => {
-        rec.onstop = () => res(new Blob(chunks, { type: "video/webm" }));
-      });
-      cancelAnimationFrame(raf);
-      video.pause();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `eliteboost-${networks[0] ?? "media"}-${Date.now()}.webm`;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-    } catch (e: any) {
-      setErr(e?.message ?? "Falha ao compilar mídia");
-    } finally {
-      setDownloading(false);
-      setDownloadPct(0);
-    }
-  };
+  const nativeDownloadHref = useMemo(() => bgVideo.trim(), [bgVideo]);
 
   const toggleNet = (n: Network) =>
     setNetworks((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
@@ -353,14 +236,18 @@ export function JarvisContentScheduler() {
           >
             🤖 {saving ? "Agendando..." : `Agendar Conteúdo Omnichannel (${networks.length})`}
           </button>
-          <button
-            type="button"
-            onClick={downloadCompiled}
-            disabled={downloading || !bgVideo}
-            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-3 text-sm font-extrabold uppercase tracking-wider text-black disabled:opacity-40 shadow-[0_0_28px_rgba(34,211,238,0.55)] border border-cyan-300/60"
+          <a
+            href={nativeDownloadHref || undefined}
+            download="Criativo_Jarvis.mp4"
+            target="_blank"
+            rel="noreferrer"
+            aria-disabled={!nativeDownloadHref}
+            className={`block w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider text-black shadow-[0_0_28px_rgba(34,211,238,0.55)] border border-cyan-300/60 ${
+              nativeDownloadHref ? "hover:brightness-110" : "pointer-events-none opacity-40"
+            }`}
           >
-            📥 {downloading ? `Compilando... ${downloadPct}%` : "BAIXAR MÍDIA COMPILADA"}
-          </button>
+            📥 BAIXAR MÍDIA COMPILADA
+          </a>
           <p className="text-[10px] text-white/50">
             🔒 Modo Seguro: posts aguardam aprovação executiva via Telegram antes do envio real.
           </p>
