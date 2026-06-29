@@ -1,7 +1,7 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
-import { BottomNav } from "@/components/BottomNav";
+import { BladePillar } from "@/components/BladePillar";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
@@ -224,7 +224,7 @@ function FacebookLanding() {
       <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><ShowcaseTrigger /></div>
       <JarvisBadge variant="facebook" />
       <FabianoBadge variant="facebook" />
-      <BottomNav active="/facebook" />
+      <BladePillar />
       <ShowcaseShell>
       <div
         className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
