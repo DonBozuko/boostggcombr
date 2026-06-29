@@ -1,7 +1,7 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
-import { BottomNav } from "@/components/BottomNav";
+import { BladePillar } from "@/components/BladePillar";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
@@ -534,7 +534,7 @@ function Landing() {
       </header>
       <JarvisBadge variant="instagram" />
       <FabianoBadge variant="instagram" />
-      <BottomNav active="/" />
+      <BladePillar />
 
       <ShowcaseShell>
 
