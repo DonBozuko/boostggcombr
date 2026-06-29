@@ -11,20 +11,32 @@ export type Category =
 
 // Quantidades canônicas — mantém IDs existentes do dispatcher (não inventa novos).
 // Phase A repõe preço, não cria novos pacotes.
+// Atacado massivo: ~50 SKUs por rede distribuídos entre categorias.
+// Cobre micro-lotes (100/200) até volumes gigantes (500k/1M).
+const SEGUIDORES_QTYS = [
+  100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000,
+  7500, 10000, 15000, 20000, 30000, 50000, 75000, 100000, 200000, 500000,
+];
+const CURTIDAS_QTYS = [
+  100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000,
+  7500, 10000, 20000, 50000, 100000,
+];
+const VIEWS_QTYS = [
+  1000, 2000, 5000, 10000, 15000, 25000, 50000, 75000, 100000,
+  200000, 300000, 500000, 750000, 1000000,
+];
+
+function pid(prefix: string, q: number): { id: string; qty: number } {
+  const label =
+    q >= 1_000_000 ? `${q / 1_000_000}m` :
+    q >= 1000 ? `${q / 1000}k` : `${q}`;
+  return { id: `${prefix}${label}`, qty: q };
+}
+
 const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
-  "instagram:seguidores": [
-    { id: "p100", qty: 100 }, { id: "p500", qty: 500 }, { id: "p1k", qty: 1000 },
-    { id: "p2k", qty: 2000 }, { id: "p5k", qty: 5000 }, { id: "p10k", qty: 10000 },
-    { id: "p20k", qty: 20000 }, { id: "p50k", qty: 50000 }, { id: "p100k", qty: 100000 },
-  ],
-  "instagram:curtidas": [
-    { id: "l100", qty: 100 }, { id: "l500", qty: 500 }, { id: "l1k", qty: 1000 },
-    { id: "l2k", qty: 2000 }, { id: "l5k", qty: 5000 },
-  ],
-  "instagram:visualizacoes": [
-    { id: "v1k", qty: 1000 }, { id: "v5k", qty: 5000 }, { id: "v10k", qty: 10000 },
-    { id: "v25k", qty: 25000 }, { id: "v50k", qty: 50000 },
-  ],
+  "instagram:seguidores": SEGUIDORES_QTYS.map((q) => pid("p", q)),
+  "instagram:curtidas": CURTIDAS_QTYS.map((q) => pid("l", q)),
+  "instagram:visualizacoes": VIEWS_QTYS.map((q) => pid("v", q)),
 };
 
 // Categoria → pacote-amostra usado para resolver o service_id no SMMhype.
