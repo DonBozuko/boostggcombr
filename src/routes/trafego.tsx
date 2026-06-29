@@ -119,7 +119,7 @@ function TrafegoLanding() {
     if (sb.enabled) {
       setPaid(false);
       setPedidoInfo({
-        price: res.valorFormatado ?? selected.price, tier: selected.tier, profile: parsed.data.profile,
+        price: selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: "00020126[SANDBOX-MOCK-NO-CHARGE]", qrCodeBase64: "", pedidoId: null,
       });
       setModalOpen(true);
