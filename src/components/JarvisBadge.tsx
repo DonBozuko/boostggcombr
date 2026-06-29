@@ -295,7 +295,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           >
             <X className="h-3 w-3" />
           </button>
-          <span className={`absolute left-[112px] top-[-7px] -translate-x-1/2 h-3 w-3 rotate-45 ${t.bubble} border-l border-t`} aria-hidden />
+          <span className={`absolute left-[40px] top-[-7px] -translate-x-1/2 h-3 w-3 rotate-45 ${t.bubble} border-l border-t`} aria-hidden />
           <div className={`font-black tracking-wide text-white ${t.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>J.A.R.V.I.S.</div>
           <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{speech}</div>
           <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
