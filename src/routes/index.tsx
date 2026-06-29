@@ -377,18 +377,17 @@ function Landing() {
   // Phase A — motor de preços dinâmico (isolado em /). Fallback automático server-side.
   const getPricingGridFn = useServerFn(getPricingGrid);
   const PRICING_CACHE_KEY = "ebp_pricing_overrides_v1";
-  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>(() => {
-    // Strict Local Cache: hidrata instantaneamente do localStorage para evitar tela vazia.
-    if (typeof window === "undefined") return {};
-    try {
-      const raw = window.localStorage.getItem(PRICING_CACHE_KEY);
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
-    } catch { return {}; }
-  });
+  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>({});
   useEffect(() => {
     let cancelled = false;
+    // Hydration-safe cache: localStorage só entra após o primeiro render do cliente.
+    try {
+      const raw = window.localStorage.getItem(PRICING_CACHE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") setPriceOverrides(parsed);
+      }
+    } catch { /* cache inválido */ }
     const cats = [
       "instagram:seguidores",
       "instagram:curtidas",
