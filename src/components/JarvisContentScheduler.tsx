@@ -37,6 +37,98 @@ export function JarvisContentScheduler() {
   const [format, setFormat] = useState<Format>("9:16");
   const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
   const [bgVideo, setBgVideo] = useState<string>("https://cdn.pixabay.com/video/2023/10/14/185247-874976358_large.mp4");
+  const [downloading, setDownloading] = useState(false);
+  const [downloadPct, setDownloadPct] = useState(0);
+
+  const downloadCompiled = async () => {
+    if (!bgVideo || downloading) return;
+    setDownloading(true); setDownloadPct(0); setErr(null);
+    try {
+      const isVertical = format === "9:16";
+      const W = isVertical ? 720 : 1080;
+      const H = isVertical ? 1280 : 1080;
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext("2d")!;
+      const video = document.createElement("video");
+      video.crossOrigin = "anonymous";
+      video.src = bgVideo;
+      video.muted = true; video.loop = true; video.playsInline = true;
+      await new Promise<void>((res, rej) => {
+        video.onloadeddata = () => res();
+        video.onerror = () => rej(new Error("Falha ao carregar vídeo de fundo (CORS?)"));
+      });
+      await video.play();
+
+      const stream = canvas.captureStream(30);
+      const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+      const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 4_000_000 });
+      const chunks: Blob[] = [];
+      rec.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      const hook = (script?.hook ?? caption.split("\n")[0] ?? "ELITEBOOST PRIME").toUpperCase();
+      const cta = script?.cta ?? "eliteboostprime.lovable.app · PRIME15";
+      const DUR = 6000;
+      const start = performance.now();
+      let raf = 0;
+      const draw = () => {
+        const t = performance.now() - start;
+        const pct = Math.min(100, Math.round((t / DUR) * 100));
+        setDownloadPct(pct);
+        // background video cover
+        const vr = video.videoWidth / video.videoHeight;
+        const cr = W / H;
+        let sw = video.videoWidth, sh = video.videoHeight, sx = 0, sy = 0;
+        if (vr > cr) { sw = sh * cr; sx = (video.videoWidth - sw) / 2; }
+        else { sh = sw / cr; sy = (video.videoHeight - sh) / 2; }
+        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, W, H);
+        // dark gradient
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, "rgba(0,0,0,0.15)");
+        grad.addColorStop(1, "rgba(0,0,0,0.85)");
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
+        // hook
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#00f2fe";
+        ctx.shadowColor = "rgba(0,242,254,0.85)";
+        ctx.shadowBlur = 24;
+        ctx.font = `900 ${Math.round(W * 0.075)}px system-ui, sans-serif`;
+        wrapText(ctx, hook, W / 2, H * 0.45, W * 0.85, Math.round(W * 0.09));
+        // cta
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `700 ${Math.round(W * 0.035)}px system-ui, sans-serif`;
+        wrapText(ctx, cta, W / 2, H * 0.82, W * 0.85, Math.round(W * 0.045));
+        ctx.shadowBlur = 0;
+        // brand
+        ctx.fillStyle = "#fe0979";
+        ctx.font = `800 ${Math.round(W * 0.028)}px system-ui, sans-serif`;
+        ctx.fillText("ELITEBOOST PRIME", W / 2, H * 0.93);
+
+        if (t < DUR) raf = requestAnimationFrame(draw);
+        else rec.stop();
+      };
+      rec.start();
+      raf = requestAnimationFrame(draw);
+
+      const blob: Blob = await new Promise((res) => {
+        rec.onstop = () => res(new Blob(chunks, { type: "video/webm" }));
+      });
+      cancelAnimationFrame(raf);
+      video.pause();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `eliteboost-${networks[0] ?? "media"}-${Date.now()}.webm`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch (e: any) {
+      setErr(e?.message ?? "Falha ao compilar mídia");
+    } finally {
+      setDownloading(false);
+      setDownloadPct(0);
+    }
+  };
 
   const toggleNet = (n: Network) =>
     setNetworks((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
