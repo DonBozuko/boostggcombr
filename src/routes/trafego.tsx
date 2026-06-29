@@ -57,22 +57,22 @@ export const Route = createFileRoute("/trafego")({
 type Categoria = "brasil" | "mundial";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
 
-const brPlans: Plan[] = [
+const brPlans: Plan[] = applyProfitFormula([
   { id: "wbr1k",   tier: "1.000 Visitas BR",    quantidade: 1000,   valor: 19.0,  price: "R$ 19,00" },
   { id: "wbr5k",   tier: "5.000 Visitas BR",    quantidade: 5000,   valor: 69.0,  price: "R$ 69,00" },
   { id: "wbr10k",  tier: "10.000 Visitas BR",   quantidade: 10000,  valor: 119.0, price: "R$ 119,00" },
   { id: "wbr25k",  tier: "25.000 Visitas BR",   quantidade: 25000,  valor: 269.0, price: "R$ 269,00" },
   { id: "wbr50k",  tier: "50.000 Visitas BR",   quantidade: 50000,  valor: 499.0, price: "R$ 499,00" },
   { id: "wbr100k", tier: "100.000 Visitas BR",  quantidade: 100000, valor: 899.0, price: "R$ 899,00" },
-];
-const glPlans: Plan[] = [
+]);
+const glPlans: Plan[] = applyProfitFormula([
   { id: "wgl1k",   tier: "1.000 Visitas Global",    quantidade: 1000,   valor: 9.0,   price: "R$ 9,00" },
   { id: "wgl5k",   tier: "5.000 Visitas Global",    quantidade: 5000,   valor: 29.0,  price: "R$ 29,00" },
   { id: "wgl10k",  tier: "10.000 Visitas Global",   quantidade: 10000,  valor: 49.0,  price: "R$ 49,00" },
   { id: "wgl25k",  tier: "25.000 Visitas Global",   quantidade: 25000,  valor: 109.0, price: "R$ 109,00" },
   { id: "wgl50k",  tier: "50.000 Visitas Global",   quantidade: 50000,  valor: 199.0, price: "R$ 199,00" },
   { id: "wgl100k", tier: "100.000 Visitas Global",  quantidade: 100000, valor: 369.0, price: "R$ 369,00" },
-];
+]);
 const allPlans = [...brPlans, ...glPlans];
 
 const urlSchema = z.object({
