@@ -56,8 +56,12 @@ function ceilTo(value: number, step: number): number {
   return Math.ceil(value / step) * step;
 }
 
+// Margem de segurança fixa: 15% extra sobre o preço pós-multiplicador.
+// Cobre o cupom PRIME10 (-10%) e blinda contra oscilação de custo da API.
+const SAFETY_MARGIN = 1.15;
+
 function priceFromCost(qty: number, costPer1k: number): number {
-  const raw = (qty / 1000) * costPer1k * multiplierFor(qty);
+  const raw = (qty / 1000) * costPer1k * multiplierFor(qty) * SAFETY_MARGIN;
   // Arredonda para cima em R$ 0,50 para evitar centavos esquisitos.
   return Math.max(3, ceilTo(raw, 0.5));
 }
