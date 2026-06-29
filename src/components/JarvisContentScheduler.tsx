@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
+  const words = text.split(/\s+/);
+  let line = ""; const lines: string[] = [];
+  for (const w of words) {
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+    else line = test;
+  }
+  if (line) lines.push(line);
+  const startY = y - ((lines.length - 1) * lineHeight) / 2;
+  lines.forEach((ln, i) => ctx.fillText(ln, x, startY + i * lineHeight));
+}
+
 type Network = "instagram" | "tiktok" | "facebook" | "youtube" | "telegram";
 type Format = "1:1" | "9:16";
 
