@@ -65,24 +65,17 @@ export const Route = createFileRoute("/facebook")({
 type Categoria = "seguidores" | "curtidas";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
 
-const followersPlans: Plan[] = applyProfitFormula([
-  { id: "ff100",  tier: "100 Seguidores",     quantidade: 100,   valor: 9.0,   price: "R$ 9,00" },
-  { id: "ff500",  tier: "500 Seguidores",     quantidade: 500,   valor: 19.0,  price: "R$ 19,00" },
-  { id: "ff1k",   tier: "1.000 Seguidores",   quantidade: 1000,  valor: 29.0,  price: "R$ 29,00" },
-  { id: "ff2k5",  tier: "2.500 Seguidores",   quantidade: 2500,  valor: 69.0,  price: "R$ 69,00" },
-  { id: "ff5k",   tier: "5.000 Seguidores",   quantidade: 5000,  valor: 129.0, price: "R$ 129,00" },
-  { id: "ff10k",  tier: "10.000 Seguidores",  quantidade: 10000, valor: 239.0, price: "R$ 239,00" },
-  { id: "ff25k",  tier: "25.000 Seguidores",  quantidade: 25000, valor: 549.0, price: "R$ 549,00" },
-]);
-const likesPlans: Plan[] = applyProfitFormula([
-  { id: "fl100",  tier: "100 Curtidas",   quantidade: 100,   valor: 4.0,   price: "R$ 4,00" },
-  { id: "fl500",  tier: "500 Curtidas",   quantidade: 500,   valor: 9.0,   price: "R$ 9,00" },
-  { id: "fl1k",   tier: "1.000 Curtidas", quantidade: 1000,  valor: 15.0,  price: "R$ 15,00" },
-  { id: "fl2k",   tier: "2.000 Curtidas", quantidade: 2000,  valor: 27.0,  price: "R$ 27,00" },
-  { id: "fl5k",   tier: "5.000 Curtidas", quantidade: 5000,  valor: 59.0,  price: "R$ 59,00" },
-  { id: "fl10k",  tier: "10.000 Curtidas",quantidade: 10000, valor: 109.0, price: "R$ 109,00" },
-]);
+const FB_FOLLOWER_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
+const FB_LIKE_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
+
+const followersPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "ff", unitLabel: "Seguidores", costPer1k: 10, qtys: FB_FOLLOWER_QTYS }),
+);
+const likesPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "fl", unitLabel: "Curtidas", costPer1k: 5, qtys: FB_LIKE_QTYS }),
+);
 const allPlans = [...followersPlans, ...likesPlans];
+
 
 const profileSchema = z.object({
   plan: z.string().min(1),
