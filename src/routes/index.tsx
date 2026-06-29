@@ -1,7 +1,7 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
-import { JarvisBladeBadge } from "@/components/JarvisBladeBadge";
-import { SantiagoBadge } from "@/components/SantiagoBadge";
+import { JarvisBadge } from "@/components/JarvisBadge";
+import { FabianoBadge } from "@/components/FabianoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { useScrolledPast } from "@/hooks/useScroll";
@@ -532,8 +532,8 @@ function Landing() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBladeBadge variant="instagram" />
-      <SantiagoBadge variant="instagram" />
+      <JarvisBadge variant="instagram" />
+      <FabianoBadge variant="instagram" />
 
       <ShowcaseShell>
 
