@@ -122,7 +122,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
 
   return (
     <div
-      className="fixed top-16 z-40 flex flex-col-reverse items-start gap-1"
+      className="fixed top-16 z-40 flex flex-col items-start gap-1"
       style={{ left: "max(8px, calc(50% - 225px))" }}
     >
       <a
@@ -163,9 +163,9 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
             <X className="h-3 w-3" />
           </button>
 
-          <div className={`font-semibold ${c.accent} ${c.glow}`}>Diretor Fabiano</div>
-          <div className="text-white/95 mt-0.5">{c.text.includes("Diretor") ? c.text : c.text}</div>
-          <div className="text-white/90 mt-0.5">
+          <div className={`font-bold tracking-wide ${c.accent} ${c.glow} drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]`}>Diretor Fabiano</div>
+          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">{c.text}</div>
+          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">
             Garantindo velocidade máxima e entrega segura em seu pedido, senhor.
           </div>
         </div>
