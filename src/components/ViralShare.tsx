@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Share2, Check } from "lucide-react";
 
-const SITE = "https://boostygram.lovable.app";
+const SITE = "https://eliteboostprime.lovable.app";
 
 const messagesByRoute: Record<string, string> = {
   "/": "Comprei seguidores na EliteBoost Prime e meu Instagram disparou de verdade. Entrega rápida e real:",
