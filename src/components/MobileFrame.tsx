@@ -5,6 +5,7 @@ import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
 import { WelcomeDiscountPopup } from "./WelcomeDiscountPopup";
+import { TopNetworksNav } from "./TopNetworksNav";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
 import ttLeft from "@/assets/char-tt-left.png";
@@ -236,6 +237,7 @@ export function MobileFrame({
       >
 
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
+        <TopNetworksNav active={route} />
         <WelcomeDiscountPopup route={route} />
         <div
           className="mf-scroll mf-compact flex-1 min-h-[850px] overflow-y-auto overflow-x-visible flex flex-col"
