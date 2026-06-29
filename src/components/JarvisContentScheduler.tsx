@@ -36,7 +36,8 @@ export function JarvisContentScheduler() {
   const [networks, setNetworks] = useState<Network[]>(["instagram"]);
   const [format, setFormat] = useState<Format>("9:16");
   const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
-  const [bgVideo, setBgVideo] = useState<string>("https://cdn.pixabay.com/video/2023/10/14/185247-874976358_large.mp4");
+  // Soberania local: zero dependência de cdn.pixabay.com (404/502/CORS). Asset nativo servido por /public.
+  const [bgVideo, setBgVideo] = useState<string>("/assets/videos/jarvis-bg.mp4");
   const nativeDownloadHref = useMemo(() => bgVideo.trim(), [bgVideo]);
 
   const toggleNet = (n: Network) =>
