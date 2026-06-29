@@ -1,3 +1,4 @@
+import { applyProfitFormula } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
