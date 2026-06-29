@@ -13,6 +13,15 @@ export function getCouponDiscount(): number {
   }
 }
 
+export function getAppliedCoupon(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(KEY) === VALID ? VALID : null;
+  } catch {
+    return null;
+  }
+}
+
 export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
   const [value, setValue] = useState("");
   const [applied, setApplied] = useState(false);

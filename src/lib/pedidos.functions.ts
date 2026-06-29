@@ -10,6 +10,7 @@ const pedidoSchema = z.object({
   whatsapp_contato: z.string().min(5).max(50).optional(),
   rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram"]).optional(),
   utm_source: z.string().max(60).optional().nullable(),
+  cupom: z.string().max(20).optional().nullable(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
@@ -86,18 +87,13 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {
-    const oficial = PRICE_TABLE[data.pacote];
-    if (!oficial || oficial.quantidade !== data.quantidade) {
-      console.error("[criarPedido] pacote/quantidade inválidos:", data.pacote, data.quantidade);
-      return { ok: false as const, error: "INVALID_PACKAGE" as const };
-    }
-    const valorCobrar = oficial.valor;
     const pkg = data.pacote.toLowerCase();
     const isTelegram = pkg.startsWith("tg");
     const isTrafego = !isTelegram && pkg.startsWith("w");
     const isTiktok = !isTelegram && !isTrafego && pkg.startsWith("t");
     const isYoutube = pkg.startsWith("y");
     const isFacebook = pkg.startsWith("f");
+    const isInstagram = !isTelegram && !isTrafego && !isTiktok && !isYoutube && !isFacebook;
     const rede =
       data.rede_social ??
       (isTelegram ? "telegram"
@@ -116,6 +112,46 @@ export const criarPedido = createServerFn({ method: "POST" })
         : isTiktok
         ? (pkg.startsWith("tl") ? "curtidas" : pkg.startsWith("tv") ? "visualizacoes" : "seguidores")
         : (pkg.startsWith("l") ? "curtidas" : pkg.startsWith("v") ? "visualizacoes" : "seguidores");
+
+    // Universal Single Source of Truth: pricing-engine para Instagram, PRICE_TABLE
+    // como fallback para as demais redes (até que migrem ao engine).
+    let valorBase: number | null = null;
+    let qtdOficial: number = data.quantidade;
+    if (isInstagram) {
+      try {
+        const { getPricingGridImpl } = await import("./pricing-engine.server");
+        const cat =
+          pkg.startsWith("l") ? "instagram:curtidas"
+            : pkg.startsWith("v") ? "instagram:visualizacoes"
+            : "instagram:seguidores";
+        const grid = await getPricingGridImpl(cat);
+        const item = grid.items.find((i) => i.id === pkg);
+        if (item) {
+          valorBase = item.valor;
+          qtdOficial = item.quantidade;
+        }
+      } catch (err) {
+        console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
+      }
+    }
+    if (valorBase == null) {
+      const oficial = PRICE_TABLE[data.pacote];
+      if (!oficial) {
+        console.error("[criarPedido] pacote inválido:", data.pacote);
+        return { ok: false as const, error: "INVALID_PACKAGE" as const };
+      }
+      valorBase = oficial.valor;
+      qtdOficial = oficial.quantidade;
+    }
+    if (qtdOficial !== data.quantidade) {
+      console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
+      return { ok: false as const, error: "INVALID_PACKAGE" as const };
+    }
+    // Cupom PRIME15 = 15% off aplicado server-side (centavo por centavo).
+    const cupom = (data.cupom ?? "").trim().toUpperCase();
+    const discount = cupom === "PRIME15" ? 0.15 : 0;
+    const valorCobrar = Math.max(1, Number((valorBase * (1 - discount)).toFixed(2)));
+
 
 
     const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
@@ -197,6 +233,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         mercadoPagoId: mpId,
         qrCode,
         qrCodeBase64,
+        valorCobrado: valorCobrar,
+        valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
+        cupomAplicado: discount > 0 ? cupom : null,
       };
     } catch (err) {
       console.error("Erro inesperado no Supabase:", err);

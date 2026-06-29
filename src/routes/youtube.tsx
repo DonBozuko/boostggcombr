@@ -27,7 +27,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField } from "@/components/CouponField";
+import { CouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogYoutube from "@/assets/og-youtube.jpg";
 
 export const Route = createFileRoute("/youtube")({
@@ -181,6 +181,7 @@ function YoutubeLanding() {
           email: "cliente@youtube.eliteboostprime.com",
           rede_social: "youtube",
           utm_source: getUtmSource(),
+          cupom: getAppliedCoupon(),
         },
       });
       if (!res?.ok) {
@@ -189,7 +190,7 @@ function YoutubeLanding() {
       }
       setPaid(false);
       setPedidoInfo({
-        price: selected.price,
+        price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
         profile: parsed.data.profile,
         pixCode: res.qrCode,

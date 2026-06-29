@@ -57,7 +57,7 @@ import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 
-import { CouponField } from "@/components/CouponField";
+import { CouponField, getAppliedCoupon } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid } from "@/lib/pricing.functions";
@@ -468,6 +468,7 @@ function Landing() {
           email: result.data.email,
           whatsapp_contato: result.data.contact,
           utm_source: getUtmSource(),
+          cupom: getAppliedCoupon(),
         },
       });
       if (!res?.ok) {
@@ -479,7 +480,7 @@ function Landing() {
       }
       setPaid(false);
       setPedidoInfo({
-        price: selected.price,
+        price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
         profile: result.data.profile,
         pixCode: res.qrCode,

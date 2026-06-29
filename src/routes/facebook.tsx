@@ -27,7 +27,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField } from "@/components/CouponField";
+import { CouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogFacebook from "@/assets/og-facebook.jpg";
 
 export const Route = createFileRoute("/facebook")({
@@ -173,6 +173,7 @@ function FacebookLanding() {
           email: "cliente@facebook.eliteboostprime.com",
           rede_social: "facebook",
           utm_source: getUtmSource(),
+          cupom: getAppliedCoupon(),
         },
       });
       if (!res?.ok) {
@@ -181,7 +182,7 @@ function FacebookLanding() {
       }
       setPaid(false);
       setPedidoInfo({
-        price: selected.price,
+        price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
         profile: parsed.data.profile,
         pixCode: res.qrCode,
