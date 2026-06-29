@@ -247,9 +247,9 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       `}</style>
       <div
         className={inline
-          ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
-          : "fixed z-[80] flex flex-col items-end gap-1 pointer-events-auto"}
-        style={inline ? undefined : { right: "max(8px, calc(50vw - 225px + 8px))", top: "max(8px, calc(env(safe-area-inset-top, 0px) + 8px))" }}
+          ? "relative z-[40] inline-flex flex-col items-center pointer-events-auto align-middle"
+          : "fixed z-[80] flex flex-col items-center pointer-events-auto"}
+        style={inline ? undefined : { right: "max(8px, calc(50vw - 225px + 8px))", top: "max(300px, calc(env(safe-area-inset-top, 0px) + 30vh))" }}
       >
         <div
           aria-label="J.A.R.V.I.S."
@@ -282,8 +282,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/80 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
-            open ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
+          className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 z-40 w-[132px] sm:w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/90 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
+            open ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-1 scale-90 pointer-events-none"
           }`}
         >
           <button
@@ -294,7 +294,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           >
             <X className="h-3 w-3" />
           </button>
-          <span className={`absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 ${t.bubble} border-r border-b`} aria-hidden />
+          <span className={`absolute left-1/2 top-[-7px] -translate-x-1/2 h-3 w-3 rotate-45 ${t.bubble} border-l border-t`} aria-hidden />
           <div className={`font-black tracking-wide text-white ${t.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>J.A.R.V.I.S.</div>
           <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{speech}</div>
           <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
