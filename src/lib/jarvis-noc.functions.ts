@@ -106,9 +106,17 @@ export const jarvisChat = createServerFn({ method: "POST" })
     const custoHoje = pagosHoje.reduce((s: number, r: any) => s + Number(r.custo_real || 0), 0);
     const lucroHoje = receitaHoje - custoHoje;
 
+    const sum = (rows: any[] | null, k: string) => (rows ?? []).reduce((s, r) => s + Number(r[k] || 0), 0);
+    const fat7d = sum(tre7 as any, "faturamento");
+    const lucro7d = sum(tre7 as any, "lucro_liquido");
+    const fat30d = sum(tre30 as any, "faturamento");
+    const lucro30d = sum(tre30 as any, "lucro_liquido");
+    const previsao30d = lucro7d > 0 ? Number(((lucro7d / 7) * 30).toFixed(2)) : 0;
+
     const ctx = {
       receitaHoje, lucroHoje, totalPagosHoje: pagosHoje.length,
       pedidosPendentes: pendentes?.length ?? 0,
+      tesouraria: { fat7d, lucro7d, fat30d, lucro30d, previsao30d },
       fornecedores: forns ?? [],
     };
 
