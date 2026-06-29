@@ -242,7 +242,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       <div
         className={inline
           ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
-          : "fixed top-16 z-40 flex flex-col-reverse items-end gap-1"}
+          : "fixed top-16 z-40 flex flex-col items-end gap-1"}
         style={inline ? undefined : { right: "max(8px, calc(50% - 225px))" }}
       >
         <div
