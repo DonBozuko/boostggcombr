@@ -249,7 +249,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         className={inline
           ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
           : "fixed z-[80] flex flex-col items-end gap-1 pointer-events-auto"}
-        style={inline ? undefined : { right: "max(8px, calc(50vw - 225px + 8px))", top: "max(290px, calc(env(safe-area-inset-top, 0px) + 280px))" }}
+        style={inline ? undefined : { right: "max(8px, calc(50vw - 225px + 8px))", top: "max(8px, calc(env(safe-area-inset-top, 0px) + 8px))" }}
       >
         <div
           aria-label="J.A.R.V.I.S."
