@@ -131,7 +131,7 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
 
 export function JarvisBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
   const t = SKINS[variant];
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
