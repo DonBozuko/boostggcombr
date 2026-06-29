@@ -1153,6 +1153,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <ExecutiveHeader soundOn={soundOn} toggleSound={toggleSound} />
 
         <JarvisAlertCenter />
+        <JarvisNocCenter token={token} />
         <AdminCostAlert />
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
