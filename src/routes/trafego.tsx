@@ -23,7 +23,7 @@ import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { getSandboxEnabled } from "@/lib/sandbox.functions";
-import { CouponField } from "@/components/CouponField";
+import { CouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTrafego from "@/assets/og-trafego.jpg";
 
 const NEON = "#B026FF";
@@ -136,6 +136,7 @@ function TrafegoLanding() {
           instagram_user: parsed.data.profile, pacote: selected.id,
           quantidade: selected.quantidade, valor: selected.valor,
           email: "cliente@trafego.eliteboostprime.com", rede_social: "trafego", utm_source: getUtmSource(),
+          cupom: getAppliedCoupon(),
         },
       });
       if (!res?.ok) { toast.error("Não foi possível gerar o Pix."); return; }

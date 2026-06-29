@@ -26,7 +26,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField } from "@/components/CouponField";
+import { CouponField, getAppliedCoupon } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import ogTelegram from "@/assets/og-telegram.jpg";
 
@@ -156,6 +156,7 @@ function TelegramLanding() {
           email: "cliente@telegram.eliteboostprime.com",
           rede_social: "telegram",
           utm_source: getUtmSource(),
+          cupom: getAppliedCoupon(),
         },
       });
       if (!res?.ok) {

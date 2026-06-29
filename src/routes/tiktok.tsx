@@ -27,7 +27,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField } from "@/components/CouponField";
+import { CouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
 
 export const Route = createFileRoute("/tiktok")({
@@ -188,6 +188,7 @@ function TiktokLanding() {
           email: "cliente@tiktok.eliteboostprime.com",
           rede_social: "tiktok",
           utm_source: getUtmSource(),
+          cupom: getAppliedCoupon(),
         },
       });
       if (!res?.ok) {
