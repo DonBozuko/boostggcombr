@@ -133,6 +133,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const t = SKINS[variant];
   const [open, setOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [hudMode, setHudMode] = useState(false);
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
@@ -143,6 +144,10 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
 
   useEffect(() => {
     setMounted(true);
+    const t = window.setTimeout(() => {
+      if (!lockOpenRef.current) { setOpen(false); setHudMode(true); }
+    }, 3000);
+    return () => window.clearTimeout(t);
   }, []);
 
   const safeClose = () => {
@@ -227,6 +232,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     e.preventDefault();
     if (!pedidoId.trim() || consulting) return;
     setConsulting(true);
+    lockOpenRef.current = true;
+    setHudMode(false);
     setOpen(true);
     setSpeech("Consultando o pedido na malha de dados, senhor…");
     try {
@@ -317,6 +324,28 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             </button>
           </form>
         </div>
+        {hudMode && (
+          <form
+            onSubmit={handleConsult}
+            className={`mt-1.5 flex items-center gap-1 rounded-full px-1.5 py-1 border ${t.border} bg-black/80 backdrop-blur-md ring-1 ring-white/10 animate-fade-in`}
+            style={{ boxShadow: t.ring }}
+          >
+            <input
+              value={pedidoId}
+              onChange={(e) => setPedidoId(e.target.value)}
+              placeholder="ID do pedido"
+              className="w-[80px] bg-transparent text-[9px] font-bold text-white placeholder:text-white/40 outline-none"
+            />
+            <button
+              type="submit"
+              disabled={consulting}
+              aria-label="Consultar pedido"
+              className={`rounded-full px-2 py-0.5 text-[9px] font-black ${t.accent} bg-white/10 hover:bg-white/25 disabled:opacity-50`}
+            >
+              {consulting ? "…" : "🔍"}
+            </button>
+          </form>
+        )}
       </div>
     </>
   );
