@@ -63,13 +63,22 @@ export function JarvisContentScheduler() {
       const canvas = document.createElement("canvas");
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext("2d")!;
+      // Proxy CORS: baixa vídeo como blob e usa object URL same-origin
+      let videoSrc = bgVideo;
+      try {
+        const resp = await fetch(bgVideo, { mode: "cors", credentials: "omit" });
+        if (resp.ok) {
+          const blob = await resp.blob();
+          videoSrc = URL.createObjectURL(blob);
+        }
+      } catch { /* fallback: tenta direto */ }
       const video = document.createElement("video");
       video.crossOrigin = "anonymous";
-      video.src = bgVideo;
+      video.src = videoSrc;
       video.muted = true; video.loop = true; video.playsInline = true;
       await new Promise<void>((res, rej) => {
         video.onloadeddata = () => res();
-        video.onerror = () => rej(new Error("Falha ao carregar vídeo de fundo (CORS?)"));
+        video.onerror = () => rej(new Error("Falha ao carregar vídeo de fundo (CORS bloqueou o proxy)"));
       });
       await video.play();
 
