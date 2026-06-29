@@ -1,5 +1,5 @@
 // Server-only pricing engine. Lê custo/1000 do SMMhype, aplica multiplicadores
-// de margem progressiva. Em qualquer falha cai no FALLBACK_RATES seguro.
+// de margem progressiva High-CAC. Em qualquer falha cai no FALLBACK_RATES.
 // NÃO importar de módulos client-reachable em escopo de módulo.
 
 import { resolveServiceIdAsync } from "./smmhype.server";
@@ -7,12 +7,19 @@ import { resolveServiceIdAsync } from "./smmhype.server";
 export type Category =
   | "instagram:seguidores"
   | "instagram:curtidas"
-  | "instagram:visualizacoes";
+  | "instagram:visualizacoes"
+  | "tiktok:seguidores"
+  | "tiktok:curtidas"
+  | "tiktok:visualizacoes"
+  | "youtube:inscritos"
+  | "youtube:visualizacoes"
+  | "facebook:seguidores"
+  | "facebook:curtidas"
+  | "telegram:canal"
+  | "telegram:grupo"
+  | "trafego:br"
+  | "trafego:global";
 
-// Quantidades canônicas — mantém IDs existentes do dispatcher (não inventa novos).
-// Phase A repõe preço, não cria novos pacotes.
-// Atacado massivo: ~50 SKUs por rede distribuídos entre categorias.
-// Cobre micro-lotes (100/200) até volumes gigantes (500k/1M).
 const SEGUIDORES_QTYS = [
   100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000,
   7500, 10000, 15000, 20000, 30000, 50000, 75000, 100000, 200000, 500000,
@@ -25,11 +32,14 @@ const VIEWS_QTYS = [
   1000, 2000, 5000, 10000, 15000, 25000, 50000, 75000, 100000,
   200000, 300000, 500000, 750000, 1000000,
 ];
+const SUBS_QTYS = [100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000];
+const MEMBROS_QTYS = [100, 250, 500, 1000, 2000, 5000, 10000];
+const TRAFEGO_QTYS = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
 
 function pid(prefix: string, q: number): { id: string; qty: number } {
   const label =
     q >= 1_000_000 ? `${q / 1_000_000}m` :
-    q >= 1000 ? `${q / 1000}k` : `${q}`;
+    q >= 1000 ? `${q / 1000}k`.replace(".", "_") : `${q}`;
   return { id: `${prefix}${label}`, qty: q };
 }
 
@@ -37,29 +47,57 @@ const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
   "instagram:seguidores": SEGUIDORES_QTYS.map((q) => pid("p", q)),
   "instagram:curtidas": CURTIDAS_QTYS.map((q) => pid("l", q)),
   "instagram:visualizacoes": VIEWS_QTYS.map((q) => pid("v", q)),
+  "tiktok:seguidores": SEGUIDORES_QTYS.map((q) => pid("tf", q)),
+  "tiktok:curtidas": CURTIDAS_QTYS.map((q) => pid("tl", q)),
+  "tiktok:visualizacoes": VIEWS_QTYS.map((q) => pid("tv", q)),
+  "youtube:inscritos": SUBS_QTYS.map((q) => pid("ys", q)),
+  "youtube:visualizacoes": VIEWS_QTYS.map((q) => pid("yv", q)),
+  "facebook:seguidores": SEGUIDORES_QTYS.map((q) => pid("ff", q)),
+  "facebook:curtidas": CURTIDAS_QTYS.map((q) => pid("fl", q)),
+  "telegram:canal": MEMBROS_QTYS.map((q) => pid("tgc", q)),
+  "telegram:grupo": MEMBROS_QTYS.map((q) => pid("tgg", q)),
+  "trafego:br": TRAFEGO_QTYS.map((q) => pid("wbr", q)),
+  "trafego:global": TRAFEGO_QTYS.map((q) => pid("wgl", q)),
 };
 
 // Categoria → pacote-amostra usado para resolver o service_id no SMMhype.
 const PROBE: Record<Category, { pacote: string; qty: number }> = {
-  "instagram:seguidores": { pacote: "p1k", qty: 1000 },
-  "instagram:curtidas":   { pacote: "l1k", qty: 1000 },
-  "instagram:visualizacoes": { pacote: "v1k", qty: 1000 },
+  "instagram:seguidores":    { pacote: "p1k",  qty: 1000 },
+  "instagram:curtidas":      { pacote: "l1k",  qty: 1000 },
+  "instagram:visualizacoes": { pacote: "v1k",  qty: 1000 },
+  "tiktok:seguidores":       { pacote: "tf1k", qty: 1000 },
+  "tiktok:curtidas":         { pacote: "tl1k", qty: 1000 },
+  "tiktok:visualizacoes":    { pacote: "tv1k", qty: 1000 },
+  "youtube:inscritos":       { pacote: "ys1k", qty: 1000 },
+  "youtube:visualizacoes":   { pacote: "yv1k", qty: 1000 },
+  "facebook:seguidores":     { pacote: "ff1k", qty: 1000 },
+  "facebook:curtidas":       { pacote: "fl1k", qty: 1000 },
+  "telegram:canal":          { pacote: "tgc1k", qty: 1000 },
+  "telegram:grupo":          { pacote: "tgg1k", qty: 1000 },
+  "trafego:br":              { pacote: "wbr1k", qty: 1000 },
+  "trafego:global":          { pacote: "wgl1k", qty: 1000 },
 };
 
-// Custo BRL por 1000 unidades — fallback seguro (acima do custo real estimado
-// com folga). Calibrado para não vender abaixo do custo se a API falhar.
+// Custo BRL por 1000 — fallback calibrado acima do custo real, com folga.
 const FALLBACK_RATES_PER_1K: Record<Category, number> = {
-  "instagram:seguidores": 12.0,
-  "instagram:curtidas":   2.4,
-  "instagram:visualizacoes": 1.5,
+  "instagram:seguidores":    12.0,
+  "instagram:curtidas":       2.4,
+  "instagram:visualizacoes":  1.5,
+  "tiktok:seguidores":       18.0,
+  "tiktok:curtidas":          3.0,
+  "tiktok:visualizacoes":     0.8,
+  "youtube:inscritos":       60.0,
+  "youtube:visualizacoes":    3.5,
+  "facebook:seguidores":     14.0,
+  "facebook:curtidas":        3.0,
+  "telegram:canal":          18.0,
+  "telegram:grupo":          18.0,
+  "trafego:br":               4.0,
+  "trafego:global":           2.0,
 };
 
-// SMMhype reporta `rate` em USD por 1000. Conversão fixa (alinhada com
-// cotacao_brl padrão usado no admin).
 const USD_TO_BRL = 7.0;
-
-// High-CAC Anti-Fee Pricing Matrix — multiplicador por faixa de volume / 0.85 (PRIME15).
-const COUPON_BUFFER = 0.85; // 1 - 0.15
+const COUPON_BUFFER = 0.85; // 1 - 0.15 (PRIME15)
 
 function tierMultiplier(qty: number): number {
   if (qty <= 1000) return 4.5;
@@ -67,9 +105,7 @@ function tierMultiplier(qty: number): number {
   return 2.2;
 }
 
-function ceilTo(value: number, step: number): number {
-  return Math.ceil(value / step) * step;
-}
+const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
@@ -144,4 +180,24 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
     items,
     generated_at: new Date().toISOString(),
   };
+}
+
+// Resolve categoria a partir do prefixo do pacote (usado no checkout).
+export function categoryFromPacote(pacote: string): Category | null {
+  const p = pacote.toLowerCase();
+  if (p.startsWith("tgc")) return "telegram:canal";
+  if (p.startsWith("tgg")) return "telegram:grupo";
+  if (p.startsWith("wbr")) return "trafego:br";
+  if (p.startsWith("wgl")) return "trafego:global";
+  if (p.startsWith("ff"))  return "facebook:seguidores";
+  if (p.startsWith("fl"))  return "facebook:curtidas";
+  if (p.startsWith("ys"))  return "youtube:inscritos";
+  if (p.startsWith("yv"))  return "youtube:visualizacoes";
+  if (p.startsWith("tf"))  return "tiktok:seguidores";
+  if (p.startsWith("tl"))  return "tiktok:curtidas";
+  if (p.startsWith("tv"))  return "tiktok:visualizacoes";
+  if (p.startsWith("l"))   return "instagram:curtidas";
+  if (p.startsWith("v"))   return "instagram:visualizacoes";
+  if (p.startsWith("p"))   return "instagram:seguidores";
+  return null;
 }

@@ -113,26 +113,23 @@ export const criarPedido = createServerFn({ method: "POST" })
         ? (pkg.startsWith("tl") ? "curtidas" : pkg.startsWith("tv") ? "visualizacoes" : "seguidores")
         : (pkg.startsWith("l") ? "curtidas" : pkg.startsWith("v") ? "visualizacoes" : "seguidores");
 
-    // Universal Single Source of Truth: pricing-engine para Instagram, PRICE_TABLE
-    // como fallback para as demais redes (até que migrem ao engine).
+    // Universal Single Source of Truth: pricing-engine para TODAS as 6 redes.
+    // PRICE_TABLE permanece apenas como fallback de último recurso.
     let valorBase: number | null = null;
     let qtdOficial: number = data.quantidade;
-    if (isInstagram) {
-      try {
-        const { getPricingGridImpl } = await import("./pricing-engine.server");
-        const cat =
-          pkg.startsWith("l") ? "instagram:curtidas"
-            : pkg.startsWith("v") ? "instagram:visualizacoes"
-            : "instagram:seguidores";
+    try {
+      const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
+      const cat = categoryFromPacote(pkg);
+      if (cat) {
         const grid = await getPricingGridImpl(cat);
         const item = grid.items.find((i) => i.id === pkg);
         if (item) {
           valorBase = item.valor;
           qtdOficial = item.quantidade;
         }
-      } catch (err) {
-        console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
       }
+    } catch (err) {
+      console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
     }
     if (valorBase == null) {
       const oficial = PRICE_TABLE[data.pacote];
