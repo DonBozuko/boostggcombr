@@ -94,6 +94,7 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
   useScrolledPercent(0.15);
   const [open, setOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [hudMode, setHudMode] = useState(false);
 
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
@@ -101,6 +102,8 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
 
   useEffect(() => {
     setMounted(true);
+    const t = window.setTimeout(() => { setOpen(false); setHudMode(true); }, 3000);
+    return () => window.clearTimeout(t);
   }, []);
 
 
