@@ -120,12 +120,26 @@ export const jarvisChat = createServerFn({ method: "POST" })
       fornecedores: forns ?? [],
     };
 
+    // Fallback determinístico local (sem tokens / sem nuvem).
+    const localAnswer = () => {
+      const f = (ctx.fornecedores as any[]) ?? [];
+      const ativo = f.find((x) => x.ativo);
+      const saldo = ativo?.saldo_atual ?? 0;
+      const margem = receitaHoje > 0 ? ((lucroHoje / receitaHoje) * 100).toFixed(1) : "0.0";
+      return [
+        `Diretor, modo local ativo (sem nuvem).`,
+        `📊 Hoje: R$ ${receitaHoje.toFixed(2)} receita · R$ ${lucroHoje.toFixed(2)} lucro (${margem}%) · ${pagosHoje.length} pagos · ${ctx.pedidosPendentes} pendentes.`,
+        `🏦 7d: R$ ${fat7d.toFixed(2)} / lucro R$ ${lucro7d.toFixed(2)} · 30d projetado R$ ${previsao30d.toFixed(2)}.`,
+        `⚡ Fornecedor ativo: ${ativo?.nome ?? "—"} · saldo R$ ${Number(saldo).toFixed(2)}.`,
+      ].join(" ");
+    };
+
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) {
-      return { ok: true, answer: `📊 Receita hoje: R$ ${receitaHoje.toFixed(2)} · Lucro: R$ ${lucroHoje.toFixed(2)} · Pagos: ${pagosHoje.length} · Pendentes: ${ctx.pedidosPendentes}`, data: ctx };
-    }
+    if (!apiKey) return { ok: true, answer: localAnswer(), data: ctx };
 
     try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
       const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
@@ -136,14 +150,21 @@ export const jarvisChat = createServerFn({ method: "POST" })
             { role: "user", content: `Pergunta: ${data.question}\n\nDados reais (JSON):\n${JSON.stringify(ctx)}` },
           ],
         }),
-      });
+        signal: ctrl.signal,
+      }).finally(() => clearTimeout(timer));
+      if (!r.ok) {
+        // 429 (rate limit) / 402 (sem créditos) / 5xx → fallback local determinístico.
+        return { ok: true, answer: localAnswer(), data: { ...ctx, fallback: true, upstream: r.status } };
+      }
       const json: any = await r.json();
-      const answer = json?.choices?.[0]?.message?.content ?? "Sem resposta do gateway.";
+      const answer = json?.choices?.[0]?.message?.content;
+      if (!answer) return { ok: true, answer: localAnswer(), data: { ...ctx, fallback: true } };
       return { ok: true, answer, data: ctx };
-    } catch (e: any) {
-      return { ok: true, answer: `Falha no gateway: ${e?.message ?? e}. Dados brutos: receita R$ ${receitaHoje.toFixed(2)}, lucro R$ ${lucroHoje.toFixed(2)}.`, data: ctx };
+    } catch {
+      return { ok: true, answer: localAnswer(), data: { ...ctx, fallback: true } };
     }
   });
+
 
 export const jarvisFailoverAtivo = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
