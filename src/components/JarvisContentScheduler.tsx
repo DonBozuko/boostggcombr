@@ -91,8 +91,8 @@ export function JarvisContentScheduler() {
       `O segredo: empilhar ${info.pitch} ANTES do conteúdo viralizar. O algoritmo lê isso como autoridade e empurra orgânico em cima.`,
     ];
     const ctas = [
-      `🔗 Acessa ${info.url} agora, usa o cupom PRIME10 e ganha 10% imediato. Pix aprovado em 2 min.`,
-      `🚀 Link na bio → ${info.url} · cupom PRIME10 · entrega começa em segundos.`,
+      `🔗 Acessa ${info.url} agora, usa o cupom PRIME15 e ganha 15% imediato. Pix aprovado em 2 min.`,
+      `🚀 Link na bio → ${info.url} · cupom PRIME15 · entrega começa em segundos.`,
     ];
     const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
     const s = { hook: pick(hooks), retention: pick(retentions), cta: pick(ctas) };

@@ -21,32 +21,32 @@ const ROTATING: Record<FabianoVariant, string[]> = {
   instagram: [
     "Detectei janela ótima: perfis que sobem 1k seguidores nesta semana ganham +38% de alcance no Explore.",
     "Recomendo blindar com curtidas e views junto — o algoritmo penaliza seguidores sem engajamento proporcional.",
-    "Cupom PRIME10 ativo: 10% off imediato no Pix. Aplique no checkout para garantir.",
+    "Cupom PRIME15 ativo: 15% off imediato no Pix. Aplique no checkout para garantir.",
   ],
   tiktok: [
     "O FYP do TikTok premia 3 sinais em conjunto: seguidores, curtidas e watch-time. Pacotes combinados rendem 2,4× mais.",
     "Vídeos com >5k views nas primeiras 6h têm 71% mais chance de viralizar. Acelere com views agora.",
-    "Cupom PRIME10 destrava 10% off imediato. Não perca a janela.",
+    "Cupom PRIME15 destrava 15% off imediato. Não perca a janela.",
   ],
   youtube: [
     "Inscritos sem retenção derrubam o canal. Combine inscritos + views de qualidade para subir nas recomendações.",
     "Canais que atingem 1k inscritos destravam monetização. Está perto? Eu acelero hoje.",
-    "PRIME10 reduz 10% do valor no Pix — válido só para sessão atual.",
+    "PRIME15 reduz 15% do valor no Pix — válido só para sessão atual.",
   ],
   facebook: [
     "Páginas com mais de 1k seguidores convertem 3× mais em anúncios. Aposta de retorno previsível.",
     "Curtidas e seguidores juntos reforçam autoridade — algoritmo Meta prioriza esse par.",
-    "Cupom PRIME10: -10% imediato. Use antes de finalizar.",
+    "Cupom PRIME15: -15% imediato. Use antes de finalizar.",
   ],
   telegram: [
     "Grupos com 500+ membros têm taxa de conversão de vendas 4,7× maior. Prova social pesa.",
     "Membros reais brasileiros entregues em até 24h — sem queda.",
-    "PRIME10 ativo: -10% no Pix. Aplique no checkout.",
+    "PRIME15 ativo: -15% no Pix. Aplique no checkout.",
   ],
   trafego: [
     "Tráfego BR converte melhor para e-commerce; tráfego global é ideal para SEO e ranqueamento.",
     "Volumes de 5k+ visitas aceleram indexação no Google em até 60%.",
-    "Cupom PRIME10 ativo — 10% off direto no Pix.",
+    "Cupom PRIME15 ativo — 15% off direto no Pix.",
   ],
 };
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const COUPON = "PRIME10";
+const COUPON = "PRIME15";
 const STORAGE_PREFIX = "eb_welcome_popup_v2:";
 const DELAY_MS = 4000;
 
@@ -81,10 +81,10 @@ export function WelcomeDiscountPopup({ route = "/" }: { route?: RouteKey }) {
             className="mt-1 text-[11px] font-extrabold leading-tight"
             style={{ color: t.color, textShadow: `0 0 8px ${t.soft}` }}
           >
-            ⚡ DESCONTO 10% INSTANTÂNEO
+            ⚡ DESCONTO 15% INSTANTÂNEO
           </h2>
           <p className="mt-1 text-[9px] text-white/75 leading-snug">
-            Aplique no checkout Pix e ganhe <b className="text-white">10% off</b> na hora.
+            Aplique no checkout Pix e ganhe <b className="text-white">15% off</b> na hora.
           </p>
         </div>
 
