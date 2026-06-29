@@ -1,4 +1,4 @@
-import { applyProfitFormula } from "@/lib/profit-markup";
+import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
@@ -65,24 +65,17 @@ export const Route = createFileRoute("/youtube")({
 type Categoria = "inscritos" | "visualizacoes";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
 
-const subsPlans: Plan[] = applyProfitFormula([
-  { id: "ys100",  tier: "100 Inscritos",     quantidade: 100,    valor: 29.0,   price: "R$ 29,00" },
-  { id: "ys250",  tier: "250 Inscritos",     quantidade: 250,    valor: 59.0,   price: "R$ 59,00" },
-  { id: "ys500",  tier: "500 Inscritos",     quantidade: 500,    valor: 99.0,   price: "R$ 99,00" },
-  { id: "ys1k",   tier: "1.000 Inscritos",   quantidade: 1000,   valor: 189.0,  price: "R$ 189,00" },
-  { id: "ys2k",   tier: "2.000 Inscritos",   quantidade: 2000,   valor: 359.0,  price: "R$ 359,00" },
-  { id: "ys5k",   tier: "5.000 Inscritos",   quantidade: 5000,   valor: 849.0,  price: "R$ 849,00" },
-  { id: "ys10k",  tier: "10.000 Inscritos",  quantidade: 10000,  valor: 1590.0, price: "R$ 1.590,00" },
-]);
-const viewsPlans: Plan[] = applyProfitFormula([
-  { id: "yv1k",   tier: "1.000 Views",     quantidade: 1000,   valor: 19.0,  price: "R$ 19,00" },
-  { id: "yv5k",   tier: "5.000 Views",     quantidade: 5000,   valor: 59.0,  price: "R$ 59,00" },
-  { id: "yv10k",  tier: "10.000 Views",    quantidade: 10000,  valor: 99.0,  price: "R$ 99,00" },
-  { id: "yv25k",  tier: "25.000 Views",    quantidade: 25000,  valor: 219.0, price: "R$ 219,00" },
-  { id: "yv50k",  tier: "50.000 Views",    quantidade: 50000,  valor: 399.0, price: "R$ 399,00" },
-  { id: "yv100k", tier: "100.000 Views",   quantidade: 100000, valor: 749.0, price: "R$ 749,00" },
-]);
+const SUB_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000,200000,500000];
+const YT_VIEW_QTYS = [1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,7500000,10000000,15000000,20000000,30000000,50000000];
+
+const subsPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "ys", unitLabel: "Inscritos", costPer1k: 25, qtys: SUB_QTYS }),
+);
+const viewsPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "yv", unitLabel: "Views", costPer1k: 1, qtys: YT_VIEW_QTYS }),
+);
 const allPlans = [...subsPlans, ...viewsPlans];
+
 
 const channelSchema = z.object({
   plan: z.string().min(1),

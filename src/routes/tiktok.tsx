@@ -1,4 +1,4 @@
-import { applyProfitFormula } from "@/lib/profit-markup";
+import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
@@ -65,34 +65,21 @@ export const Route = createFileRoute("/tiktok")({
 type Categoria = "seguidores" | "curtidas" | "visualizacoes";
 type Plan = { id: string; tier: string; qty: string; quantidade: number; valor: number; price: string };
 
-const followersPlans: Plan[] = applyProfitFormula([
-  { id: "tf100",  tier: "100 Seguidores",     qty: "100",    quantidade: 100,    valor: 9.0,   price: "R$ 9,00" },
-  { id: "tf500",  tier: "500 Seguidores",     qty: "500",    quantidade: 500,    valor: 29.0,  price: "R$ 29,00" },
-  { id: "tf1k",   tier: "1.000 Seguidores",   qty: "1000",   quantidade: 1000,   valor: 49.0,  price: "R$ 49,00" },
-  { id: "tf2k",   tier: "2.000 Seguidores",   qty: "2000",   quantidade: 2000,   valor: 89.0,  price: "R$ 89,00" },
-  { id: "tf5k",   tier: "5.000 Seguidores",   qty: "5000",   quantidade: 5000,   valor: 199.0, price: "R$ 199,00" },
-  { id: "tf10k",  tier: "10.000 Seguidores",  qty: "10000",  quantidade: 10000,  valor: 379.0, price: "R$ 379,00" },
-  { id: "tf25k",  tier: "25.000 Seguidores",  qty: "25000",  quantidade: 25000,  valor: 849.0, price: "R$ 849,00" },
-  { id: "tf50k",  tier: "50.000 Seguidores",  qty: "50000",  quantidade: 50000,  valor: 1590.0, price: "R$ 1.590,00" },
-]);
-const likesPlans: Plan[] = applyProfitFormula([
-  { id: "tl100",  tier: "100 Curtidas",   qty: "100",   quantidade: 100,   valor: 4.0,  price: "R$ 4,00" },
-  { id: "tl500",  tier: "500 Curtidas",   qty: "500",   quantidade: 500,   valor: 9.0,  price: "R$ 9,00" },
-  { id: "tl1k",   tier: "1.000 Curtidas", qty: "1000",  quantidade: 1000,  valor: 15.0, price: "R$ 15,00" },
-  { id: "tl2k",   tier: "2.000 Curtidas", qty: "2000",  quantidade: 2000,  valor: 27.0, price: "R$ 27,00" },
-  { id: "tl5k",   tier: "5.000 Curtidas", qty: "5000",  quantidade: 5000,  valor: 59.0, price: "R$ 59,00" },
-  { id: "tl10k",  tier: "10.000 Curtidas",qty: "10000", quantidade: 10000, valor: 109.0,price: "R$ 109,00" },
-]);
-const viewsPlans: Plan[] = applyProfitFormula([
-  { id: "tv1k",   tier: "1.000 Views",    qty: "1000",   quantidade: 1000,   valor: 3.0,  price: "R$ 3,00" },
-  { id: "tv5k",   tier: "5.000 Views",    qty: "5000",   quantidade: 5000,   valor: 7.0,  price: "R$ 7,00" },
-  { id: "tv10k",  tier: "10.000 Views",   qty: "10000",  quantidade: 10000,  valor: 12.0, price: "R$ 12,00" },
-  { id: "tv25k",  tier: "25.000 Views",   qty: "25000",  quantidade: 25000,  valor: 24.0, price: "R$ 24,00" },
-  { id: "tv50k",  tier: "50.000 Views",   qty: "50000",  quantidade: 50000,  valor: 39.0, price: "R$ 39,00" },
-  { id: "tv100k", tier: "100.000 Views",  qty: "100000", quantidade: 100000, valor: 69.0, price: "R$ 69,00" },
-  { id: "tv500k", tier: "500.000 Views",  qty: "500000", quantidade: 500000, valor: 290.0,price: "R$ 290,00" },
-]);
+const FOLLOWER_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
+const LIKE_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
+const VIEW_QTYS = [1000,2000,5000,10000,15000,25000,50000,75000,100000,200000,300000,500000,750000,1000000];
+
+const followersPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "tf", unitLabel: "Seguidores", costPer1k: 9, qtys: FOLLOWER_QTYS }),
+);
+const likesPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "tl", unitLabel: "Curtidas", costPer1k: 3, qtys: LIKE_QTYS }),
+);
+const viewsPlans: Plan[] = applyProfitFormula(
+  buildPlans({ prefix: "tv", unitLabel: "Views", costPer1k: 0.4, qtys: VIEW_QTYS }),
+);
 const allPlans = [...followersPlans, ...likesPlans, ...viewsPlans];
+
 
 const followersSchema = z.object({
   plan: z.string().min(1),
