@@ -161,7 +161,7 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
           role="status"
           aria-live="polite"
           style={{ zIndex: 50 }}
-          className={`absolute left-full ml-2 top-1/2 -translate-y-1/2 w-[140px] max-w-[140px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 border ${c.border} shadow-2xl ring-1 ring-white/15`}
+          className={`absolute left-full ml-1 top-1/2 -translate-y-1/2 -translate-x-2 w-[115px] max-w-[115px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 border ${c.border} shadow-2xl ring-1 ring-white/15`}
         >
           <button
             type="button"
