@@ -1154,6 +1154,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <JarvisAlertCenter />
         <JarvisNocCenter token={token} />
+        <TreasuryPanel token={token} />
         <AdminCostAlert />
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
