@@ -22,7 +22,6 @@ import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
-import { Route as ApiPublicProxyVideoRouteImport } from './routes/api/public/proxy-video'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
@@ -94,11 +93,6 @@ const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
   path: '/api/public/sync-services',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicProxyVideoRoute = ApiPublicProxyVideoRouteImport.update({
-  id: '/api/public/proxy-video',
-  path: '/api/public/proxy-video',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
   id: '/api/public/mp-webhook',
   path: '/api/public/mp-webhook',
@@ -142,7 +136,6 @@ export interface FileRoutesByFullPath {
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
-  '/api/public/proxy-video': typeof ApiPublicProxyVideoRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
@@ -163,7 +156,6 @@ export interface FileRoutesByTo {
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
-  '/api/public/proxy-video': typeof ApiPublicProxyVideoRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
@@ -185,7 +177,6 @@ export interface FileRoutesById {
   '/youtube': typeof YoutubeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
-  '/api/public/proxy-video': typeof ApiPublicProxyVideoRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
@@ -208,7 +199,6 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
-    | '/api/public/proxy-video'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/sfx/$name'
@@ -229,7 +219,6 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
-    | '/api/public/proxy-video'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/sfx/$name'
@@ -250,7 +239,6 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
-    | '/api/public/proxy-video'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/sfx/$name'
@@ -272,7 +260,6 @@ export interface RootRouteChildren {
   YoutubeRoute: typeof YoutubeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
-  ApiPublicProxyVideoRoute: typeof ApiPublicProxyVideoRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
@@ -372,13 +359,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSyncServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/proxy-video': {
-      id: '/api/public/proxy-video'
-      path: '/api/public/proxy-video'
-      fullPath: '/api/public/proxy-video'
-      preLoaderRoute: typeof ApiPublicProxyVideoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/public/mp-webhook': {
       id: '/api/public/mp-webhook'
       path: '/api/public/mp-webhook'
@@ -432,7 +412,6 @@ const rootRouteChildren: RootRouteChildren = {
   YoutubeRoute: YoutubeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
-  ApiPublicProxyVideoRoute: ApiPublicProxyVideoRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
@@ -441,13 +420,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
