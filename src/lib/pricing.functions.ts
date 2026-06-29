@@ -1,15 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeader } from "@tanstack/react-start/server";
+import type { Category } from "./pricing-engine.server";
 
-export type PricingCategory =
-  | "instagram:seguidores"
-  | "instagram:curtidas"
-  | "instagram:visualizacoes";
+export type PricingCategory = Category;
 
 const VALID: PricingCategory[] = [
   "instagram:seguidores",
   "instagram:curtidas",
   "instagram:visualizacoes",
+  "tiktok:seguidores",
+  "tiktok:curtidas",
+  "tiktok:visualizacoes",
+  "youtube:inscritos",
+  "youtube:visualizacoes",
+  "facebook:seguidores",
+  "facebook:curtidas",
+  "telegram:canal",
+  "telegram:grupo",
+  "trafego:br",
+  "trafego:global",
 ];
 
 export const getPricingGrid = createServerFn({ method: "GET" })
