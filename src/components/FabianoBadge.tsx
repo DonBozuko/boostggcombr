@@ -122,10 +122,10 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
 
   return (
     <div
-      className="fixed top-2 z-40 flex flex-col items-start gap-1"
+      className="fixed top-16 z-40 flex flex-col-reverse items-start gap-1"
       style={{ left: "max(8px, calc(50% - 225px))" }}
     >
-      <a
+      <
         href={web}
         target="_blank"
         rel="noopener noreferrer"
