@@ -90,7 +90,7 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
   },
 };
 
-export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
+export function FabianoBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
   useScrolledPercent(0.15);
   const [open, setOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -128,8 +128,10 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
 
   const badge = (
     <div
-      className="fixed z-[80] flex flex-col items-start gap-1 pointer-events-auto"
-      style={{ left: "max(8px, calc(50vw - 225px + 8px))", top: "max(8px, calc(env(safe-area-inset-top, 0px) + 8px))" }}
+      className={inline
+        ? "relative z-[40] inline-flex flex-col items-center pointer-events-auto"
+        : "fixed z-[80] flex flex-col items-center pointer-events-auto"}
+      style={inline ? undefined : { left: "max(8px, calc(50vw - 225px + 8px))", top: "max(300px, calc(env(safe-area-inset-top, 0px) + 30vh))" }}
     >
       <a
         href={web}
@@ -158,7 +160,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/80 border ${c.border} shadow-2xl ring-1 ring-white/15`}
+          className={`absolute top-full mt-2 left-1/2 -translate-x-1/2 z-40 w-[132px] sm:w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/90 border ${c.border} shadow-2xl ring-1 ring-white/15`}
         >
           <button
             type="button"
@@ -179,6 +181,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
     </div>
   );
 
+  if (inline) return badge;
   if (!mounted || typeof document === "undefined") return null;
   return createPortal(badge, document.body);
 }

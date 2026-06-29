@@ -235,8 +235,6 @@ function YoutubeLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="youtube" />
-      <FabianoBadge variant="youtube" />
       <ShowcaseShell>
       <PremiumCategorySelector
         accent={RED}
@@ -248,6 +246,10 @@ function YoutubeLanding() {
           { key: "visualizacoes", label: "Visualizações", emoji: "🎬", badge: "Recomendado",      badgeColor: RED },
         ]}
       />
+      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+        <FabianoBadge variant="youtube" inline />
+        <JarvisBadge variant="youtube" inline />
+      </div>
       <PremiumPricingGrid
         accent={RED}
         disabled={tipoBloqueado}

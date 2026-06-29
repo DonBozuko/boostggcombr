@@ -209,8 +209,6 @@ function TelegramLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="telegram" />
-      <FabianoBadge variant="telegram" />
       <ShowcaseShell>
       <PremiumCategorySelector
         accent={AERO}
@@ -222,6 +220,10 @@ function TelegramLanding() {
           { key: "_views", label: "Views Posts",   emoji: "🎬", badge: "Recomendado",      badgeColor: AERO },
         ]}
       />
+      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+        <FabianoBadge variant="telegram" inline />
+        <JarvisBadge variant="telegram" inline />
+      </div>
       <PremiumPricingGrid
         accent={AERO}
         disabled={tipoBloqueado}

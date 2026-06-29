@@ -248,8 +248,6 @@ function TiktokLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="tiktok" />
-      <FabianoBadge variant="tiktok" />
       <ShowcaseShell>
       <PremiumCategorySelector
         accent={CYAN}
@@ -261,6 +259,10 @@ function TiktokLanding() {
           { key: "visualizacoes", label: "Visualizações", emoji: "🎬", badge: "Recomendado",      badgeColor: CYAN },
         ]}
       />
+      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+        <FabianoBadge variant="tiktok" inline />
+        <JarvisBadge variant="tiktok" inline />
+      </div>
       <PremiumPricingGrid
         accent={CYAN}
         disabled={tipoBloqueado}
