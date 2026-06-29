@@ -1,13 +1,13 @@
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "@tanstack/react-router";
 import bladeAsset from "@/assets/jarvis-blade.png.asset.json";
 
 /**
  * BladePillar — Vertical plasma blade fixed at the center of the viewport.
- * 5 clickable hotspots mapped over the engraved network icons act as the
- * official omnichannel selectors.
- *
- * Hotspots are positioned as % of the image height, sequentially along the
- * blade from top to bottom: Instagram → TikTok → YouTube → Facebook → Tráfego.
+ * Rendered via portal to document.body so it lives on its own root stacking
+ * context (z-0) BEHIND the MobileFrame (z-10). It must never cover the
+ * selling square or the plan buttons.
  */
 const HOTSPOTS: Array<{ to: "/" | "/tiktok" | "/youtube" | "/facebook" | "/trafego"; label: string; top: string }> = [
   { to: "/",         label: "Instagram",   top: "22%" },
@@ -18,17 +18,22 @@ const HOTSPOTS: Array<{ to: "/" | "/tiktok" | "/youtube" | "/facebook" | "/trafe
 ];
 
 export function BladePillar() {
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted || typeof document === "undefined") return null;
+
+  return createPortal(
     <div
-      className="fixed inset-y-0 left-1/2 -translate-x-1/2 z-0 pointer-events-none"
       aria-hidden={false}
+      className="fixed left-1/2 top-0 -translate-x-1/2 h-screen pointer-events-none"
+      style={{ zIndex: 0, width: "min(34vh, 220px)" }}
     >
-      <div className="relative h-full" style={{ width: "min(38vh, 260px)" }}>
+      <div className="relative h-full w-full">
         <img
           src={bladeAsset.url}
           alt="Espada de plasma omnichannel J.A.R.V.I.S."
           draggable={false}
-          className="h-full w-full object-contain select-none"
+          className="h-full w-full object-contain select-none opacity-70"
           style={{ filter: "drop-shadow(0 0 24px rgba(255,80,0,0.55))" }}
         />
         {HOTSPOTS.map(({ to, label, top }) => (
@@ -41,6 +46,7 @@ export function BladePillar() {
           />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
