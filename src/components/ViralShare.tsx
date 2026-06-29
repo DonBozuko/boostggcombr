@@ -4,28 +4,24 @@ import { Share2, Check } from "lucide-react";
 
 const SITE = "https://eliteboostprime.lovable.app";
 
-const messagesByRoute: Record<string, string> = {
-  "/": "Comprei seguidores na EliteBoost Prime e meu Instagram disparou de verdade. Entrega rápida e real:",
-  "/tiktok": "EliteBoost Prime fez meu TikTok bombar no FYP. Views reais em horas:",
-  "/youtube": "WatchTime real e inscritos com a EliteBoost Prime. Canal monetizando:",
-  "/facebook": "EliteBoost Prime subiu o engajamento da minha página no Facebook de forma orgânica:",
-  "/telegram": "Meu canal do Telegram lotou com a EliteBoost Prime. Membros reais:",
-  "/trafego": "Tráfego orgânico real no meu site com a EliteBoost Prime. SEO local funcionou:",
-};
+// Frase oficial unificada (dinâmica de preços — sem valores engessados).
+const SHARE_TEXT =
+  "Comprei seguidores na EliteBoost Prime e meu Instagram disparou de verdade! Entrega rápida, segura e com inteligência artificial. Faça o seu teste também:";
 
 export function ViralShare({ route = "/" }: { route?: string }) {
+  void route; // mantido para compat de assinatura; mensagem é universal
   const [copied, setCopied] = useState(false);
-  const text = (messagesByRoute[route] ?? messagesByRoute["/"]) + " " + SITE;
 
   const handleShare = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "EliteBoost Prime", text, url: SITE });
+        // `url` já é anexado pelo SO — não duplicar dentro de `text`.
+        await navigator.share({ title: "EliteBoost Prime", text: SHARE_TEXT, url: SITE });
         return;
       }
     } catch {}
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(`${SHARE_TEXT} ${SITE}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {}
