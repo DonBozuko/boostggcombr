@@ -184,6 +184,23 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
                 })
                 .eq("id", pedido.id);
+
+              // ===== Tesouraria: registra ledger idempotente =====
+              try {
+                const fat = Number(pedido.valor);
+                const taxaPix = Number((fat * 0.0099).toFixed(2)); // MP Pix ~0,99%
+                const custo = custoReal != null ? Number(custoReal.toFixed(2)) : 0;
+                const lucroLiq = Number((fat - custo - taxaPix).toFixed(2));
+                await supabaseAdmin.from("admin_treasury" as any).upsert({
+                  pedido_id: pedido.id,
+                  faturamento: fat,
+                  custo_api: custo,
+                  taxa_pix: taxaPix,
+                  lucro_liquido: lucroLiq,
+                  network: String(pedido.pacote ?? "").split("_")[0] ?? null,
+                  occurred_at: new Date().toISOString(),
+                } as any, { onConflict: "pedido_id" });
+              } catch (e) { console.warn("[mp-webhook] treasury ledger falhou", e); }
               // === Notificação Telegram: sucesso / auto-reparo ===
               try {
                 const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");

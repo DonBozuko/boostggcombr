@@ -39,6 +39,7 @@ import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
+import { TreasuryPanel } from "@/components/TreasuryPanel";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
@@ -1154,6 +1155,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <JarvisAlertCenter />
         <JarvisNocCenter token={token} />
+        <TreasuryPanel token={token} />
         <AdminCostAlert />
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />

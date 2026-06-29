@@ -90,11 +90,15 @@ export const jarvisChat = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const now = new Date();
     const startDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const start7d = new Date(Date.now() - 7 * 86400_000).toISOString();
+    const start30d = new Date(Date.now() - 30 * 86400_000).toISOString();
 
-    const [{ data: hoje }, { data: forns }, { data: pendentes }] = await Promise.all([
+    const [{ data: hoje }, { data: forns }, { data: pendentes }, { data: tre7 }, { data: tre30 }] = await Promise.all([
       supabaseAdmin.from("pedidos").select("status, valor, custo_real, created_at").gte("created_at", startDay),
       supabaseAdmin.from("fornecedores").select("nome, status, saldo_atual, ativo, falhas_consecutivas, ultima_verificacao"),
       supabaseAdmin.from("pedidos").select("id, status, valor, created_at").in("status", ["pending","pendente"]).order("created_at", { ascending: false }).limit(20),
+      supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido, taxa_pix, custo_api, occurred_at").gte("occurred_at", start7d),
+      supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido").gte("occurred_at", start30d),
     ]);
 
     const pagosHoje = (hoje ?? []).filter((r: any) => ["paid","pago","completed"].includes(r.status));
@@ -102,9 +106,17 @@ export const jarvisChat = createServerFn({ method: "POST" })
     const custoHoje = pagosHoje.reduce((s: number, r: any) => s + Number(r.custo_real || 0), 0);
     const lucroHoje = receitaHoje - custoHoje;
 
+    const sum = (rows: any[] | null, k: string) => (rows ?? []).reduce((s, r) => s + Number(r[k] || 0), 0);
+    const fat7d = sum(tre7 as any, "faturamento");
+    const lucro7d = sum(tre7 as any, "lucro_liquido");
+    const fat30d = sum(tre30 as any, "faturamento");
+    const lucro30d = sum(tre30 as any, "lucro_liquido");
+    const previsao30d = lucro7d > 0 ? Number(((lucro7d / 7) * 30).toFixed(2)) : 0;
+
     const ctx = {
       receitaHoje, lucroHoje, totalPagosHoje: pagosHoje.length,
       pedidosPendentes: pendentes?.length ?? 0,
+      tesouraria: { fat7d, lucro7d, fat30d, lucro30d, previsao30d },
       fornecedores: forns ?? [],
     };
 

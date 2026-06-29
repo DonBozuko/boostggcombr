@@ -59,6 +59,50 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_treasury: {
+        Row: {
+          created_at: string
+          custo_api: number
+          faturamento: number
+          id: string
+          lucro_liquido: number
+          network: string | null
+          occurred_at: string
+          pedido_id: string | null
+          taxa_pix: number
+        }
+        Insert: {
+          created_at?: string
+          custo_api?: number
+          faturamento?: number
+          id?: string
+          lucro_liquido?: number
+          network?: string | null
+          occurred_at?: string
+          pedido_id?: string | null
+          taxa_pix?: number
+        }
+        Update: {
+          created_at?: string
+          custo_api?: number
+          faturamento?: number
+          id?: string
+          lucro_liquido?: number
+          network?: string | null
+          occurred_at?: string
+          pedido_id?: string | null
+          taxa_pix?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_treasury_pedido_id_fkey"
+            columns: ["pedido_id"]
+            isOneToOne: false
+            referencedRelation: "pedidos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           created_at: string
@@ -503,6 +547,7 @@ export type Database = {
           table_name: string
         }[]
       }
+      is_director: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
