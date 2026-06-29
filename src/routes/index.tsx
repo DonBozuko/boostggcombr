@@ -531,9 +531,6 @@ function Landing() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="instagram" />
-      <FabianoBadge variant="instagram" />
-
       <ShowcaseShell>
 
 
@@ -547,6 +544,10 @@ function Landing() {
           { key: "visualizacoes", label: "Visualizações", emoji: "🎬", badge: "Recomendado",      badgeColor: "#00f2fe" },
         ]}
       />
+      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+        <FabianoBadge variant="instagram" inline />
+        <JarvisBadge variant="instagram" inline />
+      </div>
       <PremiumPricingGrid
         cols={2}
         accent="#FFD700"

@@ -174,8 +174,6 @@ function TrafegoLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="trafego" />
-      <FabianoBadge variant="trafego" />
       <ShowcaseShell>
       <PremiumCategorySelector
         accent={NEON}
@@ -187,6 +185,10 @@ function TrafegoLanding() {
           { key: "_geo",    label: "Geo-Alvo", emoji: "📍", badge: "Recomendado",     badgeColor: NEON },
         ]}
       />
+      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+        <FabianoBadge variant="trafego" inline />
+        <JarvisBadge variant="trafego" inline />
+      </div>
       <PremiumPricingGrid
         accent={NEON}
         disabled={tipoBloqueado}

@@ -226,8 +226,6 @@ function FacebookLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="facebook" />
-      <FabianoBadge variant="facebook" />
       <ShowcaseShell>
       <PremiumCategorySelector
         accent={BLUE}
@@ -239,6 +237,10 @@ function FacebookLanding() {
           { key: "_views",     label: "Em Breve",   emoji: "🎬", badge: "Recomendado",      badgeColor: BLUE },
         ]}
       />
+      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+        <FabianoBadge variant="facebook" inline />
+        <JarvisBadge variant="facebook" inline />
+      </div>
       <PremiumPricingGrid
         accent={BLUE}
         disabled={tipoBloqueado}
