@@ -10,6 +10,7 @@ const pedidoSchema = z.object({
   whatsapp_contato: z.string().min(5).max(50).optional(),
   rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram"]).optional(),
   utm_source: z.string().max(60).optional().nullable(),
+  cupom: z.string().max(20).optional().nullable(),
 });
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
