@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import jarvisBgAsset from "@/assets/jarvis-bg.mp4.asset.json";
 
 type Network = "instagram" | "tiktok" | "facebook" | "youtube" | "telegram";
 type Format = "1:1" | "9:16";
@@ -36,9 +37,14 @@ export function JarvisContentScheduler() {
   const [networks, setNetworks] = useState<Network[]>(["instagram"]);
   const [format, setFormat] = useState<Format>("9:16");
   const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
-  // Soberania local: zero dependência de cdn.pixabay.com (404/502/CORS). Asset nativo servido por /public.
-  const [bgVideo, setBgVideo] = useState<string>("/assets/videos/jarvis-bg.mp4");
-  const nativeDownloadHref = useMemo(() => bgVideo.trim(), [bgVideo]);
+  // Soberania de asset: hospedado no CDN nativo Lovable (zero /public, zero CORS, zero 404).
+  const [bgVideo, setBgVideo] = useState<string>(jarvisBgAsset.url);
+  const nativeDownloadHref = useMemo(() => {
+    const u = bgVideo.trim();
+    if (!u) return "";
+    if (/^https?:\/\//i.test(u)) return u;
+    return typeof window !== "undefined" ? window.location.origin + u : u;
+  }, [bgVideo]);
 
   const toggleNet = (n: Network) =>
     setNetworks((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
