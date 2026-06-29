@@ -7,7 +7,6 @@ import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/compone
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
-import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -86,7 +85,6 @@ const urlSchema = z.object({
 type PedidoInfo = { price: string; tier: string; profile: string; pixCode: string; qrCodeBase64: string; pedidoId: string | null };
 
 function TrafegoLanding() {
-  const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("brasil");
   const [planId, setPlanId] = useState("");
   const [profile, setProfile] = useState("");
@@ -168,27 +166,17 @@ function TrafegoLanding() {
   return (
     <MobileFrame bg={BG} route="/trafego">
       <PlansShowcaseProvider accent={NEON}>
-      <div className="fixed z-[60] flex items-center gap-2" style={{ left: "max(8px, calc(50vw - 230px + 6px))", top: 6 }}><ShowcaseTrigger /></div>
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b transition-all duration-300" style={{ borderColor: `${NEON}66` }}>
+        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
+          </div>
+          <ShowcaseTrigger />
+        </div>
+      </header>
       <JarvisBadge variant="trafego" />
       <FabianoBadge variant="trafego" />
       <ShowcaseShell>
-      <div
-        className={`fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[450px] z-40 transition-all duration-300 backdrop-blur-xl bg-black/70 border-b ${
-          scrolled ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
-        }`}
-        style={{ borderColor: `${NEON}66` }}
-      >
-        <div className="container mx-auto px-6 h-12 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="size-7 rounded-full overflow-hidden ring-2 shadow-[0_0_12px_rgba(168,85,247,0.7)]" style={{ borderColor: "#a855f7" }}>
-              <img src="/__l5e/assets-v1/c4e83b18-e1c4-4191-88a1-8842c6097b8b/fabiano.png" alt="Fabiano Santiago" className="h-full w-full object-cover object-top" />
-            </div>
-            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
-          </div>
-          <span className="text-xs" style={{ color: NEON }}>TRÁFEGO WEB ⚡</span>
-        </div>
-      </div>
-
       <PremiumCategorySelector
         accent={NEON}
         active={categoria}
