@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-const VALID = "PRIME10";
+const VALID = "PRIME15";
 const KEY = "eb_coupon";
-const DISCOUNT = 0.10; // 10%
+const DISCOUNT = 0.15; // 15%
 
 export function getCouponDiscount(): number {
   if (typeof window === "undefined") return 0;
