@@ -159,17 +159,17 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
         )}
         <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black animate-pulse`} />
       </a>
-      {open && (
+      {open && !hudMode && (
         <div
           role="status"
           aria-live="polite"
           style={{ zIndex: 50 }}
-          className={`absolute left-full ml-1 top-1/2 -translate-y-1/2 -translate-x-2 w-[115px] max-w-[115px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 border ${c.border} shadow-2xl ring-1 ring-white/15`}
+          className={`absolute left-full ml-1 top-1/2 -translate-y-1/2 -translate-x-2 w-[115px] max-w-[115px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 border ${c.border} shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out`}
         >
           <button
             type="button"
             aria-label="Fechar"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); setHudMode(true); }}
             className="absolute top-1 right-1 h-5 w-5 grid place-items-center rounded-full bg-white/10 hover:bg-white/25 text-white/80 hover:text-white"
           >
             <X className="h-3 w-3" />
@@ -181,6 +181,19 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
             Garantindo velocidade máxima e entrega segura em seu pedido, senhor.
           </div>
         </div>
+      )}
+      {hudMode && (
+        <a
+          href={web}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+          aria-label="Fale comigo no Telegram"
+          className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide text-white border ${c.border} bg-black/80 backdrop-blur-md ${c.ring} ring-1 animate-fade-in hover:scale-105 transition-transform`}
+        >
+          <span className={`h-1.5 w-1.5 rounded-full ${c.dot} animate-pulse`} />
+          Fale Comigo
+        </a>
       )}
     </div>
   );
