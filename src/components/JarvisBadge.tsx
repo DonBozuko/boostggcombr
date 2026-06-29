@@ -283,7 +283,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           role="status"
           aria-live="polite"
           style={{ zIndex: 50 }}
-          className={`absolute top-full mt-2 left-1/2 -translate-x-[28%] w-[140px] max-w-[140px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
+          className={`absolute top-full mt-2 left-1/2 -translate-x-[28%] w-[130px] max-w-[130px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
             open ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-1 scale-90 pointer-events-none"
           }`}
         >
