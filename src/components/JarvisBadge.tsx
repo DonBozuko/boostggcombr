@@ -242,7 +242,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       <div
         className={inline
           ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
-          : "fixed top-2 z-40 flex flex-col items-end gap-1"}
+          : "fixed top-16 z-40 flex flex-col-reverse items-end gap-1"}
         style={inline ? undefined : { right: "max(8px, calc(50% - 225px))" }}
       >
         <div
@@ -276,7 +276,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 pr-7 text-[11px] leading-snug backdrop-blur-xl ${t.bubble} border shadow-2xl transition-all duration-500 ease-out ${
+          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug backdrop-blur-xl ${t.bubble} border shadow-2xl transition-all duration-500 ease-out ${
             open ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
           }`}
         >
