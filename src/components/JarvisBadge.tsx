@@ -289,8 +289,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             <X className="h-3 w-3" />
           </button>
           <span className={`absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 ${t.bubble} border-r border-b`} aria-hidden />
-          <div className={`font-semibold ${t.accent} ${t.glow}`}>J.A.R.V.I.S.</div>
-          <div className="text-white/95 mt-0.5">{speech}</div>
+          <div className={`font-bold tracking-wide ${t.accent} ${t.glow} drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]`}>J.A.R.V.I.S.</div>
+          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">{speech}</div>
           <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
             <input
               value={pedidoId}
