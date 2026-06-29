@@ -16,23 +16,67 @@ function useShowcase() {
   return ctx;
 }
 
-export function ShowcaseTrigger({ label = "VER TODOS OS PLANOS" }: { label?: string }) {
+const SLOT_WORDS = ["VER", "TODOS", "OS", "PLANOS"];
+
+export function ShowcaseTrigger({ label }: { label?: string }) {
   const { setOpen, accent } = useShowcase();
+  void label;
+  const n = SLOT_WORDS.length;
+  const stepDur = 1.7; // seconds per word
+  const total = (stepDur * n).toFixed(2);
   return (
-    <button
-      type="button"
-      onClick={() => setOpen(true)}
-      className="px-3 py-1.5 rounded-md text-[11px] font-black tracking-wider uppercase border-2 transition-all hover:scale-105 active:scale-95"
-      style={{
-        color: accent,
-        borderColor: accent,
-        background: `${accent}10`,
-        boxShadow: `0 0 12px ${accent}55, inset 0 0 8px ${accent}22`,
-        textShadow: `0 0 6px ${accent}88`,
-      }}
-    >
-      {label}
-    </button>
+    <>
+      <style>{`
+        @keyframes vertical-carousel-3d-${n} {
+          ${SLOT_WORDS.map((_, i) => {
+            const startPct = ((i / n) * 100).toFixed(2);
+            const holdPct = (((i + 0.82) / n) * 100).toFixed(2);
+            const deg = -90 * i;
+            return `${startPct}% { transform: rotateX(${deg}deg); } ${holdPct}% { transform: rotateX(${deg}deg); }`;
+          }).join("\n")}
+          100% { transform: rotateX(-360deg); }
+        }
+        .slot-3d-stage { perspective: 200px; }
+        .slot-3d-ring {
+          transform-style: preserve-3d;
+          animation: vertical-carousel-3d-${n} ${total}s cubic-bezier(.7,.05,.3,1) infinite;
+        }
+        .slot-3d-face {
+          position: absolute; inset: 0;
+          display: flex; align-items: center; justify-content: center;
+          backface-visibility: hidden;
+        }
+      `}</style>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label="Ver todos os planos"
+        className="relative w-[100px] h-[36px] rounded-md flex items-center justify-center overflow-hidden transition-transform hover:scale-105 active:scale-95"
+        style={{
+          border: `1px solid ${accent}`,
+          background: "rgba(0,0,0,0.82)",
+          boxShadow: `0 0 10px ${accent}55, inset 0 0 6px ${accent}22`,
+        }}
+      >
+        <div className="slot-3d-stage absolute inset-0">
+          <div className="slot-3d-ring relative w-full h-full">
+            {SLOT_WORDS.map((w, i) => (
+              <div
+                key={w}
+                className="slot-3d-face text-[12px] font-black tracking-wider uppercase"
+                style={{
+                  color: accent,
+                  textShadow: `0 0 6px ${accent}aa`,
+                  transform: `rotateX(${90 * i}deg) translateZ(18px)`,
+                }}
+              >
+                {w}
+              </div>
+            ))}
+          </div>
+        </div>
+      </button>
+    </>
   );
 }
 
