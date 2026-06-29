@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
 import { X } from "lucide-react";
 import type { FabianoVariant } from "./FabianoBadge";
@@ -131,6 +132,7 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
 export function JarvisBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
   const t = SKINS[variant];
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
@@ -138,6 +140,10 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const lockOpenRef = useRef(false);
   const errorTimerRef = useRef<number | null>(null);
   const consultar = useServerFn(consultarPedidoPublico);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const safeClose = () => {
     if (lockOpenRef.current) return;
@@ -233,7 +239,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     }
   }
 
-  return (
+  const badge = (
     <>
       <style>{`
         @keyframes jb-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
@@ -242,8 +248,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       <div
         className={inline
           ? "inline-flex items-center gap-2 flex-row-reverse align-middle"
-          : "fixed top-16 z-40 flex flex-col items-end gap-1"}
-        style={inline ? undefined : { right: "max(8px, calc(50% - 225px))" }}
+          : "fixed z-[80] flex flex-col items-end gap-1 pointer-events-auto"}
+        style={inline ? undefined : { right: "max(8px, calc(50vw - 225px + 8px))", top: "max(64px, calc(env(safe-area-inset-top, 0px) + 56px))" }}
       >
         <div
           aria-label="J.A.R.V.I.S."
@@ -276,7 +282,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug backdrop-blur-xl ${t.bubble} border shadow-2xl transition-all duration-500 ease-out ${
+          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/80 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
             open ? "opacity-100 translate-x-0 scale-100" : "opacity-0 translate-x-2 scale-90 pointer-events-none"
           }`}
         >
@@ -289,8 +295,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             <X className="h-3 w-3" />
           </button>
           <span className={`absolute -right-1.5 bottom-4 h-3 w-3 rotate-45 ${t.bubble} border-r border-b`} aria-hidden />
-          <div className={`font-bold tracking-wide ${t.accent} ${t.glow} drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]`}>J.A.R.V.I.S.</div>
-          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">{speech}</div>
+          <div className={`font-black tracking-wide text-white ${t.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>J.A.R.V.I.S.</div>
+          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{speech}</div>
           <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
             <input
               value={pedidoId}
@@ -313,4 +319,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       </div>
     </>
   );
+
+  if (inline) return badge;
+  if (!mounted || typeof document === "undefined") return null;
+  return createPortal(badge, document.body);
 }

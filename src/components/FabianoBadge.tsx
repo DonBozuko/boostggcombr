@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import fabiano from "@/assets/fabiano.png.asset.json";
 import { User, X } from "lucide-react";
 
@@ -92,10 +93,15 @@ const COPY: Record<FabianoVariant, { text: string; accent: string; glow: string;
 export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVariant }) {
   useScrolledPercent(0.15);
   const [open, setOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   const [imgOk, setImgOk] = useState(true);
   const c = COPY[variant];
   const { native, web } = buildLinks(variant);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
 
   // Fallback inteligente: tenta tg://, e se em ~600ms a página ainda estiver visível,
@@ -120,10 +126,10 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
     [native, web],
   );
 
-  return (
+  const badge = (
     <div
-      className="fixed top-16 z-40 flex flex-col items-start gap-1"
-      style={{ left: "max(8px, calc(50% - 225px))" }}
+      className="fixed z-[80] flex flex-col items-start gap-1 pointer-events-auto"
+      style={{ left: "max(8px, calc(50vw - 225px + 8px))", top: "max(64px, calc(env(safe-area-inset-top, 0px) + 56px))" }}
     >
       <a
         href={web}
@@ -131,7 +137,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         rel="noopener noreferrer"
         onClick={handleClick}
         aria-label="Fabiano Santiago — Falar no Telegram"
-        className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 hover:scale-105 transition-transform`}
+        className={`relative h-16 w-16 rounded-full overflow-hidden border-2 ${c.border} ${c.ring} ring-2 bg-black hover:scale-105 transition-transform`}
       >
         {imgOk ? (
           <img
@@ -152,7 +158,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug backdrop-blur-xl bg-black/40 border ${c.border} shadow-2xl`}
+          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/80 border ${c.border} shadow-2xl ring-1 ring-white/15`}
         >
           <button
             type="button"
@@ -163,13 +169,16 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
             <X className="h-3 w-3" />
           </button>
 
-          <div className={`font-bold tracking-wide ${c.accent} ${c.glow} drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]`}>Diretor Fabiano</div>
-          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">{c.text}</div>
-          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(255,255,255,0.3)]">
+          <div className={`font-black tracking-wide text-white ${c.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>Diretor Fabiano</div>
+          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{c.text}</div>
+          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
             Garantindo velocidade máxima e entrega segura em seu pedido, senhor.
           </div>
         </div>
       )}
     </div>
   );
+
+  if (!mounted || typeof document === "undefined") return null;
+  return createPortal(badge, document.body);
 }
