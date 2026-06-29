@@ -1,4 +1,4 @@
-import { applyProfitFormula } from "@/lib/profit-markup";
+import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { ViralShare } from "@/components/ViralShare";
