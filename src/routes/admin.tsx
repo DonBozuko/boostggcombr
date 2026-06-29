@@ -13,6 +13,7 @@ import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
 import { IntegrityVerifier } from "@/components/IntegrityVerifier";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
+import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
 import {
   Dialog,
   DialogContent,
