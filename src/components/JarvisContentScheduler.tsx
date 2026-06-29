@@ -235,6 +235,14 @@ export function JarvisContentScheduler() {
           >
             🤖 {saving ? "Agendando..." : `Agendar Conteúdo Omnichannel (${networks.length})`}
           </button>
+          <button
+            type="button"
+            onClick={downloadCompiled}
+            disabled={downloading || !bgVideo}
+            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-3 text-sm font-extrabold uppercase tracking-wider text-black disabled:opacity-40 shadow-[0_0_28px_rgba(34,211,238,0.55)] border border-cyan-300/60"
+          >
+            📥 {downloading ? `Compilando... ${downloadPct}%` : "BAIXAR MÍDIA COMPILADA"}
+          </button>
           <p className="text-[10px] text-white/50">
             🔒 Modo Seguro: posts aguardam aprovação executiva via Telegram antes do envio real.
           </p>
