@@ -12,6 +12,7 @@ import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
 import { IntegrityVerifier } from "@/components/IntegrityVerifier";
+import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import {
   Dialog,
   DialogContent,
@@ -1152,6 +1153,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <ExecutiveHeader soundOn={soundOn} toggleSound={toggleSound} />
 
         <JarvisAlertCenter />
+        <JarvisNocCenter token={token} />
         <AdminCostAlert />
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
