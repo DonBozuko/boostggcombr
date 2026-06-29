@@ -233,6 +233,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         mercadoPagoId: mpId,
         qrCode,
         qrCodeBase64,
+        valorCobrado: valorCobrar,
+        valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
+        cupomAplicado: discount > 0 ? cupom : null,
       };
     } catch (err) {
       console.error("Erro inesperado no Supabase:", err);
