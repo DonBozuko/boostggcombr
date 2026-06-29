@@ -282,7 +282,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         <div
           role="status"
           aria-live="polite"
-          className={`absolute top-full mt-2 left-1/2 -translate-x-[70%] z-40 w-[160px] max-w-[175px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/90 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
+          style={{ zIndex: 50 }}
+          className={`absolute top-full mt-2 left-1/2 -translate-x-[28%] w-[140px] max-w-[140px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
             open ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-1 scale-90 pointer-events-none"
           }`}
         >
@@ -294,7 +295,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           >
             <X className="h-3 w-3" />
           </button>
-          <span className={`absolute left-[112px] top-[-7px] -translate-x-1/2 h-3 w-3 rotate-45 ${t.bubble} border-l border-t`} aria-hidden />
+          <span className={`absolute left-[40px] top-[-7px] -translate-x-1/2 h-3 w-3 rotate-45 ${t.bubble} border-l border-t`} aria-hidden />
           <div className={`font-black tracking-wide text-white ${t.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>J.A.R.V.I.S.</div>
           <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{speech}</div>
           <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
