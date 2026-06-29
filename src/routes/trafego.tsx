@@ -119,7 +119,7 @@ function TrafegoLanding() {
     if (sb.enabled) {
       setPaid(false);
       setPedidoInfo({
-        price: selected.price, tier: selected.tier, profile: parsed.data.profile,
+        price: res.valorFormatado ?? selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: "00020126[SANDBOX-MOCK-NO-CHARGE]", qrCodeBase64: "", pedidoId: null,
       });
       setModalOpen(true);
@@ -142,7 +142,7 @@ function TrafegoLanding() {
       if (!res?.ok) { toast.error("Não foi possível gerar o Pix."); return; }
       setPaid(false);
       setPedidoInfo({
-        price: selected.price, tier: selected.tier, profile: parsed.data.profile,
+        price: res.valorFormatado ?? selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: res.qrCode, qrCodeBase64: res.qrCodeBase64, pedidoId: res.pedidoId,
       });
       setModalOpen(true);

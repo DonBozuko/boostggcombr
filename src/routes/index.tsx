@@ -480,7 +480,7 @@ function Landing() {
       }
       setPaid(false);
       setPedidoInfo({
-        price: selected.price,
+        price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
         profile: result.data.profile,
         pixCode: res.qrCode,

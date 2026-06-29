@@ -182,7 +182,7 @@ function FacebookLanding() {
       }
       setPaid(false);
       setPedidoInfo({
-        price: selected.price,
+        price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
         profile: parsed.data.profile,
         pixCode: res.qrCode,
