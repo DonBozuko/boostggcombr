@@ -33,9 +33,30 @@ export function TreasuryPanel({ token }: { token: string }) {
   );
   return (
     <section className="rounded-xl border border-cyan-400/40 bg-cyan-950/20 backdrop-blur-xl p-3 shadow-[0_0_18px_rgba(0,242,254,0.25)]">
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
         <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">💰 Tesouraria Inteligente</h3>
-        <button onClick={load} className="text-[10px] text-cyan-200/70 hover:text-cyan-100">↻ atualizar</button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              if (!snap.ok) return;
+              const rows = [
+                ["occurred_at", "network", "faturamento", "lucro_liquido"],
+                ...snap.ultimas.map((u) => [u.occurred_at, u.network ?? "", String(u.faturamento), String(u.lucro_liquido)]),
+              ];
+              const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url; a.download = `livro-contabil-${Date.now()}.csv`;
+              document.body.appendChild(a); a.click(); a.remove();
+              setTimeout(() => URL.revokeObjectURL(url), 2000);
+            }}
+            className="text-[10px] px-2 py-1 rounded-md border border-emerald-400/50 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
+          >
+            📥 EXPORTAR LIVRO (CSV)
+          </button>
+          <button onClick={load} className="text-[10px] text-cyan-200/70 hover:text-cyan-100">↻ atualizar</button>
+        </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Cell label="Lucro hoje" v={brl(snap.diario.lucro)} sub={`Fat: ${brl(snap.diario.fat)}`} />
