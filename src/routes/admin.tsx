@@ -1156,6 +1156,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <JarvisAlertCenter />
         <JarvisNocCenter token={token} />
+        <AuditoriaJarvis token={token} />
         <TreasuryPanel token={token} />
         <AdminCostAlert />
 
