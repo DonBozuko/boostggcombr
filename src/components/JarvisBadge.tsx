@@ -133,6 +133,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const t = SKINS[variant];
   const [open, setOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [hudMode, setHudMode] = useState(false);
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
@@ -143,6 +144,10 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
 
   useEffect(() => {
     setMounted(true);
+    const t = window.setTimeout(() => {
+      if (!lockOpenRef.current) { setOpen(false); setHudMode(true); }
+    }, 3000);
+    return () => window.clearTimeout(t);
   }, []);
 
   const safeClose = () => {
