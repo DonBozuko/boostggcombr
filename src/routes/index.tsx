@@ -1,10 +1,9 @@
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
-import { JarvisBadge } from "@/components/JarvisBadge";
-import { FabianoBadge } from "@/components/FabianoBadge";
+import { JarvisBladeBadge } from "@/components/JarvisBladeBadge";
+import { SantiagoBadge } from "@/components/SantiagoBadge";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
-import { BottomNav } from "@/components/BottomNav";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -533,8 +532,8 @@ function Landing() {
           <ShowcaseTrigger />
         </div>
       </header>
-      <JarvisBadge variant="instagram" />
-      <FabianoBadge variant="instagram" />
+      <JarvisBladeBadge variant="instagram" />
+      <SantiagoBadge variant="instagram" />
 
       <ShowcaseShell>
 
@@ -915,7 +914,6 @@ function Landing() {
           </div>
         </div>
       </footer>
-      <BottomNav active="/" />
       </PlansShowcaseProvider>
     </MobileFrame>
   );
