@@ -152,7 +152,7 @@ export function FabianoBadge({ variant = "instagram" }: { variant?: FabianoVaria
         <div
           role="status"
           aria-live="polite"
-          className={`relative max-w-[204px] sm:max-w-[221px] rounded-2xl px-3 py-2 pr-7 text-[11px] leading-snug backdrop-blur-xl bg-black/40 border ${c.border} shadow-2xl`}
+          className={`relative max-w-[132px] sm:max-w-[144px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug backdrop-blur-xl bg-black/40 border ${c.border} shadow-2xl`}
         >
           <button
             type="button"
