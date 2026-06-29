@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-const VALID = "PRIME10";
+const VALID = "PRIME15";
 const KEY = "eb_coupon";
-const DISCOUNT = 0.10; // 10%
+const DISCOUNT = 0.15; // 15%
 
 export function getCouponDiscount(): number {
   if (typeof window === "undefined") return 0;
@@ -88,7 +88,7 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
       </div>
       {applied && (
         <p className="mt-2 text-[12px] font-bold" style={{ color: "#34d399" }}>
-          ✓ Cupom <b>{VALID}</b> aplicado — 10% de desconto no Pix.
+          ✓ Cupom <b>{VALID}</b> aplicado — 15% de desconto no Pix.
         </p>
       )}
       {error && !applied && (
