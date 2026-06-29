@@ -4,12 +4,12 @@ import { createHash, timingSafeEqual } from 'crypto';
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/telegram';
 
 const ROUTES: Record<string, { label: string; url: string }> = {
-  ig: { label: '📸 Instagram', url: 'https://boostygram.lovable.app/' },
-  tk: { label: '🎵 TikTok', url: 'https://boostygram.lovable.app/tiktok' },
-  yt: { label: '▶️ YouTube', url: 'https://boostygram.lovable.app/youtube' },
-  fb: { label: '🔵 Facebook', url: 'https://boostygram.lovable.app/facebook' },
-  tg: { label: '✈️ Telegram', url: 'https://boostygram.lovable.app/telegram' },
-  tf: { label: '🌐 Tráfego', url: 'https://boostygram.lovable.app/trafego' },
+  ig: { label: '📸 Instagram', url: 'https://eliteboostprime.lovable.app/' },
+  tk: { label: '🎵 TikTok', url: 'https://eliteboostprime.lovable.app/tiktok' },
+  yt: { label: '▶️ YouTube', url: 'https://eliteboostprime.lovable.app/youtube' },
+  fb: { label: '🔵 Facebook', url: 'https://eliteboostprime.lovable.app/facebook' },
+  tg: { label: '✈️ Telegram', url: 'https://eliteboostprime.lovable.app/telegram' },
+  tf: { label: '🌐 Tráfego', url: 'https://eliteboostprime.lovable.app/trafego' },
 };
 
 function deriveSecret(key: string) {

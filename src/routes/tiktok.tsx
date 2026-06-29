@@ -185,7 +185,7 @@ function TiktokLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@tiktok.boostygram.com",
+          email: "cliente@tiktok.eliteboostprime.com",
           rede_social: "tiktok",
           utm_source: getUtmSource(),
         },

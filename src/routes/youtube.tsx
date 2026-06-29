@@ -178,7 +178,7 @@ function YoutubeLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@youtube.boostygram.com",
+          email: "cliente@youtube.eliteboostprime.com",
           rede_social: "youtube",
           utm_source: getUtmSource(),
         },

@@ -153,7 +153,7 @@ function TelegramLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@telegram.boostygram.com",
+          email: "cliente@telegram.eliteboostprime.com",
           rede_social: "telegram",
           utm_source: getUtmSource(),
         },

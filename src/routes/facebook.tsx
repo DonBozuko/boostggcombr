@@ -170,7 +170,7 @@ function FacebookLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@facebook.boostygram.com",
+          email: "cliente@facebook.eliteboostprime.com",
           rede_social: "facebook",
           utm_source: getUtmSource(),
         },

@@ -63,15 +63,19 @@ export function JarvisContentScheduler() {
       const canvas = document.createElement("canvas");
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext("2d")!;
-      // Proxy CORS: baixa vídeo como blob e usa object URL same-origin
+      // Anti-CORS: passa pelo proxy same-origin e converte em blob URL local.
+      // Zero requisição cross-origin do canvas → zero taint.
       let videoSrc = bgVideo;
       try {
-        const resp = await fetch(bgVideo, { mode: "cors", credentials: "omit" });
-        if (resp.ok) {
-          const blob = await resp.blob();
-          videoSrc = URL.createObjectURL(blob);
-        }
-      } catch { /* fallback: tenta direto */ }
+        const isLocal = bgVideo.startsWith("/") || bgVideo.startsWith(window.location.origin) || bgVideo.startsWith("blob:") || bgVideo.startsWith("data:");
+        const fetchUrl = isLocal ? bgVideo : `/api/public/proxy-video?url=${encodeURIComponent(bgVideo)}`;
+        const resp = await fetch(fetchUrl, { credentials: "omit" });
+        if (!resp.ok) throw new Error("proxy " + resp.status);
+        const blob = await resp.blob();
+        videoSrc = URL.createObjectURL(blob);
+      } catch (e: any) {
+        throw new Error("Falha ao baixar vídeo de fundo via proxy: " + (e?.message ?? "erro"));
+      }
       const video = document.createElement("video");
       video.crossOrigin = "anonymous";
       video.src = videoSrc;
