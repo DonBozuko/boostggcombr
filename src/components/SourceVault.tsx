@@ -14,7 +14,7 @@ export function SourceVault() {
   const [open, setOpen] = useState(false);
   const [shake, setShake] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  
   const inputRef = useRef<HTMLInputElement>(null);
 
   const files = useMemo(
