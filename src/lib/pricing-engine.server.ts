@@ -292,33 +292,12 @@ export async function syncPricingCacheAll(): Promise<{
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const apiKey = process.env.SMMHYPE_API_KEY;
 
-  // 1 única chamada services → mapa serviceId → rate(USD/1000)
-  const rateById = new Map<number, number>();
-  if (apiKey) {
-    try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 8000);
-      const res = await fetch("https://smmhype.com/api/v2", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
-        signal: ctrl.signal,
-      });
-      clearTimeout(timer);
-      if (res.ok) {
-        const list = (await res.json()) as Array<{ service: number | string; rate: string | number }>;
-        if (Array.isArray(list)) {
-          for (const s of list) {
-            const id = Number(s.service);
-            const r = Number(s.rate);
-            if (Number.isFinite(id) && Number.isFinite(r) && r > 0) rateById.set(id, r);
-          }
-        }
-      }
-    } catch { /* ignora — usa fallback */ }
-  }
+  // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático
+  // SMMhype → SMMPainel → Verified. Se todos caírem, FALLBACK_RATES_PER_1K cobre.
+  const { rateById, provider } = await loadProviderRateMap();
+  console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
+
 
   const cats = Object.keys(CANONICAL_QTYS) as Category[];
   const itemRows: Array<{
