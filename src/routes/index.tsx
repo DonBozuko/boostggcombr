@@ -812,16 +812,17 @@ function Landing() {
           <p className="mt-3 text-zinc-300">Relatos reais de quem impulsionou o perfil com a gente.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-5xl mx-auto mb-10 px-2">
           {socialStats.map((s) => (
-            <div key={s.label} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-5 text-center">
-              <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-yellow-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
+            <div key={s.label} className="rounded-2xl border border-white/10 bg-zinc-900/60 p-3 md:p-4 text-center overflow-hidden">
+              <div className="text-xl md:text-2xl font-bold break-words tracking-tight leading-tight bg-gradient-to-r from-yellow-200 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
                 {s.value}
               </div>
-              <div className="mt-1 text-xs md:text-sm text-zinc-300">{s.label}</div>
+              <div className="mt-1 text-xs md:text-sm text-zinc-300 break-words tracking-tight leading-tight">{s.label}</div>
             </div>
           ))}
         </div>
+
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
           {testimonials.map((t, i) => (
