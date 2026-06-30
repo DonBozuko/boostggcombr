@@ -36,7 +36,7 @@ async function run(request: Request) {
     });
   }
   try {
-    const { checkAllProvidersBalance, checkSmmhypeBalance } = await import("@/lib/monitor-saldo.server");
+    const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
     let fornecedor = new URL(request.url).searchParams.get("fornecedor") ?? undefined;
     if (request.method !== "GET") {
       try {
@@ -51,14 +51,12 @@ async function run(request: Request) {
         headers: { "Content-Type": "application/json" },
       });
     }
-    // mantém SMMhype individual (alertas/WhatsApp) compatível com v67
-    const smm = all.results.find((r) => r.nome === "SMMhype");
-    let alerta: unknown = null;
-    if (smm) {
-      try { ({ alerta } = await checkSmmhypeBalance() as any); } catch {}
-    }
-    return new Response(JSON.stringify({ ok: true, results: all.results, alerta }), {
-      headers: { "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ ok: true, results: all.results }), {
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "Pragma": "no-cache",
+      },
     });
   } catch (e: any) {
     return new Response(
