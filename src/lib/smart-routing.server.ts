@@ -86,8 +86,6 @@ export async function markProviderUnstable(slug: string, errorMsg: string): Prom
       } as any,
       { onConflict: "slug" },
     );
-    // Aumenta failure_count via RPC simplificada (best-effort)
-    await supabaseAdmin.rpc("noop" as any).catch(() => {}); // placeholder, evita crash
   } catch (e) {
     console.warn("[smart-routing] markProviderUnstable falhou", e);
   }
@@ -100,7 +98,7 @@ export async function markProviderUnstable(slug: string, errorMsg: string): Prom
       source: "smart-routing",
       message: `Fornecedor ${slug} marcado _unstable por 30min: ${errorMsg.slice(0, 200)}`,
       payload: { slug, error: errorMsg.slice(0, 300) },
-    } as any).catch(() => {});
+    } as any);
   } catch { /* ignore */ }
 }
 
