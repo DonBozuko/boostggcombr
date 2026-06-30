@@ -312,13 +312,16 @@ export type ProviderBalanceResult = {
   ok: boolean;
   saldoUsd: number | null;
   saldoBrl: number | null;
+  cotacao: number;
+  saldoPersistidoBrl: number | null;
+  /** @deprecated use saldoPersistidoBrl */
   saldoPersistidoUsd: number | null;
   status: "Online" | "Offline";
   erro: string | null;
   tempo_resposta_ms: number;
 };
 
-export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {}): Promise<{ ok: true; results: ProviderBalanceResult[] }> {
+export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {}): Promise<{ ok: true; cotacao: number; results: ProviderBalanceResult[] }> {
   const target = opts.fornecedor?.trim().toLowerCase();
   const { data: rows } = await supabaseAdmin
     .from("fornecedores")
@@ -332,10 +335,13 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
       )
     : (rows ?? []);
 
+  const fxRate = await fetchUsdBrlRate();
+
   const results = await Promise.all(fornecedores.map(async (fornecedor: any): Promise<ProviderBalanceResult> => {
-    const balance = await checkProviderBalance(fornecedor);
+    const balance = await checkProviderBalance(fornecedor, fxRate);
     await persistProviderBalance(fornecedor, balance);
 
+    const persistidoBrl = balance.saldoBrl ?? (fornecedor.saldo_atual != null ? Number(fornecedor.saldo_atual) : null);
     return {
       id: fornecedor.id,
       nome: fornecedor.nome,
@@ -343,12 +349,14 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
       ok: balance.statusPersistido === "Online",
       saldoUsd: balance.saldoUsd,
       saldoBrl: balance.saldoBrl,
-      saldoPersistidoUsd: balance.saldoUsd ?? (fornecedor.saldo_atual != null ? Number(fornecedor.saldo_atual) : null),
+      cotacao: balance.cotacao,
+      saldoPersistidoBrl: persistidoBrl,
+      saldoPersistidoUsd: balance.saldoUsd,
       status: balance.statusPersistido,
       erro: balance.erro,
       tempo_resposta_ms: balance.elapsed,
     };
   }));
 
-  return { ok: true, results };
+  return { ok: true, cotacao: fxRate, results };
 }
