@@ -66,9 +66,12 @@ export type Database = {
           faturamento: number
           id: string
           lucro_liquido: number
+          net_profit_percentage: number | null
           network: string | null
           occurred_at: string
           pedido_id: string | null
+          provider_selected: string | null
+          supplier_cost: number | null
           taxa_pix: number
         }
         Insert: {
@@ -77,9 +80,12 @@ export type Database = {
           faturamento?: number
           id?: string
           lucro_liquido?: number
+          net_profit_percentage?: number | null
           network?: string | null
           occurred_at?: string
           pedido_id?: string | null
+          provider_selected?: string | null
+          supplier_cost?: number | null
           taxa_pix?: number
         }
         Update: {
@@ -88,9 +94,12 @@ export type Database = {
           faturamento?: number
           id?: string
           lucro_liquido?: number
+          net_profit_percentage?: number | null
           network?: string | null
           occurred_at?: string
           pedido_id?: string | null
+          provider_selected?: string | null
+          supplier_cost?: number | null
           taxa_pix?: number
         }
         Relationships: [

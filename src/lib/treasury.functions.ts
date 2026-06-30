@@ -9,7 +9,7 @@ export type TreasurySnapshot =
       semanal: { fat: number; lucro: number };
       mensal: { fat: number; lucro: number };
       previsao30d: number;
-      ultimas: Array<{ occurred_at: string; faturamento: number; lucro_liquido: number; network: string | null }>;
+      ultimas: Array<{ occurred_at: string; faturamento: number; lucro_liquido: number; network: string | null; supplier_cost: number | null; provider_selected: string | null; net_profit_percentage: number | null }>;
     }
   | { ok: false; error: string };
 
@@ -44,7 +44,7 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido, taxa_pix, custo_api").gte("occurred_at", d0),
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido").gte("occurred_at", d7),
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido").gte("occurred_at", d30),
-      supabaseAdmin.from("admin_treasury" as any).select("occurred_at, faturamento, lucro_liquido, network").order("occurred_at", { ascending: false }).limit(10),
+      supabaseAdmin.from("admin_treasury" as any).select("occurred_at, faturamento, lucro_liquido, network, supplier_cost, provider_selected, net_profit_percentage").order("occurred_at", { ascending: false }).limit(50),
     ]);
     const sum = (rs: any[] | null, k: string) => (rs ?? []).reduce((s, r) => s + Number(r[k] || 0), 0);
     const lucro7d = sum(w7 as any, "lucro_liquido");
@@ -61,6 +61,9 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
       previsao30d: lucro7d > 0 ? Number(((lucro7d / 7) * 30).toFixed(2)) : 0,
       ultimas: ((ult ?? []) as any).map((r: any) => ({
         occurred_at: r.occurred_at, faturamento: Number(r.faturamento), lucro_liquido: Number(r.lucro_liquido), network: r.network,
+        supplier_cost: r.supplier_cost != null ? Number(r.supplier_cost) : null,
+        provider_selected: r.provider_selected ?? null,
+        net_profit_percentage: r.net_profit_percentage != null ? Number(r.net_profit_percentage) : null,
       })),
     };
   });
