@@ -799,9 +799,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     if (initialToken) setToken(initialToken);
   }, [initialToken]);
   const [loaded, setLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState<AdminTab>("" as AdminTab);
-  const [folder, setFolder] = useState<"root" | "buscas" | "tesouraria" | "auditoria">("root");
-  useEffect(() => { if (folder === "root") setActiveTab("" as AdminTab); }, [folder]);
+  const [activeTab, setActiveTab] = useState<AdminTab>("buscar");
+  const [folder, setFolder] = useState<"buscas" | "tesouraria" | "auditoria">("buscas");
+  
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(false);
@@ -1203,16 +1203,16 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         
         
 
-        <div className={`${activeTab === "alertas" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
-        <div className={`${activeTab === "noc" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
-        <div className={`${activeTab === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
-        <div className={`${activeTab === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
-        <div className={`${activeTab === "custos" ? "block" : "hidden"}`}><AdminCostAlert /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
 
-        <div className={`${activeTab === "buscar" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
+        <div className={`${folder === "buscas" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
 
-        <div className={`${activeTab === "pedidos" ? "block" : "hidden"}`}>
-        {activeTab === "pedidos" && (
+        <div className={`${folder === "buscas" ? "block" : "hidden"}`}>
+        {folder === "buscas" && (
           <div className="space-y-4">
             <InsightsIA token={token} />
             <ConversionAnalytics />
@@ -1277,7 +1277,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         )}
         </div>
 
-        <div className={`${activeTab === "servicos" ? "block" : "hidden"}`}>
+        <div className={`${folder === "buscas" ? "block" : "hidden"}`}>
         {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
@@ -1369,7 +1369,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
         </div>
 
-        <div className={`${activeTab === "explorar" ? "block" : "hidden"} space-y-4`}>
+        <div className={`${folder === "buscas" ? "block" : "hidden"} space-y-4`}>
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
         <div className="rounded-2xl border border-border bg-card/30 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -1408,7 +1408,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler + Auditor RLS */}
-        <div className={`${activeTab === "jarvis" ? "block" : "hidden"} space-y-4`}>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"} space-y-4`}>
           {/* Auditor RLS — mantido montado para gravar logs em admin_audit_logs, ocultado visualmente */}
           <div className="hidden" aria-hidden="true">
             <AdminAuditLog />
@@ -1417,7 +1417,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
 
 
-        <div className={`${activeTab === "servicos" ? "block" : "hidden"} space-y-4`}>
+        <div className={`${folder === "buscas" ? "block" : "hidden"} space-y-4`}>
         {/* Widget Monitor de Saldo */}
         {f && style && (
           <div className="space-y-3">
