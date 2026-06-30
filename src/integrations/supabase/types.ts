@@ -471,6 +471,45 @@ export type Database = {
         }
         Relationships: []
       }
+      service_id_matrix: {
+        Row: {
+          created_at: string
+          id: string
+          max_qty: number
+          min_qty: number
+          network: string
+          notes: string | null
+          service_id: number
+          service_type: string
+          tier_label: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_qty?: number
+          min_qty?: number
+          network: string
+          notes?: string | null
+          service_id: number
+          service_type: string
+          tier_label?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_qty?: number
+          min_qty?: number
+          network?: string
+          notes?: string | null
+          service_id?: number
+          service_type?: string
+          tier_label?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_id_overrides: {
         Row: {
           approved_at: string

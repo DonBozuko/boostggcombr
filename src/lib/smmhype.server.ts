@@ -69,12 +69,28 @@ export function packageToNetworkType(pacote: string): { network: string; type: s
   return null;
 }
 
-// Consulta service_id_overrides; se não houver override válido, cai no resolveServiceId hardcoded.
+// v49 — resolver tier-aware. Consulta service_id_matrix (1 ID por faixa de quantidade)
+// → service_id_overrides (override manual) → resolveServiceId hardcoded.
 export async function resolveServiceIdAsync(pacote: string, quantidade: number): Promise<number | null> {
   const nt = packageToNetworkType(pacote);
   if (nt) {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // 1) Matriz por tier (v49)
+      const { data: tier } = await supabaseAdmin
+        .from("service_id_matrix" as any)
+        .select("service_id")
+        .eq("network", nt.network)
+        .eq("service_type", nt.type)
+        .lte("min_qty", quantidade)
+        .gte("max_qty", quantidade)
+        .order("min_qty", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const tsid = Number((tier as any)?.service_id);
+      if (Number.isFinite(tsid) && tsid > 0) return tsid;
+
+      // 2) Override antigo (1 ID por rede/tipo)
       const { data } = await supabaseAdmin
         .from("service_id_overrides")
         .select("service_id")
@@ -84,7 +100,7 @@ export async function resolveServiceIdAsync(pacote: string, quantidade: number):
       const sid = Number((data as any)?.service_id);
       if (Number.isFinite(sid) && sid > 0) return sid;
     } catch (e) {
-      console.warn("[smmhype] override lookup failed:", e);
+      console.warn("[smmhype] tier/override lookup failed:", e);
     }
   }
   return (
@@ -93,6 +109,7 @@ export async function resolveServiceIdAsync(pacote: string, quantidade: number):
     null
   );
 }
+
 
 // Compat: map por pacote id (inclui curtidas e visualizações).
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
