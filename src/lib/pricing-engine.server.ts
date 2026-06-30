@@ -159,10 +159,10 @@ export type GridItem = {
 export type PricingGridResult = {
   category: Category;
   source: "api" | "fallback";
-  cost_per_1k_brl: number;
   items: GridItem[];
   generated_at: string;
 };
+
 
 async function readCachedRate(category: Category): Promise<number | null> {
   try {
@@ -226,7 +226,7 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   return {
     category,
     source,
-    cost_per_1k_brl: Number(rateFallback.toFixed(4)),
+    
     items,
     generated_at: new Date().toISOString(),
   };
