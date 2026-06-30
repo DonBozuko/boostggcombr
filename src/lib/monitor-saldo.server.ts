@@ -276,17 +276,13 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
   const elapsed = Date.now() - t0;
   const cotacao = Number(fxRate) > 0 ? Number(fxRate) : await fetchUsdBrlRate();
 
-  // v80 — Strict Inverse Currency Resolver.
-  // Apenas SMMhype retorna saldo em USD. SMMPanel e Verified Atacado são painéis BR
-  // e retornam saldo já em BRL — não multiplicar pela cotação.
-  const slug = String(fornecedor.slug ?? fornecedor.nome ?? "").toLowerCase();
-  const isUsdProvider = /smmhype/.test(slug);
-  const saldoUsd = isUsdProvider ? saldoRaw : null;
+  // v82 — Strict Uniform USD→BRL Multiplier.
+  // TODOS os fornecedores (SMMhype, SMMPanel, Verified Atacado) retornam saldo em USD
+  // via API SMM padrão. Aplicar a mesma multiplicação pela cotação viva do dólar.
+  const saldoUsd = saldoRaw;
   const saldoBrl = saldoRaw == null
     ? null
-    : isUsdProvider
-      ? Number((saldoRaw * cotacao).toFixed(2))
-      : Number(saldoRaw.toFixed(2));
+    : Number((saldoRaw * cotacao).toFixed(2));
 
   const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
   const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
