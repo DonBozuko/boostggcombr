@@ -123,7 +123,7 @@ export function getAppliedCoupon(): string | null {
   }
 }
 
-export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
+export function CouponField({ accent = "#FFD700", revealDelayMs = COUPON_REVEAL_DELAY_MS }: { accent?: string; revealDelayMs?: number }) {
   const [value, setValue] = useState("");
   const [applied, setApplied] = useState(false);
   const [error, setError] = useState("");
@@ -140,9 +140,9 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
 
   useEffect(() => {
     setVisible(false);
-    const id = window.setTimeout(() => setVisible(true), COUPON_REVEAL_DELAY_MS);
+    const id = window.setTimeout(() => setVisible(true), revealDelayMs);
     return () => window.clearTimeout(id);
-  }, []);
+  }, [revealDelayMs]);
 
   function apply() {
     const v = value.trim().toUpperCase();
@@ -221,4 +221,18 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
     </div>
     </div>
   );
+}
+
+export function DelayedCouponField({ accent = "#FFD700" }: { accent?: string }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(false);
+    const id = window.setTimeout(() => setMounted(true), COUPON_REVEAL_DELAY_MS);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  if (!mounted) return null;
+
+  return <CouponField accent={accent} revealDelayMs={0} />;
 }
