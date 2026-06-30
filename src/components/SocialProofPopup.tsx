@@ -37,12 +37,14 @@ export function SocialProofPopup({ route = "/" }: { route?: string }) {
   if (!msg) return null;
   return (
     <div
-      className="fixed bottom-4 left-3 z-40 max-w-[300px] rounded-xl border border-white/15 bg-black/85 backdrop-blur-md px-3 py-2 shadow-2xl animate-slide-up pointer-events-none"
+      className="fixed bottom-4 left-3 z-40 max-w-[300px] rounded-xl border border-white/15 bg-black/85 backdrop-blur-md px-3 py-2 shadow-2xl pointer-events-none"
       role="status"
       aria-live="polite"
-      style={{ boxShadow: "0 8px 30px rgba(0,0,0,0.6), 0 0 12px rgba(255,255,255,0.05)" }}
+      style={{ boxShadow: "0 8px 30px rgba(0,0,0,0.6), 0 0 12px rgba(255,255,255,0.05)", animation: "sp-slide-up 0.5s ease-out" }}
     >
+      <style>{`@keyframes sp-slide-up{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}`}</style>
       <p className="text-[11px] md:text-xs font-medium text-white/90 leading-snug break-words">{msg}</p>
     </div>
   );
 }
+
