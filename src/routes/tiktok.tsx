@@ -27,7 +27,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField, getAppliedCoupon } from "@/components/CouponField";
+import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
 
 export const Route = createFileRoute("/tiktok")({
@@ -330,7 +330,7 @@ function TiktokLanding() {
               />
             </div>
 
-            <CouponField accent="#00f2fe" />
+            <DelayedCouponField accent="#00f2fe" />
 
             <Button
               type="button"

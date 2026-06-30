@@ -27,7 +27,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField, getAppliedCoupon } from "@/components/CouponField";
+import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogFacebook from "@/assets/og-facebook.jpg";
 
 export const Route = createFileRoute("/facebook")({
@@ -312,7 +312,7 @@ function FacebookLanding() {
               />
             </div>
 
-            <CouponField accent="#1877F2" />
+            <DelayedCouponField accent="#1877F2" />
 
             <Button
               type="button"
