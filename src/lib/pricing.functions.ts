@@ -31,8 +31,15 @@ export const getPricingGrid = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { getPricingGridImpl } = await import("./pricing-engine.server");
     const result = await getPricingGridImpl(data.category);
+    // v50 — Strict Edge CDN Cache Invalidation: vitrine sempre fresca,
+    // sem race condition entre preço antigo e novo.
     try {
-      setResponseHeader("cache-control", "public, max-age=600, s-maxage=600");
+      setResponseHeader(
+        "cache-control",
+        "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+      );
+      setResponseHeader("pragma", "no-cache");
+      setResponseHeader("expires", "0");
     } catch { /* sem request context: ignora */ }
     return result;
   });
