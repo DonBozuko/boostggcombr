@@ -1423,6 +1423,21 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                   >
                     ⚡ Recarregar PIX
                   </a>
+                  <button
+                    type="button"
+                    disabled={!isReal || balanceScanId === p.id}
+                    onClick={() => isReal && syncFornecedorBalance(p)}
+                    className="inline-flex items-center justify-center gap-1 rounded-md border border-cyan-400/50 bg-cyan-500/10 text-cyan-100 font-bold text-[11px] py-1.5 px-2 hover:bg-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(34,211,238,0.25)]"
+                    title="Sincronizar saldo e persistir dados atuais na tabela fornecedores"
+                  >
+                    {balanceScanId === p.id ? "⏳ Sincronizando..." : "🔄 Atualizar saldo"}
+                  </button>
+                  {isReal && (
+                    <div className="grid grid-cols-2 gap-1 rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[10px] font-mono text-white/70">
+                      <span>Status: <b className={p.status === "Online" ? "text-emerald-300" : "text-amber-300"}>{p.status ?? "—"}</b></span>
+                      <span>Saldo: <b className="text-cyan-200">{p.saldo_atual != null ? `$${Number(p.saldo_atual).toFixed(2)}` : "—"}</b></span>
+                    </div>
+                  )}
                 </div>
               );
             })}
