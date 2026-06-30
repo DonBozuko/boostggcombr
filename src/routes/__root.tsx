@@ -149,6 +149,15 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    const { pathname, search, hash } = window.location;
+    const canonicalPath = pathname.replace(/\/{2,}/g, "/") || "/";
+
+    if (canonicalPath !== pathname) {
+      window.location.replace(`${canonicalPath}${search}${hash}`);
+    }
+  }, []);
+
+  useEffect(() => {
     // Trava silenciadora de áudio concorrente: pausa Jarvis em qualquer troca de rota
     const unsub = router.subscribe("onBeforeNavigate", () => {
       import("@/hooks/useJarvis").then((m) => m.stopAllJarvis()).catch(() => {});
