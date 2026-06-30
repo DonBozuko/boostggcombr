@@ -146,13 +146,18 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis";
+export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis" | "alertas" | "noc" | "auditoria" | "tesouraria" | "custos";
 
 const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
   { id: "explorar", icon: Compass, label: "Explorar", hint: "Vitrines públicas" },
   { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "Visão Geral · Casa dos Avós" },
   { id: "servicos", icon: Briefcase, label: "Serviços", badge: "NOVIDADE" },
+  { id: "alertas", icon: Bot, label: "Alertas", hint: "Central de alertas J.A.R.V.I.S." },
+  { id: "noc", icon: Bot, label: "NOC", hint: "Saúde operacional" },
+  { id: "auditoria", icon: BarChart3, label: "Auditoria", hint: "Reconciliação API" },
+  { id: "tesouraria", icon: Briefcase, label: "Tesouraria", hint: "Ledger e PDF contábil" },
+  { id: "custos", icon: BarChart3, label: "Custos", hint: "Flutuação de custos" },
   { id: "jarvis", icon: Bot, label: "Central J.A.R.V.I.S.", hint: "Agendador omnichannel" },
 ];
 
@@ -1166,8 +1171,15 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
 
-        {activeTab === "buscar" && <BuscarPedidoPanel />}
+        <div className={`${activeTab === "alertas" ? "block" : "hidden"} md:block`}><JarvisAlertCenter /></div>
+        <div className={`${activeTab === "noc" ? "block" : "hidden"} md:block`}><JarvisNocCenter token={token} /></div>
+        <div className={`${activeTab === "auditoria" ? "block" : "hidden"} md:block`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${activeTab === "tesouraria" ? "block" : "hidden"} md:block`}><TreasuryPanel token={token} /></div>
+        <div className={`${activeTab === "custos" ? "block" : "hidden"} md:block`}><AdminCostAlert /></div>
 
+        <div className={`${activeTab === "buscar" ? "block" : "hidden"} md:block`}><BuscarPedidoPanel /></div>
+
+        <div className={`${activeTab === "pedidos" ? "block" : "hidden"} md:block`}>
         {activeTab === "pedidos" && (
           <div className="space-y-4">
             <InsightsIA token={token} />
@@ -1231,9 +1243,10 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
-        {activeTab === "servicos" && (
-        /* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */
+        <div className={`${activeTab === "servicos" ? "block" : "hidden"} md:block`}>
+        {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
@@ -1322,9 +1335,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             })}
           </div>
         </div>
-        )}
+        </div>
 
-        <div hidden={activeTab !== "explorar"} className="space-y-4">
+        <div className={`${activeTab === "explorar" ? "block" : "hidden"} md:block space-y-4`}>
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
         <div className="rounded-2xl border border-border bg-card/30 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -1363,7 +1376,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler + Auditor RLS */}
-        <div hidden={activeTab !== "jarvis"} className="space-y-4">
+        <div className={`${activeTab === "jarvis" ? "block" : "hidden"} md:block space-y-4`}>
           {/* Auditor RLS — mantido montado para gravar logs em admin_audit_logs, ocultado visualmente */}
           <div className="hidden" aria-hidden="true">
             <AdminAuditLog />
@@ -1372,7 +1385,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
 
 
-        <div hidden={activeTab !== "servicos"} className="space-y-4">
+        <div className={`${activeTab === "servicos" ? "block" : "hidden"} md:block space-y-4`}>
         {/* Widget Monitor de Saldo */}
         {f && style && (
           <div className="space-y-3">
