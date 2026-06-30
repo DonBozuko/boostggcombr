@@ -179,51 +179,167 @@ async function readCachedRate(category: Category): Promise<number | null> {
   }
 }
 
+// v47 — lê itens já precificados 1:1 do pricing_items.
+async function readCachedItems(category: Category): Promise<Map<string, { cost: number; price: number; source: "api" | "fallback" }>> {
+  const out = new Map<string, { cost: number; price: number; source: "api" | "fallback" }>();
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("pacote, cost_brl, price_brl, source")
+      .eq("category", category);
+    for (const row of (data ?? []) as Array<any>) {
+      out.set(String(row.pacote), {
+        cost: Number(row.cost_brl) || 0,
+        price: Number(row.price_brl) || 0,
+        source: row.source === "api" ? "api" : "fallback",
+      });
+    }
+  } catch {
+    /* ignora — cai no fallback de fórmula */
+  }
+  return out;
+}
+
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
-  // Hermetic Engine v46: read-path consome SOMENTE cache local (alimentado pelo cron).
-  // Sem fetchSmmRatePer1kBRL aqui — front-end e checkout ficam isolados de latência/falha externa.
-  const cached = await readCachedRate(category);
-  const cost = cached ?? FALLBACK_RATES_PER_1K[category];
-  const source: "api" | "fallback" = cached != null ? "api" : "fallback";
+  // Hermetic Engine v47: leitura 1:1 do pricing_items (preço final por card).
+  // Fallback: pricing_cache (per-1k) → tabela estática.
+  const [itemsMap, cachedRate] = await Promise.all([
+    readCachedItems(category),
+    readCachedRate(category),
+  ]);
+  const rateFallback = cachedRate ?? FALLBACK_RATES_PER_1K[category];
+  let anyApi = false;
 
   const items: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
-    const valor = priceFromCost(qty, cost);
+    const hit = itemsMap.get(id);
+    if (hit && hit.price > 0) {
+      if (hit.source === "api") anyApi = true;
+      return { id, quantidade: qty, valor: hit.price, price: formatBRL(hit.price) };
+    }
+    const valor = priceFromCost(qty, rateFallback);
     return { id, quantidade: qty, valor, price: formatBRL(valor) };
   });
+
+  const source: "api" | "fallback" = anyApi || cachedRate != null ? "api" : "fallback";
 
   return {
     category,
     source,
-    cost_per_1k_brl: Number(cost.toFixed(4)),
+    cost_per_1k_brl: Number(rateFallback.toFixed(4)),
     items,
     generated_at: new Date().toISOString(),
   };
 }
 
+// v47 — sincroniza TODOS os ~200 cards (1 chamada services + 1 resolver por card).
 export async function syncPricingCacheAll(): Promise<{
   ok: boolean;
   updated: number;
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const cats = Object.keys(CANONICAL_QTYS) as Category[];
-  const results: Array<{ category: Category; cost: number; source: "api" | "fallback" }> = [];
-  for (const cat of cats) {
-    const apiRate = await fetchSmmRatePer1kBRL(cat);
-    const source: "api" | "fallback" = apiRate != null ? "api" : "fallback";
-    const cost = apiRate ?? FALLBACK_RATES_PER_1K[cat];
-    results.push({ category: cat, cost, source });
+  const apiKey = process.env.SMMHYPE_API_KEY;
+
+  // 1 única chamada services → mapa serviceId → rate(USD/1000)
+  const rateById = new Map<number, number>();
+  if (apiKey) {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 8000);
+      const res = await fetch("https://smmhype.com/api/v2", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
+        signal: ctrl.signal,
+      });
+      clearTimeout(timer);
+      if (res.ok) {
+        const list = (await res.json()) as Array<{ service: number | string; rate: string | number }>;
+        if (Array.isArray(list)) {
+          for (const s of list) {
+            const id = Number(s.service);
+            const r = Number(s.rate);
+            if (Number.isFinite(id) && Number.isFinite(r) && r > 0) rateById.set(id, r);
+          }
+        }
+      }
+    } catch { /* ignora — usa fallback */ }
   }
-  const rows = results.map((r) => ({
+
+  const cats = Object.keys(CANONICAL_QTYS) as Category[];
+  const itemRows: Array<{
+    pacote: string; category: Category; quantidade: number;
+    provider_service_id: number | null; cost_brl: number; price_brl: number;
+    source: "api" | "fallback"; synced_at: string;
+  }> = [];
+  const catSummary: Array<{ category: Category; cost: number; source: "api" | "fallback" }> = [];
+
+  const now = new Date().toISOString();
+
+  for (const cat of cats) {
+    let catCostPer1k = FALLBACK_RATES_PER_1K[cat];
+    let catSource: "api" | "fallback" = "fallback";
+
+    for (const { id, qty } of CANONICAL_QTYS[cat]) {
+      const serviceId = await resolveServiceIdAsync(id, qty).catch(() => null);
+      const usdPer1k = serviceId != null ? rateById.get(serviceId) : undefined;
+      let cost_brl: number;
+      let source: "api" | "fallback";
+      if (typeof usdPer1k === "number" && usdPer1k > 0) {
+        cost_brl = (qty / 1000) * usdPer1k * USD_TO_BRL;
+        source = "api";
+        catCostPer1k = usdPer1k * USD_TO_BRL;
+        catSource = "api";
+      } else {
+        cost_brl = (qty / 1000) * FALLBACK_RATES_PER_1K[cat];
+        source = "fallback";
+      }
+      // Markup v42 aplicado item-a-item sobre o custo real BRL
+      const raw = (cost_brl * tierMultiplier(qty)) / COUPON_BUFFER;
+      const price_brl = Math.max(3, ceilTo(raw, 0.5));
+      itemRows.push({
+        pacote: id, category: cat, quantidade: qty,
+        provider_service_id: serviceId ?? null,
+        cost_brl: Number(cost_brl.toFixed(4)),
+        price_brl: Number(price_brl.toFixed(2)),
+        source, synced_at: now,
+      });
+    }
+    catSummary.push({ category: cat, cost: catCostPer1k, source: catSource });
+  }
+
+  // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
+  const { error: e1 } = await supabaseAdmin
+    .from("pricing_items" as any)
+    .upsert(itemRows, { onConflict: "pacote" });
+  const summaryRows = catSummary.map((r) => ({
     category: r.category,
     cost_per_1k_brl: Number(r.cost.toFixed(4)),
     source: r.source,
-    synced_at: new Date().toISOString(),
+    synced_at: now,
   }));
-  const { error } = await supabaseAdmin
+  const { error: e2 } = await supabaseAdmin
     .from("pricing_cache" as any)
-    .upsert(rows, { onConflict: "category" });
-  return { ok: !error, updated: rows.length, results };
+    .upsert(summaryRows, { onConflict: "category" });
+
+  return { ok: !e1 && !e2, updated: itemRows.length, results: catSummary };
+}
+
+// v47 — preço final por pacote individual (checkout / webhook MP / bot Telegram).
+export async function getItemPriceBRL(pacote: string): Promise<number | null> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("price_brl")
+      .eq("pacote", pacote)
+      .maybeSingle();
+    const v = Number((data as any)?.price_brl);
+    return Number.isFinite(v) && v > 0 ? v : null;
+  } catch {
+    return null;
+  }
 }
 
 // Resolve categoria a partir do prefixo do pacote (usado no checkout).
