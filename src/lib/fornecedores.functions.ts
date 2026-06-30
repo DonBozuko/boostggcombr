@@ -28,6 +28,7 @@ export const listarFornecedores = createServerFn({ method: "POST" })
         slug: string;
         status: string | null;
         saldo_atual: number | null;
+        cotacao_brl: number | null;
         ultima_verificacao: string | null;
       }[],
     };
