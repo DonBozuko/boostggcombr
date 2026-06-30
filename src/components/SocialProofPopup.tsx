@@ -72,8 +72,8 @@ export function SocialProofPopup({ route = "/" }: { route?: string }) {
   if (!item) return null;
   return (
     <div
-      className="fixed left-1/2 -translate-x-1/2 z-40 pointer-events-none"
-      style={{ top: "calc(env(safe-area-inset-top,0px) + 235px)" }}
+      className="absolute left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+      style={{ top: "170px" }}
       role="status"
       aria-live="polite"
     >
