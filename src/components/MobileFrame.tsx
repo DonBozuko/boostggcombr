@@ -5,6 +5,7 @@ import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
 import { WelcomeDiscountPopup } from "./WelcomeDiscountPopup";
+import { SocialProofPopup } from "./SocialProofPopup";
 import { TopNetworksNav } from "./TopNetworksNav";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
