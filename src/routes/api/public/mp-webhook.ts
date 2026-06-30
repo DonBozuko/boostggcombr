@@ -211,7 +211,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
             const det = `${r.error}${r.status ? ` HTTP ${r.status}` : ""}`;
             tentativas.push(`${f.nome}: ${det}`);
-            console.warn("[mp-webhook] fallback", { pedidoId: pedido.id, fornecedor: f.slug, ...r });
+            await markProviderUnstable(f.slug, det);
+            console.warn("[mp-webhook] fallback (marcado _unstable 30min)", { pedidoId: pedido.id, fornecedor: f.slug, ...r });
           }
 
           if (!sucesso) {
