@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 type ChatMsg = { role: "user" | "jarvis"; text: string };
 
-export function JarvisNocCenter({ token }: { token: string }) {
+export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; refreshSignal?: number }) {
   const snapFn = useServerFn(jarvisNocSnapshot);
   const chatFn = useServerFn(jarvisChat);
   const failoverFn = useServerFn(jarvisFailoverAtivo);
@@ -24,6 +24,7 @@ export function JarvisNocCenter({ token }: { token: string }) {
   };
 
   useEffect(() => { refresh(); const i = setInterval(refresh, 30_000); return () => clearInterval(i); }, [token]);
+  useEffect(() => { if (refreshSignal > 0) refresh(); }, [refreshSignal]);
 
   const ask = async (text: string) => {
     if (!text.trim()) return;

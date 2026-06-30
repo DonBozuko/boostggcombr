@@ -37,7 +37,14 @@ async function run(request: Request) {
   }
   try {
     const { checkAllProvidersBalance, checkSmmhypeBalance } = await import("@/lib/monitor-saldo.server");
-    const all = await checkAllProvidersBalance();
+    let fornecedor = new URL(request.url).searchParams.get("fornecedor") ?? undefined;
+    if (request.method !== "GET") {
+      try {
+        const body = await request.clone().json() as { fornecedor?: string; slug?: string; id?: string };
+        fornecedor = body.fornecedor ?? body.slug ?? body.id ?? fornecedor;
+      } catch {}
+    }
+    const all = await checkAllProvidersBalance({ fornecedor });
     // mantém SMMhype individual (alertas/WhatsApp) compatível com v67
     const smm = all.results.find((r) => r.nome === "SMMhype");
     let alerta: unknown = null;

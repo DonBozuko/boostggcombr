@@ -26,7 +26,8 @@ export async function checkSmmhypeBalance() {
     return { ok: false as const, error: "FORNECEDOR_NOT_FOUND" };
   }
 
-  const apiKey = process.env[fornecedor.api_key_secret as string];
+  const apiKey = sanitizeKey(process.env[fornecedor.api_key_secret as string]);
+  const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
   const t0 = Date.now();
   let saldoUsd: number | null = null;
   let status = "Online";
@@ -34,9 +35,10 @@ export async function checkSmmhypeBalance() {
 
   try {
     if (!apiKey) throw new Error("API key ausente: " + fornecedor.api_key_secret);
+    if (!endpoint) throw new Error("api_url ausente");
     const body = new URLSearchParams({ key: apiKey, action: "balance" });
 
-    const doFetch = () => fetch(fornecedor.api_url, {
+    const doFetch = () => fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -75,13 +77,14 @@ export async function checkSmmhypeBalance() {
 
   // Reset forçado: zera contador de falhas para destravar cache do painel admin
   const novasFalhas = 0;
-  const statusPersistido = status;
+  const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
+  const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
 
 
   await supabaseAdmin.from("monitoramento_saldo").insert({
     fornecedor_id: fornecedor.id,
     saldo: saldoUsd,
-    status,
+    status: statusPersistido,
     tempo_resposta_ms: elapsed,
     erro_retornado: erro,
   });
@@ -206,13 +209,21 @@ export type ProviderBalanceResult = {
   tempo_resposta_ms: number;
 };
 
-export async function checkAllProvidersBalance(): Promise<{ ok: true; results: ProviderBalanceResult[] }> {
-  const { data: fornecedores } = await supabaseAdmin
+export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {}): Promise<{ ok: true; results: ProviderBalanceResult[] }> {
+  const target = opts.fornecedor?.trim().toLowerCase();
+  const { data: rows } = await supabaseAdmin
     .from("fornecedores")
-    .select("*");
+    .select("*")
+    .order("prioridade", { ascending: true });
+  const fornecedores = target
+    ? (rows ?? []).filter((f: any) =>
+        String(f.id).toLowerCase() === target ||
+        String(f.slug ?? "").toLowerCase() === target ||
+        String(f.nome ?? "").toLowerCase() === target,
+      )
+    : (rows ?? []);
 
-  const results: ProviderBalanceResult[] = [];
-  for (const fornecedor of fornecedores ?? []) {
+  const results = await Promise.all(fornecedores.map(async (fornecedor: any): Promise<ProviderBalanceResult> => {
     const apiKey = sanitizeKey(process.env[fornecedor.api_key_secret as string]);
     const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
     const t0 = Date.now();
@@ -285,7 +296,7 @@ export async function checkAllProvidersBalance(): Promise<{ ok: true; results: P
       })
       .eq("id", fornecedor.id);
 
-    results.push({
+    return {
       id: fornecedor.id,
       nome: fornecedor.nome,
       ok: status === "Online",
@@ -294,8 +305,8 @@ export async function checkAllProvidersBalance(): Promise<{ ok: true; results: P
       status: statusPersistido,
       erro,
       tempo_resposta_ms: elapsed,
-    });
-  }
+    };
+  }));
 
   return { ok: true, results };
 }

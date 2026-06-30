@@ -854,8 +854,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     bank: { nome: string; saldo_atual: number; saldo_minimo_seguranca: number; ok: boolean; status_text: string } | null;
     alerts: { id: string; tipo: string; nivel: number; mensagem: string; created_at: string }[];
   } | null>(null);
-  const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string }[]>([]);
+  const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string; status?: string | null; saldo_atual?: number | null; ultima_verificacao?: string | null }[]>([]);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [nocRefreshSignal, setNocRefreshSignal] = useState(0);
   const [cotacaoDraft, setCotacaoDraft] = useState<string>("");
   const [savingCotacao, setSavingCotacao] = useState(false);
   const alert = useAlertBeep();
@@ -934,21 +935,35 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
   const handleToggleAtivo = async (id: string, ativoAtual: boolean) => {
     if (!token) return toast.error("Informe o token");
+    if (togglingId) return;
+    const nextAtivo = !ativoAtual;
     setTogglingId(id);
     // optimistic
-    setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: !ativoAtual } : p)));
+    setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: nextAtivo } : p)));
     try {
-      const res = await toggleFornecedor({ data: { token, id, ativo: !ativoAtual } });
+      const res = await toggleFornecedor({ data: { token, id, ativo: nextAtivo } });
       if (!res.ok) {
         toast.error("Falha ao alterar status");
         setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: ativoAtual } : p)));
       } else {
-        toast.success(!ativoAtual ? "Fornecedor ativado" : "Fornecedor desativado");
+        if (res.fornecedor) setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ...res.fornecedor, ativo: nextAtivo } : p)));
+        toast.success(nextAtivo ? "Fornecedor ativado" : "Fornecedor desativado");
+        setNocRefreshSignal((n) => n + 1);
       }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao alterar status");
+      setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: ativoAtual } : p)));
     } finally {
       setTogglingId(null);
     }
   };
+
+  const handleBalanceSynced = useCallback(() => {
+    void loadMonitor();
+    void loadFornecedores();
+    void loadCaixa();
+    setNocRefreshSignal((n) => n + 1);
+  }, [token]);
 
   const salvarCotacao = async () => {
     const id = monitor?.fornecedor.id;
@@ -1205,8 +1220,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         
 
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
-        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
-        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} refreshSignal={nocRefreshSignal} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><SourceVault /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
