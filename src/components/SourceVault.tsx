@@ -41,7 +41,13 @@ export function SourceVault() {
     setPin((p) => p + k);
   };
 
-  const keys = ["1","2","3","4","5","6","7","8","9","@","0","."];
+  const [mode, setMode] = useState<"ABC" | "123" | "SYM">("ABC");
+  const keys =
+    mode === "123"
+      ? ["1","2","3","4","5","6","7","8","9","0"]
+      : mode === "SYM"
+      ? ["@","#","$","%","&","*","!","?",".","_","-","+"]
+      : ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
   return (
     <section
@@ -91,25 +97,58 @@ export function SourceVault() {
             </div>
           </div>
 
-          {/* Teclado */}
-          <div className="grid grid-cols-3 gap-1.5 w-44">
-            {keys.map((k) => (
+          {/* Teclado alfanumérico */}
+          <div className="flex flex-col gap-1.5 w-full sm:w-72">
+            <div className="grid grid-cols-3 gap-1.5">
+              {(["ABC","123","SYM"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className={`h-7 rounded-md text-[10px] font-bold uppercase tracking-widest border ${
+                    mode === m
+                      ? "bg-red-700 border-red-400 text-white"
+                      : "bg-zinc-900 border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+                  }`}
+                >{m === "ABC" ? "A-Z" : m === "123" ? "1-2-3" : "#@$"}</button>
+              ))}
+            </div>
+            <div className={`grid gap-1 ${mode === "ABC" ? "grid-cols-7" : "grid-cols-5"}`}>
+              {keys.map((k) => {
+                const label = mode === "ABC" ? k.toLowerCase() : k;
+                return (
+                  <button
+                    key={k}
+                    onClick={() => press(label)}
+                    className="h-9 rounded-md bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-100 font-mono text-xs shadow-[inset_0_-2px_0_rgba(0,0,0,0.5)] active:translate-y-px"
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            {mode === "ABC" && (
+              <div className="grid grid-cols-7 gap-1">
+                {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((k) => (
+                  <button
+                    key={"U"+k}
+                    onClick={() => press(k)}
+                    className="h-9 rounded-md bg-zinc-700 hover:bg-zinc-600 border border-zinc-500 text-amber-200 font-mono text-xs font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.5)] active:translate-y-px"
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
               <button
-                key={k}
-                onClick={() => press(k)}
-                className="h-10 rounded-md bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-100 font-mono text-sm shadow-[inset_0_-2px_0_rgba(0,0,0,0.5)] active:translate-y-px"
-              >
-                {k}
-              </button>
-            ))}
-            <button
-              onClick={() => press("⌫")}
-              className="h-10 col-span-1 rounded-md bg-amber-900/40 border border-amber-500/40 text-amber-200 text-xs font-bold"
-            >⌫</button>
-            <button
-              onClick={() => press("OK")}
-              className="h-10 col-span-2 rounded-md bg-red-700 hover:bg-red-600 border border-red-400 text-white text-xs font-bold tracking-widest"
-            >ABRIR</button>
+                onClick={() => press("⌫")}
+                className="h-10 rounded-md bg-amber-900/40 border border-amber-500/40 text-amber-200 text-xs font-bold"
+              >⌫</button>
+              <button
+                onClick={() => press("OK")}
+                className="h-10 col-span-2 rounded-md bg-red-700 hover:bg-red-600 border border-red-400 text-white text-xs font-bold tracking-widest"
+              >ABRIR</button>
+            </div>
           </div>
         </div>
       ) : (
