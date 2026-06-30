@@ -179,3 +179,123 @@ export async function checkSmmhypeBalance() {
     alerta: alertaCriado,
   };
 }
+
+// v76 — Strict Balance Synchronizer: checa TODOS os fornecedores cadastrados,
+// higieniza chaves (trim/zero-width) e normaliza api_url para o endpoint /api/v2.
+function sanitizeKey(raw: string | undefined | null): string {
+  if (!raw) return "";
+  // remove whitespace, zero-width chars e aspas residuais
+  return String(raw).replace(/[\s\u200B-\u200D\uFEFF"']+/g, "").trim();
+}
+
+function normalizeSmmEndpoint(apiUrl: string): string {
+  const u = (apiUrl || "").trim().replace(/\/+$/, "");
+  if (!u) return u;
+  if (/\/api\/v2$/i.test(u)) return u;
+  return `${u}/api/v2`;
+}
+
+export type ProviderBalanceResult = {
+  id: string;
+  nome: string;
+  ok: boolean;
+  saldoUsd: number | null;
+  saldoBrl: number | null;
+  status: "Online" | "Offline";
+  erro: string | null;
+  tempo_resposta_ms: number;
+};
+
+export async function checkAllProvidersBalance(): Promise<{ ok: true; results: ProviderBalanceResult[] }> {
+  const { data: fornecedores } = await supabaseAdmin
+    .from("fornecedores")
+    .select("*");
+
+  const results: ProviderBalanceResult[] = [];
+  for (const fornecedor of fornecedores ?? []) {
+    const apiKey = sanitizeKey(process.env[fornecedor.api_key_secret as string]);
+    const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
+    const t0 = Date.now();
+    let saldoUsd: number | null = null;
+    let status: "Online" | "Offline" = "Online";
+    let erro: string | null = null;
+
+    try {
+      if (!apiKey) throw new Error("API key ausente/inválida: " + fornecedor.api_key_secret);
+      if (!endpoint) throw new Error("api_url ausente");
+
+      const body = new URLSearchParams({ key: apiKey, action: "balance" });
+      const doFetch = () => fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json, text/plain, */*",
+          "User-Agent": "Mozilla/5.0 EliteBoostPrime/1.0",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+        body: body.toString(),
+        signal: AbortSignal.timeout(15000),
+      });
+
+      let res = await doFetch();
+      if (res.status === 429 || res.status === 502 || res.status === 503) {
+        await new Promise((r) => setTimeout(r, 2500));
+        res = await doFetch();
+      }
+      const text = await res.text();
+      let json: any = null;
+      try { json = JSON.parse(text); } catch {}
+      if (!res.ok || !json || json.error) {
+        throw new Error(`HTTP ${res.status} body=${text.slice(0, 200)}`);
+      }
+      const raw = json.balance ?? json.saldo ?? json.funds;
+      saldoUsd = typeof raw === "string" ? parseFloat(raw) : Number(raw);
+      if (!Number.isFinite(saldoUsd)) throw new Error("saldo inválido: " + text.slice(0, 200));
+    } catch (e: any) {
+      status = "Offline";
+      erro = e?.message ?? String(e);
+      saldoUsd = null;
+    }
+
+    const elapsed = Date.now() - t0;
+    const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
+    const saldoBrl = saldoUsd != null ? saldoUsd * cotacao : null;
+
+    // v67 Perpetual Balance Force: oscilação transitória NÃO desliga fornecedor com saldo cadastrado.
+    const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
+    const preservarOnline = status === "Offline" && saldoAtualPrevio > 0;
+    const statusPersistido = preservarOnline ? "Online" : status;
+
+    await supabaseAdmin.from("monitoramento_saldo").insert({
+      fornecedor_id: fornecedor.id,
+      saldo: saldoUsd,
+      status: statusPersistido,
+      tempo_resposta_ms: elapsed,
+      erro_retornado: erro,
+    });
+
+    await supabaseAdmin
+      .from("fornecedores")
+      .update({
+        saldo_atual: saldoUsd ?? fornecedor.saldo_atual,
+        status: statusPersistido,
+        ultima_verificacao: new Date().toISOString(),
+        falhas_consecutivas: 0,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", fornecedor.id);
+
+    results.push({
+      id: fornecedor.id,
+      nome: fornecedor.nome,
+      ok: status === "Online",
+      saldoUsd,
+      saldoBrl,
+      status: statusPersistido,
+      erro,
+      tempo_resposta_ms: elapsed,
+    });
+  }
+
+  return { ok: true, results };
+}
