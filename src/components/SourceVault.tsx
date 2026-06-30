@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Lock, Unlock, ShieldCheck, FileCode, ClipboardCopy, Check } from "lucide-react";
+import { Lock, Unlock, ShieldCheck, FileCode } from "lucide-react";
 
 const ROUTE_SOURCES = import.meta.glob("/src/routes/**/*.{ts,tsx}", {
   query: "?raw",
@@ -14,7 +14,7 @@ export function SourceVault() {
   const [open, setOpen] = useState(false);
   const [shake, setShake] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  
   const inputRef = useRef<HTMLInputElement>(null);
 
   const files = useMemo(
@@ -36,31 +36,6 @@ export function SourceVault() {
     }
   };
 
-  const copyAll = () => {
-    if (!selected) return;
-    const code = ROUTE_SOURCES[selected];
-    let ok = false;
-    try {
-      const ta = document.createElement("textarea");
-      ta.value = code;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.top = "0";
-      ta.style.left = "0";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      ta.setSelectionRange(0, code.length);
-      try { ok = document.execCommand("copy"); } catch { ok = false; }
-      document.body.removeChild(ta);
-    } catch { ok = false; }
-    if (!ok && navigator.clipboard) {
-      navigator.clipboard.writeText(code).catch(() => {});
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  };
 
   return (
     <section
@@ -211,21 +186,6 @@ export function SourceVault() {
             <Unlock className="h-4 w-4" /> Cofre aberto · {files.length} arquivos de rota disponíveis para Jarvis.
           </div>
 
-          {/* BOTÃO MESTRE DE CÓPIA */}
-          <button
-            onClick={copyAll}
-            disabled={!selected}
-            className={`w-full h-11 rounded-lg font-bold text-xs uppercase tracking-[0.25em] border transition flex items-center justify-center gap-2 ${
-              !selected
-                ? "bg-zinc-800 border-zinc-700 text-zinc-500 cursor-not-allowed"
-                : copied
-                ? "bg-emerald-600 border-emerald-300 text-white shadow-[0_0_18px_rgba(16,185,129,0.5)]"
-                : "bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 border-sky-300 text-white shadow-[0_0_18px_rgba(56,189,248,0.45)]"
-            }`}
-          >
-            {copied ? <><Check className="h-4 w-4" /> Código copiado integralmente</> : <><ClipboardCopy className="h-4 w-4" /> 📋 Copiar código integral</>}
-          </button>
-
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-3">
             <div className="rounded-md border border-emerald-500/30 bg-black/60 max-h-72 overflow-y-auto">
               {files.map((f) => (
@@ -241,9 +201,12 @@ export function SourceVault() {
                 </button>
               ))}
             </div>
-            <pre className="rounded-md border border-emerald-500/30 bg-black/80 p-3 max-h-72 overflow-auto text-[10.5px] leading-relaxed text-emerald-100 font-mono whitespace-pre-wrap break-all">
-              {selected ? ROUTE_SOURCES[selected] : "// Selecione um arquivo para inspeção do Jarvis"}
-            </pre>
+            <textarea
+              id="source_code_area"
+              readOnly
+              value={selected ? ROUTE_SOURCES[selected] : "// Selecione um arquivo para inspeção do Jarvis"}
+              className="w-full h-72 rounded-md border border-emerald-500/30 bg-zinc-950 text-emerald-500 font-mono p-4 resize-none focus:outline-none text-[10.5px] leading-relaxed"
+            />
           </div>
           <button
             onClick={() => { setOpen(false); setPin(""); setSelected(null); }}
