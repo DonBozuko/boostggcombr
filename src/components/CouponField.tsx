@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-// v55 — Strict Core Coupon Rollback
-// Cronômetro de 10s, loops e tic-tac via Web Audio API REMOVIDOS.
-// Cupom PRIME15 fixo, visível e estável em todas as 6 rotas.
+// v56-Final — Strict Raw Component Injection
+// Cupom PRIME15 FIXO, sempre visível, auto-aplicado no mount.
+// Sem cronômetros, sem áudio, sem delays, sem retorno null.
 
 const VALID = "PRIME15";
 const KEY = "eb_coupon";
@@ -19,85 +19,52 @@ export function getAppliedCoupon(): string | null {
 }
 
 export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
-  const [value, setValue] = useState("");
   const [applied, setApplied] = useState(false);
-  const [error, setError] = useState("");
 
+  // Auto-aplica PRIME15 no primeiro render — banner sempre verdadeiro.
   useEffect(() => {
     try {
-      if (localStorage.getItem(KEY) === VALID) { setApplied(true); setValue(VALID); }
-    } catch {}
+      localStorage.setItem(KEY, VALID);
+      setApplied(true);
+    } catch { setApplied(true); }
   }, []);
-
-  function apply() {
-    const v = value.trim().toUpperCase();
-    if (v === VALID) {
-      try { localStorage.setItem(KEY, VALID); } catch {}
-      setApplied(true); setError("");
-    } else {
-      setError("Cupom inválido"); setApplied(false);
-      try { localStorage.removeItem(KEY); } catch {}
-    }
-  }
-
-  function clear() {
-    try { localStorage.removeItem(KEY); } catch {}
-    setApplied(false); setValue(""); setError("");
-  }
 
   return (
     <div
-      className="rounded-xl p-3"
+      className="rounded-xl p-4 text-center"
       style={{
-        background: "rgba(255,255,255,0.04)",
-        border: `1px dashed ${accent}66`,
-        backdropFilter: "blur(8px)",
+        background: "rgba(139, 0, 0, 0.55)",
+        border: "2px dashed #fff",
+        backdropFilter: "blur(10px) saturate(140%)",
+        boxShadow: `0 0 22px rgba(220,38,38,0.55), inset 0 0 18px rgba(0,0,0,0.35)`,
       }}
+      role="status"
+      aria-live="polite"
     >
-      <label className="block text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: accent }}>
-        🎟️ Possui um cupom de desconto?
-      </label>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={value}
-          disabled={applied}
-          onChange={(e) => setValue(e.target.value)}
-          placeholder="Digite aqui seu cupom"
-          className="flex-1 h-11 px-3 rounded-lg text-sm font-mono uppercase tracking-wider outline-none disabled:opacity-70"
-          style={{
-            background: "rgba(0,0,0,0.5)",
-            border: `1px solid ${accent}44`,
-            color: "#fff",
-          }}
-        />
-        <button
-          type="button"
-          onClick={applied ? clear : apply}
-          className="px-4 h-11 rounded-lg text-sm font-extrabold uppercase tracking-wider transition-all shrink-0"
-          style={{
-            background: applied ? "#10b981" : accent,
-            color: "#0a0a0a",
-            boxShadow: `0 0 14px ${accent}66`,
-          }}
-        >
-          {applied ? "✓ Trocar" : "Aplicar"}
-        </button>
-      </div>
+      <p
+        className="text-white font-extrabold uppercase tracking-wider leading-tight"
+        style={{
+          fontSize: "13px",
+          textShadow: "0 0 8px rgba(0,0,0,0.9), 0 1px 0 rgba(0,0,0,0.6)",
+          letterSpacing: "0.05em",
+        }}
+      >
+        🎟️ CUPOM ATIVO: <span style={{ color: accent }}>PRIME15</span>
+        <br />
+        <span className="text-white/95 font-bold text-[12px]">
+          APLIQUE 15% DE DESCONTO EXTRA NO CHECKOUT
+        </span>
+      </p>
       {applied && (
-        <p className="mt-2 text-[12px] font-bold" style={{ color: "#34d399" }}>
-          ✓ Cupom <b>{VALID}</b> aplicado — 15% de desconto no Pix.
+        <p className="mt-2 text-[11px] font-bold text-emerald-300">
+          ✓ Desconto será aplicado automaticamente no Pix.
         </p>
-      )}
-      {error && !applied && (
-        <p className="mt-2 text-[12px] font-bold text-red-400">{error}</p>
       )}
     </div>
   );
 }
 
-// v55 — DelayedCouponField agora é alias direto de CouponField (fixo, sem delay).
-// Mantido para compatibilidade com as 6 rotas que já importam este nome.
+// Alias direto — rotas que importam DelayedCouponField recebem o banner fixo.
 export function DelayedCouponField({ accent = "#FFD700" }: { accent?: string }) {
   return <CouponField accent={accent} />;
 }
