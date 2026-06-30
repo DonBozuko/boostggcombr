@@ -16,7 +16,7 @@ export const listarFornecedores = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("fornecedores")
-      .select("id, nome, ativo, slug, status, saldo_atual, ultima_verificacao")
+      .select("id, nome, ativo, slug, status, saldo_atual, cotacao_brl, ultima_verificacao")
       .order("prioridade", { ascending: true });
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
     return {
@@ -28,6 +28,7 @@ export const listarFornecedores = createServerFn({ method: "POST" })
         slug: string;
         status: string | null;
         saldo_atual: number | null;
+        cotacao_brl: number | null;
         ultima_verificacao: string | null;
       }[],
     };

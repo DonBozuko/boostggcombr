@@ -18,14 +18,24 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
   const auditFn = useServerFn(auditarFornecedor);
   const contingencyFn = useServerFn(auditoriaContingenciaLocal);
   const listFn = useServerFn(listarFornecedores);
-  const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean; saldo_atual?: number | null; status?: string | null }>>([]);
+  const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean; saldo_atual?: number | null; saldo_usd?: number | null; cotacao_brl?: number | null; status?: string | null }>>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [balanceBusy, setBalanceBusy] = useState<string | null>(null);
   const [state, setState] = useState<ScanState>(null);
 
   useEffect(() => {
     listFn({ data: { token } } as any)
-      .then((r: any) => { if (r?.ok) setFornecedores(r.fornecedores ?? []); })
+      .then((r: any) => {
+        if (r?.ok) {
+          const list = (r.fornecedores ?? []).map((f: any) => {
+            const brl = f.saldo_atual != null ? Number(f.saldo_atual) : null;
+            const cot = f.cotacao_brl != null ? Number(f.cotacao_brl) : null;
+            const usd = brl != null && cot && cot > 0 ? Number((brl / cot).toFixed(2)) : null;
+            return { ...f, saldo_usd: usd, cotacao_brl: cot };
+          });
+          setFornecedores(list);
+        }
+      })
       .catch(() => {});
   }, [token]);
 
@@ -60,9 +70,11 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
         return;
       }
       const item = json.results?.find((r) => r.nome === f.nome) ?? json.results?.[0];
-      const saldo = item?.saldoBrl ?? item?.saldoPersistidoBrl ?? null;
-      setFornecedores((prev) => prev.map((p) => p.id === f.id ? { ...p, saldo_atual: saldo, status: item?.status ?? p.status } : p));
-      toast.success(`${f.nome}: ${item?.status ?? "Online"} · saldo ${saldo != null ? `R$ ${saldo.toFixed(2)}` : "não lido"}${item?.cotacao ? ` · USD ${item.cotacao.toFixed(4)}` : ""}`);
+      const saldoBrl = item?.saldoBrl ?? item?.saldoPersistidoBrl ?? null;
+      const saldoUsd = item?.saldoUsd ?? null;
+      const cot = item?.cotacao ?? null;
+      setFornecedores((prev) => prev.map((p) => p.id === f.id ? { ...p, saldo_atual: saldoBrl, saldo_usd: saldoUsd, cotacao_brl: cot, status: item?.status ?? p.status } : p));
+      toast.success(`${f.nome}: ${item?.status ?? "Online"} · ${saldoUsd != null ? `US$ ${saldoUsd.toFixed(2)}` : "—"}${saldoBrl != null ? ` (R$ ${saldoBrl.toFixed(2)})` : ""}${cot ? ` · cotação R$ ${cot.toFixed(4)}` : ""}`);
       onBalanceSynced?.();
     } catch (e: any) {
       toast.error(e?.message ?? "Falha na atualização de saldo");
@@ -174,8 +186,19 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
               >
                 {busy === f.id ? "📊..." : "📊"}
               </Button>
-              <span className="text-[10px] font-mono text-cyan-100">
-                {f.saldo_atual != null ? `R$ ${Number(f.saldo_atual).toFixed(2)}` : "saldo não lido"}
+              <span className="text-[10px] font-mono">
+                {f.saldo_usd != null ? (
+                  <>
+                    <span className="text-cyan-200 font-bold">US$ {f.saldo_usd.toFixed(2)}</span>
+                    {f.saldo_atual != null && (
+                      <span className="text-emerald-300"> (R$ {Number(f.saldo_atual).toFixed(2)})</span>
+                    )}
+                  </>
+                ) : f.saldo_atual != null ? (
+                  <span className="text-emerald-300">R$ {Number(f.saldo_atual).toFixed(2)}</span>
+                ) : (
+                  <span className="text-white/50">saldo não lido</span>
+                )}
               </span>
             </div>
           </div>

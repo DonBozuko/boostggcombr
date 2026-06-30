@@ -16,7 +16,7 @@ const TABLES = [
 export type NocSnapshot = {
   ok: true;
   systemHealth: { total: number; ok: number; tables: Array<{ name: string; ok: boolean; ms: number }> };
-  fornecedores: Array<{ id: string; nome: string; status: string | null; saldo: number | null; ativo: boolean; falhas: number | null; ultima: string | null }>;
+  fornecedores: Array<{ id: string; nome: string; status: string | null; saldo: number | null; saldoUsd: number | null; cotacao: number | null; ativo: boolean; falhas: number | null; ultima: string | null }>;
   apiLatency: Array<{ name: string; ms: number; ok: boolean }>;
   pedidos: { total24h: number; pagos24h: number; pendentes24h: number };
 } | { ok: false; error: string };
@@ -37,7 +37,7 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     }));
 
     const { data: fornecedoresRows } = await supabaseAdmin
-      .from("fornecedores").select("id, nome, status, saldo_atual, ativo, falhas_consecutivas, ultima_verificacao");
+      .from("fornecedores").select("id, nome, status, saldo_atual, cotacao_brl, ativo, falhas_consecutivas, ultima_verificacao");
 
     const since = new Date(Date.now() - 24 * 3600_000).toISOString();
     const { data: pedidos24 } = await supabaseAdmin
@@ -60,10 +60,15 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     return {
       ok: true,
       systemHealth: { total: tableChecks.length, ok: okCount, tables: tableChecks },
-      fornecedores: (fornecedoresRows ?? []).map((f: any) => ({
-        id: f.id, nome: f.nome, status: f.status, saldo: f.saldo_atual, ativo: !!f.ativo,
-        falhas: f.falhas_consecutivas, ultima: f.ultima_verificacao,
-      })),
+      fornecedores: (fornecedoresRows ?? []).map((f: any) => {
+        const saldoBrl = f.saldo_atual != null ? Number(f.saldo_atual) : null;
+        const cot = f.cotacao_brl != null ? Number(f.cotacao_brl) : null;
+        const saldoUsd = saldoBrl != null && cot && cot > 0 ? Number((saldoBrl / cot).toFixed(2)) : null;
+        return {
+          id: f.id, nome: f.nome, status: f.status, saldo: saldoBrl, saldoUsd, cotacao: cot, ativo: !!f.ativo,
+          falhas: f.falhas_consecutivas, ultima: f.ultima_verificacao,
+        };
+      }),
       apiLatency,
       pedidos: { total24h: pedidos24?.length ?? 0, pagos24h: pagos, pendentes24h: pendentes },
     };
