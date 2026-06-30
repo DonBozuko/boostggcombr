@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from "react";
+
 type GridPlan = {
   id: string;
   qty: string;
@@ -5,10 +7,78 @@ type GridPlan = {
   fire?: boolean;
 };
 
-type Cols = 2 | 6;
+type Cols = 2 | 3 | 6;
+
+// v51 — Omnichannel 3D Dense Grid Canvas
+// Grade rígida de 3 colunas com vidro neon, ancoragem 3x, prova social
+// dinâmica e cronômetro regressivo compartilhado de 14min em loop.
+
+const COUNTDOWN_SECONDS = 14 * 60;
+
+function useCountdown(seconds: number): string {
+  const [left, setLeft] = useState(seconds);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setLeft((s) => (s <= 1 ? seconds : s - 1));
+    }, 1000);
+    return () => clearInterval(t);
+  }, [seconds]);
+  const m = Math.floor(left / 60).toString().padStart(2, "0");
+  const s = (left % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+// Determinístico por id para hidratar SSR/CSR igual
+function seededInt(seed: string, min: number, max: number): number {
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i++) {
+    h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
+  }
+  const v = Math.abs(h) % (max - min + 1);
+  return min + v;
+}
+
+function parseBRL(p: string): number {
+  const n = parseFloat(
+    p.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", "."),
+  );
+  return Number.isFinite(n) ? n : 0;
+}
+
+function fmtBRL(v: number): string {
+  return `R$ ${v.toFixed(2).replace(".", ",")}`;
+}
+
+function tonePalette(id: string, fire?: boolean): { border: string; glow: string; chip: string; label: string } {
+  if (fire) return { border: "#FFD60A", glow: "#FFD60Acc", chip: "#FFD60A", label: "RELÂMPAGO" };
+  // visualizações → roxo
+  if (/^(v|tv|yv)\d/i.test(id)) return { border: "#A855F7", glow: "#A855F7cc", chip: "#A855F7", label: "VIEWS" };
+  // econômico (≤ 1k seguidores/curtidas) → azul
+  return { border: "#38BDF8", glow: "#38BDF8aa", chip: "#38BDF8", label: "ECONÔMICO" };
+}
+
+function BuyerTicker({ seed }: { seed: string }) {
+  const base = seededInt(seed, 340, 490);
+  const [n, setN] = useState(base);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setN((v) => {
+        const delta = Math.floor(Math.random() * 7) - 3;
+        const next = Math.max(340, Math.min(490, v + delta));
+        return next;
+      });
+    }, 3500 + (base % 1500));
+    return () => clearInterval(t);
+  }, [base]);
+  return (
+    <span className="text-[8px] md:text-[9px] font-semibold text-emerald-300/90 leading-none">
+      🟢 {n} comprando agora
+    </span>
+  );
+}
 
 export function PremiumPricingGrid({
-  cols = 2,
+  cols = 3,
   plans,
   onBuy,
   disabled,
@@ -24,81 +94,122 @@ export function PremiumPricingGrid({
   accent: string;
   unit?: string;
 }) {
-  // Strict Multi-Route UI Mirroring Shell: 2 colunas verticais simétricas em TODAS as rotas.
   void cols;
-  const gridCols = "grid-cols-2 gap-4";
-  // Hydration Guard: se a esteira chegar vazia (race condition / fetch atrasado),
-  // segura o espaço físico com skeleton animado mantendo a grade simétrica.
+  const countdown = useCountdown(COUNTDOWN_SECONDS);
+  const gridCols = "grid-cols-3 gap-1.5";
+
+  const enriched = useMemo(() => {
+    return (plans ?? []).map((p) => {
+      const real = parseBRL(p.price);
+      const anchor = real > 0 ? real * 3 : 0;
+      return { ...p, real, anchor };
+    });
+  }, [plans]);
+
   if (!plans || plans.length === 0) {
     return (
-      <section className="mx-auto my-1 w-full max-w-[550px] px-2" aria-label="Carregando pacotes">
+      <section
+        className="mx-auto my-1 w-full max-w-[560px] px-1.5 max-h-[88vh] overflow-hidden"
+        aria-label="Carregando pacotes"
+      >
         <div className={`grid ${gridCols} auto-rows-fr`}>
-          {Array.from({ length: 12 }).map((_, i) => (
+          {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-lg px-2 py-2 h-full min-h-[140px] animate-pulse"
+              className="rounded-lg p-1.5 h-full min-h-[120px] animate-pulse backdrop-blur-md"
               style={{
-                background: "#0f0f10",
+                background: "rgba(15,15,16,0.55)",
                 border: `1px solid ${accent}33`,
                 boxShadow: `0 0 8px ${accent}11`,
               }}
             >
-              <div className="h-4 w-3/4 mx-auto rounded bg-zinc-800 mb-2" />
-              <div className="h-2 w-1/2 mx-auto rounded bg-zinc-800/60 mb-3" />
-              <div className="h-6 w-2/3 mx-auto rounded bg-zinc-800 mb-3" />
-              <div className="h-6 w-full rounded bg-zinc-800" />
+              <div className="h-3 w-3/4 mx-auto rounded bg-zinc-800 mb-2" />
+              <div className="h-2 w-1/2 mx-auto rounded bg-zinc-800/60 mb-2" />
+              <div className="h-4 w-2/3 mx-auto rounded bg-zinc-800 mb-2" />
+              <div className="h-5 w-full rounded bg-zinc-800" />
             </div>
           ))}
         </div>
       </section>
     );
   }
-  return (
-    <section className="mx-auto my-1 w-full max-w-[550px] px-2" aria-label="Pacotes disponíveis">
-      <div className={`grid ${gridCols} auto-rows-fr`}>
 
-        {plans.map((p) => (
-          <div
-            key={p.id}
-            className="rounded-lg px-2 py-2 flex flex-col items-center text-center h-full min-h-[140px] justify-between"
-            style={{
-              background: "#0f0f10",
-              border: `1px solid ${accent}55`,
-              boxShadow: `0 0 8px ${accent}22`,
-            }}
-          >
-            <div className="flex items-baseline gap-1 justify-center">
-              <span className="text-base md:text-xl font-black text-white leading-none">{p.qty}</span>
-              {p.fire && <span className="text-xs md:text-sm leading-none">🔥</span>}
-            </div>
-            {unit && (
-              <span className="text-[8px] md:text-[10px] uppercase tracking-[0.16em] text-zinc-400 mt-0.5">
-                {unit}
-              </span>
-            )}
+  return (
+    <section
+      className="mx-auto my-1 w-full max-w-[560px] px-1.5 max-h-[88vh] overflow-hidden"
+      aria-label="Pacotes disponíveis"
+    >
+      <div className={`grid ${gridCols} auto-rows-fr`}>
+        {enriched.map((p) => {
+          const tone = tonePalette(p.id, p.fire);
+          return (
             <div
-              className="mt-0.5 text-lg md:text-2xl font-extrabold leading-none"
-              style={{ color: accent, textShadow: `0 0 8px ${accent}aa` }}
-            >
-              {p.price}
-            </div>
-            <button
-              type="button"
-              disabled={disabled}
-              onClick={() => onBuy(p.id)}
-              className="mt-1 w-full rounded-md py-1 md:py-1.5 text-[10px] md:text-xs font-black uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+              key={p.id}
+              className="relative rounded-lg p-1.5 flex flex-col items-center text-center h-full min-h-[128px] justify-between backdrop-blur-md overflow-hidden"
               style={{
-                background: disabled ? "#222" : "#FFD60A",
-                color: disabled ? "#888" : "#0a0a0a",
-                boxShadow: disabled ? "none" : "0 0 10px #FFD60Acc, 0 2px 3px rgba(0,0,0,0.4)",
+                background: "rgba(12,12,14,0.62)",
+                border: `1.5px solid ${tone.border}`,
+                boxShadow: `0 0 10px ${tone.border}55, inset 0 0 18px ${tone.border}14`,
               }}
             >
-              {disabled ? (disabledLabel ?? "Indisponível") : "Comprar Agora"}
-            </button>
-          </div>
-        ))}
+              <div
+                className="absolute top-0 left-0 right-0 text-[7.5px] md:text-[8.5px] font-black tracking-[0.14em] py-[1px]"
+                style={{
+                  background: `linear-gradient(90deg, ${tone.border}cc, ${tone.border}55)`,
+                  color: "#0a0a0a",
+                }}
+              >
+                {p.fire ? `⚡ ${tone.label} ${countdown}` : tone.label}
+              </div>
+
+              <div className="mt-3 flex items-baseline gap-1 justify-center">
+                <span className="text-sm md:text-lg font-black text-white leading-none">{p.qty}</span>
+                {p.fire && <span className="text-[10px] leading-none">🔥</span>}
+              </div>
+              {unit && (
+                <span className="text-[7.5px] md:text-[9px] uppercase tracking-[0.14em] text-zinc-400 leading-none">
+                  {unit}
+                </span>
+              )}
+
+              {p.anchor > 0 && (
+                <span className="text-[9px] md:text-[10px] text-zinc-500 line-through leading-none">
+                  de {fmtBRL(p.anchor)}
+                </span>
+              )}
+              <div
+                className="text-base md:text-xl font-extrabold leading-none"
+                style={{ color: tone.chip, textShadow: `0 0 8px ${tone.glow}` }}
+              >
+                {p.price}
+              </div>
+
+              <BuyerTicker seed={p.id} />
+
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onBuy(p.id)}
+                className="mt-1 w-full rounded-md py-1 text-[9px] md:text-[10px] font-black uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  background: disabled
+                    ? "#222"
+                    : "linear-gradient(180deg, #ff2d2d 0%, #b80000 100%)",
+                  color: disabled ? "#888" : "#fff",
+                  boxShadow: disabled
+                    ? "none"
+                    : "0 0 12px #ff2d2dcc, 0 2px 3px rgba(0,0,0,0.45)",
+                  textShadow: "0 1px 1px rgba(0,0,0,0.45)",
+                }}
+              >
+                {disabled ? (disabledLabel ?? "Indisponível") : "Comprar Agora"}
+              </button>
+              {/* accent é usado apenas como hint global; descartado em favor do tone */}
+              <span className="hidden" data-accent={accent} />
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 }
-
