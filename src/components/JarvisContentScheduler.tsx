@@ -308,18 +308,39 @@ export function JarvisContentScheduler() {
           >
             🤖 {saving ? "Agendando..." : `Agendar Conteúdo Omnichannel (${networks.length})`}
           </button>
-          <a
-            href={nativeDownloadHref || undefined}
-            download="Criativo_Jarvis.mp4"
-            target="_blank"
-            rel="noreferrer"
-            aria-disabled={!nativeDownloadHref}
-            className={`block w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-3 text-center text-sm font-extrabold uppercase tracking-wider text-black shadow-[0_0_28px_rgba(34,211,238,0.55)] border border-cyan-300/60 ${
-              nativeDownloadHref ? "hover:brightness-110" : "pointer-events-none opacity-40"
-            }`}
-          >
-            📥 BAIXAR MÍDIA COMPILADA
-          </a>
+          <div className="space-y-2 rounded-xl border border-cyan-400/30 bg-black/40 p-3">
+            <label className="text-[10px] uppercase tracking-wider text-cyan-300/80">
+              🔗 Webhook de Criação Externa (Canva / CapCut Automation)
+            </label>
+            <input
+              type="url"
+              value={webhookUrl}
+              onChange={(e) => setWebhookUrl(e.target.value)}
+              placeholder="https://hooks.exemplo.com/criativo-jarvis"
+              className="w-full rounded-lg border border-white/10 bg-black/60 px-3 py-2 text-xs font-mono"
+            />
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={dispatchCreativePayload}
+                disabled={dispatching || !caption.trim() || networks.length === 0}
+                className="rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-3 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_22px_rgba(34,211,238,0.55)] border border-cyan-300/60 disabled:opacity-40 hover:brightness-110"
+              >
+                🚀 {dispatching ? "Despachando..." : "Despachar Payload p/ Fila Externa"}
+              </button>
+              <button
+                type="button"
+                onClick={copyPayloadToClipboard}
+                className="rounded-xl bg-black/60 border border-cyan-400/40 text-cyan-200 px-3 py-2.5 text-xs font-extrabold uppercase tracking-wider hover:bg-black/80"
+              >
+                📋 Copiar JSON
+              </button>
+            </div>
+            {dispatchMsg && <div className="text-[11px] text-cyan-200/90">{dispatchMsg}</div>}
+            <p className="text-[10px] text-white/50">
+              Pipeline assíncrono isolado: a compilação do criativo roda fora do servidor principal (NOC, Tesouraria e Smart Cost Routing preservados).
+            </p>
+          </div>
           <p className="text-[10px] text-white/50">
             🔒 Modo Seguro: posts aguardam aprovação executiva via Telegram antes do envio real.
           </p>
