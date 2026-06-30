@@ -175,7 +175,7 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
                 {busy === f.id ? "📊..." : "📊"}
               </Button>
               <span className="text-[10px] font-mono text-cyan-100">
-                {f.saldo_atual != null ? `US$ ${Number(f.saldo_atual).toFixed(2)}` : "saldo não lido"}
+                {f.saldo_atual != null ? `R$ ${Number(f.saldo_atual).toFixed(2)}` : "saldo não lido"}
               </span>
             </div>
           </div>
