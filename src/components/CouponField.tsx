@@ -10,19 +10,23 @@ function useCouponCountdown(active: boolean, seconds: number = 10) {
   const tickRef = useRef(0);
 
   useEffect(() => {
-    function arm() {
-      if (armedRef.current) return;
+    async function arm() {
       try {
-        const Ctx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
-        ctxRef.current = new Ctx();
-        armedRef.current = true;
+        if (!ctxRef.current) {
+          const Ctx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
+          ctxRef.current = new Ctx();
+        }
+        if (ctxRef.current.state === "suspended") await ctxRef.current.resume();
+        armedRef.current = ctxRef.current.state === "running";
       } catch {}
     }
-    window.addEventListener("pointerdown", arm, { once: true });
-    window.addEventListener("keydown", arm, { once: true });
+    window.addEventListener("pointerdown", arm);
+    window.addEventListener("touchstart", arm);
+    window.addEventListener("keydown", arm);
     window.setTimeout(arm, COUPON_REVEAL_DELAY_MS);
     return () => {
       window.removeEventListener("pointerdown", arm);
+      window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
     };
   }, []);
@@ -49,7 +53,9 @@ function useCouponCountdown(active: boolean, seconds: number = 10) {
 
     const playTick = (current: number) => {
       const ctx = ctxRef.current;
-      if (!ctx || ctx.state !== "running") return;
+      if (!ctx) return;
+      if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+      if (ctx.state !== "running") return;
       try {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
