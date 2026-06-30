@@ -25,7 +25,17 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
 
   useEffect(() => {
     listFn({ data: { token } } as any)
-      .then((r: any) => { if (r?.ok) setFornecedores(r.fornecedores ?? []); })
+      .then((r: any) => {
+        if (r?.ok) {
+          const list = (r.fornecedores ?? []).map((f: any) => {
+            const brl = f.saldo_atual != null ? Number(f.saldo_atual) : null;
+            const cot = f.cotacao_brl != null ? Number(f.cotacao_brl) : null;
+            const usd = brl != null && cot && cot > 0 ? Number((brl / cot).toFixed(2)) : null;
+            return { ...f, saldo_usd: usd, cotacao_brl: cot };
+          });
+          setFornecedores(list);
+        }
+      })
       .catch(() => {});
   }, [token]);
 
