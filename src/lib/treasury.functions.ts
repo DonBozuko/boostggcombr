@@ -44,7 +44,7 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido, taxa_pix, custo_api").gte("occurred_at", d0),
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido").gte("occurred_at", d7),
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido").gte("occurred_at", d30),
-      supabaseAdmin.from("admin_treasury" as any).select("occurred_at, faturamento, lucro_liquido, network").order("occurred_at", { ascending: false }).limit(10),
+      supabaseAdmin.from("admin_treasury" as any).select("occurred_at, faturamento, lucro_liquido, network, supplier_cost, provider_selected, net_profit_percentage").order("occurred_at", { ascending: false }).limit(50),
     ]);
     const sum = (rs: any[] | null, k: string) => (rs ?? []).reduce((s, r) => s + Number(r[k] || 0), 0);
     const lucro7d = sum(w7 as any, "lucro_liquido");
