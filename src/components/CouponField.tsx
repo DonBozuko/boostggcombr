@@ -61,6 +61,8 @@ function CouponCountdownBanner() {
   const left = useCouponCountdown(10);
   const ss = left.toString().padStart(2, "0");
   return (
+    <>
+    <CouponCountdownBanner />
     <div
       className="mb-1.5 text-center text-[11px] font-mono font-extrabold animate-pulse text-red-500 tracking-wider"
       style={{ textShadow: "0 0 8px rgba(239,68,68,0.9)" }}
