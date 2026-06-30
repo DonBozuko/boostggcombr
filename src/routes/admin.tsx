@@ -799,8 +799,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     if (initialToken) setToken(initialToken);
   }, [initialToken]);
   const [loaded, setLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState<AdminTab>("explorar");
+  const [activeTab, setActiveTab] = useState<AdminTab>("" as AdminTab);
   const [folder, setFolder] = useState<"root" | "buscas" | "tesouraria" | "auditoria">("root");
+  useEffect(() => { if (folder === "root") setActiveTab("" as AdminTab); }, [folder]);
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(false);
