@@ -20,7 +20,7 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
       // 1. pricing_items integridade 1:1
       const { data: items, error: itemsErr } = await supabaseAdmin
         .from("pricing_items")
-        .select("id, price_brl, cost_per_1k_brl, provider_service_id");
+        .select("pacote, price_brl, cost_brl, provider_service_id");
       if (itemsErr) {
         checks.push({ id: "pricing_items", label: "pricing_items acessível", ok: false, detail: itemsErr.message });
         blockDeploy = true;
