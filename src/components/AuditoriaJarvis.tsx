@@ -54,15 +54,15 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
         cache: "no-store",
         body: JSON.stringify({ fornecedor: f.slug || f.id }),
       });
-      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; saldoPersistidoUsd?: number | null; status: string; erro?: string | null }> } | null;
+      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; saldoBrl: number | null; saldoPersistidoBrl?: number | null; cotacao?: number; status: string; erro?: string | null }> } | null;
       if (!res.ok || !json?.ok) {
         toast.error(`${f.nome}: falha ao atualizar saldo`);
         return;
       }
       const item = json.results?.find((r) => r.nome === f.nome) ?? json.results?.[0];
-      const saldo = item?.saldoUsd ?? item?.saldoPersistidoUsd ?? null;
+      const saldo = item?.saldoBrl ?? item?.saldoPersistidoBrl ?? null;
       setFornecedores((prev) => prev.map((p) => p.id === f.id ? { ...p, saldo_atual: saldo, status: item?.status ?? p.status } : p));
-      toast.success(`${f.nome}: ${item?.status ?? "Online"} · saldo ${saldo != null ? `US$ ${saldo.toFixed(2)}` : "não lido"}`);
+      toast.success(`${f.nome}: ${item?.status ?? "Online"} · saldo ${saldo != null ? `R$ ${saldo.toFixed(2)}` : "não lido"}${item?.cotacao ? ` · USD ${item.cotacao.toFixed(4)}` : ""}`);
       onBalanceSynced?.();
     } catch (e: any) {
       toast.error(e?.message ?? "Falha na atualização de saldo");
@@ -175,7 +175,7 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
                 {busy === f.id ? "📊..." : "📊"}
               </Button>
               <span className="text-[10px] font-mono text-cyan-100">
-                {f.saldo_atual != null ? `US$ ${Number(f.saldo_atual).toFixed(2)}` : "saldo não lido"}
+                {f.saldo_atual != null ? `R$ ${Number(f.saldo_atual).toFixed(2)}` : "saldo não lido"}
               </span>
             </div>
           </div>

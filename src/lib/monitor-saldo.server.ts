@@ -215,16 +215,47 @@ async function fetchProviderBalance(endpoint: string, apiKey: string): Promise<n
   throw lastError ?? new Error("falha desconhecida na leitura de saldo");
 }
 
+// v79 — Strict Currency Conversion Pipeline.
+// Cotação USD→BRL viva (AwesomeAPI · ExchangeRate-API · fallback default).
+let _fxCache: { rate: number; at: number } | null = null;
+const FX_TTL_MS = 5 * 60 * 1000;
+
+export async function fetchUsdBrlRate(): Promise<number> {
+  const now = Date.now();
+  if (_fxCache && now - _fxCache.at < FX_TTL_MS) return _fxCache.rate;
+  const sources = [
+    { url: "https://economia.awesomeapi.com.br/json/last/USD-BRL", pick: (j: any) => Number(j?.USDBRL?.bid) },
+    { url: "https://open.er-api.com/v6/latest/USD", pick: (j: any) => Number(j?.rates?.BRL) },
+  ];
+  for (const s of sources) {
+    try {
+      const r = await fetch(`${s.url}${s.url.includes("?") ? "&" : "?"}_=${now}`, {
+        headers: { "Cache-Control": "no-cache" },
+        signal: AbortSignal.timeout(6000),
+      });
+      if (!r.ok) continue;
+      const j = await r.json();
+      const rate = s.pick(j);
+      if (Number.isFinite(rate) && rate > 0) {
+        _fxCache = { rate: Number(rate.toFixed(4)), at: now };
+        return _fxCache.rate;
+      }
+    } catch { /* try next */ }
+  }
+  return USD_TO_BRL_DEFAULT;
+}
+
 type ProviderCheck = {
   saldoUsd: number | null;
   saldoBrl: number | null;
+  cotacao: number;
   status: "Online" | "Offline";
   statusPersistido: "Online" | "Offline";
   erro: string | null;
   elapsed: number;
 };
 
-async function checkProviderBalance(fornecedor: any): Promise<ProviderCheck> {
+async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<ProviderCheck> {
   const t0 = Date.now();
   const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
   const endpoint = normalizeSmmEndpoint(fornecedor.api_url as string);
@@ -235,19 +266,20 @@ async function checkProviderBalance(fornecedor: any): Promise<ProviderCheck> {
   try {
     if (!apiKey) throw new Error("API key ausente/inválida");
     if (!endpoint) throw new Error("api_url ausente/inválida");
-    saldoUsd = await fetchProviderBalance(endpoint, apiKey);
+    const raw = await fetchProviderBalance(endpoint, apiKey);
+    saldoUsd = Number(parseFloat(String(raw)).toFixed(2));
   } catch (e: any) {
     status = "Offline";
     erro = String(e?.message ?? e).slice(0, 240);
   }
 
   const elapsed = Date.now() - t0;
-  const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
-  const saldoBrl = saldoUsd != null ? saldoUsd * cotacao : null;
+  const cotacao = Number(fxRate) > 0 ? Number(fxRate) : await fetchUsdBrlRate();
+  const saldoBrl = saldoUsd != null ? Number((saldoUsd * cotacao).toFixed(2)) : null;
   const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
   const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
 
-  return { saldoUsd, saldoBrl, status, statusPersistido, erro, elapsed };
+  return { saldoUsd, saldoBrl, cotacao, status, statusPersistido, erro, elapsed };
 }
 
 async function persistProviderBalance(fornecedor: any, balance: ProviderCheck) {
@@ -259,10 +291,12 @@ async function persistProviderBalance(fornecedor: any, balance: ProviderCheck) {
     erro_retornado: balance.erro,
   });
 
+  // v79 — persiste saldo_atual em BRL (unificação contábil) + cotação viva.
   await supabaseAdmin
     .from("fornecedores")
     .update({
-      saldo_atual: balance.saldoUsd ?? fornecedor.saldo_atual,
+      saldo_atual: balance.saldoBrl ?? fornecedor.saldo_atual,
+      cotacao_brl: balance.cotacao,
       status: balance.statusPersistido,
       ultima_verificacao: new Date().toISOString(),
       falhas_consecutivas: 0,
@@ -278,13 +312,16 @@ export type ProviderBalanceResult = {
   ok: boolean;
   saldoUsd: number | null;
   saldoBrl: number | null;
+  cotacao: number;
+  saldoPersistidoBrl: number | null;
+  /** @deprecated use saldoPersistidoBrl */
   saldoPersistidoUsd: number | null;
   status: "Online" | "Offline";
   erro: string | null;
   tempo_resposta_ms: number;
 };
 
-export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {}): Promise<{ ok: true; results: ProviderBalanceResult[] }> {
+export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {}): Promise<{ ok: true; cotacao: number; results: ProviderBalanceResult[] }> {
   const target = opts.fornecedor?.trim().toLowerCase();
   const { data: rows } = await supabaseAdmin
     .from("fornecedores")
@@ -298,10 +335,13 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
       )
     : (rows ?? []);
 
+  const fxRate = await fetchUsdBrlRate();
+
   const results = await Promise.all(fornecedores.map(async (fornecedor: any): Promise<ProviderBalanceResult> => {
-    const balance = await checkProviderBalance(fornecedor);
+    const balance = await checkProviderBalance(fornecedor, fxRate);
     await persistProviderBalance(fornecedor, balance);
 
+    const persistidoBrl = balance.saldoBrl ?? (fornecedor.saldo_atual != null ? Number(fornecedor.saldo_atual) : null);
     return {
       id: fornecedor.id,
       nome: fornecedor.nome,
@@ -309,12 +349,14 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
       ok: balance.statusPersistido === "Online",
       saldoUsd: balance.saldoUsd,
       saldoBrl: balance.saldoBrl,
-      saldoPersistidoUsd: balance.saldoUsd ?? (fornecedor.saldo_atual != null ? Number(fornecedor.saldo_atual) : null),
+      cotacao: balance.cotacao,
+      saldoPersistidoBrl: persistidoBrl,
+      saldoPersistidoUsd: balance.saldoUsd,
       status: balance.statusPersistido,
       erro: balance.erro,
       tempo_resposta_ms: balance.elapsed,
     };
   }));
 
-  return { ok: true, results };
+  return { ok: true, cotacao: fxRate, results };
 }
