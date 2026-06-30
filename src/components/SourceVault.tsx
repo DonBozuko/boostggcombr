@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { Lock, Unlock, ShieldCheck, FileCode, ClipboardCopy, Check } from "lucide-react";
+import { Lock, Unlock, ShieldCheck, FileCode } from "lucide-react";
 
 const ROUTE_SOURCES = import.meta.glob("/src/routes/**/*.{ts,tsx}", {
   query: "?raw",
