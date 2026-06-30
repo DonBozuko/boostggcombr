@@ -1374,9 +1374,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {(fornecedores.length > 0 ? fornecedores : [
-              { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype" },
-              { id: "_smmpainel", nome: "SMMPainel", ativo: false, slug: "smmpainel" },
-              { id: "_verified", nome: "Verified Atacado", ativo: false, slug: "verified" },
+              { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype", status: null, saldo_atual: null, ultima_verificacao: null },
+              { id: "_smmpainel", nome: "SMMPainel", ativo: false, slug: "smmpainel", status: null, saldo_atual: null, ultima_verificacao: null },
+              { id: "_verified", nome: "Verified Atacado", ativo: false, slug: "verified", status: null, saldo_atual: null, ultima_verificacao: null },
             ]).map((p) => {
               const urlMap: Record<string, string> = {
                 smmhype: "https://smmhype.com/addfunds",
