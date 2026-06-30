@@ -1137,8 +1137,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     try {
       const res = await checkAgora({ data: { token } });
       if (!res.ok) return toast.error("Falha ao verificar");
-      toast.success("Saldo verificado");
-      await loadMonitor();
+      toast.success("Saldos dos fornecedores sincronizados");
+      refreshFornecedorViews();
     } finally {
       setMonitorBusy(false);
     }
