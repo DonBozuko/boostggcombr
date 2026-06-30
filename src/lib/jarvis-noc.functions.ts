@@ -37,7 +37,7 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     }));
 
     const { data: fornecedoresRows } = await supabaseAdmin
-      .from("fornecedores").select("id, nome, status, saldo_atual, ativo, falhas_consecutivas, ultima_verificacao");
+      .from("fornecedores").select("id, nome, status, saldo_atual, cotacao_brl, ativo, falhas_consecutivas, ultima_verificacao");
 
     const since = new Date(Date.now() - 24 * 3600_000).toISOString();
     const { data: pedidos24 } = await supabaseAdmin
