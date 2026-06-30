@@ -172,7 +172,7 @@ export async function checkSmmhypeBalance() {
   }
 
   return {
-    ok: status === "Online",
+    ok: statusPersistido === "Online",
     saldoUsd,
     saldoBrl,
     status: statusPersistido,
@@ -299,7 +299,7 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
     return {
       id: fornecedor.id,
       nome: fornecedor.nome,
-      ok: status === "Online",
+      ok: statusPersistido === "Online",
       saldoUsd,
       saldoBrl,
       status: statusPersistido,
