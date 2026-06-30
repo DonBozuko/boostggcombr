@@ -432,6 +432,33 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_health: {
+        Row: {
+          failure_count: number
+          last_error: string | null
+          last_failure_at: string | null
+          slug: string
+          unstable_until: string | null
+          updated_at: string
+        }
+        Insert: {
+          failure_count?: number
+          last_error?: string | null
+          last_failure_at?: string | null
+          slug: string
+          unstable_until?: string | null
+          updated_at?: string
+        }
+        Update: {
+          failure_count?: number
+          last_error?: string | null
+          last_failure_at?: string | null
+          slug?: string
+          unstable_until?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scheduled_posts: {
         Row: {
           approval_token: string | null

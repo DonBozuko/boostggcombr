@@ -123,24 +123,22 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // 3) Smart Routing Matrix: cadeia de failover A→B→C.
-          //    Inclui apenas fornecedores ATIVO=true e saldo_atual > 0 (ordenado por prioridade).
-          const { data: fornecedores } = await supabaseAdmin
-            .from("fornecedores")
-            .select("slug, nome, ativo, saldo_atual")
-            .eq("ativo", true)
-            .gt("saldo_atual", 0)
-            .order("prioridade", { ascending: true });
+          // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
+          const { rankProvidersByCost, markProviderUnstable, clearProviderUnstable } = await import("@/lib/smart-routing.server");
+          const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: pedido.quantidade });
 
-          const cadeia = fornecedores ?? [];
           if (!cadeia.length) {
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO com saldo > 0 (failover esgotado)" })
+              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO com saldo > 0 (smart routing vazio)" })
               .eq("id", pedido.id);
             return new Response("ok", { status: 200 });
           }
 
+          console.log("[mp-webhook] smart-routing rank", {
+            pedidoId: pedido.id,
+            ordem: cadeia.map((p) => ({ slug: p.slug, cost: p.cost_brl, unstable: p.unstable })),
+          });
 
           const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
           const tentativas: string[] = [];
@@ -153,28 +151,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               instagram_user: pedido.instagram_user,
             });
             if (r.ok) {
-              console.log("[mp-webhook] dispatch OK", { pedidoId: pedido.id, fornecedor: f.slug, orderId: r.orderId });
+              await clearProviderUnstable(f.slug);
+              console.log("[mp-webhook] dispatch OK", { pedidoId: pedido.id, fornecedor: f.slug, orderId: r.orderId, cost_brl: f.cost_brl });
 
-              // ===== Cálculo de custo real (atacado) =====
-              // custo_brl = (quantidade / 1000) × rate(USD) × cotacao_brl
-              let custoReal: number | null = null;
-              try {
-                const { resolveServiceIdAsync } = await import("@/lib/smmhype.server");
-                const sid = await resolveServiceIdAsync(pedido.pacote, pedido.quantidade);
-                if (sid != null) {
-                  const [{ data: svc }, { data: forn }] = await Promise.all([
-                    supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", sid).maybeSingle(),
-                    supabaseAdmin.from("fornecedores").select("cotacao_brl").eq("slug", f.slug).maybeSingle(),
-                  ]);
-                  const rate = Number(svc?.rate);
-                  const cot = Number((forn as any)?.cotacao_brl ?? 7.0) || 7.0;
-                  if (Number.isFinite(rate) && rate > 0) {
-                    custoReal = (Number(pedido.quantidade) / 1000) * rate * cot;
-                  }
-                }
-              } catch (e) {
-                console.warn("[mp-webhook] custo_real calc falhou", e);
-              }
+              // ===== Custo real: pré-computado pelo smart-routing (rate × cotacao_brl × qty/1000) =====
+              const custoReal: number | null = f.cost_brl;
 
               await supabaseAdmin
                 .from("pedidos")
@@ -230,7 +211,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
             const det = `${r.error}${r.status ? ` HTTP ${r.status}` : ""}`;
             tentativas.push(`${f.nome}: ${det}`);
-            console.warn("[mp-webhook] fallback", { pedidoId: pedido.id, fornecedor: f.slug, ...r });
+            await markProviderUnstable(f.slug, det);
+            console.warn("[mp-webhook] fallback (marcado _unstable 30min)", { pedidoId: pedido.id, fornecedor: f.slug, ...r });
           }
 
           if (!sucesso) {
