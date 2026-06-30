@@ -1243,6 +1243,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             </div>
           </div>
         )}
+        </div>
 
         {activeTab === "servicos" && (
         /* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */
