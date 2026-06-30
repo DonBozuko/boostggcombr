@@ -61,6 +61,9 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
       previsao30d: lucro7d > 0 ? Number(((lucro7d / 7) * 30).toFixed(2)) : 0,
       ultimas: ((ult ?? []) as any).map((r: any) => ({
         occurred_at: r.occurred_at, faturamento: Number(r.faturamento), lucro_liquido: Number(r.lucro_liquido), network: r.network,
+        supplier_cost: r.supplier_cost != null ? Number(r.supplier_cost) : null,
+        provider_selected: r.provider_selected ?? null,
+        net_profit_percentage: r.net_profit_percentage != null ? Number(r.net_profit_percentage) : null,
       })),
     };
   });
