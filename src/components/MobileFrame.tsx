@@ -243,6 +243,7 @@ export function MobileFrame({
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
         <TopNetworksNav active={route} />
         <WelcomeDiscountPopup route={route} />
+        <SocialProofPopup route={route} />
         <div
           className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-visible flex flex-col pb-2"
           style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}
