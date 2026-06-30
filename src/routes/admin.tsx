@@ -1172,7 +1172,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             { id: "tesouraria" as const, label: "📊 TESOURARIA & LIVRO CONTÁBIL", grad: "from-amber-400 to-orange-500",    glow: "shadow-[0_0_22px_rgba(245,158,11,0.55)]" },
             { id: "auditoria" as const,  label: "🩺 NOC & AUDITORIA DE SALDOS",   grad: "from-red-500 to-fuchsia-600",     glow: "shadow-[0_0_22px_rgba(255,0,60,0.55)]" },
           ];
-          const cur = folder === "root" ? "buscas" : folder;
+          const cur = folder;
           return (
             <nav className="rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl p-2 flex flex-wrap gap-2 justify-center">
               {TABS.map((t) => {
