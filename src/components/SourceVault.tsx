@@ -148,8 +148,19 @@ export function SourceVault() {
             autoComplete="off"
             className="w-full max-w-xs flex flex-col gap-2"
           >
+            {/* HoneyPot invisível para absorver autofill do Chrome */}
+            <input
+              type="password"
+              id="username"
+              name="username"
+              autoComplete="current-password"
+              tabIndex={-1}
+              aria-hidden="true"
+              style={{ display: "none", position: "absolute", opacity: 0, width: 0, height: 0 }}
+              onChange={() => {}}
+            />
             <label className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
-              Chave Mestra (8 caracteres)
+              Código de Verificação do Sistema (NOC)
             </label>
             <input
               ref={inputRef}
