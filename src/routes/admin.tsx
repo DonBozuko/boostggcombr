@@ -1337,7 +1337,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
         </div>
 
-        <div hidden={activeTab !== "explorar"} className="space-y-4">
+        <div className={`${activeTab === "explorar" ? "block" : "hidden"} md:block space-y-4`}>
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
         <div className="rounded-2xl border border-border bg-card/30 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -1376,7 +1376,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler + Auditor RLS */}
-        <div hidden={activeTab !== "jarvis"} className="space-y-4">
+        <div className={`${activeTab === "jarvis" ? "block" : "hidden"} md:block space-y-4`}>
           {/* Auditor RLS — mantido montado para gravar logs em admin_audit_logs, ocultado visualmente */}
           <div className="hidden" aria-hidden="true">
             <AdminAuditLog />
@@ -1385,7 +1385,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
 
 
-        <div hidden={activeTab !== "servicos"} className="space-y-4">
+        <div className={`${activeTab === "servicos" ? "block" : "hidden"} md:block space-y-4`}>
         {/* Widget Monitor de Saldo */}
         {f && style && (
           <div className="space-y-3">
