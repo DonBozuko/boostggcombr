@@ -38,7 +38,7 @@ export const Route = createFileRoute("/youtube")({
     const keywords =
       "comprar inscritos youtube, comprar views youtube, visualizações youtube barato, crescer canal youtube, monetizar canal youtube pix, agência smm youtube brasil";
     const url = "https://eliteboostprime.lovable.app/youtube";
-    const ogImage = `https://eliteboostprime.lovable.app${ogYoutube}?v=33`;
+    const ogImage = `https://eliteboostprime.lovable.app${ogYoutube}?v=48`;
     return {
       meta: [
         { title },
