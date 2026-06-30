@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from "react";
 
 const COUPON_REVEAL_DELAY_MS = 5_000; // 3s fala dos avatares + 2s respiro pós-conversa
 
+function remainingUntilCouponReveal(): number {
+  if (typeof window === "undefined") return COUPON_REVEAL_DELAY_MS;
+  return Math.max(0, COUPON_REVEAL_DELAY_MS - Math.floor(performance.now()));
+}
+
 // v52-patch — Micro-FOMO Ticker Core + Tick-Tac Syncer real após reveal
 function useCouponCountdown(active: boolean, seconds: number = 10) {
   const [left, setLeft] = useState(seconds);
@@ -140,7 +145,8 @@ export function CouponField({ accent = "#FFD700", revealDelayMs = COUPON_REVEAL_
 
   useEffect(() => {
     setVisible(false);
-    const id = window.setTimeout(() => setVisible(true), revealDelayMs);
+    const delay = revealDelayMs === COUPON_REVEAL_DELAY_MS ? remainingUntilCouponReveal() : revealDelayMs;
+    const id = window.setTimeout(() => setVisible(true), delay);
     return () => window.clearTimeout(id);
   }, [revealDelayMs]);
 
@@ -228,7 +234,7 @@ export function DelayedCouponField({ accent = "#FFD700" }: { accent?: string }) 
 
   useEffect(() => {
     setMounted(false);
-    const id = window.setTimeout(() => setMounted(true), COUPON_REVEAL_DELAY_MS);
+    const id = window.setTimeout(() => setMounted(true), remainingUntilCouponReveal());
     return () => window.clearTimeout(id);
   }, []);
 
