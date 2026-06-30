@@ -1207,6 +1207,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><SourceVault /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
 
