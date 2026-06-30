@@ -26,7 +26,7 @@ export async function checkSmmhypeBalance() {
     return { ok: false as const, error: "FORNECEDOR_NOT_FOUND" };
   }
 
-  const apiKey = sanitizeKey(process.env[fornecedor.api_key_secret as string]);
+  const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
   const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
   const t0 = Date.now();
   let saldoUsd: number | null = null;
@@ -191,6 +191,15 @@ function sanitizeKey(raw: string | undefined | null): string {
   return String(raw).replace(/[\s\u200B-\u200D\uFEFF"']+/g, "").trim();
 }
 
+function resolveApiKey(secretRef: string | undefined | null): string {
+  const ref = sanitizeKey(secretRef);
+  if (!ref) return "";
+  const fromEnv = sanitizeKey(process.env[ref]);
+  if (fromEnv) return fromEnv;
+  // Compatível com instalações onde o valor real foi salvo no banco em vez do nome do secret.
+  return /^[A-Z0-9_]+$/.test(ref) ? "" : ref;
+}
+
 function normalizeSmmEndpoint(apiUrl: string): string {
   const u = (apiUrl || "").trim().replace(/\/+$/, "");
   if (!u) return u;
@@ -224,7 +233,7 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
     : (rows ?? []);
 
   const results = await Promise.all(fornecedores.map(async (fornecedor: any): Promise<ProviderBalanceResult> => {
-    const apiKey = sanitizeKey(process.env[fornecedor.api_key_secret as string]);
+    const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
     const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
     const t0 = Date.now();
     let saldoUsd: number | null = null;
