@@ -28,6 +28,7 @@ import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-w
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
+import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 
 const Char126flockDotjsRoute = Char126flockDotjsRouteImport.update({
@@ -126,6 +127,12 @@ const ApiPublicSfxNameRoute = ApiPublicSfxNameRouteImport.update({
   path: '/api/public/sfx/$name',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksSyncPricingRoute =
+  ApiPublicHooksSyncPricingRouteImport.update({
+    id: '/api/public/hooks/sync-pricing',
+    path: '/api/public/hooks/sync-pricing',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRecoverAbandonedRoute =
   ApiPublicHooksRecoverAbandonedRouteImport.update({
     id: '/api/public/hooks/recover-abandoned',
@@ -152,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
@@ -174,6 +182,7 @@ export interface FileRoutesByTo {
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
@@ -197,6 +206,7 @@ export interface FileRoutesById {
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/sync-pricing'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -243,6 +254,7 @@ export interface FileRouteTypes {
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/sync-pricing'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
   id:
@@ -265,6 +277,7 @@ export interface FileRouteTypes {
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/sync-pricing'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
@@ -288,6 +301,7 @@ export interface RootRouteChildren {
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
+  ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
@@ -427,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSfxNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-pricing': {
+      id: '/api/public/hooks/sync-pricing'
+      path: '/api/public/hooks/sync-pricing'
+      fullPath: '/api/public/hooks/sync-pricing'
+      preLoaderRoute: typeof ApiPublicHooksSyncPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/recover-abandoned': {
       id: '/api/public/hooks/recover-abandoned'
       path: '/api/public/hooks/recover-abandoned'
@@ -456,6 +477,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
+  ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
