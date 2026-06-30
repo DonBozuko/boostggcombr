@@ -39,12 +39,77 @@ export function JarvisContentScheduler() {
   const [script, setScript] = useState<{ hook: string; retention: string; cta: string } | null>(null);
   // Soberania de asset: hospedado no CDN nativo Lovable (zero /public, zero CORS, zero 404).
   const [bgVideo, setBgVideo] = useState<string>(jarvisBgAsset.url);
-  const nativeDownloadHref = useMemo(() => {
-    const u = bgVideo.trim();
-    if (!u) return "";
-    if (/^https?:\/\//i.test(u)) return u;
-    return typeof window !== "undefined" ? window.location.origin + u : u;
-  }, [bgVideo]);
+  const [webhookUrl, setWebhookUrl] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return window.localStorage.getItem("jarvis_creative_webhook") ?? "";
+  });
+  const [dispatching, setDispatching] = useState(false);
+  const [dispatchMsg, setDispatchMsg] = useState<string | null>(null);
+
+  const dispatchCreativePayload = async () => {
+    setDispatchMsg(null);
+    const payload = {
+      version: "v81",
+      source: "jarvis_omnichannel",
+      dispatched_at: new Date().toISOString(),
+      networks,
+      format,
+      post_date: new Date(postDate).toISOString(),
+      caption_text: caption,
+      image_url: imageUrl || null,
+      background_video_url: bgVideo || null,
+      script,
+    };
+    const url = webhookUrl.trim();
+    if (!url) {
+      setDispatchMsg("Configure a URL do webhook (Canva/CapCut) antes de despachar.");
+      return;
+    }
+    setDispatching(true);
+    try {
+      window.localStorage.setItem("jarvis_creative_webhook", url);
+      // fire-and-forget assíncrono — isola do NOC/Tesouraria/Smart Cost Routing
+      const ctrl = new AbortController();
+      const t = window.setTimeout(() => ctrl.abort(), 8000);
+      const res = await fetch(url, {
+        method: "POST",
+        mode: "cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
+        keepalive: true,
+      }).catch((e) => ({ ok: false, status: 0, statusText: String(e) } as Response));
+      window.clearTimeout(t);
+      if ((res as Response).ok) {
+        setDispatchMsg("✅ Payload despachado para a fila de criação externa.");
+      } else {
+        setDispatchMsg(`⚠️ Enviado em modo no-cors (sem confirmação). Verifique a fila.`);
+      }
+    } catch (e: unknown) {
+      setDispatchMsg(`Falha ao despachar: ${e instanceof Error ? e.message : String(e)}`);
+    } finally {
+      setDispatching(false);
+    }
+  };
+
+  const copyPayloadToClipboard = async () => {
+    const payload = {
+      version: "v81",
+      networks, format, post_date: new Date(postDate).toISOString(),
+      caption_text: caption, image_url: imageUrl || null,
+      background_video_url: bgVideo || null, script,
+    };
+    const json = JSON.stringify(payload, null, 2);
+    try {
+      await navigator.clipboard.writeText(json);
+      setDispatchMsg("📋 Payload copiado.");
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = json; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta);
+      setDispatchMsg("📋 Payload copiado (fallback).");
+    }
+  };
 
   const toggleNet = (n: Network) =>
     setNetworks((p) => (p.includes(n) ? p.filter((x) => x !== n) : [...p, n]));
