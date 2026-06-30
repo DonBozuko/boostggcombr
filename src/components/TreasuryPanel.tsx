@@ -50,8 +50,14 @@ export function TreasuryPanel({ token }: { token: string }) {
 
   if (!snap || !snap.ok) {
     return (
-      <section className="rounded-xl border border-amber-400/40 bg-amber-950/20 p-3 text-amber-200 text-xs">
-        💰 Tesouraria · {loading ? "carregando…" : (snap as any)?.error ?? "sem dados"}
+      <section className="rounded-xl border border-amber-400/40 bg-amber-950/20 p-3 text-amber-200 text-xs flex items-center justify-between gap-2 flex-wrap">
+        <span>💰 Tesouraria · {loading ? "carregando…" : (snap as any)?.error ?? "sem dados"}</span>
+        <button
+          onClick={() => void exportLedger()}
+          className="text-[10px] px-2 py-1 rounded-md border border-emerald-400/60 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 shadow-[0_0_10px_rgba(52,211,153,0.35)]"
+        >
+          📥 EXPORTAR LIVRO (CSV)
+        </button>
       </section>
     );
   }
