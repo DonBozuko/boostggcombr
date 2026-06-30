@@ -26,6 +26,9 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<NocSnapshot> => {
     if (!checkToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
+
+    await checkAllProvidersBalance().catch((e) => console.error("[jarvis-noc] balance refresh failed", e));
 
     const tableChecks = await Promise.all(TABLES.map(async (name) => {
       const t0 = Date.now();
