@@ -3,6 +3,7 @@ import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
+import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
@@ -215,8 +216,9 @@ function TelegramLanding() {
           { key: "_views", label: "Views Posts",   emoji: "🎬", badge: "Recomendado",      badgeColor: AERO },
         ]}
       />
-      <div className="relative z-40 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-start justify-between px-3">
+      <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
         <FabianoBadge variant="telegram" inline />
+        <SocialProofPopup route="/telegram" />
         <JarvisBadge variant="telegram" inline />
       </div>
       <PremiumPricingGrid

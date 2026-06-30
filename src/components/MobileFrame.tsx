@@ -5,7 +5,6 @@ import { ReviewsCarousel } from "./ReviewsCarousel";
 import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
 
-import { SocialProofPopup } from "./SocialProofPopup";
 import { TopNetworksNav } from "./TopNetworksNav";
 import igLeft from "@/assets/char-ig-left.png";
 import igRight from "@/assets/char-ig-right.png";
@@ -250,8 +249,6 @@ export function MobileFrame({
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
         <TopNetworksNav active={route} />
 
-        
-        <SocialProofPopup route={route} />
         <div
           className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-visible flex flex-col pb-2"
           style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}

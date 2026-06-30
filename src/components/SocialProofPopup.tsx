@@ -72,13 +72,13 @@ export function SocialProofPopup({ route = "/" }: { route?: string }) {
   if (!item) return null;
   return (
     <div
-      className="absolute left-1/2 -translate-x-1/2 z-50 pointer-events-none"
-      style={{ top: "170px" }}
+      className="relative z-50 inline-flex shrink-0 pointer-events-none -translate-y-1 sm:-translate-y-2"
+      data-social-proof="inline-center"
       role="status"
       aria-live="polite"
     >
       <div
-        className="rounded-2xl border border-white/15 bg-black/85 backdrop-blur-md px-3 py-2 shadow-2xl flex items-center gap-2.5 min-w-[230px] max-w-[270px]"
+        className="rounded-2xl border border-white/15 bg-black/85 backdrop-blur-md px-2.5 py-2 shadow-2xl flex items-center gap-2 min-w-[190px] max-w-[220px] sm:min-w-[230px] sm:max-w-[270px]"
         style={{
           boxShadow: "0 8px 30px rgba(0,0,0,0.7), 0 0 14px rgba(255,255,255,0.06)",
           opacity: visible ? 1 : 0,
