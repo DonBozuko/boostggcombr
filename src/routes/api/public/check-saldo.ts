@@ -45,6 +45,12 @@ async function run(request: Request) {
       } catch {}
     }
     const all = await checkAllProvidersBalance({ fornecedor });
+    if (fornecedor && all.results.length === 0) {
+      return new Response(JSON.stringify({ ok: false, error: "FORNECEDOR_NOT_FOUND" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     // mantém SMMhype individual (alertas/WhatsApp) compatível com v67
     const smm = all.results.find((r) => r.nome === "SMMhype");
     let alerta: unknown = null;
