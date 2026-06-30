@@ -221,19 +221,31 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
   );
 }
 
-// Orquestrador central: mantém CouponField totalmente DESMONTADO até cravar 5s
-// desde o load da página. Ao montar, CouponField já dispara cronômetro + tic-tac.
+// v54 — Isomorphic Shell Layout Restore
+// Renderiza um wrapper invisível desde o load para NÃO afetar layout dos vizinhos
+// (grid, avatares, HUD). Aos 5s revela o CouponField como overlay isolado com
+// slide-down, sem reflow nem remount dos elementos irmãos.
 export function DelayedCouponField({ accent = "#FFD700" }: { accent?: string }) {
-  const [mounted, setMounted] = useState(false);
+  const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    armAudioUnlock(); // arma listener de gesto desde o início para liberar áudio antes do reveal
+    armAudioUnlock();
     const remaining = remainingUntilCouponReveal();
-    if (remaining === 0) { setMounted(true); return; }
-    const id = window.setTimeout(() => setMounted(true), remaining);
+    if (remaining === 0) { setRevealed(true); return; }
+    const id = window.setTimeout(() => setRevealed(true), remaining);
     return () => window.clearTimeout(id);
   }, []);
 
-  if (!mounted) return null;
-  return <CouponField accent={accent} />;
+  return (
+    <div
+      aria-hidden={!revealed}
+      style={{
+        opacity: revealed ? 1 : 0,
+        pointerEvents: revealed ? "auto" : "none",
+        transition: "opacity 0.3s ease-out",
+      }}
+    >
+      {revealed ? <CouponField accent={accent} /> : null}
+    </div>
+  );
 }
