@@ -197,7 +197,7 @@ function resolveApiKey(secretRef: string | undefined | null): string {
   const fromEnv = sanitizeKey(process.env[ref]);
   if (fromEnv) return fromEnv;
   // Compatível com instalações onde o valor real foi salvo no banco em vez do nome do secret.
-  return /^[A-Z0-9_]+$/.test(ref) ? "" : ref;
+  return ref;
 }
 
 function normalizeSmmEndpoint(apiUrl: string): string {
