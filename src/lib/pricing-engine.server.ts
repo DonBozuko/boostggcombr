@@ -162,8 +162,49 @@ async function safeFetchProviderServices(
   }
 }
 
-// Multi-Provider Fallback Core v50 — tenta SMMhype, depois SMMPainel, depois Verified.
-// Retorna o primeiro mapa serviceId→USD/1000 saudável.
+// v50.1 — Isolation registry: provedores instáveis ficam marcados em pricing_cache
+// como linhas-sentinela `_unstable:<provider>` com TTL de 30min.
+const UNSTABLE_TTL_MS = 30 * 60 * 1000;
+const MIN_HEALTHY_SERVICES = 50; // panel saudável devolve centenas
+
+async function readUnstableProviders(): Promise<Set<string>> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("pricing_cache" as any)
+      .select("category, synced_at")
+      .like("category", "_unstable:%");
+    const now = Date.now();
+    const out = new Set<string>();
+    for (const row of (data ?? []) as Array<any>) {
+      const t = new Date(row.synced_at).getTime();
+      if (Number.isFinite(t) && now - t < UNSTABLE_TTL_MS) {
+        out.add(String(row.category).replace("_unstable:", ""));
+      }
+    }
+    return out;
+  } catch { return new Set(); }
+}
+
+async function markUnstable(name: string, reason: string): Promise<void> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("pricing_cache" as any).upsert(
+      [{
+        category: `_unstable:${name}`,
+        cost_per_1k_brl: 0,
+        source: reason.slice(0, 60),
+        synced_at: new Date().toISOString(),
+      }],
+      { onConflict: "category" },
+    );
+    console.warn(`[pricing] provider isolado: ${name} (${reason})`);
+  } catch { /* noop */ }
+}
+
+// Multi-Provider Fallback Core v50.1 — SMMhype → SMMPainel → Verified com
+// isolamento persistente. Provedor com JSON inválido / IDs corrompidos é
+// removido da rotação por 30min; sistema cai em FALLBACK_RATES_PER_1K.
 async function loadProviderRateMap(): Promise<{
   rateById: Map<number, number>;
   provider: "smmhype" | "smmpanel" | "verified" | "none";
@@ -173,20 +214,31 @@ async function loadProviderRateMap(): Promise<{
     { name: "smmpanel", url: "https://smmpainel.net/api/v2", key: process.env.SMMPAINEL_API_KEY },
     { name: "verified", url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
   ];
+  const unstable = await readUnstableProviders();
   for (const p of providers) {
     if (!p.key) continue;
+    if (unstable.has(p.name)) {
+      console.warn(`[pricing] pulando ${p.name} (isolado em pricing_cache)`);
+      continue;
+    }
     const list = await safeFetchProviderServices(p.url, p.key);
-    if (!list || list.length === 0) continue;
+    if (!list) { await markUnstable(p.name, "invalid_json_or_http"); continue; }
+    if (list.length < MIN_HEALTHY_SERVICES) {
+      await markUnstable(p.name, `low_service_count:${list.length}`);
+      continue;
+    }
     const map = new Map<number, number>();
     for (const s of list) {
       const id = Number((s as any).service);
       const r = Number((s as any).rate);
       if (Number.isFinite(id) && Number.isFinite(r) && r > 0) map.set(id, r);
     }
-    if (map.size > 0) {
-      console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
-      return { rateById: map, provider: p.name };
+    if (map.size < MIN_HEALTHY_SERVICES) {
+      await markUnstable(p.name, `corrupt_ids:${map.size}`);
+      continue;
     }
+    console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
+    return { rateById: map, provider: p.name };
   }
   return { rateById: new Map(), provider: "none" };
 }
