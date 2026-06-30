@@ -36,9 +36,15 @@ async function run(request: Request) {
     });
   }
   try {
-    const { checkSmmhypeBalance } = await import("@/lib/monitor-saldo.server");
-    const res = await checkSmmhypeBalance();
-    return new Response(JSON.stringify(res), {
+    const { checkAllProvidersBalance, checkSmmhypeBalance } = await import("@/lib/monitor-saldo.server");
+    const all = await checkAllProvidersBalance();
+    // mantém SMMhype individual (alertas/WhatsApp) compatível com v67
+    const smm = all.results.find((r) => r.nome === "SMMhype");
+    let alerta: unknown = null;
+    if (smm) {
+      try { ({ alerta } = await checkSmmhypeBalance() as any); } catch {}
+    }
+    return new Response(JSON.stringify({ ok: true, results: all.results, alerta }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (e: any) {
