@@ -180,18 +180,11 @@ async function readCachedRate(category: Category): Promise<number | null> {
 }
 
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
-  // Cron-Driven API Replication: lê primeiro o cache local (atualizado em background).
+  // Hermetic Engine v46: read-path consome SOMENTE cache local (alimentado pelo cron).
+  // Sem fetchSmmRatePer1kBRL aqui — front-end e checkout ficam isolados de latência/falha externa.
   const cached = await readCachedRate(category);
-  let cost: number;
-  let source: "api" | "fallback";
-  if (cached != null) {
-    cost = cached;
-    source = "api";
-  } else {
-    const apiRate = await fetchSmmRatePer1kBRL(category);
-    source = apiRate != null ? "api" : "fallback";
-    cost = apiRate ?? FALLBACK_RATES_PER_1K[category];
-  }
+  const cost = cached ?? FALLBACK_RATES_PER_1K[category];
+  const source: "api" | "fallback" = cached != null ? "api" : "fallback";
 
   const items: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
     const valor = priceFromCost(qty, cost);
