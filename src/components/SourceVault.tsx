@@ -153,10 +153,15 @@ export function SourceVault() {
             <input
               ref={inputRef}
               type="password"
+              name="vault-pin-no-save"
               inputMode="text"
-              autoComplete="off"
+              autoComplete="new-password"
+              autoCorrect="off"
               autoCapitalize="off"
               spellCheck={false}
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
               maxLength={8}
               value={pin}
               onChange={(e) => setPin(e.target.value.slice(0, 8))}
