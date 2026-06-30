@@ -374,20 +374,16 @@ function Landing() {
   const igType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
   const tipoBloqueado = isBlocked(blockedMap, "instagram", igType);
 
-  // Phase A — motor de preços dinâmico (isolado em /). Fallback automático server-side.
+  // v54-Patch — Strict Pricing Hydration Enforcer
+  // Fonte única e imutável: server fn `getPricingGrid` → `pricing_items`.
+  // Proibido cachear em localStorage (gerava drift entre builds antigos com
+  // markup estático e o valor real do banco, causando oscilação R$3↔R$5).
   const getPricingGridFn = useServerFn(getPricingGrid);
-  const PRICING_CACHE_KEY = "ebp_pricing_overrides_v1";
   const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>({});
   useEffect(() => {
     let cancelled = false;
-    // Hydration-safe cache: localStorage só entra após o primeiro render do cliente.
-    try {
-      const raw = window.localStorage.getItem(PRICING_CACHE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === "object") setPriceOverrides(parsed);
-      }
-    } catch { /* cache inválido */ }
+    // Purga cache legado de versões anteriores (fonte do drift).
+    try { window.localStorage.removeItem("ebp_pricing_overrides_v1"); } catch {}
     const cats = [
       "instagram:seguidores",
       "instagram:curtidas",
@@ -401,10 +397,8 @@ function Landing() {
           if (!r?.items || !Array.isArray(r.items) || r.items.length === 0) continue;
           for (const it of r.items) map[it.id] = { valor: it.valor, price: it.price };
         }
-        // Fallback Guard: rejeita resposta vazia/corrompida — mantém cache anterior.
         if (Object.keys(map).length === 0) return;
         setPriceOverrides(map);
-        try { window.localStorage.setItem(PRICING_CACHE_KEY, JSON.stringify(map)); } catch { /* quota */ }
       });
     return () => { cancelled = true; };
   }, [getPricingGridFn]);
