@@ -58,7 +58,7 @@ import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 
-import { CouponField, getAppliedCoupon } from "@/components/CouponField";
+import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid } from "@/lib/pricing.functions";
@@ -654,7 +654,7 @@ function Landing() {
               />
             </div>
 
-            <CouponField accent="#FFD700" />
+            <DelayedCouponField accent="#FFD700" />
 
             <Button
               type="submit"

@@ -23,7 +23,7 @@ import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { getSandboxEnabled } from "@/lib/sandbox.functions";
-import { CouponField, getAppliedCoupon } from "@/components/CouponField";
+import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTrafego from "@/assets/og-trafego.jpg";
 
 const NEON = "#B026FF";
@@ -223,7 +223,7 @@ function TrafegoLanding() {
                 placeholder="https://seusite.com.br/landing"
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }} maxLength={500} />
             </div>
-            <CouponField accent={NEON} />
+            <DelayedCouponField accent={NEON} />
             <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
               onClick={() => { const sel = allPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
               className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"

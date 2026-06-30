@@ -1,64 +1,99 @@
 import { useEffect, useRef, useState } from "react";
 
-// v52 — Micro-FOMO Ticker Core + Tick-Tac Syncer
-function useCouponCountdown(seconds: number = 10) {
+const COUPON_REVEAL_DELAY_MS = 5_000; // 3s fala dos avatares + 2s respiro pós-conversa
+
+function remainingUntilCouponReveal(): number {
+  if (typeof window === "undefined") return COUPON_REVEAL_DELAY_MS;
+  return Math.max(0, COUPON_REVEAL_DELAY_MS - Math.floor(performance.now()));
+}
+
+// v52-patch — Micro-FOMO Ticker Core + Tick-Tac Syncer real após reveal
+function useCouponCountdown(active: boolean, seconds: number = 10) {
   const [left, setLeft] = useState(seconds);
   const ctxRef = useRef<AudioContext | null>(null);
   const armedRef = useRef(false);
+  const tickRef = useRef(0);
 
   useEffect(() => {
-    function arm() {
-      if (armedRef.current) return;
+    async function arm() {
       try {
-        const Ctx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
-        ctxRef.current = new Ctx();
-        armedRef.current = true;
+        if (!ctxRef.current) {
+          const Ctx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
+          ctxRef.current = new Ctx();
+        }
+        if (ctxRef.current.state === "suspended") await ctxRef.current.resume();
+        armedRef.current = ctxRef.current.state === "running";
       } catch {}
     }
-    window.addEventListener("pointerdown", arm, { once: true });
-    window.addEventListener("keydown", arm, { once: true });
+    window.addEventListener("pointerdown", arm);
+    window.addEventListener("touchstart", arm);
+    window.addEventListener("keydown", arm);
+    window.setTimeout(arm, COUPON_REVEAL_DELAY_MS);
     return () => {
       window.removeEventListener("pointerdown", arm);
+      window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", arm);
     };
   }, []);
 
   useEffect(() => {
-    function reset() { setLeft(seconds); }
+    function reset() {
+      tickRef.current = 0;
+      setLeft(seconds);
+    }
     document.addEventListener("visibilitychange", reset);
-    return () => document.removeEventListener("visibilitychange", reset);
+    window.addEventListener("pageshow", reset);
+    return () => {
+      document.removeEventListener("visibilitychange", reset);
+      window.removeEventListener("pageshow", reset);
+    };
   }, [seconds]);
 
   useEffect(() => {
+    if (!active) {
+      tickRef.current = 0;
+      setLeft(seconds);
+      return;
+    }
+
+    const playTick = (current: number) => {
+      const ctx = ctxRef.current;
+      if (!ctx) return;
+      if (ctx.state === "suspended") void ctx.resume().catch(() => {});
+      if (ctx.state !== "running") return;
+      try {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const duration = current <= 3 ? 0.085 : 0.06;
+        osc.type = current <= 3 ? "sawtooth" : "square";
+        osc.frequency.value = current <= 3 ? 2200 + tickRef.current * 80 : current % 2 === 0 ? 1800 : 1400;
+        gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(current <= 3 ? 0.12 : 0.08, ctx.currentTime + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration + 0.01);
+      } catch {}
+    };
+
+    setLeft(seconds);
+    playTick(seconds);
     const t = setInterval(() => {
       setLeft((s) => {
-        const next = s <= 1 ? seconds : s - 1;
-        const ctx = ctxRef.current;
-        if (ctx && ctx.state === "running") {
-          try {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = "square";
-            osc.frequency.value = s % 2 === 0 ? 1800 : 1400;
-            gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.005);
-            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
-            osc.connect(gain).connect(ctx.destination);
-            osc.start();
-            osc.stop(ctx.currentTime + 0.06);
-          } catch {}
-        }
+        tickRef.current += 1;
+        const next = s <= 0 ? seconds : s - 1;
+        playTick(next);
         return next;
       });
     }, 1000);
     return () => clearInterval(t);
-  }, [seconds]);
+  }, [active, seconds]);
 
   return left;
 }
 
-function CouponCountdownBanner() {
-  const left = useCouponCountdown(10);
+function CouponCountdownBanner({ active }: { active: boolean }) {
+  const left = useCouponCountdown(active, 10);
   const ss = left.toString().padStart(2, "0");
   return (
     <div
@@ -93,10 +128,11 @@ export function getAppliedCoupon(): string | null {
   }
 }
 
-export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
+export function CouponField({ accent = "#FFD700", revealDelayMs = COUPON_REVEAL_DELAY_MS }: { accent?: string; revealDelayMs?: number }) {
   const [value, setValue] = useState("");
   const [applied, setApplied] = useState(false);
   const [error, setError] = useState("");
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     try {
@@ -106,6 +142,13 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    setVisible(false);
+    const delay = revealDelayMs === COUPON_REVEAL_DELAY_MS ? remainingUntilCouponReveal() : revealDelayMs;
+    const id = window.setTimeout(() => setVisible(true), delay);
+    return () => window.clearTimeout(id);
+  }, [revealDelayMs]);
 
   function apply() {
     const v = value.trim().toUpperCase();
@@ -128,8 +171,13 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
   }
 
   return (
-    <>
-    <CouponCountdownBanner />
+    <div
+      className={`transition-all animate-slide-down duration-500 ${
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-3 opacity-0"
+      }`}
+      aria-hidden={!visible}
+    >
+    <CouponCountdownBanner active={visible} />
     <div
       className="rounded-xl p-3"
       style={{
@@ -177,6 +225,20 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
         <p className="mt-2 text-[12px] font-bold text-red-400">{error}</p>
       )}
     </div>
-    </>
+    </div>
   );
+}
+
+export function DelayedCouponField({ accent = "#FFD700" }: { accent?: string }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(false);
+    const id = window.setTimeout(() => setMounted(true), remainingUntilCouponReveal());
+    return () => window.clearTimeout(id);
+  }, []);
+
+  if (!mounted) return null;
+
+  return <CouponField accent={accent} revealDelayMs={0} />;
 }

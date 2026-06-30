@@ -26,7 +26,7 @@ import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CouponField, getAppliedCoupon } from "@/components/CouponField";
+import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import ogTelegram from "@/assets/og-telegram.jpg";
 
@@ -272,7 +272,7 @@ function TelegramLanding() {
                 maxLength={300}
               />
             </div>
-            <CouponField accent={AERO} />
+            <DelayedCouponField accent={AERO} />
             <Button
               type="button"
               size="lg"
