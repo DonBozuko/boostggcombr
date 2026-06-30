@@ -395,7 +395,7 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
 }
 
 // v47 — sincroniza TODOS os ~200 cards (1 chamada services + 1 resolver por card).
-export async function syncPricingCacheAll(): Promise<{
+export async function syncPricingCacheAll(options: { forceContingency?: boolean } = {}): Promise<{
   ok: boolean;
   updated: number;
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
@@ -403,9 +403,11 @@ export async function syncPricingCacheAll(): Promise<{
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático
-  // SMMhype → SMMPainel → Verified. Se todos caírem, FALLBACK_RATES_PER_1K cobre.
-  const { rateById, provider } = await loadProviderRateMap();
+  // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático.
+  // v50-Patch: forceContingency ignora rede e popula tudo pela matriz local.
+  const { rateById, provider } = options.forceContingency
+    ? { rateById: new Map<number, number>(), provider: "none" as const }
+    : await loadProviderRateMap();
   console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
 
 
