@@ -88,6 +88,8 @@ export async function markProviderUnstable(slug: string, errorMsg: string): Prom
     }
   } catch { /* noop */ }
   try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const until = new Date(Date.now() + UNSTABLE_TTL_MS).toISOString();
     await supabaseAdmin.from("provider_health" as any).upsert(
       {
         slug,
