@@ -128,6 +128,8 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
   }
 
   return (
+    <>
+    <CouponCountdownBanner />
     <div
       className="rounded-xl p-3"
       style={{
