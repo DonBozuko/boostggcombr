@@ -9,7 +9,7 @@ export type TreasurySnapshot =
       semanal: { fat: number; lucro: number };
       mensal: { fat: number; lucro: number };
       previsao30d: number;
-      ultimas: Array<{ occurred_at: string; faturamento: number; lucro_liquido: number; network: string | null }>;
+      ultimas: Array<{ occurred_at: string; faturamento: number; lucro_liquido: number; network: string | null; supplier_cost: number | null; provider_selected: string | null; net_profit_percentage: number | null }>;
     }
   | { ok: false; error: string };
 
