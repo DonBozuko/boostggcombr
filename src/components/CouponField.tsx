@@ -34,7 +34,10 @@ function useCouponCountdown(active: boolean, seconds: number = 10) {
     }
     document.addEventListener("visibilitychange", reset);
     window.addEventListener("pageshow", reset);
-    return () => document.removeEventListener("visibilitychange", reset);
+    return () => {
+      document.removeEventListener("visibilitychange", reset);
+      window.removeEventListener("pageshow", reset);
+    };
   }, [seconds]);
 
   useEffect(() => {
