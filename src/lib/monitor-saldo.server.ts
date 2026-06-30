@@ -252,6 +252,7 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
           "Accept": "application/json, text/plain, */*",
           "User-Agent": "Mozilla/5.0 EliteBoostPrime/1.0",
           "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
         },
         body: body.toString(),
         signal: AbortSignal.timeout(15000),
