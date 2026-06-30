@@ -121,9 +121,12 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
           <DialogContent className="max-w-3xl bg-black/90 border-cyan-400/30">
             <DialogHeader>
               <DialogTitle className="text-cyan-300">🖥️ Console TI · Verificador de Integridade</DialogTitle>
-              <DialogDescription>Auditoria real de rotas, mídias v=33 e tabelas do banco.</DialogDescription>
+              <DialogDescription>Auditoria real de rotas, mídias v=48 e tabelas do banco.</DialogDescription>
             </DialogHeader>
-            <IntegrityVerifier />
+            <div className="space-y-4">
+              <IntegrityVerifier />
+              <JarvisDetectorMentiras />
+            </div>
           </DialogContent>
         </Dialog>
         <Button
