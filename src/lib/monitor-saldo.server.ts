@@ -1,4 +1,4 @@
-// Server-only: check SMMhype balance and persist into monitoramento_saldo.
+// Server-only: strict balance extraction for all SMM suppliers.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const USD_TO_BRL_DEFAULT = 7.0;
@@ -26,82 +26,10 @@ export async function checkSmmhypeBalance() {
     return { ok: false as const, error: "FORNECEDOR_NOT_FOUND" };
   }
 
-  const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
-  const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
-  const t0 = Date.now();
-  let saldoUsd: number | null = null;
-  let status = "Online";
-  let erro: string | null = null;
+  const balance = await checkProviderBalance(fornecedor);
+  await persistProviderBalance(fornecedor, balance);
 
-  try {
-    if (!apiKey) throw new Error("API key ausente: " + fornecedor.api_key_secret);
-    if (!endpoint) throw new Error("api_url ausente");
-    const body = new URLSearchParams({ key: apiKey, action: "balance" });
-
-    const doFetch = () => fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*",
-        "Cache-Control": "no-cache, no-store, must-revalidate",
-        "Pragma": "no-cache",
-      },
-      body: body.toString(),
-      signal: AbortSignal.timeout(15000),
-    });
-
-    let res = await doFetch();
-    // Retry on rate-limit / transient server errors
-    if (res.status === 429 || res.status === 503 || res.status === 502) {
-      await new Promise((r) => setTimeout(r, 2500));
-      res = await doFetch();
-    }
-
-    const text = await res.text();
-    let json: any = null;
-    try { json = JSON.parse(text); } catch {}
-    if (!res.ok || !json || json.error) {
-      throw new Error(`HTTP ${res.status} body=${text.slice(0, 300)}`);
-    }
-    const raw = json.balance ?? json.saldo;
-    saldoUsd = typeof raw === "string" ? parseFloat(raw) : Number(raw);
-    if (!Number.isFinite(saldoUsd)) throw new Error("saldo inválido: " + text.slice(0, 200));
-  } catch (e: any) {
-    status = "Offline";
-    erro = e?.message ?? String(e);
-  }
-
-
-  const elapsed = Date.now() - t0;
-
-  // Reset forçado: zera contador de falhas para destravar cache do painel admin
-  const novasFalhas = 0;
-  const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
-  const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
-
-
-  await supabaseAdmin.from("monitoramento_saldo").insert({
-    fornecedor_id: fornecedor.id,
-    saldo: saldoUsd,
-    status: statusPersistido,
-    tempo_resposta_ms: elapsed,
-    erro_retornado: erro,
-  });
-
-  await supabaseAdmin
-    .from("fornecedores")
-    .update({
-      saldo_atual: saldoUsd ?? fornecedor.saldo_atual,
-      status: statusPersistido,
-      ultima_verificacao: new Date().toISOString(),
-      falhas_consecutivas: novasFalhas,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", fornecedor.id);
-
-  const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
-  const saldoBrl = saldoUsd != null ? saldoUsd * cotacao : null;
+  const { saldoUsd, saldoBrl, statusPersistido, erro, elapsed } = balance;
 
   // ---- Previsão de consumo (últimas 24h) + alertas preventivos ----
   let previsao24hBrl = 0;
@@ -201,18 +129,156 @@ function resolveApiKey(secretRef: string | undefined | null): string {
 }
 
 function normalizeSmmEndpoint(apiUrl: string): string {
-  const u = (apiUrl || "").trim().replace(/\/+$/, "");
+  const u = sanitizeEndpoint(apiUrl);
   if (!u) return u;
   if (/\/api\/v2$/i.test(u)) return u;
   return `${u}/api/v2`;
 }
 
+function sanitizeEndpoint(raw: string | undefined | null): string {
+  if (!raw) return "";
+  return String(raw).replace(/[\u200B-\u200D\uFEFF"']/g, "").trim().replace(/\/+$/, "");
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function buildBalanceHeaders(): HeadersInit {
+  return {
+    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "Accept": "application/json, text/plain, */*",
+    "User-Agent": "EliteBoostPrime-JARVIS-NOC/78.0",
+    "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+  };
+}
+
+function parseProviderBalance(text: string): number {
+  let payload: any = null;
+  try { payload = JSON.parse(text); } catch {}
+
+  const raw =
+    payload?.balance ??
+    payload?.saldo ??
+    payload?.funds ??
+    payload?.data?.balance ??
+    payload?.data?.saldo ??
+    (payload == null && /^\s*-?\d+(?:[.,]\d+)?\s*$/.test(text) ? text : undefined);
+
+  const normalized = typeof raw === "string"
+    ? Number(raw.replace(/[^\d,.-]/g, "").replace(/,/g, "."))
+    : Number(raw);
+
+  if (!Number.isFinite(normalized)) {
+    const providerError = payload?.error ?? payload?.message ?? payload?.msg;
+    throw new Error(providerError ? `saldo indisponível: ${String(providerError).slice(0, 180)}` : `saldo inválido: ${text.slice(0, 180)}`);
+  }
+  return normalized;
+}
+
+async function fetchProviderBalance(endpoint: string, apiKey: string): Promise<number> {
+  const url = `${endpoint}${endpoint.includes("?") ? "&" : "?"}_noc=${Date.now()}`;
+  const body = new URLSearchParams({ key: apiKey, action: "balance" });
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: buildBalanceHeaders(),
+        body: body.toString(),
+        signal: AbortSignal.timeout(18_000),
+      });
+      const text = await res.text();
+      if (!res.ok) {
+        const waitHeader = Number(res.headers.get("retry-after"));
+        const waitMs = Number.isFinite(waitHeader) && waitHeader > 0 ? waitHeader * 1000 : 1800 + attempt * 1400;
+        lastError = new Error(`HTTP ${res.status}: ${text.slice(0, 180)}`);
+        if ([408, 425, 429, 500, 502, 503, 504].includes(res.status) && attempt < 2) {
+          await sleep(waitMs);
+          continue;
+        }
+        throw lastError;
+      }
+      return parseProviderBalance(text);
+    } catch (e: any) {
+      lastError = e instanceof Error ? e : new Error(String(e));
+      if (attempt < 2) {
+        await sleep(1600 + attempt * 1400);
+        continue;
+      }
+    }
+  }
+
+  throw lastError ?? new Error("falha desconhecida na leitura de saldo");
+}
+
+type ProviderCheck = {
+  saldoUsd: number | null;
+  saldoBrl: number | null;
+  status: "Online" | "Offline";
+  statusPersistido: "Online" | "Offline";
+  erro: string | null;
+  elapsed: number;
+};
+
+async function checkProviderBalance(fornecedor: any): Promise<ProviderCheck> {
+  const t0 = Date.now();
+  const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
+  const endpoint = normalizeSmmEndpoint(fornecedor.api_url as string);
+  let saldoUsd: number | null = null;
+  let status: "Online" | "Offline" = "Online";
+  let erro: string | null = null;
+
+  try {
+    if (!apiKey) throw new Error("API key ausente/inválida");
+    if (!endpoint) throw new Error("api_url ausente/inválida");
+    saldoUsd = await fetchProviderBalance(endpoint, apiKey);
+  } catch (e: any) {
+    status = "Offline";
+    erro = String(e?.message ?? e).slice(0, 240);
+  }
+
+  const elapsed = Date.now() - t0;
+  const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
+  const saldoBrl = saldoUsd != null ? saldoUsd * cotacao : null;
+  const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
+  const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
+
+  return { saldoUsd, saldoBrl, status, statusPersistido, erro, elapsed };
+}
+
+async function persistProviderBalance(fornecedor: any, balance: ProviderCheck) {
+  await supabaseAdmin.from("monitoramento_saldo").insert({
+    fornecedor_id: fornecedor.id,
+    saldo: balance.saldoUsd,
+    status: balance.statusPersistido,
+    tempo_resposta_ms: balance.elapsed,
+    erro_retornado: balance.erro,
+  });
+
+  await supabaseAdmin
+    .from("fornecedores")
+    .update({
+      saldo_atual: balance.saldoUsd ?? fornecedor.saldo_atual,
+      status: balance.statusPersistido,
+      ultima_verificacao: new Date().toISOString(),
+      falhas_consecutivas: 0,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", fornecedor.id);
+}
+
 export type ProviderBalanceResult = {
   id: string;
   nome: string;
+  slug: string | null;
   ok: boolean;
   saldoUsd: number | null;
   saldoBrl: number | null;
+  saldoPersistidoUsd: number | null;
   status: "Online" | "Offline";
   erro: string | null;
   tempo_resposta_ms: number;
@@ -233,88 +299,20 @@ export async function checkAllProvidersBalance(opts: { fornecedor?: string } = {
     : (rows ?? []);
 
   const results = await Promise.all(fornecedores.map(async (fornecedor: any): Promise<ProviderBalanceResult> => {
-    const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
-    const endpoint = normalizeSmmEndpoint(fornecedor.api_url);
-    const t0 = Date.now();
-    let saldoUsd: number | null = null;
-    let status: "Online" | "Offline" = "Online";
-    let erro: string | null = null;
-
-    try {
-      if (!apiKey) throw new Error("API key ausente/inválida: " + fornecedor.api_key_secret);
-      if (!endpoint) throw new Error("api_url ausente");
-
-      const body = new URLSearchParams({ key: apiKey, action: "balance" });
-      const doFetch = () => fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Accept": "application/json, text/plain, */*",
-          "User-Agent": "Mozilla/5.0 EliteBoostPrime/1.0",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-        },
-        body: body.toString(),
-        signal: AbortSignal.timeout(15000),
-      });
-
-      let res = await doFetch();
-      if (res.status === 429 || res.status === 502 || res.status === 503) {
-        await new Promise((r) => setTimeout(r, 2500));
-        res = await doFetch();
-      }
-      const text = await res.text();
-      let json: any = null;
-      try { json = JSON.parse(text); } catch {}
-      if (!res.ok || !json || json.error) {
-        throw new Error(`HTTP ${res.status} body=${text.slice(0, 200)}`);
-      }
-      const raw = json.balance ?? json.saldo ?? json.funds;
-      saldoUsd = typeof raw === "string" ? parseFloat(raw) : Number(raw);
-      if (!Number.isFinite(saldoUsd)) throw new Error("saldo inválido: " + text.slice(0, 200));
-    } catch (e: any) {
-      status = "Offline";
-      erro = e?.message ?? String(e);
-      saldoUsd = null;
-    }
-
-    const elapsed = Date.now() - t0;
-    const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
-    const saldoBrl = saldoUsd != null ? saldoUsd * cotacao : null;
-
-    // v67 Perpetual Balance Force: oscilação transitória NÃO desliga fornecedor com saldo cadastrado.
-    const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
-    const preservarOnline = status === "Offline" && saldoAtualPrevio > 0;
-    const statusPersistido = preservarOnline ? "Online" : status;
-
-    await supabaseAdmin.from("monitoramento_saldo").insert({
-      fornecedor_id: fornecedor.id,
-      saldo: saldoUsd,
-      status: statusPersistido,
-      tempo_resposta_ms: elapsed,
-      erro_retornado: erro,
-    });
-
-    await supabaseAdmin
-      .from("fornecedores")
-      .update({
-        saldo_atual: saldoUsd ?? fornecedor.saldo_atual,
-        status: statusPersistido,
-        ultima_verificacao: new Date().toISOString(),
-        falhas_consecutivas: 0,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", fornecedor.id);
+    const balance = await checkProviderBalance(fornecedor);
+    await persistProviderBalance(fornecedor, balance);
 
     return {
       id: fornecedor.id,
       nome: fornecedor.nome,
-      ok: statusPersistido === "Online",
-      saldoUsd,
-      saldoBrl,
-      status: statusPersistido,
-      erro,
-      tempo_resposta_ms: elapsed,
+      slug: fornecedor.slug ?? null,
+      ok: balance.statusPersistido === "Online",
+      saldoUsd: balance.saldoUsd,
+      saldoBrl: balance.saldoBrl,
+      saldoPersistidoUsd: balance.saldoUsd ?? (fornecedor.saldo_atual != null ? Number(fornecedor.saldo_atual) : null),
+      status: balance.statusPersistido,
+      erro: balance.erro,
+      tempo_resposta_ms: balance.elapsed,
     };
   }));
 
