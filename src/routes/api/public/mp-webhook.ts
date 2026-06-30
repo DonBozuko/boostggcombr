@@ -191,6 +191,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 const taxaPix = Number((fat * 0.0099).toFixed(2)); // MP Pix ~0,99%
                 const custo = custoReal != null ? Number(custoReal.toFixed(2)) : 0;
                 const lucroLiq = Number((fat - custo - taxaPix).toFixed(2));
+                const netPct = fat > 0 ? Number(((lucroLiq / fat) * 100).toFixed(2)) : 0;
                 await supabaseAdmin.from("admin_treasury" as any).upsert({
                   pedido_id: pedido.id,
                   faturamento: fat,
@@ -199,6 +200,9 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   lucro_liquido: lucroLiq,
                   network: String(pedido.pacote ?? "").split("_")[0] ?? null,
                   occurred_at: new Date().toISOString(),
+                  supplier_cost: custoReal != null ? Number(custoReal.toFixed(4)) : null,
+                  provider_selected: f.slug,
+                  net_profit_percentage: netPct,
                 } as any, { onConflict: "pedido_id" });
               } catch (e) { console.warn("[mp-webhook] treasury ledger falhou", e); }
               // === Notificação Telegram: sucesso / auto-reparo ===
