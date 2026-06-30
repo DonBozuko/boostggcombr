@@ -145,6 +145,14 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           let sucesso = false;
 
           for (const f of cadeia) {
+            // v84 — Strict Failover Balance Engine: pula fornecedor sem saldo BRL suficiente p/ cobrir o custo.
+            if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
+              const det = `Saldo insuficiente: R$ ${Number(f.saldo_atual).toFixed(2)} < custo R$ ${f.cost_brl.toFixed(2)}`;
+              tentativas.push(`${f.nome}: ${det}`);
+              console.warn("[mp-webhook] v84 skip saldo zerado", { pedidoId: pedido.id, fornecedor: f.slug, saldo: f.saldo_atual, custo: f.cost_brl });
+              await markProviderUnstable(f.slug, det);
+              continue;
+            }
             const r = await dispatchByFornecedor(f.slug, {
               pacote: pedido.pacote,
               quantidade: pedido.quantidade,
