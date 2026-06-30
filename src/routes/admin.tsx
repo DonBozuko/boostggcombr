@@ -1245,8 +1245,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         )}
         </div>
 
-        {activeTab === "servicos" && (
-        /* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */
+        <div className={`${activeTab === "servicos" ? "block" : "hidden"} md:block`}>
+        {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
