@@ -145,6 +145,7 @@ export function SourceVault() {
           {/* Input mascarado + ação */}
           <form
             onSubmit={(e) => { e.preventDefault(); tryUnlock(); }}
+            autoComplete="off"
             className="w-full max-w-xs flex flex-col gap-2"
           >
             <label className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
