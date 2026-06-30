@@ -70,9 +70,11 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
         return;
       }
       const item = json.results?.find((r) => r.nome === f.nome) ?? json.results?.[0];
-      const saldo = item?.saldoBrl ?? item?.saldoPersistidoBrl ?? null;
-      setFornecedores((prev) => prev.map((p) => p.id === f.id ? { ...p, saldo_atual: saldo, status: item?.status ?? p.status } : p));
-      toast.success(`${f.nome}: ${item?.status ?? "Online"} · saldo ${saldo != null ? `R$ ${saldo.toFixed(2)}` : "não lido"}${item?.cotacao ? ` · USD ${item.cotacao.toFixed(4)}` : ""}`);
+      const saldoBrl = item?.saldoBrl ?? item?.saldoPersistidoBrl ?? null;
+      const saldoUsd = item?.saldoUsd ?? null;
+      const cot = item?.cotacao ?? null;
+      setFornecedores((prev) => prev.map((p) => p.id === f.id ? { ...p, saldo_atual: saldoBrl, saldo_usd: saldoUsd, cotacao_brl: cot, status: item?.status ?? p.status } : p));
+      toast.success(`${f.nome}: ${item?.status ?? "Online"} · ${saldoUsd != null ? `US$ ${saldoUsd.toFixed(2)}` : "—"}${saldoBrl != null ? ` (R$ ${saldoBrl.toFixed(2)})` : ""}${cot ? ` · cotação R$ ${cot.toFixed(4)}` : ""}`);
       onBalanceSynced?.();
     } catch (e: any) {
       toast.error(e?.message ?? "Falha na atualização de saldo");
