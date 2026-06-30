@@ -93,6 +93,7 @@ export function AuditoriaJarvis({ token }: { token: string }) {
         setBusy(null);
       }
     }
+    if (!current) return;
     renderPDF(current);
   };
 
