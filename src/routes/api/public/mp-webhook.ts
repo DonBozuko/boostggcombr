@@ -154,26 +154,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               await clearProviderUnstable(f.slug);
               console.log("[mp-webhook] dispatch OK", { pedidoId: pedido.id, fornecedor: f.slug, orderId: r.orderId, cost_brl: f.cost_brl });
 
-              // ===== Cálculo de custo real (atacado) =====
-              // custo_brl = (quantidade / 1000) × rate(USD) × cotacao_brl
-              let custoReal: number | null = null;
-              try {
-                const { resolveServiceIdAsync } = await import("@/lib/smmhype.server");
-                const sid = await resolveServiceIdAsync(pedido.pacote, pedido.quantidade);
-                if (sid != null) {
-                  const [{ data: svc }, { data: forn }] = await Promise.all([
-                    supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", sid).maybeSingle(),
-                    supabaseAdmin.from("fornecedores").select("cotacao_brl").eq("slug", f.slug).maybeSingle(),
-                  ]);
-                  const rate = Number(svc?.rate);
-                  const cot = Number((forn as any)?.cotacao_brl ?? 7.0) || 7.0;
-                  if (Number.isFinite(rate) && rate > 0) {
-                    custoReal = (Number(pedido.quantidade) / 1000) * rate * cot;
-                  }
-                }
-              } catch (e) {
-                console.warn("[mp-webhook] custo_real calc falhou", e);
-              }
+              // ===== Custo real: pré-computado pelo smart-routing (rate × cotacao_brl × qty/1000) =====
+              const custoReal: number | null = f.cost_brl;
 
               await supabaseAdmin
                 .from("pedidos")
