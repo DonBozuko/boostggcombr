@@ -5,13 +5,20 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
         try {
           const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
-          const result = await syncPricingCacheAll();
+          const url = new URL(request.url);
+          const forceContingency = url.searchParams.get("force") === "contingency";
+          const result = await syncPricingCacheAll({ forceContingency });
           return new Response(JSON.stringify(result), {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+              "Pragma": "no-cache",
+              "Expires": "0",
+            },
           });
         } catch (err: any) {
           return new Response(
@@ -20,13 +27,20 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           );
         }
       },
-      GET: async () => {
+      GET: async ({ request }) => {
         try {
           const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
-          const result = await syncPricingCacheAll();
+          const url = new URL(request.url);
+          const forceContingency = url.searchParams.get("force") === "contingency";
+          const result = await syncPricingCacheAll({ forceContingency });
           return new Response(JSON.stringify(result), {
             status: 200,
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+              "Pragma": "no-cache",
+              "Expires": "0",
+            },
           });
         } catch (err: any) {
           return new Response(
