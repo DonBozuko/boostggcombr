@@ -18,7 +18,7 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
   const auditFn = useServerFn(auditarFornecedor);
   const contingencyFn = useServerFn(auditoriaContingenciaLocal);
   const listFn = useServerFn(listarFornecedores);
-  const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean }>>([]);
+  const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean; saldo_atual?: number | null; status?: string | null }>>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [balanceBusy, setBalanceBusy] = useState<string | null>(null);
   const [state, setState] = useState<ScanState>(null);
@@ -51,15 +51,18 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
           "Content-Type": "application/json",
           "x-admin-token": token,
         },
+        cache: "no-store",
         body: JSON.stringify({ fornecedor: f.slug || f.id }),
       });
-      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; status: string; erro?: string | null }> } | null;
+      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; saldoPersistidoUsd?: number | null; status: string; erro?: string | null }> } | null;
       if (!res.ok || !json?.ok) {
         toast.error(`${f.nome}: falha ao atualizar saldo`);
         return;
       }
       const item = json.results?.find((r) => r.nome === f.nome) ?? json.results?.[0];
-      toast.success(`${f.nome}: ${item?.status ?? "Online"} · saldo ${item?.saldoUsd != null ? `$${item.saldoUsd.toFixed(2)}` : "preservado"}`);
+      const saldo = item?.saldoUsd ?? item?.saldoPersistidoUsd ?? null;
+      setFornecedores((prev) => prev.map((p) => p.id === f.id ? { ...p, saldo_atual: saldo, status: item?.status ?? p.status } : p));
+      toast.success(`${f.nome}: ${item?.status ?? "Online"} · saldo ${saldo != null ? `US$ ${saldo.toFixed(2)}` : "não lido"}`);
       onBalanceSynced?.();
     } catch (e: any) {
       toast.error(e?.message ?? "Falha na atualização de saldo");
@@ -152,7 +155,7 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
       <div className="flex flex-wrap gap-2">
         {fornecedores.length === 0 && <div className="text-xs text-red-200/60 font-mono">Carregando fornecedores...</div>}
         {fornecedores.map((f) => (
-          <div key={f.id} className="flex gap-1">
+          <div key={f.id} className="flex flex-col gap-1 rounded-lg border border-white/10 bg-black/30 p-1.5">
             <Button
               size="sm" variant="outline"
               onClick={() => scanBalance(f)}
@@ -161,15 +164,20 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
             >
               {balanceBusy === f.id ? `⏳ ${f.nome}...` : `🔄 Varrer ${f.nome}`}
             </Button>
-            <Button
-              size="sm" variant="outline"
-              onClick={() => scan(f)}
-              disabled={busy === f.id}
-              className="border-cyan-500/50 text-cyan-200 hover:bg-cyan-500/10 font-mono text-xs"
-              title="Auditoria contábil de serviços"
-            >
-              {busy === f.id ? "📊..." : "📊"}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm" variant="outline"
+                onClick={() => scan(f)}
+                disabled={busy === f.id}
+                className="border-cyan-500/50 text-cyan-200 hover:bg-cyan-500/10 font-mono text-xs"
+                title="Auditoria contábil de serviços"
+              >
+                {busy === f.id ? "📊..." : "📊"}
+              </Button>
+              <span className="text-[10px] font-mono text-cyan-100">
+                {f.saldo_atual != null ? `US$ ${Number(f.saldo_atual).toFixed(2)}` : "saldo não lido"}
+              </span>
+            </div>
           </div>
         ))}
       </div>
