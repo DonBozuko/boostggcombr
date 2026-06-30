@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Lock, Unlock, ShieldCheck, FileCode } from "lucide-react";
 
 const ROUTE_SOURCES = import.meta.glob("/src/routes/**/*.{ts,tsx}", {
@@ -35,6 +35,24 @@ export function SourceVault() {
       setPin("");
     }
   };
+
+  // v74: Extração automática do mp-webhook ao destravar
+  useEffect(() => {
+    if (!open) return;
+    const key = Object.keys(ROUTE_SOURCES).find((p) => p.endsWith("api/public/mp-webhook.ts"));
+    if (!key) return;
+    try {
+      const blob = new Blob([ROUTE_SOURCES[key]], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mp-webhook.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (e) { console.error("[vault v74] auto-extract failed", e); }
+  }, [open]);
 
 
   return (
@@ -202,28 +220,9 @@ export function SourceVault() {
               ))}
             </div>
             <div className="flex flex-col gap-2">
-              <button
-                type="button"
-                disabled={!selected}
-                onClick={() => {
-                  if (!selected) return;
-                  const code = ROUTE_SOURCES[selected] ?? "";
-                  const base = selected.split("/").pop() ?? "arquivo.ts";
-                  const fname = base.replace(/\.tsx?$/, "") + ".txt";
-                  const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = fname;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                  setTimeout(() => URL.revokeObjectURL(url), 1500);
-                }}
-                className="h-10 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed border border-cyan-300 text-black text-xs font-bold tracking-[0.25em] uppercase shadow-[0_0_18px_rgba(0,255,200,0.45)]"
-              >
-                📥 Baixar arquivo de código
-              </button>
+              <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-300/80">
+                📥 Extração automática · mp-webhook.txt enviado ao destravar
+              </div>
               <textarea
                 id="source_code_area"
                 readOnly
