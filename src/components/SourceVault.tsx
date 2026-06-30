@@ -113,25 +113,18 @@ export function SourceVault() {
               ))}
             </div>
             <div className={`grid gap-1 ${mode === "ABC" ? "grid-cols-7" : "grid-cols-5"}`}>
-              {keys.map((k) => (
-                <button
-                  key={k}
-                  onClick={() => press(k)}
-                  className="h-9 rounded-md bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-100 font-mono text-xs shadow-[inset_0_-2px_0_rgba(0,0,0,0.5)] active:translate-y-px"
-                >
-                  {mode === "ABC" ? k.toLowerCase() : k}
-                </button>
-              ))}
-              {mode === "ABC" && (
-                <button
-                  key="shift-upper"
-                  onClick={() => {
-                    // alterna maiúsculas inserindo última como upper — atalho: pressionar SHIFT troca próxima
-                  }}
-                  className="hidden"
-                  aria-hidden
-                />
-              )}
+              {keys.map((k) => {
+                const label = mode === "ABC" ? k.toLowerCase() : k;
+                return (
+                  <button
+                    key={k}
+                    onClick={() => press(label)}
+                    className="h-9 rounded-md bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-100 font-mono text-xs shadow-[inset_0_-2px_0_rgba(0,0,0,0.5)] active:translate-y-px"
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             {mode === "ABC" && (
               <div className="grid grid-cols-7 gap-1">
