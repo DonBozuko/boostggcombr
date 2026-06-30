@@ -1437,7 +1437,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                   {isReal && (
                     <div className="grid grid-cols-2 gap-1 rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[10px] font-mono text-white/70">
                       <span>Status: <b className={p.status === "Online" ? "text-emerald-300" : "text-amber-300"}>{p.status ?? "—"}</b></span>
-                      <span>Saldo: <b className="text-cyan-200">{p.saldo_atual != null ? `US$ ${Number(p.saldo_atual).toFixed(2)}` : "sincronizar"}</b></span>
+                      <span>Saldo: <b className="text-cyan-200">{p.saldo_atual != null ? `R$ ${Number(p.saldo_atual).toFixed(2)}` : "sincronizar"}</b></span>
                     </div>
                   )}
                 </div>
