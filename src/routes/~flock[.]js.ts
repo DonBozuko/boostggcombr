@@ -15,7 +15,7 @@ const SCRIPT = `(function(){
   for(var i=0;i<q.length;i++){window.flock.apply(null,q[i]);}
 })();`;
 
-export const Route = createFileRoute("/~flock[.]js")({
+export const Route = createFileRoute("/~flock.js")({
   server: {
     handlers: {
       GET: async () =>
