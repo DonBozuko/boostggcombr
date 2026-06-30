@@ -799,9 +799,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     if (initialToken) setToken(initialToken);
   }, [initialToken]);
   const [loaded, setLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState<AdminTab>("" as AdminTab);
-  const [folder, setFolder] = useState<"root" | "buscas" | "tesouraria" | "auditoria">("root");
-  useEffect(() => { if (folder === "root") setActiveTab("" as AdminTab); }, [folder]);
+  const [activeTab, setActiveTab] = useState<AdminTab>("buscar");
+  const [folder, setFolder] = useState<"buscas" | "tesouraria" | "auditoria">("buscas");
+  
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(false);
@@ -1165,56 +1165,54 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       <div className="max-w-[1200px] mx-auto space-y-4 relative z-10">
         <ExecutiveHeader soundOn={soundOn} toggleSound={toggleSound} />
 
-        {/* v65 · Strict Folder-Tree Workspace Matrix */}
-        {folder === "root" ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {([
-              { id: "buscas",      icon: "🔎", label: "Central de Buscas Internas", hint: "Pedidos, IDs, clientes", tabs: ["buscar","explorar","pedidos"] as AdminTab[], glow: "from-cyan-500/30 to-blue-600/20 border-cyan-400/50 shadow-[0_0_24px_rgba(0,242,254,0.35)]" },
-              { id: "tesouraria",  icon: "📒", label: "Livro Contábil & Tesouraria", hint: "Ledger · PDF · CSV · Custos", tabs: ["tesouraria","custos"] as AdminTab[], glow: "from-amber-400/30 to-orange-600/20 border-amber-400/50 shadow-[0_0_24px_rgba(245,158,11,0.40)]" },
-              { id: "auditoria",   icon: "🛡️", label: "Central de Auditoria & NOC", hint: "Alertas · NOC · Jarvis · Serviços", tabs: ["alertas","noc","auditoria","jarvis","servicos"] as AdminTab[], glow: "from-red-500/30 to-fuchsia-600/20 border-red-400/50 shadow-[0_0_24px_rgba(255,0,60,0.40)]" },
-            ] as const).map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => { setFolder(f.id); setActiveTab(f.tabs[0]); if (f.tabs.includes("pedidos") || f.tabs.includes("servicos")) setLoaded(true); }}
-                className={`group relative overflow-hidden rounded-2xl border bg-gradient-to-br ${f.glow} backdrop-blur-xl p-6 text-left transition-all hover:scale-[1.02]`}
-              >
-                <div className="text-5xl mb-3">{f.icon}</div>
-                <div className="text-lg font-extrabold tracking-tight text-white">📁 {f.label}</div>
-                <div className="text-xs text-white/60 mt-1">{f.hint}</div>
-                <div className="absolute bottom-2 right-3 text-[10px] uppercase tracking-widest text-white/40">abrir ›</div>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <>
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setFolder("root")}
-                className="text-xs uppercase tracking-wider text-cyan-200 hover:text-cyan-100 border border-cyan-400/40 rounded-full px-3 py-1 bg-black/40 backdrop-blur"
-              >
-                ⬅️ Voltar ao Diretório Raiz
-              </button>
-              <span className="text-[11px] text-white/50 font-mono">
-                📁 {folder === "buscas" ? "Central de Buscas" : folder === "tesouraria" ? "Tesouraria" : "Auditoria & NOC"}
-              </span>
-            </div>
-            <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
-          </>
-        )}
+        {/* v66 · Strict Action-Triggered UI Isolation Matrix */}
+        {(() => {
+          const TABS = [
+            { id: "buscas" as const,     label: "🔍 BUSCA DE IDS",                grad: "from-cyan-500 to-blue-600",       glow: "shadow-[0_0_22px_rgba(0,242,254,0.55)]" },
+            { id: "tesouraria" as const, label: "📊 TESOURARIA & LIVRO CONTÁBIL", grad: "from-amber-400 to-orange-500",    glow: "shadow-[0_0_22px_rgba(245,158,11,0.55)]" },
+            { id: "auditoria" as const,  label: "🩺 NOC & AUDITORIA DE SALDOS",   grad: "from-red-500 to-fuchsia-600",     glow: "shadow-[0_0_22px_rgba(255,0,60,0.55)]" },
+          ];
+          const cur = folder;
+          return (
+            <nav className="rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl p-2 flex flex-wrap gap-2 justify-center">
+              {TABS.map((t) => {
+                const active = cur === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      setFolder(t.id);
+                      const primary: Record<string, AdminTab> = { buscas: "buscar", tesouraria: "tesouraria", auditoria: "noc" };
+                      setActiveTab(primary[t.id]);
+                      if (t.id === "buscas") setLoaded(true);
+                    }}
+                    className={`flex-1 min-w-[180px] rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all ${
+                      active
+                        ? `bg-gradient-to-r ${t.grad} text-white ${t.glow} scale-[1.02]`
+                        : "bg-black/40 text-white/70 hover:text-white border border-white/10"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </nav>
+          );
+        })()}
+        
         
 
-        <div className={`${activeTab === "alertas" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
-        <div className={`${activeTab === "noc" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
-        <div className={`${activeTab === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
-        <div className={`${activeTab === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
-        <div className={`${activeTab === "custos" ? "block" : "hidden"}`}><AdminCostAlert /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
 
-        <div className={`${activeTab === "buscar" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
+        <div className={`${folder === "buscas" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
 
-        <div className={`${activeTab === "pedidos" ? "block" : "hidden"}`}>
-        {activeTab === "pedidos" && (
+        <div className={`${folder === "buscas" ? "block" : "hidden"}`}>
+        {folder === "buscas" && (
           <div className="space-y-4">
             <InsightsIA token={token} />
             <ConversionAnalytics />
@@ -1279,7 +1277,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         )}
         </div>
 
-        <div className={`${activeTab === "servicos" ? "block" : "hidden"}`}>
+        <div className={`${folder === "buscas" ? "block" : "hidden"}`}>
         {/* ⛽ Central de Abastecimento Rápido — Compact Glass Panel */}
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
@@ -1371,7 +1369,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
         </div>
 
-        <div className={`${activeTab === "explorar" ? "block" : "hidden"} space-y-4`}>
+        <div className={`${folder === "buscas" ? "block" : "hidden"} space-y-4`}>
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
         <div className="rounded-2xl border border-border bg-card/30 p-3">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -1410,7 +1408,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
         {/* 🤖 Central de Conteúdo J.A.R.V.I.S. — AI Publisher Scheduler + Auditor RLS */}
-        <div className={`${activeTab === "jarvis" ? "block" : "hidden"} space-y-4`}>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"} space-y-4`}>
           {/* Auditor RLS — mantido montado para gravar logs em admin_audit_logs, ocultado visualmente */}
           <div className="hidden" aria-hidden="true">
             <AdminAuditLog />
@@ -1419,7 +1417,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
 
 
-        <div className={`${activeTab === "servicos" ? "block" : "hidden"} space-y-4`}>
+        <div className={`${folder === "buscas" ? "block" : "hidden"} space-y-4`}>
         {/* Widget Monitor de Saldo */}
         {f && style && (
           <div className="space-y-3">
