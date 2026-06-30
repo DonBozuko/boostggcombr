@@ -201,12 +201,36 @@ export function SourceVault() {
                 </button>
               ))}
             </div>
-            <textarea
-              id="source_code_area"
-              readOnly
-              value={selected ? ROUTE_SOURCES[selected] : "// Selecione um arquivo para inspeção do Jarvis"}
-              className="w-full h-72 rounded-md border border-emerald-500/30 bg-zinc-950 text-emerald-500 font-mono p-4 resize-none focus:outline-none text-[10.5px] leading-relaxed"
-            />
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                disabled={!selected}
+                onClick={() => {
+                  if (!selected) return;
+                  const code = ROUTE_SOURCES[selected] ?? "";
+                  const base = selected.split("/").pop() ?? "arquivo.ts";
+                  const fname = base.replace(/\.tsx?$/, "") + ".txt";
+                  const blob = new Blob([code], { type: "text/plain;charset=utf-8" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = fname;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  setTimeout(() => URL.revokeObjectURL(url), 1500);
+                }}
+                className="h-10 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed border border-cyan-300 text-black text-xs font-bold tracking-[0.25em] uppercase shadow-[0_0_18px_rgba(0,255,200,0.45)]"
+              >
+                📥 Baixar arquivo de código
+              </button>
+              <textarea
+                id="source_code_area"
+                readOnly
+                value={selected ? ROUTE_SOURCES[selected] : "// Selecione um arquivo para inspeção do Jarvis"}
+                className="w-full h-72 rounded-md border border-emerald-500/30 bg-zinc-950 text-emerald-500 font-mono p-4 resize-none focus:outline-none text-[10.5px] leading-relaxed"
+              />
+            </div>
           </div>
           <button
             onClick={() => { setOpen(false); setPin(""); setSelected(null); }}
