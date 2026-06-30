@@ -276,13 +276,23 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
   const elapsed = Date.now() - t0;
   const cotacao = Number(fxRate) > 0 ? Number(fxRate) : await fetchUsdBrlRate();
 
-  // v82 — Strict Uniform USD→BRL Multiplier.
-  // TODOS os fornecedores (SMMhype, SMMPanel, Verified Atacado) retornam saldo em USD
-  // via API SMM padrão. Aplicar a mesma multiplicação pela cotação viva do dólar.
-  const saldoUsd = saldoRaw;
-  const saldoBrl = saldoRaw == null
-    ? null
-    : Number((saldoRaw * cotacao).toFixed(2));
+  // v83 — Strict Dual-Currency Mirror.
+  // SMMhype retorna USD nativo (multiplica × cotação para BRL).
+  // SMMPanel / Verified Atacado são contas BRL nativas (divide ÷ cotação para USD).
+  const slug = String(fornecedor.slug ?? fornecedor.nome ?? "").toLowerCase();
+  const isBrlNative = /smmpainel|smm[-_ ]?panel|verified/.test(slug);
+  let saldoUsd: number | null = null;
+  let saldoBrl: number | null = null;
+  if (saldoRaw != null) {
+    if (isBrlNative) {
+      saldoBrl = Number(saldoRaw.toFixed(2));
+      saldoUsd = cotacao > 0 ? Number((saldoRaw / cotacao).toFixed(2)) : null;
+    } else {
+      saldoUsd = Number(saldoRaw.toFixed(2));
+      saldoBrl = Number((saldoRaw * cotacao).toFixed(2));
+    }
+  }
+
 
   const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
   const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
