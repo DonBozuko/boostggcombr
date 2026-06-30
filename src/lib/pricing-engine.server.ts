@@ -225,17 +225,39 @@ async function loadProviderRateMap(): Promise<{
     { name: "smmpanel", url: "https://smmpainel.net/api/v2", key: process.env.SMMPAINEL_API_KEY },
     { name: "verified", url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
   ];
+
+  // v67 — Perpetual Balance Force: provedores com saldo real ATIVO nunca são
+  // isolados. O Smart Cost Routing decide o desvio em runtime, mas o cache
+  // de pricing precisa manter o provedor disponível enquanto houver saldo.
+  const balanceMap = new Map<string, number>();
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("fornecedores")
+      .select("slug, saldo_atual, ativo");
+    for (const f of (data ?? []) as Array<any>) {
+      if (f?.ativo && Number(f.saldo_atual) > 0) {
+        balanceMap.set(String(f.slug), Number(f.saldo_atual));
+      }
+    }
+  } catch { /* noop */ }
+
   const unstable = await readUnstableProviders();
   for (const p of providers) {
     if (!p.key) continue;
-    if (unstable.has(p.name)) {
+    const hasBalance = (balanceMap.get(p.name) ?? 0) > 0;
+    if (unstable.has(p.name) && !hasBalance) {
       console.warn(`[pricing] pulando ${p.name} (isolado em pricing_cache)`);
       continue;
     }
     const list = await safeFetchProviderServices(p.url, p.key);
-    if (!list) { await markUnstable(p.name, "invalid_json_or_http"); continue; }
+    if (!list) {
+      if (!hasBalance) await markUnstable(p.name, "invalid_json_or_http");
+      else console.warn(`[pricing] ${p.name} instável mas mantido ATIVO (saldo>0)`);
+      continue;
+    }
     if (list.length < MIN_HEALTHY_SERVICES) {
-      await markUnstable(p.name, `low_service_count:${list.length}`);
+      if (!hasBalance) await markUnstable(p.name, `low_service_count:${list.length}`);
       continue;
     }
     const map = new Map<number, number>();
@@ -245,7 +267,7 @@ async function loadProviderRateMap(): Promise<{
       if (Number.isFinite(id) && Number.isFinite(r) && r > 0) map.set(id, r);
     }
     if (map.size < MIN_HEALTHY_SERVICES) {
-      await markUnstable(p.name, `corrupt_ids:${map.size}`);
+      if (!hasBalance) await markUnstable(p.name, `corrupt_ids:${map.size}`);
       continue;
     }
     console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
