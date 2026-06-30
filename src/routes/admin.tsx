@@ -1203,7 +1203,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
           </>
         )}
-        {folder !== "root" && (<></>)}
+        
 
         <div className={`${activeTab === "alertas" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
         <div className={`${activeTab === "noc" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
