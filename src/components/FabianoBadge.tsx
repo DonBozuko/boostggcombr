@@ -111,11 +111,14 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
   // assume que o app não abriu e redireciona para a web.
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      // Prioridade v44: abrir chat nativo interno (JivoSite/SmartChat) sem sair do site.
-      if (typeof window !== "undefined" && window.openSupportChat?.()) {
-        e.preventDefault();
-        return;
-      }
+      // Prioridade v46: tentar chat nativo (Jivo) com trava try/catch.
+      // Qualquer falha → fallback instantâneo para Telegram, sem tela branca.
+      try {
+        if (typeof window !== "undefined" && window.openSupportChat?.()) {
+          e.preventDefault();
+          return;
+        }
+      } catch { /* chat externo offline → segue para fallback Telegram */ }
       if (!BOT_USERNAME) return; // sem bot configurado → segue href padrão
       e.preventDefault();
       const start = Date.now();
