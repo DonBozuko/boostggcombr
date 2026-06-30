@@ -1,4 +1,75 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+// v52 — Micro-FOMO Ticker Core + Tick-Tac Syncer
+function useCouponCountdown(seconds: number = 10) {
+  const [left, setLeft] = useState(seconds);
+  const ctxRef = useRef<AudioContext | null>(null);
+  const armedRef = useRef(false);
+
+  useEffect(() => {
+    function arm() {
+      if (armedRef.current) return;
+      try {
+        const Ctx = (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext);
+        ctxRef.current = new Ctx();
+        armedRef.current = true;
+      } catch {}
+    }
+    window.addEventListener("pointerdown", arm, { once: true });
+    window.addEventListener("keydown", arm, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", arm);
+      window.removeEventListener("keydown", arm);
+    };
+  }, []);
+
+  useEffect(() => {
+    function reset() { setLeft(seconds); }
+    document.addEventListener("visibilitychange", reset);
+    return () => document.removeEventListener("visibilitychange", reset);
+  }, [seconds]);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setLeft((s) => {
+        const next = s <= 1 ? seconds : s - 1;
+        const ctx = ctxRef.current;
+        if (ctx && ctx.state === "running") {
+          try {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "square";
+            osc.frequency.value = s % 2 === 0 ? 1800 : 1400;
+            gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.005);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.05);
+            osc.connect(gain).connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.06);
+          } catch {}
+        }
+        return next;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [seconds]);
+
+  return left;
+}
+
+function CouponCountdownBanner() {
+  const left = useCouponCountdown(10);
+  const ss = left.toString().padStart(2, "0");
+  return (
+    <div
+      className="mb-1.5 text-center text-[11px] font-mono font-extrabold animate-pulse text-red-500 tracking-wider"
+      style={{ textShadow: "0 0 8px rgba(239,68,68,0.9)" }}
+      aria-live="polite"
+    >
+      ⚠️ O SEU CUPOM EXPIRA EM: 00:{ss}
+    </div>
+  );
+}
 
 const VALID = "PRIME15";
 const KEY = "eb_coupon";
