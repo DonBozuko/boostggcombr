@@ -119,35 +119,88 @@ function formatBRL(v: number): string {
   return `R$ ${v.toFixed(2).replace(".", ",")}`;
 }
 
-async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> {
-  const apiKey = process.env.SMMHYPE_API_KEY;
-  if (!apiKey) return null;
-
-  const probe = PROBE[category];
-  const serviceId = await resolveServiceIdAsync(probe.pacote, probe.qty).catch(() => null);
-  if (!serviceId) return null;
-
+// v50 — JSON Response Sanitizer Matrix. Lê services de qualquer panel SMM
+// (SMMhype/SMMPainel/Verified) sem nunca explodir em "Unable to ... not valid JSON".
+async function safeFetchProviderServices(
+  endpoint: string,
+  apiKey: string,
+  timeoutMs = 8000,
+): Promise<Array<{ service: number | string; rate: string | number }> | null> {
   try {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 4000);
-    const res = await fetch("https://smmhype.com/api/v2", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
-      signal: ctrl.signal,
-    });
-    clearTimeout(timer);
-    if (!res.ok) return null;
-    const list = (await res.json()) as Array<{ service: number | string; rate: string | number }>;
-    if (!Array.isArray(list)) return null;
-    const found = list.find((s) => Number(s.service) === serviceId);
-    const rateUsd = Number(found?.rate);
-    if (!Number.isFinite(rateUsd) || rateUsd <= 0) return null;
-    return rateUsd * USD_TO_BRL;
-  } catch {
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    let res: Response;
+    try {
+      res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
+        signal: ctrl.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!res.ok) {
+      console.warn(`[pricing] provider ${endpoint} HTTP ${res.status}`);
+      return null;
+    }
+    const raw = await res.text();
+    const trimmed = raw.trim();
+    if (!trimmed || (trimmed[0] !== "[" && trimmed[0] !== "{")) {
+      console.warn(`[pricing] provider ${endpoint} non-JSON body (len=${trimmed.length})`);
+      return null;
+    }
+    let parsed: unknown;
+    try { parsed = JSON.parse(trimmed); } catch (e) {
+      console.warn(`[pricing] provider ${endpoint} JSON.parse failed:`, (e as Error).message);
+      return null;
+    }
+    return Array.isArray(parsed) ? (parsed as any) : null;
+  } catch (e) {
+    console.warn(`[pricing] provider ${endpoint} fetch error:`, (e as Error).message);
     return null;
   }
 }
+
+// Multi-Provider Fallback Core v50 — tenta SMMhype, depois SMMPainel, depois Verified.
+// Retorna o primeiro mapa serviceId→USD/1000 saudável.
+async function loadProviderRateMap(): Promise<{
+  rateById: Map<number, number>;
+  provider: "smmhype" | "smmpanel" | "verified" | "none";
+}> {
+  const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
+    { name: "smmhype",  url: "https://smmhype.com/api/v2",   key: process.env.SMMHYPE_API_KEY },
+    { name: "smmpanel", url: "https://smmpainel.net/api/v2", key: process.env.SMMPAINEL_API_KEY },
+    { name: "verified", url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
+  ];
+  for (const p of providers) {
+    if (!p.key) continue;
+    const list = await safeFetchProviderServices(p.url, p.key);
+    if (!list || list.length === 0) continue;
+    const map = new Map<number, number>();
+    for (const s of list) {
+      const id = Number((s as any).service);
+      const r = Number((s as any).rate);
+      if (Number.isFinite(id) && Number.isFinite(r) && r > 0) map.set(id, r);
+    }
+    if (map.size > 0) {
+      console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
+      return { rateById: map, provider: p.name };
+    }
+  }
+  return { rateById: new Map(), provider: "none" };
+}
+
+async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> {
+  const probe = PROBE[category];
+  const serviceId = await resolveServiceIdAsync(probe.pacote, probe.qty).catch(() => null);
+  if (!serviceId) return null;
+  const { rateById } = await loadProviderRateMap();
+  const rateUsd = rateById.get(serviceId);
+  if (!Number.isFinite(rateUsd) || !rateUsd || rateUsd <= 0) return null;
+  return rateUsd * USD_TO_BRL;
+}
+
 
 export type GridItem = {
   id: string;
@@ -239,33 +292,12 @@ export async function syncPricingCacheAll(): Promise<{
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const apiKey = process.env.SMMHYPE_API_KEY;
 
-  // 1 única chamada services → mapa serviceId → rate(USD/1000)
-  const rateById = new Map<number, number>();
-  if (apiKey) {
-    try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 8000);
-      const res = await fetch("https://smmhype.com/api/v2", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
-        signal: ctrl.signal,
-      });
-      clearTimeout(timer);
-      if (res.ok) {
-        const list = (await res.json()) as Array<{ service: number | string; rate: string | number }>;
-        if (Array.isArray(list)) {
-          for (const s of list) {
-            const id = Number(s.service);
-            const r = Number(s.rate);
-            if (Number.isFinite(id) && Number.isFinite(r) && r > 0) rateById.set(id, r);
-          }
-        }
-      }
-    } catch { /* ignora — usa fallback */ }
-  }
+  // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático
+  // SMMhype → SMMPainel → Verified. Se todos caírem, FALLBACK_RATES_PER_1K cobre.
+  const { rateById, provider } = await loadProviderRateMap();
+  console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
+
 
   const cats = Object.keys(CANONICAL_QTYS) as Category[];
   const itemRows: Array<{
