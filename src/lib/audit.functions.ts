@@ -6,6 +6,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
+const tokenOnlyInput = z.object({ token: z.string().min(8) });
 
 export type AuditRow = {
   serviceId: number;
@@ -26,7 +27,35 @@ export type AuditResp =
 
 const COUPON_BUFFER = 0.85;
 const PIX_RATE = 0.0099; // 0,99% MP PIX aprox.
-function tier(qty: number) { return qty <= 1000 ? 4.5 : qty <= 10000 ? 3.2 : 2.2; }
+function tier(qty: number) { return qty <= 1000 ? 4.0 : qty <= 10000 ? 2.6 : 1.8; }
+
+async function buildContingencyAuditRows(): Promise<AuditRow[]> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("pricing_items" as any)
+    .select("pacote, category, quantidade, provider_service_id, cost_brl, price_brl, source")
+    .order("category", { ascending: true })
+    .order("quantidade", { ascending: true });
+
+  return ((data ?? []) as any[]).map((r, idx) => {
+    const cost = Number(r.cost_brl || 0);
+    const price = Number(r.price_brl || 0);
+    const pix = price * PIX_RATE;
+    const lucro = price - cost - pix;
+    return {
+      serviceId: Number(r.provider_service_id) || idx + 1,
+      name: `${String(r.category ?? "contingencia")} · ${String(r.pacote)} · ${Number(r.quantidade || 0).toLocaleString("pt-BR")}`,
+      category: String(r.category ?? "contingencia"),
+      status: "ATIVO" as const,
+      costUsdPer1k: 0,
+      costBrlPer1k: Number(cost.toFixed(2)),
+      vendaBrlPer1k: Number(price.toFixed(2)),
+      taxaPix: Number(pix.toFixed(2)),
+      lucroBrl: Number(lucro.toFixed(2)),
+      margemPct: price > 0 ? Number(((lucro / price) * 100).toFixed(1)) : 0,
+    };
+  });
+}
 
 // IDs que efetivamente usamos no dispatcher (mantém alinhado com smmhype.server.ts)
 const USED_IDS = new Set<number>([
@@ -79,7 +108,8 @@ export const auditarFornecedor = createServerFn({ method: "POST" })
       const j = JSON.parse(txt);
       services = Array.isArray(j) ? j : [];
     } catch (e: any) {
-      return { ok: false, error: `Falha API: ${e?.message ?? e}` };
+      const rows = await buildContingencyAuditRows();
+      return { ok: true, fornecedor: `${(f as any).nome} · CONTINGÊNCIA LOCAL`, cotacao, rows, scannedAt: new Date().toISOString() };
     }
 
     const rows: AuditRow[] = [];
@@ -114,4 +144,20 @@ export const auditarFornecedor = createServerFn({ method: "POST" })
 
     rows.sort((a, b) => a.serviceId - b.serviceId);
     return { ok: true, fornecedor: (f as any).nome, cotacao, rows, scannedAt: new Date().toISOString() };
+  });
+
+export const auditoriaContingenciaLocal = createServerFn({ method: "POST" })
+  .inputValidator((i) => tokenOnlyInput.parse(i))
+  .handler(async ({ data }): Promise<AuditResp> => {
+    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+      return { ok: false, error: "UNAUTHORIZED" };
+    }
+    const rows = await buildContingencyAuditRows();
+    return {
+      ok: true,
+      fornecedor: "MATRIZ LOCAL DE CONTINGÊNCIA v50-Patch",
+      cotacao: 7.0,
+      rows,
+      scannedAt: new Date().toISOString(),
+    };
   });
