@@ -960,15 +960,15 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         cache: "no-store",
         body: JSON.stringify({ fornecedor: fornecedor.slug || fornecedor.id }),
       });
-      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; saldoPersistidoUsd?: number | null; status: string }> } | null;
+      const json = await res.json().catch(() => null) as { ok?: boolean; cotacao?: number; results?: Array<{ nome: string; saldoBrl: number | null; saldoPersistidoBrl?: number | null; status: string }> } | null;
       if (!res.ok || !json?.ok) {
         if (!opts.silent) toast.error(`${fornecedor.nome}: falha ao sincronizar saldo`);
         return false;
       }
       const item = json.results?.find((r) => r.nome === fornecedor.nome) ?? json.results?.[0];
       if (!opts.silent) {
-        const saldo = item?.saldoUsd ?? item?.saldoPersistidoUsd ?? null;
-        toast.success(`${fornecedor.nome}: ${item?.status ?? "Online"} · ${saldo != null ? `US$ ${Number(saldo).toFixed(2)}` : "saldo não lido"}`);
+        const saldo = item?.saldoBrl ?? item?.saldoPersistidoBrl ?? null;
+        toast.success(`${fornecedor.nome}: ${item?.status ?? "Online"} · ${saldo != null ? `R$ ${Number(saldo).toFixed(2)}` : "saldo não lido"}${json.cotacao ? ` · USD ${json.cotacao.toFixed(4)}` : ""}`);
       }
       refreshFornecedorViews();
       return true;
