@@ -207,7 +207,7 @@ export function MobileFrame({
   const chars = characters[route];
   return (
     <div
-      className="relative min-h-screen h-auto w-screen overflow-y-auto overflow-x-visible flex justify-center"
+      className="relative min-h-screen h-auto w-screen overflow-y-auto overflow-x-visible flex justify-center lg:items-center"
       style={{ background: "#050505", touchAction: "pan-y", overscrollBehaviorY: "auto" }}
     >
       <style>{`
@@ -228,11 +228,14 @@ export function MobileFrame({
         .mf-scroll::-webkit-scrollbar-track { background: transparent; }
         .mf-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2)); border-radius: 999px; }
         .mf-scroll::-webkit-scrollbar-corner { background: transparent; }
+        @media (min-height: 700px) and (min-width: 1024px) {
+          .mf-shell { height: 90vh !important; min-height: 0 !important; max-height: 900px; border-radius: 18px; }
+        }
       `}</style>
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`w-full md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
+        className={`mf-shell w-full md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
@@ -240,12 +243,13 @@ export function MobileFrame({
         <TopNetworksNav active={route} />
         <WelcomeDiscountPopup route={route} />
         <div
-          className="mf-scroll mf-compact flex-1 min-h-[850px] overflow-y-auto overflow-x-visible flex flex-col"
+          className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-visible flex flex-col pb-2"
           style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}
         >
 
           {children}
         </div>
+
         <div className="shrink-0">
           <TrustBadges accent={data.accent} />
           <ReviewsCarousel accent={data.accent} />
