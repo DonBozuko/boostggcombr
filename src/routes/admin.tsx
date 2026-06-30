@@ -957,16 +957,18 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           "Content-Type": "application/json",
           "x-admin-token": token,
         },
+        cache: "no-store",
         body: JSON.stringify({ fornecedor: fornecedor.slug || fornecedor.id }),
       });
-      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; status: string }> } | null;
+      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; saldoPersistidoUsd?: number | null; status: string }> } | null;
       if (!res.ok || !json?.ok) {
         if (!opts.silent) toast.error(`${fornecedor.nome}: falha ao sincronizar saldo`);
         return false;
       }
       const item = json.results?.find((r) => r.nome === fornecedor.nome) ?? json.results?.[0];
       if (!opts.silent) {
-        toast.success(`${fornecedor.nome}: ${item?.status ?? "Online"} · ${item?.saldoUsd != null ? `$${Number(item.saldoUsd).toFixed(2)}` : "saldo preservado"}`);
+        const saldo = item?.saldoUsd ?? item?.saldoPersistidoUsd ?? null;
+        toast.success(`${fornecedor.nome}: ${item?.status ?? "Online"} · ${saldo != null ? `US$ ${Number(saldo).toFixed(2)}` : "saldo não lido"}`);
       }
       refreshFornecedorViews();
       return true;
@@ -1435,7 +1437,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                   {isReal && (
                     <div className="grid grid-cols-2 gap-1 rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[10px] font-mono text-white/70">
                       <span>Status: <b className={p.status === "Online" ? "text-emerald-300" : "text-amber-300"}>{p.status ?? "—"}</b></span>
-                      <span>Saldo: <b className="text-cyan-200">{p.saldo_atual != null ? `$${Number(p.saldo_atual).toFixed(2)}` : "—"}</b></span>
+                      <span>Saldo: <b className="text-cyan-200">{p.saldo_atual != null ? `US$ ${Number(p.saldo_atual).toFixed(2)}` : "sincronizar"}</b></span>
                     </div>
                   )}
                 </div>
