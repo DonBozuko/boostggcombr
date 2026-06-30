@@ -1,3 +1,4 @@
+import ogInstagram from "@/assets/og-instagram.jpg";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
