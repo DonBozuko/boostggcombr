@@ -159,10 +159,10 @@ export type GridItem = {
 export type PricingGridResult = {
   category: Category;
   source: "api" | "fallback";
-  cost_per_1k_brl: number;
   items: GridItem[];
   generated_at: string;
 };
+
 
 async function readCachedRate(category: Category): Promise<number | null> {
   try {
