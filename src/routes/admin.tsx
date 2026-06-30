@@ -800,6 +800,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   }, [initialToken]);
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>("explorar");
+  const [folder, setFolder] = useState<"root" | "buscas" | "tesouraria" | "auditoria">("root");
   void setToken;
   const [aba, setAba] = useState<RedeKey>("overview");
   const [sandbox, setSandbox] = useState<boolean>(false);
