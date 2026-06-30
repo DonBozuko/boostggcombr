@@ -77,8 +77,8 @@ export const verificarSaldoAgora = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
-    const { checkSmmhypeBalance } = await import("@/lib/monitor-saldo.server");
-    const res = await checkSmmhypeBalance();
+    const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
+    const res = await checkAllProvidersBalance();
     return { ok: true as const, result: res };
   });
 

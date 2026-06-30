@@ -854,8 +854,10 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     bank: { nome: string; saldo_atual: number; saldo_minimo_seguranca: number; ok: boolean; status_text: string } | null;
     alerts: { id: string; tipo: string; nivel: number; mensagem: string; created_at: string }[];
   } | null>(null);
-  const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string }[]>([]);
+  const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string; status?: string | null; saldo_atual?: number | null; ultima_verificacao?: string | null }[]>([]);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [balanceScanId, setBalanceScanId] = useState<string | null>(null);
+  const [nocRefreshSignal, setNocRefreshSignal] = useState(0);
   const [cotacaoDraft, setCotacaoDraft] = useState<string>("");
   const [savingCotacao, setSavingCotacao] = useState(false);
   const alert = useAlertBeep();
@@ -932,23 +934,80 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     } catch {}
   };
 
+  const refreshFornecedorViews = useCallback(() => {
+    void loadMonitor();
+    void loadFornecedores();
+    void loadCaixa();
+    setNocRefreshSignal((n) => n + 1);
+  }, [token]);
+
+  const syncFornecedorBalance = async (
+    fornecedor: { id: string; nome: string; slug: string },
+    opts: { silent?: boolean } = {},
+  ) => {
+    if (!token) {
+      if (!opts.silent) toast.error("Informe o token");
+      return false;
+    }
+    setBalanceScanId(fornecedor.id);
+    try {
+      const res = await fetch("/api/public/check-saldo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token,
+        },
+        body: JSON.stringify({ fornecedor: fornecedor.slug || fornecedor.id }),
+      });
+      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; status: string }> } | null;
+      if (!res.ok || !json?.ok) {
+        if (!opts.silent) toast.error(`${fornecedor.nome}: falha ao sincronizar saldo`);
+        return false;
+      }
+      const item = json.results?.find((r) => r.nome === fornecedor.nome) ?? json.results?.[0];
+      if (!opts.silent) {
+        toast.success(`${fornecedor.nome}: ${item?.status ?? "Online"} · ${item?.saldoUsd != null ? `$${Number(item.saldoUsd).toFixed(2)}` : "saldo preservado"}`);
+      }
+      refreshFornecedorViews();
+      return true;
+    } catch (e: any) {
+      if (!opts.silent) toast.error(e?.message ?? "Falha na sincronização de saldo");
+      return false;
+    } finally {
+      setBalanceScanId(null);
+    }
+  };
+
   const handleToggleAtivo = async (id: string, ativoAtual: boolean) => {
     if (!token) return toast.error("Informe o token");
+    if (togglingId) return;
+    const nextAtivo = !ativoAtual;
     setTogglingId(id);
     // optimistic
-    setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: !ativoAtual } : p)));
+    setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: nextAtivo } : p)));
     try {
-      const res = await toggleFornecedor({ data: { token, id, ativo: !ativoAtual } });
+      const res = await toggleFornecedor({ data: { token, id, ativo: nextAtivo } });
       if (!res.ok) {
         toast.error("Falha ao alterar status");
         setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: ativoAtual } : p)));
       } else {
-        toast.success(!ativoAtual ? "Fornecedor ativado" : "Fornecedor desativado");
+        if (res.fornecedor) setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ...res.fornecedor, ativo: nextAtivo } : p)));
+        toast.success(nextAtivo ? "Fornecedor ativado" : "Fornecedor desativado");
+        refreshFornecedorViews();
+        const provider = fornecedores.find((p) => p.id === id);
+        if (provider) void syncFornecedorBalance(provider, { silent: true });
       }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha ao alterar status");
+      setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ativo: ativoAtual } : p)));
     } finally {
       setTogglingId(null);
     }
   };
+
+  const handleBalanceSynced = useCallback(() => {
+    refreshFornecedorViews();
+  }, [refreshFornecedorViews]);
 
   const salvarCotacao = async () => {
     const id = monitor?.fornecedor.id;
@@ -1078,8 +1137,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     try {
       const res = await checkAgora({ data: { token } });
       if (!res.ok) return toast.error("Falha ao verificar");
-      toast.success("Saldo verificado");
-      await loadMonitor();
+      toast.success("Saldos dos fornecedores sincronizados");
+      refreshFornecedorViews();
     } finally {
       setMonitorBusy(false);
     }
@@ -1205,8 +1264,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         
 
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
-        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} /></div>
-        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} refreshSignal={nocRefreshSignal} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><SourceVault /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
@@ -1315,9 +1374,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {(fornecedores.length > 0 ? fornecedores : [
-              { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype" },
-              { id: "_smmpainel", nome: "SMMPainel", ativo: false, slug: "smmpainel" },
-              { id: "_verified", nome: "Verified Atacado", ativo: false, slug: "verified" },
+              { id: "_smmhype", nome: "SMMhype", ativo: true, slug: "smmhype", status: null, saldo_atual: null, ultima_verificacao: null },
+              { id: "_smmpainel", nome: "SMMPainel", ativo: false, slug: "smmpainel", status: null, saldo_atual: null, ultima_verificacao: null },
+              { id: "_verified", nome: "Verified Atacado", ativo: false, slug: "verified", status: null, saldo_atual: null, ultima_verificacao: null },
             ]).map((p) => {
               const urlMap: Record<string, string> = {
                 smmhype: "https://smmhype.com/addfunds",
@@ -1364,6 +1423,21 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                   >
                     ⚡ Recarregar PIX
                   </a>
+                  <button
+                    type="button"
+                    disabled={!isReal || balanceScanId === p.id}
+                    onClick={() => isReal && syncFornecedorBalance(p)}
+                    className="inline-flex items-center justify-center gap-1 rounded-md border border-cyan-400/50 bg-cyan-500/10 text-cyan-100 font-bold text-[11px] py-1.5 px-2 hover:bg-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(34,211,238,0.25)]"
+                    title="Sincronizar saldo e persistir dados atuais na tabela fornecedores"
+                  >
+                    {balanceScanId === p.id ? "⏳ Sincronizando..." : "🔄 Atualizar saldo"}
+                  </button>
+                  {isReal && (
+                    <div className="grid grid-cols-2 gap-1 rounded-md border border-white/10 bg-black/30 px-2 py-1 text-[10px] font-mono text-white/70">
+                      <span>Status: <b className={p.status === "Online" ? "text-emerald-300" : "text-amber-300"}>{p.status ?? "—"}</b></span>
+                      <span>Saldo: <b className="text-cyan-200">{p.saldo_atual != null ? `$${Number(p.saldo_atual).toFixed(2)}` : "—"}</b></span>
+                    </div>
+                  )}
                 </div>
               );
             })}

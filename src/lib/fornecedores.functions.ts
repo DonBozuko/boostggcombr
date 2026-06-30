@@ -16,10 +16,21 @@ export const listarFornecedores = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("fornecedores")
-      .select("id, nome, ativo, slug")
+      .select("id, nome, ativo, slug, status, saldo_atual, ultima_verificacao")
       .order("prioridade", { ascending: true });
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
-    return { ok: true as const, fornecedores: (rows ?? []) as { id: string; nome: string; ativo: boolean; slug: string }[] };
+    return {
+      ok: true as const,
+      fornecedores: (rows ?? []) as {
+        id: string;
+        nome: string;
+        ativo: boolean;
+        slug: string;
+        status: string | null;
+        saldo_atual: number | null;
+        ultima_verificacao: string | null;
+      }[],
+    };
   });
 
 export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
@@ -29,17 +40,12 @@ export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (data.ativo) {
-      const { error: offErr } = await supabaseAdmin
-        .from("fornecedores")
-        .update({ ativo: false })
-        .neq("id", data.id);
-      if (offErr) return { ok: false as const, error: "DB_FAILED" as const };
-    }
-    const { error } = await supabaseAdmin
+    const { data: updated, error } = await supabaseAdmin
       .from("fornecedores")
-      .update({ ativo: data.ativo })
-      .eq("id", data.id);
+      .update({ ativo: data.ativo, updated_at: new Date().toISOString() })
+      .eq("id", data.id)
+      .select("id, nome, ativo, slug, status, saldo_atual, ultima_verificacao")
+      .maybeSingle();
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
-    return { ok: true as const };
+    return { ok: true as const, fornecedor: updated };
   });
