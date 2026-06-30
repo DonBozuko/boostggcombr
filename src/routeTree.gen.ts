@@ -25,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
+import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
@@ -111,6 +112,11 @@ const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
   path: '/api/public/mp-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJarvisPipelineRoute = ApiPublicJarvisPipelineRouteImport.update({
+  id: '/api/public/jarvis-pipeline',
+  path: '/api/public/jarvis-pipeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCheckSaldoRoute = ApiPublicCheckSaldoRouteImport.update({
   id: '/api/public/check-saldo',
   path: '/api/public/check-saldo',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/~flock.js': typeof Char126flockDotjsRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
+  '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -179,6 +186,7 @@ export interface FileRoutesByTo {
   '/~flock.js': typeof Char126flockDotjsRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
+  '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/~flock.js': typeof Char126flockDotjsRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
+  '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -228,6 +237,7 @@ export interface FileRouteTypes {
     | '/~flock.js'
     | '/~api/analytics'
     | '/api/public/check-saldo'
+    | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
@@ -251,6 +261,7 @@ export interface FileRouteTypes {
     | '/~flock.js'
     | '/~api/analytics'
     | '/api/public/check-saldo'
+    | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/~flock.js'
     | '/~api/analytics'
     | '/api/public/check-saldo'
+    | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/hooks/recover-abandoned'
@@ -298,6 +310,7 @@ export interface RootRouteChildren {
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
+  ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
@@ -420,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMpWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jarvis-pipeline': {
+      id: '/api/public/jarvis-pipeline'
+      path: '/api/public/jarvis-pipeline'
+      fullPath: '/api/public/jarvis-pipeline'
+      preLoaderRoute: typeof ApiPublicJarvisPipelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/check-saldo': {
       id: '/api/public/check-saldo'
       path: '/api/public/check-saldo'
@@ -474,6 +494,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char126flockDotjsRoute: Char126flockDotjsRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
+  ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
