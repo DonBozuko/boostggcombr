@@ -146,13 +146,18 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
-export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis";
+export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis" | "alertas" | "noc" | "auditoria" | "tesouraria" | "custos";
 
 const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
   { id: "buscar", icon: Search, label: "Buscar", hint: "Pesquisa rápida de pedidos" },
   { id: "explorar", icon: Compass, label: "Explorar", hint: "Vitrines públicas" },
   { id: "pedidos", icon: BarChart3, label: "Pedidos", hint: "Visão Geral · Casa dos Avós" },
   { id: "servicos", icon: Briefcase, label: "Serviços", badge: "NOVIDADE" },
+  { id: "alertas", icon: Bot, label: "Alertas", hint: "Central de alertas J.A.R.V.I.S." },
+  { id: "noc", icon: Bot, label: "NOC", hint: "Saúde operacional" },
+  { id: "auditoria", icon: BarChart3, label: "Auditoria", hint: "Reconciliação API" },
+  { id: "tesouraria", icon: Briefcase, label: "Tesouraria", hint: "Ledger e PDF contábil" },
+  { id: "custos", icon: BarChart3, label: "Custos", hint: "Flutuação de custos" },
   { id: "jarvis", icon: Bot, label: "Central J.A.R.V.I.S.", hint: "Agendador omnichannel" },
 ];
 
