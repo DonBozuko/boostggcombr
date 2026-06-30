@@ -856,6 +856,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   } | null>(null);
   const [fornecedores, setFornecedores] = useState<{ id: string; nome: string; ativo: boolean; slug: string; status?: string | null; saldo_atual?: number | null; ultima_verificacao?: string | null }[]>([]);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [balanceScanId, setBalanceScanId] = useState<string | null>(null);
   const [nocRefreshSignal, setNocRefreshSignal] = useState(0);
   const [cotacaoDraft, setCotacaoDraft] = useState<string>("");
   const [savingCotacao, setSavingCotacao] = useState(false);
@@ -933,6 +934,50 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     } catch {}
   };
 
+  const refreshFornecedorViews = useCallback(() => {
+    void loadMonitor();
+    void loadFornecedores();
+    void loadCaixa();
+    setNocRefreshSignal((n) => n + 1);
+  }, [token]);
+
+  const syncFornecedorBalance = async (
+    fornecedor: { id: string; nome: string; slug: string },
+    opts: { silent?: boolean } = {},
+  ) => {
+    if (!token) {
+      if (!opts.silent) toast.error("Informe o token");
+      return false;
+    }
+    setBalanceScanId(fornecedor.id);
+    try {
+      const res = await fetch("/api/public/check-saldo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-token": token,
+        },
+        body: JSON.stringify({ fornecedor: fornecedor.slug || fornecedor.id }),
+      });
+      const json = await res.json().catch(() => null) as { ok?: boolean; results?: Array<{ nome: string; saldoUsd: number | null; status: string }> } | null;
+      if (!res.ok || !json?.ok) {
+        if (!opts.silent) toast.error(`${fornecedor.nome}: falha ao sincronizar saldo`);
+        return false;
+      }
+      const item = json.results?.find((r) => r.nome === fornecedor.nome) ?? json.results?.[0];
+      if (!opts.silent) {
+        toast.success(`${fornecedor.nome}: ${item?.status ?? "Online"} · ${item?.saldoUsd != null ? `$${Number(item.saldoUsd).toFixed(2)}` : "saldo preservado"}`);
+      }
+      refreshFornecedorViews();
+      return true;
+    } catch (e: any) {
+      if (!opts.silent) toast.error(e?.message ?? "Falha na sincronização de saldo");
+      return false;
+    } finally {
+      setBalanceScanId(null);
+    }
+  };
+
   const handleToggleAtivo = async (id: string, ativoAtual: boolean) => {
     if (!token) return toast.error("Informe o token");
     if (togglingId) return;
@@ -948,7 +993,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       } else {
         if (res.fornecedor) setFornecedores((prev) => prev.map((p) => (p.id === id ? { ...p, ...res.fornecedor, ativo: nextAtivo } : p)));
         toast.success(nextAtivo ? "Fornecedor ativado" : "Fornecedor desativado");
-        setNocRefreshSignal((n) => n + 1);
+        refreshFornecedorViews();
+        const provider = fornecedores.find((p) => p.id === id);
+        if (provider) void syncFornecedorBalance(provider, { silent: true });
       }
     } catch (e: any) {
       toast.error(e?.message ?? "Falha ao alterar status");
@@ -959,11 +1006,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   };
 
   const handleBalanceSynced = useCallback(() => {
-    void loadMonitor();
-    void loadFornecedores();
-    void loadCaixa();
-    setNocRefreshSignal((n) => n + 1);
-  }, [token]);
+    refreshFornecedorViews();
+  }, [refreshFornecedorViews]);
 
   const salvarCotacao = async () => {
     const id = monitor?.fornecedor.id;
