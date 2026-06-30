@@ -28,6 +28,7 @@ export function SourceVault() {
   const tryUnlock = () => {
     if (pin === VAULT_KEY) {
       setOpen(true);
+      setPin("");
     } else {
       setShake(true);
       setTimeout(() => setShake(false), 600);
@@ -35,23 +36,30 @@ export function SourceVault() {
     }
   };
 
-  const copyAll = async () => {
+  const copyAll = () => {
     if (!selected) return;
+    const code = ROUTE_SOURCES[selected];
+    let ok = false;
     try {
-      await navigator.clipboard.writeText(ROUTE_SOURCES[selected]);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      // fallback
       const ta = document.createElement("textarea");
-      ta.value = ROUTE_SOURCES[selected];
+      ta.value = code;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.top = "0";
+      ta.style.left = "0";
+      ta.style.opacity = "0";
       document.body.appendChild(ta);
+      ta.focus();
       ta.select();
-      document.execCommand("copy");
+      ta.setSelectionRange(0, code.length);
+      try { ok = document.execCommand("copy"); } catch { ok = false; }
       document.body.removeChild(ta);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+    } catch { ok = false; }
+    if (!ok && navigator.clipboard) {
+      navigator.clipboard.writeText(code).catch(() => {});
     }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
   };
 
   return (
@@ -137,6 +145,7 @@ export function SourceVault() {
           {/* Input mascarado + ação */}
           <form
             onSubmit={(e) => { e.preventDefault(); tryUnlock(); }}
+            autoComplete="off"
             className="w-full max-w-xs flex flex-col gap-2"
           >
             <label className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 text-center">
@@ -145,10 +154,15 @@ export function SourceVault() {
             <input
               ref={inputRef}
               type="password"
+              name="vault-pin-no-save"
               inputMode="text"
-              autoComplete="off"
+              autoComplete="new-password"
+              autoCorrect="off"
               autoCapitalize="off"
               spellCheck={false}
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
               maxLength={8}
               value={pin}
               onChange={(e) => setPin(e.target.value.slice(0, 8))}
