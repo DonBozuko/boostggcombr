@@ -36,6 +36,24 @@ export function SourceVault() {
     }
   };
 
+  // v74: Extração automática do mp-webhook ao destravar
+  useEffect(() => {
+    if (!open) return;
+    const key = Object.keys(ROUTE_SOURCES).find((p) => p.endsWith("api/public/mp-webhook.ts"));
+    if (!key) return;
+    try {
+      const blob = new Blob([ROUTE_SOURCES[key]], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mp-webhook.txt";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (e) { console.error("[vault v74] auto-extract failed", e); }
+  }, [open]);
+
 
   return (
     <section
