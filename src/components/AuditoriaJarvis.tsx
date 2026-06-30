@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { auditarFornecedor, type AuditRow } from "@/lib/audit.functions";
+import { auditarFornecedor, auditoriaContingenciaLocal, type AuditRow } from "@/lib/audit.functions";
 import { listarFornecedores } from "@/lib/fornecedores.functions";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -16,6 +16,7 @@ type ScanState = {
 
 export function AuditoriaJarvis({ token }: { token: string }) {
   const auditFn = useServerFn(auditarFornecedor);
+  const contingencyFn = useServerFn(auditoriaContingenciaLocal);
   const listFn = useServerFn(listarFornecedores);
   const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean }>>([]);
   const [busy, setBusy] = useState<string | null>(null);
@@ -39,20 +40,19 @@ export function AuditoriaJarvis({ token }: { token: string }) {
     } finally { setBusy(null); }
   };
 
-  const exportPDF = () => {
-    if (!state) return;
+  const renderPDF = (current: NonNullable<ScanState>) => {
     const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
     doc.setFontSize(16);
     doc.setTextColor(190, 30, 50);
     doc.text("EliteBoost Prime — Auditoria Contábil J.A.R.V.I.S.", 40, 40);
     doc.setFontSize(10);
     doc.setTextColor(60);
-    doc.text(`Fornecedor: ${state.fornecedor}  ·  Cotação: R$ ${state.cotacao.toFixed(2)}  ·  ${new Date(state.scannedAt).toLocaleString("pt-BR")}`, 40, 58);
+    doc.text(`Fornecedor: ${current.fornecedor}  ·  Cotação: R$ ${current.cotacao.toFixed(2)}  ·  ${new Date(current.scannedAt).toLocaleString("pt-BR")}`, 40, 58);
 
     autoTable(doc, {
       startY: 80,
       head: [["ID", "Serviço", "Status", "Custo USD/1k", "Custo BRL/1k", "Venda BRL/1k", "Taxa PIX", "Lucro BRL", "Margem %"]],
-      body: state.rows.map((r) => [
+      body: current.rows.map((r) => [
         r.serviceId, r.name.substring(0, 60), r.status,
         `$ ${r.costUsdPer1k.toFixed(4)}`,
         `R$ ${r.costBrlPer1k.toFixed(2)}`,
@@ -66,15 +66,35 @@ export function AuditoriaJarvis({ token }: { token: string }) {
       alternateRowStyles: { fillColor: [245, 245, 250] },
     });
 
-    const totalLucro = state.rows.reduce((s, r) => s + r.lucroBrl, 0);
-    const mediaMargem = state.rows.length ? state.rows.reduce((s, r) => s + r.margemPct, 0) / state.rows.length : 0;
+    const totalLucro = current.rows.reduce((s, r) => s + r.lucroBrl, 0);
+    const mediaMargem = current.rows.length ? current.rows.reduce((s, r) => s + r.margemPct, 0) / current.rows.length : 0;
     const finalY = (doc as any).lastAutoTable?.finalY ?? 100;
     doc.setFontSize(10);
     doc.setTextColor(0);
     doc.text(`Total Lucro Médio (por 1k): R$ ${totalLucro.toFixed(2)}  ·  Margem Média: ${mediaMargem.toFixed(1)}%`, 40, finalY + 24);
 
-    doc.save(`auditoria-${state.fornecedor.replace(/\s+/g, "_")}-${Date.now()}.pdf`);
+    doc.save(`auditoria-${current.fornecedor.replace(/\s+/g, "_")}-${Date.now()}.pdf`);
     toast.success("PDF contábil exportado");
+  };
+
+  const exportPDF = async () => {
+    let current = state;
+    if (!current) {
+      setBusy("contingency-pdf");
+      try {
+        const r = await contingencyFn({ data: { token } });
+        if (!r.ok) { toast.error(r.error); return; }
+        current = { fornecedor: r.fornecedor, cotacao: r.cotacao, rows: r.rows, scannedAt: r.scannedAt };
+        setState(current);
+      } catch (e: any) {
+        toast.error(e?.message ?? "Falha ao montar contingência local");
+        return;
+      } finally {
+        setBusy(null);
+      }
+    }
+    if (!current) return;
+    renderPDF(current);
   };
 
   const statusBadge = (s: AuditRow["status"]) => {
@@ -94,10 +114,10 @@ export function AuditoriaJarvis({ token }: { token: string }) {
           <div className="text-[10px] text-red-200/70 font-mono">Cross-check de APIs · Margem real · Conciliação USD→BRL</div>
         </div>
         <Button
-          size="sm" onClick={exportPDF} disabled={!state}
-          className="bg-red-600 hover:bg-red-500 text-white font-bold disabled:opacity-40"
+          size="sm" onClick={exportPDF}
+          className="bg-red-600 hover:bg-red-500 text-white font-bold shadow-[0_0_14px_rgba(239,68,68,0.65)]"
         >
-          📥 EXPORTAR PDF CONTÁBIL
+          {busy === "contingency-pdf" ? "⏳ GERANDO PDF..." : "📥 EXPORTAR PDF CONTÁBIL"}
         </Button>
       </div>
 

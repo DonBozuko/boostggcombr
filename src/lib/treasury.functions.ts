@@ -13,6 +13,21 @@ export type TreasurySnapshot =
     }
   | { ok: false; error: string };
 
+export type PricingLedgerRow = {
+  pacote: string;
+  category: string;
+  quantidade: number;
+  custo: number;
+  venda: number;
+  lucro: number;
+  margemPct: number;
+  source: string;
+};
+
+export type PricingLedgerSnapshot =
+  | { ok: true; rows: PricingLedgerRow[]; generatedAt: string }
+  | { ok: false; error: string };
+
 export const treasurySnapshot = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
   .handler(async ({ data }): Promise<TreasurySnapshot> => {
@@ -47,5 +62,39 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
       ultimas: ((ult ?? []) as any).map((r: any) => ({
         occurred_at: r.occurred_at, faturamento: Number(r.faturamento), lucro_liquido: Number(r.lucro_liquido), network: r.network,
       })),
+    };
+  });
+
+export const pricingLedgerSnapshot = createServerFn({ method: "POST" })
+  .inputValidator((i) => input.parse(i))
+  .handler(async ({ data }): Promise<PricingLedgerSnapshot> => {
+    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+      return { ok: false, error: "UNAUTHORIZED" };
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("pacote, category, quantidade, cost_brl, price_brl, source")
+      .order("category", { ascending: true })
+      .order("quantidade", { ascending: true });
+    if (error) return { ok: false, error: error.message };
+    return {
+      ok: true,
+      generatedAt: new Date().toISOString(),
+      rows: ((rows ?? []) as any[]).map((r) => {
+        const custo = Number(r.cost_brl || 0);
+        const venda = Number(r.price_brl || 0);
+        const lucro = venda - custo;
+        return {
+          pacote: String(r.pacote),
+          category: String(r.category),
+          quantidade: Number(r.quantidade || 0),
+          custo,
+          venda,
+          lucro: Number(lucro.toFixed(2)),
+          margemPct: venda > 0 ? Number(((lucro / venda) * 100).toFixed(1)) : 0,
+          source: String(r.source ?? "fallback"),
+        };
+      }),
     };
   });

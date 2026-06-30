@@ -1,13 +1,44 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { treasurySnapshot, type TreasurySnapshot } from "@/lib/treasury.functions";
+import { pricingLedgerSnapshot, treasurySnapshot, type TreasurySnapshot } from "@/lib/treasury.functions";
 
 function brl(n: number) { return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
 
 export function TreasuryPanel({ token }: { token: string }) {
   const fn = useServerFn(treasurySnapshot);
+  const ledgerFn = useServerFn(pricingLedgerSnapshot);
   const [snap, setSnap] = useState<TreasurySnapshot | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const exportLedger = async () => {
+    const liveRows = snap?.ok ? snap.ultimas.map((u) => [u.occurred_at, u.network ?? "", String(u.faturamento), String(u.lucro_liquido), "tesouraria"]) : [];
+    let fallbackRows: string[][] = [];
+    try {
+      const ledger = await ledgerFn({ data: { token } });
+      if (ledger.ok) {
+        fallbackRows = ledger.rows.map((r) => [
+          ledger.generatedAt,
+          r.category,
+          String(r.venda),
+          String(r.lucro),
+          `${r.pacote} · qtd ${r.quantidade} · custo ${r.custo} · margem ${r.margemPct}% · ${r.source}`,
+        ]);
+      }
+    } catch { /* exporta o que houver */ }
+
+    const rows = [
+      ["occurred_at", "network_or_category", "faturamento", "lucro_liquido", "origem"],
+      ...liveRows,
+      ...fallbackRows,
+    ];
+    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `livro-contabil-${Date.now()}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
 
   const load = async () => {
     if (!token) return;
@@ -19,8 +50,14 @@ export function TreasuryPanel({ token }: { token: string }) {
 
   if (!snap || !snap.ok) {
     return (
-      <section className="rounded-xl border border-amber-400/40 bg-amber-950/20 p-3 text-amber-200 text-xs">
-        💰 Tesouraria · {loading ? "carregando…" : (snap as any)?.error ?? "sem dados"}
+      <section className="rounded-xl border border-amber-400/40 bg-amber-950/20 p-3 text-amber-200 text-xs flex items-center justify-between gap-2 flex-wrap">
+        <span>💰 Tesouraria · {loading ? "carregando…" : (snap as any)?.error ?? "sem dados"}</span>
+        <button
+          onClick={() => void exportLedger()}
+          className="text-[10px] px-2 py-1 rounded-md border border-emerald-400/60 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 shadow-[0_0_10px_rgba(52,211,153,0.35)]"
+        >
+          📥 EXPORTAR LIVRO (CSV)
+        </button>
       </section>
     );
   }
@@ -38,20 +75,9 @@ export function TreasuryPanel({ token }: { token: string }) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
-              if (!snap.ok) return;
-              const rows = [
-                ["occurred_at", "network", "faturamento", "lucro_liquido"],
-                ...snap.ultimas.map((u) => [u.occurred_at, u.network ?? "", String(u.faturamento), String(u.lucro_liquido)]),
-              ];
-              const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
-              const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url; a.download = `livro-contabil-${Date.now()}.csv`;
-              document.body.appendChild(a); a.click(); a.remove();
-              setTimeout(() => URL.revokeObjectURL(url), 2000);
+              void exportLedger();
             }}
-            className="text-[10px] px-2 py-1 rounded-md border border-emerald-400/50 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
+            className="text-[10px] px-2 py-1 rounded-md border border-emerald-400/60 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25 shadow-[0_0_10px_rgba(52,211,153,0.35)]"
           >
             📥 EXPORTAR LIVRO (CSV)
           </button>

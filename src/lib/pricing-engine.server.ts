@@ -2,7 +2,7 @@
 // de margem progressiva High-CAC. Em qualquer falha cai no FALLBACK_RATES.
 // NÃO importar de módulos client-reachable em escopo de módulo.
 
-import { resolveServiceIdAsync } from "./smmhype.server";
+import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
 
 export type Category =
   | "instagram:seguidores"
@@ -78,7 +78,8 @@ const PROBE: Record<Category, { pacote: string; qty: number }> = {
   "trafego:global":          { pacote: "wgl1k", qty: 1000 },
 };
 
-// Custo BRL por 1000 — fallback calibrado acima do custo real, com folga.
+// Hardcoded Financial Fallback Core v50-Patch — custos BRL/1000 salvos no código.
+// Base de contingência: R$ 1,28 por 100 ações (= R$ 12,80/1000), ajustada por categoria.
 const FALLBACK_RATES_PER_1K: Record<Category, number> = {
   "instagram:seguidores":    12.0,
   "instagram:curtidas":       2.4,
@@ -98,6 +99,7 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 
 const USD_TO_BRL = 7.0;
 const COUPON_BUFFER = 0.85; // 1 - 0.15 (PRIME15)
+const CONTINGENCY_SOURCE = "fallback" as const;
 
 function tierMultiplier(qty: number): number {
   // Premium Balancing Adjust v42
@@ -112,6 +114,15 @@ function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
   const raw = (baseCost * tierMultiplier(qty)) / COUPON_BUFFER;
+  return Math.max(3, ceilTo(raw, 0.5));
+}
+
+function packageCostFromRate(qty: number, costPer1k: number): number {
+  return (qty / 1000) * costPer1k;
+}
+
+function priceFromPackageCost(qty: number, costBrl: number): number {
+  const raw = (costBrl * tierMultiplier(qty)) / COUPON_BUFFER;
   return Math.max(3, ceilTo(raw, 0.5));
 }
 
@@ -268,6 +279,52 @@ export type PricingGridResult = {
   generated_at: string;
 };
 
+type PricingItemRow = {
+  pacote: string;
+  category: Category;
+  quantidade: number;
+  provider_service_id: number | null;
+  cost_brl: number;
+  price_brl: number;
+  source: "api" | "fallback";
+  synced_at: string;
+};
+
+function buildContingencyPricingRows(now = new Date().toISOString()): {
+  itemRows: PricingItemRow[];
+  summaryRows: Array<{ category: Category; cost_per_1k_brl: number; source: "fallback"; synced_at: string }>;
+  results: Array<{ category: Category; cost: number; source: "fallback" }>;
+} {
+  const itemRows: PricingItemRow[] = [];
+  const summaryRows: Array<{ category: Category; cost_per_1k_brl: number; source: "fallback"; synced_at: string }> = [];
+  const results: Array<{ category: Category; cost: number; source: "fallback" }> = [];
+
+  for (const cat of Object.keys(CANONICAL_QTYS) as Category[]) {
+    const costPer1k = FALLBACK_RATES_PER_1K[cat];
+    for (const { id, qty } of CANONICAL_QTYS[cat]) {
+      const costBrl = packageCostFromRate(qty, costPer1k);
+      itemRows.push({
+        pacote: id,
+        category: cat,
+        quantidade: qty,
+        provider_service_id: resolveServiceId(id, qty),
+        cost_brl: Number(costBrl.toFixed(4)),
+        price_brl: Number(priceFromPackageCost(qty, costBrl).toFixed(2)),
+        source: CONTINGENCY_SOURCE,
+        synced_at: now,
+      });
+    }
+    summaryRows.push({
+      category: cat,
+      cost_per_1k_brl: Number(costPer1k.toFixed(4)),
+      source: CONTINGENCY_SOURCE,
+      synced_at: now,
+    });
+    results.push({ category: cat, cost: costPer1k, source: CONTINGENCY_SOURCE });
+  }
+  return { itemRows, summaryRows, results };
+}
+
 
 async function readCachedRate(category: Category): Promise<number | null> {
   try {
@@ -338,28 +395,48 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
 }
 
 // v47 — sincroniza TODOS os ~200 cards (1 chamada services + 1 resolver por card).
-export async function syncPricingCacheAll(): Promise<{
+export async function syncPricingCacheAll(options: { forceContingency?: boolean } = {}): Promise<{
   ok: boolean;
   updated: number;
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
+  mode?: "api" | "contingency";
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático
-  // SMMhype → SMMPainel → Verified. Se todos caírem, FALLBACK_RATES_PER_1K cobre.
-  const { rateById, provider } = await loadProviderRateMap();
+  // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático.
+  // v50-Patch: forceContingency ignora rede e popula tudo pela matriz local.
+  const { rateById, provider } = options.forceContingency
+    ? { rateById: new Map<number, number>(), provider: "none" as const }
+    : await loadProviderRateMap();
   console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
 
 
   const cats = Object.keys(CANONICAL_QTYS) as Category[];
-  const itemRows: Array<{
-    pacote: string; category: Category; quantidade: number;
-    provider_service_id: number | null; cost_brl: number; price_brl: number;
-    source: "api" | "fallback"; synced_at: string;
-  }> = [];
+  let itemRows: PricingItemRow[] = [];
   const catSummary: Array<{ category: Category; cost: number; source: "api" | "fallback" }> = [];
 
   const now = new Date().toISOString();
+
+  if (provider === "none" || rateById.size === 0) {
+    console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
+    const contingency = buildContingencyPricingRows(now);
+    itemRows = contingency.itemRows;
+    const { error: e1 } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .upsert(itemRows, { onConflict: "pacote" });
+    const { error: e2 } = await supabaseAdmin
+      .from("pricing_cache" as any)
+      .upsert([
+        ...contingency.summaryRows,
+        {
+          category: "_contingency:v50-patch",
+          cost_per_1k_brl: 12.8,
+          source: "all_providers_failed_local_matrix",
+          synced_at: now,
+        },
+      ], { onConflict: "category" });
+    return { ok: !e1 && !e2, updated: itemRows.length, results: contingency.results, mode: "contingency" };
+  }
 
   for (const cat of cats) {
     let catCostPer1k = FALLBACK_RATES_PER_1K[cat];
@@ -380,8 +457,7 @@ export async function syncPricingCacheAll(): Promise<{
         source = "fallback";
       }
       // Markup v42 aplicado item-a-item sobre o custo real BRL
-      const raw = (cost_brl * tierMultiplier(qty)) / COUPON_BUFFER;
-      const price_brl = Math.max(3, ceilTo(raw, 0.5));
+      const price_brl = priceFromPackageCost(qty, cost_brl);
       itemRows.push({
         pacote: id, category: cat, quantidade: qty,
         provider_service_id: serviceId ?? null,
@@ -407,7 +483,7 @@ export async function syncPricingCacheAll(): Promise<{
     .from("pricing_cache" as any)
     .upsert(summaryRows, { onConflict: "category" });
 
-  return { ok: !e1 && !e2, updated: itemRows.length, results: catSummary };
+  return { ok: !e1 && !e2, updated: itemRows.length, results: catSummary, mode: "api" };
 }
 
 // v47 — preço final por pacote individual (checkout / webhook MP / bot Telegram).
