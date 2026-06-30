@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandGuard } from "@/components/BrandGuard";
 import { CyberDeceptionShield } from "@/components/CyberDeceptionShield";
+import { SupportChatWidget } from "@/components/SupportChatWidget";
 
 
 function NotFoundComponent() {
@@ -95,6 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" },
     ],
     scripts: [
+      { src: "/~flock.js", async: true, defer: true },
       {
         type: "application/ld+json",
         children: JSON.stringify({
@@ -158,6 +160,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <BrandGuard />
       <CyberDeceptionShield />
+      <SupportChatWidget />
       <Outlet />
       <Toaster theme="dark" position="top-center" richColors />
     </QueryClientProvider>

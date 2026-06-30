@@ -111,7 +111,12 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
   // assume que o app não abriu e redireciona para a web.
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!BOT_USERNAME) return; // sem bot configurado → segue href padrão (https://t.me)
+      // Prioridade v44: abrir chat nativo interno (JivoSite/SmartChat) sem sair do site.
+      if (typeof window !== "undefined" && window.openSupportChat?.()) {
+        e.preventDefault();
+        return;
+      }
+      if (!BOT_USERNAME) return; // sem bot configurado → segue href padrão
       e.preventDefault();
       const start = Date.now();
       const timer = window.setTimeout(() => {

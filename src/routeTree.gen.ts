@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Char126flockDotjsRouteImport } from './routes/~flock[.]js'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
@@ -21,6 +22,7 @@ import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
@@ -28,6 +30,11 @@ import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 
+const Char126flockDotjsRoute = Char126flockDotjsRouteImport.update({
+  id: '/~flock.js',
+  path: '/~flock.js',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const YoutubeRoute = YoutubeRouteImport.update({
   id: '/youtube',
   path: '/youtube',
@@ -88,6 +95,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
+  id: '/~api/analytics',
+  path: '/~api/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
   id: '/api/public/sync-services',
   path: '/api/public/sync-services',
@@ -134,6 +146,8 @@ export interface FileRoutesByFullPath {
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
+  '/~flock.js': typeof Char126flockDotjsRoute
+  '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
@@ -154,6 +168,8 @@ export interface FileRoutesByTo {
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
+  '/~flock.js': typeof Char126flockDotjsRoute
+  '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
@@ -175,6 +191,8 @@ export interface FileRoutesById {
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
+  '/~flock.js': typeof Char126flockDotjsRoute
+  '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
@@ -197,6 +215,8 @@ export interface FileRouteTypes {
     | '/tiktok'
     | '/trafego'
     | '/youtube'
+    | '/~flock.js'
+    | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
@@ -217,6 +237,8 @@ export interface FileRouteTypes {
     | '/tiktok'
     | '/trafego'
     | '/youtube'
+    | '/~flock.js'
+    | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
@@ -237,6 +259,8 @@ export interface FileRouteTypes {
     | '/tiktok'
     | '/trafego'
     | '/youtube'
+    | '/~flock.js'
+    | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
@@ -258,6 +282,8 @@ export interface RootRouteChildren {
   TiktokRoute: typeof TiktokRoute
   TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
+  Char126flockDotjsRoute: typeof Char126flockDotjsRoute
+  Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
@@ -268,6 +294,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/~flock.js': {
+      id: '/~flock.js'
+      path: '/~flock.js'
+      fullPath: '/~flock.js'
+      preLoaderRoute: typeof Char126flockDotjsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/youtube': {
       id: '/youtube'
       path: '/youtube'
@@ -352,6 +385,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/~api/analytics': {
+      id: '/~api/analytics'
+      path: '/~api/analytics'
+      fullPath: '/~api/analytics'
+      preLoaderRoute: typeof Char126apiAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-services': {
       id: '/api/public/sync-services'
       path: '/api/public/sync-services'
@@ -410,6 +450,8 @@ const rootRouteChildren: RootRouteChildren = {
   TiktokRoute: TiktokRoute,
   TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
+  Char126flockDotjsRoute: Char126flockDotjsRoute,
+  Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
