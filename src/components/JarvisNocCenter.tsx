@@ -113,8 +113,8 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
                 <span>{f.nome}</span>
                 <span>{f.ativo ? "🟢 ATIVO" : "⚫"}</span>
               </div>
-              <div>Saldo: {f.saldo != null ? `$${Number(f.saldo).toFixed(2)}` : "—"}</div>
-              <div>Falhas: {f.falhas ?? 0} · Status: {f.status ?? "—"}</div>
+              <div>Saldo: {f.saldo != null ? `US$ ${Number(f.saldo).toFixed(2)}` : "aguardando leitura"}</div>
+              <div>Falhas: {f.falhas ?? 0} · Status: {f.status ?? "sincronizando"}</div>
             </div>
           ))}
         </div>
