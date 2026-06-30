@@ -5,9 +5,10 @@
 const COUPON_BUFFER = 0.85; // 1 - 0.15 (PRIME15)
 
 function tierMultiplier(qty: number): number {
-  if (qty <= 1000) return 4.5;
-  if (qty <= 10000) return 3.2;
-  return 2.2;
+  // Premium Balancing Adjust v42
+  if (qty <= 1000) return 4.0;
+  if (qty <= 10000) return 2.6;
+  return 1.8;
 }
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
