@@ -206,6 +206,8 @@ export function MobileFrame({
 }) {
   const data = billboards[route] ?? billboards["/"];
   const chars = characters[route];
+  useEffect(() => { try { localStorage.setItem("eb_coupon", "PRIME15"); } catch {} }, []);
+
   return (
     <div
       className="relative min-h-screen h-auto w-screen overflow-y-auto overflow-x-visible flex justify-center lg:items-center"
