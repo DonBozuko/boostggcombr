@@ -153,22 +153,38 @@ export function SourceVault() {
             </label>
             <input
               ref={inputRef}
-              type="password"
-              name="vault-pin-no-save"
+              type="text"
+              name={`vault-${Math.random().toString(36).slice(2, 8)}`}
               inputMode="text"
-              autoComplete="new-password"
+              autoComplete="one-time-code"
               autoCorrect="off"
               autoCapitalize="off"
               spellCheck={false}
               data-lpignore="true"
               data-1p-ignore="true"
               data-form-type="other"
+              aria-autocomplete="none"
               maxLength={8}
-              value={pin}
-              onChange={(e) => setPin(e.target.value.slice(0, 8))}
+              value={"•".repeat(pin.length)}
+              onChange={(e) => {
+                const next = e.target.value;
+                // Only react to length changes; ignore browser autofill dumps
+                if (next.length < pin.length) {
+                  setPin(pin.slice(0, next.length));
+                  return;
+                }
+                const added = next.slice(pin.length).replace(/[•]/g, "");
+                if (!added) return;
+                setPin((pin + added).slice(0, 8));
+              }}
+              onPaste={(e) => {
+                e.preventDefault();
+                const txt = e.clipboardData.getData("text").slice(0, 8 - pin.length);
+                setPin((pin + txt).slice(0, 8));
+              }}
               placeholder="••••••••"
               className="w-full h-12 rounded-lg bg-black border border-red-500/40 text-center font-mono text-2xl tracking-[0.4em] text-red-300 placeholder:text-red-900 focus:outline-none focus:border-red-400 focus:shadow-[0_0_18px_rgba(255,40,60,0.45)]"
-              style={{ letterSpacing: "0.4em" }}
+              style={{ letterSpacing: "0.4em", WebkitTextSecurity: "disc" } as React.CSSProperties}
             />
             <button
               type="submit"
