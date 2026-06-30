@@ -1171,8 +1171,15 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <LuxuryMenuList active={activeTab} onChange={(t) => { setActiveTab(t); if (t === "pedidos" || t === "servicos") setLoaded(true); }} />
 
-        {activeTab === "buscar" && <BuscarPedidoPanel />}
+        <div className={`${activeTab === "alertas" ? "block" : "hidden"} md:block`}><JarvisAlertCenter /></div>
+        <div className={`${activeTab === "noc" ? "block" : "hidden"} md:block`}><JarvisNocCenter token={token} /></div>
+        <div className={`${activeTab === "auditoria" ? "block" : "hidden"} md:block`}><AuditoriaJarvis token={token} /></div>
+        <div className={`${activeTab === "tesouraria" ? "block" : "hidden"} md:block`}><TreasuryPanel token={token} /></div>
+        <div className={`${activeTab === "custos" ? "block" : "hidden"} md:block`}><AdminCostAlert /></div>
 
+        <div className={`${activeTab === "buscar" ? "block" : "hidden"} md:block`}><BuscarPedidoPanel /></div>
+
+        <div className={`${activeTab === "pedidos" ? "block" : "hidden"} md:block`}>
         {activeTab === "pedidos" && (
           <div className="space-y-4">
             <InsightsIA token={token} />
