@@ -164,10 +164,34 @@ export type PricingGridResult = {
   generated_at: string;
 };
 
+async function readCachedRate(category: Category): Promise<number | null> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("pricing_cache" as any)
+      .select("cost_per_1k_brl")
+      .eq("category", category)
+      .maybeSingle();
+    const v = Number((data as any)?.cost_per_1k_brl);
+    return Number.isFinite(v) && v > 0 ? v : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
-  const apiRate = await fetchSmmRatePer1kBRL(category);
-  const source: "api" | "fallback" = apiRate != null ? "api" : "fallback";
-  const cost = apiRate ?? FALLBACK_RATES_PER_1K[category];
+  // Cron-Driven API Replication: lê primeiro o cache local (atualizado em background).
+  const cached = await readCachedRate(category);
+  let cost: number;
+  let source: "api" | "fallback";
+  if (cached != null) {
+    cost = cached;
+    source = "api";
+  } else {
+    const apiRate = await fetchSmmRatePer1kBRL(category);
+    source = apiRate != null ? "api" : "fallback";
+    cost = apiRate ?? FALLBACK_RATES_PER_1K[category];
+  }
 
   const items: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
     const valor = priceFromCost(qty, cost);
@@ -181,6 +205,32 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
     items,
     generated_at: new Date().toISOString(),
   };
+}
+
+export async function syncPricingCacheAll(): Promise<{
+  ok: boolean;
+  updated: number;
+  results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
+}> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const cats = Object.keys(CANONICAL_QTYS) as Category[];
+  const results: Array<{ category: Category; cost: number; source: "api" | "fallback" }> = [];
+  for (const cat of cats) {
+    const apiRate = await fetchSmmRatePer1kBRL(cat);
+    const source: "api" | "fallback" = apiRate != null ? "api" : "fallback";
+    const cost = apiRate ?? FALLBACK_RATES_PER_1K[cat];
+    results.push({ category: cat, cost, source });
+  }
+  const rows = results.map((r) => ({
+    category: r.category,
+    cost_per_1k_brl: Number(r.cost.toFixed(4)),
+    source: r.source,
+    synced_at: new Date().toISOString(),
+  }));
+  const { error } = await supabaseAdmin
+    .from("pricing_cache" as any)
+    .upsert(rows, { onConflict: "category" });
+  return { ok: !error, updated: rows.length, results };
 }
 
 // Resolve categoria a partir do prefixo do pacote (usado no checkout).

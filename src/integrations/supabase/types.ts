@@ -369,6 +369,27 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_cache: {
+        Row: {
+          category: string
+          cost_per_1k_brl: number
+          source: string
+          synced_at: string
+        }
+        Insert: {
+          category: string
+          cost_per_1k_brl: number
+          source?: string
+          synced_at?: string
+        }
+        Update: {
+          category?: string
+          cost_per_1k_brl?: number
+          source?: string
+          synced_at?: string
+        }
+        Relationships: []
+      }
       scheduled_posts: {
         Row: {
           approval_token: string | null
