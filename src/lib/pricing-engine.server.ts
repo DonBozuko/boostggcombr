@@ -198,12 +198,9 @@ async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> 
   const { rateById } = await loadProviderRateMap();
   const rateUsd = rateById.get(serviceId);
   if (!Number.isFinite(rateUsd) || !rateUsd || rateUsd <= 0) return null;
-
-    return rateUsd * USD_TO_BRL;
-  } catch {
-    return null;
-  }
+  return rateUsd * USD_TO_BRL;
 }
+
 
 export type GridItem = {
   id: string;
