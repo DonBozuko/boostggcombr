@@ -177,5 +177,6 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
         <p className="mt-2 text-[12px] font-bold text-red-400">{error}</p>
       )}
     </div>
+    </>
   );
 }
