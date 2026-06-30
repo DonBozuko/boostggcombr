@@ -18,7 +18,7 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
   const auditFn = useServerFn(auditarFornecedor);
   const contingencyFn = useServerFn(auditoriaContingenciaLocal);
   const listFn = useServerFn(listarFornecedores);
-  const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean; saldo_atual?: number | null; status?: string | null }>>([]);
+  const [fornecedores, setFornecedores] = useState<Array<{ id: string; nome: string; slug: string; ativo: boolean; saldo_atual?: number | null; saldo_usd?: number | null; cotacao_brl?: number | null; status?: string | null }>>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [balanceBusy, setBalanceBusy] = useState<string | null>(null);
   const [state, setState] = useState<ScanState>(null);
