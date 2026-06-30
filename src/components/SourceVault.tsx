@@ -36,31 +36,6 @@ export function SourceVault() {
     }
   };
 
-  const copyAll = () => {
-    if (!selected) return;
-    const code = ROUTE_SOURCES[selected];
-    let ok = false;
-    try {
-      const ta = document.createElement("textarea");
-      ta.value = code;
-      ta.setAttribute("readonly", "");
-      ta.style.position = "fixed";
-      ta.style.top = "0";
-      ta.style.left = "0";
-      ta.style.opacity = "0";
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      ta.setSelectionRange(0, code.length);
-      try { ok = document.execCommand("copy"); } catch { ok = false; }
-      document.body.removeChild(ta);
-    } catch { ok = false; }
-    if (!ok && navigator.clipboard) {
-      navigator.clipboard.writeText(code).catch(() => {});
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  };
 
   return (
     <section
