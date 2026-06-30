@@ -73,6 +73,7 @@ export function SocialProofPopup({ route = "/" }: { route?: string }) {
   return (
     <div
       className="relative z-50 inline-flex shrink-0 pointer-events-none -translate-y-1 sm:-translate-y-2"
+      data-social-proof="inline-center"
       role="status"
       aria-live="polite"
     >

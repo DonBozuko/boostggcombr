@@ -233,7 +233,7 @@ function FacebookLanding() {
           { key: "_views",     label: "Em Breve",   emoji: "🎬", badge: "Recomendado",      badgeColor: BLUE },
         ]}
       />
-      <div className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
+      <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
         <FabianoBadge variant="facebook" inline />
         <SocialProofPopup route="/facebook" />
         <JarvisBadge variant="facebook" inline />

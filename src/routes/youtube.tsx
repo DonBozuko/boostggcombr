@@ -242,7 +242,7 @@ function YoutubeLanding() {
           { key: "visualizacoes", label: "Visualizações", emoji: "🎬", badge: "Recomendado",      badgeColor: RED },
         ]}
       />
-      <div className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
+      <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
         <FabianoBadge variant="youtube" inline />
         <SocialProofPopup route="/youtube" />
         <JarvisBadge variant="youtube" inline />
