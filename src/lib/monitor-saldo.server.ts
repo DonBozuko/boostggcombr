@@ -259,7 +259,7 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
   const t0 = Date.now();
   const apiKey = resolveApiKey(fornecedor.api_key_secret as string);
   const endpoint = normalizeSmmEndpoint(fornecedor.api_url as string);
-  let saldoUsd: number | null = null;
+  let saldoRaw: number | null = null;
   let status: "Online" | "Offline" = "Online";
   let erro: string | null = null;
 
@@ -267,7 +267,7 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
     if (!apiKey) throw new Error("API key ausente/inválida");
     if (!endpoint) throw new Error("api_url ausente/inválida");
     const raw = await fetchProviderBalance(endpoint, apiKey);
-    saldoUsd = Number(parseFloat(String(raw)).toFixed(2));
+    saldoRaw = Number(parseFloat(String(raw)).toFixed(2));
   } catch (e: any) {
     status = "Offline";
     erro = String(e?.message ?? e).slice(0, 240);
@@ -275,7 +275,19 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
 
   const elapsed = Date.now() - t0;
   const cotacao = Number(fxRate) > 0 ? Number(fxRate) : await fetchUsdBrlRate();
-  const saldoBrl = saldoUsd != null ? Number((saldoUsd * cotacao).toFixed(2)) : null;
+
+  // v80 — Strict Inverse Currency Resolver.
+  // Apenas SMMhype retorna saldo em USD. SMMPanel e Verified Atacado são painéis BR
+  // e retornam saldo já em BRL — não multiplicar pela cotação.
+  const slug = String(fornecedor.slug ?? fornecedor.nome ?? "").toLowerCase();
+  const isUsdProvider = /smmhype/.test(slug);
+  const saldoUsd = isUsdProvider ? saldoRaw : null;
+  const saldoBrl = saldoRaw == null
+    ? null
+    : isUsdProvider
+      ? Number((saldoRaw * cotacao).toFixed(2))
+      : Number(saldoRaw.toFixed(2));
+
   const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);
   const statusPersistido = status === "Offline" && saldoAtualPrevio > 0 ? "Online" : status;
 
