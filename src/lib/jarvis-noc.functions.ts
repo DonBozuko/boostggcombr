@@ -60,10 +60,15 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     return {
       ok: true,
       systemHealth: { total: tableChecks.length, ok: okCount, tables: tableChecks },
-      fornecedores: (fornecedoresRows ?? []).map((f: any) => ({
-        id: f.id, nome: f.nome, status: f.status, saldo: f.saldo_atual, ativo: !!f.ativo,
-        falhas: f.falhas_consecutivas, ultima: f.ultima_verificacao,
-      })),
+      fornecedores: (fornecedoresRows ?? []).map((f: any) => {
+        const saldoBrl = f.saldo_atual != null ? Number(f.saldo_atual) : null;
+        const cot = f.cotacao_brl != null ? Number(f.cotacao_brl) : null;
+        const saldoUsd = saldoBrl != null && cot && cot > 0 ? Number((saldoBrl / cot).toFixed(2)) : null;
+        return {
+          id: f.id, nome: f.nome, status: f.status, saldo: saldoBrl, saldoUsd, cotacao: cot, ativo: !!f.ativo,
+          falhas: f.falhas_consecutivas, ultima: f.ultima_verificacao,
+        };
+      }),
       apiLatency,
       pedidos: { total24h: pedidos24?.length ?? 0, pagos24h: pagos, pendentes24h: pendentes },
     };
