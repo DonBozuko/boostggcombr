@@ -226,7 +226,7 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   return {
     category,
     source,
-    cost_per_1k_brl: Number(rateFallback.toFixed(4)),
+    
     items,
     generated_at: new Date().toISOString(),
   };
