@@ -1335,7 +1335,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             })}
           </div>
         </div>
-        )}
+        </div>
 
         <div hidden={activeTab !== "explorar"} className="space-y-4">
         {/* Atalhos para Rotas Públicas (abrem em nova aba) */}
