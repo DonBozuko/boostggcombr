@@ -1,6 +1,7 @@
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
+import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
@@ -221,6 +222,16 @@ function TelegramLanding() {
         </div>
       </header>
       <ShowcaseShell>
+      {/* v115 — Mystery Box Banner (>200) */}
+      <div className="mx-2 mt-2 mb-1">
+        <div className="rounded-xl p-3 text-center" style={{ background: `${AERO}22`, border: `2px dashed ${AERO}`, boxShadow: `0 0 18px ${AERO}55` }}>
+          <p className="text-white font-black leading-tight" style={{ fontSize: "13px" }}>
+            🎁 <span style={{ color: AERO }}>BÔNUS ESPECIAL!</span> Compras acima de <span style={{ color: AERO }}>200 unidades</span> ganham
+            <br />
+            <span style={{ color: "#39ff14" }}>+10 a +50 extras</span> — resgate após o Pix aprovado.
+          </p>
+        </div>
+      </div>
       <PremiumCategorySelector
         accent={AERO}
         active={categoria}
@@ -333,6 +344,14 @@ function TelegramLanding() {
                   </div>
                 )}
               </div>
+              {pedidoInfo?.pedidoId && (
+                <MysteryBoxRedeem
+                  pedidoId={pedidoInfo.pedidoId}
+                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  unit={categoria === "canal" ? "membros" : "membros"}
+                  accent={AERO}
+                />
+              )}
               <ViralShare route="/telegram" />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar

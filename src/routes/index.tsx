@@ -5,6 +5,7 @@ import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { MobileFrame } from "@/components/MobileFrame";
+import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute } from "@tanstack/react-router";
@@ -589,7 +590,7 @@ function Landing() {
       </header>
       <ShowcaseShell>
 
-      {/* v114 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras ≥ 150 */}
+      {/* v115 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras acima de 200 */}
       <div className="mx-2 mt-2 mb-1">
         <div
           className="relative overflow-hidden rounded-xl p-3 text-center"
@@ -606,16 +607,17 @@ function Landing() {
             className="text-white font-black leading-tight"
             style={{ fontSize: "13px", textShadow: "0 0 8px rgba(0,0,0,0.9)" }}
           >
-            <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>150 seguidores</span>,
+            <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>200 seguidores</span>,
             <br />
-            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> direto na sua entrega!
+            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> após o Pix aprovado!
             <br />
             <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-black/40 text-[11px] uppercase tracking-wider">
-              ✨ Abra a Caixa Misteriosa ✨
+              ✨ Resgate na Caixa Misteriosa após o pagamento ✨
             </span>
           </p>
         </div>
       </div>
+
 
 
 
@@ -788,27 +790,13 @@ function Landing() {
                       </div>
                     </div>
                   )}
-                  {mysteryBonus > 0 && (
-                    <div
-                      className="w-full rounded-xl p-3 text-center"
-                      style={{
-                        background: "linear-gradient(135deg,#4a044e 0%,#7c2d12 100%)",
-                        border: "2px solid #FFD700",
-                        boxShadow: "0 0 22px rgba(255,215,0,0.55)",
-                      }}
-                    >
-                      <div className="text-2xl mb-1">🎁✨</div>
-                      <p className="text-white font-black text-sm leading-tight">
-                        🟢 PAGAMENTO APROVADO!<br />
-                        Você abriu a <span style={{ color: "#FFD700" }}>Caixa Misteriosa</span> e ganhou
-                        <br />
-                        <span className="text-2xl" style={{ color: "#39ff14", textShadow: "0 0 10px #39ff14" }}>
-                          +{mysteryBonus} SEGUIDORES EXTRA
-                        </span>
-                        <br />
-                        direto na sua entrega!
-                      </p>
-                    </div>
+                  {pedidoInfo?.pedidoId && (
+                    <MysteryBoxRedeem
+                      pedidoId={pedidoInfo.pedidoId}
+                      quantidade={dynAllPlans.find((p) => p.id === form.plan)?.quantidade ?? 0}
+                      unit={form.plan.startsWith("v") ? "views" : form.plan.startsWith("l") ? "curtidas" : "seguidores"}
+                      accent="#FFD700"
+                    />
                   )}
                   <p className="text-sm text-zinc-300 text-center">
                     Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.

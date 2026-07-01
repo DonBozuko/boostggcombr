@@ -1,6 +1,7 @@
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
+import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
@@ -238,6 +239,16 @@ function FacebookLanding() {
         </div>
       </header>
       <ShowcaseShell>
+      {/* v115 — Mystery Box Banner (>200) */}
+      <div className="mx-2 mt-2 mb-1">
+        <div className="rounded-xl p-3 text-center" style={{ background: `${BLUE}22`, border: `2px dashed ${BLUE}`, boxShadow: `0 0 18px ${BLUE}55` }}>
+          <p className="text-white font-black leading-tight" style={{ fontSize: "13px" }}>
+            🎁 <span style={{ color: BLUE }}>BÔNUS ESPECIAL!</span> Compras acima de <span style={{ color: BLUE }}>200 unidades</span> ganham
+            <br />
+            <span style={{ color: "#39ff14" }}>+10 a +50 extras</span> — resgate após o Pix aprovado.
+          </p>
+        </div>
+      </div>
       <PremiumCategorySelector
         accent={BLUE}
         active={categoria}
@@ -384,6 +395,14 @@ function FacebookLanding() {
                   </div>
                 )}
               </div>
+              {pedidoInfo?.pedidoId && (
+                <MysteryBoxRedeem
+                  pedidoId={pedidoInfo.pedidoId}
+                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  unit={categoria === "seguidores" ? "seguidores" : "curtidas"}
+                  accent={BLUE}
+                />
+              )}
               <ViralShare route="/facebook" />
               <Button
                 size="lg"
