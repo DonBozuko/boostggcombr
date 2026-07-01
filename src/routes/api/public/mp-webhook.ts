@@ -2,29 +2,54 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
 
+function scheduleWebhookBackground(job: Promise<unknown>, context?: unknown) {
+  const safeJob = job.catch((err) => console.error("[mp-webhook] background erro", err));
+  const ctxWaitUntil = (context as { waitUntil?: (promise: Promise<unknown>) => void } | undefined)?.waitUntil;
+  const edgeWaitUntil = (globalThis as { EdgeRuntime?: { waitUntil?: (promise: Promise<unknown>) => void } }).EdgeRuntime?.waitUntil;
+  const globalWaitUntil = (globalThis as { waitUntil?: (promise: Promise<unknown>) => void }).waitUntil;
+
+  try {
+    if (typeof ctxWaitUntil === "function") return ctxWaitUntil(safeJob);
+    if (typeof edgeWaitUntil === "function") return edgeWaitUntil(safeJob);
+    if (typeof globalWaitUntil === "function") return globalWaitUntil(safeJob);
+  } catch (err) {
+    console.warn("[mp-webhook] waitUntil indisponível, seguindo detached", err);
+  }
+
+  void safeJob;
+}
+
 export const Route = createFileRoute("/api/public/mp-webhook")({
   server: {
     handlers: {
       // MP às vezes faz GET ping de verificação
       GET: async () => new Response("ok", { status: 200 }),
 
-      POST: async ({ request }) => {
-        // Sempre 200 — MP reenvia se for !=2xx. Logamos erros e seguimos.
+      POST: async ({ request, context }) => {
+        const requestUrl = request.url;
+        let rawBody = "";
         try {
+          rawBody = await request.text();
+        } catch (err) {
+          console.warn("[mp-webhook] body read falhou; respondendo 200 mesmo assim", err);
+        }
+
+        const backgroundJob = Promise.resolve().then(async () => {
+          // Sempre 200 — MP reenvia se for !=2xx. Logamos erros e seguimos.
+          try {
           const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
           if (!mpToken) {
             console.error("[mp-webhook] MERCADO_PAGO_ACCESS_TOKEN ausente");
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           // Extrai payment id (body JSON OU query string)
-          const url = new URL(request.url);
+          const url = new URL(requestUrl);
           let paymentId =
             url.searchParams.get("data.id") ?? url.searchParams.get("id") ?? null;
           let topic =
             url.searchParams.get("type") ?? url.searchParams.get("topic") ?? null;
 
-          const rawBody = await request.text();
           if (rawBody) {
             try {
               const body = JSON.parse(rawBody) as {
@@ -41,12 +66,12 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
           if (!paymentId) {
             console.warn("[mp-webhook] sem payment id", { topic, rawBody });
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           // Só nos importam eventos de payment
           if (topic && !/payment/i.test(topic)) {
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           // 1) Busca o pagamento no MP para confirmar status
@@ -55,7 +80,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           });
           if (!mpRes.ok) {
             console.error("[mp-webhook] MP fetch falhou", mpRes.status, paymentId);
-            return new Response("ok", { status: 200 });
+            return;
           }
           const payment = (await mpRes.json()) as {
             status?: string;
@@ -76,7 +101,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 error_detail: `MP ${payment.status}: ${payment.status_detail ?? "sem detalhe"}`,
               })
               .eq("mercado_pago_id", String(paymentId));
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           // 2) Atualiza pedido para 'paid' (admin client p/ contornar RLS)
@@ -89,7 +114,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
           if (selErr || !pedido) {
             console.error("[mp-webhook] pedido não encontrado", paymentId, selErr);
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           // SEGURANÇA: valor pago tem que bater com o valor do plano salvo (centavos)
@@ -106,13 +131,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 error_detail: `Esperado R$${pedido.valor} · Recebido R$${payment.transaction_amount}`,
               })
               .eq("id", pedido.id);
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           // v94 — Strict Idempotency Gateway Guard (payment_id + treasury ledger)
           if (pedido.status === "paid") {
             console.log("[mp-webhook] v94 idempotency: pedido já paid", { paymentId, pedidoId: pedido.id });
-            return new Response("ok", { status: 200 });
+            return;
           }
           {
             const { data: alreadyLedger } = await supabaseAdmin
@@ -122,7 +147,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               .maybeSingle();
             if (alreadyLedger) {
               console.log("[mp-webhook] v94 idempotency: ledger existente, abort", { paymentId, pedidoId: pedido.id });
-              return new Response("ok", { status: 200 });
+              return;
             }
           }
 
@@ -154,7 +179,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             .eq("id", pedido.id);
           if (updErr) {
             console.error("[mp-webhook] update falhou", updErr);
-            return new Response("ok", { status: 200 });
+            return;
           }
 
 
@@ -167,7 +192,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               .from("pedidos")
               .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO com saldo > 0 (smart routing vazio)" })
               .eq("id", pedido.id);
-            return new Response("ok", { status: 200 });
+            return;
           }
 
           console.log("[mp-webhook] smart-routing rank", {
@@ -312,7 +337,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               } as any).then(() => {}, (e) => console.warn("[mp-webhook] audit insert fail", e));
               const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
               await dispatchWhatsappAlert(`🚨 MARGIN GUARDIAN · Pedido ${pedido.id} em HOLD. Custos violam 300%. Ajuste preço ou fornecedor.`).catch(() => {});
-              return new Response("ok", { status: 200 });
+              return;
             }
             console.error("[mp-webhook] todos fornecedores falharam → estorno", { pedidoId: pedido.id, tentativas });
             const refund = await refundMercadoPago(String(paymentId));
@@ -351,11 +376,16 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             await dispatchWhatsappAlert(alertMsg).catch((e) => console.error("[mp-webhook] alerta tg", e));
           }
 
-          return new Response("ok", { status: 200 });
         } catch (err) {
           console.error("[mp-webhook] erro inesperado", err);
-          return new Response("ok", { status: 200 });
         }
+        });
+
+        scheduleWebhookBackground(backgroundJob, context);
+        return Response.json({ received: true }, {
+          status: 200,
+          headers: { "cache-control": "no-store" },
+        });
       },
     },
   },
