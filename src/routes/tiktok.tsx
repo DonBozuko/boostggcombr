@@ -427,6 +427,14 @@ function TiktokLanding() {
                   </div>
                 )}
               </div>
+              {pedidoInfo?.pedidoId && (
+                <MysteryBoxRedeem
+                  pedidoId={pedidoInfo.pedidoId}
+                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  unit={categoria === "seguidores" ? "seguidores" : categoria === "curtidas" ? "curtidas" : "views"}
+                  accent={CYAN}
+                />
+              )}
               <ViralShare route="/tiktok" />
               <Button
                 size="lg"
