@@ -63,6 +63,7 @@ export const Route = createFileRoute("/facebook")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [buildProductJsonLd({ network: "facebook", url, description, priceFromBrl: 5 })],
     };
   },
   component: FacebookLanding,

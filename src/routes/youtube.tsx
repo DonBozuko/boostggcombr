@@ -63,6 +63,7 @@ export const Route = createFileRoute("/youtube")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [buildProductJsonLd({ network: "youtube", url, description, priceFromBrl: 5 })],
     };
   },
   component: YoutubeLanding,
