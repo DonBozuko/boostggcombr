@@ -153,7 +153,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         <h3 className="text-amber-300 font-bold tracking-wide text-sm">
           📦 EXPANSÃO DO CATÁLOGO · IDs DOS FORNECEDORES
         </h3>
-        <button onClick={reload} className="text-[11px] px-2 py-1 rounded border border-amber-500/40 text-amber-200 hover:bg-amber-500/10">
+        <button onClick={() => reload(true)} className="text-[11px] px-2 py-1 rounded border border-amber-500/40 text-amber-200 hover:bg-amber-500/10">
           ⟳ Atualizar
         </button>
       </div>
