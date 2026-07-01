@@ -217,6 +217,24 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   net_profit_percentage: netPct,
                 } as any, { onConflict: "pedido_id" });
               } catch (e) { console.warn("[mp-webhook] treasury ledger falhou", e); }
+              // v94 — Telemetria de auditoria: dispatch OK
+              try {
+                await supabaseAdmin.from("admin_audit_logs" as any).insert({
+                  admin_email: "system@webhook",
+                  action: "DISPATCH_OK",
+                  detail: {
+                    ts: new Date().toISOString(),
+                    payment_id: String(paymentId),
+                    pedido_id: pedido.id,
+                    pacote: pedido.pacote,
+                    quantidade: pedido.quantidade,
+                    cost_brl: custoReal,
+                    provider: f.slug,
+                    order_id: r.orderId ?? null,
+                    message: `[mp-webhook] dispatch OK`,
+                  },
+                } as any);
+              } catch (e) { console.warn("[mp-webhook] audit dispatch_ok fail", e); }
               // === Notificação Telegram: sucesso / auto-reparo ===
               try {
                 const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
