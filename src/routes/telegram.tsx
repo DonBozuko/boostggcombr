@@ -132,8 +132,14 @@ function TelegramLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "canal" ? canalPlans : grupoPlans;
+  const dyn = useDynamicPlans({
+    canal: { category: "telegram:canal", fallback: canalPlans, unitLabel: "Membros" },
+    grupo: { category: "telegram:grupo", fallback: grupoPlans, unitLabel: "Membros" },
+  });
+  const currentPlans = categoria === "canal" ? dyn.canal : dyn.grupo;
+  const dynAllPlans = [...dyn.canal, ...dyn.grupo];
   const tipoBloqueado = isBlocked(blocked, "telegram", categoria);
+
 
   const submit = async (selected: Plan) => {
     if (isBlocked(blocked, "telegram", categoria)) {
