@@ -16,6 +16,7 @@ import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
 import { LiveTelemetryMonitor } from "@/components/LiveTelemetryMonitor";
+import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
 import { SourceVault } from "@/components/SourceVault";
 import {
   Dialog,
@@ -1269,6 +1270,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} refreshSignal={nocRefreshSignal} /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><ClaudeCodeInspector /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><LiveTelemetryMonitor /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><SourceVault /></div>
