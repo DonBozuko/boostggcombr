@@ -61,6 +61,7 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { respectsMinMargin, computeGuardedPrice } = await import("@/lib/margin-guardian");
     const clean = (v: string | null | undefined) => {
       if (v == null) return null;
       const t = String(v).trim();
@@ -69,6 +70,14 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
     const hype = clean(data.smmhype_service_id);
     const panel = clean(data.smmpanel_service_id);
     const verified = clean(data.verified_service_id);
+    // v135 — Margin Guardian server-side: bloqueia bypass via curl/manipulação externa.
+    // Aceita price >= floor da Equação Fabiano OU que respeite 300% de lucro líquido.
+    if (data.cost_brl > 0 && data.price_brl > 0) {
+      const floor = computeGuardedPrice(data.cost_brl);
+      if (data.price_brl < floor && !respectsMinMargin(data.price_brl, data.cost_brl)) {
+        return { ok: false, error: `⛔ v135 Margin Guardian: preço R$${data.price_brl.toFixed(2)} abaixo do piso R$${floor.toFixed(2)} (custo R$${data.cost_brl.toFixed(4)} × 4.0 × 1.15 / 0.9901). Lucro < 300% rejeitado.` };
+      }
+    }
     // v112 — Lacre Contábil: rejeita duplicação em 0ms antes do INSERT
     if (hype && ((panel && panel === hype) || (verified && verified === hype))) {
       return { ok: false, error: DUP_ID_MSG };
