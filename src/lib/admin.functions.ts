@@ -8,23 +8,21 @@ export const getPedidoStatus = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("pedidos")
-      .select("status")
+      .select("status, error_detail")
       .eq("id", data.id)
       .maybeSingle();
-    if (error || !row) return { ok: false as const, status: null };
+    if (error || !row) return { ok: false as const, status: null, error_detail: null as string | null };
 
-    // Contingência: se o webhook do MP ainda não chegou, consulta a API direta
-    // e despacha o pedido para evitar o looping "Aguardando pagamento...".
     if (row.status === "pending") {
       try {
         const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
         const r = await confirmAndDispatchIfPaid(data.id);
-        if (r.ok) return { ok: true as const, status: r.status };
+        if (r.ok) return { ok: true as const, status: r.status, error_detail: null as string | null };
       } catch (e) {
         console.warn("[getPedidoStatus] contingency falhou", e);
       }
     }
-    return { ok: true as const, status: row.status as string };
+    return { ok: true as const, status: row.status as string, error_detail: (row as { error_detail?: string | null }).error_detail ?? null };
   });
 
 // === ADMIN: listar pedidos pagos e reprocessar ===
