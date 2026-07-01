@@ -51,7 +51,7 @@ export function ClaudeCodeInspector() {
     <section className="rounded-lg border border-cyan-500/40 bg-black/60 p-4 space-y-4 font-mono text-xs text-cyan-100">
       <header className="flex items-center justify-between border-b border-cyan-500/30 pb-2">
         <h2 className="text-sm font-bold text-cyan-300">🔬 INSPEÇÃO DE CÓDIGO & AUDITORIA SEGUNDO A SEGUNDO</h2>
-        <span className="text-[10px] text-cyan-400/70">Claude Code Mirror · v110 · {data?.ts?.slice(11, 19) ?? "..."}</span>
+        <span className="text-[10px] text-cyan-400/70">Claude Code Mirror · v111 · {data?.ts?.slice(11, 19) ?? "..."}</span>
       </header>
 
       {err && <div className="text-red-400">⛔ {err}</div>}
