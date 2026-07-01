@@ -87,19 +87,53 @@ export function ClaudeCodeInspector() {
           </div>
         )}
         {data ? (
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              Total:{" "}
-              <span className={data.catalog.symmetric ? "text-emerald-400" : "text-yellow-400"}>
-                {data.catalog.total} / {data.catalog.expected}
-              </span>{" "}
-              {data.catalog.symmetric ? "🟢 simétrico" : "⚠️ divergente"}
+          <>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                Total:{" "}
+                <span className={data.catalog.symmetric ? "text-emerald-400" : "text-yellow-400"}>
+                  {data.catalog.total} / {data.catalog.expected}
+                </span>{" "}
+                {data.catalog.symmetric ? "🟢 simétrico" : "⚠️ divergente"}
+                {(data.catalog as any).fallbackApplied && (
+                  <span className="ml-1 text-[10px] text-cyan-300/80">(fallback local)</span>
+                )}
+              </div>
+              <div>Triple-ID: <span className="text-emerald-300">{data.catalog.withTriple}</span></div>
+              <div>SMMhype IDs: {data.catalog.withSmmhype}</div>
+              <div>SMMPainel IDs: {data.catalog.withSmmpanel}</div>
+              <div>Verified IDs: {data.catalog.withVerified}</div>
             </div>
-            <div>Triple-ID: <span className="text-emerald-300">{data.catalog.withTriple}</span></div>
-            <div>SMMhype IDs: {data.catalog.withSmmhype}</div>
-            <div>SMMPainel IDs: {data.catalog.withSmmpanel}</div>
-            <div>Verified IDs: {data.catalog.withVerified}</div>
-          </div>
+
+            {/* v126 — Provider Health Handshake */}
+            {Array.isArray((data as any).providers) && (data as any).providers.length > 0 && (
+              <div className="mt-3 pt-2 border-t border-cyan-500/20">
+                <div className="text-cyan-300/80 text-[11px] mb-1">Engrenagens (Handshake)</div>
+                <div className="flex flex-wrap gap-2">
+                  {(data as any).providers.map((p: any) => {
+                    const badge =
+                      p.state === "ATIVO"
+                        ? "bg-emerald-500/20 border-emerald-400 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                        : p.state === "RESERVA"
+                        ? "bg-cyan-500/15 border-cyan-400 text-cyan-200 shadow-[0_0_8px_rgba(34,211,238,0.4)]"
+                        : "bg-zinc-700/40 border-zinc-500 text-zinc-300";
+                    const dot = p.state === "OFFLINE" ? "🔴" : "🟢";
+                    return (
+                      <div key={p.slug} className="flex items-center gap-1.5">
+                        <span className="text-cyan-100/90">{p.nome}</span>
+                        <span className={`px-2 py-0.5 rounded border text-[10px] font-bold ${badge}`}>
+                          {dot} {p.state}
+                        </span>
+                        <span className="text-cyan-100/60 text-[10px]">
+                          R$ {Number(p.saldo).toFixed(2)} · {p.hasKey ? "key✓" : "key✗"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </>
         ) : <div>carregando…</div>}
       </div>
 
