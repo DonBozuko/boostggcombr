@@ -223,6 +223,14 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               } as any);
               await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: Number(pedido.valor) });
             } catch (e) { console.warn("[mp-webhook] v116 waiting_provision ledger fail", e); }
+            try {
+              const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
+              await notifyAdminProvisioning({
+                pedidoId: String(pedido.id),
+                vendaBrl: Number(pedido.valor),
+                motivo: "Nenhum fornecedor ATIVO com saldo/ID mapeado",
+              });
+            } catch (e) { console.warn("[mp-webhook] v119 whatsapp bridge fail", e); }
             return;
           }
 
