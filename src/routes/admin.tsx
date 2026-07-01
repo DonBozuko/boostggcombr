@@ -1271,6 +1271,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><SourceVault /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><PricingCatalogEditor token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
 
         <div className={`${folder === "buscas" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
