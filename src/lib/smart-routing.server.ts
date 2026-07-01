@@ -59,8 +59,7 @@ export async function rankProvidersByCost(opts: {
     supabaseAdmin
       .from("fornecedores")
       .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade")
-      .eq("ativo", true)
-      .gt("saldo_atual", 0),
+      .eq("ativo", true),
     serviceId != null
       ? supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", serviceId).maybeSingle()
       : Promise.resolve({ data: null } as any),
