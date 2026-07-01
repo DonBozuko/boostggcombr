@@ -348,7 +348,7 @@ function TiktokLanding() {
               onClick={() => {
                 const sel = dynAllPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
-                submit(sel);
+                submit({ ...sel, qty: sel.qty ?? sel.quantidade.toLocaleString("pt-BR") });
               }}
               className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{
