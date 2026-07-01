@@ -66,6 +66,7 @@ export async function dispatchSmmV2(opts: {
 
 export async function dispatchByFornecedor(slug: string, args: {
   pacote: string; quantidade: number; instagram_user: string;
+  serviceIdOverride?: string | number | null;
 }): Promise<SmmDispatchResult> {
   if (slug === "smmhype") {
     const { dispatchSmmhype } = await import("./smmhype.server");
