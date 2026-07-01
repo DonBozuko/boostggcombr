@@ -126,14 +126,37 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
           }
 
+          // v98 — Late-Payment Catch Engine: aprovação chegou após timeout de 3min do front.
+          // NÃO descartamos: processamos assíncrono, aplicando Equação Fabiano + dispatch.
+          // Se dispatch falhar em todos fornecedores, o fluxo v95 (linhas abaixo) estorna automaticamente.
+          const LATE_STATES = new Set(["expired", "timeout", "cancelled_client", "abandoned", "pending"]);
+          const isLatePayment = LATE_STATES.has(String(pedido.status ?? "").toLowerCase());
+          if (isLatePayment) {
+            try {
+              await supabaseAdmin.from("admin_audit_logs" as any).insert({
+                admin_email: "system@webhook",
+                action: "LATE_PAYMENT_CATCH",
+                detail: {
+                  ts: new Date().toISOString(),
+                  payment_id: String(paymentId),
+                  pedido_id: pedido.id,
+                  previous_status: pedido.status,
+                  message: `[mp-webhook] v98 Late-Payment Catch · pagamento aprovado pós-timeout, processando assíncrono`,
+                },
+              } as any);
+            } catch (e) { console.warn("[mp-webhook] v98 audit late catch fail", e); }
+            console.warn("[mp-webhook] v98 late payment catch", { paymentId, pedidoId: pedido.id, previous: pedido.status });
+          }
+
           const { error: updErr } = await supabaseAdmin
             .from("pedidos")
-            .update({ status: "paid", error_detail: null })
+            .update({ status: "paid", error_detail: isLatePayment ? "v98 late-payment catch: processado pós-timeout" : null })
             .eq("id", pedido.id);
           if (updErr) {
             console.error("[mp-webhook] update falhou", updErr);
             return new Response("ok", { status: 200 });
           }
+
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
           const { rankProvidersByCost, markProviderUnstable, clearProviderUnstable } = await import("@/lib/smart-routing.server");
