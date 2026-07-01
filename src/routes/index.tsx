@@ -467,6 +467,9 @@ function Landing() {
           if (m) setMysteryBonus(Number(m[1]));
           stop(); setPaid(true); playSuccessAudio(); return;
         }
+        if (res.status === "waiting_provision") {
+          stop(); setWaitingProvision(true); setPaid(true); playSuccessAudio(); return;
+        }
         if (res.status === "mp_rejected_insufficient") {
           stop();
           setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
