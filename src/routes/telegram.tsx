@@ -344,6 +344,14 @@ function TelegramLanding() {
                   </div>
                 )}
               </div>
+              {pedidoInfo?.pedidoId && (
+                <MysteryBoxRedeem
+                  pedidoId={pedidoInfo.pedidoId}
+                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  unit={categoria === "canal" ? "membros" : "membros"}
+                  accent={AERO}
+                />
+              )}
               <ViralShare route="/telegram" />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar

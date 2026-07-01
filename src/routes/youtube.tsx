@@ -403,6 +403,14 @@ function YoutubeLanding() {
                   </div>
                 )}
               </div>
+              {pedidoInfo?.pedidoId && (
+                <MysteryBoxRedeem
+                  pedidoId={pedidoInfo.pedidoId}
+                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  unit={categoria === "inscritos" ? "inscritos" : "views"}
+                  accent={RED}
+                />
+              )}
               <ViralShare route="/youtube" />
               <Button
                 size="lg"
