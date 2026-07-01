@@ -15,6 +15,7 @@ import { IntegrityVerifier } from "@/components/IntegrityVerifier";
 import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
+import { LiveTelemetryMonitor } from "@/components/LiveTelemetryMonitor";
 import { SourceVault } from "@/components/SourceVault";
 import {
   Dialog,
