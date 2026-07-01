@@ -451,22 +451,28 @@ function Landing() {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid || rejectionMsg) return;
     const id = pedidoInfo.pedidoId;
     let cancelled = false;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const stop = () => { cancelled = true; if (interval) { clearInterval(interval); interval = null; } };
     const tick = async () => {
+      if (cancelled) return;
       try {
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
-        if (res.status === "paid") { setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "paid") { stop(); setPaid(true); playSuccessAudio(); return; }
         if (res.status === "mp_rejected_insufficient") {
+          stop();
           setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
           toast.error("Pix recusado: saldo insuficiente no banco emissor.");
           return;
         }
         if (res.status === "mp_refunded" || res.status === "SMM_FAILED") {
+          stop();
           setRejectionMsg("❌ Instabilidade temporária de envio. Para sua segurança, seu pagamento foi ESTORNADO AUTOMATICAMENTE para a sua conta bancária em tempo real! Por favor, verifique seu extrato e tente novamente em alguns instantes.");
           toast.error("Estorno automático realizado com sucesso.");
           return;
         }
         if (typeof res.status === "string" && res.status.startsWith("mp_")) {
+          stop();
           setRejectionMsg("❌ Pagamento recusado pelo Mercado Pago. Tente novamente.");
           return;
         }
@@ -475,11 +481,9 @@ function Landing() {
       }
     };
     tick();
-    const interval = setInterval(tick, 1000);
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
+    interval = setInterval(tick, 1000);
+    const hardStop = setTimeout(stop, 180_000); // v104 anti-loop 3min
+    return () => { stop(); clearTimeout(hardStop); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, rejectionMsg, getStatusFn]);
 
 

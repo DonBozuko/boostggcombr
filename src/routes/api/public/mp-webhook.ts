@@ -108,7 +108,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { data: pedido, error: selErr } = await supabaseAdmin
             .from("pedidos")
-            .select("id, status, pacote, quantidade, instagram_user, valor")
+            .select("id, status, pacote, quantidade, instagram_user, valor, cupom")
             .eq("mercado_pago_id", String(paymentId))
             .maybeSingle();
 
@@ -184,8 +184,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
+          // v104 — BRINDE50: cupom concede +50 unidades no despacho (custo absorvido pela gordura 15% da Equação Fabiano).
+          const BRINDE_BONUS = String((pedido as any).cupom ?? "").toUpperCase().split(/[,\s]+/).includes("BRINDE50") ? 50 : 0;
+          const qtyEnvio = Number(pedido.quantidade) + BRINDE_BONUS;
           const { rankProvidersByCost, markProviderUnstable, clearProviderUnstable } = await import("@/lib/smart-routing.server");
-          const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: pedido.quantidade });
+          const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: qtyEnvio });
 
           if (!cadeia.length) {
             await supabaseAdmin
@@ -225,7 +228,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
             const r = await dispatchByFornecedor(f.slug, {
               pacote: pedido.pacote,
-              quantidade: pedido.quantidade,
+              quantidade: qtyEnvio,
               instagram_user: pedido.instagram_user,
               serviceIdOverride: f.provider_service_id ?? null,
             });

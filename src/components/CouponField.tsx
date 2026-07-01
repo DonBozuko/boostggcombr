@@ -8,6 +8,10 @@ const VALID = "PRIME15";
 const KEY = "eb_coupon";
 const DISCOUNT = 0.15;
 
+// v104 — BRINDE50 (bônus em seguidores, não em cash).
+const BRINDE = "BRINDE50";
+const BRINDE_KEY = "eb_brinde";
+
 export function getCouponDiscount(): number {
   if (typeof window === "undefined") return 0;
   try { return localStorage.getItem(KEY) === VALID ? DISCOUNT : 0; } catch { return 0; }
@@ -15,7 +19,17 @@ export function getCouponDiscount(): number {
 
 export function getAppliedCoupon(): string | null {
   if (typeof window === "undefined") return null;
-  try { return localStorage.getItem(KEY) === VALID ? VALID : null; } catch { return null; }
+  try {
+    const parts: string[] = [];
+    if (localStorage.getItem(KEY) === VALID) parts.push(VALID);
+    if (localStorage.getItem(BRINDE_KEY) === BRINDE) parts.push(BRINDE);
+    return parts.length ? parts.join(",") : null;
+  } catch { return null; }
+}
+
+export function setBrindeApplied() {
+  if (typeof window === "undefined") return;
+  try { localStorage.setItem(BRINDE_KEY, BRINDE); } catch {}
 }
 
 export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
