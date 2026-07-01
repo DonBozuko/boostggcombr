@@ -152,7 +152,7 @@ function FacebookLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "seguidores" ? followersPlans : likesPlans;
+  
   const dyn = useDynamicPlans({
     seguidores: { category: "facebook:seguidores", fallback: followersPlans, unitLabel: "Seguidores" },
     curtidas:   { category: "facebook:curtidas",   fallback: likesPlans,     unitLabel: "Curtidas" },
