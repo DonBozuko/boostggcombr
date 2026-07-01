@@ -157,6 +157,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               pacote: pedido.pacote,
               quantidade: pedido.quantidade,
               instagram_user: pedido.instagram_user,
+              serviceIdOverride: f.provider_service_id ?? null,
             });
             if (r.ok) {
               await clearProviderUnstable(f.slug);
