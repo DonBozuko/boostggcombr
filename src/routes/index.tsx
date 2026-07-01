@@ -370,6 +370,7 @@ function Landing() {
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
   const [paid, setPaid] = useState(false);
+  const [mysteryBonus, setMysteryBonus] = useState<number>(0);
   const [rejectionMsg, setRejectionMsg] = useState<string | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
