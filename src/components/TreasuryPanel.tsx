@@ -8,7 +8,9 @@ function brl(n: number) { return n.toLocaleString("pt-BR", { style: "currency", 
 export function TreasuryPanel({ token }: { token: string }) {
   const fn = useServerFn(treasurySnapshot);
   const ledgerFn = useServerFn(pricingLedgerSnapshot);
+  const walletsFn = useServerFn(walletsSnapshot);
   const [snap, setSnap] = useState<TreasurySnapshot | null>(null);
+  const [wallets, setWallets] = useState<WalletsSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [busyPdf, setBusyPdf] = useState(false);
 
