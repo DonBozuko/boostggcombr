@@ -36,7 +36,7 @@ export function LiveTelemetryMonitor() {
           supabase
             .from("admin_audit_logs")
             .select("id, action, detail, created_at")
-            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR"])
+            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED"])
             .order("created_at", { ascending: false })
             .limit(8),
           supabase
@@ -67,6 +67,7 @@ export function LiveTelemetryMonitor() {
     if (!lastPedido) return { color: "text-zinc-400", text: "Aguardando primeiro webhook…" };
     const s = lastPedido.status;
     if (s === "paid") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
+    if (s === "mp_refunded") return { color: "text-amber-300", text: `💸 ESTORNADO · Pix devolvido automaticamente · pedido ${lastPedido.id.slice(0,8)}` };
     if (s?.startsWith("mp_")) return { color: "text-rose-400", text: `🔴 MP ${s} · ${lastPedido.error_detail ?? ""}` };
     if (s === "MARGIN_HOLD") return { color: "text-amber-300", text: `🟠 MARGIN_HOLD · ${lastPedido.error_detail ?? ""}` };
     if (s === "SMM_FAILED" || s === "amount_mismatch") return { color: "text-rose-400", text: `🔴 ${s} · ${lastPedido.error_detail ?? ""}` };
