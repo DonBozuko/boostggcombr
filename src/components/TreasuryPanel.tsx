@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { pricingLedgerSnapshot, treasurySnapshot, type TreasurySnapshot } from "@/lib/treasury.functions";
+import { walletsSnapshot, type WalletsSnapshot } from "@/lib/wallets.functions";
 
 function brl(n: number) { return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
 
 export function TreasuryPanel({ token }: { token: string }) {
   const fn = useServerFn(treasurySnapshot);
   const ledgerFn = useServerFn(pricingLedgerSnapshot);
+  const walletsFn = useServerFn(walletsSnapshot);
   const [snap, setSnap] = useState<TreasurySnapshot | null>(null);
+  const [wallets, setWallets] = useState<WalletsSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [busyPdf, setBusyPdf] = useState(false);
 
@@ -150,9 +153,18 @@ export function TreasuryPanel({ token }: { token: string }) {
     if (!token) return;
     setLoading(true);
     try { setSnap(await fn({ data: { token } })); } catch { setSnap({ ok: false, error: "NET" }); }
+    try { setWallets(await walletsFn({ data: { token } })); } catch { setWallets({ ok: false, error: "NET" }); }
     setLoading(false);
   };
   useEffect(() => { void load(); /* eslint-disable-next-line */ }, [token]);
+  // v116 — escuta de 1s do Banco Interno Virtual
+  useEffect(() => {
+    if (!token) return;
+    const iv = setInterval(async () => {
+      try { setWallets(await walletsFn({ data: { token } })); } catch { /* silencio */ }
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [token, walletsFn]);
 
   const hasLedger = !!(snap && snap.ok && snap.ultimas.length > 0);
 
@@ -215,6 +227,28 @@ export function TreasuryPanel({ token }: { token: string }) {
             </li>
           ))}
         </ul>
+      )}
+      {/* v116 — Banco Interno Virtual (escuta de 1s) */}
+      {wallets && wallets.ok && (
+        <div className="mt-3 border-t border-cyan-400/20 pt-2">
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="text-[10px] uppercase tracking-[0.18em] text-cyan-300/90">🏦 Banco Interno Virtual</h4>
+            <span className="text-[9px] text-amber-200/80">Fila waiting_provision: <strong className="text-amber-100">{wallets.queueCount}</strong></span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {wallets.wallets.map((w) => {
+              const semId = w.fornecedor_slug && Number(w.saldo_brl) === 0;
+              return (
+                <div key={w.wallet_key} className="rounded-lg border border-cyan-400/25 bg-black/40 p-2">
+                  <div className="text-[9px] uppercase tracking-wider text-cyan-300/70">{w.label}</div>
+                  <div className="text-sm font-bold text-white">{brl(Number(w.saldo_brl))}</div>
+                  {w.reserved_brl > 0 && <div className="text-[9px] text-amber-300/80">Reservado: {brl(Number(w.reserved_brl))}</div>}
+                  {semId && <div className="text-[9px] text-amber-200">⚠️ Cadastrar ID</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
     </section>
   );

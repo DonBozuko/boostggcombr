@@ -173,19 +173,37 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.warn("[mp-webhook] v98 late payment catch", { paymentId, pedidoId: pedido.id, previous: pedido.status });
           }
 
-          const { error: updErr } = await supabaseAdmin
+          // v116 — Pessimistic lock via conditional update: só passa 1 worker.
+          const { data: lockRow, error: updErr } = await supabaseAdmin
             .from("pedidos")
             .update({ status: "paid", error_detail: isLatePayment ? "v98 late-payment catch: processado pós-timeout" : null })
-            .eq("id", pedido.id);
+            .eq("id", pedido.id)
+            .neq("status", "paid")
+            .select("id")
+            .maybeSingle();
           if (updErr) {
             console.error("[mp-webhook] update falhou", updErr);
             return;
           }
+          if (!lockRow) {
+            console.log("[mp-webhook] v116 lock: outro worker já processou", { pedidoId: pedido.id });
+            return;
+          }
 
+          // v116 — Banco Interno Virtual: credita Carteira Geral + registra ledger imutável.
+          try {
+            await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
+            await supabaseAdmin.from("financial_ledger" as any).insert({
+              valor_brl: Number(pedido.valor),
+              origem: "mercado_pago",
+              destino: "wallet:geral",
+              pedido_id: pedido.id,
+              buyer_ip: request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip") ?? null,
+              telemetry: { payment_id: String(paymentId), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED" },
+            } as any);
+          } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
-          // v115 — Mystery Box migrado para resgate manual pós-pagamento (server fn redeemMysteryBox).
-          // O webhook NÃO adiciona bônus automático mais; o cliente resgata via UI (qty > 200).
           const baseQty = Number(pedido.quantidade);
           const mysteryBonus = 0;
           const qtyEnvio = baseQty;
@@ -193,10 +211,18 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: qtyEnvio });
 
           if (!cadeia.length) {
+            // v116 — sem fornecedor disponível: entra em fila, NÃO estorna, NÃO cancela.
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO com saldo > 0 (smart routing vazio)" })
+              .update({ status: "waiting_provision", error_detail: "v116 fila: aguardando provisão de fornecedor (nenhum ATIVO com saldo/ID)" })
               .eq("id", pedido.id);
+            try {
+              await supabaseAdmin.from("financial_ledger" as any).insert({
+                valor_brl: Number(pedido.valor), origem: "wallet:geral", destino: "wallet:reservado", pedido_id: pedido.id,
+                telemetry: { event: "WAITING_PROVISION", reason: "no_provider" },
+              } as any);
+              await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: Number(pedido.valor) });
+            } catch (e) { console.warn("[mp-webhook] v116 waiting_provision ledger fail", e); }
             return;
           }
 
@@ -205,7 +231,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             ordem: cadeia.map((p) => ({ slug: p.slug, cost: p.cost_brl, unstable: p.unstable })),
           });
 
-          const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+          const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
           const { respectsMinMargin } = await import("@/lib/margin-guardian");
           const tentativas: string[] = [];
           let sucesso = false;
@@ -364,41 +390,35 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               await dispatchWhatsappAlert(`🚨 MARGIN GUARDIAN · Pedido ${pedido.id} em HOLD. Custos violam 300%. Ajuste preço ou fornecedor.`).catch(() => {});
               return;
             }
-            console.error("[mp-webhook] todos fornecedores falharam → estorno", { pedidoId: pedido.id, tentativas });
-            const refund = await refundMercadoPago(String(paymentId));
-            const novoStatus = refund.ok ? "mp_refunded" : "SMM_FAILED";
-            const logDetail = refund.ok
-              ? `Estorno automático executado via Pix devido a falha geral de entrega. Tentativas: ${falhaResumo}`
-              : `Falha geral + estorno falhou (${refund.detail}). Tentativas: ${falhaResumo}`;
+            // v116 — todos fornecedores falharam por saldo/instabilidade (não é margem):
+            // NÃO estorna, NÃO cancela. Enfileira em waiting_provision. Operador provisiona depois.
+            console.warn("[mp-webhook] v116 waiting_provision · sem provisão dispatch", { pedidoId: pedido.id, tentativas });
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: novoStatus, error_detail: logDetail.slice(0, 500) })
+              .update({
+                status: "waiting_provision",
+                error_detail: `v116 fila: aguardando provisão. ${falhaResumo}`.slice(0, 500),
+              })
               .eq("id", pedido.id);
-
-            // v95 — auditoria explícita do estorno automático
             try {
+              await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: Number(pedido.valor) });
+              await supabaseAdmin.from("financial_ledger" as any).insert({
+                valor_brl: Number(pedido.valor), origem: "wallet:geral", destino: "wallet:reservado", pedido_id: pedido.id,
+                telemetry: { event: "WAITING_PROVISION", reason: "all_providers_failed", tentativas: falhaResumo },
+              } as any);
               await supabaseAdmin.from("admin_audit_logs" as any).insert({
                 admin_email: "system@webhook",
-                action: refund.ok ? "REFUND_OK" : "REFUND_FAILED",
+                action: "WAITING_PROVISION",
                 detail: {
-                  ts: new Date().toISOString(),
-                  payment_id: String(paymentId),
-                  pedido_id: pedido.id,
-                  valor_brl: Number(pedido.valor),
-                  refund_detail: refund.detail,
-                  tentativas: falhaResumo,
-                  message: refund.ok
-                    ? `[mp-webhook] REFUND OK · Pix devolvido ao cliente em tempo real`
-                    : `[mp-webhook] REFUND FAILED · ${refund.detail}`,
+                  ts: new Date().toISOString(), payment_id: String(paymentId), pedido_id: pedido.id,
+                  valor_brl: Number(pedido.valor), tentativas: falhaResumo,
+                  message: "[mp-webhook] v116 · pedido enfileirado, sem estorno",
                 },
               } as any);
-            } catch (e) { console.warn("[mp-webhook] audit refund fail", e); }
+            } catch (e) { console.warn("[mp-webhook] v116 audit waiting fail", e); }
 
             const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-            const alertMsg = refund.ok
-              ? `🚨 Pedido ${pedido.id} falhou em todos os fornecedores. Pix estornado automaticamente para o cliente.`
-              : `🚨 Pedido ${pedido.id} falhou em todos os fornecedores E o estorno automático falhou (${refund.detail}). Ação manual necessária.`;
-            await dispatchWhatsappAlert(alertMsg).catch((e) => console.error("[mp-webhook] alerta tg", e));
+            await dispatchWhatsappAlert(`🟡 v116 Pedido ${pedido.id} em fila (waiting_provision). Sem fornecedor com saldo. Provisionar SMMHype/SMMPanel/Verified.`).catch(() => {});
           }
 
         } catch (err) {
