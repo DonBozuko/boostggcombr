@@ -110,7 +110,12 @@ function TrafegoLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "brasil" ? brPlans : glPlans;
+  const dyn = useDynamicPlans({
+    brasil:  { category: "trafego:br",     fallback: brPlans, unitLabel: "Visitas" },
+    mundial: { category: "trafego:global", fallback: glPlans, unitLabel: "Visitas" },
+  });
+  const currentPlans = categoria === "brasil" ? dyn.brasil : dyn.mundial;
+  const dynAllPlans = [...dyn.brasil, ...dyn.mundial];
 
   const submit = async (selected: Plan) => {
     const parsed = urlSchema.safeParse({ plan: selected.id, profile });
