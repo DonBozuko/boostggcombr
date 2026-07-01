@@ -50,6 +50,8 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
     return { ok: true, rows: (rows ?? []) as any };
   });
 
+const DUP_ID_MSG = "⚠️ Erro Contábil: Os IDs das chaves reservas não podem ser idênticos ao ID da SMMHype. Digite os códigos específicos de cada painel.";
+
 export const upsertPricingCatalog = createServerFn({ method: "POST" })
   .inputValidator((i) => upsertInput.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
@@ -62,22 +64,35 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
       const t = String(v).trim();
       return t === "" ? null : t;
     };
+    const hype = clean(data.smmhype_service_id);
+    const panel = clean(data.smmpanel_service_id);
+    const verified = clean(data.verified_service_id);
+    // v112 — Lacre Contábil: rejeita duplicação em 0ms antes do INSERT
+    if (hype && ((panel && panel === hype) || (verified && verified === hype))) {
+      return { ok: false, error: DUP_ID_MSG };
+    }
     const row = {
       pacote: data.pacote.trim(),
       category: data.category.trim(),
       quantidade: data.quantidade,
       cost_brl: Number(data.cost_brl.toFixed(4)),
       price_brl: Number(data.price_brl.toFixed(2)),
-      smmhype_service_id: clean(data.smmhype_service_id),
-      smmpanel_service_id: clean(data.smmpanel_service_id),
-      verified_service_id: clean(data.verified_service_id),
+      smmhype_service_id: hype,
+      smmpanel_service_id: panel,
+      verified_service_id: verified,
       source: "manual",
       synced_at: new Date().toISOString(),
     };
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(row, { onConflict: "pacote" });
-    if (error) return { ok: false, error: error.message };
+    if (error) {
+      // Traduz erro do CHECK CONSTRAINT do banco
+      if (error.message?.includes("pricing_items_no_duplicate_service_ids")) {
+        return { ok: false, error: DUP_ID_MSG };
+      }
+      return { ok: false, error: error.message };
+    }
     return { ok: true };
   });
 
