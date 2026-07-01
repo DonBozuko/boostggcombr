@@ -45,19 +45,31 @@ export function useDynamicPlans<K extends string>(
   useEffect(() => {
     let cancelled = false;
     try { window.localStorage.removeItem("ebp_pricing_overrides_v1"); } catch {}
-    Promise.all(
-      keys.map((k) =>
-        getPricingGridFn({ data: { category: map[k].category } }).catch(() => null),
-      ),
-    ).then((results) => {
-      if (cancelled) return;
-      const next = Object.fromEntries(keys.map((k) => [k, [] as GridItem[]])) as Record<K, GridItem[]>;
-      results.forEach((r, i) => {
-        if (r?.items?.length) next[keys[i]] = r.items as GridItem[];
+    const tick = () => {
+      Promise.all(
+        keys.map((k) =>
+          getPricingGridFn({ data: { category: map[k].category } }).catch(() => null),
+        ),
+      ).then((results) => {
+        if (cancelled) return;
+        const next = Object.fromEntries(keys.map((k) => [k, [] as GridItem[]])) as Record<K, GridItem[]>;
+        results.forEach((r, i) => {
+          if (r?.items?.length) next[keys[i]] = r.items as GridItem[];
+        });
+        if (keys.some((k) => next[k].length)) setGridBy(next);
       });
-      if (keys.some((k) => next[k].length)) setGridBy(next);
-    });
-    return () => { cancelled = true; };
+    };
+    tick();
+    // v106 — Sincronismo vivo: re-hidrata a vitrine a cada 15s (a fonte
+    // pricing_items é atualizada pelo cron sync-pricing seg a seg).
+    const iv = setInterval(tick, 15000);
+    const onVis = () => { if (document.visibilityState === "visible") tick(); };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      cancelled = true;
+      clearInterval(iv);
+      document.removeEventListener("visibilitychange", onVis);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [getPricingGridFn]);
 
