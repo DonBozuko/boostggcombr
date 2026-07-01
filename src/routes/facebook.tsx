@@ -8,6 +8,7 @@ import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/compone
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { useDynamicPlans } from "@/hooks/useDynamicPlans";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -151,7 +152,13 @@ function FacebookLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "seguidores" ? followersPlans : likesPlans;
+  
+  const dyn = useDynamicPlans({
+    seguidores: { category: "facebook:seguidores", fallback: followersPlans, unitLabel: "Seguidores" },
+    curtidas:   { category: "facebook:curtidas",   fallback: likesPlans,     unitLabel: "Curtidas" },
+  });
+  const currentPlans = categoria === "seguidores" ? dyn.seguidores : dyn.curtidas;
+  const dynAllPlans = [...dyn.seguidores, ...dyn.curtidas];
   const isFollowers = categoria === "seguidores";
 
   const submit = async (selected: Plan) => {
@@ -321,7 +328,7 @@ function FacebookLanding() {
               size="lg"
               disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
-                const sel = allPlans.find((p) => p.id === planId);
+                const sel = dynAllPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}

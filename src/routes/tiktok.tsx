@@ -8,6 +8,7 @@ import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/compone
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { useDynamicPlans } from "@/hooks/useDynamicPlans";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -163,9 +164,15 @@ function TiktokLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
+  const dyn = useDynamicPlans({
+    seguidores:    { category: "tiktok:seguidores",    fallback: followersPlans, unitLabel: "Seguidores" },
+    curtidas:      { category: "tiktok:curtidas",      fallback: likesPlans,     unitLabel: "Curtidas" },
+    visualizacoes: { category: "tiktok:visualizacoes", fallback: viewsPlans,     unitLabel: "Views" },
+  });
   const currentPlans =
-    categoria === "seguidores" ? followersPlans :
-    categoria === "curtidas" ? likesPlans : viewsPlans;
+    categoria === "seguidores" ? dyn.seguidores :
+    categoria === "curtidas" ? dyn.curtidas : dyn.visualizacoes;
+  const dynAllPlans = [...dyn.seguidores, ...dyn.curtidas, ...dyn.visualizacoes];
 
   const isFollowers = categoria === "seguidores";
 
@@ -339,9 +346,9 @@ function TiktokLanding() {
               size="lg"
               disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
-                const sel = allPlans.find((p) => p.id === planId);
+                const sel = dynAllPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
-                submit(sel);
+                submit({ ...sel, qty: sel.qty ?? sel.quantidade.toLocaleString("pt-BR") });
               }}
               className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{

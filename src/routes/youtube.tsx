@@ -8,6 +8,7 @@ import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/compone
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { useDynamicPlans } from "@/hooks/useDynamicPlans";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -159,7 +160,12 @@ function YoutubeLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "inscritos" ? subsPlans : viewsPlans;
+  const dyn = useDynamicPlans({
+    inscritos:     { category: "youtube:inscritos",     fallback: subsPlans,  unitLabel: "Inscritos" },
+    visualizacoes: { category: "youtube:visualizacoes", fallback: viewsPlans, unitLabel: "Views" },
+  });
+  const currentPlans = categoria === "inscritos" ? dyn.inscritos : dyn.visualizacoes;
+  const dynAllPlans = [...dyn.inscritos, ...dyn.visualizacoes];
   const isSubs = categoria === "inscritos";
 
   const submit = async (selected: Plan) => {
@@ -330,7 +336,7 @@ function YoutubeLanding() {
               size="lg"
               disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
-                const sel = allPlans.find((p) => p.id === planId);
+                const sel = dynAllPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}

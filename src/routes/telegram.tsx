@@ -8,6 +8,7 @@ import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/compone
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { useDynamicPlans } from "@/hooks/useDynamicPlans";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -131,8 +132,14 @@ function TelegramLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "canal" ? canalPlans : grupoPlans;
+  const dyn = useDynamicPlans({
+    canal: { category: "telegram:canal", fallback: canalPlans, unitLabel: "Membros" },
+    grupo: { category: "telegram:grupo", fallback: grupoPlans, unitLabel: "Membros" },
+  });
+  const currentPlans = categoria === "canal" ? dyn.canal : dyn.grupo;
+  const dynAllPlans = [...dyn.canal, ...dyn.grupo];
   const tipoBloqueado = isBlocked(blocked, "telegram", categoria);
+
 
   const submit = async (selected: Plan) => {
     if (isBlocked(blocked, "telegram", categoria)) {
@@ -280,7 +287,7 @@ function TelegramLanding() {
               size="lg"
               disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
-                const sel = allPlans.find((p) => p.id === planId);
+                const sel = dynAllPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}

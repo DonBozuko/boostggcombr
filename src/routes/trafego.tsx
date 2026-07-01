@@ -9,6 +9,7 @@ import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/compone
 import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
+import { useDynamicPlans } from "@/hooks/useDynamicPlans";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -109,7 +110,12 @@ function TrafegoLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "brasil" ? brPlans : glPlans;
+  const dyn = useDynamicPlans({
+    brasil:  { category: "trafego:br",     fallback: brPlans, unitLabel: "Visitas" },
+    mundial: { category: "trafego:global", fallback: glPlans, unitLabel: "Visitas" },
+  });
+  const currentPlans = categoria === "brasil" ? dyn.brasil : dyn.mundial;
+  const dynAllPlans = [...dyn.brasil, ...dyn.mundial];
 
   const submit = async (selected: Plan) => {
     const parsed = urlSchema.safeParse({ plan: selected.id, profile });
@@ -227,7 +233,7 @@ function TrafegoLanding() {
             </div>
             <DelayedCouponField accent={NEON} />
             <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
-              onClick={() => { const sel = allPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
+              onClick={() => { const sel = dynAllPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
               className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{ background: NEON, color: "#fff", boxShadow: `0 0 35px ${NEON}` }}>
               {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
