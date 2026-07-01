@@ -231,12 +231,18 @@ export async function dispatchSmmhype(args: {
   pacote: string;
   quantidade: number;
   instagram_user: string;
+  serviceIdOverride?: string | number | null;
 }): Promise<SmmDispatchResult> {
   const smmKey = process.env.SMMHYPE_API_KEY;
   if (!smmKey) return { ok: false, error: "SMMHYPE_API_KEY ausente" };
 
-  // Resolve service: 1º override aprovado em DB; 2º hardcoded.
-  const serviceId = await resolveServiceIdAsync(args.pacote, args.quantidade);
+  // v85: override explícito do pricing_items > resolver dinâmico
+  const overrideRaw = args.serviceIdOverride != null && String(args.serviceIdOverride).trim() !== ""
+    ? Number(args.serviceIdOverride)
+    : NaN;
+  const serviceId = Number.isFinite(overrideRaw) && overrideRaw > 0
+    ? overrideRaw
+    : await resolveServiceIdAsync(args.pacote, args.quantidade);
   if (!serviceId) {
     return {
       ok: false,
