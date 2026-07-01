@@ -67,6 +67,7 @@ export async function rankProvidersByCost(opts: {
       saldo_atual: Number(f.saldo_atual),
       cost_brl: cost,
       service_id: serviceId,
+      provider_service_id: providerIdMap[f.slug] ?? null,
       rate_usd: Number.isFinite(rate) ? rate : null,
       unstable,
     };
