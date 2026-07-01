@@ -44,8 +44,10 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
     // v137 — Strict Cache Purge & Forceful Sync: botão "Atualizar" força motor completo + IDs vivos.
     if (data.force) {
       const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
-      await syncPricingCacheAll().catch((e) => console.warn("[v137] pricing sync falhou", e));
-      await syncReserveProviderIds().catch((e) => console.warn("[v136] force sync falhou", e));
+      await syncPricingCacheAll().catch(async (e) => {
+        console.warn("[v137] pricing sync falhou; executando handshake de reservas", e);
+        await syncReserveProviderIds().catch((err) => console.warn("[v137] force sync falhou", err));
+      });
     } else {
       await ensureReserveProviderIdsFresh();
     }
