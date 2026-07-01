@@ -227,7 +227,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
         const m = pickBestMatch(verifiedList, cat, qty);
         const id = cleanId(m?.service);
         const current = cleanId(r.verified_service_id);
-        if (id && id !== hype && current !== id) {
+        // v136 — Isolamento tripartite: nunca escrever verified == hype nem verified == panel proposto/atual.
+        const panelClash = cleanId(patch.smmpanel_service_id ?? r.smmpanel_service_id);
+        if (id && id !== hype && id !== panelClash && current !== id) {
           patch.verified_service_id = id;
           verified_filled++;
           perCategory[cat].verified++;
