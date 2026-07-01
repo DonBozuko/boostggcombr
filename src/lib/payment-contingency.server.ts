@@ -30,7 +30,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   if (!mpToken) return { ok: false, status: pedido.status, error: "MP_TOKEN_MISSING" };
 
   // 1) Direct read of payment status (fallback when webhook never arrived)
-  let payment: { status?: string; transaction_amount?: number } = {};
+  let payment: { status?: string; status_detail?: string; transaction_amount?: number } = {};
   try {
     const r = await fetch(`${MP_PAYMENTS_ENDPOINT}/${pedido.mercado_pago_id}`, {
       headers: { Authorization: `Bearer ${mpToken}` },
@@ -41,6 +41,37 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   } catch (e) {
     console.warn("[contingency] MP fetch falhou", e);
     return { ok: true, status: pedido.status, recovered: false };
+  }
+
+  // v96 — Strict Client-Side Gateway Handshake: recusa por saldo insuficiente do comprador.
+  if (payment.status === "rejected") {
+    const detail = String(payment.status_detail ?? "");
+    const isInsufficient = /insufficient_amount|insufficient_funds|cc_rejected_insufficient/i.test(detail);
+    const newStatus = isInsufficient ? "mp_rejected_insufficient" : `mp_${payment.status}`;
+    const msg = isInsufficient
+      ? `Recusado pela instituição financeira: saldo insuficiente (${detail})`
+      : `MP rejected: ${detail || "sem detalhe"}`;
+    await supabaseAdmin
+      .from("pedidos")
+      .update({ status: newStatus, error_detail: msg })
+      .eq("id", pedido.id)
+      .eq("status", "pending");
+    if (isInsufficient) {
+      try {
+        await supabaseAdmin.from("admin_audit_logs" as any).insert({
+          admin_email: "system@checkout",
+          action: "CHECKOUT_INSUFFICIENT_FUNDS",
+          detail: {
+            ts: new Date().toISOString(),
+            pedido_id: pedido.id,
+            payment_id: pedido.mercado_pago_id,
+            status_detail: detail,
+            message: `❌ [CHECKOUT] Tentativa de pagamento recusada por saldo insuficiente do cliente`,
+          },
+        } as any);
+      } catch (e) { console.warn("[contingency] audit insufficient fail", e); }
+    }
+    return { ok: true, status: newStatus, recovered: false };
   }
 
   if (payment.status !== "approved") {
