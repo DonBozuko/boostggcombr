@@ -1,4 +1,5 @@
 import ogInstagram from "@/assets/og-instagram.jpg";
+import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
@@ -777,11 +778,9 @@ function Landing() {
             {paid ? (
               <>
                 <DialogHeader>
-                  <DialogTitle className="text-center text-2xl">🎉 Pagamento confirmado!</DialogTitle>
-                  <DialogDescription className="text-center">
-                    {waitingProvision
-                      ? "Seu pedido foi recebido com sucesso e entrou na fila de processamento automático."
-                      : "Seu pedido está em produção. Os seguidores começam a chegar em poucos minutos."}
+                  <DialogTitle className="text-center text-2xl">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
+                  <DialogDescription className="text-center whitespace-pre-line">
+                    {CHECKOUT_SUCCESS_MESSAGE}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4 py-4">

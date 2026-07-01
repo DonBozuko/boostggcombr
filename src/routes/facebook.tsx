@@ -1,4 +1,5 @@
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
+import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -376,10 +377,10 @@ function FacebookLanding() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl text-white">
-                  🎉 Pagamento confirmado!
+                  {CHECKOUT_SUCCESS_TITLE}
                 </DialogTitle>
-                <DialogDescription className="text-center text-zinc-400">
-                  Seu pedido foi enviado ao Facebook. Entrega em minutos.
+                <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">
+                  {CHECKOUT_SUCCESS_MESSAGE}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
