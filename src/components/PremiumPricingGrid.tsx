@@ -96,7 +96,10 @@ export function PremiumPricingGrid({
 }) {
   void cols;
   const countdown = useCountdown(COUNTDOWN_SECONDS);
-  const gridCols = "grid-cols-3 gap-1.5";
+  // v89 — Anti-Scale Responsive Enforcer: grade nativa responsiva, sem
+  // encolhimento artificial. Cards quebram para baixo automaticamente.
+  const gridCols = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4";
+
 
   const enriched = useMemo(() => {
     return (plans ?? []).map((p) => {
