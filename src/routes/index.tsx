@@ -373,6 +373,7 @@ function Landing() {
   const [paid, setPaid] = useState(false);
   const [mysteryBonus, setMysteryBonus] = useState<number>(0);
   const [rejectionMsg, setRejectionMsg] = useState<string | null>(null);
+  const [waitingProvision, setWaitingProvision] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
   const blockedMap = useBlockedMap();
