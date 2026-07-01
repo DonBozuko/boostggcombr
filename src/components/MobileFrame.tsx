@@ -213,31 +213,24 @@ export function MobileFrame({
       style={{ background: "#050505", touchAction: "pan-y", overscrollBehaviorY: "auto" }}
     >
       <style>{`
-        html, body { max-width: none !important; overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; }
-
-        .mf-compact > * { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-        .mf-compact section, .mf-compact header { padding-top: 0.5rem !important; padding-bottom: 0.5rem !important; }
-        .mf-compact .space-y-5 > * + * { margin-top: 0.6rem !important; }
-        .mf-compact .space-y-6 > * + * { margin-top: 0.7rem !important; }
-        .mf-compact .gap-6 { gap: 0.7rem !important; }
-        .mf-compact .gap-5 { gap: 0.6rem !important; }
-        .mf-compact .p-6 { padding: 0.75rem !important; }
-        .mf-compact .mt-6 { margin-top: 0.6rem !important; }
-        .mf-compact .mt-10 { margin-top: 0.85rem !important; }
-        .mf-compact { font-size: 92%; }
+        html, body { max-width: none !important; overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; zoom: 1 !important; transform: none !important; }
+        /* v88 — Strict CSS Scale Rollback: removido font-size:92% e paddings
+           compactos que davam a impressão de "zoom reverso". Shell volta ao
+           tamanho nativo de alta conversão. */
+        .mf-compact { font-size: 100%; }
         .mf-scroll { scrollbar-gutter: stable both-edges; scrollbar-color: rgba(255,255,255,0.35) transparent; scrollbar-width: thin; }
         .mf-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
         .mf-scroll::-webkit-scrollbar-track { background: transparent; }
         .mf-scroll::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.2)); border-radius: 999px; }
         .mf-scroll::-webkit-scrollbar-corner { background: transparent; }
         @media (min-height: 700px) and (min-width: 1024px) {
-          .mf-shell { height: 90vh !important; min-height: 0 !important; max-height: 900px; border-radius: 18px; }
+          .mf-shell { height: auto !important; min-height: 100vh !important; max-height: none !important; border-radius: 18px; }
         }
       `}</style>
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`mf-shell w-full md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
+        className={`mf-shell w-full md:max-w-[560px] lg:max-w-[620px] xl:max-w-[680px] 2xl:max-w-[720px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
