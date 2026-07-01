@@ -370,6 +370,7 @@ function Landing() {
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
   const [paid, setPaid] = useState(false);
+  const [mysteryBonus, setMysteryBonus] = useState<number>(0);
   const [rejectionMsg, setRejectionMsg] = useState<string | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
   const getStatusFn = useServerFn(getPedidoStatus);
@@ -459,7 +460,11 @@ function Landing() {
       try {
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
-        if (res.status === "paid") { stop(); setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "paid") {
+          const m = String((res as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
+          if (m) setMysteryBonus(Number(m[1]));
+          stop(); setPaid(true); playSuccessAudio(); return;
+        }
         if (res.status === "mp_rejected_insufficient") {
           stop();
           setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
@@ -583,6 +588,35 @@ function Landing() {
         </div>
       </header>
       <ShowcaseShell>
+
+      {/* v114 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras ≥ 150 */}
+      <div className="mx-2 mt-2 mb-1">
+        <div
+          className="relative overflow-hidden rounded-xl p-3 text-center"
+          style={{
+            background: "linear-gradient(135deg, rgba(88,28,135,0.75) 0%, rgba(190,24,93,0.75) 50%, rgba(234,88,12,0.75) 100%)",
+            border: "2px dashed #FFD700",
+            boxShadow: "0 0 24px rgba(255,215,0,0.45), inset 0 0 18px rgba(0,0,0,0.4)",
+            backdropFilter: "blur(8px) saturate(140%)",
+          }}
+          role="status"
+          aria-label="Bônus Caixa Misteriosa"
+        >
+          <p
+            className="text-white font-black leading-tight"
+            style={{ fontSize: "13px", textShadow: "0 0 8px rgba(0,0,0,0.9)" }}
+          >
+            <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>150 seguidores</span>,
+            <br />
+            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> direto na sua entrega!
+            <br />
+            <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-black/40 text-[11px] uppercase tracking-wider">
+              ✨ Abra a Caixa Misteriosa ✨
+            </span>
+          </p>
+        </div>
+      </div>
+
 
 
       <PremiumCategorySelector
@@ -752,6 +786,28 @@ function Landing() {
                       <div className="text-3xl font-display font-bold text-gradient mt-1">
                         {pedidoInfo.price}
                       </div>
+                    </div>
+                  )}
+                  {mysteryBonus > 0 && (
+                    <div
+                      className="w-full rounded-xl p-3 text-center"
+                      style={{
+                        background: "linear-gradient(135deg,#4a044e 0%,#7c2d12 100%)",
+                        border: "2px solid #FFD700",
+                        boxShadow: "0 0 22px rgba(255,215,0,0.55)",
+                      }}
+                    >
+                      <div className="text-2xl mb-1">🎁✨</div>
+                      <p className="text-white font-black text-sm leading-tight">
+                        🟢 PAGAMENTO APROVADO!<br />
+                        Você abriu a <span style={{ color: "#FFD700" }}>Caixa Misteriosa</span> e ganhou
+                        <br />
+                        <span className="text-2xl" style={{ color: "#39ff14", textShadow: "0 0 10px #39ff14" }}>
+                          +{mysteryBonus} SEGUIDORES EXTRA
+                        </span>
+                        <br />
+                        direto na sua entrega!
+                      </p>
                     </div>
                   )}
                   <p className="text-sm text-zinc-300 text-center">

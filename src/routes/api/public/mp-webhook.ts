@@ -184,9 +184,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
-          // v104 — BRINDE50: cupom concede +50 unidades no despacho (custo absorvido pela gordura 15% da Equação Fabiano).
-          const BRINDE_BONUS = String((pedido as any).cupom ?? "").toUpperCase().split(/[,\s]+/).includes("BRINDE50") ? 50 : 0;
-          const qtyEnvio = Number(pedido.quantidade) + BRINDE_BONUS;
+          // v114 — Mystery Box Reward Engine: bônus dinâmico 10–50 quando qty >= 150.
+          // Custo absorvido pela gordura 15% da Equação Fabiano.
+          const baseQty = Number(pedido.quantidade);
+          const mysteryBonus = baseQty >= 150 ? Math.floor(Math.random() * 41) + 10 : 0;
+          const qtyEnvio = baseQty + mysteryBonus;
           const { rankProvidersByCost, markProviderUnstable, clearProviderUnstable } = await import("@/lib/smart-routing.server");
           const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: qtyEnvio });
 
@@ -263,7 +265,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 .from("pedidos")
                 .update({
                   status: "paid",
-                  error_detail: `Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+                  error_detail: `${mysteryBonus > 0 ? `MB:${mysteryBonus} · ` : ""}Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
                   ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
                 })
                 .eq("id", pedido.id);
