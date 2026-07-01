@@ -86,6 +86,11 @@ export function ClaudeCodeInspector() {
             ⚠️ Rotas de Failover Ocultas Desarmadas (Mapeie os IDs correspondentes no catálogo para ativar o Smart Cost Routing)
           </div>
         )}
+        {data && data.catalog.withSmmpanel >= data.catalog.total && data.catalog.withVerified >= data.catalog.total && data.catalog.total > 0 && (
+          <div className="mb-2 rounded border border-emerald-400/60 bg-emerald-500/10 px-2 py-1.5 text-emerald-200 text-[11px] shadow-[0_0_10px_rgba(16,185,129,0.45)]">
+            🟢 RESERVA PRONTO · Smart Cost Routing triplo em cascata ativo (USD/BRL)
+          </div>
+        )}
         {data ? (
           <>
             <div className="grid grid-cols-2 gap-2">
