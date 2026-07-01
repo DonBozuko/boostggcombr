@@ -901,21 +901,21 @@ function Landing() {
                     <Button
                       asChild
                       size="lg"
-                      className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
+                      className="w-full h-14 bg-sky-500 hover:bg-sky-600 text-white font-bold text-base shadow-lg"
                     >
                       <a
-                        href={whatsappHref}
+                        href={supportHref}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() =>
-                          trackEvent("cta_payment_confirm_whatsapp", {
+                          trackEvent("cta_payment_confirm_telegram", {
                             pedido_id: pedidoInfo?.pedidoId ?? "",
                             plan_tier: pedidoInfo?.tier ?? "",
                           })
                         }
                       >
                         <MessageCircle className="size-5" />
-                        Já paguei! Enviar comprovante no WhatsApp
+                        Já paguei! Enviar comprovante no Telegram
                       </a>
                     </Button>
                   </div>
