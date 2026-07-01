@@ -74,10 +74,10 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={refresh} disabled={loading} className="border-red-500/50 text-red-200">
-            {loading ? "..." : "🔄 Refresh"}
+            {loading ? "..." : "🔄 Atualizar Dados"}
           </Button>
           <Button size="sm" onClick={runFailover} className="bg-red-600 hover:bg-red-500 text-white text-xs">
-            ⚡ Failover Check
+            ⚡ Testar Rota Reserva
           </Button>
         </div>
       </div>
@@ -90,7 +90,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         <div className="rounded-lg border border-cyan-500/50 bg-black/50 p-3 text-cyan-200">
           <div className="text-[10px] uppercase opacity-70">Pedidos 24h</div>
           <div className="text-2xl font-black font-mono">{snap.pedidos.total24h}</div>
-          <div className="text-[10px] font-mono">✅ {snap.pedidos.pagos24h} pagos · ⏳ {snap.pedidos.pendentes24h} pend.</div>
+          <div className="text-[10px] font-mono">✅ {snap.pedidos.pagos24h} Aprovados · ⏳ {snap.pedidos.pendentes24h} Pendentes</div>
         </div>
         <div className="rounded-lg border border-amber-500/50 bg-black/50 p-3 text-amber-200 col-span-2">
           <div className="text-[10px] uppercase opacity-70">Latência APIs (ms)</div>
@@ -129,7 +129,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
                 )}
                 {f.cotacao ? <span className="text-amber-200/70 text-[10px]"> · USD {f.cotacao.toFixed(4)}</span> : null}
               </div>
-              <div>Falhas: {f.falhas ?? 0} · Status: {f.status ?? "sincronizando"}</div>
+              <div>Erros Registrados: {f.falhas ?? 0} · Conexão: {f.status === "online" ? "🟢 Conectado" : (f.status ?? "sincronizando")}</div>
             </div>
           ))}
         </div>

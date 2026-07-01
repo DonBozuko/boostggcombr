@@ -39,8 +39,8 @@ export function JarvisAlertCenter() {
           return {
             id: `ok-${name}`,
             kind: "repair",
-            title: "Pipeline de áudio íntegro",
-            detail: `${name} respondeu com Content-Type audio/* — reparo preventivo confirmado.`,
+            title: "Fluxo de Áudio Conectado",
+            detail: `${name} respondeu com Formato de Áudio Válido — reparo preventivo confirmado.`,
             at: new Date().toISOString(),
           };
         }
