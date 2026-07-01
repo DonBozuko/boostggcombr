@@ -209,11 +209,11 @@ export function MobileFrame({
 
   return (
     <div
-      className="relative min-h-screen h-auto w-screen overflow-y-auto overflow-x-visible flex justify-center lg:items-center"
-      style={{ background: "#050505", touchAction: "pan-y", overscrollBehaviorY: "auto" }}
+      className="relative min-h-screen w-screen overflow-x-hidden flex justify-center lg:items-center"
+      style={{ background: "#050505", WebkitOverflowScrolling: "touch" as any }}
     >
       <style>{`
-        html, body { max-width: none !important; overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; zoom: 1 !important; transform: none !important; }
+        html, body { max-width: none !important; overflow-x: hidden !important; overflow-y: visible !important; overscroll-behavior-y: auto !important; height: auto !important; margin: 0; zoom: 1 !important; transform: none !important; touch-action: pan-y !important; -webkit-overflow-scrolling: touch; }
         /* v88 — Strict CSS Scale Rollback: removido font-size:92% e paddings
            compactos que davam a impressão de "zoom reverso". Shell volta ao
            tamanho nativo de alta conversão. */
