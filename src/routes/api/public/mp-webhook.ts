@@ -109,9 +109,21 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // Idempotência: se já estava paid, não dispara de novo
+          // v94 — Strict Idempotency Gateway Guard (payment_id + treasury ledger)
           if (pedido.status === "paid") {
+            console.log("[mp-webhook] v94 idempotency: pedido já paid", { paymentId, pedidoId: pedido.id });
             return new Response("ok", { status: 200 });
+          }
+          {
+            const { data: alreadyLedger } = await supabaseAdmin
+              .from("admin_treasury" as any)
+              .select("id")
+              .eq("pedido_id", pedido.id)
+              .maybeSingle();
+            if (alreadyLedger) {
+              console.log("[mp-webhook] v94 idempotency: ledger existente, abort", { paymentId, pedidoId: pedido.id });
+              return new Response("ok", { status: 200 });
+            }
           }
 
           const { error: updErr } = await supabaseAdmin
@@ -205,6 +217,24 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   net_profit_percentage: netPct,
                 } as any, { onConflict: "pedido_id" });
               } catch (e) { console.warn("[mp-webhook] treasury ledger falhou", e); }
+              // v94 — Telemetria de auditoria: dispatch OK
+              try {
+                await supabaseAdmin.from("admin_audit_logs" as any).insert({
+                  admin_email: "system@webhook",
+                  action: "DISPATCH_OK",
+                  detail: {
+                    ts: new Date().toISOString(),
+                    payment_id: String(paymentId),
+                    pedido_id: pedido.id,
+                    pacote: pedido.pacote,
+                    quantidade: pedido.quantidade,
+                    cost_brl: custoReal,
+                    provider: f.slug,
+                    order_id: r.orderId ?? null,
+                    message: `[mp-webhook] dispatch OK`,
+                  },
+                } as any);
+              } catch (e) { console.warn("[mp-webhook] audit dispatch_ok fail", e); }
               // === Notificação Telegram: sucesso / auto-reparo ===
               try {
                 const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
@@ -244,10 +274,18 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 .update({ status: "MARGIN_HOLD", error_detail: `Retido por margem <300% em todos fornecedores. ${falhaResumo}`.slice(0, 500) })
                 .eq("id", pedido.id);
               await supabaseAdmin.from("admin_audit_logs" as any).insert({
-                action: "MARGIN_GUARDIAN_RED_ALERT",
-                entity: "pedido",
-                entity_id: String(pedido.id),
-                detail: `🚨 ALERTA VERMELHO · Pedido ${pedido.id} retido: nenhum fornecedor respeita margem 300%. ${falhaResumo}`.slice(0, 1000),
+                admin_email: "system@webhook",
+                action: "MARGIN_HOLD_ERROR",
+                detail: {
+                  ts: new Date().toISOString(),
+                  payment_id: String(paymentId),
+                  pedido_id: pedido.id,
+                  pacote: pedido.pacote,
+                  quantidade: pedido.quantidade,
+                  venda_brl: Number(pedido.valor),
+                  tentativas: falhaResumo,
+                  message: `[mp-webhook] MARGIN_HOLD ERROR · nenhum fornecedor respeita 300%`,
+                },
               } as any).then(() => {}, (e) => console.warn("[mp-webhook] audit insert fail", e));
               const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
               await dispatchWhatsappAlert(`🚨 MARGIN GUARDIAN · Pedido ${pedido.id} em HOLD. Custos violam 300%. Ajuste preço ou fornecedor.`).catch(() => {});
