@@ -22,10 +22,11 @@ export async function rankProvidersByCost(opts: {
 }): Promise<RankedProvider[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { resolveServiceIdAsync } = await import("./smmhype.server");
+  const { getPricingRow } = await import("./pricing-cache.server");
 
   const serviceId = await resolveServiceIdAsync(opts.pacote, opts.quantidade);
 
-  const [{ data: forn }, { data: svc }, { data: health }, { data: pricingItem }] = await Promise.all([
+  const [{ data: forn }, { data: svc }, { data: health }, pricingItem] = await Promise.all([
     supabaseAdmin
       .from("fornecedores")
       .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade")
@@ -35,11 +36,7 @@ export async function rankProvidersByCost(opts: {
       ? supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", serviceId).maybeSingle()
       : Promise.resolve({ data: null } as any),
     supabaseAdmin.from("provider_health" as any).select("slug, unstable_until"),
-    supabaseAdmin
-      .from("pricing_items" as any)
-      .select("smmhype_service_id, smmpanel_service_id, verified_service_id")
-      .eq("pacote", opts.pacote)
-      .maybeSingle(),
+    getPricingRow(opts.pacote),
   ]);
 
   const providerIdMap: Record<string, string | null> = {
@@ -47,6 +44,7 @@ export async function rankProvidersByCost(opts: {
     smmpainel: (pricingItem as any)?.smmpanel_service_id ?? null,
     verified: (pricingItem as any)?.verified_service_id ?? null,
   };
+
 
   const rate = Number((svc as any)?.rate);
   const healthMap = new Map<string, string | null>();
