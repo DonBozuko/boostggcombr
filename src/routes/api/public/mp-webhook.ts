@@ -210,6 +210,26 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           let margemBloqueada = 0;
 
           for (const f of cadeia) {
+            // v110 — Failover Injector Gateway: registra desvio quando não é o preferencial (smmhype)
+            // ou quando já houve tentativa anterior nesta ordem.
+            if (f.slug !== "smmhype" || tentativas.length > 0) {
+              try {
+                await supabaseAdmin.from("admin_audit_logs" as any).insert({
+                  admin_email: "system@webhook",
+                  action: "FAILOVER_ACTIVE",
+                  detail: {
+                    ts: new Date().toISOString(),
+                    pedido_id: pedido.id,
+                    provider: f.slug,
+                    provider_nome: f.nome,
+                    provider_service_id: f.provider_service_id,
+                    unstable: f.unstable,
+                    tentativas_anteriores: tentativas,
+                    message: `🟢 [mp-webhook] Failover Ativo ➔ Desviando Ordem para Fornecedor Reserva ${f.nome} via ID ${f.provider_service_id ?? f.service_id ?? "?"}`,
+                  },
+                });
+              } catch (e) { console.warn("[mp-webhook] audit failover fail", e); }
+            }
             // v84 — saldo BRL insuficiente
             if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
               const det = `Saldo insuficiente: R$ ${Number(f.saldo_atual).toFixed(2)} < custo R$ ${f.cost_brl.toFixed(2)}`;
