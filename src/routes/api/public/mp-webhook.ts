@@ -265,7 +265,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 .from("pedidos")
                 .update({
                   status: "paid",
-                  error_detail: `Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+                  error_detail: `${mysteryBonus > 0 ? `MB:${mysteryBonus} · ` : ""}Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
                   ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
                 })
                 .eq("id", pedido.id);
