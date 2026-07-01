@@ -1,6 +1,7 @@
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
+import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
