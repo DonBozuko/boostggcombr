@@ -365,9 +365,13 @@ function buildContingencyPricingRows(now = new Date().toISOString()): {
         category: cat,
         quantidade: qty,
         provider_service_id: sid,
+        // v111 — Strict Automated Database Alignment:
+        // apenas o ID primário (SMMhype) é conhecido pela matriz.
+        // Panel/Verified permanecem NULL até que um mapeamento real
+        // seja cadastrado via PricingCatalogEditor / service_id_overrides.
         smmhype_service_id: sidStr,
-        smmpanel_service_id: sidStr,
-        verified_service_id: sidStr,
+        smmpanel_service_id: null,
+        verified_service_id: null,
         cost_brl: Number(costBrl.toFixed(4)),
         price_brl: Number(priceFromPackageCost(qty, costBrl).toFixed(2)),
         source: CONTINGENCY_SOURCE,
@@ -540,9 +544,10 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       itemRows.push({
         pacote: id, category: cat, quantidade: qty,
         provider_service_id: serviceId ?? null,
+        // v111 — Não duplica o ID do SMMhype nas colunas de reserva.
         smmhype_service_id: sidStr,
-        smmpanel_service_id: sidStr,
-        verified_service_id: sidStr,
+        smmpanel_service_id: null,
+        verified_service_id: null,
         cost_brl: Number(cost_brl.toFixed(4)),
         price_brl: Number(price_brl.toFixed(2)),
         source, synced_at: now,
