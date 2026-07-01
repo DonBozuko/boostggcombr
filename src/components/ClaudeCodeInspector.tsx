@@ -90,20 +90,21 @@ export function ClaudeCodeInspector() {
           <>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                Total:{" "}
+                Total de Planos:{" "}
                 <span className={data.catalog.symmetric ? "text-emerald-400" : "text-yellow-400"}>
                   {data.catalog.total} / {data.catalog.expected}
                 </span>{" "}
-                {data.catalog.symmetric ? "🟢 simétrico" : "⚠️ divergente"}
+                {data.catalog.symmetric ? "🟢 simétrico" : "⚠️ divergente (Esperado)"}
                 {(data.catalog as any).fallbackApplied && (
-                  <span className="ml-1 text-[10px] text-cyan-300/80">(fallback local)</span>
+                  <span className="ml-1 text-[10px] text-cyan-300/80">(Contingência de Configuração Local Ativa)</span>
                 )}
               </div>
-              <div>Triple-ID: <span className="text-emerald-300">{data.catalog.withTriple}</span></div>
-              <div>SMMhype IDs: {data.catalog.withSmmhype}</div>
-              <div>SMMPainel IDs: {data.catalog.withSmmpanel}</div>
-              <div>Verified IDs: {data.catalog.withVerified}</div>
+              <div>Mapeamento Triplo Real: <span className="text-emerald-300">{data.catalog.withTriple}</span></div>
+              <div>IDs SMMhype: {data.catalog.withSmmhype}</div>
+              <div>IDs SMMPainel: {data.catalog.withSmmpanel}</div>
+              <div>IDs Verified: {data.catalog.withVerified}</div>
             </div>
+
 
             {/* v126 — Provider Health Handshake */}
             {Array.isArray((data as any).providers) && (data as any).providers.length > 0 && (
