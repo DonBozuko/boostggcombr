@@ -249,9 +249,11 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
     }
   }
 
-  console.log("[pricing-cache] v130 auto-map", {
+  console.log("[pricing-cache] v136 multi-category sync", {
     smmpanel_catalog: panelList?.length ?? 0,
     verified_catalog: verifiedList?.length ?? 0,
+    categories: Object.keys(perCategory).length,
+    per_category: perCategory,
     scanned: ((rows as any[]) ?? []).length,
     updated_rows: updates.length,
     smmpanel_filled, verified_filled,
