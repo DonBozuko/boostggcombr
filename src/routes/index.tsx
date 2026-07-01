@@ -804,10 +804,16 @@ function Landing() {
                       </Button>
                     </div>
 
-                    <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-zinc-300">
-                      <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                      Aguardando pagamento...
-                    </div>
+                    {rejectionMsg ? (
+                      <div className="rounded-lg border-2 border-red-500 bg-red-950/40 py-3 px-4 text-sm text-red-200 font-semibold text-center shadow-[0_0_20px_rgba(255,0,60,0.35)]">
+                        {rejectionMsg}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm text-zinc-300">
+                        <span className="inline-block size-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                        Aguardando pagamento...
+                      </div>
+                    )}
 
                     <Button
                       asChild
