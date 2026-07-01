@@ -230,7 +230,7 @@ export function MobileFrame({
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`mf-shell w-full md:max-w-[640px] lg:max-w-[700px] xl:max-w-[760px] 2xl:max-w-[800px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
+        className={`mf-shell w-full md:max-w-[640px] lg:max-w-[700px] xl:max-w-[760px] 2xl:max-w-[800px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible lg:overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
@@ -243,8 +243,8 @@ export function MobileFrame({
         <TopNetworksNav active={route} />
 
         <div
-          className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-visible flex flex-col pb-2"
-          style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}
+          className="mf-scroll mf-compact flex-1 min-h-0 overflow-visible lg:overflow-y-auto overflow-x-visible flex flex-col pb-2"
+          style={{ touchAction: "pan-y" }}
         >
 
           {children}
