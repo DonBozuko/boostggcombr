@@ -289,6 +289,7 @@ function TrafegoLanding() {
                     <div className="text-2xl font-extrabold mt-1" style={{ color: NEON }}>{pedidoInfo.price}</div>
                   </div>
                   {qrCodeUrl && (
+                    <>
                     <PixCountdown
                       active={modalOpen && !paid && !!pedidoInfo?.pedidoId}
                       onExpire={() => { setModalOpen(false); setPedidoInfo(null); toast.error("Tempo limite de pagamento esgotado. Por favor, gere um novo pedido para garantir o seu crescimento!"); }}
@@ -298,6 +299,7 @@ function TrafegoLanding() {
                         <img src={qrCodeUrl} alt="QR Code Pix" width={220} height={220} className="block" />
                       </div>
                     </div>
+                    </>
                   )}
                   <div className="space-y-2">
                     <Label className="text-zinc-300">Pix Copia e Cola</Label>
