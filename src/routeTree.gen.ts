@@ -23,6 +23,7 @@ import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
+import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
@@ -102,6 +103,11 @@ const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
   path: '/~api/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCatalogRoute = AdminCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => AdminRoute,
+} as any)
 const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
   id: '/api/public/sync-services',
   path: '/api/public/sync-services',
@@ -148,7 +154,7 @@ const ApiPublicHooksRecoverAbandonedRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
+  '/admin/catalog': typeof AdminCatalogRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -172,7 +179,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
+  '/admin/catalog': typeof AdminCatalogRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -197,7 +205,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
+  '/admin/catalog': typeof AdminCatalogRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/trafego'
     | '/youtube'
     | '/~flock.js'
+    | '/admin/catalog'
     | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/trafego'
     | '/youtube'
     | '/~flock.js'
+    | '/admin/catalog'
     | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/trafego'
     | '/youtube'
     | '/~flock.js'
+    | '/admin/catalog'
     | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -296,7 +308,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   DiagnosticoRoute: typeof DiagnosticoRoute
   FacebookRoute: typeof FacebookRoute
   LoginRoute: typeof LoginRoute
@@ -419,6 +431,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char126apiAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/catalog': {
+      id: '/admin/catalog'
+      path: '/catalog'
+      fullPath: '/admin/catalog'
+      preLoaderRoute: typeof AdminCatalogRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/api/public/sync-services': {
       id: '/api/public/sync-services'
       path: '/api/public/sync-services'
@@ -478,9 +497,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminCatalogRoute: typeof AdminCatalogRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCatalogRoute: AdminCatalogRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   DiagnosticoRoute: DiagnosticoRoute,
   FacebookRoute: FacebookRoute,
   LoginRoute: LoginRoute,

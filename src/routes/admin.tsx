@@ -43,7 +43,7 @@ import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
-import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
+// PricingCatalogEditor movido para rota isolada /admin/catalog (v86)
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
@@ -1271,7 +1271,11 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><SourceVault /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
-        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><PricingCatalogEditor token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}>
+          <a href="/admin/catalog" className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-amber-500/40 bg-black/60 text-amber-200 text-sm font-bold shadow-[0_0_18px_rgba(245,158,11,0.35)] hover:bg-amber-500/10">
+            📦 Abrir Editor de Catálogo (rota isolada)
+          </a>
+        </div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
 
         <div className={`${folder === "buscas" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
