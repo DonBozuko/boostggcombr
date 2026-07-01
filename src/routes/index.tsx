@@ -53,6 +53,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
@@ -786,6 +787,10 @@ function Landing() {
                       </div>
                     </div>
 
+                    <PixCountdown
+                      active={modalOpen && !paid && !rejectionMsg && !!pedidoInfo?.pedidoId}
+                      onExpire={() => { setModalOpen(false); setPedidoInfo(null); setRejectionMsg(null); toast.error("Tempo limite de pagamento esgotado. Por favor, gere um novo pedido para garantir o seu crescimento!"); }}
+                    />
                     <div className="flex justify-center">
                       <div className="rounded-xl bg-white p-3 shadow-glow">
                         <img

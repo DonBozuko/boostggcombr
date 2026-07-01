@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import PixCountdown from "@/components/PixCountdown";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
@@ -288,6 +289,10 @@ function TrafegoLanding() {
                     <div className="text-2xl font-extrabold mt-1" style={{ color: NEON }}>{pedidoInfo.price}</div>
                   </div>
                   {qrCodeUrl && (
+                    <PixCountdown
+                      active={modalOpen && !paid && !!pedidoInfo?.pedidoId}
+                      onExpire={() => { setModalOpen(false); setPedidoInfo(null); toast.error("Tempo limite de pagamento esgotado. Por favor, gere um novo pedido para garantir o seu crescimento!"); }}
+                    />
                     <div className="flex justify-center">
                       <div className="rounded-xl bg-white p-3" style={{ boxShadow: `0 0 25px ${NEON}aa` }}>
                         <img src={qrCodeUrl} alt="QR Code Pix" width={220} height={220} className="block" />
