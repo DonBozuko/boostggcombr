@@ -1,3 +1,4 @@
+import { buildProductJsonLd } from "@/lib/seo-jsonld";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
