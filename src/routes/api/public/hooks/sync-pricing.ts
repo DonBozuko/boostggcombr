@@ -8,9 +8,14 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
       POST: async ({ request }) => {
         try {
           const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
+          const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
           const url = new URL(request.url);
           const forceContingency = url.searchParams.get("force") === "contingency";
-          const result = await syncPricingCacheAll({ forceContingency });
+          const [result, reserves] = await Promise.all([
+            syncPricingCacheAll({ forceContingency }),
+            syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) })),
+          ]);
+          (result as any).reserves = reserves;
           return new Response(JSON.stringify(result), {
             status: 200,
             headers: {
