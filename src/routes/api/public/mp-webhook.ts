@@ -184,11 +184,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
-          // v114 — Mystery Box Reward Engine: bônus dinâmico 10–50 quando qty >= 150.
-          // Custo absorvido pela gordura 15% da Equação Fabiano.
+          // v115 — Mystery Box migrado para resgate manual pós-pagamento (server fn redeemMysteryBox).
+          // O webhook NÃO adiciona bônus automático mais; o cliente resgata via UI (qty > 200).
           const baseQty = Number(pedido.quantidade);
-          const mysteryBonus = baseQty >= 150 ? Math.floor(Math.random() * 41) + 10 : 0;
-          const qtyEnvio = baseQty + mysteryBonus;
+          const mysteryBonus = 0;
+          const qtyEnvio = baseQty;
           const { rankProvidersByCost, markProviderUnstable, clearProviderUnstable } = await import("@/lib/smart-routing.server");
           const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: qtyEnvio });
 
