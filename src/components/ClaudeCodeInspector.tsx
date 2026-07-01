@@ -81,6 +81,11 @@ export function ClaudeCodeInspector() {
       {/* Panel 2 — Canonical count */}
       <div className="rounded border border-cyan-500/20 p-3">
         <div className="text-cyan-300 font-bold mb-1">Painel 2 · pricing_items (contador canônico)</div>
+        {data && (data.catalog.withSmmpanel < data.catalog.total || data.catalog.withVerified < data.catalog.total) && (
+          <div className="mb-2 rounded border border-yellow-500/60 bg-yellow-500/10 px-2 py-1.5 text-yellow-200 text-[11px] shadow-[0_0_10px_rgba(234,179,8,0.35)] animate-pulse">
+            ⚠️ Rotas de Failover Ocultas Desarmadas (Mapeie os IDs correspondentes no catálogo para ativar o Smart Cost Routing)
+          </div>
+        )}
         {data ? (
           <div className="grid grid-cols-2 gap-2">
             <div>

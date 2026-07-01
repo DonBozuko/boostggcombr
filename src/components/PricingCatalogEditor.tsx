@@ -66,12 +66,22 @@ export function PricingCatalogEditor({ token }: { token: string }) {
     setMsg(`Editando pacote: ${r.pacote}`);
   };
 
+  const hypeId = form.smmhype_service_id.trim();
+  const panelId = form.smmpanel_service_id.trim();
+  const verifiedId = form.verified_service_id.trim();
+  const dupError =
+    hypeId && ((panelId && panelId === hypeId) || (verifiedId && verifiedId === hypeId));
+
   const save = async () => {
     setBusy(true); setMsg(null);
     try {
       if (!form.pacote.trim()) { setMsg("⚠️ Informe o código do pacote"); return; }
       const q = Number(form.quantidade);
       if (!Number.isFinite(q) || q <= 0) { setMsg("⚠️ Quantidade inválida"); return; }
+      if (dupError) {
+        setMsg("⚠️ Erro Contábil: Os IDs das chaves reservas não podem ser idênticos ao ID da SMMHype. Digite os códigos específicos de cada painel.");
+        return;
+      }
       const r = await upsertFn({ data: {
         token,
         pacote: form.pacote.trim(),
@@ -157,13 +167,19 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         </div>
         <div>
           <label className={labelCls}>ID SMMPanel</label>
-          <input className={inputCls} value={form.smmpanel_service_id} onChange={(e) => setForm({ ...form, smmpanel_service_id: e.target.value })} placeholder="ex: 8721" />
+          <input className={inputCls + (panelId && panelId === hypeId ? " !border-red-500 !text-red-300" : "")} value={form.smmpanel_service_id} onChange={(e) => setForm({ ...form, smmpanel_service_id: e.target.value })} placeholder="ex: 8721" />
         </div>
         <div>
           <label className={labelCls}>ID Verified Atacado</label>
-          <input className={inputCls} value={form.verified_service_id} onChange={(e) => setForm({ ...form, verified_service_id: e.target.value })} placeholder="ex: 1204" />
+          <input className={inputCls + (verifiedId && verifiedId === hypeId ? " !border-red-500 !text-red-300" : "")} value={form.verified_service_id} onChange={(e) => setForm({ ...form, verified_service_id: e.target.value })} placeholder="ex: 1204" />
         </div>
       </div>
+
+      {dupError && (
+        <div className="mb-3 rounded-md border border-red-500/60 bg-red-950/40 px-3 py-2 text-[12px] text-red-300 shadow-[0_0_14px_rgba(239,68,68,0.35)]">
+          ⚠️ Erro Contábil: Os IDs das chaves reservas não podem ser idênticos ao ID da SMMHype. Digite os códigos específicos de cada painel.
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2 mb-3">
         <button onClick={save} disabled={busy} className="px-4 py-2 rounded-md bg-gradient-to-r from-amber-400 to-orange-500 text-black text-sm font-bold shadow-[0_0_18px_rgba(245,158,11,0.55)] disabled:opacity-50">
