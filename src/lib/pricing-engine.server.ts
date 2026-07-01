@@ -336,6 +336,9 @@ type PricingItemRow = {
   category: Category;
   quantidade: number;
   provider_service_id: number | null;
+  smmhype_service_id: string | null;
+  smmpanel_service_id: string | null;
+  verified_service_id: string | null;
   cost_brl: number;
   price_brl: number;
   source: "api" | "fallback";
