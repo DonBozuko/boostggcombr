@@ -153,9 +153,18 @@ export function TreasuryPanel({ token }: { token: string }) {
     if (!token) return;
     setLoading(true);
     try { setSnap(await fn({ data: { token } })); } catch { setSnap({ ok: false, error: "NET" }); }
+    try { setWallets(await walletsFn({ data: { token } })); } catch { setWallets({ ok: false, error: "NET" }); }
     setLoading(false);
   };
   useEffect(() => { void load(); /* eslint-disable-next-line */ }, [token]);
+  // v116 — escuta de 1s do Banco Interno Virtual
+  useEffect(() => {
+    if (!token) return;
+    const iv = setInterval(async () => {
+      try { setWallets(await walletsFn({ data: { token } })); } catch { /* silencio */ }
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [token, walletsFn]);
 
   const hasLedger = !!(snap && snap.ok && snap.ultimas.length > 0);
 
