@@ -11,10 +11,13 @@ type PricingRow = {
   verified_service_id: string | null;
 };
 
-const TTL_MS = 1000;
-let cache: { at: number; byPacote: Map<string, PricingRow> } | null = null;
-let inflight: Promise<Map<string, PricingRow>> | null = null;
 let lastReserveSyncAt = 0;
+
+export function purgePricingCacheMemory(reason = "v137-force-purge"): void {
+  // v137 — sem cache estático: qualquer handshake força leitura viva do banco.
+  lastReserveSyncAt = 0;
+  console.log(`[pricing-cache] purge absoluto de cache em memória (${reason})`);
+}
 
 async function refresh(): Promise<Map<string, PricingRow>> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -23,23 +26,16 @@ async function refresh(): Promise<Map<string, PricingRow>> {
     .select("pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
   const map = new Map<string, PricingRow>();
   for (const r of ((data as any[]) ?? [])) map.set(String(r.pacote), r as PricingRow);
-  cache = { at: Date.now(), byPacote: map };
   return map;
 }
 
 export async function getPricingRow(pacote: string): Promise<PricingRow | null> {
-  const fresh = cache && Date.now() - cache.at < TTL_MS;
-  if (fresh) return cache!.byPacote.get(pacote) ?? null;
-  if (!inflight) inflight = refresh().finally(() => { inflight = null; });
-  const map = await inflight;
+  const map = await refresh();
   return map.get(pacote) ?? null;
 }
 
 export async function primePricingCache(): Promise<void> {
-  if (!cache || Date.now() - cache.at >= TTL_MS) {
-    if (!inflight) inflight = refresh().finally(() => { inflight = null; });
-    await inflight;
-  }
+  await refresh();
 }
 
 // ============================================================
@@ -56,6 +52,7 @@ type RemoteService = {
 };
 
 export const RESERVE_PROVIDER_ENDPOINTS = {
+  smmhype: "https://smmhype.com/api/v2",
   smmpanel: "https://smmpainel.com/api/v2",
   verified: "https://verifiedatacado.com/api/v2",
 } as const;
@@ -148,13 +145,16 @@ function pickBestMatch(services: RemoteService[], cat: string, qty: number): Rem
  * Retorna contagem de linhas preenchidas por provedor.
  */
 export async function syncReserveProviderIds(): Promise<{
+  smmhype_filled: number;
   smmpanel_filled: number;
   verified_filled: number;
+  smmhype_catalog: number;
   smmpanel_catalog: number;
   verified_catalog: number;
   scanned: number;
   updated_rows: number;
 }> {
+  purgePricingCacheMemory("syncReserveProviderIds:start");
   return syncReserveProviderIdsNow({ force: true });
 }
 
@@ -166,23 +166,29 @@ export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<v
 }
 
 async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
+  smmhype_filled: number;
   smmpanel_filled: number;
   verified_filled: number;
+  smmhype_catalog: number;
   smmpanel_catalog: number;
   verified_catalog: number;
   scanned: number;
   updated_rows: number;
 }> {
+  purgePricingCacheMemory(_opts.force ? "v137-force-live-handshake" : "v137-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { resolveServiceIdAsync } = await import("./smmhype.server");
 
-  const [panelList, verifiedList] = await Promise.all([
-    process.env.SMMPAINEL_API_KEY
-      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmpanel, process.env.SMMPAINEL_API_KEY)
-      : Promise.resolve(null),
-    process.env.VERIFIED_API_KEY
-      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.verified, process.env.VERIFIED_API_KEY)
-      : Promise.resolve(null),
-  ]);
+  // v137 — handshake vivo nas 3 APIs, aguardado antes de renderizar qualquer linha.
+  const hypeList = process.env.SMMHYPE_API_KEY
+    ? await fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmhype, process.env.SMMHYPE_API_KEY)
+    : null;
+  const panelList = process.env.SMMPAINEL_API_KEY
+    ? await fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmpanel, process.env.SMMPAINEL_API_KEY)
+    : null;
+  const verifiedList = process.env.VERIFIED_API_KEY
+    ? await fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.verified, process.env.VERIFIED_API_KEY)
+    : null;
 
   const { data: rows } = await supabaseAdmin
     .from("pricing_items" as any)
@@ -190,10 +196,11 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
     .order("category", { ascending: true })
     .order("quantidade", { ascending: true });
 
+  let smmhype_filled = 0;
   let smmpanel_filled = 0;
   let verified_filled = 0;
-  const updates: Array<{ pacote: string; smmpanel_service_id?: string; verified_service_id?: string }> = [];
-  const perCategory: Record<string, { scanned: number; panel: number; verified: number }> = {};
+  let updated_rows = 0;
+  const perCategory: Record<string, { scanned: number; hype: number; panel: number; verified: number }> = {};
 
   // v136 — Varredura sequencial multi-categoria: agrupa linhas por categoria e
   // processa cada bucket em lote para eliminar falhas de cache parcial.
@@ -205,22 +212,25 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
   }
 
   for (const [cat, bucket] of byCategory) {
-    perCategory[cat] = { scanned: bucket.length, panel: 0, verified: 0 };
+    perCategory[cat] = { scanned: bucket.length, hype: 0, panel: 0, verified: 0 };
     for (const r of bucket) {
       const qty = Number(r.quantidade);
-      const patch: { pacote: string; smmpanel_service_id?: string; verified_service_id?: string } = { pacote: r.pacote };
-      let dirty = false;
-      const hype = cleanId(r.smmhype_service_id);
+      const set: Record<string, string> = { synced_at: new Date().toISOString() };
+      const currentHype = cleanId(r.smmhype_service_id);
+
+      const hypeMatch = hypeList ? pickBestMatch(hypeList, cat, qty) : null;
+      const liveHypeId = cleanId(hypeMatch?.service) ?? cleanId(await resolveServiceIdAsync(String(r.pacote), qty).catch(() => null));
+      if (liveHypeId && liveHypeId !== currentHype) {
+        set.smmhype_service_id = liveHypeId;
+      }
+      const hype = cleanId(set.smmhype_service_id ?? currentHype);
 
       if (panelList) {
         const m = pickBestMatch(panelList, cat, qty);
         const id = cleanId(m?.service);
         const current = cleanId(r.smmpanel_service_id);
         if (id && id !== hype && current !== id) {
-          patch.smmpanel_service_id = id;
-          smmpanel_filled++;
-          perCategory[cat].panel++;
-          dirty = true;
+          set.smmpanel_service_id = id;
         }
       }
       if (verifiedList) {
@@ -228,49 +238,49 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
         const id = cleanId(m?.service);
         const current = cleanId(r.verified_service_id);
         // v136 — Isolamento tripartite: nunca escrever verified == hype nem verified == panel proposto/atual.
-        const panelClash = cleanId(patch.smmpanel_service_id ?? r.smmpanel_service_id);
+        const panelClash = cleanId(set.smmpanel_service_id ?? r.smmpanel_service_id);
         if (id && id !== hype && id !== panelClash && current !== id) {
-          patch.verified_service_id = id;
-          verified_filled++;
-          perCategory[cat].verified++;
-          dirty = true;
+          set.verified_service_id = id;
         }
       }
-      if (dirty) updates.push(patch);
-    }
-  }
 
-  // v134 — UPDATE real e definitivo item-a-item; nunca usa upsert/placebo.
-  for (const u of updates) {
-    const set: Record<string, string> = { synced_at: new Date().toISOString() };
-    if (u.smmpanel_service_id) set.smmpanel_service_id = u.smmpanel_service_id;
-    if (u.verified_service_id) set.verified_service_id = u.verified_service_id;
-    if (Object.keys(set).length > 1) {
-      const { error } = await supabaseAdmin.from("pricing_items" as any).update(set).eq("pacote", u.pacote);
-      if (error) console.error("[pricing-cache] v134 UPDATE real falhou", { pacote: u.pacote, error: error.message });
+      // v137 — gravação imediata linha-a-linha; sem lote pendente e sem cache parcial.
+      if (Object.keys(set).length > 1) {
+        const { error } = await supabaseAdmin.from("pricing_items" as any).update(set).eq("pacote", r.pacote);
+        if (error) {
+          console.error("[pricing-cache] v137 UPDATE vivo falhou", { pacote: r.pacote, error: error.message });
+        } else {
+          updated_rows++;
+          if (set.smmhype_service_id) { smmhype_filled++; perCategory[cat].hype++; }
+          if (set.smmpanel_service_id) { smmpanel_filled++; perCategory[cat].panel++; }
+          if (set.verified_service_id) { verified_filled++; perCategory[cat].verified++; }
+        }
+      }
     }
   }
 
   console.log("[pricing-cache] v136 multi-category sync", {
+    smmhype_catalog: hypeList?.length ?? 0,
     smmpanel_catalog: panelList?.length ?? 0,
     verified_catalog: verifiedList?.length ?? 0,
     categories: Object.keys(perCategory).length,
     per_category: perCategory,
     scanned: ((rows as any[]) ?? []).length,
-    updated_rows: updates.length,
-    smmpanel_filled, verified_filled,
+    updated_rows,
+    smmhype_filled, smmpanel_filled, verified_filled,
   });
 
-  // Invalida cache local para o próximo getPricingRow refletir os IDs recém-mapeados.
-  cache = null;
   lastReserveSyncAt = Date.now();
+  purgePricingCacheMemory("syncReserveProviderIds:end");
 
   return {
+    smmhype_filled,
     smmpanel_filled,
     verified_filled,
+    smmhype_catalog: hypeList?.length ?? 0,
     smmpanel_catalog: panelList?.length ?? 0,
     verified_catalog: verifiedList?.length ?? 0,
     scanned: ((rows as any[]) ?? []).length,
-    updated_rows: updates.length,
+    updated_rows,
   };
 }
