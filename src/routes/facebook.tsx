@@ -153,6 +153,12 @@ function FacebookLanding() {
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
   const currentPlans = categoria === "seguidores" ? followersPlans : likesPlans;
+  const dyn = useDynamicPlans({
+    seguidores: { category: "facebook:seguidores", fallback: followersPlans, unitLabel: "Seguidores" },
+    curtidas:   { category: "facebook:curtidas",   fallback: likesPlans,     unitLabel: "Curtidas" },
+  });
+  const currentPlans = categoria === "seguidores" ? dyn.seguidores : dyn.curtidas;
+  const dynAllPlans = [...dyn.seguidores, ...dyn.curtidas];
   const isFollowers = categoria === "seguidores";
 
   const submit = async (selected: Plan) => {
