@@ -42,6 +42,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
       GET: async () => new Response("ok", { status: 200 }),
 
       POST: async ({ request, context }) => {
+        const clientIp = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+        if (!rateLimitCheck(clientIp)) {
+          return new Response("Too Many Requests", { status: 429, headers: { "retry-after": "1", "cache-control": "no-store" } });
+        }
         const requestUrl = request.url;
         let rawBody = "";
         try {
