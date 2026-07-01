@@ -158,7 +158,7 @@ function YoutubeLanding() {
       } catch (err) { console.error("[yt poll]", err); }
     };
     tick();
-    const interval = setInterval(tick, 5000);
+    const interval = setInterval(tick, 1000);
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, rejected, getStatusFn]);
 
