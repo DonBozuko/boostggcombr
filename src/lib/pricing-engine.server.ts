@@ -574,6 +574,13 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     .from("pricing_cache" as any)
     .upsert(summaryRows, { onConflict: "category" });
 
+  // v130 — Auto-Provider Mapping: preenche IDs reserva (SMMPanel/Verified) por paridade de catálogo.
+  try {
+    const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
+    const rep = await syncReserveProviderIds();
+    console.log("[pricing] v130 reserve auto-map", rep);
+  } catch (e) { console.warn("[pricing] v130 reserve auto-map fail", e); }
+
   return { ok: !e1 && !e2, updated: itemRows.length, results: catSummary, mode: "api" };
 }
 
