@@ -1,5 +1,13 @@
-// v130 — Cache in-memory + Auto-Mapper de IDs em provedores reserva (SMMPanel/Verified).
-// Preserva HUD v57, cronômetro v105, MysteryBox v115, rolagem v122, rate-limit v129, Telegram v125.
+// v137 — Strict Canonical Link Matrix.
+// A busca heurística por aproximação de nomes foi EXTERMINADA (evita IDs replicados
+// tipo 7593 colado em lote). Agora os IDs em pricing_items são a fonte da verdade:
+// - Sem preenchimento automático por nome.
+// - Sincronismo contínuo lê os catálogos remotos indexados por service_id e atualiza
+//   apenas cost_brl (rate vivo) recalculando price_brl com a Equação Fabiano.
+// Preserva HUD v57, largura +80px v101, grade 200 v107, cronômetro 3min v105,
+// Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
+
+import { computeGuardedPrice } from "./margin-guardian";
 
 type PricingRow = {
   pacote: string;
@@ -14,7 +22,6 @@ type PricingRow = {
 let lastReserveSyncAt = 0;
 
 export function purgePricingCacheMemory(reason = "v137-force-purge"): void {
-  // v137 — sem cache estático: qualquer handshake força leitura viva do banco.
   lastReserveSyncAt = 0;
   console.log(`[pricing-cache] purge absoluto de cache em memória (${reason})`);
 }
@@ -39,7 +46,7 @@ export async function primePricingCache(): Promise<void> {
 }
 
 // ============================================================
-// v130 — Strict Auto-Provider Mapping Alignment
+// v137 — Canonical Link Sync (rate + saldo, sem heurística)
 // ============================================================
 
 type RemoteService = {
@@ -68,7 +75,7 @@ async function fetchServiceCatalog(endpoint: string, apiKey: string): Promise<Re
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           "Accept": "application/json,text/plain,*/*",
-          "User-Agent": "EliteBoostPrime-AutoMapper/134",
+          "User-Agent": "EliteBoostPrime-CanonicalSync/137",
         },
         body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
         signal: ctrl.signal,
@@ -87,63 +94,16 @@ function cleanId(v: unknown): string | null {
   return t ? t : null;
 }
 
-// Categoria canônica → tokens obrigatórios (todos precisam bater no name+category do serviço remoto).
-// Também tokens negativos para descartar serviços que não servem (ex: subscribers p/ likes).
-const CATEGORY_TOKENS: Record<string, { must: string[][]; not?: string[] }> = {
-  "instagram:seguidores":    { must: [["instagram","insta"], ["follower","seguidor"]], not: ["like","view","comment","story","reel"] },
-  "instagram:curtidas":      { must: [["instagram","insta"], ["like","curtida"]],     not: ["follower","view","comment"] },
-  "instagram:visualizacoes": { must: [["instagram","insta"], ["view","visual","reel","story"]], not: ["follower","like","comment"] },
-  "tiktok:seguidores":       { must: [["tiktok"], ["follower","seguidor"]], not: ["like","view"] },
-  "tiktok:curtidas":         { must: [["tiktok"], ["like","curtida"]],      not: ["follower","view"] },
-  "tiktok:visualizacoes":    { must: [["tiktok"], ["view","visual"]],       not: ["follower","like"] },
-  "youtube:inscritos":       { must: [["youtube"], ["subscriber","inscrit"]], not: ["view","like","watch"] },
-  "youtube:visualizacoes":   { must: [["youtube"], ["view","visual","watch"]], not: ["subscriber","like"] },
-  "facebook:seguidores":     { must: [["facebook","fb"], ["follower","seguidor","page like","curtida de página"]], not: ["post like","view","comment"] },
-  "facebook:curtidas":       { must: [["facebook","fb"], ["like","curtida"]], not: ["follower","view"] },
-  "telegram:canal":          { must: [["telegram"], ["member","membro","channel","canal","group","grupo"]], not: ["view","visual","react"] },
-  "telegram:grupo":          { must: [["telegram"], ["member","membro","channel","canal","group","grupo"]], not: ["view","visual","react"] },
-  "trafego:br":              { must: [["traffic","tráfego","website","visitor","visita"]], not: ["instagram","tiktok","youtube","facebook","telegram"] },
-  "trafego:global":          { must: [["traffic","tráfego","website","visitor","visita"]], not: ["instagram","tiktok","youtube","facebook","telegram"] },
-};
-
-function normalize(s: string): string {
-  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-}
-
-function matchesTokens(haystack: string, cat: string): boolean {
-  const rules = CATEGORY_TOKENS[cat];
-  if (!rules) return false;
-  const h = normalize(haystack);
-  for (const group of rules.must) {
-    if (!group.some((t) => h.includes(normalize(t)))) return false;
+function indexById(list: RemoteService[] | null): Map<string, RemoteService> {
+  const m = new Map<string, RemoteService>();
+  if (!list) return m;
+  for (const s of list) {
+    const id = cleanId(s.service);
+    if (id) m.set(id, s);
   }
-  if (rules.not?.some((t) => h.includes(normalize(t)))) return false;
-  return true;
+  return m;
 }
 
-function pickBestMatch(services: RemoteService[], cat: string, qty: number): RemoteService | null {
-  let best: RemoteService | null = null;
-  let bestRate = Number.POSITIVE_INFINITY;
-  for (const s of services) {
-    const name = String(s.name ?? "") + " " + String(s.category ?? "");
-    if (!matchesTokens(name, cat)) continue;
-    const min = Number(s.min ?? 0);
-    const max = Number(s.max ?? Number.POSITIVE_INFINITY);
-    if (Number.isFinite(min) && qty < min) continue;
-    if (Number.isFinite(max) && qty > max) continue;
-    const rate = Number(s.rate);
-    if (!Number.isFinite(rate) || rate <= 0) continue;
-    if (rate < bestRate) { bestRate = rate; best = s; }
-  }
-  return best;
-}
-
-/**
- * v130 — Auto-map de IDs para provedores reserva (SMMPanel + Verified).
- * Cruza catálogo remoto contra pricing_items pela categoria + faixa min/max,
- * gravando smmpanel_service_id e verified_service_id apenas quando NULOS.
- * Retorna contagem de linhas preenchidas por provedor.
- */
 export async function syncReserveProviderIds(): Promise<{
   smmhype_filled: number;
   smmpanel_filled: number;
@@ -161,7 +121,7 @@ export async function syncReserveProviderIds(): Promise<{
 export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<void> {
   if (Date.now() - lastReserveSyncAt < staleMs) return;
   await syncReserveProviderIdsNow({ force: false }).then(() => {}, (e) => {
-    console.warn("[pricing-cache] v134 auto-map lazy sync falhou", e);
+    console.warn("[pricing-cache] v137 canonical sync lazy falhou", e);
   });
 }
 
@@ -177,98 +137,93 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
 }> {
   purgePricingCacheMemory(_opts.force ? "v137-force-live-handshake" : "v137-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { resolveServiceIdAsync } = await import("./smmhype.server");
 
-  // v137 — handshake vivo nas 3 APIs, aguardado antes de renderizar qualquer linha.
-  const hypeList = process.env.SMMHYPE_API_KEY
-    ? await fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmhype, process.env.SMMHYPE_API_KEY)
-    : null;
-  const panelList = process.env.SMMPAINEL_API_KEY
-    ? await fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmpanel, process.env.SMMPAINEL_API_KEY)
-    : null;
-  const verifiedList = process.env.VERIFIED_API_KEY
-    ? await fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.verified, process.env.VERIFIED_API_KEY)
-    : null;
+  // v137 — handshake vivo paralelo nas 3 APIs.
+  const [hypeList, panelList, verifiedList] = await Promise.all([
+    process.env.SMMHYPE_API_KEY
+      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmhype, process.env.SMMHYPE_API_KEY)
+      : Promise.resolve(null),
+    process.env.SMMPAINEL_API_KEY
+      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmpanel, process.env.SMMPAINEL_API_KEY)
+      : Promise.resolve(null),
+    process.env.VERIFIED_API_KEY
+      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.verified, process.env.VERIFIED_API_KEY)
+      : Promise.resolve(null),
+  ]);
+
+  const hypeIdx = indexById(hypeList);
+  const panelIdx = indexById(panelList);
+  const verifiedIdx = indexById(verifiedList);
 
   const { data: rows } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, category, quantidade, smmhype_service_id, smmpanel_service_id, verified_service_id")
-    .order("category", { ascending: true })
-    .order("quantidade", { ascending: true });
+    .select("pacote, category, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
 
   let smmhype_filled = 0;
   let smmpanel_filled = 0;
   let verified_filled = 0;
   let updated_rows = 0;
-  const perCategory: Record<string, { scanned: number; hype: number; panel: number; verified: number }> = {};
 
-  // v136 — Varredura sequencial multi-categoria: agrupa linhas por categoria e
-  // processa cada bucket em lote para eliminar falhas de cache parcial.
-  const byCategory = new Map<string, any[]>();
   for (const r of ((rows as any[]) ?? [])) {
-    const cat = String(r.category ?? "");
-    if (!byCategory.has(cat)) byCategory.set(cat, []);
-    byCategory.get(cat)!.push(r);
-  }
+    const qty = Number(r.quantidade);
+    const hypeId = cleanId(r.smmhype_service_id);
+    const panelId = cleanId(r.smmpanel_service_id);
+    const verifiedId = cleanId(r.verified_service_id);
 
-  for (const [cat, bucket] of byCategory) {
-    perCategory[cat] = { scanned: bucket.length, hype: 0, panel: 0, verified: 0 };
-    for (const r of bucket) {
-      const qty = Number(r.quantidade);
-      const set: Record<string, string> = { synced_at: new Date().toISOString() };
-      const currentHype = cleanId(r.smmhype_service_id);
+    // Confere presença viva de cada ID canônico no catálogo remoto correspondente.
+    const hypeHit = hypeId ? hypeIdx.get(hypeId) : null;
+    const panelHit = panelId ? panelIdx.get(panelId) : null;
+    const verifiedHit = verifiedId ? verifiedIdx.get(verifiedId) : null;
 
-      const hypeMatch = hypeList ? pickBestMatch(hypeList, cat, qty) : null;
-      const liveHypeId = cleanId(hypeMatch?.service) ?? cleanId(await resolveServiceIdAsync(String(r.pacote), qty).catch(() => null));
-      if (liveHypeId && liveHypeId !== currentHype) {
-        set.smmhype_service_id = liveHypeId;
-      }
-      const hype = cleanId(set.smmhype_service_id ?? currentHype);
+    if (hypeHit) smmhype_filled++;
+    if (panelHit) smmpanel_filled++;
+    if (verifiedHit) verified_filled++;
 
-      if (panelList) {
-        const m = pickBestMatch(panelList, cat, qty);
-        const id = cleanId(m?.service);
-        const current = cleanId(r.smmpanel_service_id);
-        const verifiedClash = cleanId(set.verified_service_id ?? r.verified_service_id);
-        if (id && id !== hype && id !== verifiedClash && current !== id) {
-          set.smmpanel_service_id = id;
-        }
-      }
-      if (verifiedList) {
-        const m = pickBestMatch(verifiedList, cat, qty);
-        const id = cleanId(m?.service);
-        const current = cleanId(r.verified_service_id);
-        // v136 — Isolamento tripartite: nunca escrever verified == hype nem verified == panel proposto/atual.
-        const panelClash = cleanId(set.smmpanel_service_id ?? r.smmpanel_service_id);
-        if (id && id !== hype && id !== panelClash && current !== id) {
-          set.verified_service_id = id;
-        }
-      }
+    // Custo canônico = menor rate vivo entre os provedores vinculados (por 1000 → * qty / 1000).
+    const rates: number[] = [];
+    for (const hit of [hypeHit, panelHit, verifiedHit]) {
+      if (!hit) continue;
+      const rate = Number(hit.rate);
+      if (Number.isFinite(rate) && rate > 0) rates.push(rate);
+    }
+    if (rates.length === 0) continue;
 
-      // v137 — gravação imediata linha-a-linha; sem lote pendente e sem cache parcial.
-      if (Object.keys(set).length > 1) {
-        const { error } = await supabaseAdmin.from("pricing_items" as any).update(set).eq("pacote", r.pacote);
-        if (error) {
-          console.error("[pricing-cache] v137 UPDATE vivo falhou", { pacote: r.pacote, error: error.message });
-        } else {
-          updated_rows++;
-          if (set.smmhype_service_id) { smmhype_filled++; perCategory[cat].hype++; }
-          if (set.smmpanel_service_id) { smmpanel_filled++; perCategory[cat].panel++; }
-          if (set.verified_service_id) { verified_filled++; perCategory[cat].verified++; }
-        }
-      }
+    const bestRatePer1k = Math.min(...rates);
+    const newCost = Number(((bestRatePer1k * qty) / 1000).toFixed(4));
+    const newPrice = computeGuardedPrice(newCost); // Equação Fabiano
+
+    const currentCost = Number(r.cost_brl ?? 0);
+    const currentPrice = Number(r.price_brl ?? 0);
+    const costChanged = Math.abs(newCost - currentCost) > 0.0001;
+    const priceChanged = Math.abs(newPrice - currentPrice) > 0.009;
+
+    if (!costChanged && !priceChanged) continue;
+
+    const patch: Record<string, unknown> = {
+      cost_brl: newCost,
+      price_brl: newPrice,
+      synced_at: new Date().toISOString(),
+    };
+    const { error } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .update(patch)
+      .eq("pacote", r.pacote);
+    if (error) {
+      console.error("[pricing-cache] v137 UPDATE rate/price falhou", { pacote: r.pacote, error: error.message });
+    } else {
+      updated_rows++;
     }
   }
 
-  console.log("[pricing-cache] v136 multi-category sync", {
+  console.log("[pricing-cache] v137 canonical link sync", {
     smmhype_catalog: hypeList?.length ?? 0,
     smmpanel_catalog: panelList?.length ?? 0,
     verified_catalog: verifiedList?.length ?? 0,
-    categories: Object.keys(perCategory).length,
-    per_category: perCategory,
     scanned: ((rows as any[]) ?? []).length,
     updated_rows,
-    smmhype_filled, smmpanel_filled, verified_filled,
+    smmhype_bound: smmhype_filled,
+    smmpanel_bound: smmpanel_filled,
+    verified_bound: verified_filled,
   });
 
   lastReserveSyncAt = Date.now();
