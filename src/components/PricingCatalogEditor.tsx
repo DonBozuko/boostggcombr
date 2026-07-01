@@ -221,9 +221,9 @@ export function PricingCatalogEditor({ token }: { token: string }) {
                   <td className="px-2 py-1 text-right">{r.quantidade}</td>
                   <td className="px-2 py-1 text-right">{Number(r.cost_brl).toFixed(2)}</td>
                   <td className="px-2 py-1 text-right">{Number(r.price_brl).toFixed(2)}</td>
-                  <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? "—"}</td>
-                  <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? "—"}</td>
-                  <td className="px-2 py-1 font-mono">{r.verified_service_id ?? "—"}</td>
+                  <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
+                  <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
+                  <td className="px-2 py-1 font-mono">{r.verified_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
                   <td className="px-2 py-1 text-right whitespace-nowrap">
                     <button onClick={() => edit(r)} className="text-amber-300 hover:underline mr-2">editar</button>
                     <button onClick={() => remove(r.pacote)} className="text-red-400 hover:underline">excluir</button>
