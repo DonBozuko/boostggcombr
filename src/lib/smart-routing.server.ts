@@ -51,7 +51,9 @@ export async function rankProvidersByCost(opts: {
 }): Promise<RankedProvider[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { resolveServiceIdAsync } = await import("./smmhype.server");
-  const { getPricingRow } = await import("./pricing-cache.server");
+  const { getPricingRow, ensureReserveProviderIdsFresh } = await import("./pricing-cache.server");
+
+  await ensureReserveProviderIdsFresh();
 
   const serviceId = await resolveServiceIdAsync(opts.pacote, opts.quantidade);
 
