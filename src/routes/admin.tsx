@@ -43,7 +43,7 @@ import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
-import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
+// PricingCatalogEditor movido para rota isolada /admin/catalog (v86)
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
