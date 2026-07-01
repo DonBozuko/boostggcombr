@@ -107,11 +107,16 @@ export async function rankProvidersByCost(opts: {
       rate_usd: providerRate,
       unstable,
     };
-  });
+  }).filter((p) => p.slug === "smmhype" || !!p.provider_service_id);
 
-  // Ordem: estáveis primeiro; depois menor custo (null vai pro fim); depois prioridade
+  // v134 — Cascata canônica: SMMhype → SMMPainel → Verified.
+  // Mantém saúde/saldo antes da tentativa, mas nunca troca backup por ID falso.
+  const cascadeOrder: Record<string, number> = { smmhype: 0, smmpainel: 1, verified: 2 };
   ranked.sort((a, b) => {
     if (a.unstable !== b.unstable) return a.unstable ? 1 : -1;
+    const ao = cascadeOrder[a.slug] ?? 99;
+    const bo = cascadeOrder[b.slug] ?? 99;
+    if (ao !== bo) return ao - bo;
     const ac = a.cost_brl ?? Number.POSITIVE_INFINITY;
     const bc = b.cost_brl ?? Number.POSITIVE_INFINITY;
     if (ac !== bc) return ac - bc;

@@ -72,6 +72,9 @@ export async function dispatchByFornecedor(slug: string, args: {
     const { dispatchSmmhype } = await import("./smmhype.server");
     return dispatchSmmhype(args);
   }
+  if (args.serviceIdOverride == null || String(args.serviceIdOverride).trim() === "") {
+    return { ok: false, error: `${slug}: ID reserva real ausente no pricing_items` };
+  }
   if (slug === "smmpainel") {
     return dispatchSmmV2({
       endpoint: "https://smmpainel.com/api/v2",
