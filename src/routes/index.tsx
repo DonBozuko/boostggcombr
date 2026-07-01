@@ -67,7 +67,7 @@ import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid } from "@/lib/pricing.functions";
 
-const WHATSAPP_ADMIN = "5515997445388";
+
 
 // Analytics: dispara evento p/ gtag, dataLayer (GTM) e fbq, sem quebrar se nenhum existir.
 type TrackPayload = Record<string, string | number | boolean | undefined>;
@@ -567,14 +567,16 @@ function Landing() {
     }
   };
 
-  const whatsappHref = pedidoInfo
-    ? `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(
-        `Olá! Acabei de pagar o pacote *${pedidoInfo.tier}* (${pedidoInfo.price}) para o perfil *${pedidoInfo.profile}*.\n` +
-        `Order ID: ${pedidoInfo.pedidoId}\n` +
-        `Auditoria admin: https://eliteboostprime.lovable.app/admin?pid=${pedidoInfo.pedidoId}\n` +
-        `Segue o comprovante.`,
+  // v125 — Isolamento de tráfego: comprovantes vão para o Telegram público,
+  // preservando a linha privada do Diretor no WhatsApp (alertas backend v121).
+  const telegramSupportBase =
+    (import.meta.env.VITE_TELEGRAM_SUPPORT_URL as string | undefined)?.trim() ||
+    "https://t.me/boostgramseguidores_bot";
+  const supportHref = pedidoInfo
+    ? `https://t.me/share/url?url=${encodeURIComponent(telegramSupportBase)}&text=${encodeURIComponent(
+        `Olá, acabei de realizar o pagamento do Pix na EliteBoost Prime para o pedido #${pedidoInfo.pedidoId} e estou enviando o comprovante para acompanhamento de rede.`,
       )}`
-    : `https://wa.me/${WHATSAPP_ADMIN}`;
+    : telegramSupportBase;
 
   // QR Code real retornado pelo Mercado Pago (base64 PNG).
   const qrCodeUrl = pedidoInfo?.qrCodeBase64
@@ -899,21 +901,21 @@ function Landing() {
                     <Button
                       asChild
                       size="lg"
-                      className="w-full h-14 bg-green-500 hover:bg-green-600 text-white font-bold text-base shadow-lg"
+                      className="w-full h-14 bg-sky-500 hover:bg-sky-600 text-white font-bold text-base shadow-lg"
                     >
                       <a
-                        href={whatsappHref}
+                        href={supportHref}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() =>
-                          trackEvent("cta_payment_confirm_whatsapp", {
+                          trackEvent("cta_payment_confirm_telegram", {
                             pedido_id: pedidoInfo?.pedidoId ?? "",
                             plan_tier: pedidoInfo?.tier ?? "",
                           })
                         }
                       >
                         <MessageCircle className="size-5" />
-                        Já paguei! Enviar comprovante no WhatsApp
+                        Já paguei! Enviar comprovante no Telegram
                       </a>
                     </Button>
                   </div>
