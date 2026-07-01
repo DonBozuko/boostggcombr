@@ -461,6 +461,11 @@ function Landing() {
           toast.error("Pix recusado: saldo insuficiente no banco emissor.");
           return;
         }
+        if (res.status === "mp_refunded" || res.status === "SMM_FAILED") {
+          setRejectionMsg("❌ Instabilidade temporária de envio. Para sua segurança, seu pagamento foi ESTORNADO AUTOMATICAMENTE para a sua conta bancária em tempo real! Por favor, verifique seu extrato e tente novamente em alguns instantes.");
+          toast.error("Estorno automático realizado com sucesso.");
+          return;
+        }
         if (typeof res.status === "string" && res.status.startsWith("mp_")) {
           setRejectionMsg("❌ Pagamento recusado pelo Mercado Pago. Tente novamente.");
           return;
