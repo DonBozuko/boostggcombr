@@ -162,6 +162,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               margemBloqueada++;
               console.warn("[mp-webhook] v91 skip margem", { pedidoId: pedido.id, fornecedor: f.slug, custo: f.cost_brl, venda: pedido.valor });
               continue;
+            }
             const r = await dispatchByFornecedor(f.slug, {
               pacote: pedido.pacote,
               quantidade: pedido.quantidade,
