@@ -230,7 +230,7 @@ export function MobileFrame({
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`mf-shell w-full md:max-w-[450px] lg:max-w-[450px] xl:max-w-[450px] 2xl:max-w-[450px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
+        className={`mf-shell w-full md:max-w-[560px] lg:max-w-[620px] xl:max-w-[680px] 2xl:max-w-[720px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
