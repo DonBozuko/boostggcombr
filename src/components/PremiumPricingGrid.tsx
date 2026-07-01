@@ -156,7 +156,7 @@ export function PremiumPricingGrid({
               }}
             >
               <div
-                className="absolute top-0 left-0 right-0 text-[7.5px] md:text-[8.5px] font-black tracking-[0.14em] py-[1px]"
+                className="absolute top-0 left-0 right-0 text-[10px] font-black tracking-[0.14em] py-[2px]"
                 style={{
                   background: `linear-gradient(90deg, ${tone.border}cc, ${tone.border}55)`,
                   color: "#0a0a0a",
@@ -165,24 +165,24 @@ export function PremiumPricingGrid({
                 {p.fire ? `⚡ ${tone.label} ${countdown}` : tone.label}
               </div>
 
-              <div className="mt-3 flex items-baseline gap-1 justify-center">
-                <span className="text-sm md:text-lg font-black text-white leading-none">{p.qty}</span>
-                {p.fire && <span className="text-[10px] leading-none">🔥</span>}
+              <div className="mt-4 flex items-baseline gap-1 justify-center">
+                <span className="text-xl md:text-2xl font-black text-white leading-none">{p.qty}</span>
+                {p.fire && <span className="text-sm leading-none">🔥</span>}
               </div>
               {unit && (
-                <span className="text-[7.5px] md:text-[9px] uppercase tracking-[0.14em] text-zinc-400 leading-none">
+                <span className="text-[10px] uppercase tracking-[0.14em] text-zinc-400 leading-none">
                   {unit}
                 </span>
               )}
 
               {p.anchor > 0 && (
-                <span className="text-[9px] md:text-[10px] text-zinc-500 line-through leading-none">
+                <span className="text-[11px] text-zinc-500 line-through leading-none">
                   de {fmtBRL(p.anchor)}
                 </span>
               )}
               <div
-                className="text-base md:text-xl font-extrabold leading-none"
-                style={{ color: tone.chip, textShadow: `0 0 8px ${tone.glow}` }}
+                className="text-xl md:text-2xl font-extrabold leading-none"
+                style={{ color: tone.chip, textShadow: `0 0 10px ${tone.glow}` }}
               >
                 {p.price}
               </div>
@@ -193,7 +193,7 @@ export function PremiumPricingGrid({
                 type="button"
                 disabled={disabled}
                 onClick={() => onBuy(p.id)}
-                className="mt-1 w-full rounded-md py-1 text-[9px] md:text-[10px] font-black uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
+                className="mt-2 w-full rounded-md py-2 text-[12px] font-black uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{
                   background: disabled
                     ? "#222"
