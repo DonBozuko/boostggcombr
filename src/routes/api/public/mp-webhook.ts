@@ -109,9 +109,21 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return new Response("ok", { status: 200 });
           }
 
-          // Idempotência: se já estava paid, não dispara de novo
+          // v94 — Strict Idempotency Gateway Guard (payment_id + treasury ledger)
           if (pedido.status === "paid") {
+            console.log("[mp-webhook] v94 idempotency: pedido já paid", { paymentId, pedidoId: pedido.id });
             return new Response("ok", { status: 200 });
+          }
+          {
+            const { data: alreadyLedger } = await supabaseAdmin
+              .from("admin_treasury" as any)
+              .select("id")
+              .eq("pedido_id", pedido.id)
+              .maybeSingle();
+            if (alreadyLedger) {
+              console.log("[mp-webhook] v94 idempotency: ledger existente, abort", { paymentId, pedidoId: pedido.id });
+              return new Response("ok", { status: 200 });
+            }
           }
 
           const { error: updErr } = await supabaseAdmin
