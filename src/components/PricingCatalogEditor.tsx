@@ -68,9 +68,10 @@ export function PricingCatalogEditor({ token }: { token: string }) {
   const [msg, setMsg] = useState<string | null>(null);
   const [filter, setFilter] = useState("");
 
-  const reload = async () => {
-    const r = await listFn({ data: { token } });
-    if (r.ok) setRows(r.rows);
+  const reload = async (force = false) => {
+    if (force) setMsg("⏳ Varredura multi-categoria em execução…");
+    const r = await listFn({ data: { token, force } });
+    if (r.ok) { setRows(r.rows); if (force) setMsg("✅ Sincronização v136 concluída"); }
     else setMsg(r.error);
   };
 
