@@ -148,7 +148,7 @@ export function PremiumPricingGrid({
           return (
             <div
               key={p.id}
-              className="relative rounded-lg p-1.5 flex flex-col items-center text-center h-full min-h-[128px] justify-between backdrop-blur-md overflow-hidden"
+              className="relative rounded-xl p-3 pt-5 flex flex-col items-center text-center h-full min-h-[180px] justify-between backdrop-blur-md overflow-hidden"
               style={{
                 background: "rgba(12,12,14,0.62)",
                 border: `1.5px solid ${tone.border}`,
