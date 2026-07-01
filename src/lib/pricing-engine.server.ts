@@ -77,6 +77,10 @@ const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
   "trafego:global":          TRAF_GL_QTYS.map((q) => pid("wgl", q)),
 };
 
+// v126 — total canônico local (fallback quando pricing_items retorna vazio)
+export const CANONICAL_TOTAL = Object.values(CANONICAL_QTYS)
+  .reduce((s, a) => s + a.length, 0);
+
 
 // Categoria → pacote-amostra usado para resolver o service_id no SMMhype.
 const PROBE: Record<Category, { pacote: string; qty: number }> = {
