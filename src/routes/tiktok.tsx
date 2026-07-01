@@ -147,14 +147,23 @@ function TiktokLanding() {
   const ttType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
   const tipoBloqueado = isBlocked(blockedMap, "tiktok", ttType);
 
+  const [rejected, setRejected] = useState(false);
   useEffect(() => {
-    if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
+    if (!modalOpen || !pedidoInfo?.pedidoId || paid || rejected) return;
     const id = pedidoInfo.pedidoId;
     let cancelled = false;
     const tick = async () => {
       try {
         const res = await getStatusFn({ data: { id } });
-        if (!cancelled && res.ok && res.status === "paid") { setPaid(true); playSuccessAudio(); }
+        if (cancelled || !res.ok) return;
+        if (res.status === "paid") { setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "mp_rejected_insufficient") {
+          setRejected(true);
+          toast.error("❌ Pagamento recusado: saldo insuficiente no banco emissor.");
+        } else if (typeof res.status === "string" && res.status.startsWith("mp_")) {
+          setRejected(true);
+          toast.error("❌ Pagamento recusado pelo Mercado Pago.");
+        }
       } catch (err) {
         console.error("[tt poll]", err);
       }
@@ -162,7 +171,7 @@ function TiktokLanding() {
     tick();
     const interval = setInterval(tick, 5000);
     return () => { cancelled = true; clearInterval(interval); };
-  }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
+  }, [modalOpen, pedidoInfo?.pedidoId, paid, rejected, getStatusFn]);
 
   const dyn = useDynamicPlans({
     seguidores:    { category: "tiktok:seguidores",    fallback: followersPlans, unitLabel: "Seguidores" },
