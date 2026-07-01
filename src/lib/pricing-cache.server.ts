@@ -4,7 +4,8 @@
 type PricingRow = {
   pacote: string;
   quantidade: number;
-  valor: number;
+  price_brl: number;
+  cost_brl: number;
   smmhype_service_id: string | null;
   smmpanel_service_id: string | null;
   verified_service_id: string | null;
@@ -13,12 +14,13 @@ type PricingRow = {
 const TTL_MS = 1000;
 let cache: { at: number; byPacote: Map<string, PricingRow> } | null = null;
 let inflight: Promise<Map<string, PricingRow>> | null = null;
+let lastReserveSyncAt = 0;
 
 async function refresh(): Promise<Map<string, PricingRow>> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, quantidade, valor, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
   const map = new Map<string, PricingRow>();
   for (const r of ((data as any[]) ?? [])) map.set(String(r.pacote), r as PricingRow);
   cache = { at: Date.now(), byPacote: map };
@@ -53,6 +55,11 @@ type RemoteService = {
   max?: number | string;
 };
 
+export const RESERVE_PROVIDER_ENDPOINTS = {
+  smmpanel: "https://smmpainel.com/api/v2",
+  verified: "https://verifiedatacado.com/api/v2",
+} as const;
+
 async function fetchServiceCatalog(endpoint: string, apiKey: string): Promise<RemoteService[] | null> {
   try {
     const ctrl = new AbortController();
@@ -61,7 +68,11 @@ async function fetchServiceCatalog(endpoint: string, apiKey: string): Promise<Re
     try {
       res = await fetch(endpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json,text/plain,*/*",
+          "User-Agent": "EliteBoostPrime-AutoMapper/134",
+        },
         body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
         signal: ctrl.signal,
       });
@@ -72,6 +83,11 @@ async function fetchServiceCatalog(endpoint: string, apiKey: string): Promise<Re
     const parsed = JSON.parse(txt);
     return Array.isArray(parsed) ? parsed as RemoteService[] : null;
   } catch { return null; }
+}
+
+function cleanId(v: unknown): string | null {
+  const t = String(v ?? "").trim();
+  return t ? t : null;
 }
 
 // Categoria canônica → tokens obrigatórios (todos precisam bater no name+category do serviço remoto).
@@ -87,8 +103,8 @@ const CATEGORY_TOKENS: Record<string, { must: string[][]; not?: string[] }> = {
   "youtube:visualizacoes":   { must: [["youtube"], ["view","visual","watch"]], not: ["subscriber","like"] },
   "facebook:seguidores":     { must: [["facebook","fb"], ["follower","seguidor","page like","curtida de página"]], not: ["post like","view","comment"] },
   "facebook:curtidas":       { must: [["facebook","fb"], ["like","curtida"]], not: ["follower","view","page"] },
-  "telegram:canal":          { must: [["telegram"], ["channel","canal","member","membro"]], not: ["group","grupo","view","react"] },
-  "telegram:grupo":          { must: [["telegram"], ["group","grupo","member","membro"]], not: ["channel","canal","view","react"] },
+  "telegram:canal":          { must: [["telegram"], ["member","membro","channel","canal","group","grupo"]], not: ["view","visual","react"] },
+  "telegram:grupo":          { must: [["telegram"], ["member","membro","channel","canal","group","grupo"]], not: ["view","visual","react"] },
   "trafego:br":              { must: [["traffic","tráfego","website","visitor","visita"]], not: ["instagram","tiktok","youtube","facebook","telegram"] },
   "trafego:global":          { must: [["traffic","tráfego","website","visitor","visita"]], not: ["instagram","tiktok","youtube","facebook","telegram"] },
 };
@@ -136,21 +152,41 @@ export async function syncReserveProviderIds(): Promise<{
   verified_filled: number;
   smmpanel_catalog: number;
   verified_catalog: number;
+  scanned: number;
+  updated_rows: number;
+}> {
+  return syncReserveProviderIdsNow({ force: true });
+}
+
+export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<void> {
+  if (Date.now() - lastReserveSyncAt < staleMs) return;
+  await syncReserveProviderIdsNow({ force: false }).then(() => {}, (e) => {
+    console.warn("[pricing-cache] v134 auto-map lazy sync falhou", e);
+  });
+}
+
+async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
+  smmpanel_filled: number;
+  verified_filled: number;
+  smmpanel_catalog: number;
+  verified_catalog: number;
+  scanned: number;
+  updated_rows: number;
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const [panelList, verifiedList] = await Promise.all([
     process.env.SMMPAINEL_API_KEY
-      ? fetchServiceCatalog("https://smmpainel.net/api/v2", process.env.SMMPAINEL_API_KEY)
+      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmpanel, process.env.SMMPAINEL_API_KEY)
       : Promise.resolve(null),
     process.env.VERIFIED_API_KEY
-      ? fetchServiceCatalog("https://verifiedatacado.com/api/v2", process.env.VERIFIED_API_KEY)
+      ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.verified, process.env.VERIFIED_API_KEY)
       : Promise.resolve(null),
   ]);
 
   const { data: rows } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, category, quantidade, smmpanel_service_id, verified_service_id");
+    .select("pacote, category, quantidade, smmhype_service_id, smmpanel_service_id, verified_service_id");
 
   let smmpanel_filled = 0;
   let verified_filled = 0;
@@ -161,41 +197,60 @@ export async function syncReserveProviderIds(): Promise<{
     const qty = Number(r.quantidade);
     const patch: { pacote: string; smmpanel_service_id?: string; verified_service_id?: string } = { pacote: r.pacote };
     let dirty = false;
+    const hype = cleanId(r.smmhype_service_id);
 
-    if (panelList && !r.smmpanel_service_id) {
+    if (panelList) {
       const m = pickBestMatch(panelList, cat, qty);
-      if (m) { patch.smmpanel_service_id = String(m.service); smmpanel_filled++; dirty = true; }
+      const id = cleanId(m?.service);
+      const current = cleanId(r.smmpanel_service_id);
+      if (id && id !== hype && current !== id) {
+        patch.smmpanel_service_id = id;
+        smmpanel_filled++;
+        dirty = true;
+      }
     }
-    if (verifiedList && !r.verified_service_id) {
+    if (verifiedList) {
       const m = pickBestMatch(verifiedList, cat, qty);
-      if (m) { patch.verified_service_id = String(m.service); verified_filled++; dirty = true; }
+      const id = cleanId(m?.service);
+      const current = cleanId(r.verified_service_id);
+      if (id && id !== hype && current !== id) {
+        patch.verified_service_id = id;
+        verified_filled++;
+        dirty = true;
+      }
     }
     if (dirty) updates.push(patch);
   }
 
-  // Atualização item-a-item (evita sobrescrever campos ausentes no upsert).
+  // v134 — UPDATE real e definitivo item-a-item; nunca usa upsert/placebo.
   for (const u of updates) {
-    const set: Record<string, string> = {};
+    const set: Record<string, string> = { synced_at: new Date().toISOString() };
     if (u.smmpanel_service_id) set.smmpanel_service_id = u.smmpanel_service_id;
     if (u.verified_service_id) set.verified_service_id = u.verified_service_id;
-    if (Object.keys(set).length) {
-      await supabaseAdmin.from("pricing_items" as any).update(set).eq("pacote", u.pacote);
+    if (Object.keys(set).length > 1) {
+      const { error } = await supabaseAdmin.from("pricing_items" as any).update(set).eq("pacote", u.pacote);
+      if (error) console.error("[pricing-cache] v134 UPDATE real falhou", { pacote: u.pacote, error: error.message });
     }
   }
 
   console.log("[pricing-cache] v130 auto-map", {
     smmpanel_catalog: panelList?.length ?? 0,
     verified_catalog: verifiedList?.length ?? 0,
+    scanned: ((rows as any[]) ?? []).length,
+    updated_rows: updates.length,
     smmpanel_filled, verified_filled,
   });
 
   // Invalida cache local para o próximo getPricingRow refletir os IDs recém-mapeados.
   cache = null;
+  lastReserveSyncAt = Date.now();
 
   return {
     smmpanel_filled,
     verified_filled,
     smmpanel_catalog: panelList?.length ?? 0,
     verified_catalog: verifiedList?.length ?? 0,
+    scanned: ((rows as any[]) ?? []).length,
+    updated_rows: updates.length,
   };
 }

@@ -40,6 +40,8 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
+    const { ensureReserveProviderIdsFresh } = await import("@/lib/pricing-cache.server");
+    await ensureReserveProviderIdsFresh();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pricing_items" as any)

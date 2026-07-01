@@ -286,6 +286,14 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 });
               } catch (e) { console.warn("[mp-webhook] audit failover fail", e); }
             }
+            // v134 — saldo zerado bloqueia dispatch mesmo se a API não devolver rate/custo.
+            if (Number(f.saldo_atual) <= 0) {
+              const det = `Saldo zerado/indisponível: R$ ${Number(f.saldo_atual).toFixed(2)}`;
+              tentativas.push(`${f.nome}: ${det}`);
+              console.warn("[mp-webhook] v134 skip saldo zerado", { pedidoId: pedido.id, fornecedor: f.slug, saldo: f.saldo_atual, provider_service_id: f.provider_service_id });
+              await markProviderUnstable(f.slug, det);
+              continue;
+            }
             // v84 — saldo BRL insuficiente
             if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
               const det = `Saldo insuficiente: R$ ${Number(f.saldo_atual).toFixed(2)} < custo R$ ${f.cost_brl.toFixed(2)}`;

@@ -256,7 +256,7 @@ async function loadProviderRateMap(): Promise<{
 }> {
   const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
     { name: "smmhype",  url: "https://smmhype.com/api/v2",   key: process.env.SMMHYPE_API_KEY },
-    { name: "smmpanel", url: "https://smmpainel.net/api/v2", key: process.env.SMMPAINEL_API_KEY },
+    { name: "smmpanel", url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
     { name: "verified", url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
   ];
 
@@ -431,6 +431,35 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
   return out;
 }
 
+async function readExistingReserveIds(): Promise<Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>> {
+  const out = new Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>();
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("pacote, smmpanel_service_id, verified_service_id");
+    for (const row of (data ?? []) as Array<any>) {
+      out.set(String(row.pacote), {
+        smmpanel_service_id: row.smmpanel_service_id ? String(row.smmpanel_service_id) : null,
+        verified_service_id: row.verified_service_id ? String(row.verified_service_id) : null,
+      });
+    }
+  } catch { /* noop */ }
+  return out;
+}
+
+function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>): PricingItemRow[] {
+  return rows.map((r) => {
+    const old = existing.get(r.pacote);
+    if (!old) return r;
+    return {
+      ...r,
+      smmpanel_service_id: r.smmpanel_service_id ?? old.smmpanel_service_id,
+      verified_service_id: r.verified_service_id ?? old.verified_service_id,
+    };
+  });
+}
+
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
   // Hermetic Engine v47: leitura 1:1 do pricing_items (preço final por card).
   // Fallback: pricing_cache (per-1k) → tabela estática.
@@ -488,6 +517,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   mode?: "api" | "contingency";
 }> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const existingReserveIds = await readExistingReserveIds();
 
   // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático.
   // v50-Patch: forceContingency ignora rede e popula tudo pela matriz local.
@@ -506,7 +536,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = contingency.itemRows;
+    itemRows = preserveReserveIds(contingency.itemRows, existingReserveIds);
     const { error: e1 } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(itemRows, { onConflict: "pacote" });
@@ -561,6 +591,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
+  itemRows = preserveReserveIds(itemRows, existingReserveIds);
   const { error: e1 } = await supabaseAdmin
     .from("pricing_items" as any)
     .upsert(itemRows, { onConflict: "pacote" });
