@@ -460,7 +460,11 @@ function Landing() {
       try {
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
-        if (res.status === "paid") { stop(); setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "paid") {
+          const m = String((res as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
+          if (m) setMysteryBonus(Number(m[1]));
+          stop(); setPaid(true); playSuccessAudio(); return;
+        }
         if (res.status === "mp_rejected_insufficient") {
           stop();
           setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
