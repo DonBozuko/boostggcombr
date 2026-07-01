@@ -445,15 +445,25 @@ function Landing() {
   const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
 
-  // Polling: a cada 3s consulta o status do pedido até detectar 'paid'.
+  // Polling: a cada 5s consulta o status do pedido até detectar 'paid' ou rejeição.
   useEffect(() => {
-    if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
+    if (!modalOpen || !pedidoInfo?.pedidoId || paid || rejectionMsg) return;
     const id = pedidoInfo.pedidoId;
     let cancelled = false;
     const tick = async () => {
       try {
         const res = await getStatusFn({ data: { id } });
-        if (!cancelled && res.ok && res.status === "paid") { setPaid(true); playSuccessAudio(); }
+        if (cancelled || !res.ok) return;
+        if (res.status === "paid") { setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "mp_rejected_insufficient") {
+          setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
+          toast.error("Pix recusado: saldo insuficiente no banco emissor.");
+          return;
+        }
+        if (typeof res.status === "string" && res.status.startsWith("mp_")) {
+          setRejectionMsg("❌ Pagamento recusado pelo Mercado Pago. Tente novamente.");
+          return;
+        }
       } catch (err) {
         console.error("[poll status]", err);
       }
@@ -464,7 +474,8 @@ function Landing() {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
+  }, [modalOpen, pedidoInfo?.pedidoId, paid, rejectionMsg, getStatusFn]);
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
