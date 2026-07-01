@@ -141,16 +141,26 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           });
 
           const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+          const { respectsMinMargin } = await import("@/lib/margin-guardian");
           const tentativas: string[] = [];
           let sucesso = false;
+          let margemBloqueada = 0;
 
           for (const f of cadeia) {
-            // v84 — Strict Failover Balance Engine: pula fornecedor sem saldo BRL suficiente p/ cobrir o custo.
+            // v84 — saldo BRL insuficiente
             if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
               const det = `Saldo insuficiente: R$ ${Number(f.saldo_atual).toFixed(2)} < custo R$ ${f.cost_brl.toFixed(2)}`;
               tentativas.push(`${f.nome}: ${det}`);
               console.warn("[mp-webhook] v84 skip saldo zerado", { pedidoId: pedido.id, fornecedor: f.slug, saldo: f.saldo_atual, custo: f.cost_brl });
               await markProviderUnstable(f.slug, det);
+              continue;
+            }
+            // v91 — Strict Margin Guardian: pula fornecedor se custo violar 300% de lucro líquido
+            if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
+              const det = `Margem <300%: venda R$ ${Number(pedido.valor).toFixed(2)} vs custo R$ ${f.cost_brl.toFixed(2)}`;
+              tentativas.push(`${f.nome}: ${det}`);
+              margemBloqueada++;
+              console.warn("[mp-webhook] v91 skip margem", { pedidoId: pedido.id, fornecedor: f.slug, custo: f.cost_brl, venda: pedido.valor });
               continue;
             }
             const r = await dispatchByFornecedor(f.slug, {
@@ -226,6 +236,23 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
           if (!sucesso) {
             const falhaResumo = tentativas.join(" | ").slice(0, 400);
+            // v91 — se TODOS falharam por margem, retém em modo de segurança e gera Alerta Vermelho
+            if (margemBloqueada > 0 && margemBloqueada === cadeia.length) {
+              console.error("[mp-webhook] v91 HOLD margem", { pedidoId: pedido.id, tentativas });
+              await supabaseAdmin
+                .from("pedidos")
+                .update({ status: "MARGIN_HOLD", error_detail: `Retido por margem <300% em todos fornecedores. ${falhaResumo}`.slice(0, 500) })
+                .eq("id", pedido.id);
+              await supabaseAdmin.from("admin_audit_logs" as any).insert({
+                action: "MARGIN_GUARDIAN_RED_ALERT",
+                entity: "pedido",
+                entity_id: String(pedido.id),
+                detail: `🚨 ALERTA VERMELHO · Pedido ${pedido.id} retido: nenhum fornecedor respeita margem 300%. ${falhaResumo}`.slice(0, 1000),
+              } as any).then(() => {}, (e) => console.warn("[mp-webhook] audit insert fail", e));
+              const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+              await dispatchWhatsappAlert(`🚨 MARGIN GUARDIAN · Pedido ${pedido.id} em HOLD. Custos violam 300%. Ajuste preço ou fornecedor.`).catch(() => {});
+              return new Response("ok", { status: 200 });
+            }
             console.error("[mp-webhook] todos fornecedores falharam → estorno", { pedidoId: pedido.id, tentativas });
             const refund = await refundMercadoPago(String(paymentId));
             const novoStatus = refund.ok ? "mp_refunded" : "SMM_FAILED";
