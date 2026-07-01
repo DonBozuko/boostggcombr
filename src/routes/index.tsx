@@ -567,14 +567,16 @@ function Landing() {
     }
   };
 
-  const whatsappHref = pedidoInfo
-    ? `https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(
-        `Olá! Acabei de pagar o pacote *${pedidoInfo.tier}* (${pedidoInfo.price}) para o perfil *${pedidoInfo.profile}*.\n` +
-        `Order ID: ${pedidoInfo.pedidoId}\n` +
-        `Auditoria admin: https://eliteboostprime.lovable.app/admin?pid=${pedidoInfo.pedidoId}\n` +
-        `Segue o comprovante.`,
+  // v125 — Isolamento de tráfego: comprovantes vão para o Telegram público,
+  // preservando a linha privada do Diretor no WhatsApp (alertas backend v121).
+  const telegramSupportBase =
+    (import.meta.env.VITE_TELEGRAM_SUPPORT_URL as string | undefined)?.trim() ||
+    "https://t.me/boostgramseguidores_bot";
+  const supportHref = pedidoInfo
+    ? `https://t.me/share/url?url=${encodeURIComponent(telegramSupportBase)}&text=${encodeURIComponent(
+        `Olá, acabei de realizar o pagamento do Pix na EliteBoost Prime para o pedido #${pedidoInfo.pedidoId} e estou enviando o comprovante para acompanhamento de rede.`,
       )}`
-    : `https://wa.me/${WHATSAPP_ADMIN}`;
+    : telegramSupportBase;
 
   // QR Code real retornado pelo Mercado Pago (base64 PNG).
   const qrCodeUrl = pedidoInfo?.qrCodeBase64
