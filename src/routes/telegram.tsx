@@ -331,9 +331,9 @@ function TelegramLanding() {
           {paid ? (
             <>
               <DialogHeader>
-                <DialogTitle className="text-center text-2xl text-white">🎉 Pagamento confirmado!</DialogTitle>
-                <DialogDescription className="text-center text-zinc-400">
-                  Pedido enviado. Entrega gradual nos próximos minutos.
+                <DialogTitle className="text-center text-2xl text-white">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
+                <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">
+                  {CHECKOUT_SUCCESS_MESSAGE}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
