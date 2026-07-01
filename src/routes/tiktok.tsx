@@ -163,9 +163,15 @@ function TiktokLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
+  const dyn = useDynamicPlans({
+    seguidores:    { category: "tiktok:seguidores",    fallback: followersPlans, unitLabel: "Seguidores" },
+    curtidas:      { category: "tiktok:curtidas",      fallback: likesPlans,     unitLabel: "Curtidas" },
+    visualizacoes: { category: "tiktok:visualizacoes", fallback: viewsPlans,     unitLabel: "Views" },
+  });
   const currentPlans =
-    categoria === "seguidores" ? followersPlans :
-    categoria === "curtidas" ? likesPlans : viewsPlans;
+    categoria === "seguidores" ? dyn.seguidores :
+    categoria === "curtidas" ? dyn.curtidas : dyn.visualizacoes;
+  const dynAllPlans = [...dyn.seguidores, ...dyn.curtidas, ...dyn.visualizacoes];
 
   const isFollowers = categoria === "seguidores";
 
