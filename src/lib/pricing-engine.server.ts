@@ -129,11 +129,21 @@ const FABIANO_PIX_NET = 0.9901;
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 
+// v109 — Strict Incremental Pricing Core
+// Piso R$3,00 aplica-se APENAS ao pacote de entrada (qty <= 50).
+// Pacotes maiores usam piso proporcional escalonado (qty/50 * 3 * 0.9),
+// permitindo que 100 seg → ~R$4,50-R$4,90, 200 → ~R$6+, etc.
+function floorFor(qty: number): number {
+  if (qty <= 50) return 3;
+  // escala suave: 100→R$4,50 | 200→R$6,00 | 500→R$8,50
+  return Math.max(3, 3 + Math.log2(qty / 50) * 1.5);
+}
+
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
   const raw = (baseCost * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
-  return Math.max(3, ceilTo(raw, 0.5));
+  return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
 
 function packageCostFromRate(qty: number, costPer1k: number): number {
@@ -142,8 +152,9 @@ function packageCostFromRate(qty: number, costPer1k: number): number {
 
 function priceFromPackageCost(qty: number, costBrl: number): number {
   const raw = (costBrl * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
-  return Math.max(3, ceilTo(raw, 0.5));
+  return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
+
 
 function formatBRL(v: number): string {
   return `R$ ${v.toFixed(2).replace(".", ",")}`;
@@ -414,15 +425,33 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   const rateFallback = cachedRate ?? FALLBACK_RATES_PER_1K[category];
   let anyApi = false;
 
-  const items: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
+  const rawItems: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
     const hit = itemsMap.get(id);
     if (hit && hit.price > 0) {
       if (hit.source === "api") anyApi = true;
-      return { id, quantidade: qty, valor: hit.price, price: formatBRL(hit.price) };
+      // v109 — reaplica piso escalonado sobre preços cacheados,
+      // evita R$3 duplicado em 50/100/200 quando o cache foi gravado
+      // antes da matriz incremental.
+      const guarded = Math.max(floorFor(qty), hit.price);
+      return { id, quantidade: qty, valor: guarded, price: formatBRL(guarded) };
     }
     const valor = priceFromCost(qty, rateFallback);
     return { id, quantidade: qty, valor, price: formatBRL(valor) };
   });
+
+  // v109 — Monotonic Guard: cada pacote deve custar >= anterior + R$0,50.
+  const sorted = [...rawItems].sort((a, b) => a.quantidade - b.quantidade);
+  let prev = 0;
+  for (const it of sorted) {
+    const minAllowed = prev + 0.5;
+    if (it.valor < minAllowed) {
+      it.valor = ceilTo(minAllowed, 0.5);
+      it.price = formatBRL(it.valor);
+    }
+    prev = it.valor;
+  }
+  const items = sorted;
+
 
   const source: "api" | "fallback" = anyApi || cachedRate != null ? "api" : "fallback";
 
