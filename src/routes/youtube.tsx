@@ -143,22 +143,24 @@ function YoutubeLanding() {
   const ytType = categoria === "inscritos" ? "followers" : "views";
   const tipoBloqueado = isBlocked(blockedMap, "youtube", ytType);
 
+  const [rejected, setRejected] = useState(false);
   useEffect(() => {
-    if (!modalOpen || !pedidoInfo?.pedidoId || paid) return;
+    if (!modalOpen || !pedidoInfo?.pedidoId || paid || rejected) return;
     const id = pedidoInfo.pedidoId;
     let cancelled = false;
     const tick = async () => {
       try {
         const res = await getStatusFn({ data: { id } });
-        if (!cancelled && res.ok && res.status === "paid") { setPaid(true); playSuccessAudio(); }
-      } catch (err) {
-        console.error("[yt poll]", err);
-      }
+        if (cancelled || !res.ok) return;
+        if (res.status === "paid") { setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "mp_rejected_insufficient") { setRejected(true); toast.error("❌ Pagamento recusado: saldo insuficiente no banco emissor."); }
+        else if (typeof res.status === "string" && res.status.startsWith("mp_")) { setRejected(true); toast.error("❌ Pagamento recusado pelo Mercado Pago."); }
+      } catch (err) { console.error("[yt poll]", err); }
     };
     tick();
     const interval = setInterval(tick, 5000);
     return () => { cancelled = true; clearInterval(interval); };
-  }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
+  }, [modalOpen, pedidoInfo?.pedidoId, paid, rejected, getStatusFn]);
 
   const dyn = useDynamicPlans({
     inscritos:     { category: "youtube:inscritos",     fallback: subsPlans,  unitLabel: "Inscritos" },
