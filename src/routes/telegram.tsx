@@ -24,6 +24,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { getUtmSource } from "@/lib/utm";
@@ -351,6 +352,10 @@ function TelegramLanding() {
                     <div className="text-xs uppercase text-zinc-400">{pedidoInfo.tier} · {pedidoInfo.profile}</div>
                     <div className="text-2xl font-extrabold mt-1" style={{ color: AERO }}>{pedidoInfo.price}</div>
                   </div>
+                  <PixCountdown
+                      active={modalOpen && !paid && !!pedidoInfo?.pedidoId}
+                      onExpire={() => { setModalOpen(false); setPedidoInfo(null); toast.error("Tempo limite de pagamento esgotado. Por favor, gere um novo pedido para garantir o seu crescimento!"); }}
+                    />
                   <div className="flex justify-center">
                     <div className="rounded-xl bg-white p-3" style={{ boxShadow: `0 0 25px ${AERO}aa` }}>
                       <img src={qrCodeUrl} alt="QR Code Pix" width={220} height={220} className="block" />

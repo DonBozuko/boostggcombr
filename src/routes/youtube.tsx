@@ -24,6 +24,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import PixCountdown from "@/components/PixCountdown";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
@@ -424,6 +425,10 @@ function YoutubeLanding() {
                       {pedidoInfo.price}
                     </div>
                   </div>
+                  <PixCountdown
+                      active={modalOpen && !paid && !!pedidoInfo?.pedidoId}
+                      onExpire={() => { setModalOpen(false); setPedidoInfo(null); toast.error("Tempo limite de pagamento esgotado. Por favor, gere um novo pedido para garantir o seu crescimento!"); }}
+                    />
                   <div className="flex justify-center">
                     <div className="rounded-xl bg-white p-3" style={{ boxShadow: `0 0 25px ${RED}aa` }}>
                       <img src={qrCodeUrl} alt="QR Code Pix" width={220} height={220} className="block" />
