@@ -779,7 +779,9 @@ function Landing() {
                 <DialogHeader>
                   <DialogTitle className="text-center text-2xl">🎉 Pagamento confirmado!</DialogTitle>
                   <DialogDescription className="text-center">
-                    Seu pedido está em produção. Os seguidores começam a chegar em poucos minutos.
+                    {waitingProvision
+                      ? "Seu pedido foi recebido com sucesso e entrou na fila de processamento automático."
+                      : "Seu pedido está em produção. Os seguidores começam a chegar em poucos minutos."}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4 py-4">
@@ -794,7 +796,21 @@ function Landing() {
                       </div>
                     </div>
                   )}
-                  {pedidoInfo?.pedidoId && (
+                  {waitingProvision && pedidoInfo?.pedidoId && (
+                    <div className="w-full rounded-xl border border-emerald-400/40 bg-emerald-950/30 p-3 text-center">
+                      <p className="text-sm text-emerald-100 font-semibold">
+                        🟢 Pagamento confirmado! Seu pedido foi recebido com sucesso. Estamos realizando o processamento automático. Você será notificado assim que o serviço iniciar.
+                      </p>
+                      <a
+                        href={`https://wa.me/5511900000000?text=${encodeURIComponent(`Olá! Meu pedido ${pedidoInfo.pedidoId.slice(0, 8)} está em processamento. Pode confirmar?`)}`}
+                        target="_blank" rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500 text-black font-bold px-4 py-2 text-xs shadow-[0_0_14px_rgba(52,211,153,0.6)]"
+                      >
+                        💬 Falar com suporte no WhatsApp
+                      </a>
+                    </div>
+                  )}
+                  {!waitingProvision && pedidoInfo?.pedidoId && (
                     <MysteryBoxRedeem
                       pedidoId={pedidoInfo.pedidoId}
                       quantidade={dynAllPlans.find((p) => p.id === form.plan)?.quantidade ?? 0}
@@ -802,9 +818,11 @@ function Landing() {
                       accent="#FFD700"
                     />
                   )}
-                  <p className="text-sm text-zinc-300 text-center">
-                    Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.
-                  </p>
+                  {!waitingProvision && (
+                    <p className="text-sm text-zinc-300 text-center">
+                      Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.
+                    </p>
+                  )}
                 </div>
                 <ViralShare route="/" />
                 <Button
