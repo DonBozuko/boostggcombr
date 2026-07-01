@@ -231,7 +231,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             ordem: cadeia.map((p) => ({ slug: p.slug, cost: p.cost_brl, unstable: p.unstable })),
           });
 
-          const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+          const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
           const { respectsMinMargin } = await import("@/lib/margin-guardian");
           const tentativas: string[] = [];
           let sucesso = false;
