@@ -129,7 +129,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
                 )}
                 {f.cotacao ? <span className="text-amber-200/70 text-[10px]"> · USD {f.cotacao.toFixed(4)}</span> : null}
               </div>
-              <div>Falhas: {f.falhas ?? 0} · Status: {f.status ?? "sincronizando"}</div>
+              <div>Erros Registrados: {f.falhas ?? 0} · Conexão: {f.status === "online" ? "🟢 Conectado" : (f.status ?? "sincronizando")}</div>
             </div>
           ))}
         </div>
