@@ -90,7 +90,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         <div className="rounded-lg border border-cyan-500/50 bg-black/50 p-3 text-cyan-200">
           <div className="text-[10px] uppercase opacity-70">Pedidos 24h</div>
           <div className="text-2xl font-black font-mono">{snap.pedidos.total24h}</div>
-          <div className="text-[10px] font-mono">✅ {snap.pedidos.pagos24h} pagos · ⏳ {snap.pedidos.pendentes24h} pend.</div>
+          <div className="text-[10px] font-mono">✅ {snap.pedidos.pagos24h} Aprovados · ⏳ {snap.pedidos.pendentes24h} Pendentes</div>
         </div>
         <div className="rounded-lg border border-amber-500/50 bg-black/50 p-3 text-amber-200 col-span-2">
           <div className="text-[10px] uppercase opacity-70">Latência APIs (ms)</div>
