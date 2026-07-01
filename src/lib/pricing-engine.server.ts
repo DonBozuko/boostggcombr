@@ -425,15 +425,33 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   const rateFallback = cachedRate ?? FALLBACK_RATES_PER_1K[category];
   let anyApi = false;
 
-  const items: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
+  const rawItems: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
     const hit = itemsMap.get(id);
     if (hit && hit.price > 0) {
       if (hit.source === "api") anyApi = true;
-      return { id, quantidade: qty, valor: hit.price, price: formatBRL(hit.price) };
+      // v109 — reaplica piso escalonado sobre preços cacheados,
+      // evita R$3 duplicado em 50/100/200 quando o cache foi gravado
+      // antes da matriz incremental.
+      const guarded = Math.max(floorFor(qty), hit.price);
+      return { id, quantidade: qty, valor: guarded, price: formatBRL(guarded) };
     }
     const valor = priceFromCost(qty, rateFallback);
     return { id, quantidade: qty, valor, price: formatBRL(valor) };
   });
+
+  // v109 — Monotonic Guard: cada pacote deve custar >= anterior + R$0,50.
+  const sorted = [...rawItems].sort((a, b) => a.quantidade - b.quantidade);
+  let prev = 0;
+  for (const it of sorted) {
+    const minAllowed = prev + 0.5;
+    if (it.valor < minAllowed) {
+      it.valor = ceilTo(minAllowed, 0.5);
+      it.price = formatBRL(it.valor);
+    }
+    prev = it.valor;
+  }
+  const items = sorted;
+
 
   const source: "api" | "fallback" = anyApi || cachedRate != null ? "api" : "fallback";
 
