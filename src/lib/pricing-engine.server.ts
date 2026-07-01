@@ -98,22 +98,23 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 };
 
 const USD_TO_BRL = 7.0;
-const COUPON_BUFFER = 0.85; // 1 - 0.15 (PRIME15)
 const CONTINGENCY_SOURCE = "fallback" as const;
 
-function tierMultiplier(qty: number): number {
-  // Premium Balancing Adjust v42
-  if (qty <= 1000) return 4.0;
-  if (qty <= 10000) return 2.6;
-  return 1.8;
-}
+// v106 — Equação Fabiano unificada:
+// preço = custo_brl * 4.0 * 1.15 / 0.9901
+// 4.0 = 300% de lucro líquido puro
+// 1.15 = gordura antecipada p/ absorver PRIME15 sem furar margem
+// 0.9901 = repasse da taxa Pix do Mercado Pago (0,99%)
+const FABIANO_PROFIT = 4.0;
+const FABIANO_COUPON = 1.15;
+const FABIANO_PIX_NET = 0.9901;
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
-  const raw = (baseCost * tierMultiplier(qty)) / COUPON_BUFFER;
+  const raw = (baseCost * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
   return Math.max(3, ceilTo(raw, 0.5));
 }
 
@@ -122,7 +123,7 @@ function packageCostFromRate(qty: number, costPer1k: number): number {
 }
 
 function priceFromPackageCost(qty: number, costBrl: number): number {
-  const raw = (costBrl * tierMultiplier(qty)) / COUPON_BUFFER;
+  const raw = (costBrl * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
   return Math.max(3, ceilTo(raw, 0.5));
 }
 
