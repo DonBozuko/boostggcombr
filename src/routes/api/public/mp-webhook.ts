@@ -141,11 +141,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           });
 
           const { dispatchByFornecedor, refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+          const { respectsMinMargin } = await import("@/lib/margin-guardian");
           const tentativas: string[] = [];
           let sucesso = false;
+          let margemBloqueada = 0;
 
           for (const f of cadeia) {
-            // v84 — Strict Failover Balance Engine: pula fornecedor sem saldo BRL suficiente p/ cobrir o custo.
+            // v84 — saldo BRL insuficiente
             if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
               const det = `Saldo insuficiente: R$ ${Number(f.saldo_atual).toFixed(2)} < custo R$ ${f.cost_brl.toFixed(2)}`;
               tentativas.push(`${f.nome}: ${det}`);
