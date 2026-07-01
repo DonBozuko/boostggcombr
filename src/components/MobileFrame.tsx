@@ -209,11 +209,11 @@ export function MobileFrame({
 
   return (
     <div
-      className="relative min-h-screen h-auto w-screen overflow-y-auto overflow-x-visible flex justify-center lg:items-center"
-      style={{ background: "#050505", touchAction: "pan-y", overscrollBehaviorY: "auto" }}
+      className="relative min-h-screen w-screen overflow-x-hidden flex justify-center lg:items-center"
+      style={{ background: "#050505", WebkitOverflowScrolling: "touch" as any }}
     >
       <style>{`
-        html, body { max-width: none !important; overflow-y: auto !important; overflow-x: visible !important; overscroll-behavior-y: auto !important; min-height: 100%; height: auto; margin: 0; zoom: 1 !important; transform: none !important; }
+        html, body { max-width: none !important; overflow-x: hidden !important; overflow-y: visible !important; overscroll-behavior-y: auto !important; height: auto !important; margin: 0; zoom: 1 !important; transform: none !important; touch-action: pan-y !important; -webkit-overflow-scrolling: touch; }
         /* v88 — Strict CSS Scale Rollback: removido font-size:92% e paddings
            compactos que davam a impressão de "zoom reverso". Shell volta ao
            tamanho nativo de alta conversão. */
@@ -230,7 +230,7 @@ export function MobileFrame({
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`mf-shell w-full md:max-w-[640px] lg:max-w-[700px] xl:max-w-[760px] 2xl:max-w-[800px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
+        className={`mf-shell w-full md:max-w-[640px] lg:max-w-[700px] xl:max-w-[760px] 2xl:max-w-[800px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible lg:overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
@@ -243,8 +243,8 @@ export function MobileFrame({
         <TopNetworksNav active={route} />
 
         <div
-          className="mf-scroll mf-compact flex-1 min-h-0 overflow-y-auto overflow-x-visible flex flex-col pb-2"
-          style={{ touchAction: "pan-y", overscrollBehavior: "contain" }}
+          className="mf-scroll mf-compact flex-1 min-h-0 overflow-visible lg:overflow-y-auto overflow-x-visible flex flex-col pb-2"
+          style={{ touchAction: "pan-y" }}
         >
 
           {children}
