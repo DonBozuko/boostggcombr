@@ -788,6 +788,28 @@ function Landing() {
                       </div>
                     </div>
                   )}
+                  {mysteryBonus > 0 && (
+                    <div
+                      className="w-full rounded-xl p-3 text-center"
+                      style={{
+                        background: "linear-gradient(135deg,#4a044e 0%,#7c2d12 100%)",
+                        border: "2px solid #FFD700",
+                        boxShadow: "0 0 22px rgba(255,215,0,0.55)",
+                      }}
+                    >
+                      <div className="text-2xl mb-1">🎁✨</div>
+                      <p className="text-white font-black text-sm leading-tight">
+                        🟢 PAGAMENTO APROVADO!<br />
+                        Você abriu a <span style={{ color: "#FFD700" }}>Caixa Misteriosa</span> e ganhou
+                        <br />
+                        <span className="text-2xl" style={{ color: "#39ff14", textShadow: "0 0 10px #39ff14" }}>
+                          +{mysteryBonus} SEGUIDORES EXTRA
+                        </span>
+                        <br />
+                        direto na sua entrega!
+                      </p>
+                    </div>
+                  )}
                   <p className="text-sm text-zinc-300 text-center">
                     Entrega gradual em até 24h. Você pode fechar esta janela com tranquilidade.
                   </p>
