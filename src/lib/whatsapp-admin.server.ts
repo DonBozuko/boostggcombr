@@ -44,10 +44,11 @@ export function buildProvisioningMessage(a: ProvisioningAlert): string {
 
 async function sendViaTwilio(text: string): Promise<{ ok: boolean; detail?: string }> {
   const lovableKey = process.env.LOVABLE_API_KEY;
-  const twilioKey = process.env.TWILIO_API_KEY;
+  const twilioKey = process.env.WHATSAPP_API_TOKEN || process.env.TWILIO_API_KEY;
   const to = process.env.ADMIN_WHATSAPP_NUMBER; // ex: whatsapp:+5511999999999
   const from = process.env.TWILIO_WHATSAPP_FROM; // ex: whatsapp:+14155238886
   if (!lovableKey || !twilioKey || !to || !from) {
+    console.warn("[whatsapp-admin] ⚠️ Credenciais ausentes. Configure em Lovable → Project Settings → Environment Variables:\n  • ADMIN_WHATSAPP_NUMBER = whatsapp:+55DDDNUMERO (ex: whatsapp:+5511999998888)\n  • WHATSAPP_API_TOKEN    = token Twilio da Ponte v119\n  • TWILIO_WHATSAPP_FROM  = whatsapp:+14155238886 (sandbox ou aprovado)");
     return { ok: false, detail: "WHATSAPP_ENV_MISSING" };
   }
   try {
