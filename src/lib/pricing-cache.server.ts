@@ -186,40 +186,56 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
 
   const { data: rows } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, category, quantidade, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, category, quantidade, smmhype_service_id, smmpanel_service_id, verified_service_id")
+    .order("category", { ascending: true })
+    .order("quantidade", { ascending: true });
 
   let smmpanel_filled = 0;
   let verified_filled = 0;
   const updates: Array<{ pacote: string; smmpanel_service_id?: string; verified_service_id?: string }> = [];
+  const perCategory: Record<string, { scanned: number; panel: number; verified: number }> = {};
 
+  // v136 — Varredura sequencial multi-categoria: agrupa linhas por categoria e
+  // processa cada bucket em lote para eliminar falhas de cache parcial.
+  const byCategory = new Map<string, any[]>();
   for (const r of ((rows as any[]) ?? [])) {
     const cat = String(r.category ?? "");
-    const qty = Number(r.quantidade);
-    const patch: { pacote: string; smmpanel_service_id?: string; verified_service_id?: string } = { pacote: r.pacote };
-    let dirty = false;
-    const hype = cleanId(r.smmhype_service_id);
+    if (!byCategory.has(cat)) byCategory.set(cat, []);
+    byCategory.get(cat)!.push(r);
+  }
 
-    if (panelList) {
-      const m = pickBestMatch(panelList, cat, qty);
-      const id = cleanId(m?.service);
-      const current = cleanId(r.smmpanel_service_id);
-      if (id && id !== hype && current !== id) {
-        patch.smmpanel_service_id = id;
-        smmpanel_filled++;
-        dirty = true;
+  for (const [cat, bucket] of byCategory) {
+    perCategory[cat] = { scanned: bucket.length, panel: 0, verified: 0 };
+    for (const r of bucket) {
+      const qty = Number(r.quantidade);
+      const patch: { pacote: string; smmpanel_service_id?: string; verified_service_id?: string } = { pacote: r.pacote };
+      let dirty = false;
+      const hype = cleanId(r.smmhype_service_id);
+
+      if (panelList) {
+        const m = pickBestMatch(panelList, cat, qty);
+        const id = cleanId(m?.service);
+        const current = cleanId(r.smmpanel_service_id);
+        if (id && id !== hype && current !== id) {
+          patch.smmpanel_service_id = id;
+          smmpanel_filled++;
+          perCategory[cat].panel++;
+          dirty = true;
+        }
       }
-    }
-    if (verifiedList) {
-      const m = pickBestMatch(verifiedList, cat, qty);
-      const id = cleanId(m?.service);
-      const current = cleanId(r.verified_service_id);
-      if (id && id !== hype && current !== id) {
-        patch.verified_service_id = id;
-        verified_filled++;
-        dirty = true;
+      if (verifiedList) {
+        const m = pickBestMatch(verifiedList, cat, qty);
+        const id = cleanId(m?.service);
+        const current = cleanId(r.verified_service_id);
+        if (id && id !== hype && current !== id) {
+          patch.verified_service_id = id;
+          verified_filled++;
+          perCategory[cat].verified++;
+          dirty = true;
+        }
       }
+      if (dirty) updates.push(patch);
     }
-    if (dirty) updates.push(patch);
   }
 
   // v134 — UPDATE real e definitivo item-a-item; nunca usa upsert/placebo.
