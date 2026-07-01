@@ -83,9 +83,13 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
         return { ok: false, error: `⛔ v135 Margin Guardian: preço R$${data.price_brl.toFixed(2)} abaixo do piso R$${floor.toFixed(2)} (custo R$${data.cost_brl.toFixed(4)} × 4.0 × 1.15 / 0.9901). Lucro < 300% rejeitado.` };
       }
     }
-    // v112 — Lacre Contábil: rejeita duplicação em 0ms antes do INSERT
+    // v112/v136 — Lacre Contábil: rejeita duplicação em 0ms antes do INSERT.
+    // Isolamento tripartite: hype ≠ panel ≠ verified.
     if (hype && ((panel && panel === hype) || (verified && verified === hype))) {
       return { ok: false, error: DUP_ID_MSG };
+    }
+    if (panel && verified && panel === verified) {
+      return { ok: false, error: "⚠️ v136 Isolamento: SMMPanel e Verified Atacado precisam de IDs nativos distintos — cada API emite seu próprio código." };
     }
     const row = {
       pacote: data.pacote.trim(),
