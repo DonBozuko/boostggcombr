@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   listPricingCatalog,
@@ -34,6 +34,30 @@ const empty: FormState = {
   smmhype_service_id: "", smmpanel_service_id: "", verified_service_id: "",
 };
 
+const MONOTONIC_STEP = 0.5;
+
+/** v133 — Preço vivo pela Equação Fabiano + Monotonic Guard sequencial por categoria. */
+function buildLivePrices(rows: PricingCatalogRow[]): Map<string, number> {
+  const out = new Map<string, number>();
+  const byCat = new Map<string, PricingCatalogRow[]>();
+  for (const r of rows) {
+    if (!byCat.has(r.category)) byCat.set(r.category, []);
+    byCat.get(r.category)!.push(r);
+  }
+  for (const [, list] of byCat) {
+    list.sort((a, b) => a.quantidade - b.quantidade);
+    let prev = 0;
+    for (const r of list) {
+      const equation = computeGuardedPrice(Number(r.cost_brl) || 0);
+      let live = equation > 0 ? equation : Number(r.price_brl) || 0;
+      if (live <= prev) live = Number((prev + MONOTONIC_STEP).toFixed(2));
+      out.set(r.pacote, live);
+      prev = live;
+    }
+  }
+  return out;
+}
+
 export function PricingCatalogEditor({ token }: { token: string }) {
   const listFn = useServerFn(listPricingCatalog);
   const upsertFn = useServerFn(upsertPricingCatalog);
@@ -52,13 +76,16 @@ export function PricingCatalogEditor({ token }: { token: string }) {
 
   useEffect(() => { if (token) void reload(); /* eslint-disable-next-line */ }, [token]);
 
+  const livePrices = useMemo(() => buildLivePrices(rows), [rows]);
+
   const edit = (r: PricingCatalogRow) => {
+    const live = livePrices.get(r.pacote) ?? Number(r.price_brl);
     setForm({
       pacote: r.pacote,
       category: r.category,
       quantidade: String(r.quantidade),
       cost_brl: String(r.cost_brl),
-      price_brl: String(r.price_brl),
+      price_brl: String(live.toFixed(2)),
       smmhype_service_id: r.smmhype_service_id ?? "",
       smmpanel_service_id: r.smmpanel_service_id ?? "",
       verified_service_id: r.verified_service_id ?? "",
@@ -94,7 +121,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         verified_service_id: form.verified_service_id || null,
       }});
       if (r.ok) {
-        setMsg("✅ Pacote salvo no Supabase");
+        setMsg("✅ Pacote salvo no banco de dados");
         setForm(empty);
         await reload();
       } else setMsg(`❌ ${r.error ?? "Falha ao salvar"}`);
@@ -123,10 +150,10 @@ export function PricingCatalogEditor({ token }: { token: string }) {
     <div className="rounded-xl border border-amber-500/30 bg-black/60 p-4 shadow-[0_0_22px_rgba(245,158,11,0.25)]">
       <div className="flex items-center justify-between gap-2 mb-3">
         <h3 className="text-amber-300 font-bold tracking-wide text-sm">
-          📦 EXPANSÃO DE CATÁLOGO · IDs DE FORNECEDORES
+          📦 EXPANSÃO DO CATÁLOGO · IDs DOS FORNECEDORES
         </h3>
         <button onClick={reload} className="text-[11px] px-2 py-1 rounded border border-amber-500/40 text-amber-200 hover:bg-amber-500/10">
-          ⟳ atualizar
+          ⟳ Atualizar
         </button>
       </div>
 
@@ -146,7 +173,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
           <input className={inputCls} type="number" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: e.target.value })} />
         </div>
         <div>
-          <label className={labelCls}>Custo BRL</label>
+          <label className={labelCls}>Custo em Real</label>
           <input className={inputCls} type="number" step="0.0001" value={form.cost_brl} onChange={(e) => {
             const cost = e.target.value;
             const suggested = computeGuardedPrice(Number(cost) || 0);
@@ -155,8 +182,8 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         </div>
         <div>
           <label className={labelCls}>
-            Preço venda BRL {form.cost_brl && form.price_brl && !respectsMinMargin(Number(form.price_brl), Number(form.cost_brl)) && (
-              <span className="text-red-400 ml-1">⚠ margem &lt; 300%</span>
+            Preço de Venda {form.cost_brl && form.price_brl && !respectsMinMargin(Number(form.price_brl), Number(form.cost_brl)) && (
+              <span className="text-red-400 ml-1">⚠ Margem Abaixo do Limite de Segurança</span>
             )}
           </label>
           <input className={inputCls} type="number" step="0.01" value={form.price_brl} onChange={(e) => setForm({ ...form, price_brl: e.target.value })} />
@@ -183,7 +210,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
 
       <div className="flex flex-wrap gap-2 mb-3">
         <button onClick={save} disabled={busy} className="px-4 py-2 rounded-md bg-gradient-to-r from-amber-400 to-orange-500 text-black text-sm font-bold shadow-[0_0_18px_rgba(245,158,11,0.55)] disabled:opacity-50">
-          {busy ? "salvando..." : "💾 Salvar pacote"}
+          {busy ? "Salvando..." : "💾 Salvar pacote"}
         </button>
         <button onClick={() => { setForm(empty); setMsg(null); }} className="px-3 py-2 rounded-md border border-amber-500/40 text-amber-200 text-sm">
           Limpar
@@ -194,7 +221,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
       <div className="mt-2">
         <input
           className={inputCls + " mb-2"}
-          placeholder="🔎 filtrar por pacote ou categoria..."
+          placeholder="🔎 Filtrar por pacote ou categoria..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         />
@@ -204,38 +231,48 @@ export function PricingCatalogEditor({ token }: { token: string }) {
               <tr>
                 <th className="px-2 py-1 text-left">Pacote</th>
                 <th className="px-2 py-1 text-left">Categoria</th>
-                <th className="px-2 py-1 text-right">Qtd</th>
-                <th className="px-2 py-1 text-right">Custo</th>
-                <th className="px-2 py-1 text-right">Venda</th>
-                <th className="px-2 py-1 text-left">Hype</th>
-                <th className="px-2 py-1 text-left">Panel</th>
-                <th className="px-2 py-1 text-left">Verified</th>
+                <th className="px-2 py-1 text-right">Quantidade</th>
+                <th className="px-2 py-1 text-right">Preço de Custo (R$)</th>
+                <th className="px-2 py-1 text-right">Preço de Venda (R$)</th>
+                <th className="px-2 py-1 text-left">ID SMMHype</th>
+                <th className="px-2 py-1 text-left">ID SMMPanel</th>
+                <th className="px-2 py-1 text-left">ID Verified Atacado</th>
                 <th className="px-2 py-1"></th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((r) => (
-                <tr key={r.pacote} className="border-t border-amber-500/10 hover:bg-amber-500/5">
-                  <td className="px-2 py-1 font-mono">{r.pacote}</td>
-                  <td className="px-2 py-1">{r.category}</td>
-                  <td className="px-2 py-1 text-right">{r.quantidade}</td>
-                  <td className="px-2 py-1 text-right">{Number(r.cost_brl).toFixed(2)}</td>
-                  <td className="px-2 py-1 text-right">{Number(r.price_brl).toFixed(2)}</td>
-                  <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
-                  <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
-                  <td className="px-2 py-1 font-mono">{r.verified_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
-                  <td className="px-2 py-1 text-right whitespace-nowrap">
-                    <button onClick={() => edit(r)} className="text-amber-300 hover:underline mr-2">editar</button>
-                    <button onClick={() => remove(r.pacote)} className="text-red-400 hover:underline">excluir</button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((r) => {
+                const live = livePrices.get(r.pacote) ?? Number(r.price_brl);
+                const drift = Math.abs(live - Number(r.price_brl)) > 0.01;
+                return (
+                  <tr key={r.pacote} className="border-t border-amber-500/10 hover:bg-amber-500/5">
+                    <td className="px-2 py-1 font-mono">{r.pacote}</td>
+                    <td className="px-2 py-1">{r.category}</td>
+                    <td className="px-2 py-1 text-right">{r.quantidade}</td>
+                    <td className="px-2 py-1 text-right">{Number(r.cost_brl).toFixed(2)}</td>
+                    <td className="px-2 py-1 text-right font-bold text-emerald-300" title="Equação Fabiano viva + Monotonic Guard">
+                      {live.toFixed(2)}
+                      {drift && <span className="ml-1 text-[9px] text-amber-400/80">↺</span>}
+                    </td>
+                    <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
+                    <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
+                    <td className="px-2 py-1 font-mono">{r.verified_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
+                    <td className="px-2 py-1 text-right whitespace-nowrap">
+                      <button onClick={() => edit(r)} className="text-amber-300 hover:underline mr-2">editar</button>
+                      <button onClick={() => remove(r.pacote)} className="text-red-400 hover:underline">excluir</button>
+                    </td>
+                  </tr>
+                );
+              })}
               {!filtered.length && (
                 <tr><td colSpan={9} className="px-2 py-4 text-center text-amber-200/60">Nenhum pacote encontrado.</td></tr>
               )}
             </tbody>
           </table>
         </div>
+        <p className="mt-2 text-[10px] text-amber-200/60">
+          Preço de Venda calculado ao vivo: Custo × 4,0 × 1,15 ÷ 0,9901 (Equação Fabiano) com incremento mínimo de R$ 0,50 entre pacotes da mesma categoria.
+        </p>
       </div>
     </div>
   );
