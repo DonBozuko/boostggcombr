@@ -129,11 +129,21 @@ const FABIANO_PIX_NET = 0.9901;
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 
+// v109 — Strict Incremental Pricing Core
+// Piso R$3,00 aplica-se APENAS ao pacote de entrada (qty <= 50).
+// Pacotes maiores usam piso proporcional escalonado (qty/50 * 3 * 0.9),
+// permitindo que 100 seg → ~R$4,50-R$4,90, 200 → ~R$6+, etc.
+function floorFor(qty: number): number {
+  if (qty <= 50) return 3;
+  // escala suave: 100→R$4,50 | 200→R$6,00 | 500→R$8,50
+  return Math.max(3, 3 + Math.log2(qty / 50) * 1.5);
+}
+
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
   const raw = (baseCost * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
-  return Math.max(3, ceilTo(raw, 0.5));
+  return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
 
 function packageCostFromRate(qty: number, costPer1k: number): number {
@@ -142,8 +152,9 @@ function packageCostFromRate(qty: number, costPer1k: number): number {
 
 function priceFromPackageCost(qty: number, costBrl: number): number {
   const raw = (costBrl * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
-  return Math.max(3, ceilTo(raw, 0.5));
+  return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
+
 
 function formatBRL(v: number): string {
   return `R$ ${v.toFixed(2).replace(".", ",")}`;
