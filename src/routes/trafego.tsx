@@ -233,7 +233,7 @@ function TrafegoLanding() {
             </div>
             <DelayedCouponField accent={NEON} />
             <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
-              onClick={() => { const sel = allPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
+              onClick={() => { const sel = dynAllPlans.find((p) => p.id === planId); if (!sel) { toast.error("Selecione um pacote."); return; } submit(sel); }}
               className="w-full h-16 text-lg sm:text-xl font-black uppercase tracking-wider border-0 sticky bottom-2 z-30"
               style={{ background: NEON, color: "#fff", boxShadow: `0 0 35px ${NEON}` }}>
               {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
