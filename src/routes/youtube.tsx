@@ -154,6 +154,7 @@ function YoutubeLanding() {
         if (cancelled || !res.ok) return;
         if (res.status === "paid") { setPaid(true); playSuccessAudio(); return; }
         if (res.status === "mp_rejected_insufficient") { setRejected(true); toast.error("❌ Pagamento recusado: saldo insuficiente no banco emissor."); }
+        else if (res.status === "mp_refunded" || res.status === "SMM_FAILED") { setRejected(true); toast.error("❌ Instabilidade temporária de envio. Para sua segurança, seu pagamento foi ESTORNADO AUTOMATICAMENTE para a sua conta bancária em tempo real! Por favor, verifique seu extrato e tente novamente em alguns instantes.", { duration: 15000 }); }
         else if (typeof res.status === "string" && res.status.startsWith("mp_")) { setRejected(true); toast.error("❌ Pagamento recusado pelo Mercado Pago."); }
       } catch (err) { console.error("[yt poll]", err); }
     };
