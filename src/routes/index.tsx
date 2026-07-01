@@ -470,7 +470,7 @@ function Landing() {
       }
     };
     tick();
-    const interval = setInterval(tick, 5000);
+    const interval = setInterval(tick, 1000);
     return () => {
       cancelled = true;
       clearInterval(interval);
