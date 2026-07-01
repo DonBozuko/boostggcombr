@@ -536,9 +536,13 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       }
       // Markup v42 aplicado item-a-item sobre o custo real BRL
       const price_brl = priceFromPackageCost(qty, cost_brl);
+      const sidStr = serviceId != null ? String(serviceId) : null;
       itemRows.push({
         pacote: id, category: cat, quantidade: qty,
         provider_service_id: serviceId ?? null,
+        smmhype_service_id: sidStr,
+        smmpanel_service_id: sidStr,
+        verified_service_id: sidStr,
         cost_brl: Number(cost_brl.toFixed(4)),
         price_brl: Number(price_brl.toFixed(2)),
         source, synced_at: now,
