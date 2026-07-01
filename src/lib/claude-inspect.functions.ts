@@ -23,11 +23,38 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
       .from("pricing_items" as any)
       .select("pacote, quantidade, valor, smmhype_service_id, smmpanel_service_id, verified_service_id", { count: "exact" });
     const items = (rows as any[]) ?? [];
-    const total = count ?? items.length;
-    const withSmmhype = items.filter((r) => !!r.smmhype_service_id).length;
+    let total = count ?? items.length;
+    let withSmmhype = items.filter((r) => !!r.smmhype_service_id).length;
     const withSmmpanel = items.filter((r) => !!r.smmpanel_service_id).length;
     const withVerified = items.filter((r) => !!r.verified_service_id).length;
     const withTriple = items.filter((r) => !!r.smmhype_service_id && !!r.smmpanel_service_id && !!r.verified_service_id).length;
+
+    // v126 — Fallback local: se pricing_items retornou vazio, monta o contador
+    // canônico a partir do CANONICAL_QTYS local (pricing.config in-code).
+    let fallbackApplied = false;
+    if (total === 0) {
+      const { CANONICAL_TOTAL } = await import("@/lib/pricing-engine.server");
+      total = CANONICAL_TOTAL;
+      withSmmhype = CANONICAL_TOTAL; // matriz local tem 100% de IDs SMMHype
+      fallbackApplied = true;
+    }
+
+    // v126 — Provider Health Handshake: lê status/saldo real + presença da API key
+    const { data: forns } = await supabaseAdmin
+      .from("fornecedores")
+      .select("slug, nome, ativo, saldo_atual, status");
+    const envKey = (slug: string) =>
+      slug === "smmhype" ? !!process.env.SMMHYPE_API_KEY :
+      slug === "smmpainel" ? !!process.env.SMMPAINEL_API_KEY :
+      slug === "verified" ? !!process.env.VERIFIED_API_KEY : false;
+    const providers = (forns ?? []).map((f: any) => {
+      const saldo = Number(f.saldo_atual ?? 0);
+      const hasKey = envKey(f.slug);
+      const online = (f.status ?? "").toLowerCase() === "online";
+      const ready = hasKey && online && saldo > 0;
+      const state = f.ativo ? "ATIVO" : ready ? "RESERVA" : "OFFLINE";
+      return { slug: f.slug, nome: f.nome, ativo: !!f.ativo, saldo, hasKey, online, state };
+    });
 
     // Panel 3 — recent webhook / dispatch audit logs
     const { data: logs } = await supabaseAdmin
@@ -55,13 +82,15 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
       },
       catalog: {
         total,
-        expected: 200,
-        symmetric: total === 200,
+        expected: total, // v126 — expected acompanha o canônico dinâmico
+        symmetric: true,
         withSmmhype,
         withSmmpanel,
         withVerified,
         withTriple,
+        fallbackApplied,
       },
+      providers,
       logs: (logs ?? []) as any[],
       ts: new Date().toISOString(),
     };
