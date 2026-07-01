@@ -287,7 +287,7 @@ function TelegramLanding() {
               size="lg"
               disabled={loading || !planId || tipoBloqueado}
               onClick={() => {
-                const sel = allPlans.find((p) => p.id === planId);
+                const sel = dynAllPlans.find((p) => p.id === planId);
                 if (!sel) { toast.error("Selecione um pacote."); return; }
                 submit(sel);
               }}
