@@ -6,7 +6,7 @@ export type DynPlan = {
   id: string;
   tier: string;
   tag?: string;
-  qty: string;
+  qty?: string;
   quantidade: number;
   valor: number;
   price: string;
