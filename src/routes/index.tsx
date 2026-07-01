@@ -589,6 +589,35 @@ function Landing() {
       </header>
       <ShowcaseShell>
 
+      {/* v114 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras ≥ 150 */}
+      <div className="mx-2 mt-2 mb-1">
+        <div
+          className="relative overflow-hidden rounded-xl p-3 text-center"
+          style={{
+            background: "linear-gradient(135deg, rgba(88,28,135,0.75) 0%, rgba(190,24,93,0.75) 50%, rgba(234,88,12,0.75) 100%)",
+            border: "2px dashed #FFD700",
+            boxShadow: "0 0 24px rgba(255,215,0,0.45), inset 0 0 18px rgba(0,0,0,0.4)",
+            backdropFilter: "blur(8px) saturate(140%)",
+          }}
+          role="status"
+          aria-label="Bônus Caixa Misteriosa"
+        >
+          <p
+            className="text-white font-black leading-tight"
+            style={{ fontSize: "13px", textShadow: "0 0 8px rgba(0,0,0,0.9)" }}
+          >
+            <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>150 seguidores</span>,
+            <br />
+            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> direto na sua entrega!
+            <br />
+            <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-black/40 text-[11px] uppercase tracking-wider">
+              ✨ Abra a Caixa Misteriosa ✨
+            </span>
+          </p>
+        </div>
+      </div>
+
+
 
       <PremiumCategorySelector
         accent="#FFD700"
