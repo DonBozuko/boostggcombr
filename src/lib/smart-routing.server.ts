@@ -11,6 +11,7 @@ export type RankedProvider = {
   saldo_atual: number;
   cost_brl: number | null; // null = sem rate conhecido → fica no final
   service_id: number | null;
+  provider_service_id: string | null; // v85 — ID específico do fornecedor p/ este pacote
   rate_usd: number | null;
   unstable: boolean;
 };
