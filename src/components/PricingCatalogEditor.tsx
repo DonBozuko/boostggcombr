@@ -66,12 +66,22 @@ export function PricingCatalogEditor({ token }: { token: string }) {
     setMsg(`Editando pacote: ${r.pacote}`);
   };
 
+  const hypeId = form.smmhype_service_id.trim();
+  const panelId = form.smmpanel_service_id.trim();
+  const verifiedId = form.verified_service_id.trim();
+  const dupError =
+    hypeId && ((panelId && panelId === hypeId) || (verifiedId && verifiedId === hypeId));
+
   const save = async () => {
     setBusy(true); setMsg(null);
     try {
       if (!form.pacote.trim()) { setMsg("⚠️ Informe o código do pacote"); return; }
       const q = Number(form.quantidade);
       if (!Number.isFinite(q) || q <= 0) { setMsg("⚠️ Quantidade inválida"); return; }
+      if (dupError) {
+        setMsg("⚠️ Erro Contábil: Os IDs das chaves reservas não podem ser idênticos ao ID da SMMHype. Digite os códigos específicos de cada painel.");
+        return;
+      }
       const r = await upsertFn({ data: {
         token,
         pacote: form.pacote.trim(),
