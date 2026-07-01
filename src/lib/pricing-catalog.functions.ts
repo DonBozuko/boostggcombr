@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const tokenOnly = z.object({ token: z.string().min(8) });
+const tokenOnly = z.object({ token: z.string().min(8), force: z.boolean().optional() });
 
 const upsertInput = z.object({
   token: z.string().min(8),
