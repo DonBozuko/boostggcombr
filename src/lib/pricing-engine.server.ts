@@ -516,6 +516,8 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
   mode?: "api" | "contingency";
 }> {
+  const { purgePricingCacheMemory } = await import("@/lib/pricing-cache.server");
+  purgePricingCacheMemory("syncPricingCacheAll:start");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const existingReserveIds = await readExistingReserveIds();
 
@@ -551,6 +553,12 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
           synced_at: now,
         },
       ], { onConflict: "category" });
+    try {
+      const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
+      const rep = await syncReserveProviderIds();
+      console.log("[pricing] v137 reserve live handshake", rep);
+    } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
+    purgePricingCacheMemory("syncPricingCacheAll:contingency:end");
     return { ok: !e1 && !e2, updated: itemRows.length, results: contingency.results, mode: "contingency" };
   }
 
@@ -609,8 +617,10 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   try {
     const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
     const rep = await syncReserveProviderIds();
-    console.log("[pricing] v130 reserve auto-map", rep);
-  } catch (e) { console.warn("[pricing] v130 reserve auto-map fail", e); }
+    console.log("[pricing] v137 reserve live handshake", rep);
+  } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
+
+  purgePricingCacheMemory("syncPricingCacheAll:end");
 
   return { ok: !e1 && !e2, updated: itemRows.length, results: catSummary, mode: "api" };
 }
