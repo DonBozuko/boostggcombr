@@ -302,6 +302,25 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               .update({ status: novoStatus, error_detail: logDetail.slice(0, 500) })
               .eq("id", pedido.id);
 
+            // v95 — auditoria explícita do estorno automático
+            try {
+              await supabaseAdmin.from("admin_audit_logs" as any).insert({
+                admin_email: "system@webhook",
+                action: refund.ok ? "REFUND_OK" : "REFUND_FAILED",
+                detail: {
+                  ts: new Date().toISOString(),
+                  payment_id: String(paymentId),
+                  pedido_id: pedido.id,
+                  valor_brl: Number(pedido.valor),
+                  refund_detail: refund.detail,
+                  tentativas: falhaResumo,
+                  message: refund.ok
+                    ? `[mp-webhook] REFUND OK · Pix devolvido ao cliente em tempo real`
+                    : `[mp-webhook] REFUND FAILED · ${refund.detail}`,
+                },
+              } as any);
+            } catch (e) { console.warn("[mp-webhook] audit refund fail", e); }
+
             const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
             const alertMsg = refund.ok
               ? `🚨 Pedido ${pedido.id} falhou em todos os fornecedores. Pix estornado automaticamente para o cliente.`
