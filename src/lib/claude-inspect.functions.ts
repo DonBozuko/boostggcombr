@@ -32,8 +32,8 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
     // Panel 3 — recent webhook / dispatch audit logs
     const { data: logs } = await supabaseAdmin
       .from("admin_audit_logs")
-      .select("id, acao, detalhe, created_at")
-      .in("acao", ["DISPATCH_OK", "MARGIN_HOLD", "REFUND_OK", "LATE_PAYMENT_CATCH", "mp_rejected_insufficient"])
+      .select("id, action, detail, created_at")
+      .in("action", ["DISPATCH_OK", "MARGIN_HOLD", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "LATE_PAYMENT_CATCH", "FAILOVER_ACTIVE", "SIMULATE_UNSTABLE"])
       .order("created_at", { ascending: false })
       .limit(30);
 
