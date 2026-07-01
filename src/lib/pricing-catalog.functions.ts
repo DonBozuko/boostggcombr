@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const tokenOnly = z.object({ token: z.string().min(8) });
+const tokenOnly = z.object({ token: z.string().min(8), force: z.boolean().optional() });
 
 const upsertInput = z.object({
   token: z.string().min(8),
@@ -40,8 +40,13 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
-    const { ensureReserveProviderIdsFresh } = await import("@/lib/pricing-cache.server");
-    await ensureReserveProviderIdsFresh();
+    const { ensureReserveProviderIdsFresh, syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
+    // v136 — Strict Multi-Category Sync: botão "Atualizar" força varredura profunda completa.
+    if (data.force) {
+      await syncReserveProviderIds().catch((e) => console.warn("[v136] force sync falhou", e));
+    } else {
+      await ensureReserveProviderIdsFresh();
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pricing_items" as any)
