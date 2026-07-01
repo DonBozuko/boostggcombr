@@ -589,7 +589,7 @@ function Landing() {
       </header>
       <ShowcaseShell>
 
-      {/* v114 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras ≥ 150 */}
+      {/* v115 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras acima de 200 */}
       <div className="mx-2 mt-2 mb-1">
         <div
           className="relative overflow-hidden rounded-xl p-3 text-center"
@@ -606,16 +606,17 @@ function Landing() {
             className="text-white font-black leading-tight"
             style={{ fontSize: "13px", textShadow: "0 0 8px rgba(0,0,0,0.9)" }}
           >
-            <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>150 seguidores</span>,
+            <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>200 seguidores</span>,
             <br />
-            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> direto na sua entrega!
+            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> após o Pix aprovado!
             <br />
             <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-black/40 text-[11px] uppercase tracking-wider">
-              ✨ Abra a Caixa Misteriosa ✨
+              ✨ Resgate na Caixa Misteriosa após o pagamento ✨
             </span>
           </p>
         </div>
       </div>
+
 
 
 
