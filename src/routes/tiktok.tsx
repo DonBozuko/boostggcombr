@@ -62,6 +62,7 @@ export const Route = createFileRoute("/tiktok")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [buildProductJsonLd({ network: "TikTok", url, description, priceFromBrl: 5 })],
     };
   },
   component: TiktokLanding,
