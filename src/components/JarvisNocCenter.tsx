@@ -74,10 +74,10 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={refresh} disabled={loading} className="border-red-500/50 text-red-200">
-            {loading ? "..." : "🔄 Refresh"}
+            {loading ? "..." : "🔄 Atualizar Dados"}
           </Button>
           <Button size="sm" onClick={runFailover} className="bg-red-600 hover:bg-red-500 text-white text-xs">
-            ⚡ Failover Check
+            ⚡ Testar Rota Reserva
           </Button>
         </div>
       </div>
