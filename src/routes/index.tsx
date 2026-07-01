@@ -67,7 +67,7 @@ import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid } from "@/lib/pricing.functions";
 
-const WHATSAPP_ADMIN = "5515997445388";
+
 
 // Analytics: dispara evento p/ gtag, dataLayer (GTM) e fbq, sem quebrar se nenhum existir.
 type TrackPayload = Record<string, string | number | boolean | undefined>;
