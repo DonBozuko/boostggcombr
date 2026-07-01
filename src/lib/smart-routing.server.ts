@@ -11,6 +11,7 @@ export type RankedProvider = {
   saldo_atual: number;
   cost_brl: number | null; // null = sem rate conhecido → fica no final
   service_id: number | null;
+  provider_service_id: string | null; // v85 — ID específico do fornecedor p/ este pacote
   rate_usd: number | null;
   unstable: boolean;
 };
@@ -24,7 +25,7 @@ export async function rankProvidersByCost(opts: {
 
   const serviceId = await resolveServiceIdAsync(opts.pacote, opts.quantidade);
 
-  const [{ data: forn }, { data: svc }, { data: health }] = await Promise.all([
+  const [{ data: forn }, { data: svc }, { data: health }, { data: pricingItem }] = await Promise.all([
     supabaseAdmin
       .from("fornecedores")
       .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade")
@@ -34,7 +35,18 @@ export async function rankProvidersByCost(opts: {
       ? supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", serviceId).maybeSingle()
       : Promise.resolve({ data: null } as any),
     supabaseAdmin.from("provider_health" as any).select("slug, unstable_until"),
+    supabaseAdmin
+      .from("pricing_items" as any)
+      .select("smmhype_service_id, smmpanel_service_id, verified_service_id")
+      .eq("pacote", opts.pacote)
+      .maybeSingle(),
   ]);
+
+  const providerIdMap: Record<string, string | null> = {
+    smmhype: (pricingItem as any)?.smmhype_service_id ?? (serviceId != null ? String(serviceId) : null),
+    smmpainel: (pricingItem as any)?.smmpanel_service_id ?? null,
+    verified: (pricingItem as any)?.verified_service_id ?? null,
+  };
 
   const rate = Number((svc as any)?.rate);
   const healthMap = new Map<string, string | null>();
@@ -55,6 +67,7 @@ export async function rankProvidersByCost(opts: {
       saldo_atual: Number(f.saldo_atual),
       cost_brl: cost,
       service_id: serviceId,
+      provider_service_id: providerIdMap[f.slug] ?? null,
       rate_usd: Number.isFinite(rate) ? rate : null,
       unstable,
     };

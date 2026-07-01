@@ -26,9 +26,13 @@ export async function dispatchSmmV2(opts: {
   pacote: string;
   quantidade: number;
   instagram_user: string;
+  serviceIdOverride?: string | number | null;
 }): Promise<SmmDispatchResult> {
   if (!opts.apiKey) return { ok: false, error: `${opts.fornecedor}: API key ausente` };
   const serviceId =
+    (opts.serviceIdOverride != null && String(opts.serviceIdOverride).trim() !== ""
+      ? opts.serviceIdOverride
+      : null) ??
     resolveServiceId(opts.pacote, opts.quantidade) ??
     SMMHYPE_SERVICE_IDS[opts.pacote.toLowerCase()];
   if (!serviceId) return { ok: false, error: `${opts.fornecedor}: service id ausente` };
@@ -62,6 +66,7 @@ export async function dispatchSmmV2(opts: {
 
 export async function dispatchByFornecedor(slug: string, args: {
   pacote: string; quantidade: number; instagram_user: string;
+  serviceIdOverride?: string | number | null;
 }): Promise<SmmDispatchResult> {
   if (slug === "smmhype") {
     const { dispatchSmmhype } = await import("./smmhype.server");
