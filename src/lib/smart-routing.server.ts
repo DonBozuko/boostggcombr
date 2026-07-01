@@ -16,6 +16,35 @@ export type RankedProvider = {
   unstable: boolean;
 };
 
+type ServiceRate = { service: number | string; rate: number | string };
+
+async function fetchServiceRate(endpoint: string, apiKey: string | undefined, serviceId: string | null): Promise<number | null> {
+  if (!apiKey || !serviceId) return null;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 8000);
+    let res: Response;
+    try {
+      res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json,text/plain,*/*",
+          "User-Agent": "EliteBoostPrime-Routing/134",
+        },
+        body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
+        signal: ctrl.signal,
+      });
+    } finally { clearTimeout(timer); }
+    if (!res.ok) return null;
+    const parsed = JSON.parse(await res.text()) as ServiceRate[];
+    if (!Array.isArray(parsed)) return null;
+    const hit = parsed.find((s) => String(s.service) === String(serviceId));
+    const rate = Number(hit?.rate);
+    return Number.isFinite(rate) && rate > 0 ? rate : null;
+  } catch { return null; }
+}
+
 export async function rankProvidersByCost(opts: {
   pacote: string;
   quantidade: number;
@@ -45,16 +74,25 @@ export async function rankProvidersByCost(opts: {
     verified: (pricingItem as any)?.verified_service_id ?? null,
   };
 
-
-  const rate = Number((svc as any)?.rate);
+  const smmhypeRate = Number((svc as any)?.rate);
+  const [smmpainelRate, verifiedRate] = await Promise.all([
+    fetchServiceRate("https://smmpainel.com/api/v2", process.env.SMMPAINEL_API_KEY, providerIdMap.smmpainel),
+    fetchServiceRate("https://verifiedatacado.com/api/v2", process.env.VERIFIED_API_KEY, providerIdMap.verified),
+  ]);
+  const providerRateMap: Record<string, number | null> = {
+    smmhype: Number.isFinite(smmhypeRate) && smmhypeRate > 0 ? smmhypeRate : null,
+    smmpainel: smmpainelRate,
+    verified: verifiedRate,
+  };
   const healthMap = new Map<string, string | null>();
   ((health as any[]) ?? []).forEach((h) => healthMap.set(h.slug, h.unstable_until));
 
   const now = Date.now();
   const ranked: RankedProvider[] = ((forn as any[]) ?? []).map((f) => {
     const cot = Number(f.cotacao_brl ?? 7.0) || 7.0;
-    const cost = Number.isFinite(rate) && rate > 0
-      ? Number(((opts.quantidade / 1000) * rate * cot).toFixed(4))
+    const providerRate = providerRateMap[f.slug] ?? null;
+    const cost = providerRate != null
+      ? Number(((opts.quantidade / 1000) * providerRate * cot).toFixed(4))
       : null;
     const until = healthMap.get(f.slug);
     const unstable = !!(until && new Date(until).getTime() > now);
@@ -66,7 +104,7 @@ export async function rankProvidersByCost(opts: {
       cost_brl: cost,
       service_id: serviceId,
       provider_service_id: providerIdMap[f.slug] ?? null,
-      rate_usd: Number.isFinite(rate) ? rate : null,
+      rate_usd: providerRate,
       unstable,
     };
   });

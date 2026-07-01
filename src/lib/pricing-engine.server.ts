@@ -256,7 +256,7 @@ async function loadProviderRateMap(): Promise<{
 }> {
   const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
     { name: "smmhype",  url: "https://smmhype.com/api/v2",   key: process.env.SMMHYPE_API_KEY },
-    { name: "smmpanel", url: "https://smmpainel.net/api/v2", key: process.env.SMMPAINEL_API_KEY },
+    { name: "smmpanel", url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
     { name: "verified", url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
   ];
 

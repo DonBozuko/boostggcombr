@@ -21,7 +21,7 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
     // Panel 2 — pricing_items canonical count + triple-ID coverage
     const { data: rows, count } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, quantidade, valor, smmhype_service_id, smmpanel_service_id, verified_service_id", { count: "exact" });
+      .select("pacote, quantidade, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id", { count: "exact" });
     const items = (rows as any[]) ?? [];
     let total = count ?? items.length;
     let withSmmhype = items.filter((r) => !!r.smmhype_service_id).length;
