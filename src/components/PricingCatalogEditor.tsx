@@ -6,6 +6,7 @@ import {
   deletePricingCatalog,
   type PricingCatalogRow,
 } from "@/lib/pricing-catalog.functions";
+import { computeGuardedPrice, respectsMinMargin } from "@/lib/margin-guardian";
 
 const CATEGORIES = [
   "instagram:seguidores", "instagram:curtidas", "instagram:visualizacoes",
