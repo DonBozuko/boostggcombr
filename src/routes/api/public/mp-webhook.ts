@@ -2,6 +2,22 @@ import { createFileRoute } from "@tanstack/react-router";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
 
+// v129 — Strict IP Rate Limiter (5 req/s por IP, in-memory sliding window)
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 1000;
+const rateBuckets = new Map<string, number[]>();
+function rateLimitCheck(ip: string): boolean {
+  const now = Date.now();
+  const arr = (rateBuckets.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (arr.length >= RATE_LIMIT_MAX) { rateBuckets.set(ip, arr); return false; }
+  arr.push(now);
+  rateBuckets.set(ip, arr);
+  if (rateBuckets.size > 5000) {
+    for (const [k, v] of rateBuckets) if (!v.length || now - v[v.length - 1] > 60000) rateBuckets.delete(k);
+  }
+  return true;
+}
+
 function scheduleWebhookBackground(job: Promise<unknown>, context?: unknown) {
   const safeJob = job.catch((err) => console.error("[mp-webhook] background erro", err));
   const ctxWaitUntil = (context as { waitUntil?: (promise: Promise<unknown>) => void } | undefined)?.waitUntil;
