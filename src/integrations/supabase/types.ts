@@ -184,6 +184,45 @@ export type Database = {
         }
         Relationships: []
       }
+      financial_ledger: {
+        Row: {
+          buyer_ip: string | null
+          created_at: string
+          destino: string
+          fornecedor_slug: string | null
+          id: string
+          origem: string
+          pedido_id: string | null
+          telemetry: Json
+          ts_utc: string
+          valor_brl: number
+        }
+        Insert: {
+          buyer_ip?: string | null
+          created_at?: string
+          destino: string
+          fornecedor_slug?: string | null
+          id?: string
+          origem: string
+          pedido_id?: string | null
+          telemetry?: Json
+          ts_utc?: string
+          valor_brl: number
+        }
+        Update: {
+          buyer_ip?: string | null
+          created_at?: string
+          destino?: string
+          fornecedor_slug?: string | null
+          id?: string
+          origem?: string
+          pedido_id?: string | null
+          telemetry?: Json
+          ts_utc?: string
+          valor_brl?: number
+        }
+        Relationships: []
+      }
       fornecedores: {
         Row: {
           api_key_secret: string
@@ -660,6 +699,39 @@ export type Database = {
         }
         Relationships: []
       }
+      virtual_wallets: {
+        Row: {
+          created_at: string
+          fornecedor_slug: string | null
+          id: string
+          label: string
+          reserved_brl: number
+          saldo_brl: number
+          updated_at: string
+          wallet_key: string
+        }
+        Insert: {
+          created_at?: string
+          fornecedor_slug?: string | null
+          id?: string
+          label: string
+          reserved_brl?: number
+          saldo_brl?: number
+          updated_at?: string
+          wallet_key: string
+        }
+        Update: {
+          created_at?: string
+          fornecedor_slug?: string | null
+          id?: string
+          label?: string
+          reserved_brl?: number
+          saldo_brl?: number
+          updated_at?: string
+          wallet_key?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -689,6 +761,10 @@ export type Database = {
         }[]
       }
       is_director: { Args: never; Returns: boolean }
+      wallet_credit: {
+        Args: { _amount: number; _wallet_key: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
