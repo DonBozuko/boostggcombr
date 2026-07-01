@@ -41,8 +41,10 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { ensureReserveProviderIdsFresh, syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
-    // v136 — Strict Multi-Category Sync: botão "Atualizar" força varredura profunda completa.
+    // v137 — Strict Cache Purge & Forceful Sync: botão "Atualizar" força motor completo + IDs vivos.
     if (data.force) {
+      const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
+      await syncPricingCacheAll().catch((e) => console.warn("[v137] pricing sync falhou", e));
       await syncReserveProviderIds().catch((e) => console.warn("[v136] force sync falhou", e));
     } else {
       await ensureReserveProviderIdsFresh();
