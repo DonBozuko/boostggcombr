@@ -144,9 +144,9 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
-    // Cupom PRIME15 = 15% off aplicado server-side (centavo por centavo).
+    // Cupom PRIME15 = 15% off aplicado server-side. BRINDE50 = bônus em seguidores (não desconta).
     const cupom = (data.cupom ?? "").trim().toUpperCase();
-    const discount = cupom === "PRIME15" ? 0.15 : 0;
+    const discount = cupom.split(/[,\s]+/).includes("PRIME15") ? 0.15 : 0;
     const valorCobrar = Math.max(1, Number((valorBase * (1 - discount)).toFixed(2)));
 
 
@@ -217,6 +217,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           mercado_pago_id: mpId,
           rede_social: rede,
           utm_source: data.utm_source ? data.utm_source.toLowerCase().slice(0, 60) : null,
+          cupom: cupom || null,
         })
         .select("id")
         .single();

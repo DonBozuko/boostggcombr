@@ -100,19 +100,26 @@ function TrafegoLanding() {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid || rejected) return;
     const id = pedidoInfo.pedidoId;
     let cancelled = false;
+    let interval: ReturnType<typeof setInterval> | null = null;
+    const stop = () => {
+      cancelled = true;
+      if (interval) { clearInterval(interval); interval = null; }
+    };
     const tick = async () => {
+      if (cancelled) return;
       try {
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
-        if (res.status === "paid") { setPaid(true); playSuccessAudio(); return; }
-        if (res.status === "mp_rejected_insufficient") { setRejected(true); toast.error("❌ Pagamento recusado: saldo insuficiente no banco emissor."); }
-        else if (res.status === "mp_refunded" || res.status === "SMM_FAILED") { setRejected(true); toast.error("❌ Instabilidade temporária de envio. Para sua segurança, seu pagamento foi ESTORNADO AUTOMATICAMENTE para a sua conta bancária em tempo real! Por favor, verifique seu extrato e tente novamente em alguns instantes.", { duration: 15000 }); }
-        else if (typeof res.status === "string" && res.status.startsWith("mp_")) { setRejected(true); toast.error("❌ Pagamento recusado pelo Mercado Pago."); }
+        if (res.status === "paid") { stop(); setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "mp_rejected_insufficient") { stop(); setRejected(true); toast.error("❌ Pagamento recusado: saldo insuficiente no banco emissor."); return; }
+        if (res.status === "mp_refunded" || res.status === "SMM_FAILED") { stop(); setRejected(true); toast.error("❌ Instabilidade temporária de envio. Para sua segurança, seu pagamento foi ESTORNADO AUTOMATICAMENTE para a sua conta bancária em tempo real! Por favor, verifique seu extrato e tente novamente em alguns instantes.", { duration: 15000 }); return; }
+        if (typeof res.status === "string" && res.status.startsWith("mp_")) { stop(); setRejected(true); toast.error("❌ Pagamento recusado pelo Mercado Pago."); return; }
       } catch {}
     };
     tick();
-    const interval = setInterval(tick, 1000);
-    return () => { cancelled = true; clearInterval(interval); };
+    interval = setInterval(tick, 1000);
+    const hardStop = setTimeout(stop, 180_000); // v104 anti-loop 3min
+    return () => { stop(); clearTimeout(hardStop); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, rejected, getStatusFn]);
 
   const dyn = useDynamicPlans({
