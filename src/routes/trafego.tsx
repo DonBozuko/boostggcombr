@@ -1,3 +1,4 @@
+import { buildProductJsonLd } from "@/lib/seo-jsonld";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
@@ -53,6 +54,7 @@ export const Route = createFileRoute("/trafego")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [buildProductJsonLd({ network: "Tráfego Pago", url, description, priceFromBrl: 5 })],
     };
   },
   component: TrafegoLanding,
