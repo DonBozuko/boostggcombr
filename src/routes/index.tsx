@@ -380,38 +380,69 @@ function Landing() {
   // Proibido cachear em localStorage (gerava drift entre builds antigos com
   // markup estático e o valor real do banco, causando oscilação R$3↔R$5).
   const getPricingGridFn = useServerFn(getPricingGrid);
-  const [priceOverrides, setPriceOverrides] = useState<Record<string, { valor: number; price: string }>>({});
+  type GridItem = { id: string; quantidade: number; valor: number; price: string };
+  const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
+    seguidores: [], curtidas: [], visualizacoes: [],
+  });
   useEffect(() => {
     let cancelled = false;
-    // Purga cache legado de versões anteriores (fonte do drift).
     try { window.localStorage.removeItem("ebp_pricing_overrides_v1"); } catch {}
-    const cats = [
-      "instagram:seguidores",
-      "instagram:curtidas",
-      "instagram:visualizacoes",
-    ] as const;
-    Promise.all(cats.map((c) => getPricingGridFn({ data: { category: c } }).catch(() => null)))
+    const cats: Array<[Categoria, "instagram:seguidores" | "instagram:curtidas" | "instagram:visualizacoes"]> = [
+      ["seguidores", "instagram:seguidores"],
+      ["curtidas", "instagram:curtidas"],
+      ["visualizacoes", "instagram:visualizacoes"],
+    ];
+    Promise.all(cats.map(([, c]) => getPricingGridFn({ data: { category: c } }).catch(() => null)))
       .then((results) => {
         if (cancelled) return;
-        const map: Record<string, { valor: number; price: string }> = {};
-        for (const r of results) {
-          if (!r?.items || !Array.isArray(r.items) || r.items.length === 0) continue;
-          for (const it of r.items) map[it.id] = { valor: it.valor, price: it.price };
+        const next: Record<Categoria, GridItem[]> = { seguidores: [], curtidas: [], visualizacoes: [] };
+        results.forEach((r, i) => {
+          if (r?.items?.length) next[cats[i][0]] = r.items as GridItem[];
+        });
+        if (next.seguidores.length || next.curtidas.length || next.visualizacoes.length) {
+          setGridBy(next);
         }
-        if (Object.keys(map).length === 0) return;
-        setPriceOverrides(map);
       });
     return () => { cancelled = true; };
   }, [getPricingGridFn]);
 
-  const applyOverrides = (arr: Plan[]): Plan[] =>
-    arr.map((p) => {
-      const o = priceOverrides[p.id];
-      return o ? { ...p, valor: o.valor, price: o.price } : p;
+  const staticById = useMemo(() => {
+    const m = new Map<string, Plan>();
+    for (const p of [...plans, ...likesPlans, ...viewsPlans]) m.set(p.id, p);
+    return m;
+  }, []);
+
+  const buildDyn = (items: GridItem[], fallback: Plan[], unitLabel: string): Plan[] => {
+    if (!items.length) return fallback;
+    const tagFor = (q: number): string => {
+      if (q <= 200) return "+ MINI";
+      if (q <= 750) return "+ STARTER";
+      if (q <= 2000) return "+ BASIC";
+      if (q <= 7500) return "+ GROWTH";
+      if (q <= 20000) return "+ PRO";
+      if (q <= 75000) return "+ ELITE";
+      return "+ ULTIMATE";
+    };
+    return items.map((it) => {
+      const s = staticById.get(it.id);
+      const qtyStr = it.quantidade.toLocaleString("pt-BR");
+      return {
+        id: it.id,
+        tier: s?.tier ?? `${qtyStr} ${unitLabel}`,
+        tag: s?.tag ?? tagFor(it.quantidade),
+        qty: qtyStr,
+        quantidade: it.quantidade,
+        valor: it.valor,
+        price: it.price,
+        benefit: s?.benefit ?? "Entrega rápida e segura",
+        highlight: s?.highlight,
+      };
     });
-  const dynPlans      = useMemo(() => applyOverrides(plans),      [priceOverrides]);
-  const dynLikesPlans = useMemo(() => applyOverrides(likesPlans), [priceOverrides]);
-  const dynViewsPlans = useMemo(() => applyOverrides(viewsPlans), [priceOverrides]);
+  };
+
+  const dynPlans      = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores]);
+  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas]);
+  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
 
   // Polling: a cada 3s consulta o status do pedido até detectar 'paid'.
