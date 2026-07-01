@@ -229,7 +229,8 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
         const m = pickBestMatch(panelList, cat, qty);
         const id = cleanId(m?.service);
         const current = cleanId(r.smmpanel_service_id);
-        if (id && id !== hype && current !== id) {
+        const verifiedClash = cleanId(set.verified_service_id ?? r.verified_service_id);
+        if (id && id !== hype && id !== verifiedClash && current !== id) {
           set.smmpanel_service_id = id;
         }
       }
