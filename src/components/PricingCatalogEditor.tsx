@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
 import {
   listPricingCatalog,
   upsertPricingCatalog,
@@ -59,6 +60,7 @@ function buildLivePrices(rows: PricingCatalogRow[]): Map<string, number> {
 }
 
 export function PricingCatalogEditor({ token }: { token: string }) {
+  const router = useRouter();
   const listFn = useServerFn(listPricingCatalog);
   const upsertFn = useServerFn(upsertPricingCatalog);
   const delFn = useServerFn(deletePricingCatalog);
@@ -69,9 +71,15 @@ export function PricingCatalogEditor({ token }: { token: string }) {
   const [filter, setFilter] = useState("");
 
   const reload = async (force = false) => {
-    if (force) setMsg("⏳ Varredura multi-categoria em execução…");
+    if (force) setMsg("⏳ Handshake vivo v137 em execução…");
     const r = await listFn({ data: { token, force } });
-    if (r.ok) { setRows(r.rows); if (force) setMsg("✅ Sincronização v136 concluída"); }
+    if (r.ok) {
+      setRows(r.rows);
+      if (force) {
+        await router.invalidate();
+        setMsg("✅ Sincronismo vivo v137 concluído");
+      }
+    }
     else setMsg(r.error);
   };
 
@@ -153,8 +161,8 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         <h3 className="text-amber-300 font-bold tracking-wide text-sm">
           📦 EXPANSÃO DO CATÁLOGO · IDs DOS FORNECEDORES
         </h3>
-        <button onClick={() => reload(true)} className="text-[11px] px-2 py-1 rounded border border-amber-500/40 text-amber-200 hover:bg-amber-500/10">
-          ⟳ Atualizar
+        <button onClick={() => reload(true)} className="text-[11px] px-2 py-1 rounded border border-cyan-400/50 text-cyan-100 bg-cyan-500/10 hover:bg-cyan-500/20 shadow-[0_0_14px_rgba(34,211,238,0.35)]">
+          ⚙️ Atualizar
         </button>
       </div>
 
