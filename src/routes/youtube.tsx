@@ -159,7 +159,12 @@ function YoutubeLanding() {
     return () => { cancelled = true; clearInterval(interval); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, getStatusFn]);
 
-  const currentPlans = categoria === "inscritos" ? subsPlans : viewsPlans;
+  const dyn = useDynamicPlans({
+    inscritos:     { category: "youtube:inscritos",     fallback: subsPlans,  unitLabel: "Inscritos" },
+    visualizacoes: { category: "youtube:visualizacoes", fallback: viewsPlans, unitLabel: "Views" },
+  });
+  const currentPlans = categoria === "inscritos" ? dyn.inscritos : dyn.visualizacoes;
+  const dynAllPlans = [...dyn.inscritos, ...dyn.visualizacoes];
   const isSubs = categoria === "inscritos";
 
   const submit = async (selected: Plan) => {
