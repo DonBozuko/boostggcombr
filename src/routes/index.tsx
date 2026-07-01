@@ -801,13 +801,15 @@ function Landing() {
                       <p className="text-sm text-emerald-100 font-semibold">
                         🟢 Pagamento confirmado! Seu pedido foi recebido com sucesso. Estamos realizando o processamento automático. Você será notificado assim que o serviço iniciar.
                       </p>
-                      <a
-                        href={`https://wa.me/5511900000000?text=${encodeURIComponent(`Olá! Meu pedido ${pedidoInfo.pedidoId.slice(0, 8)} está em processamento. Pode confirmar?`)}`}
-                        target="_blank" rel="noopener noreferrer"
-                        className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500 text-black font-bold px-4 py-2 text-xs shadow-[0_0_14px_rgba(52,211,153,0.6)]"
-                      >
-                        💬 Falar com suporte no WhatsApp
-                      </a>
+                      {import.meta.env.VITE_SUPPORT_WHATSAPP_NUMBER && (
+                        <a
+                          href={`https://wa.me/${String(import.meta.env.VITE_SUPPORT_WHATSAPP_NUMBER).replace(/\D/g, "")}?text=${encodeURIComponent(`Olá! Meu pedido ${pedidoInfo.pedidoId.slice(0, 8)} está em processamento. Pode confirmar?`)}`}
+                          target="_blank" rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center gap-2 rounded-lg bg-emerald-500 text-black font-bold px-4 py-2 text-xs shadow-[0_0_14px_rgba(52,211,153,0.6)]"
+                        >
+                          💬 Falar com suporte no WhatsApp
+                        </a>
+                      )}
                     </div>
                   )}
                   {!waitingProvision && pedidoInfo?.pedidoId && (
