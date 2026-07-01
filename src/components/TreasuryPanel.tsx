@@ -228,6 +228,28 @@ export function TreasuryPanel({ token }: { token: string }) {
           ))}
         </ul>
       )}
+      {/* v116 — Banco Interno Virtual (escuta de 1s) */}
+      {wallets && wallets.ok && (
+        <div className="mt-3 border-t border-cyan-400/20 pt-2">
+          <div className="flex items-center justify-between mb-1">
+            <h4 className="text-[10px] uppercase tracking-[0.18em] text-cyan-300/90">🏦 Banco Interno Virtual</h4>
+            <span className="text-[9px] text-amber-200/80">Fila waiting_provision: <strong className="text-amber-100">{wallets.queueCount}</strong></span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {wallets.wallets.map((w) => {
+              const semId = w.fornecedor_slug && Number(w.saldo_brl) === 0;
+              return (
+                <div key={w.wallet_key} className="rounded-lg border border-cyan-400/25 bg-black/40 p-2">
+                  <div className="text-[9px] uppercase tracking-wider text-cyan-300/70">{w.label}</div>
+                  <div className="text-sm font-bold text-white">{brl(Number(w.saldo_brl))}</div>
+                  {w.reserved_brl > 0 && <div className="text-[9px] text-amber-300/80">Reservado: {brl(Number(w.reserved_brl))}</div>}
+                  {semId && <div className="text-[9px] text-amber-200">⚠️ Cadastrar ID</div>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </section>
   );
 }
