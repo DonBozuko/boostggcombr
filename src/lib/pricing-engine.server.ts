@@ -358,11 +358,16 @@ function buildContingencyPricingRows(now = new Date().toISOString()): {
     const costPer1k = FALLBACK_RATES_PER_1K[cat];
     for (const { id, qty } of CANONICAL_QTYS[cat]) {
       const costBrl = packageCostFromRate(qty, costPer1k);
+      const sid = resolveServiceId(id, qty);
+      const sidStr = sid != null ? String(sid) : null;
       itemRows.push({
         pacote: id,
         category: cat,
         quantidade: qty,
-        provider_service_id: resolveServiceId(id, qty),
+        provider_service_id: sid,
+        smmhype_service_id: sidStr,
+        smmpanel_service_id: sidStr,
+        verified_service_id: sidStr,
         cost_brl: Number(costBrl.toFixed(4)),
         price_brl: Number(priceFromPackageCost(qty, costBrl).toFixed(2)),
         source: CONTINGENCY_SOURCE,
