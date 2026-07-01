@@ -102,7 +102,7 @@ const CATEGORY_TOKENS: Record<string, { must: string[][]; not?: string[] }> = {
   "youtube:inscritos":       { must: [["youtube"], ["subscriber","inscrit"]], not: ["view","like","watch"] },
   "youtube:visualizacoes":   { must: [["youtube"], ["view","visual","watch"]], not: ["subscriber","like"] },
   "facebook:seguidores":     { must: [["facebook","fb"], ["follower","seguidor","page like","curtida de página"]], not: ["post like","view","comment"] },
-  "facebook:curtidas":       { must: [["facebook","fb"], ["like","curtida"]], not: ["follower","view","page"] },
+  "facebook:curtidas":       { must: [["facebook","fb"], ["like","curtida"]], not: ["follower","view"] },
   "telegram:canal":          { must: [["telegram"], ["member","membro","channel","canal","group","grupo"]], not: ["view","visual","react"] },
   "telegram:grupo":          { must: [["telegram"], ["member","membro","channel","canal","group","grupo"]], not: ["view","visual","react"] },
   "trafego:br":              { must: [["traffic","tráfego","website","visitor","visita"]], not: ["instagram","tiktok","youtube","facebook","telegram"] },
