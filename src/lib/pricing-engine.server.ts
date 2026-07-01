@@ -43,22 +43,40 @@ function pid(prefix: string, q: number): { id: string; qty: number } {
   return { id: `${prefix}${label}`, qty: q };
 }
 
+// v107 — Strict 200-Package Dynamic Matrix
+// IG 60 (25+20+15) · TT 40 (20+12+8) · YT 40 (20+20) · FB/TG 40 (12+8+10+10) · Tráfego 20 (10+10)
+const IG_SEG_QTYS = [50,100,150,200,300,400,500,750,1000,1500,2000,3000,4000,5000,7500,10000,15000,20000,30000,50000,75000,100000,200000,350000,500000];
+const IG_LIKE_QTYS = [50,100,200,300,500,750,1000,1500,2000,3000,4000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
+const IG_VIEW_QTYS = [1000,2500,5000,10000,15000,25000,50000,75000,100000,200000,300000,500000,750000,1000000,2000000];
+const TT_SEG_QTYS  = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000,200000,500000];
+const TT_LIKE_QTYS = [100,250,500,1000,2000,5000,10000,20000,50000,100000,200000,500000];
+const TT_VIEW_QTYS = [1000,5000,10000,25000,50000,100000,250000,500000];
+const YT_SUB_QTYS  = [50,100,200,300,500,750,1000,1500,2000,3000,4000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
+const YT_VIEW_QTYS = [1000,2000,5000,10000,15000,25000,50000,75000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,10000000];
+const FB_SEG_QTYS  = [100,250,500,1000,2000,3000,5000,10000,20000,50000,100000,200000];
+const FB_LIKE_QTYS = [100,500,1000,2500,5000,10000,25000,50000];
+const TG_CANAL_QTYS = [100,250,500,1000,2000,3000,5000,10000,25000,50000];
+const TG_GRUPO_QTYS = [100,250,500,1000,2000,3000,5000,10000,25000,50000];
+const TRAF_BR_QTYS  = [1000,2500,5000,10000,25000,50000,75000,100000,200000,500000];
+const TRAF_GL_QTYS  = [1000,2500,5000,10000,25000,50000,75000,100000,200000,500000];
+
 const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
-  "instagram:seguidores": SEGUIDORES_QTYS.map((q) => pid("p", q)),
-  "instagram:curtidas": CURTIDAS_QTYS.map((q) => pid("l", q)),
-  "instagram:visualizacoes": VIEWS_QTYS.map((q) => pid("v", q)),
-  "tiktok:seguidores": SEGUIDORES_QTYS.map((q) => pid("tf", q)),
-  "tiktok:curtidas": CURTIDAS_QTYS.map((q) => pid("tl", q)),
-  "tiktok:visualizacoes": VIEWS_QTYS.map((q) => pid("tv", q)),
-  "youtube:inscritos": SUBS_QTYS.map((q) => pid("ys", q)),
-  "youtube:visualizacoes": VIEWS_QTYS.map((q) => pid("yv", q)),
-  "facebook:seguidores": SEGUIDORES_QTYS.map((q) => pid("ff", q)),
-  "facebook:curtidas": CURTIDAS_QTYS.map((q) => pid("fl", q)),
-  "telegram:canal": MEMBROS_QTYS.map((q) => pid("tgc", q)),
-  "telegram:grupo": MEMBROS_QTYS.map((q) => pid("tgg", q)),
-  "trafego:br": TRAFEGO_QTYS.map((q) => pid("wbr", q)),
-  "trafego:global": TRAFEGO_QTYS.map((q) => pid("wgl", q)),
+  "instagram:seguidores":    IG_SEG_QTYS.map((q) => pid("p", q)),
+  "instagram:curtidas":      IG_LIKE_QTYS.map((q) => pid("l", q)),
+  "instagram:visualizacoes": IG_VIEW_QTYS.map((q) => pid("v", q)),
+  "tiktok:seguidores":       TT_SEG_QTYS.map((q) => pid("tf", q)),
+  "tiktok:curtidas":         TT_LIKE_QTYS.map((q) => pid("tl", q)),
+  "tiktok:visualizacoes":    TT_VIEW_QTYS.map((q) => pid("tv", q)),
+  "youtube:inscritos":       YT_SUB_QTYS.map((q) => pid("ys", q)),
+  "youtube:visualizacoes":   YT_VIEW_QTYS.map((q) => pid("yv", q)),
+  "facebook:seguidores":     FB_SEG_QTYS.map((q) => pid("ff", q)),
+  "facebook:curtidas":       FB_LIKE_QTYS.map((q) => pid("fl", q)),
+  "telegram:canal":          TG_CANAL_QTYS.map((q) => pid("tgc", q)),
+  "telegram:grupo":          TG_GRUPO_QTYS.map((q) => pid("tgg", q)),
+  "trafego:br":              TRAF_BR_QTYS.map((q) => pid("wbr", q)),
+  "trafego:global":          TRAF_GL_QTYS.map((q) => pid("wgl", q)),
 };
+
 
 // Categoria → pacote-amostra usado para resolver o service_id no SMMhype.
 const PROBE: Record<Category, { pacote: string; qty: number }> = {
