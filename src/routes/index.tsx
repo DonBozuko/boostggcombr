@@ -518,6 +518,7 @@ function Landing() {
         return;
       }
       setPaid(false);
+      setRejectionMsg(null);
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
