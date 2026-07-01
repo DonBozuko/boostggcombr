@@ -173,19 +173,37 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.warn("[mp-webhook] v98 late payment catch", { paymentId, pedidoId: pedido.id, previous: pedido.status });
           }
 
-          const { error: updErr } = await supabaseAdmin
+          // v116 — Pessimistic lock via conditional update: só passa 1 worker.
+          const { data: lockRow, error: updErr } = await supabaseAdmin
             .from("pedidos")
             .update({ status: "paid", error_detail: isLatePayment ? "v98 late-payment catch: processado pós-timeout" : null })
-            .eq("id", pedido.id);
+            .eq("id", pedido.id)
+            .neq("status", "paid")
+            .select("id")
+            .maybeSingle();
           if (updErr) {
             console.error("[mp-webhook] update falhou", updErr);
             return;
           }
+          if (!lockRow) {
+            console.log("[mp-webhook] v116 lock: outro worker já processou", { pedidoId: pedido.id });
+            return;
+          }
 
+          // v116 — Banco Interno Virtual: credita Carteira Geral + registra ledger imutável.
+          try {
+            await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
+            await supabaseAdmin.from("financial_ledger" as any).insert({
+              valor_brl: Number(pedido.valor),
+              origem: "mercado_pago",
+              destino: "wallet:geral",
+              pedido_id: pedido.id,
+              buyer_ip: request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip") ?? null,
+              telemetry: { payment_id: String(paymentId), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED" },
+            } as any);
+          } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
-          // v115 — Mystery Box migrado para resgate manual pós-pagamento (server fn redeemMysteryBox).
-          // O webhook NÃO adiciona bônus automático mais; o cliente resgata via UI (qty > 200).
           const baseQty = Number(pedido.quantidade);
           const mysteryBonus = 0;
           const qtyEnvio = baseQty;
@@ -193,10 +211,18 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: qtyEnvio });
 
           if (!cadeia.length) {
+            // v116 — sem fornecedor disponível: entra em fila, NÃO estorna, NÃO cancela.
             await supabaseAdmin
               .from("pedidos")
-              .update({ status: "SMM_FAILED", error_detail: "Nenhum fornecedor ATIVO com saldo > 0 (smart routing vazio)" })
+              .update({ status: "waiting_provision", error_detail: "v116 fila: aguardando provisão de fornecedor (nenhum ATIVO com saldo/ID)" })
               .eq("id", pedido.id);
+            try {
+              await supabaseAdmin.from("financial_ledger" as any).insert({
+                valor_brl: Number(pedido.valor), origem: "wallet:geral", destino: "wallet:reservado", pedido_id: pedido.id,
+                telemetry: { event: "WAITING_PROVISION", reason: "no_provider" },
+              } as any);
+              await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: Number(pedido.valor) });
+            } catch (e) { console.warn("[mp-webhook] v116 waiting_provision ledger fail", e); }
             return;
           }
 
