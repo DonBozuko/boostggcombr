@@ -32,8 +32,8 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
     // Panel 3 — recent webhook / dispatch audit logs
     const { data: logs } = await supabaseAdmin
       .from("admin_audit_logs")
-      .select("id, acao, detalhe, created_at")
-      .in("acao", ["DISPATCH_OK", "MARGIN_HOLD", "REFUND_OK", "LATE_PAYMENT_CATCH", "mp_rejected_insufficient"])
+      .select("id, action, detail, created_at")
+      .in("action", ["DISPATCH_OK", "MARGIN_HOLD", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "LATE_PAYMENT_CATCH", "FAILOVER_ACTIVE", "SIMULATE_UNSTABLE"])
       .order("created_at", { ascending: false })
       .limit(30);
 
@@ -66,3 +66,46 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
       ts: new Date().toISOString(),
     };
   });
+
+// v110 — Simulador de Pane: força um fornecedor para _unstable por 5min,
+// bypassando o Perpetual Balance Guard. Somente diretor.
+export const simulateProviderUnstable = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { slug: string; minutes?: number }) => data)
+  .handler(async ({ data, context }) => {
+    const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
+    if (email !== ADMIN_EMAIL) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const ms = Math.max(1, Math.min(30, data.minutes ?? 5)) * 60 * 1000;
+    const until = new Date(Date.now() + ms).toISOString();
+    await supabaseAdmin.from("provider_health" as any).upsert(
+      { slug: data.slug, unstable_until: until, last_error: "SIMULATED_PANE_v110", last_failure_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      { onConflict: "slug" },
+    );
+    await supabaseAdmin.from("admin_audit_logs" as any).insert({
+      admin_email: email,
+      action: "SIMULATE_UNSTABLE",
+      detail: { slug: data.slug, until, message: `🧪 Pane simulada em ${data.slug} até ${until}` },
+    });
+    return { ok: true, slug: data.slug, until };
+  });
+
+export const clearProviderUnstableFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { slug: string }) => data)
+  .handler(async ({ data, context }) => {
+    const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
+    if (email !== ADMIN_EMAIL) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("provider_health" as any).upsert(
+      { slug: data.slug, unstable_until: null, updated_at: new Date().toISOString() },
+      { onConflict: "slug" },
+    );
+    await supabaseAdmin.from("admin_audit_logs" as any).insert({
+      admin_email: email,
+      action: "SIMULATE_UNSTABLE",
+      detail: { slug: data.slug, message: `✅ Pane simulada REVERTIDA em ${data.slug}` },
+    });
+    return { ok: true };
+  });
+
