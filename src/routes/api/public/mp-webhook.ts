@@ -155,6 +155,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               await markProviderUnstable(f.slug, det);
               continue;
             }
+            // v91 — Strict Margin Guardian: pula fornecedor se custo violar 300% de lucro líquido
+            if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
+              const det = `Margem <300%: venda R$ ${Number(pedido.valor).toFixed(2)} vs custo R$ ${f.cost_brl.toFixed(2)}`;
+              tentativas.push(`${f.nome}: ${det}`);
+              margemBloqueada++;
+              console.warn("[mp-webhook] v91 skip margem", { pedidoId: pedido.id, fornecedor: f.slug, custo: f.cost_brl, venda: pedido.valor });
+              continue;
             const r = await dispatchByFornecedor(f.slug, {
               pacote: pedido.pacote,
               quantidade: pedido.quantidade,
