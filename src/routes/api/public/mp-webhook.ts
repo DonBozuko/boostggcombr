@@ -427,6 +427,18 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
             const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
             await dispatchWhatsappAlert(`🟡 v116 Pedido ${pedido.id} em fila (waiting_provision). Sem fornecedor com saldo. Provisionar SMMHype/SMMPanel/Verified.`).catch(() => {});
+            try {
+              const custoEstim = cadeia.find((p) => p.cost_brl != null)?.cost_brl ?? null;
+              const fornecedorAlvo = cadeia[0]?.slug ?? null;
+              const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
+              await notifyAdminProvisioning({
+                pedidoId: String(pedido.id),
+                vendaBrl: Number(pedido.valor),
+                custoBrl: custoEstim,
+                fornecedor: fornecedorAlvo,
+                motivo: `Todos fornecedores falharam: ${falhaResumo}`.slice(0, 200),
+              });
+            } catch (e) { console.warn("[mp-webhook] v119 whatsapp bridge fail", e); }
           }
 
         } catch (err) {
