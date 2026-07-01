@@ -137,10 +137,18 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         </div>
         <div>
           <label className={labelCls}>Custo BRL</label>
-          <input className={inputCls} type="number" step="0.0001" value={form.cost_brl} onChange={(e) => setForm({ ...form, cost_brl: e.target.value })} />
+          <input className={inputCls} type="number" step="0.0001" value={form.cost_brl} onChange={(e) => {
+            const cost = e.target.value;
+            const suggested = computeGuardedPrice(Number(cost) || 0);
+            setForm({ ...form, cost_brl: cost, price_brl: suggested ? String(suggested) : form.price_brl });
+          }} />
         </div>
         <div>
-          <label className={labelCls}>Preço venda BRL</label>
+          <label className={labelCls}>
+            Preço venda BRL {form.cost_brl && form.price_brl && !respectsMinMargin(Number(form.price_brl), Number(form.cost_brl)) && (
+              <span className="text-red-400 ml-1">⚠ margem &lt; 300%</span>
+            )}
+          </label>
           <input className={inputCls} type="number" step="0.01" value={form.price_brl} onChange={(e) => setForm({ ...form, price_brl: e.target.value })} />
         </div>
         <div>
