@@ -407,8 +407,11 @@ export type Database = {
           price_brl: number
           provider_service_id: number | null
           quantidade: number
+          smmhype_service_id: string | null
+          smmpanel_service_id: string | null
           source: string
           synced_at: string
+          verified_service_id: string | null
         }
         Insert: {
           category: string
@@ -417,8 +420,11 @@ export type Database = {
           price_brl?: number
           provider_service_id?: number | null
           quantidade: number
+          smmhype_service_id?: string | null
+          smmpanel_service_id?: string | null
           source?: string
           synced_at?: string
+          verified_service_id?: string | null
         }
         Update: {
           category?: string
@@ -427,8 +433,11 @@ export type Database = {
           price_brl?: number
           provider_service_id?: number | null
           quantidade?: number
+          smmhype_service_id?: string | null
+          smmpanel_service_id?: string | null
           source?: string
           synced_at?: string
+          verified_service_id?: string | null
         }
         Relationships: []
       }
