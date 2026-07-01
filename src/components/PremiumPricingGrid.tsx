@@ -112,7 +112,7 @@ export function PremiumPricingGrid({
   if (!plans || plans.length === 0) {
     return (
       <section
-        className="mx-auto my-1 w-full max-w-[560px] px-1.5 max-h-[88vh] overflow-hidden"
+        className="mx-auto my-2 w-full px-3"
         aria-label="Carregando pacotes"
       >
         <div className={`grid ${gridCols} auto-rows-fr`}>
