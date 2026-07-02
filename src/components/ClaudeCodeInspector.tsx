@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getClaudeInspect, simulateProviderUnstable, clearProviderUnstableFn } from "@/lib/claude-inspect.functions";
+import { getClaudeInspect, simulateProviderUnstable } from "@/lib/claude-inspect.functions";
 
 type Data = Awaited<ReturnType<typeof getClaudeInspect>>;
 
 export function ClaudeCodeInspector() {
   const fn = useServerFn(getClaudeInspect);
   const simFn = useServerFn(simulateProviderUnstable);
-  const clearFn = useServerFn(clearProviderUnstableFn);
+  
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -37,15 +37,8 @@ export function ClaudeCodeInspector() {
       setFlash(`⛔ ${e?.message ?? e}`);
     } finally { setBusy(null); }
   };
-  const runClear = async (slug: string) => {
-    setBusy(`clear:${slug}`);
-    try {
-      await clearFn({ data: { slug } });
-      setFlash(`✅ Pane revertida em ${slug}`);
-    } catch (e: any) {
-      setFlash(`⛔ ${e?.message ?? e}`);
-    } finally { setBusy(null); }
-  };
+
+
 
   return (
     <section className="rounded-lg border border-cyan-500/40 bg-black/60 p-4 space-y-4 font-mono text-xs text-cyan-100">
@@ -151,23 +144,14 @@ export function ClaudeCodeInspector() {
         </div>
         <div className="flex flex-wrap gap-2">
           {["smmhype", "smmpainel", "verified"].map((slug) => (
-            <div key={slug} className="flex gap-1">
-              <button
-                onClick={() => runSim(slug)}
-                disabled={busy !== null}
-                className="px-3 py-1 rounded bg-fuchsia-600/80 hover:bg-fuchsia-500 text-white font-bold disabled:opacity-40"
-              >
-                {busy === slug ? "…" : `Simular Instabilidade ${slug}`}
-              </button>
-              <button
-                onClick={() => runClear(slug)}
-                disabled={busy !== null}
-                className="px-2 py-1 rounded border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10 disabled:opacity-40"
-                title="Reverter pane"
-              >
-                ✕
-              </button>
-            </div>
+            <button
+              key={slug}
+              onClick={() => runSim(slug)}
+              disabled={busy !== null}
+              className="px-3 py-1 rounded bg-fuchsia-600/80 hover:bg-fuchsia-500 text-white font-bold disabled:opacity-40"
+            >
+              {busy === slug ? "…" : `Simular Instabilidade ${slug}`}
+            </button>
           ))}
         </div>
         {flash && <div className="mt-2 text-fuchsia-200">{flash}</div>}
