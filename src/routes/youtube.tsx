@@ -414,7 +414,7 @@ function YoutubeLanding() {
                   accent={RED}
                 />
               )}
-              <ViralShare route="/youtube" />
+              <ViralShare route="/youtube" quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0} />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
