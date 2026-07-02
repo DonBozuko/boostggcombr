@@ -265,7 +265,7 @@ function TrafegoLanding() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl text-white">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
-                <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">{CHECKOUT_SUCCESS_MESSAGE}</DialogDescription>
+                <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">{CHECKOUT_SUCCESS_MESSAGE_CLEAN}</DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
                 <CheckCircle2 className="size-20" style={{ color: NEON }} />
