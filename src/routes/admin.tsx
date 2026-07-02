@@ -1127,6 +1127,12 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, loaded]);
 
+  // v160 — Realtime push: qualquer mudança em pedidos/tesouraria/fornecedores/carteiras dispara refresh imediato.
+  useAdminRealtime(
+    ["pedidos", "admin_treasury", "fornecedores", "virtual_wallets", "financial_ledger", "alerts"],
+    () => { loadMonitor(); loadFalhos(); loadPendentes(); loadCaixa(); loadFaturamento(); loadFornecedores(); loadGrowth(); load(); },
+  );
+
 
   // Alerta sonoro: dispara a cada 30s em estado crítico OU se houver pedidos com falha
   const f = monitor?.fornecedor;
