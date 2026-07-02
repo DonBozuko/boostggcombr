@@ -438,7 +438,7 @@ function TiktokLanding() {
                   accent={CYAN}
                 />
               )}
-              <ViralShare route="/tiktok" />
+              <ViralShare route="/tiktok" quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0} />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
