@@ -11,8 +11,10 @@ const SHARE_TEXT =
 
 const BRINDE_CODE = "BRINDE50";
 
-export function ViralShare({ route = "/" }: { route?: string }) {
+export function ViralShare({ route = "/", quantidade }: { route?: string; quantidade?: number }) {
   void route;
+  // v144 — Restringe promoção/bônus a pedidos > 200 unidades.
+  if (typeof quantidade === "number" && quantidade <= 200) return null;
   const [copied, setCopied] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const sharedRef = useRef(false);
