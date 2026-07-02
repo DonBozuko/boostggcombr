@@ -167,29 +167,8 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
         )}
         <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black animate-pulse`} />
       </a>
-      {open && !hudMode && (
-        <div
-          role="status"
-          aria-live="polite"
-          style={{ zIndex: 50 }}
-          className={`absolute left-full ml-1 top-1/2 -translate-y-1/2 -translate-x-2 w-[115px] max-w-[115px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 border ${c.border} shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out`}
-        >
-          <button
-            type="button"
-            aria-label="Fechar"
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(false); setHudMode(true); }}
-            className="absolute top-1 right-1 h-5 w-5 grid place-items-center rounded-full bg-white/10 hover:bg-white/25 text-white/80 hover:text-white"
-          >
-            <X className="h-3 w-3" />
-          </button>
+      {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
 
-          <div className={`font-black tracking-wide text-white ${c.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>Diretor Fabiano</div>
-          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{c.text}</div>
-          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">
-            Garantindo velocidade máxima e entrega segura em seu pedido, senhor.
-          </div>
-        </div>
-      )}
       {hudMode && (
         <a
           href={web}
