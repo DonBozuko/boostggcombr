@@ -1,5 +1,5 @@
 import ogInstagram from "@/assets/og-instagram.jpg";
-import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
+import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
@@ -362,6 +362,7 @@ type PedidoInfo = {
   pixCode: string;
   qrCodeBase64: string;
   pedidoId: string | null;
+  quantidade?: number;
 };
 
 function Landing() {
@@ -547,6 +548,7 @@ function Landing() {
         pixCode: res.qrCode,
         qrCodeBase64: res.qrCodeBase64,
         pedidoId: res.pedidoId,
+        quantidade: selected.quantidade,
       });
       setModalOpen(true);
     } catch (err) {
@@ -782,7 +784,7 @@ function Landing() {
                 <DialogHeader>
                   <DialogTitle className="text-center text-2xl">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
                   <DialogDescription className="text-center whitespace-pre-line">
-                    {CHECKOUT_SUCCESS_MESSAGE}
+                    {getCheckoutSuccessMessage(pedidoInfo?.quantidade)}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4 py-4">

@@ -1,6 +1,6 @@
 import { buildProductJsonLd } from "@/lib/seo-jsonld";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
-import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
+import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { ViralShare } from "@/components/ViralShare";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -382,7 +382,7 @@ function FacebookLanding() {
                   {CHECKOUT_SUCCESS_TITLE}
                 </DialogTitle>
                 <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">
-                  {CHECKOUT_SUCCESS_MESSAGE}
+                  {getCheckoutSuccessMessage(dynAllPlans.find((p) => p.id === planId)?.quantidade)}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">

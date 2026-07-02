@@ -1,6 +1,6 @@
 import { buildProductJsonLd } from "@/lib/seo-jsonld";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
-import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE } from "@/lib/checkout-messages";
+import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE_CLEAN } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { ViralShare } from "@/components/ViralShare";
@@ -265,7 +265,7 @@ function TrafegoLanding() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl text-white">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
-                <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">{CHECKOUT_SUCCESS_MESSAGE}</DialogDescription>
+                <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">{CHECKOUT_SUCCESS_MESSAGE_CLEAN}</DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
                 <CheckCircle2 className="size-20" style={{ color: NEON }} />
