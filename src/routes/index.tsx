@@ -818,7 +818,7 @@ function Landing() {
                   {!waitingProvision && pedidoInfo?.pedidoId && (
                     <MysteryBoxRedeem
                       pedidoId={pedidoInfo.pedidoId}
-                      quantidade={dynAllPlans.find((p) => p.id === form.plan)?.quantidade ?? 0}
+                      quantidade={pedidoInfo.quantidade}
                       unit={form.plan.startsWith("v") ? "views" : form.plan.startsWith("l") ? "curtidas" : "seguidores"}
                       accent="#FFD700"
                     />
@@ -829,7 +829,7 @@ function Landing() {
                     </p>
                   )}
                 </div>
-                <ViralShare route="/" quantidade={dynAllPlans.find((p) => p.id === form.plan)?.quantidade ?? 0} />
+                <ViralShare route="/" quantidade={pedidoInfo?.quantidade ?? 0} />
                 <Button
                   size="lg"
                   className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-bold"

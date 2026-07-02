@@ -1,6 +1,8 @@
 // Backward-compatible facade. Real Telegram delivery lives in messaging.ts.
 import { dispatchTelegramAlert, type InlineKeyboardButton } from "./messaging";
 
+export type { InlineKeyboardButton };
+
 export function buildSmmhypeAlertMessage(saldoBrl: number | null): string {
   const valor = saldoBrl == null ? "indisponível" : `R$ ${saldoBrl.toFixed(2)}`;
   return `⚠️ Fornecedor SMMHype abaixo do limite. Saldo atual: ${valor}`;

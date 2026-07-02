@@ -98,6 +98,7 @@ type PedidoInfo = {
   pixCode: string;
   qrCodeBase64: string;
   pedidoId: string | null;
+  quantidade: number;
 };
 
 function TelegramIcon({ size = 28 }: { size?: number }) {
@@ -191,6 +192,7 @@ function TelegramLanding() {
         pixCode: res.qrCode,
         qrCodeBase64: res.qrCodeBase64,
         pedidoId: res.pedidoId,
+        quantidade: selected.quantidade,
       });
       setModalOpen(true);
     } catch (err) {
@@ -335,7 +337,7 @@ function TelegramLanding() {
               <DialogHeader>
                 <DialogTitle className="text-center text-2xl text-white">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
                 <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">
-                  {getCheckoutSuccessMessage(dynAllPlans.find((p) => p.id === planId)?.quantidade)}
+                  {getCheckoutSuccessMessage(pedidoInfo?.quantidade)}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
@@ -350,12 +352,12 @@ function TelegramLanding() {
               {pedidoInfo?.pedidoId && (
                 <MysteryBoxRedeem
                   pedidoId={pedidoInfo.pedidoId}
-                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  quantidade={pedidoInfo.quantidade}
                   unit={categoria === "canal" ? "membros" : "membros"}
                   accent={AERO}
                 />
               )}
-              <ViralShare route="/telegram" quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0} />
+              <ViralShare route="/telegram" quantidade={pedidoInfo?.quantidade ?? 0} />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar
               </Button>

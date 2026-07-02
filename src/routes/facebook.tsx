@@ -112,6 +112,7 @@ type PedidoInfo = {
   pixCode: string;
   qrCodeBase64: string;
   pedidoId: string | null;
+  quantidade: number;
 };
 
 const BLUE = "#1877F2";
@@ -208,6 +209,7 @@ function FacebookLanding() {
         pixCode: res.qrCode,
         qrCodeBase64: res.qrCodeBase64,
         pedidoId: res.pedidoId,
+        quantidade: selected.quantidade,
       });
       setModalOpen(true);
     } catch (err) {
@@ -382,7 +384,7 @@ function FacebookLanding() {
                   {CHECKOUT_SUCCESS_TITLE}
                 </DialogTitle>
                 <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">
-                  {getCheckoutSuccessMessage(dynAllPlans.find((p) => p.id === planId)?.quantidade)}
+                  {getCheckoutSuccessMessage(pedidoInfo?.quantidade)}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
@@ -401,12 +403,12 @@ function FacebookLanding() {
               {pedidoInfo?.pedidoId && (
                 <MysteryBoxRedeem
                   pedidoId={pedidoInfo.pedidoId}
-                  quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0}
+                  quantidade={pedidoInfo.quantidade}
                   unit={categoria === "seguidores" ? "seguidores" : "curtidas"}
                   accent={BLUE}
                 />
               )}
-              <ViralShare route="/facebook" quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0} />
+              <ViralShare route="/facebook" quantidade={pedidoInfo?.quantidade ?? 0} />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
