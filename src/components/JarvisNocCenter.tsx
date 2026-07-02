@@ -11,6 +11,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
   const snapFn = useServerFn(jarvisNocSnapshot);
   const chatFn = useServerFn(jarvisChat);
   const failoverFn = useServerFn(jarvisFailoverAtivo);
+  const router = useRouter();
   const [snap, setSnap] = useState<NocSnapshot | null>(null);
   const [loading, startTransition] = useTransition();
   const [q, setQ] = useState("");
