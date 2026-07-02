@@ -223,6 +223,24 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             } as any);
           } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
 
+          // v153 — Live Webhook Heartbeat: emite audit imediato pro monitor destravar [1].
+          try {
+            await supabaseAdmin.from("admin_audit_logs" as any).insert({
+              admin_email: "system@webhook",
+              action: "PIX_APPROVED",
+              detail: {
+                ts: new Date().toISOString(),
+                payment_id: String(paymentId),
+                pedido_id: pedido.id,
+                pacote: pedido.pacote,
+                quantidade: pedido.quantidade,
+                valor_brl: Number(pedido.valor),
+                buyer: pedido.instagram_user,
+                message: `🟢 [webhook] PIX aprovado MP ${paymentId} · pedido ${pedido.id}`,
+              },
+            } as any);
+          } catch (e) { console.warn("[mp-webhook] v153 audit PIX_APPROVED fail", e); }
+
           // v151 — Universal Trigger: TODO pedido pago dispara alerta Telegram com PIX do fornecedor + botão de recarga.
           try {
             const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");

@@ -36,7 +36,7 @@ export function LiveTelemetryMonitor() {
           supabase
             .from("admin_audit_logs")
             .select("id, action, detail, created_at")
-            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "CHECKOUT_INSUFFICIENT_FUNDS", "WHATSAPP_SEND_FAILED"])
+            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "CHECKOUT_INSUFFICIENT_FUNDS", "TELEGRAM_SEND_FAILED", "PIX_APPROVED", "PROVIDER_RECHARGE_MANUAL", "LATE_PAYMENT_CATCH"])
             .order("created_at", { ascending: false })
             .limit(8),
           supabase
@@ -63,10 +63,15 @@ export function LiveTelemetryMonitor() {
   const lastOk = logs.find((l) => l.action === "DISPATCH_OK");
   const lastErr = logs.find((l) => l.action === "MARGIN_HOLD_ERROR");
 
+  const lastPix = logs.find((l) => l.action === "PIX_APPROVED");
   const webhookLine = (() => {
+    if (lastPedido?.status === "paid") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
+    if (lastPix) {
+      const d: any = lastPix.detail ?? {};
+      return { color: "text-emerald-300", text: `🟢 WEBHOOK MP recebido · PIX aprovado · pedido ${String(d.pedido_id ?? "").slice(0,8)} · payment ${d.payment_id ?? "?"}` };
+    }
     if (!lastPedido) return { color: "text-zinc-400", text: "Aguardando primeiro webhook…" };
     const s = lastPedido.status;
-    if (s === "paid") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
     if (s === "mp_rejected_insufficient") return { color: "text-rose-500", text: `❌ [CHECKOUT] Tentativa de pagamento recusada por saldo insuficiente do cliente · pedido ${lastPedido.id.slice(0,8)}` };
     if (s === "mp_refunded") return { color: "text-amber-300", text: `💸 ESTORNADO · Pix devolvido automaticamente · pedido ${lastPedido.id.slice(0,8)}` };
     if (s?.startsWith("mp_")) return { color: "text-rose-400", text: `🔴 MP ${s} · ${lastPedido.error_detail ?? ""}` };
@@ -118,16 +123,14 @@ export function LiveTelemetryMonitor() {
           <span className="text-zinc-500">[3] Disparo real:</span> {dispatchLine.text}
         </div>
         {(() => {
-          const wa = logs.find((l) => l.action === "WHATSAPP_SEND_FAILED");
-          if (!wa) return null;
-          const d: any = wa.detail ?? {};
-          const first = Array.isArray(d.attempts) ? d.attempts.find((a: any) => !a.ok) : null;
-          const line = first
-            ? `❌ Twilio bloqueado · HTTP ${first.status ?? "?"} · code=${first.code ?? "?"} · ${(first.message ?? "").slice(0, 140)}`
-            : `❌ Twilio bloqueado · ${d.summary ?? d.reason ?? "erro desconhecido"}`;
+          const tg = logs.find((l) => l.action === "TELEGRAM_SEND_FAILED");
+          if (!tg) return null;
+          const d: any = tg.detail ?? {};
+          const reason = String(d.reason ?? d.summary ?? "erro desconhecido");
+          const line = `❌ Telegram bloqueado · ${reason.slice(0, 180)}`;
           return (
             <div className="text-rose-400">
-              <span className="text-zinc-500">[4] WhatsApp Admin:</span> {line}
+              <span className="text-zinc-500">[4] Telegram Admin:</span> {line}
             </div>
           );
         })()}
