@@ -257,6 +257,28 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             });
           } catch (e) { console.warn("[mp-webhook] v155 universal trigger fail", e); }
 
+          // v158 — SANDBOX HARD-GATE: se Modo Teste está ATIVO, NÃO despacha para API real.
+          // Força waiting_provision imediato pra validar fluxo sem gastar dinheiro nem entregar seguidores reais.
+          const { data: sbRow } = await supabaseAdmin
+            .from("admin_settings").select("value").eq("key", "sandbox_mode").maybeSingle();
+          const sandboxOn = !!(sbRow?.value as { enabled?: boolean } | null)?.enabled;
+          if (sandboxOn) {
+            await supabaseAdmin.from("pedidos")
+              .update({ status: "waiting_provision", error_detail: "v158 sandbox_mode ATIVO — dispatch bloqueado (teste)" })
+              .eq("id", pedido.id);
+            try {
+              const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
+              await notifyAdminProvisioning({
+                pedidoId: String(pedido.id),
+                vendaBrl: Number(pedido.valor),
+                motivo: "🧪 SANDBOX ATIVO — dispatch bloqueado (nenhum seguidor enviado)",
+                criticalCaixaZero: true,
+              });
+            } catch (e) { console.warn("[mp-webhook] v158 sandbox notify fail", e); }
+            console.log("[mp-webhook] v158 SANDBOX_BLOCK", { pedidoId: pedido.id });
+            return;
+          }
+
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
           const baseQty = Number(pedido.quantidade);
           const mysteryBonus = 0;
