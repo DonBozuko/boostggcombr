@@ -382,7 +382,7 @@ function FacebookLanding() {
                   {CHECKOUT_SUCCESS_TITLE}
                 </DialogTitle>
                 <DialogDescription className="text-center text-zinc-300 whitespace-pre-line">
-                  {CHECKOUT_SUCCESS_MESSAGE}
+                  {getCheckoutSuccessMessage(dynAllPlans.find((p) => p.id === planId)?.quantidade)}
                 </DialogDescription>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
