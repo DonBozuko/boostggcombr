@@ -151,13 +151,8 @@ export function ClaudeCodeInspector() {
         ) : <div>carregando…</div>}
       </div>
 
-      {/* v110 — Simulador de Resiliência */}
-      <div className="rounded border border-fuchsia-500/40 bg-fuchsia-500/5 p-3">
-        <div className="text-fuchsia-300 font-bold mb-2">🧪 SIMULADOR DE RESILIÊNCIA DE REDE (v110)</div>
-        <div className="text-fuchsia-100/70 mb-2">
-          Injeta pane de 5 min no fornecedor. O <code>mp-webhook.ts</code> desvia síncronamente para o backup usando os IDs triplos da v85.
-        </div>
-        <div className="flex flex-wrap gap-2">
+      {/* v110/v152 — Simulador de Resiliência */}
+
       <div className="rounded border border-fuchsia-500/40 bg-fuchsia-500/5 p-3">
         <div className="text-fuchsia-300 font-bold mb-2">🧪 SIMULADOR DE RESILIÊNCIA DE REDE (v110)</div>
 
