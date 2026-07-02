@@ -783,7 +783,7 @@ function Landing() {
                 <DialogHeader>
                   <DialogTitle className="text-center text-2xl">{CHECKOUT_SUCCESS_TITLE}</DialogTitle>
                   <DialogDescription className="text-center whitespace-pre-line">
-                    {CHECKOUT_SUCCESS_MESSAGE}
+                    {getCheckoutSuccessMessage(pedidoInfo?.quantidade)}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4 py-4">
