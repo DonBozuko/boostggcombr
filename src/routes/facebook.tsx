@@ -406,7 +406,7 @@ function FacebookLanding() {
                   accent={BLUE}
                 />
               )}
-              <ViralShare route="/facebook" />
+              <ViralShare route="/facebook" quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0} />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
