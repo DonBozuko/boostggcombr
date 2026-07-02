@@ -236,6 +236,7 @@ export type Database = {
           prioridade: number
           rede_social: string
           saldo_atual: number | null
+          saldo_atual_backup: number | null
           slug: string
           status: string
           ultima_verificacao: string | null
@@ -253,6 +254,7 @@ export type Database = {
           prioridade?: number
           rede_social?: string
           saldo_atual?: number | null
+          saldo_atual_backup?: number | null
           slug: string
           status?: string
           ultima_verificacao?: string | null
@@ -270,6 +272,7 @@ export type Database = {
           prioridade?: number
           rede_social?: string
           saldo_atual?: number | null
+          saldo_atual_backup?: number | null
           slug?: string
           status?: string
           ultima_verificacao?: string | null
