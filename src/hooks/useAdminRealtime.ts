@@ -32,8 +32,9 @@ export function useAdminRealtime(tables: Table[], onChange: () => void) {
 
     const channel = supabase.channel(`admin-rt-${tables.join("-")}`);
     for (const t of tables) {
-      channel.on(
-        // @ts-expect-error — supabase types are strict here, but this is the documented API
+      (channel as unknown as {
+        on: (evt: string, cfg: Record<string, unknown>, cb: () => void) => void;
+      }).on(
         "postgres_changes",
         { event: "*", schema: "public", table: t },
         trigger,
