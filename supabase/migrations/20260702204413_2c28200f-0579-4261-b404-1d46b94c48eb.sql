@@ -1,0 +1,1 @@
+ALTER TABLE public.fornecedores ADD COLUMN IF NOT EXISTS saldo_atual_backup NUMERIC;
