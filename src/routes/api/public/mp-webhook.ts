@@ -282,7 +282,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               await notifyAdminProvisioning({
                 pedidoId: String(pedido.id),
                 vendaBrl: Number(pedido.valor),
-                motivo: "Nenhum fornecedor ATIVO com saldo/ID mapeado",
+                motivo: "Cascata esgotada: A+B+C sem saldo/ID mapeado",
+                criticalCaixaZero: true,
               });
             } catch (e) { console.warn("[mp-webhook] v119 whatsapp bridge fail", e); }
             return;

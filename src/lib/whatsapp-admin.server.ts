@@ -14,6 +14,8 @@ export type ProvisioningAlert = {
   compradorHandle?: string | null;
   pacote?: string | null;
   quantidade?: number | null;
+  /** v157 — Cascata totalmente esgotada (A+B+C sem saldo/instáveis). Escala alerta a CRÍTICO. */
+  criticalCaixaZero?: boolean;
 };
 
 function fmtBrl(v: number): string {
@@ -40,8 +42,11 @@ export function buildProvisioningMessage(a: ProvisioningAlert): string {
   const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl);
   const lucroLiquido = Number((a.vendaBrl * 0.9901 - custo * 1.15).toFixed(2));
   const pix = pixForFornecedor(a.fornecedor);
+  const header = a.criticalCaixaZero
+    ? "🚨🔴 <b>CAIXA ZERO · TODOS FORNECEDORES SEM SALDO</b>\n<i>Pedido segurado em fila. Recarregue AGORA para liberar entregas.</i>"
+    : "🟡 <b>v151 · Provisão Necessária</b>";
   const linhas = [
-    "🟡 <b>v151 · Provisão Necessária</b>",
+    header,
     `Pedido: <code>${a.pedidoId}</code>`,
     a.compradorHandle ? `Comprador: <b>${a.compradorHandle}</b>` : null,
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
