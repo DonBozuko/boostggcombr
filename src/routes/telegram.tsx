@@ -355,7 +355,7 @@ function TelegramLanding() {
                   accent={AERO}
                 />
               )}
-              <ViralShare route="/telegram" />
+              <ViralShare route="/telegram" quantidade={dynAllPlans.find((p) => p.id === planId)?.quantidade ?? 0} />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar
               </Button>
