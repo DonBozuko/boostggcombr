@@ -477,7 +477,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         // v144 — Dispatch síncrono: aguarda backgroundJob completar antes de responder MP,
         // garantindo que notifyAdminProvisioning entregue o Pix Copia e Cola ao WhatsApp.
         try { await backgroundJob; } catch (err) { console.error("[mp-webhook] v144 sync fail", err); }
-        scheduleWebhookBackground(Promise.resolve(), context);
+        
         return Response.json({ received: true }, {
           status: 200,
           headers: { "cache-control": "no-store" },
