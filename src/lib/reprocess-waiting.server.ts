@@ -62,7 +62,7 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
           valor_brl: Number(pedido.valor),
           origem: "wallet:reservado",
           destino: "wallet:geral",
-          pedido_id: pedido.id,
+          pedido_id: String(pedido.id),
           telemetry: {
             event: "PROVIDER_RECHARGE_MANUAL",
             provider: f.slug,
