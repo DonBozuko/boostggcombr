@@ -1,5 +1,6 @@
 import { useEffect, useState, useTransition } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
 import { jarvisNocSnapshot, jarvisChat, jarvisFailoverAtivo, type NocSnapshot, type JarvisChatResp } from "@/lib/jarvis-noc.functions";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
