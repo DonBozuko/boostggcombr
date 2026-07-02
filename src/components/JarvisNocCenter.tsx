@@ -47,13 +47,21 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
     } finally { setThinking(false); }
   };
 
-  const runFailover = async () => {
+  const runUnifiedDiagnostic = async () => {
+    const t = toast.loading("🔄 Diagnóstico e Sincronização Geral em curso...");
     try {
-      const res = await failoverFn({ data: { token } });
-      if ((res as any).ok) toast.success(`Failover: ${(res as any).action} ${(res as any).to ? "→ " + (res as any).to : ""}`);
-      else toast.error((res as any).error ?? "Falha");
-      refresh();
-    } catch (e: any) { toast.error(e?.message ?? "Erro"); }
+      const [snapRes, failRes] = await Promise.all([
+        snapFn({ data: { token } }),
+        failoverFn({ data: { token } }),
+      ]);
+      setSnap(snapRes);
+      await router.invalidate();
+      const fr: any = failRes;
+      if (fr?.ok) toast.success(`Sincronizado · Failover: ${fr.action}${fr.to ? " → " + fr.to : ""}`, { id: t });
+      else toast.success("Sincronização concluída", { id: t });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha na sincronização", { id: t });
+    }
   };
 
   if (!snap || !snap.ok) {
