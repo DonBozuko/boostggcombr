@@ -548,6 +548,7 @@ function Landing() {
         pixCode: res.qrCode,
         qrCodeBase64: res.qrCodeBase64,
         pedidoId: res.pedidoId,
+        quantidade: selected.quantidade,
       });
       setModalOpen(true);
     } catch (err) {
