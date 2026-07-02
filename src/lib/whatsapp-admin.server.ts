@@ -68,19 +68,22 @@ export type UniversalPaidAlert = {
 };
 
 export function buildUniversalPaidMessage(a: UniversalPaidAlert): string {
-  const pix = pixForFornecedor(a.fornecedor);
+  // v156 — Modelo saldo pré-carregado: cliente paga → sistema debita saldo local
+  // e entrega imediato. NÃO enviamos PIX por pedido. PIX de recarga só chega
+  // no alerta de provisão (saldo baixo/zerado) via buildProvisioningMessage.
+  const custoEstimado = estimateCost(a.vendaBrl);
+  const lucroLiquido = Number((a.vendaBrl * 0.9901 - custoEstimado * 1.15).toFixed(2));
   const linhas = [
-    "🟢 <b>v151 · PIX APROVADO</b>",
+    "🟢 <b>PIX APROVADO · Entrega automática</b>",
     `Pedido: <code>${a.pedidoId}</code>`,
     a.compradorHandle ? `Comprador: <b>${a.compradorHandle}</b>` : null,
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
-    a.fornecedor ? `Fornecedor alvo: <b>${a.fornecedor}</b>` : null,
+    `Custo estimado: ${fmtBrl(custoEstimado)}`,
+    `Lucro líq. estimado: <b>${fmtBrl(lucroLiquido)}</b>`,
+    a.fornecedor ? `Debitado de: <b>${a.fornecedor}</b>` : null,
   ].filter(Boolean);
-  const base = linhas.join("\n");
-  return pix
-    ? `${base}\n\n<b>Pix Copia e Cola (recarga fornecedor):</b>\n<code>${pix}</code>`
-    : base;
+  return linhas.join("\n");
 }
 
 function rechargeKeyboard(pedidoId: string): InlineKeyboardButton[][] {
