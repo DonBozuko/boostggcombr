@@ -294,6 +294,20 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             ordem: cadeia.map((p) => ({ slug: p.slug, cost: p.cost_brl, unstable: p.unstable })),
           });
 
+          // v157 — Early Warning: sobrou só 1 fornecedor com saldo. Alerta laranja pra recarga preventiva.
+          try {
+            const comSaldo = cadeia.filter((p) => !p.unstable && Number(p.saldo_atual) > 0);
+            if (comSaldo.length === 1) {
+              const ultimo = comSaldo[0];
+              const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+              await dispatchWhatsappAlert(
+                `🟠 <b>ALERTA ANTECIPADO · Só 1 fornecedor com saldo</b>\n` +
+                `Restante ativo: <b>${ultimo.nome}</b> (saldo USD ${Number(ultimo.saldo_atual).toFixed(2)})\n` +
+                `Recarregue os outros 2 <b>agora</b> pra evitar Caixa Zero.`,
+              );
+            }
+          } catch (e) { console.warn("[mp-webhook] v157 early-warning fail", e); }
+
           const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
           const { respectsMinMargin } = await import("@/lib/margin-guardian");
           const tentativas: string[] = [];
