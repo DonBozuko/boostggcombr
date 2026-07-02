@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { pricingLedgerSnapshot, treasurySnapshot, type TreasurySnapshot } from "@/lib/treasury.functions";
 import { walletsSnapshot, type WalletsSnapshot } from "@/lib/wallets.functions";
+import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
 function brl(n: number) { return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
 
