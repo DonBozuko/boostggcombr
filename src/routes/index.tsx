@@ -818,7 +818,7 @@ function Landing() {
                   {!waitingProvision && pedidoInfo?.pedidoId && (
                     <MysteryBoxRedeem
                       pedidoId={pedidoInfo.pedidoId}
-                      quantidade={pedidoInfo.quantidade}
+                      quantidade={pedidoInfo?.quantidade ?? 0}
                       unit={form.plan.startsWith("v") ? "views" : form.plan.startsWith("l") ? "curtidas" : "seguidores"}
                       accent="#FFD700"
                     />
