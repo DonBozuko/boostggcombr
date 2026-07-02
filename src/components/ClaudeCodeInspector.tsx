@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getClaudeInspect, simulateProviderUnstable, clearProviderUnstableFn } from "@/lib/claude-inspect.functions";
+import { getClaudeInspect, simulateProviderUnstable } from "@/lib/claude-inspect.functions";
 
 type Data = Awaited<ReturnType<typeof getClaudeInspect>>;
 
