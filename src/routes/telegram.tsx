@@ -270,7 +270,7 @@ function TelegramLanding() {
           <p className="mt-2 text-center text-sm text-zinc-400">
             Cole o link público do seu {categoria} no Telegram (ex: https://t.me/seucanal).
           </p>
-          <div className="mt-6 rounded-2xl p-6 space-y-5"
+          <div className="mt-6 rounded-2xl p-4 space-y-3"
             style={{ background: BG, border: `1px solid ${AERO}66`, boxShadow: `0 0 30px ${AERO}33` }}>
             <div className="space-y-2">
               <Label>Pacote</Label>
