@@ -50,6 +50,7 @@ import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
+import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
 const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
