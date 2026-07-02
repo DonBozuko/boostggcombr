@@ -112,6 +112,7 @@ async function handleUpdate(update: any) {
   if (update.callback_query) {
     const cq = update.callback_query;
     const chat_id = cq.message.chat.id;
+    const message_id = cq.message.message_id;
     const data: string = cq.data || '';
     await tg('answerCallbackQuery', { callback_query_id: cq.id });
 
@@ -121,6 +122,33 @@ async function handleUpdate(update: any) {
       if (close) {
         await sendTyping(chat_id, close.text, close.keyboard);
       }
+      return;
+    }
+
+    // v151 — botão "✅ Recarga Confirmada": reprocessa pedido travado e grava PROVIDER_RECHARGE_MANUAL.
+    if (data.startsWith('recharge:')) {
+      const pedidoId = data.slice(9);
+      await tg('editMessageReplyMarkup', { chat_id, message_id, reply_markup: { inline_keyboard: [[{ text: '⏳ Reprocessando…', callback_data: 'noop' }]] } });
+      try {
+        const { reprocessWaitingProvision } = await import('@/lib/reprocess-waiting.server');
+        const res = await reprocessWaitingProvision(pedidoId);
+        if (res.ok) {
+          await tg('sendMessage', {
+            chat_id,
+            parse_mode: 'HTML',
+            text: `✅ <b>Recarga aplicada.</b>\nPedido <code>${pedidoId}</code> despachado via <b>${res.fornecedor}</b> (order ${res.orderId ?? '?'}).`,
+          });
+        } else {
+          await tg('sendMessage', {
+            chat_id,
+            parse_mode: 'HTML',
+            text: `⚠️ Reprocessamento falhou: <code>${res.error}</code>${res.tentativas?.length ? `\n${res.tentativas.join(' | ').slice(0, 400)}` : ''}`,
+          });
+        }
+      } catch (e: any) {
+        await tg('sendMessage', { chat_id, text: `❌ Erro interno: ${e?.message ?? String(e)}` });
+      }
+      return;
     }
   }
 }
