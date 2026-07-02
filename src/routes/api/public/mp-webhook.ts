@@ -441,26 +441,16 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   },
                 } as any);
               } catch (e) { console.warn("[mp-webhook] audit dispatch_ok fail", e); }
-              // === Notificação Telegram: sucesso / auto-reparo ===
-              try {
-                const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-                const lucro = custoReal != null ? (Number(pedido.valor) - custoReal) : null;
-                const isFailover = tentativas.length > 0;
-                const header = isFailover
-                  ? "🚨 AUTO-REPARO ATIVADO: Pedido migrado e resolvido com sucesso no Fornecedor de Backup"
-                  : "🟢 OK · Venda confirmada e despachada";
-                const msg = [
-                  header,
-                  `🧾 Pedido: ${pedido.id}`,
-                  `👤 ${pedido.instagram_user} · ${pedido.pacote} (${pedido.quantidade})`,
-                  `💰 Venda: R$ ${Number(pedido.valor).toFixed(2)}`,
-                  custoReal != null ? `📦 Custo real: R$ ${custoReal.toFixed(2)}` : null,
-                  lucro != null ? `💎 Lucro: R$ ${lucro.toFixed(2)}` : null,
-                  `🏷️ Fornecedor: ${f.nome} (order ${r.orderId ?? "?"})`,
-                  isFailover ? `↩️ Tentativas anteriores: ${tentativas.join(" | ").slice(0, 300)}` : null,
-                ].filter(Boolean).join("\n");
-                await dispatchWhatsappAlert(msg);
-              } catch (e) { console.error("[mp-webhook] tg success notify", e); }
+              // v159 — Alerta de sucesso removido: notifyAdminUniversalPaid (linha ~250) já cobre.
+              // Só emite AUTO-REPARO no Telegram se houve failover real, pra não poluir feed.
+              if (tentativas.length > 0) {
+                try {
+                  const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+                  await dispatchWhatsappAlert(
+                    `🚨 <b>AUTO-REPARO</b> · Pedido <code>${pedido.id}</code> migrado p/ <b>${f.nome}</b> após ${tentativas.length} falha(s).`,
+                  );
+                } catch (e) { console.error("[mp-webhook] tg failover notify", e); }
+              }
               sucesso = true;
               break;
             }
@@ -524,8 +514,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               } as any);
             } catch (e) { console.warn("[mp-webhook] v116 audit waiting fail", e); }
 
-            const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-            await dispatchWhatsappAlert(`🟡 v116 Pedido ${pedido.id} em fila (waiting_provision). Sem fornecedor com saldo. Provisionar SMMHype/SMMPanel/Verified.`).catch(() => {});
+            // v159 — Alerta legado "🟡 v116" removido: notifyAdminProvisioning abaixo já cobre com PIX + botão.
+
             try {
               // v144 — menor custo bruto de atacado da rota (não a ordem de cascata).
               const custos = cadeia.map((p) => p.cost_brl).filter((v): v is number => typeof v === "number" && v > 0);
