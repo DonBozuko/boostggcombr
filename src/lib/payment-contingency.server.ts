@@ -106,6 +106,38 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     return { ok: true, status: fresh?.status ?? "paid", recovered: false };
   }
 
+  // v154 — Live Webhook Heartbeat + Telegram universal (paridade com mp-webhook.ts)
+  try {
+    await supabaseAdmin.from("admin_audit_logs" as any).insert({
+      admin_email: "system@contingency",
+      action: "PIX_APPROVED",
+      detail: {
+        ts: new Date().toISOString(),
+        payment_id: String(pedido.mercado_pago_id),
+        pedido_id: pedido.id,
+        pacote: pedido.pacote,
+        quantidade: pedido.quantidade,
+        valor_brl: Number(pedido.valor),
+        buyer: pedido.instagram_user,
+        source: "contingency-polling",
+        message: `🟢 [contingency] PIX aprovado via polling · pedido ${pedido.id}`,
+      },
+    } as any);
+  } catch (e) { console.warn("[contingency] v154 audit PIX_APPROVED fail", e); }
+
+  try {
+    const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");
+    await notifyAdminUniversalPaid({
+      pedidoId: String(pedido.id),
+      vendaBrl: Number(pedido.valor),
+      compradorHandle: pedido.instagram_user ?? null,
+      pacote: pedido.pacote ?? null,
+      quantidade: Number(pedido.quantidade) || null,
+      fornecedor: "smmhype",
+    });
+  } catch (e) { console.warn("[contingency] v154 telegram universal fail", e); }
+
+
   // 4) Dispatch failover A→B→C (somente fornecedores ativos com saldo > 0)
   const { data: fornecedores } = await supabaseAdmin
     .from("fornecedores")
