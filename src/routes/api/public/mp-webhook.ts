@@ -241,8 +241,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             } as any);
           } catch (e) { console.warn("[mp-webhook] v153 audit PIX_APPROVED fail", e); }
 
-          // v151 — Universal Trigger: TODO pedido pago dispara alerta Telegram com PIX do fornecedor + botão de recarga.
+          // v155 — Universal Trigger: seleciona dinamicamente o fornecedor MAIS BARATO
+          // (Math.min sobre cost_brl real da trindade) e injeta o PIX correspondente no Telegram.
           try {
+            const { pickCheapestFornecedorSlug } = await import("@/lib/smart-routing.server");
+            const cheapestSlug = await pickCheapestFornecedorSlug(pedido.pacote, Number(pedido.quantidade)).catch(() => null);
             const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");
             await notifyAdminUniversalPaid({
               pedidoId: String(pedido.id),
@@ -250,9 +253,9 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               compradorHandle: pedido.instagram_user ?? null,
               pacote: pedido.pacote ?? null,
               quantidade: Number(pedido.quantidade) || null,
-              fornecedor: "smmhype",
+              fornecedor: cheapestSlug ?? "smmhype",
             });
-          } catch (e) { console.warn("[mp-webhook] v151 universal trigger fail", e); }
+          } catch (e) { console.warn("[mp-webhook] v155 universal trigger fail", e); }
 
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
           const baseQty = Number(pedido.quantidade);
