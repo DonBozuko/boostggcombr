@@ -32,6 +32,7 @@ import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/publi
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
+import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 
 const Char126flockDotjsRoute = Char126flockDotjsRouteImport.update({
   id: '/~flock.js',
@@ -151,6 +152,12 @@ const ApiPublicHooksRecoverAbandonedRoute =
     path: '/api/public/hooks/recover-abandoned',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBackfillSmmhypeIdsRoute =
+  ApiPublicHooksBackfillSmmhypeIdsRouteImport.update({
+    id: '/api/public/hooks/backfill-smmhype-ids',
+    path: '/api/public/hooks/backfill-smmhype-ids',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -172,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
@@ -197,6 +205,7 @@ export interface FileRoutesByTo {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
@@ -223,6 +232,7 @@ export interface FileRoutesById {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/sfx/$name'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/sfx/$name'
@@ -300,6 +312,7 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/sfx/$name'
@@ -325,6 +338,7 @@ export interface RootRouteChildren {
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
+  ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
@@ -494,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRecoverAbandonedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/backfill-smmhype-ids': {
+      id: '/api/public/hooks/backfill-smmhype-ids'
+      path: '/api/public/hooks/backfill-smmhype-ids'
+      fullPath: '/api/public/hooks/backfill-smmhype-ids'
+      preLoaderRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -526,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
+  ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
@@ -534,13 +556,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -135,19 +135,23 @@ async function runBackfill() {
   const cobertura = totalItens ? Math.round((comSmmhype! / totalItens) * 1000) / 10 : 0;
 
   // 5. Audit log imutável
-  await supabaseAdmin.from("admin_audit_logs").insert({
-    action: "backfill_smmhype_ids_v158",
-    payload: {
-      matched_count: matched.length,
-      ambiguous_count: ambiguous.length,
-      missing_count: missing.length,
-      total_items: totalItens,
-      smmhype_coverage_percent: cobertura,
-      catalog_size: svcs.length,
-      ambiguous: ambiguous.slice(0, 20),
-      missing: missing.slice(0, 20),
-    } as any,
-  } as any).catch(() => null);
+  try {
+    await supabaseAdmin.from("admin_audit_logs").insert({
+      action: "backfill_smmhype_ids_v158",
+      admin_email: "system@backfill",
+      detail: {
+        matched_count: matched.length,
+        ambiguous_count: ambiguous.length,
+        missing_count: missing.length,
+        total_items: totalItens,
+        smmhype_coverage_percent: cobertura,
+        catalog_size: svcs.length,
+        ambiguous: ambiguous.slice(0, 20),
+        missing: missing.slice(0, 20),
+      } as any,
+    } as any);
+  } catch { /* audit falha não bloqueia */ }
+
 
   return {
     ok: true as const,
