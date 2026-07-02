@@ -199,7 +199,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         </div>
         <div>
           <label className={labelCls}>ID SMMHype</label>
-          <input className={inputCls} value={form.smmhype_service_id} onChange={(e) => setForm({ ...form, smmhype_service_id: e.target.value })} placeholder="14330" />
+          <input className={inputCls} value={form.smmhype_service_id} onChange={(e) => setForm({ ...form, smmhype_service_id: e.target.value })} placeholder="ex: 14330 (código da API SMMHype)" />
         </div>
         <div>
           <label className={labelCls}>ID SMMPanel</label>
