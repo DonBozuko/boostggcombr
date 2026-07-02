@@ -514,8 +514,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               } as any);
             } catch (e) { console.warn("[mp-webhook] v116 audit waiting fail", e); }
 
-            const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-            await dispatchWhatsappAlert(`🟡 v116 Pedido ${pedido.id} em fila (waiting_provision). Sem fornecedor com saldo. Provisionar SMMHype/SMMPanel/Verified.`).catch(() => {});
+            // v159 — Alerta legado "🟡 v116" removido: notifyAdminProvisioning abaixo já cobre com PIX + botão.
+
             try {
               // v144 — menor custo bruto de atacado da rota (não a ordem de cascata).
               const custos = cadeia.map((p) => p.cost_brl).filter((v): v is number => typeof v === "number" && v > 0);
