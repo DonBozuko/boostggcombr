@@ -157,14 +157,8 @@ export function TreasuryPanel({ token }: { token: string }) {
     setLoading(false);
   };
   useEffect(() => { void load(); /* eslint-disable-next-line */ }, [token]);
-  // v116 — escuta de 1s do Banco Interno Virtual
-  useEffect(() => {
-    if (!token) return;
-    const iv = setInterval(async () => {
-      try { setWallets(await walletsFn({ data: { token } })); } catch { /* silencio */ }
-    }, 1000);
-    return () => clearInterval(iv);
-  }, [token, walletsFn]);
+  // v160 — Realtime push: substitui polling 1s por evento Postgres Changes.
+  useAdminRealtime(["virtual_wallets", "admin_treasury", "pedidos"], () => { void load(); });
 
   const hasLedger = !!(snap && snap.ok && snap.ultimas.length > 0);
 
