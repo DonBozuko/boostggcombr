@@ -36,7 +36,7 @@ export function LiveTelemetryMonitor() {
           supabase
             .from("admin_audit_logs")
             .select("id, action, detail, created_at")
-            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "CHECKOUT_INSUFFICIENT_FUNDS"])
+            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "CHECKOUT_INSUFFICIENT_FUNDS", "WHATSAPP_SEND_FAILED"])
             .order("created_at", { ascending: false })
             .limit(8),
           supabase
