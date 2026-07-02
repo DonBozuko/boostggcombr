@@ -823,13 +823,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     }
   };
 
-  // v147 — Auto-refresh 30s da telemetria tripla.
-  useEffect(() => {
-    if (!token) return;
-    runTriPing(true);
-    const i = setInterval(() => runTriPing(true), 30_000);
-    return () => clearInterval(i);
-  }, [token]);
+
+
 
 
   // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
