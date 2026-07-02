@@ -123,16 +123,14 @@ export function LiveTelemetryMonitor() {
           <span className="text-zinc-500">[3] Disparo real:</span> {dispatchLine.text}
         </div>
         {(() => {
-          const wa = logs.find((l) => l.action === "WHATSAPP_SEND_FAILED");
-          if (!wa) return null;
-          const d: any = wa.detail ?? {};
-          const first = Array.isArray(d.attempts) ? d.attempts.find((a: any) => !a.ok) : null;
-          const line = first
-            ? `❌ Twilio bloqueado · HTTP ${first.status ?? "?"} · code=${first.code ?? "?"} · ${(first.message ?? "").slice(0, 140)}`
-            : `❌ Twilio bloqueado · ${d.summary ?? d.reason ?? "erro desconhecido"}`;
+          const tg = logs.find((l) => l.action === "TELEGRAM_SEND_FAILED");
+          if (!tg) return null;
+          const d: any = tg.detail ?? {};
+          const reason = String(d.reason ?? d.summary ?? "erro desconhecido");
+          const line = `❌ Telegram bloqueado · ${reason.slice(0, 180)}`;
           return (
             <div className="text-rose-400">
-              <span className="text-zinc-500">[4] WhatsApp Admin:</span> {line}
+              <span className="text-zinc-500">[4] Telegram Admin:</span> {line}
             </div>
           );
         })()}
