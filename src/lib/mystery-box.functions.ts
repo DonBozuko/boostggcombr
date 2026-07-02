@@ -19,7 +19,7 @@ export const redeemMysteryBox = createServerFn({ method: "POST" })
 
     const { data: pedido, error } = await supabaseAdmin
       .from("pedidos")
-      .select("id, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail")
+      .select("id, status, pacote, quantidade, instagram_user, mercado_pago_id, error_detail, rede_social")
       .eq("id", data.pedidoId)
       .maybeSingle();
 
@@ -33,8 +33,21 @@ export const redeemMysteryBox = createServerFn({ method: "POST" })
       return { ok: false as const, error: "JA_RESGATADO", bonus: Number(already[1]) };
     }
 
-    // Sorteio 10..50
-    const bonus = 10 + Math.floor(Math.random() * 41);
+    // v143 — Brindes decrescentes por rede social (custo × margem).
+    // /trafego: BLOQUEADO (bônus = 0). YouTube: 10-20. TikTok/Facebook/Telegram: 21-35. Instagram: 36-50.
+    const rede = String((pedido as any).rede_social ?? "instagram").toLowerCase();
+    const rand = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+    let bonus: number;
+    if (rede === "trafego") {
+      return { ok: false as const, error: "BONUS_INDISPONIVEL_TRAFEGO" };
+    } else if (rede === "youtube") {
+      bonus = rand(10, 20);
+    } else if (rede === "tiktok" || rede === "facebook" || rede === "telegram") {
+      bonus = rand(21, 35);
+    } else {
+      bonus = rand(36, 50);
+    }
+
 
     // Trava atômica: só grava marcador se ainda não existir
     const novoDetail = detail
