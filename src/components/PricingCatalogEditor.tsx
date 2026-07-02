@@ -199,16 +199,17 @@ export function PricingCatalogEditor({ token }: { token: string }) {
         </div>
         <div>
           <label className={labelCls}>ID SMMHype</label>
-          <input className={inputCls} value={form.smmhype_service_id} onChange={(e) => setForm({ ...form, smmhype_service_id: e.target.value })} placeholder="ex: 14330 (código da API SMMHype)" />
+          <input className={inputCls} value={form.smmhype_service_id} onChange={(e) => setForm({ ...form, smmhype_service_id: e.target.value })} placeholder="Aguardando seleção..." />
         </div>
         <div>
           <label className={labelCls}>ID SMMPanel</label>
-          <input className={inputCls + (panelId && panelId === hypeId ? " !border-red-500 !text-red-300" : "")} value={form.smmpanel_service_id} onChange={(e) => setForm({ ...form, smmpanel_service_id: e.target.value })} placeholder="ex: 274 (código da API SMMPanel)" />
+          <input className={inputCls + (panelId && panelId === hypeId ? " !border-red-500 !text-red-300" : "")} value={form.smmpanel_service_id} onChange={(e) => setForm({ ...form, smmpanel_service_id: e.target.value })} placeholder="Aguardando seleção..." />
         </div>
         <div>
           <label className={labelCls}>ID Verified Atacado</label>
-          <input className={inputCls + (verifiedId && verifiedId === hypeId ? " !border-red-500 !text-red-300" : "")} value={form.verified_service_id} onChange={(e) => setForm({ ...form, verified_service_id: e.target.value })} placeholder="ex: 717 (código da API Verified)" />
+          <input className={inputCls + (verifiedId && verifiedId === hypeId ? " !border-red-500 !text-red-300" : "")} value={form.verified_service_id} onChange={(e) => setForm({ ...form, verified_service_id: e.target.value })} placeholder="Aguardando seleção..." />
         </div>
+
       </div>
 
       {dupError && (
