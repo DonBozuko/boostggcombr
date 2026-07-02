@@ -855,6 +855,14 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   useEffect(() => {
     if (initialToken) setToken(initialToken);
   }, [initialToken]);
+  // v147 — Auto-refresh 30s da telemetria tripla (após declaração do token).
+  useEffect(() => {
+    if (!token) return;
+    runTriPing(true);
+    const i = setInterval(() => runTriPing(true), 30_000);
+    return () => clearInterval(i);
+  }, [token]);
+
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<AdminTab>("buscar");
   const [folder, setFolder] = useState<"buscas" | "tesouraria" | "auditoria">("buscas");
