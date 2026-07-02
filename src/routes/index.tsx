@@ -827,7 +827,7 @@ function Landing() {
                     </p>
                   )}
                 </div>
-                <ViralShare route="/" />
+                <ViralShare route="/" quantidade={dynAllPlans.find((p) => p.id === form.plan)?.quantidade ?? 0} />
                 <Button
                   size="lg"
                   className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-bold"
