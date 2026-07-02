@@ -254,7 +254,11 @@ export function PricingCatalogEditor({ token }: { token: string }) {
                 const live = livePrices.get(r.pacote) ?? Number(r.price_brl);
                 const drift = Math.abs(live - Number(r.price_brl)) > 0.01;
                 return (
-                  <tr key={r.pacote} className="border-t border-amber-500/10 hover:bg-amber-500/5">
+                  <tr
+                    key={r.pacote}
+                    onClick={() => edit(r)}
+                    className={`border-t border-amber-500/10 hover:bg-amber-500/10 cursor-pointer transition-colors ${form.pacote === r.pacote ? "bg-amber-500/15 outline outline-1 outline-amber-400/60" : ""}`}
+                  >
                     <td className="px-2 py-1 font-mono">{r.pacote}</td>
                     <td className="px-2 py-1">{r.category}</td>
                     <td className="px-2 py-1 text-right">{r.quantidade}</td>
@@ -266,7 +270,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
                     <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
                     <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
                     <td className="px-2 py-1 font-mono">{r.verified_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
-                    <td className="px-2 py-1 text-right whitespace-nowrap">
+                    <td className="px-2 py-1 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       <button onClick={() => edit(r)} className="text-amber-300 hover:underline mr-2">editar</button>
                       <button onClick={() => remove(r.pacote)} className="text-red-400 hover:underline">excluir</button>
                     </td>
