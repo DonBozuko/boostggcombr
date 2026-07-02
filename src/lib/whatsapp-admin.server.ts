@@ -57,17 +57,26 @@ function normalizeAdminNumbers(raw: string): string[] {
   return out;
 }
 
-async function sendViaTwilio(text: string): Promise<{ ok: boolean; detail?: string }> {
+type TwilioAttempt = { to: string; status?: number; code?: number | string; message?: string; moreInfo?: string; ok: boolean };
+type TwilioResult = { ok: boolean; attempts: TwilioAttempt[]; reason?: string };
+
+async function sendViaTwilio(text: string): Promise<TwilioResult> {
   const lovableKey = process.env.LOVABLE_API_KEY;
   const twilioKey = process.env.WHATSAPP_API_TOKEN || process.env.TWILIO_API_KEY;
-  const rawTo = process.env.ADMIN_WHATSAPP_NUMBER; // padrão internacional v148
+  const rawTo = process.env.ADMIN_WHATSAPP_NUMBER;
   const from = process.env.TWILIO_WHATSAPP_FROM;
   if (!lovableKey || !twilioKey || !rawTo || !from) {
-    console.warn("[whatsapp-admin] ⚠️ Credenciais ausentes. Configure ADMIN_WHATSAPP_NUMBER, WHATSAPP_API_TOKEN e TWILIO_WHATSAPP_FROM.");
-    return { ok: false, detail: "WHATSAPP_ENV_MISSING" };
+    const missing = [
+      !lovableKey && "LOVABLE_API_KEY",
+      !twilioKey && "WHATSAPP_API_TOKEN/TWILIO_API_KEY",
+      !rawTo && "ADMIN_WHATSAPP_NUMBER",
+      !from && "TWILIO_WHATSAPP_FROM",
+    ].filter(Boolean).join(", ");
+    console.warn("[whatsapp-admin] ⚠️ Credenciais ausentes:", missing);
+    return { ok: false, attempts: [], reason: `WHATSAPP_ENV_MISSING: ${missing}` };
   }
   const targets = normalizeAdminNumbers(rawTo);
-  let lastDetail = "";
+  const attempts: TwilioAttempt[] = [];
   for (const to of targets) {
     try {
       const res = await fetch(`${TWILIO_GATEWAY}/Messages.json`, {
@@ -79,14 +88,35 @@ async function sendViaTwilio(text: string): Promise<{ ok: boolean; detail?: stri
         },
         body: new URLSearchParams({ To: to, From: from, Body: text }),
       });
-      if (res.ok) return { ok: true };
-      lastDetail = `HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`;
-      console.warn(`[whatsapp-admin] falha em ${to} → tentando fallback`, lastDetail);
+      const raw = await res.text();
+      let parsed: any = null;
+      try { parsed = JSON.parse(raw); } catch { /* ignore */ }
+      if (res.ok) {
+        attempts.push({ to, status: res.status, ok: true });
+        return { ok: true, attempts };
+      }
+      const att: TwilioAttempt = {
+        to,
+        ok: false,
+        status: res.status,
+        code: parsed?.code ?? parsed?.error?.code,
+        message: parsed?.message ?? parsed?.error?.message ?? raw.slice(0, 240),
+        moreInfo: parsed?.more_info ?? parsed?.error?.more_info,
+      };
+      attempts.push(att);
+      console.warn("[whatsapp-admin] Twilio erro", att);
     } catch (e: any) {
-      lastDetail = e?.message ?? String(e);
+      attempts.push({ to, ok: false, message: e?.message ?? String(e) });
     }
   }
-  return { ok: false, detail: lastDetail };
+  return { ok: false, attempts };
+}
+
+function summarizeAttempts(r: TwilioResult): string {
+  if (r.reason) return r.reason;
+  return r.attempts.map((a) =>
+    `${a.to} → HTTP ${a.status ?? "?"} code=${a.code ?? "?"} · ${(a.message ?? "").slice(0, 160)}`
+  ).join(" | ");
 }
 
 /** Notifica o admin sobre um pedido em waiting_provision. Não lança. */
@@ -95,8 +125,24 @@ export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise
   try {
     const wa = await sendViaTwilio(text);
     if (wa.ok) return;
-    console.warn("[whatsapp-admin] fallback telegram", wa.detail);
-    await dispatchTelegramFallback(text).catch(() => {});
+    const detail = summarizeAttempts(wa);
+    console.error("[whatsapp-admin] ❌ Twilio falhou · v149", detail);
+    // v149 — registra falha detalhada para o LiveTelemetryMonitor no /admin
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("admin_audit_logs" as any).insert({
+        action: "WHATSAPP_SEND_FAILED",
+        detail: {
+          pedido_id: alert.pedidoId,
+          reason: wa.reason ?? "twilio_error",
+          attempts: wa.attempts,
+          summary: detail,
+        },
+      } as any);
+    } catch (logErr) {
+      console.warn("[whatsapp-admin] audit-log insert falhou", logErr);
+    }
+    await dispatchTelegramFallback(`${text}\n\n[v149 Twilio erro] ${detail}`).catch(() => {});
   } catch (e) {
     console.warn("[whatsapp-admin] notifyAdminProvisioning falhou", e);
   }
