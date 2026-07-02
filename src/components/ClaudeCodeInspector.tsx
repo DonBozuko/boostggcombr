@@ -38,6 +38,21 @@ export function ClaudeCodeInspector() {
     } finally { setBusy(null); }
   };
 
+  const runBlackout = async () => {
+    setBusy("BLACKOUT");
+    try {
+      const slugs = ["smmhype", "smmpainel", "verified"];
+      const results = await Promise.allSettled(
+        slugs.map((slug) => simFn({ data: { slug, minutes: 5 } })),
+      );
+      const ok = results.filter((r) => r.status === "fulfilled").length;
+      const until = new Date(Date.now() + 5 * 60_000).toLocaleTimeString("pt-BR");
+      setFlash(`⚠️ APAGÃO GERAL disparado · ${ok}/3 fornecedores instáveis até ${until}`);
+    } catch (e: any) {
+      setFlash(`⛔ ${e?.message ?? e}`);
+    } finally { setBusy(null); }
+  };
+
 
 
   return (
