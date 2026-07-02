@@ -126,6 +126,8 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   } catch (e) { console.warn("[contingency] v154 audit PIX_APPROVED fail", e); }
 
   try {
+    const { pickCheapestFornecedorSlug } = await import("@/lib/smart-routing.server");
+    const cheapestSlug = await pickCheapestFornecedorSlug(pedido.pacote, Number(pedido.quantidade)).catch(() => null);
     const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");
     await notifyAdminUniversalPaid({
       pedidoId: String(pedido.id),
@@ -133,9 +135,9 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       compradorHandle: pedido.instagram_user ?? null,
       pacote: pedido.pacote ?? null,
       quantidade: Number(pedido.quantidade) || null,
-      fornecedor: "smmhype",
+      fornecedor: cheapestSlug ?? "smmhype",
     });
-  } catch (e) { console.warn("[contingency] v154 telegram universal fail", e); }
+  } catch (e) { console.warn("[contingency] v155 telegram universal fail", e); }
 
 
   // 4) Dispatch failover A→B→C (somente fornecedores ativos com saldo > 0)
