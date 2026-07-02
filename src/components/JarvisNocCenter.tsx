@@ -1,5 +1,6 @@
 import { useEffect, useState, useTransition } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { useRouter } from "@tanstack/react-router";
 import { jarvisNocSnapshot, jarvisChat, jarvisFailoverAtivo, type NocSnapshot, type JarvisChatResp } from "@/lib/jarvis-noc.functions";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -10,6 +11,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
   const snapFn = useServerFn(jarvisNocSnapshot);
   const chatFn = useServerFn(jarvisChat);
   const failoverFn = useServerFn(jarvisFailoverAtivo);
+  const router = useRouter();
   const [snap, setSnap] = useState<NocSnapshot | null>(null);
   const [loading, startTransition] = useTransition();
   const [q, setQ] = useState("");
@@ -45,13 +47,21 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
     } finally { setThinking(false); }
   };
 
-  const runFailover = async () => {
+  const runUnifiedDiagnostic = async () => {
+    const t = toast.loading("🔄 Diagnóstico e Sincronização Geral em curso...");
     try {
-      const res = await failoverFn({ data: { token } });
-      if ((res as any).ok) toast.success(`Failover: ${(res as any).action} ${(res as any).to ? "→ " + (res as any).to : ""}`);
-      else toast.error((res as any).error ?? "Falha");
-      refresh();
-    } catch (e: any) { toast.error(e?.message ?? "Erro"); }
+      const [snapRes, failRes] = await Promise.all([
+        snapFn({ data: { token } }),
+        failoverFn({ data: { token } }),
+      ]);
+      setSnap(snapRes);
+      await router.invalidate();
+      const fr: any = failRes;
+      if (fr?.ok) toast.success(`Sincronizado · Failover: ${fr.action}${fr.to ? " → " + fr.to : ""}`, { id: t });
+      else toast.success("Sincronização concluída", { id: t });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Falha na sincronização", { id: t });
+    }
   };
 
   if (!snap || !snap.ok) {
@@ -73,11 +83,13 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
           <div className="text-[10px] text-red-200/70 font-mono">Central de Inteligência Operacional · Autonomia com Segurança</div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={refresh} disabled={loading} className="border-red-500/50 text-red-200">
-            {loading ? "..." : "🔄 Atualizar Dados"}
-          </Button>
-          <Button size="sm" onClick={runFailover} className="bg-red-600 hover:bg-red-500 text-white text-xs">
-            ⚡ Testar Rota Reserva
+          <Button
+            size="sm"
+            onClick={runUnifiedDiagnostic}
+            disabled={loading}
+            className="bg-gradient-to-r from-red-700 via-red-500 to-red-700 hover:from-red-600 hover:to-red-600 text-white font-bold text-xs shadow-[0_0_20px_rgba(255,0,40,0.6)] border border-red-400/50"
+          >
+            {loading ? "🛰️ Sincronizando..." : "🔄 Diagnóstico e Sincronização Geral"}
           </Button>
         </div>
       </div>
