@@ -42,33 +42,51 @@ export function buildProvisioningMessage(a: ProvisioningAlert): string {
   return pix ? `${base}\n\nPix Copia e Cola (recarga fornecedor):\n${pix}` : base;
 }
 
+// v148 — normaliza destino: garante prefixo "whatsapp:+55" e gera fallback sem o 9º dígito
+function normalizeAdminNumbers(raw: string): string[] {
+  let s = raw.trim().replace(/\s+/g, "");
+  if (!s.startsWith("whatsapp:")) {
+    const digits = s.replace(/\D/g, "");
+    const withCountry = digits.startsWith("55") ? digits : `55${digits}`;
+    s = `whatsapp:+${withCountry}`;
+  }
+  const out = [s];
+  // Fallback sem 9º dígito: whatsapp:+55 DDD 9XXXXXXXX -> whatsapp:+55 DDD XXXXXXXX
+  const m = s.match(/^whatsapp:\+55(\d{2})9(\d{8})$/);
+  if (m) out.push(`whatsapp:+55${m[1]}${m[2]}`);
+  return out;
+}
+
 async function sendViaTwilio(text: string): Promise<{ ok: boolean; detail?: string }> {
   const lovableKey = process.env.LOVABLE_API_KEY;
   const twilioKey = process.env.WHATSAPP_API_TOKEN || process.env.TWILIO_API_KEY;
-  const to = process.env.ADMIN_WHATSAPP_NUMBER; // ex: whatsapp:+5511999999999
-  const from = process.env.TWILIO_WHATSAPP_FROM; // ex: whatsapp:+14155238886
-  if (!lovableKey || !twilioKey || !to || !from) {
-    console.warn("[whatsapp-admin] ⚠️ Credenciais ausentes. Configure em Lovable → Project Settings → Environment Variables:\n  • ADMIN_WHATSAPP_NUMBER = whatsapp:+55DDDNUMERO (ex: whatsapp:+5511999998888)\n  • WHATSAPP_API_TOKEN    = token Twilio da Ponte v119\n  • TWILIO_WHATSAPP_FROM  = whatsapp:+14155238886 (sandbox ou aprovado)");
+  const rawTo = process.env.ADMIN_WHATSAPP_NUMBER; // padrão internacional v148
+  const from = process.env.TWILIO_WHATSAPP_FROM;
+  if (!lovableKey || !twilioKey || !rawTo || !from) {
+    console.warn("[whatsapp-admin] ⚠️ Credenciais ausentes. Configure ADMIN_WHATSAPP_NUMBER, WHATSAPP_API_TOKEN e TWILIO_WHATSAPP_FROM.");
     return { ok: false, detail: "WHATSAPP_ENV_MISSING" };
   }
-  try {
-    const res = await fetch(`${TWILIO_GATEWAY}/Messages.json`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${lovableKey}`,
-        "X-Connection-Api-Key": twilioKey,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({ To: to, From: from, Body: text }),
-    });
-    if (!res.ok) {
-      const detail = (await res.text()).slice(0, 200);
-      return { ok: false, detail: `HTTP ${res.status}: ${detail}` };
+  const targets = normalizeAdminNumbers(rawTo);
+  let lastDetail = "";
+  for (const to of targets) {
+    try {
+      const res = await fetch(`${TWILIO_GATEWAY}/Messages.json`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${lovableKey}`,
+          "X-Connection-Api-Key": twilioKey,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ To: to, From: from, Body: text }),
+      });
+      if (res.ok) return { ok: true };
+      lastDetail = `HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`;
+      console.warn(`[whatsapp-admin] falha em ${to} → tentando fallback`, lastDetail);
+    } catch (e: any) {
+      lastDetail = e?.message ?? String(e);
     }
-    return { ok: true };
-  } catch (e: any) {
-    return { ok: false, detail: e?.message ?? String(e) };
   }
+  return { ok: false, detail: lastDetail };
 }
 
 /** Notifica o admin sobre um pedido em waiting_provision. Não lança. */
