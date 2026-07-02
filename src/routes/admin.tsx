@@ -44,6 +44,7 @@ import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
+import { SandboxModeToggle } from "@/components/SandboxModeToggle";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
 import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
@@ -1341,6 +1342,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         </div>
 
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><SandboxModeToggle /></div>
 
         <div className={`${folder === "buscas" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
 
