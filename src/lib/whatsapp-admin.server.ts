@@ -38,10 +38,22 @@ export function pixForFornecedor(slug: string | null | undefined): string | null
   return process.env.PROVIDER_PIX_COPIA_COLA?.trim() || null;
 }
 
+/** v159 — Sugestão inteligente de recarga (múltiplo de R$5, mínimo R$5). */
+function suggestRecharge(custoUnitBrl: number): { valor: number; cobre: number } {
+  const c = Math.max(custoUnitBrl, 0.05);
+  // pedidos pequenos (custo < R$1) → cobrir 50 pedidos; grandes → 20
+  const alvoPedidos = c < 1 ? 50 : 20;
+  const bruto = c * alvoPedidos;
+  const valor = Math.max(5, Math.ceil(bruto / 5) * 5);
+  const cobre = Math.floor(valor / c);
+  return { valor, cobre };
+}
+
 export function buildProvisioningMessage(a: ProvisioningAlert): string {
   const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl);
   const lucroLiquido = Number((a.vendaBrl * 0.9901 - custo * 1.15).toFixed(2));
   const pix = pixForFornecedor(a.fornecedor);
+  const sug = suggestRecharge(custo);
   const header = a.criticalCaixaZero
     ? "🚨🔴 <b>CAIXA ZERO · TODOS FORNECEDORES SEM SALDO</b>\n<i>Pedido segurado em fila. Recarregue AGORA para liberar entregas.</i>"
     : "🟡 <b>v151 · Provisão Necessária</b>";
@@ -54,6 +66,7 @@ export function buildProvisioningMessage(a: ProvisioningAlert): string {
     `Venda: ${fmtBrl(a.vendaBrl)}`,
     `Custo depósito: <b>${fmtBrl(custo)}</b>`,
     `Lucro líq. (~300%): ${fmtBrl(lucroLiquido)}`,
+    `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)`,
     a.motivo ? `Motivo: ${a.motivo}` : null,
   ].filter(Boolean);
   const base = linhas.join("\n");
@@ -61,6 +74,7 @@ export function buildProvisioningMessage(a: ProvisioningAlert): string {
     ? `${base}\n\n<b>Pix Copia e Cola (recarga fornecedor):</b>\n<code>${pix}</code>`
     : `${base}\n\n⚠️ <i>Pix Copia-e-Cola do fornecedor não configurado.</i>`;
 }
+
 
 /** Alerta universal: TODO pedido pago (com sucesso ou aguardando provisão). */
 export type UniversalPaidAlert = {
