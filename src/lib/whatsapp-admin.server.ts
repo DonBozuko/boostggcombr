@@ -110,12 +110,10 @@ export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise
   }
 }
 
-/** Alerta universal em TODO pedido pago. Não lança. */
+/** Alerta universal em TODO pedido pago (sem PIX, sem botão). Não lança. */
 export async function notifyAdminUniversalPaid(alert: UniversalPaidAlert): Promise<void> {
   try {
-    const res = await dispatchTelegram(buildUniversalPaidMessage(alert), {
-      inlineKeyboard: rechargeKeyboard(alert.pedidoId),
-    });
+    const res = await dispatchTelegram(buildUniversalPaidMessage(alert));
     if (!res.ok) console.error("[admin-notify] universal Telegram falhou", res.detail);
   } catch (e) {
     console.warn("[admin-notify] notifyAdminUniversalPaid falhou", e);
