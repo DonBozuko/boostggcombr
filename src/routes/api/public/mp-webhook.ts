@@ -223,6 +223,19 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             } as any);
           } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
 
+          // v151 — Universal Trigger: TODO pedido pago dispara alerta Telegram com PIX do fornecedor + botão de recarga.
+          try {
+            const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");
+            await notifyAdminUniversalPaid({
+              pedidoId: String(pedido.id),
+              vendaBrl: Number(pedido.valor),
+              compradorHandle: pedido.instagram_user ?? null,
+              pacote: pedido.pacote ?? null,
+              quantidade: Number(pedido.quantidade) || null,
+              fornecedor: "smmhype",
+            });
+          } catch (e) { console.warn("[mp-webhook] v151 universal trigger fail", e); }
+
           // 3) Smart Cost Routing v58-B: ranqueia por menor custo BRL real, com sentinela de saúde.
           const baseQty = Number(pedido.quantidade);
           const mysteryBonus = 0;
