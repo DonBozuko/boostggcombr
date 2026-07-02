@@ -226,7 +226,7 @@ function TrafegoLanding() {
         <div className="container mx-auto px-4 sm:px-6 max-w-xl">
           <h2 className="text-2xl sm:text-3xl font-bold text-center">Finalizar pedido</h2>
           <p className="mt-2 text-center text-sm text-zinc-400">Cole a URL completa do seu site ou landing page.</p>
-          <div className="mt-6 rounded-2xl p-6 space-y-5" style={{ background: BG, border: `1px solid ${NEON}66`, boxShadow: `0 0 30px ${NEON}33` }}>
+          <div className="mt-6 rounded-2xl p-4 space-y-3" style={{ background: BG, border: `1px solid ${NEON}66`, boxShadow: `0 0 30px ${NEON}33` }}>
             <div className="space-y-2">
               <Label>Pacote</Label>
               <div className="grid grid-cols-1 gap-2">

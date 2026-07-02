@@ -326,7 +326,7 @@ function TiktokLanding() {
           </p>
 
           <div
-            className="mt-6 rounded-2xl p-6 space-y-5"
+            className="mt-6 rounded-2xl p-4 space-y-3"
             style={{
               background: "#0a0a0a",
               border: `1px solid ${CYAN}55`,

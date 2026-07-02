@@ -678,7 +678,7 @@ function Landing() {
 
           <form
             onSubmit={onSubmit}
-            className="rounded-2xl border border-border bg-card p-4 sm:p-8 space-y-6 shadow-glow-blue"
+            className="rounded-2xl border border-border bg-card p-3 sm:p-5 space-y-4 shadow-glow-blue"
           >
             <div className="space-y-2">
               <Label htmlFor="plan">Pacote escolhido</Label>
@@ -846,7 +846,7 @@ function Landing() {
                 </DialogHeader>
 
                 {pedidoInfo && (
-                  <div className="space-y-5">
+                  <div className="space-y-3">
                     <div className="rounded-lg border border-border bg-muted/40 p-4 text-center">
                       <div className="text-xs uppercase tracking-wider text-zinc-300">
                         Pacote {pedidoInfo.tier} · {pedidoInfo.profile}
@@ -997,7 +997,7 @@ function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="rounded-2xl border border-border bg-card/60 p-8 text-center"
+                className="rounded-2xl border border-border bg-card/60 p-5 text-center"
               >
                 <div className="size-14 mx-auto rounded-xl bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow mb-5">
                   <Icon className="size-6 text-background" />
