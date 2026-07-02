@@ -689,6 +689,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
   const getFaturamento = useServerFn(getFaturamentoPorRede);
   const pingSmm = useServerFn(pingSmmhype);
+  const pingAll = useServerFn(pingAllProviders);
+
   const syncIdsApi = useServerFn(sincronizarIdsApi);
   const smartApprove = useServerFn(smartApproveIds);
   const [approving, setApproving] = useState(false);
