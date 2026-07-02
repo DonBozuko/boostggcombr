@@ -83,11 +83,13 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
           <div className="text-[10px] text-red-200/70 font-mono">Central de Inteligência Operacional · Autonomia com Segurança</div>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={refresh} disabled={loading} className="border-red-500/50 text-red-200">
-            {loading ? "..." : "🔄 Atualizar Dados"}
-          </Button>
-          <Button size="sm" onClick={runFailover} className="bg-red-600 hover:bg-red-500 text-white text-xs">
-            ⚡ Testar Rota Reserva
+          <Button
+            size="sm"
+            onClick={runUnifiedDiagnostic}
+            disabled={loading}
+            className="bg-gradient-to-r from-red-700 via-red-500 to-red-700 hover:from-red-600 hover:to-red-600 text-white font-bold text-xs shadow-[0_0_20px_rgba(255,0,40,0.6)] border border-red-400/50"
+          >
+            {loading ? "🛰️ Sincronizando..." : "🔄 Diagnóstico e Sincronização Geral"}
           </Button>
         </div>
       </div>
