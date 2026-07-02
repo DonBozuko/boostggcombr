@@ -286,44 +286,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             }}
           />
         </div>
-        <div
-          role="status"
-          aria-live="polite"
-          style={{ zIndex: 50 }}
-          className={`absolute right-full mr-1 top-1/2 -translate-y-1/2 translate-x-2 w-[115px] max-w-[115px] rounded-xl px-2 py-1.5 pr-5 text-[8.5px] leading-snug text-white font-bold backdrop-blur-xl bg-black/95 ${t.bubble} border shadow-2xl ring-1 ring-white/15 transition-all duration-500 ease-out ${
-            open ? "opacity-100 translate-y-[-50%] scale-100" : "opacity-0 -translate-y-[60%] scale-90 pointer-events-none"
-          }`}
-        >
-          <button
-            type="button"
-            aria-label="Fechar"
-            onClick={() => { lockOpenRef.current = false; if (errorTimerRef.current != null) { window.clearTimeout(errorTimerRef.current); errorTimerRef.current = null; } setOpen(false); }}
-            className="absolute top-1 right-1 h-5 w-5 grid place-items-center rounded-full bg-white/10 hover:bg-white/25 text-white/80 hover:text-white"
-          >
-            <X className="h-3 w-3" />
-          </button>
-          <span className={`absolute left-[40px] top-[-7px] -translate-x-1/2 h-3 w-3 rotate-45 ${t.bubble} border-l border-t`} aria-hidden />
-          <div className={`font-black tracking-wide text-white ${t.glow} drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]`}>J.A.R.V.I.S.</div>
-          <div className="text-white font-bold tracking-wide mt-0.5 drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)]">{speech}</div>
-          <form onSubmit={handleConsult} className="mt-1.5 flex gap-1">
-            <input
-              value={pedidoId}
-              onChange={(e) => setPedidoId(e.target.value)}
-              onFocus={clearAutoClose}
-              onPointerDown={clearAutoClose}
-              placeholder="ID do pedido"
-              className="flex-1 min-w-0 rounded bg-black/50 border border-white/20 px-1.5 py-0.5 text-[10px] text-white placeholder:text-white/40 outline-none focus:border-white/50"
-            />
-            <button
-              type="submit"
-              disabled={consulting}
-              onPointerDown={clearAutoClose}
-              className="rounded bg-white/15 hover:bg-white/25 px-1.5 py-0.5 text-[10px] font-bold text-white disabled:opacity-50"
-            >
-              {consulting ? "…" : "Ver ID"}
-            </button>
-          </form>
-        </div>
+        {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
+
         {hudMode && (
           <form
             onSubmit={handleConsult}
