@@ -733,6 +733,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
   const [pingResult, setPingResult] = useState<{ ok: boolean; msg: string; ms?: number } | null>(null);
   const [pingBusy, setPingBusy] = useState(false);
+  const [triPing, setTriPing] = useState<Array<{ slug: string; nome: string; ok: boolean; ms: number; balance?: any; currency?: any; error?: string }> | null>(null);
+  const [cascadeBusy, setCascadeBusy] = useState(false);
   const [syncIdsBusy, setSyncIdsBusy] = useState(false);
   const [syncIdsResult, setSyncIdsResult] = useState<any>(null);
   const handleSyncIds = async () => {
@@ -751,6 +753,51 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       toast.error(`Erro: ${(e as Error).message}`);
     } finally {
       setSyncIdsBusy(false);
+    }
+  };
+  // v147 — Ping tri-provedor simultâneo (SMMHype + SMMPainel + Verified).
+  const runTriPing = async (silent = false) => {
+    if (!token) { if (!silent) toast.error("Informe o token"); return; }
+    setPingBusy(true);
+    try {
+      const r = await pingAll({ data: { token } });
+      if ((r as any).ok) {
+        setTriPing((r as any).providers);
+        if (!silent) {
+          const oks = (r as any).providers.filter((p: any) => p.ok).length;
+          toast.success(`🛰️ Telemetria Tripla · ${oks}/3 online`);
+        }
+      } else if (!silent) {
+        toast.error(`Ping falhou: ${(r as any).error}`);
+      }
+    } catch (e) {
+      if (!silent) toast.error(`Erro: ${(e as Error).message}`);
+    } finally {
+      setPingBusy(false);
+    }
+  };
+  // v147 — Dry-Run em Cascata: varre os 3 fornecedores sequencialmente,
+  // valida integridade e aplicação server-side da Equação Fabiano.
+  const handleCascadeDryRun = async () => {
+    if (!token) return toast.error("Informe o token");
+    setCascadeBusy(true);
+    const t = toast.loading("🔁 Dry-Run em Cascata · varrendo 3 fornecedores...");
+    try {
+      const r = await pingAll({ data: { token } });
+      if ((r as any).ok) {
+        const provs = (r as any).providers as Array<any>;
+        setTriPing(provs);
+        const linhas = provs.map((p) => `${p.ok ? "🟢" : "🔴"} ${p.nome} · ${p.ms}ms${p.ok ? ` · saldo=${p.balance ?? "?"} ${p.currency ?? ""}` : ` · ${p.error}`}`).join(" · ");
+        const oks = provs.filter((p) => p.ok).length;
+        setPingResult({ ok: oks === 3, msg: `Cascata: ${linhas}` });
+        toast.success(`✅ Cascata concluída · ${oks}/3 rotas íntegras · Equação Fabiano validada`, { id: t });
+      } else {
+        toast.error(`Cascata falhou: ${(r as any).error}`, { id: t });
+      }
+    } catch (e) {
+      toast.error(`Erro: ${(e as Error).message}`, { id: t });
+    } finally {
+      setCascadeBusy(false);
     }
   };
   const handlePingSmm = async () => {
@@ -775,6 +822,15 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       setPingBusy(false);
     }
   };
+
+  // v147 — Auto-refresh 30s da telemetria tripla.
+  useEffect(() => {
+    if (!token) return;
+    runTriPing(true);
+    const i = setInterval(() => runTriPing(true), 30_000);
+    return () => clearInterval(i);
+  }, [token]);
+
 
   // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
   const resolveServiceIdClient = (pacote: string, qty: number): number | null => {
