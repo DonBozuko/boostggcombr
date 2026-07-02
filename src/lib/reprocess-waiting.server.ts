@@ -81,7 +81,7 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
           detail: { pedido_id: pedido.id, provider: f.slug, order_id: r.orderId ?? null, tentativas },
         } as any);
       } catch (e) { console.warn("[reprocess] audit fail", e); }
-      return { ok: true, fornecedor: f.nome, orderId: r.orderId ?? null, custoBrl: f.cost_brl ?? null };
+      return { ok: true, fornecedor: f.nome, orderId: r.orderId != null ? String(r.orderId) : null, custoBrl: f.cost_brl ?? null };
     }
     tentativas.push(`${f.nome}: ${r.error}${r.status ? ` HTTP ${r.status}` : ""}`);
     await markProviderUnstable(f.slug, r.error ?? "dispatch fail");
