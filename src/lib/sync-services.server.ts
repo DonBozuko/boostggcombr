@@ -56,24 +56,24 @@ export async function syncSmmhypeServices() {
   const json = (await resp.json()) as ProviderService[];
   if (!Array.isArray(json)) throw new Error("Resposta inesperada do fornecedor");
 
-  // Filtra apenas Instagram + refill
+  // v158 — filtro amplo: importa TODO o catálogo (IG/TK/YT/FB/TG, com e sem refill).
+  // O match fino é feito no backfill por palavra-chave + faixa min/max.
   const filtered = json.filter(
-    (s) =>
-      typeof s.category === "string" &&
-      /instagram/i.test(s.category) &&
-      s.refill === true,
+    (s) => typeof s.category === "string" && typeof s.name === "string" && s.service != null,
   );
+
 
   const rows = filtered.map((s) => ({
     provider_service_id: Number(s.service),
     category: String(s.category),
     name: String(s.name),
-    rate: Number(s.rate),
-    refill: true,
+    rate: Number(s.rate) || 0,
+    refill: s.refill === true,
     min: Number(s.min) || 0,
     max: Number(s.max) || 0,
     updated_at: new Date().toISOString(),
   }));
+
 
   // Upsert
   if (rows.length > 0) {
