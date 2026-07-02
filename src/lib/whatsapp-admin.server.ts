@@ -14,6 +14,8 @@ export type ProvisioningAlert = {
   compradorHandle?: string | null;
   pacote?: string | null;
   quantidade?: number | null;
+  /** v157 — Cascata totalmente esgotada (A+B+C sem saldo/instáveis). Escala alerta a CRÍTICO. */
+  criticalCaixaZero?: boolean;
 };
 
 function fmtBrl(v: number): string {
