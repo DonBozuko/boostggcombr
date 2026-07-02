@@ -326,7 +326,7 @@ async function persistProviderBalance(fornecedor: any, balance: ProviderCheck) {
     updatePayload.saldo_atual = balance.saldoBrl ?? fornecedor.saldo_atual;
   }
 
-  await supabaseAdmin.from("fornecedores").update(updatePayload).eq("id", fornecedor.id);
+  await supabaseAdmin.from("fornecedores").update(updatePayload as any).eq("id", fornecedor.id);
 }
 
 export type ProviderBalanceResult = {
