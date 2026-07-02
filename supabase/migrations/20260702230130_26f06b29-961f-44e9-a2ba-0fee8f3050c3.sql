@@ -1,0 +1,16 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.pedidos;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.admin_treasury;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.virtual_wallets;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.fornecedores;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.financial_ledger;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.alerts;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.admin_audit_logs;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.monitoramento_saldo;
+ALTER TABLE public.pedidos REPLICA IDENTITY FULL;
+ALTER TABLE public.admin_treasury REPLICA IDENTITY FULL;
+ALTER TABLE public.virtual_wallets REPLICA IDENTITY FULL;
+ALTER TABLE public.fornecedores REPLICA IDENTITY FULL;
+ALTER TABLE public.financial_ledger REPLICA IDENTITY FULL;
+ALTER TABLE public.alerts REPLICA IDENTITY FULL;
+ALTER TABLE public.admin_audit_logs REPLICA IDENTITY FULL;
+ALTER TABLE public.monitoramento_saldo REPLICA IDENTITY FULL;
