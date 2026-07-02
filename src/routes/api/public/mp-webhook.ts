@@ -456,8 +456,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
             await dispatchWhatsappAlert(`🟡 v116 Pedido ${pedido.id} em fila (waiting_provision). Sem fornecedor com saldo. Provisionar SMMHype/SMMPanel/Verified.`).catch(() => {});
             try {
-              const custoEstim = cadeia.find((p) => p.cost_brl != null)?.cost_brl ?? null;
-              const fornecedorAlvo = cadeia[0]?.slug ?? null;
+              // v144 — menor custo bruto de atacado da rota (não a ordem de cascata).
+              const custos = cadeia.map((p) => p.cost_brl).filter((v): v is number => typeof v === "number" && v > 0);
+              const custoEstim = custos.length ? Math.min(...custos) : null;
+              const fornecedorAlvo = cadeia.find((p) => p.cost_brl === custoEstim)?.slug ?? cadeia[0]?.slug ?? null;
               const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
               await notifyAdminProvisioning({
                 pedidoId: String(pedido.id),
@@ -474,7 +476,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         }
         });
 
-        scheduleWebhookBackground(backgroundJob, context);
+        // v144 — Dispatch síncrono: aguarda backgroundJob completar antes de responder MP,
+        // garantindo que notifyAdminProvisioning entregue o Pix Copia e Cola ao WhatsApp.
+        try { await backgroundJob; } catch (err) { console.error("[mp-webhook] v144 sync fail", err); }
+        
         return Response.json({ received: true }, {
           status: 200,
           headers: { "cache-control": "no-store" },
