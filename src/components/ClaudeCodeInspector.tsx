@@ -7,7 +7,7 @@ type Data = Awaited<ReturnType<typeof getClaudeInspect>>;
 export function ClaudeCodeInspector() {
   const fn = useServerFn(getClaudeInspect);
   const simFn = useServerFn(simulateProviderUnstable);
-  const clearFn = useServerFn(clearProviderUnstableFn);
+  
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
