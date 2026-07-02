@@ -37,15 +37,8 @@ export function ClaudeCodeInspector() {
       setFlash(`⛔ ${e?.message ?? e}`);
     } finally { setBusy(null); }
   };
-  const runClear = async (slug: string) => {
-    setBusy(`clear:${slug}`);
-    try {
-      await clearFn({ data: { slug } });
-      setFlash(`✅ Pane revertida em ${slug}`);
-    } catch (e: any) {
-      setFlash(`⛔ ${e?.message ?? e}`);
-    } finally { setBusy(null); }
-  };
+
+
 
   return (
     <section className="rounded-lg border border-cyan-500/40 bg-black/60 p-4 space-y-4 font-mono text-xs text-cyan-100">
