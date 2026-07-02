@@ -36,7 +36,7 @@ export function LiveTelemetryMonitor() {
           supabase
             .from("admin_audit_logs")
             .select("id, action, detail, created_at")
-            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "CHECKOUT_INSUFFICIENT_FUNDS"])
+            .in("action", ["DISPATCH_OK", "MARGIN_HOLD_ERROR", "REFUND_OK", "REFUND_FAILED", "CHECKOUT_INSUFFICIENT_FUNDS", "WHATSAPP_SEND_FAILED"])
             .order("created_at", { ascending: false })
             .limit(8),
           supabase
@@ -102,7 +102,7 @@ export function LiveTelemetryMonitor() {
         <h3 className="text-red-300 font-black text-sm tracking-wider">
           📡 MONITOR DE TRANSMISSÃO DE PEDIDOS (LIVE TELEMETRY)
         </h3>
-        <span className="text-[10px] text-zinc-400">poll 1s · v94</span>
+        <span className="text-[10px] text-zinc-400">poll 1s · v149</span>
       </div>
 
       {err && <div className="text-xs text-rose-400 mb-2">RLS/erro: {err}</div>}
@@ -117,6 +117,20 @@ export function LiveTelemetryMonitor() {
         <div className={`${dispatchLine.color}`}>
           <span className="text-zinc-500">[3] Disparo real:</span> {dispatchLine.text}
         </div>
+        {(() => {
+          const wa = logs.find((l) => l.action === "WHATSAPP_SEND_FAILED");
+          if (!wa) return null;
+          const d: any = wa.detail ?? {};
+          const first = Array.isArray(d.attempts) ? d.attempts.find((a: any) => !a.ok) : null;
+          const line = first
+            ? `❌ Twilio bloqueado · HTTP ${first.status ?? "?"} · code=${first.code ?? "?"} · ${(first.message ?? "").slice(0, 140)}`
+            : `❌ Twilio bloqueado · ${d.summary ?? d.reason ?? "erro desconhecido"}`;
+          return (
+            <div className="text-rose-400">
+              <span className="text-zinc-500">[4] WhatsApp Admin:</span> {line}
+            </div>
+          );
+        })()}
       </div>
 
       <div className="mt-4 border-t border-red-500/20 pt-2">
