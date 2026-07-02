@@ -178,6 +178,43 @@ export const pingSmmhype = createServerFn({ method: "POST" })
     }
   });
 
+// v147 — Ping tri-provedor simultâneo + dry-run em cascata.
+export const pingAllProviders = createServerFn({ method: "POST" })
+  .inputValidator((input) => adminInput.parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const providers = [
+      { slug: "smmhype", nome: "SMMHype", url: "https://smmhype.com/api/v2", key: process.env.SMMHYPE_API_KEY },
+      { slug: "smmpainel", nome: "SMMPainel", url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
+      { slug: "verified", nome: "Verified Atacado", url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
+    ];
+    const results = await Promise.all(
+      providers.map(async (p) => {
+        const t0 = Date.now();
+        if (!p.key) return { slug: p.slug, nome: p.nome, ok: false as const, ms: 0, error: "API_KEY ausente", balance: null as any, currency: null as any };
+        try {
+          const body = new URLSearchParams({ key: p.key, action: "balance" });
+          const res = await fetch(p.url, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: body.toString(),
+          });
+          const ms = Date.now() - t0;
+          const text = await res.text();
+          let json: any = null; try { json = JSON.parse(text); } catch {}
+          if (!res.ok) return { slug: p.slug, nome: p.nome, ok: false as const, ms, error: `HTTP ${res.status}`, balance: null as any, currency: null as any };
+          if (json?.error) return { slug: p.slug, nome: p.nome, ok: false as const, ms, error: String(json.error), balance: null as any, currency: null as any };
+          return { slug: p.slug, nome: p.nome, ok: true as const, ms, balance: json?.balance ?? null, currency: json?.currency ?? null };
+        } catch (e) {
+          return { slug: p.slug, nome: p.nome, ok: false as const, ms: Date.now() - t0, error: (e as Error).message, balance: null as any, currency: null as any };
+        }
+      }),
+    );
+    return { ok: true as const, providers: results, at: new Date().toISOString() };
+  });
+
+
+
 
 // 🤖 Sincronizar IDs da API: lê services do SMMhype, filtra por refill/recarga/reposicion
 // para Instagram, TikTok, YouTube e Facebook, e devolve os MAIS BARATOS por rede/tipo.
