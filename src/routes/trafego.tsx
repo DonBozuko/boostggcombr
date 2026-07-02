@@ -82,7 +82,7 @@ const urlSchema = z.object({
     .regex(/^https?:\/\//i, "Por favor, insira o link completo do perfil, vídeo ou publicação."),
 });
 
-type PedidoInfo = { price: string; tier: string; profile: string; pixCode: string; qrCodeBase64: string; pedidoId: string | null };
+type PedidoInfo = { price: string; tier: string; profile: string; pixCode: string; qrCodeBase64: string; pedidoId: string | null; quantidade: number };
 
 function TrafegoLanding() {
   const [categoria, setCategoria] = useState<Categoria>("brasil");
@@ -144,6 +144,7 @@ function TrafegoLanding() {
       setPedidoInfo({
         price: selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: "00020126[SANDBOX-MOCK-NO-CHARGE]", qrCodeBase64: "", pedidoId: null,
+        quantidade: selected.quantidade,
       });
       setModalOpen(true);
       setTimeout(() => setPaid(true), 2000);
@@ -167,6 +168,7 @@ function TrafegoLanding() {
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: res.qrCode, qrCodeBase64: res.qrCodeBase64, pedidoId: res.pedidoId,
+        quantidade: selected.quantidade,
       });
       setModalOpen(true);
     } catch { toast.error("Erro ao registrar pedido."); }
