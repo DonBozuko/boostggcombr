@@ -158,6 +158,22 @@ export function ClaudeCodeInspector() {
           Injeta pane de 5 min no fornecedor. O <code>mp-webhook.ts</code> desvia síncronamente para o backup usando os IDs triplos da v85.
         </div>
         <div className="flex flex-wrap gap-2">
+      <div className="rounded border border-fuchsia-500/40 bg-fuchsia-500/5 p-3">
+        <div className="text-fuchsia-300 font-bold mb-2">🧪 SIMULADOR DE RESILIÊNCIA DE REDE (v110)</div>
+
+        {/* v152 — Botão Mestre de Apagão Geral */}
+        <button
+          onClick={runBlackout}
+          disabled={busy !== null}
+          className="w-full mb-3 px-4 py-3 rounded-lg bg-gradient-to-r from-red-700 via-red-500 to-red-700 hover:from-red-600 hover:to-red-600 text-white font-black uppercase tracking-wider text-sm shadow-[0_0_25px_rgba(255,0,40,0.7)] border-2 border-red-400/60 animate-pulse disabled:opacity-40 disabled:animate-none"
+        >
+          {busy === "BLACKOUT" ? "⏳ Disparando apagão nas 3 APIs..." : "⚠️ APAGÃO GERAL: Forçar Instabilidade nas 3 APIs (5 min)"}
+        </button>
+
+        <div className="text-fuchsia-100/70 mb-2">
+          Injeta pane de 5 min no fornecedor. O <code>mp-webhook.ts</code> desvia síncronamente para o backup usando os IDs triplos da v85.
+        </div>
+        <div className="flex flex-wrap gap-2">
           {["smmhype", "smmpainel", "verified"].map((slug) => (
             <button
               key={slug}
