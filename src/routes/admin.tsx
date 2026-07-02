@@ -1415,34 +1415,52 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className="rounded-xl border border-border bg-card/50 backdrop-blur-sm p-3">
           <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
             <h2 className="text-sm font-extrabold tracking-tight text-amber-100">⛽ Abastecimento · Fornecedores</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handlePingSmm}
+                onClick={() => runTriPing(false)}
                 disabled={pingBusy}
                 className="h-7 text-[11px] border-emerald-500/50 text-emerald-200 hover:bg-emerald-500/10"
+                title="Ping simultâneo nas 3 APIs (SMMHype + SMMPainel + Verified)"
               >
-                {pingBusy ? "Pingando..." : "🛰️ Ping SMMhype (Dry-Run)"}
+                {pingBusy ? "🛰️ Pingando..." : "🛰️ Telemetria Tripla (Dry-Run)"}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handlePingSmm}
-                disabled={pingBusy}
+                onClick={handleCascadeDryRun}
+                disabled={cascadeBusy || pingBusy}
                 className="h-7 text-[11px] border-cyan-500/50 text-cyan-200 hover:bg-cyan-500/10"
-                title="Forçar nova checagem de conexão"
+                title="Varredura sequencial nas 3 rotas validando Equação Fabiano server-side"
               >
-                🔄 Repetir Dry-Run
+                {cascadeBusy ? "🔁 Varrendo..." : "🔁 Simular Dry-Run em Cascata"}
               </Button>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">auto-refresh 60s</span>
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">auto-refresh 30s</span>
             </div>
           </div>
+          {/* v147 — Telemetria Tripla: latência ms + saldo por fornecedor */}
+          {triPing && (
+            <div className="mb-2 grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+              {triPing.map((p) => (
+                <div
+                  key={p.slug}
+                  className={`text-[11px] font-mono px-2 py-1.5 rounded border ${p.ok ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : "bg-red-950/40 border-red-500/40 text-red-200"}`}
+                >
+                  <div className="font-bold">{p.ok ? "🟢" : "🔴"} {p.nome} · {p.ms}ms</div>
+                  <div className="opacity-80">
+                    {p.ok ? `saldo=${p.balance ?? "?"} ${p.currency ?? ""}` : (p.error ?? "erro")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
           {pingResult && (
             <div className={`mb-2 text-[11px] font-mono px-2 py-1 rounded border ${pingResult.ok ? "bg-emerald-950/40 border-emerald-500/40 text-emerald-200" : "bg-red-950/40 border-red-500/40 text-red-200"}`}>
               {pingResult.msg}
             </div>
           )}
+
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
             {(fornecedores.length > 0 ? fornecedores : [
