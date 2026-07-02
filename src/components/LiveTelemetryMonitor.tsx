@@ -63,10 +63,15 @@ export function LiveTelemetryMonitor() {
   const lastOk = logs.find((l) => l.action === "DISPATCH_OK");
   const lastErr = logs.find((l) => l.action === "MARGIN_HOLD_ERROR");
 
+  const lastPix = logs.find((l) => l.action === "PIX_APPROVED");
   const webhookLine = (() => {
+    if (lastPedido?.status === "paid") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
+    if (lastPix) {
+      const d: any = lastPix.detail ?? {};
+      return { color: "text-emerald-300", text: `🟢 WEBHOOK MP recebido · PIX aprovado · pedido ${String(d.pedido_id ?? "").slice(0,8)} · payment ${d.payment_id ?? "?"}` };
+    }
     if (!lastPedido) return { color: "text-zinc-400", text: "Aguardando primeiro webhook…" };
     const s = lastPedido.status;
-    if (s === "paid") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
     if (s === "mp_rejected_insufficient") return { color: "text-rose-500", text: `❌ [CHECKOUT] Tentativa de pagamento recusada por saldo insuficiente do cliente · pedido ${lastPedido.id.slice(0,8)}` };
     if (s === "mp_refunded") return { color: "text-amber-300", text: `💸 ESTORNADO · Pix devolvido automaticamente · pedido ${lastPedido.id.slice(0,8)}` };
     if (s?.startsWith("mp_")) return { color: "text-rose-400", text: `🔴 MP ${s} · ${lastPedido.error_detail ?? ""}` };
