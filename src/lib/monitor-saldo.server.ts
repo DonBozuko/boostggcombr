@@ -309,18 +309,24 @@ async function persistProviderBalance(fornecedor: any, balance: ProviderCheck) {
     erro_retornado: balance.erro,
   });
 
-  // v79 — persiste saldo_atual em BRL (unificação contábil) + cotação viva.
-  await supabaseAdmin
-    .from("fornecedores")
-    .update({
-      saldo_atual: balance.saldoBrl ?? fornecedor.saldo_atual,
-      cotacao_brl: balance.cotacao,
-      status: balance.statusPersistido,
-      ultima_verificacao: new Date().toISOString(),
-      falhas_consecutivas: 0,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", fornecedor.id);
+  // v158 — Sandbox guard: se Modo Teste está ATIVO, NÃO sobrescreve saldo_atual local
+  // (senão o cron desfaz o zero do sandbox e a validação vaza pra API real).
+  const { data: sbRow } = await supabaseAdmin
+    .from("admin_settings").select("value").eq("key", "sandbox_mode").maybeSingle();
+  const sandboxOn = !!(sbRow?.value as { enabled?: boolean } | null)?.enabled;
+
+  const updatePayload: Record<string, any> = {
+    cotacao_brl: balance.cotacao,
+    status: balance.statusPersistido,
+    ultima_verificacao: new Date().toISOString(),
+    falhas_consecutivas: 0,
+    updated_at: new Date().toISOString(),
+  };
+  if (!sandboxOn) {
+    updatePayload.saldo_atual = balance.saldoBrl ?? fornecedor.saldo_atual;
+  }
+
+  await supabaseAdmin.from("fornecedores").update(updatePayload).eq("id", fornecedor.id);
 }
 
 export type ProviderBalanceResult = {
