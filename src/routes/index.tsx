@@ -362,6 +362,7 @@ type PedidoInfo = {
   pixCode: string;
   qrCodeBase64: string;
   pedidoId: string | null;
+  quantidade?: number;
 };
 
 function Landing() {
