@@ -37,6 +37,7 @@ import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/q
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
+import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
 
 const Char126flockDotjsRoute = Char126flockDotjsRouteImport.update({
@@ -183,6 +184,12 @@ const ApiPublicHooksBackfillSmmhypeIdsRoute =
     path: '/api/public/hooks/backfill-smmhype-ids',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksAutoHealerRoute =
+  ApiPublicHooksAutoHealerRouteImport.update({
+    id: '/api/public/hooks/auto-healer',
+    path: '/api/public/hooks/auto-healer',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminPricingConfigRoute =
   ApiPublicAdminPricingConfigRouteImport.update({
     id: '/api/public/admin/pricing-config',
@@ -213,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
+  '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
+  '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -276,6 +285,7 @@ export interface FileRoutesById {
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
+  '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
     | '/api/public/admin/pricing-config'
+    | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
@@ -340,6 +351,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
     | '/api/public/admin/pricing-config'
+    | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
@@ -371,6 +383,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
     | '/api/public/admin/pricing-config'
+    | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
@@ -402,6 +415,7 @@ export interface RootRouteChildren {
   ApiPublicSyncSmmpanelRoute: typeof ApiPublicSyncSmmpanelRoute
   ApiPublicSyncVerifiedRoute: typeof ApiPublicSyncVerifiedRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
+  ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
@@ -609,6 +623,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/auto-healer': {
+      id: '/api/public/hooks/auto-healer'
+      path: '/api/public/hooks/auto-healer'
+      fullPath: '/api/public/hooks/auto-healer'
+      preLoaderRoute: typeof ApiPublicHooksAutoHealerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/pricing-config': {
       id: '/api/public/admin/pricing-config'
       path: '/api/public/admin/pricing-config'
@@ -651,6 +672,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSyncSmmpanelRoute: ApiPublicSyncSmmpanelRoute,
   ApiPublicSyncVerifiedRoute: ApiPublicSyncVerifiedRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
+  ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
