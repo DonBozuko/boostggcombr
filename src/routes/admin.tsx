@@ -1355,6 +1355,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><AdminCostAlert /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><SandboxModeToggle /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><SimulateCheckoutPanel token={token} /></div>
 
         <div className={`${folder === "buscas" ? "block" : "hidden"}`}><BuscarPedidoPanel /></div>
 
