@@ -124,19 +124,22 @@ export const simulatePurchase = createServerFn({ method: "POST" })
       st4,
     );
 
-    // 5) Cálculo completo de margem (mesma fórmula da produção — margin-guardian)
+    // 5) Cálculo completo de margem — reproduz PRIME15 (15% off) + Pix MP (0,99% + R$0,49)
     const st5 = Date.now();
-    // Pix MP: líquido = venda * 0.9901 - 0.49 ; buffer cupom PRIME15: custo * 1.15
-    const pixLiquido = Number((valor * 0.9901 - 0.49).toFixed(4));
-    const lucroBruto = Number((valor - custoReal).toFixed(4));
-    const lucroLiquido = Number((pixLiquido - custoReal * 1.15).toFixed(4));
-    const margemPct = valor > 0 ? Number(((lucroLiquido / valor) * 100).toFixed(2)) : 0;
+    const valorCheio = valor;                                       // preço de vitrine (já com buffer 1.15 embutido)
+    const descontoPrime15 = Number((valorCheio * 0.15).toFixed(4)); // abatido no checkout
+    const valorPagoCliente = Number((valorCheio - descontoPrime15).toFixed(4)); // o que o cliente paga via Pix
+    const taxaMp = Number((valorPagoCliente * 0.0099 + 0.49).toFixed(4));
+    const pixLiquido = Number((valorPagoCliente - taxaMp).toFixed(4));
+    const lucroBruto = Number((valorPagoCliente - custoReal).toFixed(4));
+    const lucroLiquido = Number((pixLiquido - custoReal).toFixed(4));
+    const margemPct = valorPagoCliente > 0 ? Number(((lucroLiquido / valorPagoCliente) * 100).toFixed(2)) : 0;
     const razaoNet = custoReal > 0 ? Number((lucroLiquido / custoReal).toFixed(2)) : 0;
     const saldoDepoisSimulado = saldoAntes != null ? Number((saldoAntes - custoReal).toFixed(4)) : null;
     mark(
       "5_calculo_margem",
       true,
-      `bruto ${fmtBrl(lucroBruto)} · líq ${fmtBrl(lucroLiquido)} · margem ${margemPct}% · razão ${razaoNet}×`,
+      `pago ${fmtBrl(valorPagoCliente)} · bruto ${fmtBrl(lucroBruto)} · líq ${fmtBrl(lucroLiquido)} · margem ${margemPct}%`,
       st5,
     );
 
@@ -153,12 +156,15 @@ export const simulatePurchase = createServerFn({ method: "POST" })
         `Pacote: <b>${data.pacote}</b> × ${data.quantidade}`,
         "",
         "<b>💰 Financeiro</b>",
-        `Valor pago (simulado): <b>${fmtBrl(valor)}</b>`,
+        `Valor de vitrine: ${fmtBrl(valorCheio)}`,
+        `Cupom PRIME15 (-15%): -${fmtBrl(descontoPrime15)}`,
+        `<b>Valor pago pelo cliente: ${fmtBrl(valorPagoCliente)}</b>`,
+        `Taxa Mercado Pago (0,99% + R$0,49): -${fmtBrl(taxaMp)}`,
+        `Líquido recebido no Pix: ${fmtBrl(pixLiquido)}`,
         `Fornecedor escolhido: <b>${fornecedorSlug ?? "—"}</b>`,
         `Custo fornecedor: <b>${fmtBrl(custoReal)}</b>`,
-        `Líquido após Pix MP (0,99% + R$0,49): ${fmtBrl(pixLiquido)}`,
-        `Lucro bruto: ${fmtBrl(lucroBruto)}`,
-        `Lucro líquido (com buffer PRIME15): <b>${fmtBrl(lucroLiquido)}</b>`,
+        `Lucro bruto (pago − custo): ${fmtBrl(lucroBruto)}`,
+        `Lucro líquido (pix líq − custo): <b>${fmtBrl(lucroLiquido)}</b>`,
         `Margem sobre venda: <b>${margemPct}%</b>`,
         `Razão líq/custo: <b>${razaoNet}×</b> (alvo ≥ 3×)`,
         "",
@@ -186,7 +192,11 @@ export const simulatePurchase = createServerFn({ method: "POST" })
       finalStatus: "simulated",
       mode: "dry" as const,
       calculo: {
-        venda: valor,
+        valorCheio,
+        descontoPrime15,
+        valorPagoCliente,
+        taxaMp,
+        venda: valorPagoCliente,
         custo: custoReal,
         pixLiquido,
         lucroBruto,
