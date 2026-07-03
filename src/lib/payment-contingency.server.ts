@@ -202,6 +202,16 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   let fornecedorOk: string | null = null;
   let orderIdOk: string | number | null = null;
 
+  // v174 — obter cost_brl real por fornecedor para gravar custo_real + ledger
+  const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
+  const rankedContingency = await rankProvidersByCost({
+    pacote: pedido.pacote,
+    quantidade: Number(pedido.quantidade),
+  }).catch(() => [] as Array<{ slug: string; cost_brl: number | null }>);
+  const costMap = new Map<string, number | null>(
+    rankedContingency.map((p) => [p.slug, p.cost_brl]),
+  );
+
   for (const f of cadeia) {
     const r = await dispatchByFornecedor(f.slug, {
       pacote: pedido.pacote,
@@ -212,13 +222,49 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       sucesso = true;
       fornecedorOk = f.nome;
       orderIdOk = r.orderId ?? null;
+      const custoReal = costMap.get(f.slug) ?? null;
       await supabaseAdmin
         .from("pedidos")
         .update({
           status: "paid",
           error_detail: `Contingência OK · ${f.nome} (order ${r.orderId ?? "?"})`,
+          ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
         })
         .eq("id", pedido.id);
+
+      // v174 — ledger + treasury: fecha o buraco de auditoria do path legado
+      try {
+        const fat = Number(pedido.valor);
+        const taxaPix = Number((fat * 0.0099 + 0.49).toFixed(2));
+        const custo = custoReal != null ? Number(custoReal.toFixed(2)) : 0;
+        const lucroLiq = Number((fat - custo - taxaPix).toFixed(2));
+        const netPct = fat > 0 ? Number(((lucroLiq / fat) * 100).toFixed(2)) : 0;
+        await supabaseAdmin.from("admin_treasury" as any).upsert(
+          {
+            pedido_id: pedido.id,
+            faturamento: fat,
+            custo_api: custo,
+            taxa_pix: taxaPix,
+            lucro_liquido: lucroLiq,
+            network: String(pedido.pacote ?? "").split("_")[0] ?? null,
+            occurred_at: new Date().toISOString(),
+            supplier_cost: custoReal != null ? Number(custoReal.toFixed(4)) : null,
+            provider_selected: f.slug,
+            net_profit_percentage: netPct,
+          } as any,
+          { onConflict: "pedido_id" },
+        );
+        if (custo > 0) {
+          await supabaseAdmin.from("financial_ledger" as any).insert({
+            valor_brl: custo,
+            origem: "wallet:geral",
+            destino: `fornecedor:${f.slug}`,
+            pedido_id: pedido.id,
+            fornecedor_slug: f.slug,
+            telemetry: { event: "DISPATCH_OK_CONTINGENCY", provider: f.slug, cost_brl: custo, order_id: r.orderId ?? null },
+          } as any);
+        }
+      } catch (e) { console.warn("[contingency] v174 treasury/ledger fail", e); }
       break;
     }
     tentativas.push(`${f.nome}: ${r.error}${r.status ? ` HTTP ${r.status}` : ""}`);
