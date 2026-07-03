@@ -49,7 +49,7 @@ function buildLivePrices(rows: PricingCatalogRow[]): Map<string, number> {
     list.sort((a, b) => a.quantidade - b.quantidade);
     let prev = 0;
     for (const r of list) {
-      const equation = computeGuardedPrice(Number(r.cost_brl) || 0);
+      const equation = computeGuardedPrice(Number(r.cost_brl) || 0, Number(r.quantidade) || 0);
       let live = equation > 0 ? equation : Number(r.price_brl) || 0;
       if (live <= prev) live = Number((prev + MONOTONIC_STEP).toFixed(2));
       out.set(r.pacote, live);
