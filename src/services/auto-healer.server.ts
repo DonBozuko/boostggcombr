@@ -142,7 +142,7 @@ export async function runAutoHealer(): Promise<HealReport> {
     const price = Number(it.price_brl);
     if (Number.isFinite(cost) && cost > 0) {
       if (!respectsMinMargin(price, cost)) {
-        const fixed = computeGuardedPrice(cost);
+        const fixed = computeGuardedPrice(cost, Number(it.quantidade));
         if (fixed > 0 && Math.abs(fixed - price) > 0.01) {
           await supabaseAdmin
             .from("pricing_items" as any)
