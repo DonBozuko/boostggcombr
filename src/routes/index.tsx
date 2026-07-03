@@ -58,6 +58,7 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { simulatePurchase } from "@/lib/simulate-purchase.functions";
 import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
