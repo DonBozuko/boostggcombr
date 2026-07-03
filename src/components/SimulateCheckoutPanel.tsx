@@ -105,14 +105,7 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <label className="flex items-center gap-1.5 text-xs text-white/80 cursor-pointer">
-          <input type="radio" checked={mode === "dry"} onChange={() => setMode("dry")} />
-          Dry-run (não envia)
-        </label>
-        <label className="flex items-center gap-1.5 text-xs text-red-300 cursor-pointer">
-          <input type="radio" checked={mode === "real"} onChange={() => setMode("real")} />
-          Real (envia ao fornecedor)
-        </label>
+        <span className="text-xs text-emerald-300">🛡 Modo dry-run · sem débito · sem envio</span>
         <Button size="sm" variant="default" className="ml-auto bg-amber-600 hover:bg-amber-500" onClick={run} disabled={loading}>
           {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "🧪 Simular Compra"}
         </Button>
