@@ -13,7 +13,7 @@ const AUDIO_PROBES = [
 ];
 const PING_TARGETS: Array<{ provider: string; url: string }> = [
   { provider: "SMMHype", url: "https://smmhype.com/api/v2" },
-  { provider: "SMMPanel", url: "https://smmpanel.com.br/api/v2" },
+  { provider: "SMMPainel", url: "https://smmpainel.com/api/v2" },
 ];
 
 async function probe(url: string, kind: "html" | "audio"): Promise<{ ok: boolean; detail: string }> {
