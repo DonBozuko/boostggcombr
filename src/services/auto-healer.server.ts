@@ -161,15 +161,15 @@ export async function runAutoHealer(): Promise<HealReport> {
       if (f.ativo && f.saldo > 0 && f.saldo < 10) criticos.push(`${slug}: R$${f.saldo.toFixed(2)}`);
     });
     if (criticos.length > 0) {
-      const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
-      await notifyAdminProvisioning({
-        title: "⚠️ SALDO PULMÃO CRÍTICO",
-        body: `Fornecedores abaixo de R$10:\n${criticos.join("\n")}\n\nRecarregue para evitar refunds em cadeia.`,
+      const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+      await dispatchWhatsappAlert({
+        body: `⚠️ SALDO PULMÃO CRÍTICO\n\nFornecedores abaixo de R$10:\n${criticos.join("\n")}\n\nRecarregue para evitar refunds em cadeia.`,
       }).catch(() => {});
     }
   } catch (e: any) {
     report.errors.push(`alert failed: ${e?.message ?? "unknown"}`);
   }
+
 
   // 5) Log auditoria
   try {
