@@ -41,7 +41,7 @@ export const Route = createFileRoute("/youtube")({
   head: () => {
     const title = "Comprar Inscritos no YouTube e Views Reais | EliteBoost Prime";
     const description =
-      "Comprar inscritos no YouTube e visualizações reais com entrega via Pix automático. Pacotes para crescer e monetizar seu canal rápido.";
+      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
     const keywords =
       "comprar inscritos youtube, comprar views youtube, visualizações youtube barato, crescer canal youtube, monetizar canal youtube pix, agência smm youtube brasil";
     const url = "https://eliteboostprime.lovable.app/youtube";
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/youtube")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "YouTube", url, description, priceFromBrl: 5 })],
+      scripts: [buildProductJsonLd({ network: "YouTube", url, description })],
     };
   },
   component: YoutubeLanding,

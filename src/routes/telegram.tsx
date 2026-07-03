@@ -44,7 +44,7 @@ export const Route = createFileRoute("/telegram")({
   head: () => {
     const title = "Comprar Membros para Grupo e Canal do Telegram | EliteBoost Prime";
     const description =
-      "Comprar membros reais para grupo e canal do Telegram com entrega via Pix automático. Crescimento real, recarga estável e suporte humano.";
+      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
     const url = "https://eliteboostprime.lovable.app/telegram";
     const ogImage = `https://eliteboostprime.lovable.app${ogTelegram}?v=48`;
     return {
@@ -61,7 +61,7 @@ export const Route = createFileRoute("/telegram")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Telegram", url, description, priceFromBrl: 5 })],
+      scripts: [buildProductJsonLd({ network: "Telegram", url, description })],
     };
   },
   component: TelegramLanding,

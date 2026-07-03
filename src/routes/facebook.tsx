@@ -41,7 +41,7 @@ export const Route = createFileRoute("/facebook")({
   head: () => {
     const title = "Comprar Seguidores no Facebook e Curtidas | EliteBoost Prime";
     const description =
-      "Comprar seguidores no Facebook e curtidas reais com entrega via Pix automático. Pacotes para crescer perfil, página e posts rapidamente.";
+      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
     const keywords =
       "comprar seguidores facebook, comprar curtidas facebook, seguidores facebook barato, curtidas post facebook, crescer pagina facebook, agência smm facebook brasil";
     const url = "https://eliteboostprime.lovable.app/facebook";
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/facebook")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Facebook", url, description, priceFromBrl: 5 })],
+      scripts: [buildProductJsonLd({ network: "Facebook", url, description })],
     };
   },
   component: FacebookLanding,

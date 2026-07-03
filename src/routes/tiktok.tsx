@@ -41,7 +41,7 @@ export const Route = createFileRoute("/tiktok")({
   head: () => {
     const title = "Comprar Seguidores no TikTok Barato e Real | EliteBoost Prime";
     const description =
-      "Comprar seguidores no TikTok e visualizações com entrega imediata via Pix automático. Pacotes reais com reposição garantida para bater os requisitos de monetização rápido.";
+      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
     const keywords =
       "comprar seguidores tiktok, comprar views tiktok, visualizações tiktok barato, comprar curtidas tiktok, monetizar tiktok rápido, seguidores tiktok pix, impulsionar tiktok, agência smm brasil tiktok, como ganhar seguidores no tiktok";
     const url = "https://eliteboostprime.lovable.app/tiktok";
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/tiktok")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "TikTok", url, description, priceFromBrl: 5 })],
+      scripts: [buildProductJsonLd({ network: "TikTok", url, description })],
     };
   },
   component: TiktokLanding,
