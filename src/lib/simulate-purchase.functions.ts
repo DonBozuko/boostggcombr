@@ -201,8 +201,6 @@ export const simulatePurchase = createServerFn({ method: "POST" })
         pixLiquido,
         lucroBruto,
         lucroLiquido,
-        lucroBruto,
-        lucroLiquido,
         margemPct,
         razaoNet,
         saldoAntes,
