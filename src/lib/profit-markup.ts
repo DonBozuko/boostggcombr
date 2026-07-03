@@ -1,5 +1,5 @@
-// v168 — Strict Margin Guard client-safe. Aplica multiplicador tier + buffer PRIME15
-// + taxa Pix MP fixa (R$ 0,49). Piso mínimo R$ 5,00.
+// v173 — Strict Tiered Margin Guard client-safe. Multiplicador escalonado
+// por quantidade + buffer PRIME15 + taxa Pix MP fixa. Piso R$ 5,00.
 
 const COUPON_BUFFER = 1.15;
 const PIX_NET = 0.9901;
@@ -7,8 +7,14 @@ const PIX_FIXED = 0.49;
 const FLOOR_BRL = 5.0;
 
 function tierMultiplier(qty: number): number {
-  // v172: cravado em 5.0 (400% lucro) em TODAS as rotas/pacotes.
-  return 5.0;
+  // v173: escalonado — mesmo desconto PRIME15, margem compensada por faixa.
+  //   qty ≤ 500        → 5.0x  (isca de topo)
+  //   qty ≤ 10.000     → 8.0x  (sweet spot varejo)
+  //   qty > 10.000     → 12.0x (premium/autoridade)
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 500) return 5.0;
+  if (q <= 10_000) return 8.0;
+  return 12.0;
 }
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;

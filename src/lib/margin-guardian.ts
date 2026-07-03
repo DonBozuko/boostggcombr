@@ -1,23 +1,40 @@
-// v168 — Strict Margin Guard
+// v173 — Strict Tiered Margin Guard
 // Fórmula perpétua de venda (com taxa fixa Pix MP de R$ 0,49):
-//   price = (cost_brl * PROFIT_MULT * COUPON_BUFFER + PIX_FIXED) / PIX_NET
-// - PROFIT_MULT = 4.0   → 300% de lucro real (custo × 4)
-// - COUPON_BUFFER = 1.15 → absorve o cupom PRIME15
+//   price = (cost_brl * PROFIT_MULT * tierFactor(qty) * COUPON_BUFFER + PIX_FIXED) / PIX_NET
+// - PROFIT_MULT base = 5.0 (piso 400% lucro; trigger DB enforce_pricing_markup)
+// - Tier factor por quantidade (v173):
+//     qty ≤ 500        → 1.0  (efetivo 5.0x  — isca de topo)
+//     qty ≤ 10.000     → 1.6  (efetivo 8.0x  — sweet spot varejo)
+//     qty > 10.000     → 2.4  (efetivo 12.0x — premium/autoridade)
+// - COUPON_BUFFER = 1.15 → absorve o cupom PRIME15 sem sangrar margem
 // - PIX_NET = 0.9901    → líquido após taxa percentual MP Pix (0,99%)
 // - PIX_FIXED = 0.49    → taxa FIXA MP Pix por transação
-// - FLOOR = R$ 5,00     → piso mínimo (evita micro-ticket sangrar margem)
+// - FLOOR = R$ 5,00     → piso mínimo absoluto
 
-export const PROFIT_MULT = 5.0; // v172: 400% de lucro real sobre o custo
+export const PROFIT_MULT = 5.0; // base preservada — trigger DB usa este piso
 export const COUPON_BUFFER = 1.15;
 export const PIX_NET = 0.9901;
 export const PIX_FIXED = 0.49;
 export const FLOOR_BRL = 5.0;
-export const MIN_NET_PROFIT_RATIO = 4.0; // v172: alvo líquido 400%
+export const MIN_NET_PROFIT_RATIO = 4.0; // validação: net ≥ 4× custo
 
-export function computeGuardedPrice(costBrl: number): number {
+/** v173 — Fator escalar aplicado sobre PROFIT_MULT conforme a quantidade. */
+export function tierFactor(qty: number): number {
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 500) return 1.0; // 5.0x
+  if (q <= 10_000) return 1.6;                      // 8.0x
+  return 2.4;                                       // 12.0x
+}
+
+/** v173 — Multiplicador efetivo de lucro para uma quantidade. */
+export function effectiveProfitMult(qty: number): number {
+  return PROFIT_MULT * tierFactor(qty);
+}
+
+export function computeGuardedPrice(costBrl: number, qty = 0): number {
   const c = Number(costBrl);
   if (!Number.isFinite(c) || c <= 0) return 0;
-  const raw = (c * PROFIT_MULT * COUPON_BUFFER + PIX_FIXED) / PIX_NET;
+  const raw = (c * effectiveProfitMult(qty) * COUPON_BUFFER + PIX_FIXED) / PIX_NET;
   return Number(Math.max(FLOOR_BRL, raw).toFixed(2));
 }
 

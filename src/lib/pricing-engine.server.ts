@@ -122,13 +122,23 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 const USD_TO_BRL = 7.0;
 const CONTINGENCY_SOURCE = "fallback" as const;
 
-// v168 — Equação Fabiano com taxa MP Pix fixa (R$ 0,49) + piso R$ 5,00.
-// Fórmula: preço = (custo * PROFIT * COUPON + PIX_FIXED) / PIX_NET
-let FABIANO_PROFIT = 5.0; // v172: 400% de lucro real
+// v173 — Equação Fabiano Tiered. Fórmula:
+//   preço = (custo * FABIANO_PROFIT * tierFactor(qty) * COUPON + PIX_FIXED) / PIX_NET
+// FABIANO_PROFIT continua sendo o piso 5.0 (trigger DB enforce_pricing_markup);
+// o escalonamento vem de tierFactor(qty) — desconto PRIME15 preservado no
+// COUPON e margem compensada por faixa.
+let FABIANO_PROFIT = 5.0; // base — trigger DB usa este piso
 let FABIANO_COUPON = 1.15;
 let FABIANO_PIX_NET = 0.9901;
 let FABIANO_PIX_FIXED = 0.49;
 let FLOOR_BASE = 5.0;
+
+function tierFactor(qty: number): number {
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 500) return 1.0; // 5.0x
+  if (q <= 10_000) return 1.6;                      // 8.0x
+  return 2.4;                                       // 12.0x
+}
 
 async function primeConfig(): Promise<void> {
   try {
@@ -152,7 +162,7 @@ function floorFor(qty: number): number {
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
-  const raw = (baseCost * FABIANO_PROFIT * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
+  const raw = (baseCost * FABIANO_PROFIT * tierFactor(qty) * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
   return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
 
@@ -161,7 +171,7 @@ function packageCostFromRate(qty: number, costPer1k: number): number {
 }
 
 function priceFromPackageCost(qty: number, costBrl: number): number {
-  const raw = (costBrl * FABIANO_PROFIT * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
+  const raw = (costBrl * FABIANO_PROFIT * tierFactor(qty) * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
   return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
 
