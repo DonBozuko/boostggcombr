@@ -231,17 +231,14 @@ export function TreasuryPanel({ token }: { token: string }) {
             <span className="text-[9px] text-amber-200/80">Fila Aguardando Processamento Financeiro: <strong className="text-amber-100">{wallets.queueCount}</strong></span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {wallets.wallets.map((w) => {
-              const semId = w.fornecedor_slug && Number(w.saldo_brl) === 0;
-              return (
-                <div key={w.wallet_key} className="rounded-lg border border-cyan-400/25 bg-black/40 p-2">
-                  <div className="text-[9px] uppercase tracking-wider text-cyan-300/70">{w.label}</div>
-                  <div className="text-sm font-bold text-white">{brl(Number(w.saldo_brl))}</div>
-                  {w.reserved_brl > 0 && <div className="text-[9px] text-amber-300/80">Reservado: {brl(Number(w.reserved_brl))}</div>}
-                  {semId && <div className="text-[9px] text-amber-200">⚠️ Cadastrar ID</div>}
-                </div>
-              );
-            })}
+            {wallets.wallets.map((w) => (
+              <div key={w.wallet_key} className="rounded-lg border border-cyan-400/25 bg-black/40 p-2">
+                <div className="text-[9px] uppercase tracking-wider text-cyan-300/70">{w.label}</div>
+                <div className="text-sm font-bold text-white">{brl(Number(w.saldo_brl))}</div>
+                {w.reserved_brl > 0 && <div className="text-[9px] text-amber-300/80">Reservado: {brl(Number(w.reserved_brl))}</div>}
+              </div>
+            ))}
+
           </div>
         </div>
       )}
