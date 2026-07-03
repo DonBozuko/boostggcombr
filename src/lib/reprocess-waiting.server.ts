@@ -45,7 +45,11 @@ export async function confirmRobotDispatch(input: {
   }
 
   const orderId = input.providerOrderId ?? null;
-  const updates: Record<string, unknown> = {
+  const updates: {
+    status: string;
+    error_detail: string;
+    custo_real?: number;
+  } = {
     status: "Enviado",
     error_detail: `Robô externo confirmou envio${fornecedor ? ` via ${fornecedor}` : ""}${orderId ? ` (order ${orderId})` : ""}`,
   };
