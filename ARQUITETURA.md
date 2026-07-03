@@ -16,18 +16,21 @@
    Geral. Governa 3 fornecedores (smmhype/smmpainel/verified), cron de
    sync, roteamento de menor custo, blindagem visual.
 
-## Constantes Cravadas (v172)
+## Constantes Cravadas (v173 — Tiered)
 
 ```
-PROFIT_MULT   = 5.0     // 400% de lucro real sobre custo
-COUPON_BUFFER = 1.15    // absorve cupom PRIME15
+PROFIT_MULT   = 5.0     // base — piso reconhecido pelo trigger DB
+tierFactor(q) = 1.0 se q ≤ 500      → 5.0x  (isca)
+              = 1.6 se q ≤ 10.000   → 8.0x  (varejo)
+              = 2.4 se q > 10.000   → 12.0x (premium)
+COUPON_BUFFER = 1.15    // absorve cupom PRIME15 (preservado)
 PIX_NET       = 0.9901  // líquido pós taxa % MP Pix
 PIX_FIXED     = 0.49    // taxa fixa MP Pix por transação (BRL)
 FLOOR_BRL     = 5.00    // piso absoluto por pacote
 ```
 
 Fórmula de venda:
-`price = max(5.00, (cost × 5.0 × 1.15 + 0.49) / 0.9901)`
+`price = max(floor(qty), (cost × 5.0 × tierFactor(qty) × 1.15 + 0.49) / 0.9901)`
 
 Aplicada em 3 camadas defensivas:
 - Cliente: `src/lib/margin-guardian.ts`, `src/lib/profit-markup.ts`
