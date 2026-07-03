@@ -1,11 +1,12 @@
-// High-CAC Anti-Fee Pricing Matrix — client-safe markup.
-// Aplica multiplicador por faixa de volume e divide por 0.85 (buffer PRIME15)
-// sobre o `valor` base tratado como custo. Unifica com o motor server.
+// v168 — Strict Margin Guard client-safe. Aplica multiplicador tier + buffer PRIME15
+// + taxa Pix MP fixa (R$ 0,49). Piso mínimo R$ 5,00.
 
-const COUPON_BUFFER = 0.85; // 1 - 0.15 (PRIME15)
+const COUPON_BUFFER = 1.15;
+const PIX_NET = 0.9901;
+const PIX_FIXED = 0.49;
+const FLOOR_BRL = 5.0;
 
 function tierMultiplier(qty: number): number {
-  // Premium Balancing Adjust v42
   if (qty <= 1000) return 4.0;
   if (qty <= 10000) return 2.6;
   return 1.8;
@@ -25,8 +26,8 @@ export function applyProfitFormula<T extends { valor: number; price: string; qua
   return plans.map((p) => {
     const cost = parseFloat(String(p.valor));
     const qty = Number(p.quantidade ?? 0);
-    const raw = (cost * tierMultiplier(qty)) / COUPON_BUFFER;
-    const final = Math.max(3, ceilTo(raw, 0.5));
+    const raw = (cost * tierMultiplier(qty) * COUPON_BUFFER + PIX_FIXED) / PIX_NET;
+    const final = Math.max(FLOOR_BRL, ceilTo(raw, 0.5));
     return { ...p, valor: final, price: formatBRL(final) };
   });
 }

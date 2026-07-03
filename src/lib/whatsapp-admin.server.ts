@@ -24,8 +24,8 @@ function fmtBrl(v: number): string {
 
 /** Estima o custo bruto a partir do preço de venda quando não temos rate. */
 function estimateCost(vendaBrl: number): number {
-  // preço = custo * 4.0 * 1.15 / 0.9901
-  return Number(((vendaBrl * 0.9901) / (4.0 * 1.15)).toFixed(2));
+  // v168: preço = (custo * 4.0 * 1.15 + 0.49) / 0.9901 → custo = (venda * 0.9901 - 0.49) / 4.6
+  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (4.0 * 1.15)).toFixed(2));
 }
 
 /** Retorna o Pix Copia-e-Cola do fornecedor alvo (ou null). */

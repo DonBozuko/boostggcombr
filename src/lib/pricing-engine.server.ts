@@ -122,13 +122,13 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 const USD_TO_BRL = 7.0;
 const CONTINGENCY_SOURCE = "fallback" as const;
 
-// v162 — Equação Fabiano com config dinâmica (admin_settings.pricing_config).
-// Valores default preservam a fórmula histórica: preço = custo * 4.0 * 1.15 / 0.9901.
-// Cache 30s no getPricingConfig — alterações no admin refletem em até 30s.
+// v168 — Equação Fabiano com taxa MP Pix fixa (R$ 0,49) + piso R$ 5,00.
+// Fórmula: preço = (custo * PROFIT * COUPON + PIX_FIXED) / PIX_NET
 let FABIANO_PROFIT = 4.0;
 let FABIANO_COUPON = 1.15;
 let FABIANO_PIX_NET = 0.9901;
-let FLOOR_BASE = 3.0;
+let FABIANO_PIX_FIXED = 0.49;
+let FLOOR_BASE = 5.0;
 
 async function primeConfig(): Promise<void> {
   try {
@@ -137,6 +137,7 @@ async function primeConfig(): Promise<void> {
     FABIANO_PROFIT = cfg.profit_multiplier;
     FABIANO_COUPON = cfg.coupon_buffer;
     FABIANO_PIX_NET = cfg.gateway_net;
+    FABIANO_PIX_FIXED = cfg.gateway_fixed;
     FLOOR_BASE = cfg.floor_brl;
   } catch { /* mantém defaults */ }
 }
@@ -151,7 +152,7 @@ function floorFor(qty: number): number {
 function priceFromCost(qty: number, costPer1k: number): number {
   const cost = parseFloat(String(costPer1k));
   const baseCost = (qty / 1000) * cost;
-  const raw = (baseCost * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
+  const raw = (baseCost * FABIANO_PROFIT * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
   return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
 
@@ -160,7 +161,7 @@ function packageCostFromRate(qty: number, costPer1k: number): number {
 }
 
 function priceFromPackageCost(qty: number, costBrl: number): number {
-  const raw = (costBrl * FABIANO_PROFIT * FABIANO_COUPON) / FABIANO_PIX_NET;
+  const raw = (costBrl * FABIANO_PROFIT * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
   return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
 
