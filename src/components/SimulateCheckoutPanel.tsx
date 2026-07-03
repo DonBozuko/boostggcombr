@@ -39,13 +39,13 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
     setLoading(true);
     setResult(null);
     try {
-      const r = await sim({ data: { token, pacote, quantidade: qty, handle, mode } });
+      const r = await sim({ data: { token, pacote, quantidade: qty, handle } });
       if (!r.ok) {
         toast.error(`Falha: ${(r as any).error ?? "desconhecido"}`);
         return;
       }
       setResult({ steps: r.steps, pedidoId: r.pedidoId, totalMs: (r as any).totalMs, finalStatus: (r as any).finalStatus });
-      toast.success(`Simulação ${mode.toUpperCase()} concluída em ${(r as any).totalMs}ms`);
+      toast.success(`Simulação concluída em ${(r as any).totalMs}ms`);
     } catch (e) {
       toast.error(`Erro: ${(e as Error).message}`);
     } finally {
