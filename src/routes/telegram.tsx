@@ -42,9 +42,9 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/telegram")({
   head: () => {
-    const title = "Comprar Membros para Grupo e Canal do Telegram | EliteBoost Prime";
+    const title = "Comprar Membros Telegram Grupo e Canal | EliteBoost";
     const description =
-      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
+      "Compre membros reais para grupo e canal do Telegram com entrega imediata via Pix. Alta retenção e reposição garantida.";
     const url = "https://eliteboostprime.lovable.app/telegram";
     const ogImage = `https://eliteboostprime.lovable.app${ogTelegram}?v=48`;
     return {

@@ -39,9 +39,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/youtube")({
   head: () => {
-    const title = "Comprar Inscritos no YouTube e Views Reais | EliteBoost Prime";
+    const title = "Comprar Inscritos YouTube Reais | EliteBoost Prime";
     const description =
-      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
+      "Compre inscritos, views e likes de YouTube reais com entrega via Pix. Ativa monetização, alta retenção e reposição garantida.";
     const keywords =
       "comprar inscritos youtube, comprar views youtube, visualizações youtube barato, crescer canal youtube, monetizar canal youtube pix, agência smm youtube brasil";
     const url = "https://eliteboostprime.lovable.app/youtube";

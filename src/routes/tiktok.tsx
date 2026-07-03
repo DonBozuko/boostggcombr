@@ -39,9 +39,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Comprar Seguidores no TikTok Barato e Real | EliteBoost Prime";
+    const title = "Comprar Seguidores TikTok Barato | EliteBoost Prime";
     const description =
-      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
+      "Compre seguidores, curtidas e views de TikTok reais com entrega imediata via Pix. Alta retenção, orgânico e reposição garantida.";
     const keywords =
       "comprar seguidores tiktok, comprar views tiktok, visualizações tiktok barato, comprar curtidas tiktok, monetizar tiktok rápido, seguidores tiktok pix, impulsionar tiktok, agência smm brasil tiktok, como ganhar seguidores no tiktok";
     const url = "https://eliteboostprime.lovable.app/tiktok";

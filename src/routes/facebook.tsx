@@ -39,9 +39,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/facebook")({
   head: () => {
-    const title = "Comprar Seguidores no Facebook e Curtidas | EliteBoost Prime";
+    const title = "Comprar Curtidas e Seguidores Facebook | EliteBoost";
     const description =
-      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
+      "Compre curtidas, seguidores e views de Facebook reais com entrega via Pix. Engajamento orgânico, alta retenção e reposição garantida.";
     const keywords =
       "comprar seguidores facebook, comprar curtidas facebook, seguidores facebook barato, curtidas post facebook, crescer pagina facebook, agência smm facebook brasil";
     const url = "https://eliteboostprime.lovable.app/facebook";
