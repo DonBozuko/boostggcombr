@@ -38,12 +38,15 @@ export async function checkSmmhypeBalance() {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const { data: pedidos24h } = await supabaseAdmin
       .from("pedidos")
-      .select("valor")
-      .eq("status", "approved")
+      .select("valor, custo_real")
+      .in("status", ["paid", "waiting_provision", "Enviado"])
       .gte("created_at", since);
-    // valor em centavos (BRL)
-    const totalCentavos = (pedidos24h ?? []).reduce((s, p: any) => s + (Number(p.valor) || 0), 0);
-    previsao24hBrl = totalCentavos / 100;
+    // pedidos.valor/custo_real já são BRL decimal; nunca dividir por 100.
+    previsao24hBrl = (pedidos24h ?? []).reduce((s, p: any) => {
+      const custo = Number(p.custo_real);
+      const venda = Number(p.valor);
+      return s + (Number.isFinite(custo) && custo > 0 ? custo : (Number.isFinite(venda) ? venda : 0));
+    }, 0);
 
     // Sincroniza saldo na tabela suppliers (BRL)
     if (saldoBrl != null) {

@@ -67,7 +67,7 @@ export async function runAutoHealer(): Promise<HealReport> {
   // 1) Snapshot pricing_items
   const { data: items, error: itemsErr } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("id, pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
   if (itemsErr || !items) {
     report.errors.push(`pricing_items load failed: ${itemsErr?.message ?? "unknown"}`);
     return report;
@@ -124,15 +124,15 @@ export async function runAutoHealer(): Promise<HealReport> {
       if (guess) {
         await supabaseAdmin
           .from("pricing_items" as any)
-          .update({ [p.idCol]: String(guess.service), updated_at: new Date().toISOString() } as any)
-          .eq("id", it.id);
+          .update({ [p.idCol]: String(guess.service), synced_at: new Date().toISOString() } as any)
+          .eq("pacote", it.pacote);
         report.id_fixed++;
       } else {
         // ID órfão → zera para o smart-routing pular esta rota
         await supabaseAdmin
           .from("pricing_items" as any)
-          .update({ [p.idCol]: null, updated_at: new Date().toISOString() } as any)
-          .eq("id", it.id);
+          .update({ [p.idCol]: null, synced_at: new Date().toISOString() } as any)
+          .eq("pacote", it.pacote);
         report.errors.push(`ID órfão em ${pacote} (${p.slug}): ${currentId}`);
       }
     }
@@ -146,8 +146,8 @@ export async function runAutoHealer(): Promise<HealReport> {
         if (fixed > 0 && Math.abs(fixed - price) > 0.01) {
           await supabaseAdmin
             .from("pricing_items" as any)
-            .update({ price_brl: fixed, updated_at: new Date().toISOString() } as any)
-            .eq("id", it.id);
+            .update({ price_brl: fixed, synced_at: new Date().toISOString() } as any)
+            .eq("pacote", it.pacote);
           report.price_fixed++;
         }
       }
@@ -157,8 +157,9 @@ export async function runAutoHealer(): Promise<HealReport> {
   // 4) Log auditoria
   try {
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
+      admin_email: "system@auto-healer",
       action: "auto_healer_v172",
-      details: report as any,
+      detail: report as any,
       created_at: new Date().toISOString(),
     } as any);
   } catch (e: any) {

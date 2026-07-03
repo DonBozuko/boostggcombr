@@ -55,12 +55,25 @@ export async function confirmRobotDispatch(input: {
   };
   if (custoBrl != null) updates.custo_real = Number(custoBrl.toFixed(4));
 
-  const { error: updErr } = await supabaseAdmin
+  const { data: confirmedRow, error: updErr } = await supabaseAdmin
     .from("pedidos")
     .update(updates)
     .eq("id", pedido.id)
-    .in("status", ["waiting_provision", "MARGIN_HOLD", "SMM_FAILED", "Enviado"]);
+    .in("status", ["waiting_provision", "MARGIN_HOLD", "SMM_FAILED"])
+    .select("id")
+    .maybeSingle();
   if (updErr) return { ok: false, error: "UPDATE_FAILED" };
+  if (!confirmedRow) {
+    const { data: fresh } = await supabaseAdmin
+      .from("pedidos")
+      .select("status, custo_real")
+      .eq("id", pedido.id)
+      .maybeSingle();
+    if (fresh?.status === "Enviado") {
+      return { ok: true, fornecedor: input.fornecedor ?? null, orderId: input.providerOrderId ?? null, custoBrl: Number(fresh.custo_real ?? 0) || null };
+    }
+    return { ok: false, error: "UPDATE_SKIPPED" };
+  }
 
   if (custoBrl != null && custoBrl > 0) {
     try {
@@ -86,7 +99,7 @@ export async function confirmRobotDispatch(input: {
   try {
     const fat = Number(pedido.valor) || 0;
     const custo = Number(custoBrl ?? 0);
-    const taxaPix = Number((fat * 0.0099).toFixed(2));
+    const taxaPix = Number((fat * 0.0099 + 0.49).toFixed(2));
     const lucroLiq = Number((fat - custo - taxaPix).toFixed(2));
     const netPct = fat > 0 ? Number(((lucroLiq / fat) * 100).toFixed(2)) : 0;
     await supabaseAdmin.from("admin_treasury" as any).upsert({
@@ -157,18 +170,22 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
       await supabaseAdmin
         .from("pedidos")
         .update({
-          status: "paid",
+          status: "Enviado",
           error_detail: `v151 recarga manual · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
         })
         .eq("id", pedido.id);
       // Registra ledger de auditoria PROVIDER_RECHARGE_MANUAL
       try {
+        if (f.cost_brl != null && f.cost_brl > 0) {
+          await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: -Number(f.cost_brl.toFixed(4)) });
+        }
         await supabaseAdmin.from("financial_ledger" as any).insert({
-          valor_brl: Number(pedido.valor),
+          valor_brl: f.cost_brl != null ? Number(f.cost_brl.toFixed(4)) : 0,
           origem: "wallet:reservado",
-          destino: "wallet:geral",
+          destino: `fornecedor:${f.slug}`,
           pedido_id: String(pedido.id),
+          fornecedor_slug: f.slug,
           telemetry: {
             event: "PROVIDER_RECHARGE_MANUAL",
             provider: f.slug,
