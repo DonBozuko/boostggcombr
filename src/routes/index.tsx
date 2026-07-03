@@ -676,7 +676,11 @@ function Landing() {
             <p className="text-sm sm:text-base text-zinc-300">
               Preencha os dados abaixo. Em segundos você recebe o Pix no WhatsApp.
             </p>
+            <p className="mt-2 text-[11px] text-zinc-400/80">
+              ⚡ Início da entrega: imediato na maioria dos pedidos · até 24h em picos de demanda.
+            </p>
           </div>
+
 
 
           <form
