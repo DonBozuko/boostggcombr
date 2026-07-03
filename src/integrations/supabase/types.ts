@@ -513,6 +513,27 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_rates_cache: {
+        Row: {
+          provider_service_id: string
+          provider_slug: string
+          rate_usd: number
+          updated_at: string
+        }
+        Insert: {
+          provider_service_id: string
+          provider_slug: string
+          rate_usd: number
+          updated_at?: string
+        }
+        Update: {
+          provider_service_id?: string
+          provider_slug?: string
+          rate_usd?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       scheduled_posts: {
         Row: {
           approval_token: string | null
