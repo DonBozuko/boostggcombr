@@ -154,7 +154,24 @@ export async function runAutoHealer(): Promise<HealReport> {
     }
   }
 
-  // 4) Log auditoria
+  // 4) Alerta proativo — saldo pulmão crítico (< R$10 em qualquer fornecedor ativo)
+  try {
+    const criticos: string[] = [];
+    fornMap.forEach((f, slug) => {
+      if (f.ativo && f.saldo > 0 && f.saldo < 10) criticos.push(`${slug}: R$${f.saldo.toFixed(2)}`);
+    });
+    if (criticos.length > 0) {
+      const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+      await dispatchWhatsappAlert(
+        `⚠️ SALDO PULMÃO CRÍTICO\n\nFornecedores abaixo de R$10:\n${criticos.join("\n")}\n\nRecarregue para evitar refunds em cadeia.`,
+      ).catch(() => {});
+    }
+  } catch (e: any) {
+    report.errors.push(`alert failed: ${e?.message ?? "unknown"}`);
+  }
+
+
+  // 5) Log auditoria
   try {
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
       admin_email: "system@auto-healer",

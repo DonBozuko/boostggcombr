@@ -54,10 +54,15 @@ export async function dispatchSmmV2(opts: {
     const text = await res.text();
     let json: unknown = null;
     try { json = JSON.parse(text); } catch { /* */ }
-    if (!res.ok || (json && (json as { error?: string }).error)) {
-      return { ok: false, error: `${opts.fornecedor} falhou`, status: res.status, body: json ?? text };
+    const apiError = (json as { error?: string } | null)?.error;
+    if (!res.ok || apiError) {
+      const detail = apiError ? String(apiError) : text.slice(0, 200);
+      return { ok: false, error: `${opts.fornecedor} falhou: ${detail}`, status: res.status, body: json ?? text };
     }
     const orderId = (json as { order?: string | number } | null)?.order;
+    if (orderId == null || orderId === "") {
+      return { ok: false, error: `${opts.fornecedor}: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
+    }
     return { ok: true, orderId, body: json ?? text };
   } catch (err) {
     return { ok: false, error: `${opts.fornecedor}: rede ${(err as Error).message}` };
