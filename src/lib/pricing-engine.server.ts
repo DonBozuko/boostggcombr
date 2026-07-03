@@ -135,10 +135,12 @@ let FLOOR_BASE = 5.0;
 
 function tierFactor(qty: number): number {
   const q = Number(qty);
-  if (!Number.isFinite(q) || q <= 500) return 1.0; // 5.0x
-  if (q <= 10_000) return 1.6;                      // 8.0x
-  return 2.4;                                       // 12.0x
+  if (!Number.isFinite(q) || q <= 500) return 1.0;   // 5.0x  — isca
+  if (q <= 5_000) return 1.6;                         // 8.0x  — sweet spot
+  if (q <= 15_000) return 1.6 + ((q - 5000) / 10000) * 0.8; // rampa 8x→12x
+  return 2.4;                                         // 12.0x — premium
 }
+
 
 async function primeConfig(): Promise<void> {
   try {
