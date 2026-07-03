@@ -36,6 +36,7 @@
   --color-electric: var(--electric);
   --font-display: "Space Grotesk", sans-serif;
   --font-sans: "Inter", sans-serif;
+  --font-serif: "Cinzel", "Playfair Display", serif;
 }
 
 :root {
