@@ -522,6 +522,30 @@ function Landing() {
     });
     setLoading(true);
     try {
+      // v176 Shadow Mode: admin com localStorage.ADMIN_SHADOW='1' roda dry-run
+      // ao invés de criar pedido MP real. Cliente comum não tem a flag → paga normal.
+      const shadow =
+        typeof window !== "undefined" &&
+        window.localStorage.getItem("ADMIN_SHADOW") === "1" &&
+        !!window.localStorage.getItem("eliteboost_prime_admin_token");
+      if (shadow) {
+        const token = window.localStorage.getItem("eliteboost_prime_admin_token")!;
+        const simRes = await simulatePurchaseFn({
+          data: {
+            token,
+            pacote: selected.id,
+            quantidade: selected.quantidade,
+            handle: result.data.profile,
+          },
+        });
+        if (!simRes?.ok) {
+          toast.error(`Simulação falhou: ${(simRes as { error?: string })?.error ?? "erro"}`);
+          return;
+        }
+        toast.success(`🧪 SHADOW OK · pedido SIM ${String(simRes.pedidoId).slice(0, 8)} · ${simRes.totalMs}ms — nenhum Pix real gerado`);
+        console.info("[shadow] steps:", simRes.steps);
+        return;
+      }
       if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
       const res = await criarPedidoFn({
         data: {
