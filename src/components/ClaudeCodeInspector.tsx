@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getClaudeInspect, simulateProviderUnstable } from "@/lib/claude-inspect.functions";
+import { getClaudeInspect } from "@/lib/claude-inspect.functions";
 
 type Data = Awaited<ReturnType<typeof getClaudeInspect>>;
 
 export function ClaudeCodeInspector() {
   const fn = useServerFn(getClaudeInspect);
-  const simFn = useServerFn(simulateProviderUnstable);
-  
+
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [flash, setFlash] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -28,30 +25,7 @@ export function ClaudeCodeInspector() {
     return () => { alive = false; clearInterval(iv); };
   }, [fn]);
 
-  const runSim = async (slug: string) => {
-    setBusy(slug);
-    try {
-      const r: any = await simFn({ data: { slug, minutes: 5 } });
-      setFlash(`🧪 Pane injetada em ${slug} até ${new Date(r.until).toLocaleTimeString("pt-BR")}`);
-    } catch (e: any) {
-      setFlash(`⛔ ${e?.message ?? e}`);
-    } finally { setBusy(null); }
-  };
 
-  const runBlackout = async () => {
-    setBusy("BLACKOUT");
-    try {
-      const slugs = ["smmhype", "smmpainel", "verified"];
-      const results = await Promise.allSettled(
-        slugs.map((slug) => simFn({ data: { slug, minutes: 5 } })),
-      );
-      const ok = results.filter((r) => r.status === "fulfilled").length;
-      const until = new Date(Date.now() + 5 * 60_000).toLocaleTimeString("pt-BR");
-      setFlash(`⚠️ APAGÃO GERAL disparado · ${ok}/3 fornecedores instáveis até ${until}`);
-    } catch (e: any) {
-      setFlash(`⛔ ${e?.message ?? e}`);
-    } finally { setBusy(null); }
-  };
 
 
 
