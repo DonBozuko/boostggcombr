@@ -114,3 +114,86 @@ export async function syncSmmhypeServices() {
 
 // Executa fallback imediatamente em runtime (popula cache em cold start se vazio)
 ensureFallback().catch(() => { /* silencioso: chamado novamente no próximo sync */ });
+
+// v164 — Alias explícito para paridade tri-provider (SMMhype = services_cache)
+export const syncSmmHype = syncSmmhypeServices;
+
+// ============================================================================
+// v164 — Sync isolado SMMPainel → smmpanel_services_cache
+// ============================================================================
+async function syncGenericProvider(opts: {
+  slug: "smmpanel" | "verified";
+  endpoint: string;
+  apiKey: string | undefined;
+  tableName: "smmpanel_services_cache" | "verified_services_cache";
+}) {
+  if (!opts.apiKey) throw new Error(`${opts.slug.toUpperCase()}_API_KEY ausente`);
+  const body = new URLSearchParams({ key: opts.apiKey, action: "services" });
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15_000);
+  let json: ProviderService[];
+  try {
+    const resp = await fetch(opts.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json,text/plain,*/*",
+        "User-Agent": "EliteBoostPrime-Sync/164",
+      },
+      body: body.toString(),
+      signal: ctrl.signal,
+    });
+    if (!resp.ok) throw new Error(`${opts.slug} HTTP ${resp.status}`);
+    json = JSON.parse(await resp.text()) as ProviderService[];
+  } finally { clearTimeout(timer); }
+  if (!Array.isArray(json)) throw new Error(`Resposta inesperada de ${opts.slug}`);
+
+  const filtered = json.filter(
+    (s) => typeof s.category === "string" && typeof s.name === "string" && s.service != null,
+  );
+  const rows = filtered.map((s) => ({
+    provider_service_id: Number(s.service),
+    category: String(s.category),
+    name: String(s.name),
+    rate: Number(s.rate) || 0,
+    refill: s.refill === true,
+    min: Number(s.min) || 0,
+    max: Number(s.max) || 0,
+    updated_at: new Date().toISOString(),
+  }));
+
+  if (rows.length > 0) {
+    // batches de 500 p/ evitar payloads gigantes
+    for (let i = 0; i < rows.length; i += 500) {
+      const chunk = rows.slice(i, i + 500);
+      const { error } = await supabaseAdmin
+        .from(opts.tableName as any)
+        .upsert(chunk as any, { onConflict: "provider_service_id" });
+      if (error) throw error;
+    }
+  }
+  return {
+    ok: true as const,
+    provider: opts.slug,
+    total: rows.length,
+    synced_at: new Date().toISOString(),
+  };
+}
+
+export async function syncSmmPanel() {
+  return syncGenericProvider({
+    slug: "smmpanel",
+    endpoint: "https://smmpainel.com/api/v2",
+    apiKey: process.env.SMMPAINEL_API_KEY,
+    tableName: "smmpanel_services_cache",
+  });
+}
+
+export async function syncVerified() {
+  return syncGenericProvider({
+    slug: "verified",
+    endpoint: "https://verifiedatacado.com/api/v2",
+    apiKey: process.env.VERIFIED_API_KEY,
+    tableName: "verified_services_cache",
+  });
+}
