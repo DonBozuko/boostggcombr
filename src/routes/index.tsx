@@ -6,6 +6,7 @@ import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { MobileFrame } from "@/components/MobileFrame";
+import { FaqSection } from "@/components/FaqSection";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { useScrolledPast } from "@/hooks/useScroll";
@@ -1075,6 +1076,7 @@ function Landing() {
         </div>
       </footer>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="instagram" />
+      </MobileFrame>
   );
 }

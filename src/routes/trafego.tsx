@@ -1,4 +1,5 @@
-import { buildProductJsonLd } from "@/lib/seo-jsonld";
+import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE_CLEAN } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
@@ -55,7 +56,7 @@ export const Route = createFileRoute("/trafego")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Tráfego Pago", url, description })],
+      scripts: [buildProductJsonLd({ network: "Tráfego Pago", url, description }), buildFaqJsonLd(FAQS["trafego"])],
     };
   },
   component: TrafegoLanding,
@@ -324,6 +325,7 @@ function TrafegoLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="trafego" />
+      </MobileFrame>
   );
 }

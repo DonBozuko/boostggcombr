@@ -1,4 +1,5 @@
-import { buildProductJsonLd } from "@/lib/seo-jsonld";
+import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
@@ -60,7 +61,7 @@ export const Route = createFileRoute("/telegram")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Telegram", url, description })],
+      scripts: [buildProductJsonLd({ network: "Telegram", url, description }), buildFaqJsonLd(FAQS["telegram"])],
     };
   },
   component: TelegramLanding,
@@ -404,6 +405,7 @@ function TelegramLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="telegram" />
+      </MobileFrame>
   );
 }

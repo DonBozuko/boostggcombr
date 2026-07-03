@@ -25,3 +25,18 @@ export function buildProductJsonLd(opts: {
     }),
   };
 }
+
+export function buildFaqJsonLd(items: { q: string; a: string }[]) {
+  return {
+    type: "application/ld+json" as const,
+    children: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: items.map((i) => ({
+        "@type": "Question",
+        name: i.q,
+        acceptedAnswer: { "@type": "Answer", text: i.a },
+      })),
+    }),
+  };
+}

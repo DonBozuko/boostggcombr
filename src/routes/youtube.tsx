@@ -1,4 +1,5 @@
-import { buildProductJsonLd } from "@/lib/seo-jsonld";
+import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
@@ -61,7 +62,7 @@ export const Route = createFileRoute("/youtube")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "YouTube", url, description })],
+      scripts: [buildProductJsonLd({ network: "YouTube", url, description }), buildFaqJsonLd(FAQS["youtube"])],
     };
   },
   component: YoutubeLanding,
@@ -482,6 +483,7 @@ function YoutubeLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="youtube" />
+      </MobileFrame>
   );
 }
