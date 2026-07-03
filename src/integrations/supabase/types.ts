@@ -358,6 +358,7 @@ export type Database = {
           pacote: string
           quantidade: number
           rede_social: string
+          sla_deadline: string | null
           status: string
           utm_source: string | null
           valor: number
@@ -374,6 +375,7 @@ export type Database = {
           pacote: string
           quantidade: number
           rede_social?: string
+          sla_deadline?: string | null
           status?: string
           utm_source?: string | null
           valor: number
@@ -390,6 +392,7 @@ export type Database = {
           pacote?: string
           quantidade?: number
           rede_social?: string
+          sla_deadline?: string | null
           status?: string
           utm_source?: string | null
           valor?: number

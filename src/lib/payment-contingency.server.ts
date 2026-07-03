@@ -295,6 +295,33 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   }
 
   if (!sucesso) {
+    // v180 — SLA 24h: se falha for saldo insuficiente em fornecedor, parqueia em waiting_provision.
+    // Só refunda se, após 24h, ainda não houver saldo (executado pelo SLA watcher).
+    const isSaldoInsuficiente = tentativas.some((t) =>
+      /insufficient|saldo|balance|not enough|no funds/i.test(t),
+    );
+
+    if (isSaldoInsuficiente) {
+      const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      await supabaseAdmin
+        .from("pedidos")
+        .update({
+          status: "waiting_provision",
+          sla_deadline: deadline,
+          error_detail: `Saldo insuficiente em fornecedores. Recarga até ${deadline}. ${tentativas.join(" | ")}`.slice(0, 500),
+        } as any)
+        .eq("id", pedido.id);
+
+      try {
+        const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+        await dispatchWhatsappAlert(
+          `⏳ PEDIDO PARQUEADO (SLA 24h)\n\nPedido ${pedido.id.slice(0, 8)} · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nRecarregue fornecedor até ${new Date(deadline).toLocaleString("pt-BR")} ou refund automático.\n\nTentativas:\n${tentativas.join("\n")}`,
+        ).catch(() => {});
+      } catch { /* */ }
+
+      return { ok: true, status: "waiting_provision", recovered: false, note: `SLA 24h até ${deadline}` };
+    }
+
     const refund = await refundMercadoPago(String(pedido.mercado_pago_id));
     await supabaseAdmin
       .from("pedidos")
@@ -305,6 +332,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       .eq("id", pedido.id);
     return { ok: true, status: refund.ok ? "mp_refunded" : "SMM_FAILED", recovered: false };
   }
+
 
   return { ok: true, status: "paid", recovered: true, note: `via ${fornecedorOk}` };
 }
