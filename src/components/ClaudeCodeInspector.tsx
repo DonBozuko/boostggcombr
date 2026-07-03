@@ -1,17 +1,14 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getClaudeInspect, simulateProviderUnstable } from "@/lib/claude-inspect.functions";
+import { getClaudeInspect } from "@/lib/claude-inspect.functions";
 
 type Data = Awaited<ReturnType<typeof getClaudeInspect>>;
 
 export function ClaudeCodeInspector() {
   const fn = useServerFn(getClaudeInspect);
-  const simFn = useServerFn(simulateProviderUnstable);
-  
+
   const [data, setData] = useState<Data | null>(null);
   const [err, setErr] = useState<string | null>(null);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [flash, setFlash] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -28,30 +25,7 @@ export function ClaudeCodeInspector() {
     return () => { alive = false; clearInterval(iv); };
   }, [fn]);
 
-  const runSim = async (slug: string) => {
-    setBusy(slug);
-    try {
-      const r: any = await simFn({ data: { slug, minutes: 5 } });
-      setFlash(`🧪 Pane injetada em ${slug} até ${new Date(r.until).toLocaleTimeString("pt-BR")}`);
-    } catch (e: any) {
-      setFlash(`⛔ ${e?.message ?? e}`);
-    } finally { setBusy(null); }
-  };
 
-  const runBlackout = async () => {
-    setBusy("BLACKOUT");
-    try {
-      const slugs = ["smmhype", "smmpainel", "verified"];
-      const results = await Promise.allSettled(
-        slugs.map((slug) => simFn({ data: { slug, minutes: 5 } })),
-      );
-      const ok = results.filter((r) => r.status === "fulfilled").length;
-      const until = new Date(Date.now() + 5 * 60_000).toLocaleTimeString("pt-BR");
-      setFlash(`⚠️ APAGÃO GERAL disparado · ${ok}/3 fornecedores instáveis até ${until}`);
-    } catch (e: any) {
-      setFlash(`⛔ ${e?.message ?? e}`);
-    } finally { setBusy(null); }
-  };
 
 
 
@@ -151,37 +125,8 @@ export function ClaudeCodeInspector() {
         ) : <div>carregando…</div>}
       </div>
 
-      {/* v110/v152 — Simulador de Resiliência */}
+      {/* v176 — Simulador de instabilidade removido: smart-routing + auto-healer + sla-watcher já cobrem failover automático. */}
 
-      <div className="rounded border border-fuchsia-500/40 bg-fuchsia-500/5 p-3">
-        <div className="text-fuchsia-300 font-bold mb-2">🧪 SIMULADOR DE RESILIÊNCIA DE REDE (v110)</div>
-
-        {/* v152 — Botão Mestre de Apagão Geral */}
-        <button
-          onClick={runBlackout}
-          disabled={busy !== null}
-          className="w-full mb-3 px-4 py-3 rounded-lg bg-gradient-to-r from-red-700 via-red-500 to-red-700 hover:from-red-600 hover:to-red-600 text-white font-black uppercase tracking-wider text-sm shadow-[0_0_25px_rgba(255,0,40,0.7)] border-2 border-red-400/60 animate-pulse disabled:opacity-40 disabled:animate-none"
-        >
-          {busy === "BLACKOUT" ? "⏳ Disparando apagão nas 3 APIs..." : "⚠️ APAGÃO GERAL: Forçar Instabilidade nas 3 APIs (5 min)"}
-        </button>
-
-        <div className="text-fuchsia-100/70 mb-2">
-          Injeta pane de 5 min no fornecedor. O <code>mp-webhook.ts</code> desvia síncronamente para o backup usando os IDs triplos da v85.
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {["smmhype", "smmpainel", "verified"].map((slug) => (
-            <button
-              key={slug}
-              onClick={() => runSim(slug)}
-              disabled={busy !== null}
-              className="px-3 py-1 rounded bg-fuchsia-600/80 hover:bg-fuchsia-500 text-white font-bold disabled:opacity-40"
-            >
-              {busy === slug ? "…" : `Simular Instabilidade ${slug}`}
-            </button>
-          ))}
-        </div>
-        {flash && <div className="mt-2 text-fuchsia-200">{flash}</div>}
-      </div>
 
       {/* Panel 3 — Webhook logs */}
       <div className="rounded border border-cyan-500/20 p-3">
