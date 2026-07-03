@@ -124,14 +124,14 @@ export async function runAutoHealer(): Promise<HealReport> {
       if (guess) {
         await supabaseAdmin
           .from("pricing_items" as any)
-          .update({ [p.idCol]: String(guess.service), updated_at: new Date().toISOString() } as any)
+          .update({ [p.idCol]: String(guess.service), synced_at: new Date().toISOString() } as any)
           .eq("id", it.id);
         report.id_fixed++;
       } else {
         // ID órfão → zera para o smart-routing pular esta rota
         await supabaseAdmin
           .from("pricing_items" as any)
-          .update({ [p.idCol]: null, updated_at: new Date().toISOString() } as any)
+          .update({ [p.idCol]: null, synced_at: new Date().toISOString() } as any)
           .eq("id", it.id);
         report.errors.push(`ID órfão em ${pacote} (${p.slug}): ${currentId}`);
       }
@@ -146,7 +146,7 @@ export async function runAutoHealer(): Promise<HealReport> {
         if (fixed > 0 && Math.abs(fixed - price) > 0.01) {
           await supabaseAdmin
             .from("pricing_items" as any)
-            .update({ price_brl: fixed, updated_at: new Date().toISOString() } as any)
+            .update({ price_brl: fixed, synced_at: new Date().toISOString() } as any)
             .eq("id", it.id);
           report.price_fixed++;
         }
