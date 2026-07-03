@@ -49,14 +49,19 @@ function suggestRecharge(custoUnitBrl: number): { valor: number; cobre: number }
   return { valor, cobre };
 }
 
-export function buildProvisioningMessage(a: ProvisioningAlert): string {
+export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?: boolean }): string {
   const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl);
   const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custo * 1.15).toFixed(2));
-  const pix = pixForFornecedor(a.fornecedor);
+  // v174 — Pix SÓ é anexado quando saldo pulmão < R$5 (ou cascata zerada).
+  // Fluxo normal fica silencioso: debita direto do saldo_atual do fornecedor.
+  const showPix = !!(a.saldoCritical || a.criticalCaixaZero);
+  const pix = showPix ? pixForFornecedor(a.fornecedor) : null;
   const sug = suggestRecharge(custo);
   const header = a.criticalCaixaZero
     ? "🚨🔴 <b>CAIXA ZERO · TODOS FORNECEDORES SEM SALDO</b>\n<i>Pedido segurado em fila. Recarregue AGORA para liberar entregas.</i>"
-    : "🟡 <b>v151 · Provisão Necessária</b>";
+    : a.saldoCritical
+      ? "⚠️ <b>ATENÇÃO DIRETOR</b>: Saldo pulmão crítico abaixo de R$ 5.\n<i>Copie o Pix abaixo para reabastecer a carteira usando o lucro acumulado no Mercado Pago.</i>"
+      : "🟡 <b>v174 · Provisão Necessária</b>";
   const linhas = [
     header,
     `Pedido: <code>${a.pedidoId}</code>`,
@@ -66,10 +71,11 @@ export function buildProvisioningMessage(a: ProvisioningAlert): string {
     `Venda: ${fmtBrl(a.vendaBrl)}`,
     `Custo depósito: <b>${fmtBrl(custo)}</b>`,
     `Lucro líq. (~300%): ${fmtBrl(lucroLiquido)}`,
-    `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)`,
+    showPix ? `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)` : null,
     a.motivo ? `Motivo: ${a.motivo}` : null,
   ].filter(Boolean);
   const base = linhas.join("\n");
+  if (!showPix) return base;
   return pix
     ? `${base}\n\n<b>Pix Copia e Cola (recarga fornecedor):</b>\n<code>${pix}</code>`
     : `${base}\n\n⚠️ <i>Pix Copia-e-Cola do fornecedor não configurado.</i>`;
@@ -109,11 +115,30 @@ function rechargeKeyboard(pedidoId: string): InlineKeyboardButton[][] {
   return [[{ text: "✅ Recarga Confirmada", callback_data: `recharge:${pedidoId}` }]];
 }
 
-/** Notifica o admin (Telegram primário). Não lança. */
+/** v174 — Só anexa Pix Copia-e-Cola + botão quando saldo pulmão < R$5. */
 export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise<void> {
-  const text = buildProvisioningMessage(alert);
+  let saldoCritical = false;
   try {
-    const res = await dispatchTelegram(text, { inlineKeyboard: rechargeKeyboard(alert.pedidoId) });
+    if (alert.fornecedor) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: f } = await supabaseAdmin
+        .from("fornecedores")
+        .select("saldo_atual")
+        .eq("slug", alert.fornecedor)
+        .maybeSingle();
+      const saldo = Number((f as any)?.saldo_atual ?? 0);
+      saldoCritical = !Number.isFinite(saldo) || saldo < 5;
+    } else {
+      saldoCritical = !!alert.criticalCaixaZero;
+    }
+  } catch { saldoCritical = !!alert.criticalCaixaZero; }
+
+  const text = buildProvisioningMessage({ ...alert, saldoCritical });
+  const opts = saldoCritical || alert.criticalCaixaZero
+    ? { inlineKeyboard: rechargeKeyboard(alert.pedidoId) }
+    : undefined;
+  try {
+    const res = await dispatchTelegram(text, opts);
     if (!res.ok) {
       console.error("[admin-notify] Telegram falhou", res.detail);
       try {
