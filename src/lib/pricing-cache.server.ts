@@ -190,7 +190,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
 
     const bestRatePer1k = Math.min(...rates);
     const newCost = Number(((bestRatePer1k * qty) / 1000).toFixed(4));
-    const newPrice = computeGuardedPrice(newCost); // Equação Fabiano
+    const newPrice = computeGuardedPrice(newCost, qty); // Equação Fabiano Tiered v173
 
     const currentCost = Number(r.cost_brl ?? 0);
     const currentPrice = Number(r.price_brl ?? 0);
