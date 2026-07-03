@@ -16,10 +16,11 @@ export type RankedProvider = {
   unstable: boolean;
 };
 
+const RATE_TTL_MS = 60_000; // v163 — TTL rígido de 60s p/ rates dos 3 fornecedores
+
 type ServiceRate = { service: number | string; rate: number | string };
 
-async function fetchServiceRate(endpoint: string, apiKey: string | undefined, serviceId: string | null): Promise<number | null> {
-  if (!apiKey || !serviceId) return null;
+async function fetchServiceRateLive(endpoint: string, apiKey: string, serviceId: string): Promise<number | null> {
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
@@ -30,7 +31,7 @@ async function fetchServiceRate(endpoint: string, apiKey: string | undefined, se
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
           "Accept": "application/json,text/plain,*/*",
-          "User-Agent": "EliteBoostPrime-Routing/134",
+          "User-Agent": "EliteBoostPrime-Routing/163",
         },
         body: new URLSearchParams({ key: apiKey, action: "services" }).toString(),
         signal: ctrl.signal,
@@ -43,6 +44,46 @@ async function fetchServiceRate(endpoint: string, apiKey: string | undefined, se
     const rate = Number(hit?.rate);
     return Number.isFinite(rate) && rate > 0 ? rate : null;
   } catch { return null; }
+}
+
+// v163 — Cache read-through com TTL 60s por (slug,service_id).
+// Só bate HTTP externo se o registro daquele SKU estourou 60s. Se HTTP falha e há cache stale, serve o stale.
+async function fetchServiceRate(
+  slug: string,
+  endpoint: string,
+  apiKey: string | undefined,
+  serviceId: string | null,
+): Promise<number | null> {
+  if (!apiKey || !serviceId) return null;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: cached } = await supabaseAdmin
+    .from("provider_rates_cache" as any)
+    .select("rate_usd, updated_at")
+    .eq("provider_slug", slug)
+    .eq("provider_service_id", String(serviceId))
+    .maybeSingle();
+
+  if (cached) {
+    const age = Date.now() - new Date((cached as any).updated_at).getTime();
+    if (age < RATE_TTL_MS) {
+      const r = Number((cached as any).rate_usd);
+      return Number.isFinite(r) && r > 0 ? r : null;
+    }
+  }
+
+  const live = await fetchServiceRateLive(endpoint, apiKey, serviceId);
+  if (live != null) {
+    await supabaseAdmin.from("provider_rates_cache" as any).upsert(
+      { provider_slug: slug, provider_service_id: String(serviceId), rate_usd: live, updated_at: new Date().toISOString() } as any,
+      { onConflict: "provider_slug,provider_service_id" },
+    );
+    return live;
+  }
+  if (cached) {
+    const r = Number((cached as any).rate_usd);
+    return Number.isFinite(r) && r > 0 ? r : null;
+  }
+  return null;
 }
 
 export async function rankProvidersByCost(opts: {
