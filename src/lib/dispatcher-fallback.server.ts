@@ -46,26 +46,34 @@ export async function dispatchSmmV2(opts: {
   });
 
   try {
-    const res = await fetch(opts.endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: body.toString(),
-    });
-    const text = await res.text();
-    let json: unknown = null;
-    try { json = JSON.parse(text); } catch { /* */ }
-    const apiError = (json as { error?: string } | null)?.error;
-    if (!res.ok || apiError) {
-      const detail = apiError ? String(apiError) : text.slice(0, 200);
-      return { ok: false, error: `${opts.fornecedor} falhou: ${detail}`, status: res.status, body: json ?? text };
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 15_000);
+    try {
+      const res = await fetch(opts.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+        signal: ctrl.signal,
+      });
+      const text = await res.text();
+      let json: unknown = null;
+      try { json = JSON.parse(text); } catch { /* */ }
+      const apiError = (json as { error?: string } | null)?.error;
+      if (!res.ok || apiError) {
+        const detail = apiError ? String(apiError) : text.slice(0, 200);
+        return { ok: false, error: `${opts.fornecedor} falhou: ${detail}`, status: res.status, body: json ?? text };
+      }
+      const orderId = (json as { order?: string | number } | null)?.order;
+      if (orderId == null || orderId === "") {
+        return { ok: false, error: `${opts.fornecedor}: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
+      }
+      return { ok: true, orderId, body: json ?? text };
+    } finally {
+      clearTimeout(timer);
     }
-    const orderId = (json as { order?: string | number } | null)?.order;
-    if (orderId == null || orderId === "") {
-      return { ok: false, error: `${opts.fornecedor}: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
-    }
-    return { ok: true, orderId, body: json ?? text };
   } catch (err) {
-    return { ok: false, error: `${opts.fornecedor}: rede ${(err as Error).message}` };
+    const msg = (err as Error).name === "AbortError" ? "timeout 15s" : (err as Error).message;
+    return { ok: false, error: `${opts.fornecedor}: rede ${msg}` };
   }
 }
 

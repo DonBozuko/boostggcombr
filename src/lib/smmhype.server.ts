@@ -275,18 +275,33 @@ export async function dispatchSmmhype(args: {
     quantity: String(args.quantidade),
   });
 
-  const res = await fetch(SMMHYPE_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString(),
-  });
-  const text = await res.text();
-  let json: unknown = null;
-  try { json = JSON.parse(text); } catch { /* não-JSON */ }
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15_000);
+  try {
+    const res = await fetch(SMMHYPE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
+      signal: ctrl.signal,
+    });
+    const text = await res.text();
+    let json: unknown = null;
+    try { json = JSON.parse(text); } catch { /* não-JSON */ }
 
-  if (!res.ok || (json && (json as { error?: string }).error)) {
-    return { ok: false, error: "SMMhype falhou", status: res.status, body: json ?? text };
+    const apiError = (json as { error?: string } | null)?.error;
+    if (!res.ok || apiError) {
+      const detail = apiError ? String(apiError) : text.slice(0, 200);
+      return { ok: false, error: `SMMhype falhou: ${detail}`, status: res.status, body: json ?? text };
+    }
+    const orderId = (json as { order?: string | number } | null)?.order;
+    if (orderId == null || orderId === "") {
+      return { ok: false, error: `SMMhype: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
+    }
+    return { ok: true, orderId, body: json ?? text };
+  } catch (err) {
+    const msg = (err as Error).name === "AbortError" ? "timeout 15s" : (err as Error).message;
+    return { ok: false, error: `SMMhype: rede ${msg}` };
+  } finally {
+    clearTimeout(timer);
   }
-  const orderId = (json as { order?: string | number } | null)?.order;
-  return { ok: true, orderId, body: json ?? text };
 }
