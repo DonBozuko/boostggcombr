@@ -98,4 +98,4 @@ Executa `simulatePurchase` (dry-run) em vez de MP real. Zero débito.
 
 ---
 
-`ELITEBOOST PRIME — v172 · 400%+15% Strict Margin`
+`ELITEBOOST PRIME — v173 · Tiered Strict Margin (5x/8x/12x + PRIME15 buffer)`
