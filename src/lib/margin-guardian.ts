@@ -7,12 +7,12 @@
 // - PIX_FIXED = 0.49    → taxa FIXA MP Pix por transação
 // - FLOOR = R$ 5,00     → piso mínimo (evita micro-ticket sangrar margem)
 
-export const PROFIT_MULT = 4.0;
+export const PROFIT_MULT = 5.0; // v172: 400% de lucro real sobre o custo
 export const COUPON_BUFFER = 1.15;
 export const PIX_NET = 0.9901;
 export const PIX_FIXED = 0.49;
 export const FLOOR_BRL = 5.0;
-export const MIN_NET_PROFIT_RATIO = 3.0; // 300% líquido
+export const MIN_NET_PROFIT_RATIO = 4.0; // v172: alvo líquido 400%
 
 export function computeGuardedPrice(costBrl: number): number {
   const c = Number(costBrl);
