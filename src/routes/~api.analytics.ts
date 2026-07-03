@@ -44,8 +44,9 @@ export const Route = createFileRoute("/~api/analytics")({
         try {
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           await supabaseAdmin.from("admin_audit_logs").insert({
+            admin_email: "system@analytics",
             action: "capi_event",
-            details: { event: payload, forwarded: result },
+            detail: { event: payload, forwarded: result },
           } as any);
         } catch { /* tabela ausente / sem RLS — não quebra o beacon */ }
         return new Response(JSON.stringify({ ok: true }), {

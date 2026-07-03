@@ -197,7 +197,9 @@ export const jarvisFailoverAtivo = createServerFn({ method: "POST" })
     await supabaseAdmin.from("fornecedores").update({ ativo: false } as any).eq("id", ativo.id);
     await supabaseAdmin.from("fornecedores").update({ ativo: true, falhas_consecutivas: 0 } as any).eq("id", candidato.id);
     await supabaseAdmin.from("admin_audit_logs").insert({
-      action: "jarvis_failover", details: { from: ativo.nome, to: candidato.nome },
+      admin_email: "system@jarvis",
+      action: "jarvis_failover",
+      detail: { from: ativo.nome, to: candidato.nome },
     } as any);
     return { ok: true as const, action: "switched", from: ativo.nome, to: candidato.nome };
   });
