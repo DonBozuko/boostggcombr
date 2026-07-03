@@ -17,7 +17,6 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
   const [pacote, setPacote] = useState<string>("");
   const [qty, setQty] = useState<number>(0);
   const [handle, setHandle] = useState<string>("@fabiano.majestic");
-  const [mode, setMode] = useState<"dry" | "real">("dry");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ steps: Step[]; pedidoId: string | null; totalMs?: number; finalStatus?: string } | null>(null);
 
@@ -40,13 +39,13 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
     setLoading(true);
     setResult(null);
     try {
-      const r = await sim({ data: { token, pacote, quantidade: qty, handle, mode } });
+      const r = await sim({ data: { token, pacote, quantidade: qty, handle } });
       if (!r.ok) {
         toast.error(`Falha: ${(r as any).error ?? "desconhecido"}`);
         return;
       }
       setResult({ steps: r.steps, pedidoId: r.pedidoId, totalMs: (r as any).totalMs, finalStatus: (r as any).finalStatus });
-      toast.success(`Simulação ${mode.toUpperCase()} concluída em ${(r as any).totalMs}ms`);
+      toast.success(`Simulação concluída em ${(r as any).totalMs}ms`);
     } catch (e) {
       toast.error(`Erro: ${(e as Error).message}`);
     } finally {
@@ -61,10 +60,9 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
         <h3 className="text-sm font-bold text-amber-400 tracking-wider">SIMULADOR DE COMPRA REAL</h3>
       </div>
       <p className="text-xs text-white/60 mb-3">
-        Reproduz o pipeline completo (pedido → smart-routing → dispatch → Telegram) sem tocar no Mercado Pago.
-        <br />
-        <span className="text-amber-300">Dry-run</span> = para no dispatcher (não envia).{" "}
-        <span className="text-red-300">Real</span> = envia de verdade ao fornecedor (gasta saldo).
+        Reproduz o pipeline (pricing → pedido SIM → smart-routing → cálculo de margem → Telegram) em modo
+        <span className="text-amber-300"> dry-run</span>. Nenhum saldo é debitado, nenhum pedido é enviado ao fornecedor,
+        nenhum valor é movimentado. Fluxo real de compra permanece intocado.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
@@ -107,14 +105,7 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
       </div>
 
       <div className="flex items-center gap-2 mb-3">
-        <label className="flex items-center gap-1.5 text-xs text-white/80 cursor-pointer">
-          <input type="radio" checked={mode === "dry"} onChange={() => setMode("dry")} />
-          Dry-run (não envia)
-        </label>
-        <label className="flex items-center gap-1.5 text-xs text-red-300 cursor-pointer">
-          <input type="radio" checked={mode === "real"} onChange={() => setMode("real")} />
-          Real (envia ao fornecedor)
-        </label>
+        <span className="text-xs text-emerald-300">🛡 Modo dry-run · sem débito · sem envio</span>
         <Button size="sm" variant="default" className="ml-auto bg-amber-600 hover:bg-amber-500" onClick={run} disabled={loading}>
           {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "🧪 Simular Compra"}
         </Button>

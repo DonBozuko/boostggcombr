@@ -1,6 +1,7 @@
-// v170 — Synthetic Purchase Simulator
-// Roda o mesmo pipeline de uma compra real (pedido → smart-routing → dispatch → telegram)
-// SEM tocar no Mercado Pago. Retorna trace passo-a-passo pra auditoria de erro.
+// v175 — Synthetic Purchase Simulator (DRY-ONLY)
+// Roda o pipeline (pricing → pedido SIM → smart-routing → cálculo → Telegram) SEM
+// tocar em saldo real, SEM despachar ao fornecedor, SEM movimentar Mercado Pago.
+// Fluxo real de compra permanece inalterado — este arquivo só descreve a simulação.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -9,10 +10,13 @@ const input = z.object({
   pacote: z.string().min(1),
   quantidade: z.number().int().positive(),
   handle: z.string().trim().min(2).max(200),
-  mode: z.enum(["dry", "real"]),
 });
 
 type Step = { key: string; ok: boolean; ms: number; detail: string };
+
+function fmtBrl(v: number): string {
+  return `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
+}
 
 export const listSimulatablePackages = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ token: z.string().min(8) }).parse(i))
@@ -42,7 +46,7 @@ export const simulatePurchase = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Buscar linha de pricing p/ valor + custo
+    // 1) Pricing lookup
     const st1 = Date.now();
     const { data: pricing } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -55,9 +59,10 @@ export const simulatePurchase = createServerFn({ method: "POST" })
       return { ok: false as const, steps, pedidoId: null };
     }
     const valor = Number((pricing as any).price_brl);
-    mark("1_pricing_lookup", true, `preço R$${valor.toFixed(2)} · custo R$${Number((pricing as any).cost_brl).toFixed(4)}`, st1);
+    const custoTabela = Number((pricing as any).cost_brl);
+    mark("1_pricing_lookup", true, `venda ${fmtBrl(valor)} · custo tabela ${fmtBrl(custoTabela)}`, st1);
 
-    // Criar pedido de simulação
+    // 2) Criar pedido SIMULADO (marcado com prefixo SIM- e status simulated)
     const st2 = Date.now();
     const { data: pedido, error: insErr } = await supabaseAdmin
       .from("pedidos")
@@ -66,8 +71,8 @@ export const simulatePurchase = createServerFn({ method: "POST" })
         quantidade: data.quantidade,
         instagram_user: data.handle,
         valor,
-        status: "paid",
-        error_detail: `SIMULATION:${data.mode} · ts=${new Date().toISOString()}`,
+        status: "simulated",
+        error_detail: `SIMULATION · dry-only · ts=${new Date().toISOString()}`,
         mercado_pago_id: `SIM-${Date.now()}`,
       } as any)
       .select("id")
@@ -77,89 +82,98 @@ export const simulatePurchase = createServerFn({ method: "POST" })
       return { ok: false as const, steps, pedidoId: null };
     }
     const pedidoId = (pedido as any).id as string;
-    mark("2_create_pedido", true, `pedido ${pedidoId} criado`, st2);
+    mark("2_create_pedido", true, `pedido SIM ${pedidoId.slice(0, 8)} criado (status=simulated)`, st2);
 
-    // Smart-routing (ranqueia fornecedor mais barato com saldo)
+    // 3) Smart-routing — só LEITURA, escolhe fornecedor mais barato
     const st3 = Date.now();
     let ranked: any[] = [];
     try {
       const { rankProvidersByCost } = await import("./smart-routing.server");
       ranked = await rankProvidersByCost({ pacote: data.pacote, quantidade: data.quantidade });
-      if (!ranked.length) {
-        mark("3_smart_routing", false, "nenhum fornecedor disponível (sem saldo/ID)", st3);
-      } else {
-        mark(
-          "3_smart_routing",
-          true,
-          ranked.map((r) => `${r.slug}=R$${Number(r.cost_brl ?? 0).toFixed(4)}${r.unstable ? "⚠" : ""}`).join(" · "),
-          st3,
-        );
-      }
+      mark(
+        "3_smart_routing",
+        ranked.length > 0,
+        ranked.length
+          ? ranked.map((r) => `${r.slug}=${fmtBrl(Number(r.cost_brl ?? 0))}${r.unstable ? "⚠" : ""}`).join(" · ")
+          : "nenhum fornecedor com service_id disponível",
+        st3,
+      );
     } catch (e) {
       mark("3_smart_routing", false, (e as Error).message, st3);
     }
 
-    // Dispatch (só em modo real)
-    let dispatchOk = false;
-    let dispatchDetail = "";
-    if (data.mode === "real" && ranked.length) {
-      const st4 = Date.now();
-      try {
-        const { dispatchByFornecedor } = await import("./dispatcher-fallback.server");
-        for (const f of ranked) {
-          const r = await dispatchByFornecedor(f.slug, {
-            pacote: data.pacote,
-            quantidade: data.quantidade,
-            instagram_user: data.handle,
-            serviceIdOverride: (f as any).provider_service_id ?? null,
-          });
-          if (r.ok) {
-            dispatchOk = true;
-            dispatchDetail = `${f.slug} → orderId ${r.orderId}`;
-            await supabaseAdmin
-              .from("pedidos")
-              .update({ status: "Enviado", fornecedor: f.slug, order_id_externo: String(r.orderId) } as any)
-              .eq("id", pedidoId);
-            break;
-          } else {
-            dispatchDetail += `${f.slug}✗ ${r.error} · `;
-          }
-        }
-        mark("4_dispatch_real", dispatchOk, dispatchDetail || "todos falharam", st4);
-      } catch (e) {
-        mark("4_dispatch_real", false, (e as Error).message, st4);
-      }
-    } else {
-      mark("4_dispatch_real", true, data.mode === "dry" ? "SKIP (dry-run)" : "SKIP (sem fornecedor)", Date.now());
-    }
+    const escolhido = ranked[0] ?? null;
+    const custoReal = Number(escolhido?.cost_brl ?? custoTabela);
+    const fornecedorSlug: string | null = escolhido?.slug ?? null;
 
-    // Se não despachou, marca waiting_provision (mesmo caminho da venda real)
-    if (!dispatchOk) {
-      const st5 = Date.now();
-      const custo = ranked[0]?.cost_brl ?? null;
-      await supabaseAdmin
-        .from("pedidos")
-        .update({
-          status: "waiting_provision",
-          error_detail: `SIMULATION · aguardando (${data.mode})`,
-          ...(custo != null ? { custo_real: Number(Number(custo).toFixed(4)) } : {}),
-        } as any)
-        .eq("id", pedidoId);
-      mark("5_waiting_provision", true, `pedido parqueado · custo estim R$${Number(custo ?? 0).toFixed(4)}`, st5);
+    // 4) Snapshot saldo fornecedor (SEM DEBITAR)
+    const st4 = Date.now();
+    let saldoAntes: number | null = null;
+    if (fornecedorSlug) {
+      const { data: f } = await supabaseAdmin
+        .from("fornecedores")
+        .select("saldo_atual")
+        .eq("slug", fornecedorSlug)
+        .maybeSingle();
+      saldoAntes = Number((f as any)?.saldo_atual ?? 0);
     }
+    mark(
+      "4_saldo_snapshot",
+      true,
+      fornecedorSlug ? `${fornecedorSlug} · saldo atual ${fmtBrl(saldoAntes ?? 0)} (não debitado)` : "sem fornecedor",
+      st4,
+    );
 
-    // Telegram — mesmo caminho da venda real
+    // 5) Cálculo completo de margem (mesma fórmula da produção — margin-guardian)
+    const st5 = Date.now();
+    // Pix MP: líquido = venda * 0.9901 - 0.49 ; buffer cupom PRIME15: custo * 1.15
+    const pixLiquido = Number((valor * 0.9901 - 0.49).toFixed(4));
+    const lucroBruto = Number((valor - custoReal).toFixed(4));
+    const lucroLiquido = Number((pixLiquido - custoReal * 1.15).toFixed(4));
+    const margemPct = valor > 0 ? Number(((lucroLiquido / valor) * 100).toFixed(2)) : 0;
+    const razaoNet = custoReal > 0 ? Number((lucroLiquido / custoReal).toFixed(2)) : 0;
+    const saldoDepoisSimulado = saldoAntes != null ? Number((saldoAntes - custoReal).toFixed(4)) : null;
+    mark(
+      "5_calculo_margem",
+      true,
+      `bruto ${fmtBrl(lucroBruto)} · líq ${fmtBrl(lucroLiquido)} · margem ${margemPct}% · razão ${razaoNet}×`,
+      st5,
+    );
+
+    // 6) Telegram — mensagem exclusiva de SIMULAÇÃO (não usa notifyAdminProvisioning)
     const st6 = Date.now();
     try {
-      const { notifyAdminProvisioning } = await import("./whatsapp-admin.server");
-      await notifyAdminProvisioning({
-        pedidoId: `SIM-${pedidoId}`,
-        vendaBrl: valor,
-        custoBrl: ranked[0]?.cost_brl ?? null,
-        fornecedor: ranked[0]?.slug ?? null,
-        motivo: `🧪 SIMULAÇÃO (${data.mode.toUpperCase()}) · ${dispatchOk ? "ENVIADO" : "PARQUEADO"} · pacote ${data.pacote} x${data.quantidade} @${data.handle}`,
-      });
-      mark("6_telegram_alert", true, "notifyAdminProvisioning enviado", st6);
+      const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      const linhas = [
+        "🧪 <b>SIMULAÇÃO DE COMPRA (dry-run)</b>",
+        "<i>Nenhum saldo movimentado · nenhum pedido real enviado</i>",
+        "",
+        `Pedido SIM: <code>${pedidoId.slice(0, 8)}</code>`,
+        `Handle teste: <b>${data.handle}</b>`,
+        `Pacote: <b>${data.pacote}</b> × ${data.quantidade}`,
+        "",
+        "<b>💰 Financeiro</b>",
+        `Valor pago (simulado): <b>${fmtBrl(valor)}</b>`,
+        `Fornecedor escolhido: <b>${fornecedorSlug ?? "—"}</b>`,
+        `Custo fornecedor: <b>${fmtBrl(custoReal)}</b>`,
+        `Líquido após Pix MP (0,99% + R$0,49): ${fmtBrl(pixLiquido)}`,
+        `Lucro bruto: ${fmtBrl(lucroBruto)}`,
+        `Lucro líquido (com buffer PRIME15): <b>${fmtBrl(lucroLiquido)}</b>`,
+        `Margem sobre venda: <b>${margemPct}%</b>`,
+        `Razão líq/custo: <b>${razaoNet}×</b> (alvo ≥ 3×)`,
+        "",
+        "<b>🏦 Saldo fornecedor</b>",
+        saldoAntes != null
+          ? `Antes: ${fmtBrl(saldoAntes)}\nDepois (se real fosse): ${fmtBrl(saldoDepoisSimulado ?? 0)}\n<i>⚠ Nada foi debitado — modo simulação</i>`
+          : "sem fornecedor selecionado",
+        "",
+        "<b>📊 Ranking custos</b>",
+        ranked.length
+          ? ranked.map((r) => `• ${r.slug}: ${fmtBrl(Number(r.cost_brl ?? 0))}${r.unstable ? " ⚠" : ""}`).join("\n")
+          : "—",
+      ];
+      const res = await dispatchWhatsappAlert(linhas.join("\n"));
+      mark("6_telegram_alert", res.ok, res.ok ? "mensagem SIM enviada" : `falha: ${res.detail}`, st6);
     } catch (e) {
       mark("6_telegram_alert", false, (e as Error).message, st6);
     }
@@ -169,7 +183,19 @@ export const simulatePurchase = createServerFn({ method: "POST" })
       steps,
       pedidoId,
       totalMs: Date.now() - t0,
-      finalStatus: dispatchOk ? "Enviado" : "waiting_provision",
-      mode: data.mode,
+      finalStatus: "simulated",
+      mode: "dry" as const,
+      calculo: {
+        venda: valor,
+        custo: custoReal,
+        pixLiquido,
+        lucroBruto,
+        lucroLiquido,
+        margemPct,
+        razaoNet,
+        saldoAntes,
+        saldoDepoisSimulado,
+        fornecedor: fornecedorSlug,
+      },
     };
   });
