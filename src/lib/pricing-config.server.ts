@@ -12,7 +12,7 @@ export type PricingConfig = {
 };
 
 const DEFAULT: PricingConfig = {
-  profit_multiplier: 4.0,
+  profit_multiplier: 5.0, // v172: 400% lucro real
   coupon_buffer: 1.15,
   gateway_net: 0.9901,
   gateway_fixed: 0.49,
