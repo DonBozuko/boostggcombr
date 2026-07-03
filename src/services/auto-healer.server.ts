@@ -67,7 +67,7 @@ export async function runAutoHealer(): Promise<HealReport> {
   // 1) Snapshot pricing_items
   const { data: items, error: itemsErr } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("id, pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
   if (itemsErr || !items) {
     report.errors.push(`pricing_items load failed: ${itemsErr?.message ?? "unknown"}`);
     return report;
@@ -125,14 +125,14 @@ export async function runAutoHealer(): Promise<HealReport> {
         await supabaseAdmin
           .from("pricing_items" as any)
           .update({ [p.idCol]: String(guess.service), synced_at: new Date().toISOString() } as any)
-          .eq("id", it.id);
+          .eq("pacote", it.pacote);
         report.id_fixed++;
       } else {
         // ID órfão → zera para o smart-routing pular esta rota
         await supabaseAdmin
           .from("pricing_items" as any)
           .update({ [p.idCol]: null, synced_at: new Date().toISOString() } as any)
-          .eq("id", it.id);
+          .eq("pacote", it.pacote);
         report.errors.push(`ID órfão em ${pacote} (${p.slug}): ${currentId}`);
       }
     }
@@ -147,7 +147,7 @@ export async function runAutoHealer(): Promise<HealReport> {
           await supabaseAdmin
             .from("pricing_items" as any)
             .update({ price_brl: fixed, synced_at: new Date().toISOString() } as any)
-            .eq("id", it.id);
+            .eq("pacote", it.pacote);
           report.price_fixed++;
         }
       }
