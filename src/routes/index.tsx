@@ -379,6 +379,7 @@ function Landing() {
   const [rejectionMsg, setRejectionMsg] = useState<string | null>(null);
   const [waitingProvision, setWaitingProvision] = useState(false);
   const criarPedidoFn = useServerFn(criarPedido);
+  const simulatePurchaseFn = useServerFn(simulatePurchase);
   const getStatusFn = useServerFn(getPedidoStatus);
   const blockedMap = useBlockedMap();
   const igType = categoria === "seguidores" ? "followers" : categoria === "curtidas" ? "likes" : "views";
