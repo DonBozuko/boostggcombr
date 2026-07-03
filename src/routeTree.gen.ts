@@ -37,6 +37,7 @@ import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/q
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
+import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
@@ -184,6 +185,12 @@ const ApiPublicHooksRecoverAbandonedRoute =
     path: '/api/public/hooks/recover-abandoned',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksReconciliationRoute =
+  ApiPublicHooksReconciliationRouteImport.update({
+    id: '/api/public/hooks/reconciliation',
+    path: '/api/public/hooks/reconciliation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBackfillSmmhypeIdsRoute =
   ApiPublicHooksBackfillSmmhypeIdsRouteImport.update({
     id: '/api/public/hooks/backfill-smmhype-ids',
@@ -228,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -261,6 +269,7 @@ export interface FileRoutesByTo {
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -295,6 +304,7 @@ export interface FileRoutesById {
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
+    | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
+    | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
@@ -396,6 +408,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
+    | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
@@ -429,6 +442,7 @@ export interface RootRouteChildren {
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicHooksSmokeTestRoute: typeof ApiPublicHooksSmokeTestRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
@@ -636,6 +650,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRecoverAbandonedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/reconciliation': {
+      id: '/api/public/hooks/reconciliation'
+      path: '/api/public/hooks/reconciliation'
+      fullPath: '/api/public/hooks/reconciliation'
+      preLoaderRoute: typeof ApiPublicHooksReconciliationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/backfill-smmhype-ids': {
       id: '/api/public/hooks/backfill-smmhype-ids'
       path: '/api/public/hooks/backfill-smmhype-ids'
@@ -694,6 +715,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
+  ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicHooksSmokeTestRoute: ApiPublicHooksSmokeTestRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
