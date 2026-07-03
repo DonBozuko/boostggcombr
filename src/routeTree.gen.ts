@@ -30,6 +30,8 @@ import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
+import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
+import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
@@ -140,6 +142,16 @@ const ApiPublicSfxNameRoute = ApiPublicSfxNameRouteImport.update({
   path: '/api/public/sfx/$name',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQueueWaitingRoute = ApiPublicQueueWaitingRouteImport.update({
+  id: '/api/public/queue/waiting',
+  path: '/api/public/queue/waiting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicQueueConfirmRoute = ApiPublicQueueConfirmRouteImport.update({
+  id: '/api/public/queue/confirm',
+  path: '/api/public/queue/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksSyncPricingRoute =
   ApiPublicHooksSyncPricingRouteImport.update({
     id: '/api/public/hooks/sync-pricing',
@@ -182,6 +194,8 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
+  '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
+  '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
@@ -208,6 +222,8 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
+  '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
+  '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
@@ -235,6 +251,8 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
+  '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
+  '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
 }
@@ -263,6 +281,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
+    | '/api/public/queue/confirm'
+    | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -289,6 +309,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
+    | '/api/public/queue/confirm'
+    | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
   id:
@@ -315,6 +337,8 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/sync-pricing'
+    | '/api/public/queue/confirm'
+    | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
   fileRoutesById: FileRoutesById
@@ -341,6 +365,8 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
+  ApiPublicQueueConfirmRoute: typeof ApiPublicQueueConfirmRoute
+  ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
 }
@@ -494,6 +520,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSfxNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/queue/waiting': {
+      id: '/api/public/queue/waiting'
+      path: '/api/public/queue/waiting'
+      fullPath: '/api/public/queue/waiting'
+      preLoaderRoute: typeof ApiPublicQueueWaitingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/queue/confirm': {
+      id: '/api/public/queue/confirm'
+      path: '/api/public/queue/confirm'
+      fullPath: '/api/public/queue/confirm'
+      preLoaderRoute: typeof ApiPublicQueueConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/sync-pricing': {
       id: '/api/public/hooks/sync-pricing'
       path: '/api/public/hooks/sync-pricing'
@@ -550,6 +590,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
+  ApiPublicQueueConfirmRoute: ApiPublicQueueConfirmRoute,
+  ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
 }
