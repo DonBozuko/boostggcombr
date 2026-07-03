@@ -124,7 +124,7 @@ const CONTINGENCY_SOURCE = "fallback" as const;
 
 // v168 — Equação Fabiano com taxa MP Pix fixa (R$ 0,49) + piso R$ 5,00.
 // Fórmula: preço = (custo * PROFIT * COUPON + PIX_FIXED) / PIX_NET
-let FABIANO_PROFIT = 4.0;
+let FABIANO_PROFIT = 5.0; // v172: 400% de lucro real
 let FABIANO_COUPON = 1.15;
 let FABIANO_PIX_NET = 0.9901;
 let FABIANO_PIX_FIXED = 0.49;
