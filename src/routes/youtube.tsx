@@ -483,6 +483,7 @@ function YoutubeLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="youtube" />
+      </MobileFrame>
   );
 }

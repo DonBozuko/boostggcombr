@@ -325,6 +325,7 @@ function TrafegoLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="trafego" />
+      </MobileFrame>
   );
 }

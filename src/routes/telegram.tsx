@@ -405,6 +405,7 @@ function TelegramLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="telegram" />
+      </MobileFrame>
   );
 }

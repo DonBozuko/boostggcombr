@@ -507,6 +507,7 @@ function TiktokLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="tiktok" />
+      </MobileFrame>
   );
 }

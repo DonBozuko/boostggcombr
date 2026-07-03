@@ -475,6 +475,7 @@ function FacebookLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
-    </MobileFrame>
+          <FaqSection network="facebook" />
+      </MobileFrame>
   );
 }
