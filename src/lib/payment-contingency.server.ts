@@ -327,9 +327,10 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         .eq("id", pedido.id);
 
       try {
-        const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-        await dispatchWhatsappAlert(
-          `⏳ PEDIDO PARQUEADO (SLA 24h)\n\nPedido ${pedido.id.slice(0, 8)} · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nRecarregue fornecedor até ${new Date(deadline).toLocaleString("pt-BR")} ou refund automático.\n\nTentativas:\n${tentativas.join("\n")}`,
+        const { dispatchTelegramAlert } = await import("@/lib/messaging");
+        await dispatchTelegramAlert(
+          `⏳ <b>PEDIDO PARQUEADO (SLA 24h)</b>\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nRecarregue fornecedor até ${new Date(deadline).toLocaleString("pt-BR")} ou refund automático.\n\nTentativas:\n${tentativas.join("\n")}`,
+          { inlineKeyboard: [[{ text: "✅ Recarga Confirmada", callback_data: `recharge:${pedido.id}` }]] },
         ).catch(() => {});
       } catch { /* */ }
 
