@@ -1,9 +1,9 @@
 // v129 — JSON-LD Product + AggregateRating para rich snippets nas 6 rotas públicas.
 export function buildProductJsonLd(opts: {
-  network: string; // ex "Instagram"
-  url: string; // absoluto
+  network: string;
+  url: string;
   description: string;
-  priceFromBrl?: number;
+  priceFromBrl?: number; // v167 — deprecated, ignorado para evitar cache defasado
 }) {
   return {
     type: "application/ld+json" as const,
@@ -14,14 +14,6 @@ export function buildProductJsonLd(opts: {
       description: opts.description,
       brand: { "@type": "Brand", name: "EliteBoost Prime" },
       url: opts.url,
-      offers: {
-        "@type": "AggregateOffer",
-        priceCurrency: "BRL",
-        lowPrice: (opts.priceFromBrl ?? 5).toFixed(2),
-        highPrice: "9999.00",
-        offerCount: "200",
-        availability: "https://schema.org/InStock",
-      },
       aggregateRating: {
         "@type": "AggregateRating",
         ratingValue: "5",
