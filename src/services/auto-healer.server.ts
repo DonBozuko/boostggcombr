@@ -157,8 +157,9 @@ export async function runAutoHealer(): Promise<HealReport> {
   // 4) Log auditoria
   try {
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
+      admin_email: "system@auto-healer",
       action: "auto_healer_v172",
-      details: report as any,
+      detail: report as any,
       created_at: new Date().toISOString(),
     } as any);
   } catch (e: any) {

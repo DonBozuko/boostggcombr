@@ -224,10 +224,10 @@ export async function markProviderUnstable(slug: string, errorMsg: string): Prom
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("jarvis_alerts" as any).insert({
-      severity: "warning",
-      source: "smart-routing",
-      message: `Fornecedor ${slug} marcado _unstable por 30min: ${errorMsg.slice(0, 200)}`,
-      payload: { slug, error: errorMsg.slice(0, 300) },
+      severidade: "warning",
+      origem: "smart-routing",
+      mensagem: `Fornecedor ${slug} marcado _unstable por 30min: ${errorMsg.slice(0, 200)}`,
+      detalhe: JSON.stringify({ slug, error: errorMsg.slice(0, 300) }).slice(0, 1000),
     } as any);
   } catch { /* ignore */ }
 }

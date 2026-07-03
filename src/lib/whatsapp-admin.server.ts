@@ -144,6 +144,7 @@ export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         await supabaseAdmin.from("admin_audit_logs" as any).insert({
+          admin_email: "system@telegram",
           action: "TELEGRAM_SEND_FAILED",
           detail: { pedido_id: alert.pedidoId, reason: res.detail ?? "unknown" },
         } as any);

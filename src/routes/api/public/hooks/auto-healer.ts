@@ -4,7 +4,13 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/api/public/hooks/auto-healer")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const apikey = request.headers.get("apikey");
+        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY;
+        if (!apikey || !expected || apikey !== expected) {
+          return new Response("Unauthorized", { status: 401 });
+        }
+
         try {
           const { runAutoHealer } = await import("@/services/auto-healer.server");
           const report = await runAutoHealer();
