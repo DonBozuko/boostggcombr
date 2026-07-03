@@ -15,7 +15,7 @@ import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
-import { LiveTelemetryMonitor } from "@/components/LiveTelemetryMonitor";
+
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
 
 import {
