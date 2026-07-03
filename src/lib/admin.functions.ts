@@ -42,7 +42,7 @@ export const listarPedidosPagos = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
       .select("id, created_at, status, pacote, quantidade, valor, instagram_user, mercado_pago_id, error_detail, rede_social")
-      .eq("status", "paid")
+      .in("status", ["paid", "Enviado"])
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -122,7 +122,7 @@ export const listarPedidosPendentes = createServerFn({ method: "POST" })
     return { ok: true as const, pedidos: rows ?? [] };
   });
 
-// Faturamento agregado por rede social (status=paid).
+// Faturamento agregado por rede social (status=paid/Enviado).
 export const getFaturamentoPorRede = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
@@ -131,7 +131,7 @@ export const getFaturamentoPorRede = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
       .select("valor, rede_social")
-      .eq("status", "paid");
+      .in("status", ["paid", "Enviado"]);
     if (error) return { ok: false as const, error: "DB_FAILED" as const };
     const totais: Record<string, { total: number; count: number }> = {};
     let geral = 0;
@@ -352,7 +352,7 @@ export const getGrowthCentral = createServerFn({ method: "POST" })
       funil[r].total++;
       totalGeral++;
       const s = String((p as any).status);
-      if (s === "paid") { funil[r].paid++; funil[r].revenue += Number((p as any).valor) || 0; }
+      if (s === "paid" || s === "Enviado") { funil[r].paid++; funil[r].revenue += Number((p as any).valor) || 0; }
       else if (s === "pending" || s === "mp_pending" || s === "mp_in_process") funil[r].pending++;
       else if (s === "mp_cancelled" || s === "mp_expired") funil[r].cancelled++;
       else if (s === "SMM_FAILED" || s === "amount_mismatch" || s === "mp_rejected") funil[r].failed++;

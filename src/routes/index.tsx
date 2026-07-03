@@ -464,7 +464,7 @@ function Landing() {
       try {
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
-        if (res.status === "paid") {
+        if (res.status === "paid" || res.status === "Enviado") {
           const m = String((res as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
           if (m) setMysteryBonus(Number(m[1]));
           stop(); setPaid(true); playSuccessAudio(); return;

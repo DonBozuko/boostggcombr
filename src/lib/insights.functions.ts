@@ -47,7 +47,7 @@ export const getInsightsIA = createServerFn({ method: "POST" })
     const totalGeral = rows?.length ?? 0;
 
     for (const r of rows ?? []) {
-      const isPaid = r.status === "paid" || r.status === "pago" || r.status === "completed";
+      const isPaid = r.status === "paid" || r.status === "Enviado" || r.status === "pago" || r.status === "completed";
       if (!isPaid) continue;
       totalPagos++;
       const val = Number(r.valor) || 0;

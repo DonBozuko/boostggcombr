@@ -165,7 +165,7 @@ function TiktokLanding() {
       try {
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
-        if (res.status === "paid") { stop(); setPaid(true); playSuccessAudio(); return; }
+        if (res.status === "paid" || res.status === "Enviado" || res.status === "waiting_provision") { stop(); setPaid(true); playSuccessAudio(); return; }
         if (res.status === "mp_rejected_insufficient") {
           stop(); setRejected(true);
           toast.error("❌ Pagamento recusado: saldo insuficiente no banco emissor.");

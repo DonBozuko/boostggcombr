@@ -155,8 +155,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
 
           // v94 — Strict Idempotency Gateway Guard (payment_id + treasury ledger)
-          if (pedido.status === "paid") {
-            console.log("[mp-webhook] v94 idempotency: pedido já paid", { paymentId, pedidoId: pedido.id });
+          if (["paid", "waiting_provision", "Enviado"].includes(String(pedido.status))) {
+            console.log("[mp-webhook] v94 idempotency: pedido já avançado", { paymentId, pedidoId: pedido.id, status: pedido.status });
             return;
           }
           {
@@ -256,6 +256,47 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               fornecedor: cheapestSlug ?? "smmhype",
             });
           } catch (e) { console.warn("[mp-webhook] v155 universal trigger fail", e); }
+
+          // v164 — fluxo correto: pagamento aprovado entra SEMPRE na fila do robô externo.
+          // O robô consulta /api/public/queue/waiting e confirma em /api/public/queue/confirm.
+          try {
+            const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
+            const ranked = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: Number(pedido.quantidade) });
+            const top = ranked.find((p) => p.cost_brl != null) ?? ranked[0] ?? null;
+            const custoEstim = top?.cost_brl ?? null;
+            await supabaseAdmin
+              .from("pedidos")
+              .update({
+                status: "waiting_provision",
+                error_detail: `Aguardando Automação/Saldo${top?.slug ? ` · fornecedor sugerido: ${top.slug}` : ""}`,
+                ...(custoEstim != null ? { custo_real: Number(custoEstim.toFixed(4)) } : {}),
+              })
+              .eq("id", pedido.id);
+            if (custoEstim != null && custoEstim > 0) {
+              await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: Number(custoEstim.toFixed(4)) });
+              await supabaseAdmin.from("financial_ledger" as any).insert({
+                valor_brl: Number(custoEstim.toFixed(4)),
+                origem: "wallet:geral",
+                destino: "wallet:reservado",
+                pedido_id: pedido.id,
+                fornecedor_slug: top?.slug ?? null,
+                telemetry: { event: "WAITING_AUTOMATION_BALANCE", payment_id: String(paymentId), provider: top?.slug ?? null, cost_brl: custoEstim },
+              } as any);
+            }
+            try {
+              const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
+              await notifyAdminProvisioning({
+                pedidoId: String(pedido.id),
+                vendaBrl: Number(pedido.valor),
+                custoBrl: custoEstim,
+                fornecedor: top?.slug ?? null,
+                motivo: "Pagamento aprovado · aguardando robô externo confirmar envio",
+              });
+            } catch (e) { console.warn("[mp-webhook] v164 queue notify fail", e); }
+            return;
+          } catch (e) {
+            console.warn("[mp-webhook] v164 queue fail", e);
+          }
 
           // v158 — SANDBOX HARD-GATE: se Modo Teste está ATIVO, NÃO despacha para API real.
           // Força waiting_provision imediato pra validar fluxo sem gastar dinheiro nem entregar seguidores reais.
