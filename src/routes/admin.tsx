@@ -46,6 +46,7 @@ import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { SandboxModeToggle } from "@/components/SandboxModeToggle";
+import { SimulateCheckoutPanel } from "@/components/SimulateCheckoutPanel";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
 import { WaitingProvisionQueue } from "@/components/WaitingProvisionQueue";
 import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
