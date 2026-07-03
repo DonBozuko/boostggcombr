@@ -115,11 +115,30 @@ function rechargeKeyboard(pedidoId: string): InlineKeyboardButton[][] {
   return [[{ text: "✅ Recarga Confirmada", callback_data: `recharge:${pedidoId}` }]];
 }
 
-/** Notifica o admin (Telegram primário). Não lança. */
+/** v174 — Só anexa Pix Copia-e-Cola + botão quando saldo pulmão < R$5. */
 export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise<void> {
-  const text = buildProvisioningMessage(alert);
+  let saldoCritical = false;
   try {
-    const res = await dispatchTelegram(text, { inlineKeyboard: rechargeKeyboard(alert.pedidoId) });
+    if (alert.fornecedor) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: f } = await supabaseAdmin
+        .from("fornecedores")
+        .select("saldo_atual")
+        .eq("slug", alert.fornecedor)
+        .maybeSingle();
+      const saldo = Number((f as any)?.saldo_atual ?? 0);
+      saldoCritical = !Number.isFinite(saldo) || saldo < 5;
+    } else {
+      saldoCritical = !!alert.criticalCaixaZero;
+    }
+  } catch { saldoCritical = !!alert.criticalCaixaZero; }
+
+  const text = buildProvisioningMessage({ ...alert, saldoCritical });
+  const opts = saldoCritical || alert.criticalCaixaZero
+    ? { inlineKeyboard: rechargeKeyboard(alert.pedidoId) }
+    : undefined;
+  try {
+    const res = await dispatchTelegram(text, opts);
     if (!res.ok) {
       console.error("[admin-notify] Telegram falhou", res.detail);
       try {
