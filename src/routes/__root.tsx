@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { BrandGuard } from "@/components/BrandGuard";
-import { CyberDeceptionShield } from "@/components/CyberDeceptionShield";
+
 import { SupportChatWidget } from "@/components/SupportChatWidget";
 
 
@@ -168,7 +168,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrandGuard />
-      <CyberDeceptionShield />
+      
       <SupportChatWidget />
       <Outlet />
       <Toaster theme="dark" position="top-center" richColors />
