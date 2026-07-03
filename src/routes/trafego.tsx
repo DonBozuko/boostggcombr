@@ -45,7 +45,6 @@ export const Route = createFileRoute("/trafego")({
     return {
       meta: [
         { title }, { name: "description", content: description },
-        { name: "keywords", content: "comprar tráfego web, comprar visitas site, tráfego brasileiro, tráfego mundial, smm tráfego, comprar visitantes landing page" },
         { property: "og:title", content: title }, { property: "og:description", content: description },
         { property: "og:url", content: url }, { property: "og:type", content: "website" },
         { property: "og:image", content: ogImage },
