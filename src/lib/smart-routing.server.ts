@@ -118,8 +118,8 @@ export async function rankProvidersByCost(opts: {
 
   const smmhypeRate = Number((svc as any)?.rate);
   const [smmpainelRate, verifiedRate] = await Promise.all([
-    fetchServiceRate("https://smmpainel.com/api/v2", process.env.SMMPAINEL_API_KEY, providerIdMap.smmpainel),
-    fetchServiceRate("https://verifiedatacado.com/api/v2", process.env.VERIFIED_API_KEY, providerIdMap.verified),
+    fetchServiceRate("smmpainel", "https://smmpainel.com/api/v2", process.env.SMMPAINEL_API_KEY, providerIdMap.smmpainel),
+    fetchServiceRate("verified", "https://verifiedatacado.com/api/v2", process.env.VERIFIED_API_KEY, providerIdMap.verified),
   ]);
   const providerRateMap: Record<string, number | null> = {
     smmhype: Number.isFinite(smmhypeRate) && smmhypeRate > 0 ? smmhypeRate : null,
