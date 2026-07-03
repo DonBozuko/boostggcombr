@@ -24,6 +24,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
+import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
@@ -112,6 +114,16 @@ const AdminCatalogRoute = AdminCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
+const ApiPublicSyncVerifiedRoute = ApiPublicSyncVerifiedRouteImport.update({
+  id: '/api/public/sync-verified',
+  path: '/api/public/sync-verified',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSyncSmmpanelRoute = ApiPublicSyncSmmpanelRouteImport.update({
+  id: '/api/public/sync-smmpanel',
+  path: '/api/public/sync-smmpanel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
   id: '/api/public/sync-services',
   path: '/api/public/sync-services',
@@ -198,6 +210,8 @@ export interface FileRoutesByFullPath {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
+  '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -227,6 +241,8 @@ export interface FileRoutesByTo {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
+  '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -257,6 +273,8 @@ export interface FileRoutesById {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
+  '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
+  '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -288,6 +306,8 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/sync-smmpanel'
+    | '/api/public/sync-verified'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
@@ -317,6 +337,8 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/sync-smmpanel'
+    | '/api/public/sync-verified'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
@@ -346,6 +368,8 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
+    | '/api/public/sync-smmpanel'
+    | '/api/public/sync-verified'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/recover-abandoned'
@@ -375,6 +399,8 @@ export interface RootRouteChildren {
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
+  ApiPublicSyncSmmpanelRoute: typeof ApiPublicSyncSmmpanelRoute
+  ApiPublicSyncVerifiedRoute: typeof ApiPublicSyncVerifiedRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
@@ -492,6 +518,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/api/public/sync-verified': {
+      id: '/api/public/sync-verified'
+      path: '/api/public/sync-verified'
+      fullPath: '/api/public/sync-verified'
+      preLoaderRoute: typeof ApiPublicSyncVerifiedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/sync-smmpanel': {
+      id: '/api/public/sync-smmpanel'
+      path: '/api/public/sync-smmpanel'
+      fullPath: '/api/public/sync-smmpanel'
+      preLoaderRoute: typeof ApiPublicSyncSmmpanelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-services': {
       id: '/api/public/sync-services'
       path: '/api/public/sync-services'
@@ -608,6 +648,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
+  ApiPublicSyncSmmpanelRoute: ApiPublicSyncSmmpanelRoute,
+  ApiPublicSyncVerifiedRoute: ApiPublicSyncVerifiedRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,

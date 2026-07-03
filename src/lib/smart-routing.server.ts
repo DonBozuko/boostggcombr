@@ -169,18 +169,22 @@ export async function rankProvidersByCost(opts: {
 }
 
 /**
- * v155 — Retorna o slug do fornecedor com MENOR custo bruto real (BRL) para o pacote/quantidade.
- * Usa Math.min sobre cost_brl dos fornecedores ranqueados. Em empate/ausência de rate,
- * cai no primeiro slug ranqueado (cascata canônica). Retorna null se não há fornecedor ativo.
+ * v164 — Cheapest picker: Math.min sobre fornecedores VÁLIDOS
+ * (com provider_service_id específico, não-unstable, saldo>0).
+ * Empréstimo síncrono: se o mais barato falhar/instável, cai no próximo mais barato.
  */
 export async function pickCheapestFornecedorSlug(pacote: string, quantidade: number): Promise<string | null> {
   const ranked = await rankProvidersByCost({ pacote, quantidade });
   if (!ranked.length) return null;
-  const withCost = ranked.filter((p) => typeof p.cost_brl === "number" && (p.cost_brl as number) > 0);
+  const valid = ranked.filter(
+    (p) => !p.unstable && p.saldo_atual > 0 && !!p.provider_service_id,
+  );
+  const withCost = valid.filter((p) => typeof p.cost_brl === "number" && (p.cost_brl as number) > 0);
   if (withCost.length) {
     const min = Math.min(...withCost.map((p) => p.cost_brl as number));
-    return withCost.find((p) => p.cost_brl === min)?.slug ?? ranked[0].slug;
+    return withCost.find((p) => p.cost_brl === min)?.slug ?? withCost[0].slug;
   }
+  if (valid.length) return valid[0].slug;
   return ranked[0].slug;
 }
 
