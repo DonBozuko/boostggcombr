@@ -132,7 +132,7 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
               <DialogDescription>Auditoria real de rotas, mídias v=48 e tabelas do banco.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <IntegrityVerifier />
+              
               <JarvisDetectorMentiras />
             </div>
           </DialogContent>
