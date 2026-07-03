@@ -168,7 +168,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrandGuard />
-      <CyberDeceptionShield />
+      
       <SupportChatWidget />
       <Outlet />
       <Toaster theme="dark" position="top-center" richColors />
