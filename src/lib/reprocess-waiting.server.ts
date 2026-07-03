@@ -75,6 +75,10 @@ export async function confirmRobotDispatch(input: {
       } as any);
     } catch (e) {
       console.warn("[robot-confirm] reserved debit fail", e);
+      await supabaseAdmin
+        .from("pedidos")
+        .update({ status: "waiting_provision", error_detail: "Falha ao debitar saldo reservado; confirmação do robô revertida." })
+        .eq("id", pedido.id);
       return { ok: false, error: "RESERVED_DEBIT_FAILED" };
     }
   }
