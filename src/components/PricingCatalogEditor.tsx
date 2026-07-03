@@ -49,7 +49,7 @@ function buildLivePrices(rows: PricingCatalogRow[]): Map<string, number> {
     list.sort((a, b) => a.quantidade - b.quantidade);
     let prev = 0;
     for (const r of list) {
-      const equation = computeGuardedPrice(Number(r.cost_brl) || 0);
+      const equation = computeGuardedPrice(Number(r.cost_brl) || 0, Number(r.quantidade) || 0);
       let live = equation > 0 ? equation : Number(r.price_brl) || 0;
       if (live <= prev) live = Number((prev + MONOTONIC_STEP).toFixed(2));
       out.set(r.pacote, live);
@@ -185,7 +185,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
           <label className={labelCls}>Custo em Real</label>
           <input className={inputCls} type="number" step="0.0001" value={form.cost_brl} onChange={(e) => {
             const cost = e.target.value;
-            const suggested = computeGuardedPrice(Number(cost) || 0);
+            const suggested = computeGuardedPrice(Number(cost) || 0, Number(form.quantidade) || 0);
             setForm({ ...form, cost_brl: cost, price_brl: suggested ? String(suggested) : form.price_brl });
           }} />
         </div>

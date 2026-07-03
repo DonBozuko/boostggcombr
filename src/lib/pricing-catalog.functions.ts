@@ -82,7 +82,7 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
     // v135 — Margin Guardian server-side: bloqueia bypass via curl/manipulação externa.
     // Aceita price >= floor da Equação Fabiano OU que respeite 300% de lucro líquido.
     if (data.cost_brl > 0 && data.price_brl > 0) {
-      const floor = computeGuardedPrice(data.cost_brl);
+      const floor = computeGuardedPrice(data.cost_brl, data.quantidade);
       if (data.price_brl < floor && !respectsMinMargin(data.price_brl, data.cost_brl)) {
         return { ok: false, error: `⛔ v135 Margin Guardian: preço R$${data.price_brl.toFixed(2)} abaixo do piso R$${floor.toFixed(2)} (custo R$${data.cost_brl.toFixed(4)} × 4.0 × 1.15 / 0.9901). Lucro < 300% rejeitado.` };
       }
