@@ -35,6 +35,7 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import ogTelegram from "@/assets/og-telegram.jpg";
+import { BrandHeader } from "@/components/BrandHeader";
 
 const AERO = "#00CCFF";
 const BG = "#0a0a0a";
@@ -221,7 +222,7 @@ function TelegramLanding() {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b transition-all duration-300" style={{ borderColor: `${AERO}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
+            <BrandHeader subtitle="Membros Reais no Telegram via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>

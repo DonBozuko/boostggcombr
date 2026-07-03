@@ -35,6 +35,7 @@ import { getUtmSource } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
+import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
@@ -268,7 +269,7 @@ function TiktokLanding() {
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b transition-all duration-300" style={{ borderColor: `${CYAN}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-sm text-white">ELITEBOOST PRIME</span>
+            <BrandHeader subtitle="Seguidores Reais no TikTok via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>

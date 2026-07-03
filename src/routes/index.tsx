@@ -66,6 +66,7 @@ import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid } from "@/lib/pricing.functions";
+import { BrandHeader } from "@/components/BrandHeader";
 
 
 
@@ -592,7 +593,7 @@ function Landing() {
       <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
         <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>
           <div className="flex items-center gap-2">
-            <span className="font-display font-bold text-lg">ELITEBOOST PRIME</span>
+            <BrandHeader subtitle="Seguidores Reais no Instagram via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>
