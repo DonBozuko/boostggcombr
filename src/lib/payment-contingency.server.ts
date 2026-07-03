@@ -125,6 +125,20 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     } as any);
   } catch (e) { console.warn("[contingency] v154 audit PIX_APPROVED fail", e); }
 
+  // v173 — paridade com mp-webhook: credita Carteira Geral + ledger imutável.
+  try {
+    await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
+    await supabaseAdmin.from("financial_ledger" as any).insert({
+      valor_brl: Number(pedido.valor),
+      origem: "mercado_pago",
+      destino: "wallet:geral",
+      pedido_id: pedido.id,
+      telemetry: { payment_id: String(pedido.mercado_pago_id), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED", source: "contingency" },
+    } as any);
+  } catch (e) { console.warn("[contingency] v173 credit geral fail", e); }
+
+
+
   try {
     const { pickCheapestFornecedorSlug } = await import("@/lib/smart-routing.server");
     const cheapestSlug = await pickCheapestFornecedorSlug(pedido.pacote, Number(pedido.quantidade)).catch(() => null);
