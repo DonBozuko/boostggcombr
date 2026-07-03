@@ -93,7 +93,7 @@ export const Route = createFileRoute("/")({
   head: () => {
     const title = "Comprar Seguidores no Instagram Orgânicos e Reais | EliteBoost Prime";
     const description =
-      "Comprar seguidores no Instagram com entrega imediata e 100% seguro. Pacotes de seguidores brasileiros, curtidas e engajamento real via Pix. Teste a partir de R$ 2,55!";
+      "Comprar engajamento real e orgânico com entrega imediata e 100% seguro. Pacotes de alta retenção e entrega rápida via Pix. Confira os planos promocionais direto no site!";
     const url = "https://eliteboostprime.lovable.app/";
     const ogImage = `https://eliteboostprime.lovable.app${ogInstagram}?v=48`;
     return {
