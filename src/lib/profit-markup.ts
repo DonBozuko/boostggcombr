@@ -7,9 +7,8 @@ const PIX_FIXED = 0.49;
 const FLOOR_BRL = 5.0;
 
 function tierMultiplier(qty: number): number {
-  if (qty <= 1000) return 4.0;
-  if (qty <= 10000) return 2.6;
-  return 1.8;
+  // v172: cravado em 5.0 (400% lucro) em TODAS as rotas/pacotes.
+  return 5.0;
 }
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
