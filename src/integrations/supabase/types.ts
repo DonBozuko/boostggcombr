@@ -693,6 +693,39 @@ export type Database = {
         }
         Relationships: []
       }
+      smmpanel_services_cache: {
+        Row: {
+          category: string
+          max: number
+          min: number
+          name: string
+          provider_service_id: number
+          rate: number
+          refill: boolean
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          max?: number
+          min?: number
+          name?: string
+          provider_service_id: number
+          rate?: number
+          refill?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          max?: number
+          min?: number
+          name?: string
+          provider_service_id?: number
+          rate?: number
+          refill?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           created_at: string
@@ -720,6 +753,39 @@ export type Database = {
           saldo_atual?: number
           saldo_minimo?: number
           ultimo_update?: string
+        }
+        Relationships: []
+      }
+      verified_services_cache: {
+        Row: {
+          category: string
+          max: number
+          min: number
+          name: string
+          provider_service_id: number
+          rate: number
+          refill: boolean
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          max?: number
+          min?: number
+          name?: string
+          provider_service_id: number
+          rate?: number
+          refill?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          max?: number
+          min?: number
+          name?: string
+          provider_service_id?: number
+          rate?: number
+          refill?: boolean
+          updated_at?: string
         }
         Relationships: []
       }
@@ -758,7 +824,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      smmhype_services_cache: {
+        Row: {
+          category: string | null
+          max: number | null
+          min: number | null
+          name: string | null
+          provider_service_id: number | null
+          rate: number | null
+          refill: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          max?: number | null
+          min?: number | null
+          name?: string | null
+          provider_service_id?: number | null
+          rate?: number | null
+          refill?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          max?: number | null
+          min?: number | null
+          name?: string | null
+          provider_service_id?: number | null
+          rate?: number | null
+          refill?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_cron_status: {
