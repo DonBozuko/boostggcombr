@@ -86,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "EliteBoost Prime" },
       { property: "og:locale", content: "pt_BR" },
+      { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
