@@ -162,9 +162,9 @@ export async function runAutoHealer(): Promise<HealReport> {
     });
     if (criticos.length > 0) {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-      await dispatchWhatsappAlert({
-        body: `⚠️ SALDO PULMÃO CRÍTICO\n\nFornecedores abaixo de R$10:\n${criticos.join("\n")}\n\nRecarregue para evitar refunds em cadeia.`,
-      }).catch(() => {});
+      await dispatchWhatsappAlert(
+        `⚠️ SALDO PULMÃO CRÍTICO\n\nFornecedores abaixo de R$10:\n${criticos.join("\n")}\n\nRecarregue para evitar refunds em cadeia.`,
+      ).catch(() => {});
     }
   } catch (e: any) {
     report.errors.push(`alert failed: ${e?.message ?? "unknown"}`);
