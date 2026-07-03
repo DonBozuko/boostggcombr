@@ -24,8 +24,8 @@ function fmtBrl(v: number): string {
 
 /** Estima o custo bruto a partir do preço de venda quando não temos rate. */
 function estimateCost(vendaBrl: number): number {
-  // preço = custo * 4.0 * 1.15 / 0.9901
-  return Number(((vendaBrl * 0.9901) / (4.0 * 1.15)).toFixed(2));
+  // v168: preço = (custo * 4.0 * 1.15 + 0.49) / 0.9901 → custo = (venda * 0.9901 - 0.49) / 4.6
+  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (4.0 * 1.15)).toFixed(2));
 }
 
 /** Retorna o Pix Copia-e-Cola do fornecedor alvo (ou null). */
@@ -51,7 +51,7 @@ function suggestRecharge(custoUnitBrl: number): { valor: number; cobre: number }
 
 export function buildProvisioningMessage(a: ProvisioningAlert): string {
   const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl);
-  const lucroLiquido = Number((a.vendaBrl * 0.9901 - custo * 1.15).toFixed(2));
+  const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custo * 1.15).toFixed(2));
   const pix = pixForFornecedor(a.fornecedor);
   const sug = suggestRecharge(custo);
   const header = a.criticalCaixaZero
@@ -91,7 +91,7 @@ export function buildUniversalPaidMessage(a: UniversalPaidAlert): string {
   // e entrega imediato. NÃO enviamos PIX por pedido. PIX de recarga só chega
   // no alerta de provisão (saldo baixo/zerado) via buildProvisioningMessage.
   const custoEstimado = estimateCost(a.vendaBrl);
-  const lucroLiquido = Number((a.vendaBrl * 0.9901 - custoEstimado * 1.15).toFixed(2));
+  const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custoEstimado * 1.15).toFixed(2));
   const linhas = [
     "🟢 <b>PIX APROVADO · Entrega automática</b>",
     `Pedido: <code>${a.pedidoId}</code>`,

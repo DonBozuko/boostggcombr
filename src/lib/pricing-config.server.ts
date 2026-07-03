@@ -7,6 +7,7 @@ export type PricingConfig = {
   profit_multiplier: number; // ex.: 4.0 = +300% de lucro sobre o custo
   coupon_buffer: number;     // ex.: 1.15 = gordura pra absorver PRIME15
   gateway_net: number;       // ex.: 0.9901 = líquido após taxa Pix 0,99%
+  gateway_fixed: number;     // v168: taxa FIXA Pix MP em BRL (0,49)
   floor_brl: number;         // piso mínimo do pacote de entrada
 };
 
@@ -14,7 +15,8 @@ const DEFAULT: PricingConfig = {
   profit_multiplier: 4.0,
   coupon_buffer: 1.15,
   gateway_net: 0.9901,
-  floor_brl: 3.0,
+  gateway_fixed: 0.49,
+  floor_brl: 5.0,
 };
 
 export async function getPricingConfig(): Promise<PricingConfig> {
@@ -32,6 +34,7 @@ export async function getPricingConfig(): Promise<PricingConfig> {
       profit_multiplier: Number(v.profit_multiplier) > 0 ? Number(v.profit_multiplier) : DEFAULT.profit_multiplier,
       coupon_buffer:     Number(v.coupon_buffer)     > 0 ? Number(v.coupon_buffer)     : DEFAULT.coupon_buffer,
       gateway_net:       Number(v.gateway_net)       > 0 && Number(v.gateway_net) <= 1 ? Number(v.gateway_net) : DEFAULT.gateway_net,
+      gateway_fixed:     Number(v.gateway_fixed)     >= 0 ? Number(v.gateway_fixed)    : DEFAULT.gateway_fixed,
       floor_brl:         Number(v.floor_brl)         > 0 ? Number(v.floor_brl)         : DEFAULT.floor_brl,
     };
     cache = { data: cfg, at: now };

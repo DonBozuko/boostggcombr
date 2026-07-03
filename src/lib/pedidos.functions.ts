@@ -147,7 +147,7 @@ export const criarPedido = createServerFn({ method: "POST" })
     // Cupom PRIME15 = 15% off aplicado server-side. BRINDE50 = bônus em seguidores (não desconta).
     const cupom = (data.cupom ?? "").trim().toUpperCase();
     const discount = cupom.split(/[,\s]+/).includes("PRIME15") ? 0.15 : 0;
-    const valorCobrar = Math.max(1, Number((valorBase * (1 - discount)).toFixed(2)));
+    const valorCobrar = Math.max(5, Number((valorBase * (1 - discount)).toFixed(2)));
 
 
 
