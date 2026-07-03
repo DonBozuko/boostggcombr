@@ -211,12 +211,16 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   const costMap = new Map<string, number | null>(
     rankedContingency.map((p) => [p.slug, p.cost_brl]),
   );
+  const serviceIdMap = new Map<string, string | number | null>(
+    rankedContingency.map((p: any) => [p.slug, p.provider_service_id ?? null]),
+  );
 
   for (const f of cadeia) {
     const r = await dispatchByFornecedor(f.slug, {
       pacote: pedido.pacote,
       quantidade: pedido.quantidade,
       instagram_user: pedido.instagram_user,
+      serviceIdOverride: f.slug === "smmhype" ? undefined : serviceIdMap.get(f.slug) ?? null,
     });
     if (r.ok) {
       sucesso = true;

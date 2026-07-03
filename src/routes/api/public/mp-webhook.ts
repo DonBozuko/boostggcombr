@@ -218,7 +218,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               origem: "mercado_pago",
               destino: "wallet:geral",
               pedido_id: pedido.id,
-              buyer_ip: request.headers.get("x-forwarded-for") ?? request.headers.get("cf-connecting-ip") ?? null,
+              buyer_ip: clientIp,
               telemetry: { payment_id: String(paymentId), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED" },
             } as any);
           } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
@@ -447,7 +447,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               // ===== Tesouraria: registra ledger idempotente =====
               try {
                 const fat = Number(pedido.valor);
-                const taxaPix = Number((fat * 0.0099).toFixed(2)); // MP Pix ~0,99%
+                const taxaPix = Number((fat * 0.0099 + 0.49).toFixed(2)); // MP Pix 0,99% + taxa fixa
                 const custo = custoReal != null ? Number(custoReal.toFixed(2)) : 0;
                 const lucroLiq = Number((fat - custo - taxaPix).toFixed(2));
                 const netPct = fat > 0 ? Number(((lucroLiq / fat) * 100).toFixed(2)) : 0;
@@ -463,6 +463,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   provider_selected: f.slug,
                   net_profit_percentage: netPct,
                 } as any, { onConflict: "pedido_id" });
+                if (custo > 0) {
+                  await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: -Number(custoReal!.toFixed(4)) });
+                  await supabaseAdmin.from("financial_ledger" as any).insert({
+                    valor_brl: Number(custoReal!.toFixed(4)),
+                    origem: "wallet:geral",
+                    destino: `fornecedor:${f.slug}`,
+                    pedido_id: pedido.id,
+                    fornecedor_slug: f.slug,
+                    telemetry: { event: "DISPATCH_OK_DIRECT_FALLBACK", payment_id: String(paymentId), provider: f.slug, order_id: r.orderId ?? null, cost_brl: custoReal },
+                  } as any);
+                }
               } catch (e) { console.warn("[mp-webhook] treasury ledger falhou", e); }
               // v94 — Telemetria de auditoria: dispatch OK
               try {

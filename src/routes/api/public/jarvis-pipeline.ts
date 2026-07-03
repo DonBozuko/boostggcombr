@@ -1,21 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// v76: Pipeline trancado por chave mestra (?key=F@bi1313)
-const SOURCES = import.meta.glob("/src/routes/api/public/mp-webhook.ts", {
-  query: "?raw",
-  import: "default",
-  eager: true,
-}) as Record<string, string>;
-
-const MASTER_KEY = "F@bi1313";
-
 export const Route = createFileRoute("/api/public/jarvis-pipeline")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const key = url.searchParams.get("key");
-        if (key !== MASTER_KEY) {
+        const key = request.headers.get("x-admin-token") ?? url.searchParams.get("token") ?? "";
+        if (!process.env.ADMIN_TOKEN || key !== process.env.ADMIN_TOKEN) {
           return new Response("403 Forbidden — Acesso Bloqueado", {
             status: 403,
             headers: {
@@ -25,15 +16,17 @@ export const Route = createFileRoute("/api/public/jarvis-pipeline")({
             },
           });
         }
-        const fileKey = Object.keys(SOURCES)[0];
-        const code = fileKey ? SOURCES[fileKey] : "// mp-webhook.ts não encontrado";
-        return new Response(code, {
+        return Response.json({
+          ok: true,
+          pipeline: "mp-webhook",
+          status: "registered",
+          source_exposure: "disabled",
+          ts: new Date().toISOString(),
+        }, {
           status: 200,
           headers: {
-            "Content-Type": "text/plain; charset=utf-8",
             "Cache-Control": "no-store",
             "X-Jarvis-Pipeline": "v76",
-            "Access-Control-Allow-Origin": "*",
           },
         });
       },
