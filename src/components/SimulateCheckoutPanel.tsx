@@ -17,7 +17,6 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
   const [pacote, setPacote] = useState<string>("");
   const [qty, setQty] = useState<number>(0);
   const [handle, setHandle] = useState<string>("@fabiano.majestic");
-  const [mode, setMode] = useState<"dry" | "real">("dry");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{ steps: Step[]; pedidoId: string | null; totalMs?: number; finalStatus?: string } | null>(null);
 
