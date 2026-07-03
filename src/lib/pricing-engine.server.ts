@@ -157,8 +157,9 @@ async function primeConfig(): Promise<void> {
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 
 function floorFor(qty: number): number {
-  if (qty <= 50) return FLOOR_BASE;
-  return Math.max(FLOOR_BASE, FLOOR_BASE + Math.log2(qty / 50) * 1.5);
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 500) return FLOOR_BASE;
+  return FLOOR_BASE + ((q - 500) / 1000) * 2.0;
 }
 
 function priceFromCost(qty: number, costPer1k: number): number {
