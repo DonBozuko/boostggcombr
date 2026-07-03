@@ -23,6 +23,7 @@ import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
+import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
@@ -111,6 +112,11 @@ const IndexRoute = IndexRouteImport.update({
 const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
   id: '/~api/analytics',
   path: '/~api/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSeoRoute = DashboardSeoRouteImport.update({
+  id: '/dashboard/seo',
+  path: '/dashboard/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -267,6 +274,7 @@ export interface FileRoutesByTo {
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -340,6 +349,7 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/~flock.js'
     | '/admin/catalog'
+    | '/dashboard/seo'
     | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -375,6 +385,7 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/~flock.js'
     | '/admin/catalog'
+    | '/dashboard/seo'
     | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/~flock.js'
     | '/admin/catalog'
+    | '/dashboard/seo'
     | '/~api/analytics'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -445,6 +457,7 @@ export interface RootRouteChildren {
   TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
+  DashboardSeoRoute: typeof DashboardSeoRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
@@ -564,6 +577,13 @@ declare module '@tanstack/react-router' {
       path: '/~api/analytics'
       fullPath: '/~api/analytics'
       preLoaderRoute: typeof Char126apiAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/seo': {
+      id: '/dashboard/seo'
+      path: '/dashboard/seo'
+      fullPath: '/dashboard/seo'
+      preLoaderRoute: typeof DashboardSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/catalog': {
@@ -726,6 +746,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
   Char126flockDotjsRoute: Char126flockDotjsRoute,
+  DashboardSeoRoute: DashboardSeoRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
