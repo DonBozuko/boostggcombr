@@ -185,7 +185,7 @@ export function PricingCatalogEditor({ token }: { token: string }) {
           <label className={labelCls}>Custo em Real</label>
           <input className={inputCls} type="number" step="0.0001" value={form.cost_brl} onChange={(e) => {
             const cost = e.target.value;
-            const suggested = computeGuardedPrice(Number(cost) || 0);
+            const suggested = computeGuardedPrice(Number(cost) || 0, Number(form.quantidade) || 0);
             setForm({ ...form, cost_brl: cost, price_brl: suggested ? String(suggested) : form.price_brl });
           }} />
         </div>
