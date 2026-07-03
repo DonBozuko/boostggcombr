@@ -527,7 +527,7 @@ function BuscarPedidoPanel() {
             <div key={p.id} className="rounded-lg border border-cyan-400/20 bg-black/50 p-3 text-xs space-y-1">
               <div className="flex justify-between flex-wrap gap-2">
                 <span className="font-mono text-cyan-200">#{p.id.slice(0, 8)}</span>
-                <span className={`uppercase font-bold ${p.status === "paid" || p.status === "approved" ? "text-emerald-300" : p.status === "pending" ? "text-amber-300" : "text-red-300"}`}>{p.status}</span>
+                <span className={`uppercase font-bold ${p.status === "paid" || p.status === "Enviado" || p.status === "approved" ? "text-emerald-300" : p.status === "pending" || p.status === "waiting_provision" ? "text-amber-300" : "text-red-300"}`}>{p.status}</span>
               </div>
               <div className="text-white/80"><strong>{p.instagram_user}</strong> · {REDE_ICON[p.rede_social ?? ""] ?? "🌐"} {p.rede_social ?? "—"}</div>
               <div className="text-white/60">Pacote {p.pacote} · {p.quantidade} un.</div>

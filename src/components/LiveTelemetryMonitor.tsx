@@ -65,7 +65,8 @@ export function LiveTelemetryMonitor() {
 
   const lastPix = logs.find((l) => l.action === "PIX_APPROVED");
   const webhookLine = (() => {
-    if (lastPedido?.status === "paid") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
+    if (lastPedido?.status === "paid" || lastPedido?.status === "Enviado") return { color: "text-emerald-400", text: `🟢 PAGAMENTO CONFIRMADO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
+    if (lastPedido?.status === "waiting_provision") return { color: "text-emerald-300", text: `🤖 AGUARDANDO AUTOMAÇÃO/SALDO · pedido ${lastPedido.id.slice(0,8)} · ${lastPedido.pacote}` };
     if (lastPix) {
       const d: any = lastPix.detail ?? {};
       return { color: "text-emerald-300", text: `🟢 WEBHOOK MP recebido · PIX aprovado · pedido ${String(d.pedido_id ?? "").slice(0,8)} · payment ${d.payment_id ?? "?"}` };

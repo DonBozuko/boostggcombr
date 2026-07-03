@@ -6,6 +6,8 @@ const input = z.object({ pedidoId: z.string().min(4).max(60) });
 const STATUS_MSG: Record<string, string> = {
   pending: "Seu pedido está aguardando confirmação do pagamento Pix, senhor.",
   paid: "Pagamento confirmado. Disparei o pedido para o fornecedor, senhor.",
+  Enviado: "Pedido enviado ao fornecedor com sucesso, senhor.",
+  waiting_provision: "Pagamento confirmado. Pedido aguardando automação de envio, senhor.",
   processing: "Seu pedido está em processamento na rede ativa, senhor.",
   completed: "Pedido entregue com sucesso! Operação concluída.",
   failed: "Detectei uma falha no pedido. Acione o suporte para reprocessar, senhor.",

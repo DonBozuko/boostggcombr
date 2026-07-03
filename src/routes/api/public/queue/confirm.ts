@@ -8,6 +8,7 @@ const schema = z.object({
   pedido_id: z.string().min(1),
   provider_order_id: z.string().optional(),
   fornecedor: z.string().optional(),
+  valor_pago_brl: z.number().nonnegative().optional(),
 });
 
 export const Route = createFileRoute("/api/public/queue/confirm")({
@@ -30,8 +31,13 @@ export const Route = createFileRoute("/api/public/queue/confirm")({
             headers: { "Content-Type": "application/json" },
           });
         }
-        const { reprocessWaitingProvision } = await import("@/lib/reprocess-waiting.server");
-        const result = await reprocessWaitingProvision(parsed.data.pedido_id);
+        const { confirmRobotDispatch } = await import("@/lib/reprocess-waiting.server");
+        const result = await confirmRobotDispatch({
+          pedidoId: parsed.data.pedido_id,
+          providerOrderId: parsed.data.provider_order_id ?? null,
+          fornecedor: parsed.data.fornecedor ?? null,
+          valorPagoBrl: parsed.data.valor_pago_brl ?? null,
+        });
         const status = result.ok ? 200 : 422;
         return new Response(JSON.stringify(result), {
           status,

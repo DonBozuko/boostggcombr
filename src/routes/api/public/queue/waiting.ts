@@ -27,8 +27,8 @@ export const Route = createFileRoute("/api/public/queue/waiting")({
           });
         }
 
-        // Enriquece com service_id do fornecedor mais barato disponível
-        const { pickCheapestFornecedorSlug, rankProvidersByCost } = await import("@/lib/smart-routing.server");
+        // Enriquece com service_id do fornecedor sugerido; custo exposto prioriza o valor já reservado no pedido.
+        const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
         const items = await Promise.all(
           (data ?? []).map(async (p: any) => {
             const ranked = await rankProvidersByCost({ pacote: p.pacote, quantidade: Number(p.quantidade) });
@@ -40,7 +40,7 @@ export const Route = createFileRoute("/api/public/queue/waiting")({
               quantidade: Number(p.quantidade),
               link_do_perfil: p.instagram_user,
               valor_cliente_brl: Number(p.valor),
-              custo_estimado_brl: top?.cost_brl ?? p.custo_real ?? null,
+              custo_estimado_brl: p.custo_real ?? top?.cost_brl ?? null,
               fornecedor_sugerido: top?.slug ?? null,
               service_id: top?.provider_service_id ?? null,
               created_at: p.created_at,
