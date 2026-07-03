@@ -468,6 +468,7 @@ function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Pick<P
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
   // Hermetic Engine v47: leitura 1:1 do pricing_items (preço final por card).
   // Fallback: pricing_cache (per-1k) → tabela estática.
+  await primeConfig();
   const [itemsMap, cachedRate] = await Promise.all([
     readCachedItems(category),
     readCachedRate(category),
@@ -521,6 +522,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
   mode?: "api" | "contingency";
 }> {
+  await primeConfig();
   const { purgePricingCacheMemory } = await import("@/lib/pricing-cache.server");
   purgePricingCacheMemory("syncPricingCacheAll:start");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
