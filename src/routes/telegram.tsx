@@ -50,7 +50,6 @@ export const Route = createFileRoute("/telegram")({
     return {
       meta: [
         { title }, { name: "description", content: description },
-        { name: "keywords", content: "comprar membros telegram, comprar inscritos canal telegram, membros grupo telegram, smm telegram brasil" },
         { property: "og:title", content: title }, { property: "og:description", content: description },
         { property: "og:url", content: url }, { property: "og:type", content: "website" },
         { property: "og:image", content: ogImage },

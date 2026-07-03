@@ -42,15 +42,12 @@ export const Route = createFileRoute("/youtube")({
     const title = "Comprar Inscritos YouTube Reais | EliteBoost Prime";
     const description =
       "Compre inscritos, views e likes de YouTube reais com entrega via Pix. Ativa monetização, alta retenção e reposição garantida.";
-    const keywords =
-      "comprar inscritos youtube, comprar views youtube, visualizações youtube barato, crescer canal youtube, monetizar canal youtube pix, agência smm youtube brasil";
     const url = "https://eliteboostprime.lovable.app/youtube";
     const ogImage = `https://eliteboostprime.lovable.app${ogYoutube}?v=48`;
     return {
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "keywords", content: keywords },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
