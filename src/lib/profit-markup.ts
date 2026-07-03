@@ -7,14 +7,23 @@ const PIX_FIXED = 0.49;
 const FLOOR_BRL = 5.0;
 
 function tierMultiplier(qty: number): number {
-  // v173: escalonado — mesmo desconto PRIME15, margem compensada por faixa.
-  //   qty ≤ 500        → 5.0x  (isca de topo)
-  //   qty ≤ 10.000     → 8.0x  (sweet spot varejo)
-  //   qty > 10.000     → 12.0x (premium/autoridade)
+  // v174: rampa linear entre 5k e 15k elimina degrau de +50% no preço/mil.
+  //   qty ≤ 500        → 5.0x  (isca)
+  //   qty ≤ 5.000      → 8.0x  (sweet spot)
+  //   qty 5k → 15k     → 8.0x → 12.0x (rampa linear)
+  //   qty > 15.000     → 12.0x (premium)
   const q = Number(qty);
   if (!Number.isFinite(q) || q <= 500) return 5.0;
-  if (q <= 10_000) return 8.0;
+  if (q <= 5_000) return 8.0;
+  if (q <= 15_000) return 8.0 + ((q - 5000) / 10000) * 4.0;
   return 12.0;
+}
+
+// v174: piso escalar — evita empatar vários pacotes pequenos no mesmo R$5.
+function scaledFloor(qty: number): number {
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 500) return FLOOR_BRL;
+  return FLOOR_BRL + ((q - 500) / 1000) * 2.0;
 }
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
@@ -32,10 +41,11 @@ export function applyProfitFormula<T extends { valor: number; price: string; qua
     const cost = parseFloat(String(p.valor));
     const qty = Number(p.quantidade ?? 0);
     const raw = (cost * tierMultiplier(qty) * COUPON_BUFFER + PIX_FIXED) / PIX_NET;
-    const final = Math.max(FLOOR_BRL, ceilTo(raw, 0.5));
+    const final = Math.max(scaledFloor(qty), ceilTo(raw, 0.5));
     return { ...p, valor: final, price: formatBRL(final) };
   });
 }
+
 
 // Strict 50-Pack Omnichannel Ingestion Matrix — gerador massivo de SKUs.
 // Recebe prefixo (tf/tl/tv/ys/yv/ff/fl/tgc/tgg/wbr/wgl), label de unidade,
