@@ -11,12 +11,11 @@ import { Eye, EyeOff, Settings, Terminal, Search, Tag, Compass, BarChart3, Brief
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
-import { IntegrityVerifier } from "@/components/IntegrityVerifier";
 import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
-import { LiveTelemetryMonitor } from "@/components/LiveTelemetryMonitor";
+
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
 
 import {
@@ -133,7 +132,7 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
               <DialogDescription>Auditoria real de rotas, mídias v=48 e tabelas do banco.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
-              <IntegrityVerifier />
+              
               <JarvisDetectorMentiras />
             </div>
           </DialogContent>
@@ -1344,7 +1343,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} refreshSignal={nocRefreshSignal} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"} mt-3`}><CatalogTelemetryPanel token={token} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><ClaudeCodeInspector /></div>
-        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><LiveTelemetryMonitor /></div>
+        
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><TreasuryPanel token={token} /></div>
