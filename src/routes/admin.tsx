@@ -18,7 +18,7 @@ import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
 import { LiveTelemetryMonitor } from "@/components/LiveTelemetryMonitor";
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
-import { SourceVault } from "@/components/SourceVault";
+
 import {
   Dialog,
   DialogContent,
