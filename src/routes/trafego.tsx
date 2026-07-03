@@ -56,7 +56,7 @@ export const Route = createFileRoute("/trafego")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Tráfego Pago", url, description, priceFromBrl: 5 })],
+      scripts: [buildProductJsonLd({ network: "Tráfego Pago", url, description })],
     };
   },
   component: TrafegoLanding,

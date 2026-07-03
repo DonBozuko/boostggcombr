@@ -61,7 +61,7 @@ export const Route = createFileRoute("/telegram")({
         { name: "twitter:image", content: ogImage },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Telegram", url, description, priceFromBrl: 5 })],
+      scripts: [buildProductJsonLd({ network: "Telegram", url, description })],
     };
   },
   component: TelegramLanding,
