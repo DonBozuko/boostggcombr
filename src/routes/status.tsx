@@ -8,6 +8,7 @@ export const Route = createFileRoute("/status")({
       { name: "description", content: "Monitoramento em tempo real das redes sociais e webhooks da EliteBoost Prime." },
       { property: "og:title", content: "Status do Sistema | EliteBoost Prime" },
       { property: "og:description", content: "Integridade em tempo real das 5 redes, tráfego e webhooks." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: StatusPage,
