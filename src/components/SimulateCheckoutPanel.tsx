@@ -60,10 +60,9 @@ export function SimulateCheckoutPanel({ token }: { token: string }) {
         <h3 className="text-sm font-bold text-amber-400 tracking-wider">SIMULADOR DE COMPRA REAL</h3>
       </div>
       <p className="text-xs text-white/60 mb-3">
-        Reproduz o pipeline completo (pedido → smart-routing → dispatch → Telegram) sem tocar no Mercado Pago.
-        <br />
-        <span className="text-amber-300">Dry-run</span> = para no dispatcher (não envia).{" "}
-        <span className="text-red-300">Real</span> = envia de verdade ao fornecedor (gasta saldo).
+        Reproduz o pipeline (pricing → pedido SIM → smart-routing → cálculo de margem → Telegram) em modo
+        <span className="text-amber-300"> dry-run</span>. Nenhum saldo é debitado, nenhum pedido é enviado ao fornecedor,
+        nenhum valor é movimentado. Fluxo real de compra permanece intocado.
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
