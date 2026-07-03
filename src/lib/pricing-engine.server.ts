@@ -122,25 +122,30 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 const USD_TO_BRL = 7.0;
 const CONTINGENCY_SOURCE = "fallback" as const;
 
-// v106 — Equação Fabiano unificada:
-// preço = custo_brl * 4.0 * 1.15 / 0.9901
-// 4.0 = 300% de lucro líquido puro
-// 1.15 = gordura antecipada p/ absorver PRIME15 sem furar margem
-// 0.9901 = repasse da taxa Pix do Mercado Pago (0,99%)
-const FABIANO_PROFIT = 4.0;
-const FABIANO_COUPON = 1.15;
-const FABIANO_PIX_NET = 0.9901;
+// v162 — Equação Fabiano com config dinâmica (admin_settings.pricing_config).
+// Valores default preservam a fórmula histórica: preço = custo * 4.0 * 1.15 / 0.9901.
+// Cache 30s no getPricingConfig — alterações no admin refletem em até 30s.
+let FABIANO_PROFIT = 4.0;
+let FABIANO_COUPON = 1.15;
+let FABIANO_PIX_NET = 0.9901;
+let FLOOR_BASE = 3.0;
+
+async function primeConfig(): Promise<void> {
+  try {
+    const { getPricingConfig } = await import("./pricing-config.server");
+    const cfg = await getPricingConfig();
+    FABIANO_PROFIT = cfg.profit_multiplier;
+    FABIANO_COUPON = cfg.coupon_buffer;
+    FABIANO_PIX_NET = cfg.gateway_net;
+    FLOOR_BASE = cfg.floor_brl;
+  } catch { /* mantém defaults */ }
+}
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 
-// v109 — Strict Incremental Pricing Core
-// Piso R$3,00 aplica-se APENAS ao pacote de entrada (qty <= 50).
-// Pacotes maiores usam piso proporcional escalonado (qty/50 * 3 * 0.9),
-// permitindo que 100 seg → ~R$4,50-R$4,90, 200 → ~R$6+, etc.
 function floorFor(qty: number): number {
-  if (qty <= 50) return 3;
-  // escala suave: 100→R$4,50 | 200→R$6,00 | 500→R$8,50
-  return Math.max(3, 3 + Math.log2(qty / 50) * 1.5);
+  if (qty <= 50) return FLOOR_BASE;
+  return Math.max(FLOOR_BASE, FLOOR_BASE + Math.log2(qty / 50) * 1.5);
 }
 
 function priceFromCost(qty: number, costPer1k: number): number {
@@ -463,6 +468,7 @@ function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Pick<P
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
   // Hermetic Engine v47: leitura 1:1 do pricing_items (preço final por card).
   // Fallback: pricing_cache (per-1k) → tabela estática.
+  await primeConfig();
   const [itemsMap, cachedRate] = await Promise.all([
     readCachedItems(category),
     readCachedRate(category),
@@ -516,6 +522,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   results: Array<{ category: Category; cost: number; source: "api" | "fallback" }>;
   mode?: "api" | "contingency";
 }> {
+  await primeConfig();
   const { purgePricingCacheMemory } = await import("@/lib/pricing-cache.server");
   purgePricingCacheMemory("syncPricingCacheAll:start");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
