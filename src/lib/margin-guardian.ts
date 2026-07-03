@@ -18,25 +18,45 @@ export const PIX_FIXED = 0.49;
 export const FLOOR_BRL = 5.0;
 export const MIN_NET_PROFIT_RATIO = 4.0; // validação: net ≥ 4× custo
 
-/** v173 — Fator escalar aplicado sobre PROFIT_MULT conforme a quantidade. */
+/** v174 — Fator escalar com rampa linear entre 5k e 15k (elimina degrau abrupto). */
 export function tierFactor(qty: number): number {
   const q = Number(qty);
-  if (!Number.isFinite(q) || q <= 500) return 1.0; // 5.0x
-  if (q <= 10_000) return 1.6;                      // 8.0x
-  return 2.4;                                       // 12.0x
+  if (!Number.isFinite(q) || q <= 500) return 1.0;   // 5.0x  — isca
+  if (q <= 5_000) return 1.6;                         // 8.0x  — sweet spot
+  if (q <= 15_000) {
+    // Rampa linear 8x → 12x entre 5k e 15k (evita zona morta comercial)
+    return 1.6 + ((q - 5000) / 10000) * 0.8;
+  }
+  return 2.4;                                         // 12.0x — premium
 }
 
-/** v173 — Multiplicador efetivo de lucro para uma quantidade. */
+/** v174 — Multiplicador efetivo de lucro para uma quantidade. */
 export function effectiveProfitMult(qty: number): number {
   return PROFIT_MULT * tierFactor(qty);
+}
+
+/**
+ * v174 — Piso escalar por quantidade.
+ * Quando custo é baixíssimo (curtidas/views), o piso fixo R$5 achatava vários
+ * pacotes no mesmo preço. Piso escalar mantém monotonia visível ao cliente:
+ *   qty ≤ 500     → R$ 5,00
+ *   qty  1.000    → R$ 6,00
+ *   qty  3.000    → R$ 10,00
+ *   qty 10.000    → R$ 24,00
+ */
+export function scaledFloor(qty: number): number {
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 500) return FLOOR_BRL;
+  return FLOOR_BRL + ((q - 500) / 1000) * 2.0;
 }
 
 export function computeGuardedPrice(costBrl: number, qty = 0): number {
   const c = Number(costBrl);
   if (!Number.isFinite(c) || c <= 0) return 0;
   const raw = (c * effectiveProfitMult(qty) * COUPON_BUFFER + PIX_FIXED) / PIX_NET;
-  return Number(Math.max(FLOOR_BRL, raw).toFixed(2));
+  return Number(Math.max(scaledFloor(qty), raw).toFixed(2));
 }
+
 
 /** Líquido após cupom PRIME15 (15%) + taxa MP Pix (0,99% + R$ 0,49). */
 export function estimateNetProfit(priceBrl: number, costBrl: number): number {
