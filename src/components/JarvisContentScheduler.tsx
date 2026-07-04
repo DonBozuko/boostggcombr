@@ -442,3 +442,94 @@ export function JarvisContentScheduler() {
     </div>
   );
 }
+
+// -------- UTM Link Generator (Omnichannel Tracking) --------
+type UtmProps = { networks: Network[]; format: Format };
+
+function UtmLinkGenerator({ networks, format }: UtmProps) {
+  const BASE_BY_NET: Record<Network, string> = {
+    instagram: "https://eliteboostprime.lovable.app",
+    tiktok: "https://eliteboostprime.lovable.app/tiktok",
+    facebook: "https://eliteboostprime.lovable.app/facebook",
+    youtube: "https://eliteboostprime.lovable.app/youtube",
+    telegram: "https://eliteboostprime.lovable.app/telegram",
+  };
+  const [selected, setSelected] = useState<Network>(networks[0] ?? "instagram");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (networks[0] && !networks.includes(selected)) setSelected(networks[0]);
+  }, [networks, selected]);
+
+  const trackedUrl = useMemo(() => {
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const fmt = format === "9:16" ? "reels" : "feed";
+    const base = BASE_BY_NET[selected];
+    const params = new URLSearchParams({
+      utm_source: selected,
+      utm_medium: fmt,
+      utm_campaign: `jarvis_${date}`,
+    });
+    return `${base}?${params.toString()}`;
+  }, [selected, format]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(trackedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  const opts: { id: Network; label: string }[] = [
+    { id: "instagram", label: "Instagram" },
+    { id: "tiktok", label: "TikTok" },
+    { id: "facebook", label: "Facebook" },
+    { id: "youtube", label: "YouTube" },
+    { id: "telegram", label: "Telegram" },
+  ];
+
+  return (
+    <div className="space-y-2 rounded-xl border border-amber-400/30 bg-black/40 p-3">
+      <label className="text-[10px] uppercase tracking-wider text-amber-300/80">
+        🎯 Geração de Links de Rastreamento Omnichannel (UTM)
+      </label>
+      <div className="flex flex-wrap gap-1.5">
+        {opts.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => setSelected(o.id)}
+            className={`px-2.5 py-1 rounded-lg text-[11px] border transition ${
+              selected === o.id
+                ? "bg-amber-500/20 text-amber-200 border-amber-400/60"
+                : "bg-black/30 text-white/60 border-white/10 hover:text-white"
+            }`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          readOnly
+          value={trackedUrl}
+          className="flex-1 rounded-lg border border-white/10 bg-black/60 px-3 py-2 text-[11px] font-mono text-amber-100 select-all"
+          onFocus={(e) => e.currentTarget.select()}
+        />
+        <button
+          type="button"
+          onClick={copy}
+          className="rounded-lg bg-amber-500/20 border border-amber-400/50 text-amber-200 px-3 py-2 text-[11px] font-bold uppercase hover:bg-amber-500/30"
+        >
+          {copied ? "✓ Copiado" : "Copiar"}
+        </button>
+      </div>
+      <p className="text-[10px] text-white/50">
+        Alimenta em tempo real o painel <b>Top Fontes (utm_source)</b> do dashboard admin — funil de tráfego × lucro real.
+      </p>
+    </div>
+  );
+}
+
