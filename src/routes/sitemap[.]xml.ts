@@ -32,7 +32,9 @@ const buildSitemapXml = () => {
     { path: "/blog/melhor-site-comprar-seguidores", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/comprar-seguidores-pix", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/seguidores-instagram-baratos", changefreq: "monthly", priority: "0.6" },
+    { path: "/ferramentas/contador-seguidores", changefreq: "weekly", priority: "0.7" },
   ];
+
 
   const urls = entries.map((e) =>
     [
