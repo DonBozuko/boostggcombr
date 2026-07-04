@@ -6,7 +6,7 @@
 export function RecommendedBadge({ color = "#FF0028" }: { color?: string }) {
   return (
     <div
-      className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-[0.18em] whitespace-nowrap animate-pulse"
+      className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-[0.18em] whitespace-nowrap"
       style={{
         background: `linear-gradient(90deg, ${color}33, ${color}66)`,
         border: `1px solid ${color}`,

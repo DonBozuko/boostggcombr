@@ -97,7 +97,7 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
             <span className="text-sm font-bold tracking-wide">FS</span>
           </div>
         )}
-        <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black animate-pulse`} />
+        <span className={`absolute bottom-0 right-0 h-3 w-3 rounded-full ${c.dot} border-2 border-black`} />
       </a>
 
       {hudMode && (
@@ -109,7 +109,7 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
           aria-label="Fale comigo no Telegram"
           className={`mt-1.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black tracking-wide text-white border ${c.border} bg-black/80 backdrop-blur-md ${c.ring} ring-1 animate-fade-in hover:scale-105 transition-transform ${c.accent}`}
         >
-          <span className={`h-1.5 w-1.5 rounded-full ${c.dot} animate-pulse`} />
+          <span className={`h-1.5 w-1.5 rounded-full ${c.dot}`} />
           Fale Comigo
         </a>
       )}

@@ -19,7 +19,7 @@ export function LivePurchasesTicker({ accent = "#00f2fe" }: { accent?: string })
     >
       <div className="flex items-center gap-1.5 px-2 py-0.5 border-b border-white/5">
         <span
-          className="inline-block h-1.5 w-1.5 rounded-full animate-pulse"
+          className="inline-block h-1.5 w-1.5 rounded-full"
           style={{ background: accent, boxShadow: `0 0 6px ${accent}` }}
         />
         <span
