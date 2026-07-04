@@ -845,7 +845,7 @@ function Landing() {
                       )}
                     </div>
                   )}
-                  {!waitingProvision && pedidoInfo?.pedidoId && (
+                  {pedidoInfo?.pedidoId && (
                     <MysteryBoxRedeem
                       pedidoId={pedidoInfo.pedidoId}
                       quantidade={pedidoInfo?.quantidade ?? 0}
