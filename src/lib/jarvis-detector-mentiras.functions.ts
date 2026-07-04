@@ -20,21 +20,32 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
       // 1. pricing_items integridade 1:1
       const { data: items, error: itemsErr } = await supabaseAdmin
         .from("pricing_items")
-        .select("pacote, price_brl, cost_brl, provider_service_id");
+        .select("pacote, price_brl, cost_brl, provider_service_id, smmhype_service_id, smmpanel_service_id, verified_service_id");
       if (itemsErr) {
         checks.push({ id: "pricing_items", label: "pricing_items acessível", ok: false, detail: itemsErr.message });
         blockDeploy = true;
       } else {
         const total = items?.length ?? 0;
-        const broken = (items ?? []).filter(
-          (i) => !i.price_brl || Number(i.price_brl) <= 0 || !i.provider_service_id,
-        );
+        // v177 — Alerta vermelho SÓ quando não há NENHUMA rota de dispatch (todos os 4 IDs nulos)
+        // ou preço abaixo do piso de R$ 5,00. Ter só SMMPanel + Verified é 100% íntegro.
+        const broken = (items ?? []).filter((i) => {
+          const semPreco = !i.price_brl || Number(i.price_brl) < 5;
+          const semRota =
+            !i.provider_service_id &&
+            !i.smmhype_service_id &&
+            !i.smmpanel_service_id &&
+            !i.verified_service_id;
+          return semPreco || semRota;
+        });
         const ok = total > 0 && broken.length === 0;
+        const amostra = broken.slice(0, 5).map((b) => b.pacote).join(", ");
         checks.push({
           id: "pricing_items",
-          label: `Mapeamento 1:1 pacote→ID (${total} itens, ${broken.length} quebrados)`,
+          label: `Mapeamento pacote→rota de dispatch (${total} itens, ${broken.length} órfãos)`,
           ok,
-          detail: ok ? "íntegro" : `${broken.length} itens sem preço/ID fornecedor`,
+          detail: ok
+            ? "íntegro — todo pacote tem ao menos 1 rota SMM ativa"
+            : `${broken.length} sem rota/preço: ${amostra}${broken.length > 5 ? "…" : ""}`,
         });
         if (!ok) blockDeploy = true;
       }
