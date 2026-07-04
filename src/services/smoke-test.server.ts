@@ -72,7 +72,8 @@ export async function runSmokeTest(): Promise<SmokeReport> {
 
     const cost = Number(it.cost_brl) || 0;
     const price = Number(it.price_brl) || 0;
-    if (cost > 0 && price < cost * 4.5 - 0.01) report.packages_below_margin.push(it.pacote);
+    // Alinhado com trigger enforce_pricing_markup (v170): 3x mínimo p/ pacotes pequenos
+    if (cost > 0 && price < cost * 2.9 - 0.01) report.packages_below_margin.push(it.pacote);
   }
 
   // 3) Auto-healer rodou recentemente?
