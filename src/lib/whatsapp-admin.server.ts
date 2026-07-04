@@ -22,10 +22,23 @@ function fmtBrl(v: number): string {
   return `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
 }
 
-/** Estima o custo bruto a partir do preço de venda quando não temos rate. */
-function estimateCost(vendaBrl: number): number {
-  // v168: preço = (custo * 4.0 * 1.15 + 0.49) / 0.9901 → custo = (venda * 0.9901 - 0.49) / 4.6
-  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (4.0 * 1.15)).toFixed(2));
+/** v181 — Estima custo bruto usando o mesmo tier multiplier de profit-markup.ts.
+ *  Fórmula inversa: preço = (custo × tier × 1.15 + 0.49) / 0.9901 → custo = (venda×0.9901 − 0.49) / (tier×1.15). */
+function tierMult(qty: number): number {
+  const q = Number(qty) || 0;
+  if (q <= 500) return 5.0;
+  if (q <= 5_000) return 8.0;
+  if (q <= 15_000) return 8.0 + ((q - 5000) / 10000) * 4.0;
+  return 12.0;
+}
+function estimateCost(vendaBrl: number, quantidade?: number | null): number {
+  const tier = tierMult(Number(quantidade ?? 0));
+  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (tier * 1.15)).toFixed(2));
+}
+function roiPct(venda: number, custo: number): number {
+  const liquido = venda * 0.9901 - 0.49 - custo * 1.15;
+  if (custo <= 0) return 0;
+  return Math.round((liquido / custo) * 100);
 }
 
 /** Retorna o Pix Copia-e-Cola do fornecedor alvo (ou null). */
@@ -50,10 +63,9 @@ function suggestRecharge(custoUnitBrl: number): { valor: number; cobre: number }
 }
 
 export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?: boolean }): string {
-  const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl);
+  const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl, a.quantidade);
   const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custo * 1.15).toFixed(2));
-  // v174 — Pix SÓ é anexado quando saldo pulmão < R$5 (ou cascata zerada).
-  // Fluxo normal fica silencioso: debita direto do saldo_atual do fornecedor.
+  const roi = roiPct(a.vendaBrl, custo);
   const showPix = !!(a.saldoCritical || a.criticalCaixaZero);
   const pix = showPix ? pixForFornecedor(a.fornecedor) : null;
   const sug = suggestRecharge(custo);
@@ -61,7 +73,7 @@ export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?
     ? "🚨🔴 <b>CAIXA ZERO · TODOS FORNECEDORES SEM SALDO</b>\n<i>Pedido segurado em fila. Recarregue AGORA para liberar entregas.</i>"
     : a.saldoCritical
       ? "⚠️ <b>ATENÇÃO DIRETOR</b>: Saldo pulmão crítico abaixo de R$ 5.\n<i>Copie o Pix abaixo para reabastecer a carteira usando o lucro acumulado no Mercado Pago.</i>"
-      : "🟡 <b>v174 · Provisão Necessária</b>";
+      : "🟡 <b>v181 · Provisão Necessária</b>";
   const linhas = [
     header,
     `Pedido: <code>${a.pedidoId}</code>`,
@@ -69,8 +81,9 @@ export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
     a.fornecedor ? `Fornecedor: <b>${a.fornecedor}</b>` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
-    `Custo depósito: <b>${fmtBrl(custo)}</b>`,
-    `Lucro líq. (~300%): ${fmtBrl(lucroLiquido)}`,
+    `Taxa Pix MP: ${fmtBrl(Number((a.vendaBrl * 0.0099 + 0.49).toFixed(2)))}`,
+    `Custo fornecedor: <b>${fmtBrl(custo)}</b>`,
+    `Lucro líq. (ROI ${roi}%): ${fmtBrl(lucroLiquido)}`,
     showPix ? `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)` : null,
     a.motivo ? `Motivo: ${a.motivo}` : null,
   ].filter(Boolean);
@@ -96,16 +109,19 @@ export function buildUniversalPaidMessage(a: UniversalPaidAlert): string {
   // v156 — Modelo saldo pré-carregado: cliente paga → sistema debita saldo local
   // e entrega imediato. NÃO enviamos PIX por pedido. PIX de recarga só chega
   // no alerta de provisão (saldo baixo/zerado) via buildProvisioningMessage.
-  const custoEstimado = estimateCost(a.vendaBrl);
-  const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custoEstimado * 1.15).toFixed(2));
+  const custoEstimado = estimateCost(a.vendaBrl, a.quantidade);
+  const taxaPix = Number((a.vendaBrl * 0.0099 + 0.49).toFixed(2));
+  const lucroLiquido = Number((a.vendaBrl - taxaPix - custoEstimado * 1.15).toFixed(2));
+  const roi = roiPct(a.vendaBrl, custoEstimado);
   const linhas = [
     "🟢 <b>PIX APROVADO · Entrega automática</b>",
     `Pedido: <code>${a.pedidoId}</code>`,
     a.compradorHandle ? `Comprador: <b>${a.compradorHandle}</b>` : null,
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
-    `Custo estimado: ${fmtBrl(custoEstimado)}`,
-    `Lucro líq. estimado: <b>${fmtBrl(lucroLiquido)}</b>`,
+    `Taxa Pix MP: ${fmtBrl(taxaPix)}`,
+    `Custo fornecedor: ${fmtBrl(custoEstimado)}`,
+    `Lucro líq. (ROI ${roi}%): <b>${fmtBrl(lucroLiquido)}</b>`,
     a.fornecedor ? `Debitado de: <b>${a.fornecedor}</b>` : null,
   ].filter(Boolean);
   return linhas.join("\n");
