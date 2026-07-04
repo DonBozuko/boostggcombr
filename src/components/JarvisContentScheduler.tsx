@@ -154,29 +154,26 @@ export function JarvisContentScheduler() {
     telegram:  "#telegram #grupotelegram #canal #eliteboostprime",
   };
 
-  const generateFacelessScript = () => {
+  const runGenScript = useServerFn(genScriptFn);
+  const [genLoading, setGenLoading] = useState(false);
+
+  const generateFacelessScript = async () => {
     const target = networks[0] ?? "instagram";
-    const info = ROUTE_BY_NET[target];
-    const hooks = [
-      "PARA AÍ 👀 ninguém te contou esse atalho de crescimento…",
-      "Se seu perfil tá travado, isso aqui é pra você 🚨",
-      "Como criadores estão explodindo em 48h sem aparecer 🤯",
-    ];
-    const retentions = [
-      `Algoritmo recompensa quem tem prova social desde o segundo 1 — por isso ${info.pitch} muda o jogo. Entrega blindada, sem queda, sem bot detectável.`,
-      `O segredo: empilhar ${info.pitch} ANTES do conteúdo viralizar. O algoritmo lê isso como autoridade e empurra orgânico em cima.`,
-    ];
-    const ctas = [
-      `🔗 Acessa ${info.url} agora, usa o cupom PRIME15 e ganha 15% imediato. Pix aprovado em 2 min.`,
-      `🚀 Link na bio → ${info.url} · cupom PRIME15 · entrega começa em segundos.`,
-    ];
-    const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
-    const s = { hook: pick(hooks), retention: pick(retentions), cta: pick(ctas) };
-    setScript(s);
-    setCaption(`${s.hook}\n\n${s.retention}\n\n${s.cta}\n\n${HASHTAGS[target]}`);
+    setGenLoading(true);
+    try {
+      const r = await runGenScript({ data: { network: target, format } });
+      const s = { hook: r.hook, retention: r.retention, cta: r.cta };
+      setScript(s);
+      setCaption(`${s.hook}\n\n${s.retention}\n\n${s.cta}\n\n${r.hashtags ?? HASHTAGS[target]}`);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Falha ao gerar roteiro");
+    } finally {
+      setGenLoading(false);
+    }
   };
 
   const aiSuggest = generateFacelessScript;
+
 
   const schedule = async () => {
     if (networks.length === 0) { setErr("Selecione ao menos 1 rede."); return; }
