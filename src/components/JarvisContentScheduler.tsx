@@ -177,13 +177,14 @@ export function JarvisContentScheduler() {
 
 
   const schedule = async () => {
-    if (networks.length === 0) { setErr("Selecione ao menos 1 rede."); return; }
+    if (networks.length === 0) { setErr("Selecione ao menos 1 rede."); toast.error("Selecione ao menos 1 rede."); return; }
+    if (!caption.trim()) { setErr("Gere ou escreva a legenda antes de agendar."); toast.error("Legenda vazia — gere o roteiro Faceless."); return; }
     setSaving(true); setErr(null);
     const rows = networks.map((n) => ({
       post_date: new Date(postDate).toISOString(),
       image_url: imageUrl || null,
       caption_text: caption,
-      status: "pending",
+      status: "scheduled",
       network: n,
       format,
       approved: false,
@@ -191,7 +192,8 @@ export function JarvisContentScheduler() {
     }));
     const { error } = await supabase.from("scheduled_posts").insert(rows);
     setSaving(false);
-    if (error) { setErr(error.message); return; }
+    if (error) { setErr(error.message); toast.error(`Falha ao agendar: ${error.message}`); return; }
+    toast.success(`✅ Conteúdo Omnichannel agendado com sucesso! (${rows.length}) — Link UTM gerado.`);
     setImageUrl(""); setCaption("");
     await load();
   };
