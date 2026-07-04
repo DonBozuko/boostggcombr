@@ -58,14 +58,18 @@ export function SocialProofPopup({ route = "/" }: { route?: string }) {
     let hideTimer: ReturnType<typeof setTimeout>;
 
     const cycle = () => {
+      if (typeof document !== "undefined" && document.hidden) {
+        showTimer = setTimeout(cycle, 5000);
+        return;
+      }
       setItem({ person: pick(PEOPLE), city: pick(CITIES), product: pick(products), qty: pick(QUANTITIES) });
       setVisible(true);
-      hideTimer = setTimeout(() => setVisible(false), 3000);
-      const nextDelay = 6000 + Math.floor(Math.random() * 2000); // 6-8s
+      hideTimer = setTimeout(() => setVisible(false), 3500);
+      const nextDelay = 12000 + Math.floor(Math.random() * 4000); // 12-16s
       showTimer = setTimeout(cycle, nextDelay);
     };
 
-    showTimer = setTimeout(cycle, 2500);
+    showTimer = setTimeout(cycle, 4000);
     return () => { clearTimeout(showTimer); clearTimeout(hideTimer); };
   }, [route]);
 
