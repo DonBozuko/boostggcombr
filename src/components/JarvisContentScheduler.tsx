@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { generateFacelessScript as genScriptFn } from "@/lib/jarvis-script-gen.functions";
 import jarvisBgAsset from "@/assets/jarvis-bg.mp4.asset.json";
+
 
 type Network = "instagram" | "tiktok" | "facebook" | "youtube" | "telegram";
 type Format = "1:1" | "9:16";
@@ -151,29 +154,26 @@ export function JarvisContentScheduler() {
     telegram:  "#telegram #grupotelegram #canal #eliteboostprime",
   };
 
-  const generateFacelessScript = () => {
+  const runGenScript = useServerFn(genScriptFn);
+  const [genLoading, setGenLoading] = useState(false);
+
+  const generateFacelessScript = async () => {
     const target = networks[0] ?? "instagram";
-    const info = ROUTE_BY_NET[target];
-    const hooks = [
-      "PARA AÍ 👀 ninguém te contou esse atalho de crescimento…",
-      "Se seu perfil tá travado, isso aqui é pra você 🚨",
-      "Como criadores estão explodindo em 48h sem aparecer 🤯",
-    ];
-    const retentions = [
-      `Algoritmo recompensa quem tem prova social desde o segundo 1 — por isso ${info.pitch} muda o jogo. Entrega blindada, sem queda, sem bot detectável.`,
-      `O segredo: empilhar ${info.pitch} ANTES do conteúdo viralizar. O algoritmo lê isso como autoridade e empurra orgânico em cima.`,
-    ];
-    const ctas = [
-      `🔗 Acessa ${info.url} agora, usa o cupom PRIME15 e ganha 15% imediato. Pix aprovado em 2 min.`,
-      `🚀 Link na bio → ${info.url} · cupom PRIME15 · entrega começa em segundos.`,
-    ];
-    const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
-    const s = { hook: pick(hooks), retention: pick(retentions), cta: pick(ctas) };
-    setScript(s);
-    setCaption(`${s.hook}\n\n${s.retention}\n\n${s.cta}\n\n${HASHTAGS[target]}`);
+    setGenLoading(true);
+    try {
+      const r = await runGenScript({ data: { network: target, format } });
+      const s = { hook: r.hook, retention: r.retention, cta: r.cta };
+      setScript(s);
+      setCaption(`${s.hook}\n\n${s.retention}\n\n${s.cta}\n\n${r.hashtags ?? HASHTAGS[target]}`);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Falha ao gerar roteiro");
+    } finally {
+      setGenLoading(false);
+    }
   };
 
   const aiSuggest = generateFacelessScript;
+
 
   const schedule = async () => {
     if (networks.length === 0) { setErr("Selecione ao menos 1 rede."); return; }
@@ -288,9 +288,11 @@ export function JarvisContentScheduler() {
             <button
               type="button"
               onClick={generateFacelessScript}
-              className="mt-1 w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_20px_rgba(34,211,238,0.5)] border border-cyan-300/60 hover:brightness-110"
+              disabled={genLoading}
+              className="mt-1 w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_20px_rgba(34,211,238,0.5)] border border-cyan-300/60 hover:brightness-110 disabled:opacity-40"
             >
-              🤖 Gerar Script Faceless (Gancho · Retenção · CTA)
+              🤖 {genLoading ? "Gerando com IA…" : "Gerar Script Faceless (Gancho · Retenção · CTA)"}
+
             </button>
             <textarea
               rows={5}
@@ -341,11 +343,16 @@ export function JarvisContentScheduler() {
               Pipeline assíncrono isolado: a compilação do criativo roda fora do servidor principal (NOC, Tesouraria e Smart Cost Routing preservados).
             </p>
           </div>
+
+          {/* UTM Link Generator */}
+          <UtmLinkGenerator networks={networks} format={format} />
+
           <p className="text-[10px] text-white/50">
             🔒 Modo Seguro: posts aguardam aprovação executiva via Telegram antes do envio real.
           </p>
           {err && <div className="text-xs text-red-400">{err}</div>}
         </div>
+
 
         {/* Mockup multi-format */}
         <div className="space-y-3">
@@ -435,3 +442,94 @@ export function JarvisContentScheduler() {
     </div>
   );
 }
+
+// -------- UTM Link Generator (Omnichannel Tracking) --------
+type UtmProps = { networks: Network[]; format: Format };
+
+function UtmLinkGenerator({ networks, format }: UtmProps) {
+  const BASE_BY_NET: Record<Network, string> = {
+    instagram: "https://eliteboostprime.lovable.app",
+    tiktok: "https://eliteboostprime.lovable.app/tiktok",
+    facebook: "https://eliteboostprime.lovable.app/facebook",
+    youtube: "https://eliteboostprime.lovable.app/youtube",
+    telegram: "https://eliteboostprime.lovable.app/telegram",
+  };
+  const [selected, setSelected] = useState<Network>(networks[0] ?? "instagram");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (networks[0] && !networks.includes(selected)) setSelected(networks[0]);
+  }, [networks, selected]);
+
+  const trackedUrl = useMemo(() => {
+    const date = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+    const fmt = format === "9:16" ? "reels" : "feed";
+    const base = BASE_BY_NET[selected];
+    const params = new URLSearchParams({
+      utm_source: selected,
+      utm_medium: fmt,
+      utm_campaign: `jarvis_${date}`,
+    });
+    return `${base}?${params.toString()}`;
+  }, [selected, format]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(trackedUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
+  };
+
+  const opts: { id: Network; label: string }[] = [
+    { id: "instagram", label: "Instagram" },
+    { id: "tiktok", label: "TikTok" },
+    { id: "facebook", label: "Facebook" },
+    { id: "youtube", label: "YouTube" },
+    { id: "telegram", label: "Telegram" },
+  ];
+
+  return (
+    <div className="space-y-2 rounded-xl border border-amber-400/30 bg-black/40 p-3">
+      <label className="text-[10px] uppercase tracking-wider text-amber-300/80">
+        🎯 Geração de Links de Rastreamento Omnichannel (UTM)
+      </label>
+      <div className="flex flex-wrap gap-1.5">
+        {opts.map((o) => (
+          <button
+            key={o.id}
+            type="button"
+            onClick={() => setSelected(o.id)}
+            className={`px-2.5 py-1 rounded-lg text-[11px] border transition ${
+              selected === o.id
+                ? "bg-amber-500/20 text-amber-200 border-amber-400/60"
+                : "bg-black/30 text-white/60 border-white/10 hover:text-white"
+            }`}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          readOnly
+          value={trackedUrl}
+          className="flex-1 rounded-lg border border-white/10 bg-black/60 px-3 py-2 text-[11px] font-mono text-amber-100 select-all"
+          onFocus={(e) => e.currentTarget.select()}
+        />
+        <button
+          type="button"
+          onClick={copy}
+          className="rounded-lg bg-amber-500/20 border border-amber-400/50 text-amber-200 px-3 py-2 text-[11px] font-bold uppercase hover:bg-amber-500/30"
+        >
+          {copied ? "✓ Copiado" : "Copiar"}
+        </button>
+      </div>
+      <p className="text-[10px] text-white/50">
+        Alimenta em tempo real o painel <b>Top Fontes (utm_source)</b> do dashboard admin — funil de tráfego × lucro real.
+      </p>
+    </div>
+  );
+}
+
