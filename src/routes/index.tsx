@@ -620,6 +620,9 @@ function Landing() {
           <ShowcaseTrigger />
         </div>
       </header>
+      <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
+        Comprar Seguidores Instagram Reais
+      </h1>
       <ShowcaseShell>
 
       {/* v115 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras acima de 200 */}

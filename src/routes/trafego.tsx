@@ -196,6 +196,9 @@ function TrafegoLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
+      <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
+        Comprar Tráfego Web Real
+      </h1>
       <ShowcaseShell>
       <PremiumCategorySelector
         accent={NEON}
