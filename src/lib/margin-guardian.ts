@@ -51,12 +51,17 @@ export function scaledFloor(qty: number): number {
   const q = Number(qty);
   if (!Number.isFinite(q) || q <= 50) return FLOOR_BRL;
   if (q <= 500) {
-    // Rampa linear 50→500 seguidores: R$5 → R$13 (+R$8 em 450 qty)
+    // Rampa 50→500: R$5 → R$13
     return FLOOR_BRL + ((q - 50) / 450) * 8.0;
   }
-  // Acima de 500: R$13 base + R$2 por mil (rampa antiga preservada)
-  return 13.0 + ((q - 500) / 1000) * 2.0;
+  if (q <= 2000) {
+    // v176 — Rampa suavizada 500→2000: R$13 → R$18 (progressão crível)
+    return 13.0 + ((q - 500) / 1500) * 5.0;
+  }
+  // Acima de 2000: R$18 base + R$2 por mil
+  return 18.0 + ((q - 2000) / 1000) * 2.0;
 }
+
 
 
 
