@@ -19,6 +19,16 @@ const POSTS = [
     title: "Melhor Site Para Comprar Seguidores: Critérios Que Importam",
     excerpt: "Cinco critérios objetivos para escolher onde comprar sem perder dinheiro.",
   },
+  {
+    slug: "comprar-seguidores-pix",
+    title: "Comprar Seguidores no Pix: Como Funciona e Por Que É a Forma Mais Segura",
+    excerpt: "Por que pagar seguidores via Pix é mais rápido, rastreável e seguro que cartão ou boleto.",
+  },
+  {
+    slug: "seguidores-instagram-baratos",
+    title: "Seguidores Instagram Baratos: Vale a Pena? O Que Observar",
+    excerpt: "Barato demais quase sempre é bot. Como diferenciar preço justo de armadilha.",
+  },
 ];
 
 export const Route = createFileRoute("/blog/")({
