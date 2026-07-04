@@ -30,6 +30,8 @@ const buildSitemapXml = () => {
     { path: "/blog/como-ganhar-seguidores-instagram", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/e-seguro-comprar-seguidores", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/melhor-site-comprar-seguidores", changefreq: "monthly", priority: "0.6" },
+    { path: "/blog/comprar-seguidores-pix", changefreq: "monthly", priority: "0.6" },
+    { path: "/blog/seguidores-instagram-baratos", changefreq: "monthly", priority: "0.6" },
   ];
 
   const urls = entries.map((e) =>

@@ -93,9 +93,9 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Comprar Seguidores Instagram Reais | EliteBoost Prime";
+    const title = "Comprar Seguidores Instagram no Pix — Reais e Baratos | EliteBoost Prime";
     const description =
-      "Compre seguidores, curtidas e views de Instagram reais com entrega via Pix em minutos. 100% seguro, alta retenção e reposição garantida.";
+      "Comprar seguidores Instagram reais com pagamento no Pix e entrega em minutos. Preços baratos, alta retenção, reposição garantida e 100% seguro.";
     const url = "https://eliteboostprime.lovable.app/";
     const ogImage = `https://eliteboostprime.lovable.app${ogInstagram}?v=48`;
     return {
