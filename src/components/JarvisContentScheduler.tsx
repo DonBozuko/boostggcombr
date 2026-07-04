@@ -343,11 +343,16 @@ export function JarvisContentScheduler() {
               Pipeline assíncrono isolado: a compilação do criativo roda fora do servidor principal (NOC, Tesouraria e Smart Cost Routing preservados).
             </p>
           </div>
+
+          {/* UTM Link Generator */}
+          <UtmLinkGenerator networks={networks} format={format} />
+
           <p className="text-[10px] text-white/50">
             🔒 Modo Seguro: posts aguardam aprovação executiva via Telegram antes do envio real.
           </p>
           {err && <div className="text-xs text-red-400">{err}</div>}
         </div>
+
 
         {/* Mockup multi-format */}
         <div className="space-y-3">
