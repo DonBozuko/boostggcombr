@@ -288,9 +288,11 @@ export function JarvisContentScheduler() {
             <button
               type="button"
               onClick={generateFacelessScript}
-              className="mt-1 w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_20px_rgba(34,211,238,0.5)] border border-cyan-300/60 hover:brightness-110"
+              disabled={genLoading}
+              className="mt-1 w-full rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-cyan-400 px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-black shadow-[0_0_20px_rgba(34,211,238,0.5)] border border-cyan-300/60 hover:brightness-110 disabled:opacity-40"
             >
-              🤖 Gerar Script Faceless (Gancho · Retenção · CTA)
+              🤖 {genLoading ? "Gerando com IA…" : "Gerar Script Faceless (Gancho · Retenção · CTA)"}
+
             </button>
             <textarea
               rows={5}
