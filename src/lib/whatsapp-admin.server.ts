@@ -109,16 +109,19 @@ export function buildUniversalPaidMessage(a: UniversalPaidAlert): string {
   // v156 — Modelo saldo pré-carregado: cliente paga → sistema debita saldo local
   // e entrega imediato. NÃO enviamos PIX por pedido. PIX de recarga só chega
   // no alerta de provisão (saldo baixo/zerado) via buildProvisioningMessage.
-  const custoEstimado = estimateCost(a.vendaBrl);
-  const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custoEstimado * 1.15).toFixed(2));
+  const custoEstimado = estimateCost(a.vendaBrl, a.quantidade);
+  const taxaPix = Number((a.vendaBrl * 0.0099 + 0.49).toFixed(2));
+  const lucroLiquido = Number((a.vendaBrl - taxaPix - custoEstimado * 1.15).toFixed(2));
+  const roi = roiPct(a.vendaBrl, custoEstimado);
   const linhas = [
     "🟢 <b>PIX APROVADO · Entrega automática</b>",
     `Pedido: <code>${a.pedidoId}</code>`,
     a.compradorHandle ? `Comprador: <b>${a.compradorHandle}</b>` : null,
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
-    `Custo estimado: ${fmtBrl(custoEstimado)}`,
-    `Lucro líq. estimado: <b>${fmtBrl(lucroLiquido)}</b>`,
+    `Taxa Pix MP: ${fmtBrl(taxaPix)}`,
+    `Custo fornecedor: ${fmtBrl(custoEstimado)}`,
+    `Lucro líq. (ROI ${roi}%): <b>${fmtBrl(lucroLiquido)}</b>`,
     a.fornecedor ? `Debitado de: <b>${a.fornecedor}</b>` : null,
   ].filter(Boolean);
   return linhas.join("\n");
