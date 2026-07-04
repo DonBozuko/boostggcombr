@@ -19,12 +19,14 @@ function tierMultiplier(qty: number): number {
   return 12.0;
 }
 
-// v174: piso escalar — evita empatar vários pacotes pequenos no mesmo R$5.
+// v175: piso escalar contínuo desde qty=50 — evita empatar pacotes pequenos.
 function scaledFloor(qty: number): number {
   const q = Number(qty);
-  if (!Number.isFinite(q) || q <= 500) return FLOOR_BRL;
-  return FLOOR_BRL + ((q - 500) / 1000) * 2.0;
+  if (!Number.isFinite(q) || q <= 50) return FLOOR_BRL;
+  if (q <= 500) return FLOOR_BRL + ((q - 50) / 450) * 8.0;
+  return 13.0 + ((q - 500) / 1000) * 2.0;
 }
+
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
 

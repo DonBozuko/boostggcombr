@@ -36,19 +36,31 @@ export function effectiveProfitMult(qty: number): number {
 }
 
 /**
- * v174 — Piso escalar por quantidade.
- * Quando custo é baixíssimo (curtidas/views), o piso fixo R$5 achatava vários
- * pacotes no mesmo preço. Piso escalar mantém monotonia visível ao cliente:
- *   qty ≤ 500     → R$ 5,00
- *   qty  1.000    → R$ 6,00
- *   qty  3.000    → R$ 10,00
- *   qty 10.000    → R$ 24,00
+ * v175 — Piso escalar contínuo desde qty=50 (elimina achatamento visual
+ * do piso fixo R$5 nos pacotes pequenos). Progressão crível para o cliente:
+ *   qty  50     → R$ 5,00
+ *   qty 100     → R$ 5,89
+ *   qty 200     → R$ 7,67
+ *   qty 500     → R$ 13,00
+ *   qty 1.000   → R$ 14,00
+ *   qty 3.000   → R$ 18,00
+ *   qty 10.000  → R$ 32,00
+ * Monotônico e sempre ≥ FLOOR_BRL. Nunca reduz preço (formula > floor prevalece).
  */
 export function scaledFloor(qty: number): number {
   const q = Number(qty);
-  if (!Number.isFinite(q) || q <= 500) return FLOOR_BRL;
-  return FLOOR_BRL + ((q - 500) / 1000) * 2.0;
+  if (!Number.isFinite(q) || q <= 50) return FLOOR_BRL;
+  if (q <= 500) {
+    // Rampa linear 50→500 seguidores: R$5 → R$13 (+R$8 em 450 qty)
+    return FLOOR_BRL + ((q - 50) / 450) * 8.0;
+  }
+  // Acima de 500: R$13 base + R$2 por mil (rampa antiga preservada)
+  return 13.0 + ((q - 500) / 1000) * 2.0;
 }
+
+
+
+
 
 export function computeGuardedPrice(costBrl: number, qty = 0): number {
   const c = Number(costBrl);
