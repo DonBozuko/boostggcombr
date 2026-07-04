@@ -58,7 +58,8 @@ export function scaledFloor(qty: number): number {
   return 13.0 + ((q - 500) / 1000) * 2.0;
 }
 
-}
+
+
 
 
 export function computeGuardedPrice(costBrl: number, qty = 0): number {
