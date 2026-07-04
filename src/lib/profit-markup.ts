@@ -19,13 +19,15 @@ function tierMultiplier(qty: number): number {
   return 12.0;
 }
 
-// v175: piso escalar contínuo desde qty=50 — evita empatar pacotes pequenos.
+// v176 — Piso escalar contínuo com rampa suavizada 500→2000.
 function scaledFloor(qty: number): number {
   const q = Number(qty);
   if (!Number.isFinite(q) || q <= 50) return FLOOR_BRL;
   if (q <= 500) return FLOOR_BRL + ((q - 50) / 450) * 8.0;
-  return 13.0 + ((q - 500) / 1000) * 2.0;
+  if (q <= 2000) return 13.0 + ((q - 500) / 1500) * 5.0;
+  return 18.0 + ((q - 2000) / 1000) * 2.0;
 }
+
 
 
 const ceilTo = (v: number, step: number) => Math.ceil(v / step) * step;
