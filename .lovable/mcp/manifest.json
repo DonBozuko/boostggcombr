@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "eliteboost-prime-mcp",
+      "version": "0.1.0",
+      "title": "EliteBoost Prime"
+    },
+    "tools": [
+      {
+        "name": "get_pricing",
+        "title": "Consultar preços de pacotes",
+        "description": "Lista os pacotes disponíveis (rede social, quantidade, preço em BRL) da vitrine pública do EliteBoost Prime.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "network": {
+              "type": "string",
+              "enum": [
+                "tiktok",
+                "instagram",
+                "youtube",
+                "facebook",
+                "telegram",
+                "trafego"
+              ],
+              "description": "Filtrar por rede social. Omita para retornar todas."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "consultar_pedido",
+        "title": "Consultar status de pedido",
+        "description": "Consulta o status de um pedido do EliteBoost Prime pelo ID público (retorna status, rede, quantidade e valor).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "pedido_id": {
+              "type": "string",
+              "minLength": 4,
+              "description": "ID público do pedido"
+            }
+          },
+          "required": [
+            "pedido_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

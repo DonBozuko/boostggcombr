@@ -17,6 +17,7 @@ import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
@@ -28,12 +29,15 @@ import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferr
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
@@ -85,6 +89,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -143,6 +152,18 @@ const AdminCatalogRoute = AdminCatalogRouteImport.update({
   path: '/catalog',
   getParentRoute: () => AdminRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicSyncVerifiedRoute = ApiPublicSyncVerifiedRouteImport.update({
   id: '/api/public/sync-verified',
   path: '/api/public/sync-verified',
@@ -173,6 +194,12 @@ const ApiPublicCheckSaldoRoute = ApiPublicCheckSaldoRouteImport.update({
   path: '/api/public/check-saldo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTelegramWebhookRoute =
   ApiPublicTelegramWebhookRouteImport.update({
     id: '/api/public/telegram/webhook',
@@ -248,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -256,12 +284,15 @@ export interface FileRoutesByFullPath {
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -287,6 +318,7 @@ export interface FileRoutesByTo {
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -295,12 +327,15 @@ export interface FileRoutesByTo {
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog': typeof BlogIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -327,6 +362,7 @@ export interface FileRoutesById {
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
+  '/mcp': typeof McpRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -335,12 +371,15 @@ export interface FileRoutesById {
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -368,6 +407,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/facebook'
     | '/login'
+    | '/mcp'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -376,12 +416,15 @@ export interface FileRouteTypes {
     | '/trafego'
     | '/youtube'
     | '/~flock.js'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
@@ -407,6 +450,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/facebook'
     | '/login'
+    | '/mcp'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -415,12 +459,15 @@ export interface FileRouteTypes {
     | '/trafego'
     | '/youtube'
     | '/~flock.js'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
@@ -446,6 +493,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/facebook'
     | '/login'
+    | '/mcp'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -454,12 +502,15 @@ export interface FileRouteTypes {
     | '/trafego'
     | '/youtube'
     | '/~flock.js'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
+    | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
@@ -486,6 +537,7 @@ export interface RootRouteChildren {
   DiagnosticoRoute: typeof DiagnosticoRoute
   FacebookRoute: typeof FacebookRoute
   LoginRoute: typeof LoginRoute
+  McpRoute: typeof McpRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -494,11 +546,14 @@ export interface RootRouteChildren {
   TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlogSlugRoute: typeof BlogSlugRoute
   DashboardSeoRoute: typeof DashboardSeoRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
@@ -575,6 +630,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -654,6 +716,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-verified': {
       id: '/api/public/sync-verified'
       path: '/api/public/sync-verified'
@@ -694,6 +770,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/check-saldo'
       fullPath: '/api/public/check-saldo'
       preLoaderRoute: typeof ApiPublicCheckSaldoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/telegram/webhook': {
@@ -799,6 +882,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiagnosticoRoute: DiagnosticoRoute,
   FacebookRoute: FacebookRoute,
   LoginRoute: LoginRoute,
+  McpRoute: McpRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
@@ -807,11 +891,15 @@ const rootRouteChildren: RootRouteChildren = {
   TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
   Char126flockDotjsRoute: Char126flockDotjsRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlogSlugRoute: BlogSlugRoute,
   DashboardSeoRoute: DashboardSeoRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   BlogIndexRoute: BlogIndexRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
