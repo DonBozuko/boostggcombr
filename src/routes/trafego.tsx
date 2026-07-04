@@ -188,7 +188,7 @@ function TrafegoLanding() {
   return (
     <MobileFrame bg={BG} route="/trafego">
       <PlansShowcaseProvider accent={NEON}>
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/60 border-b transition-all duration-300" style={{ borderColor: `${NEON}66` }}>
+      <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${NEON}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BrandHeader subtitle="Tráfego Web Real Brasil e Global via Pix" />
