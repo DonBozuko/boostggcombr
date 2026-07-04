@@ -63,10 +63,9 @@ function suggestRecharge(custoUnitBrl: number): { valor: number; cobre: number }
 }
 
 export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?: boolean }): string {
-  const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl);
+  const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl, a.quantidade);
   const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custo * 1.15).toFixed(2));
-  // v174 — Pix SÓ é anexado quando saldo pulmão < R$5 (ou cascata zerada).
-  // Fluxo normal fica silencioso: debita direto do saldo_atual do fornecedor.
+  const roi = roiPct(a.vendaBrl, custo);
   const showPix = !!(a.saldoCritical || a.criticalCaixaZero);
   const pix = showPix ? pixForFornecedor(a.fornecedor) : null;
   const sug = suggestRecharge(custo);
@@ -74,7 +73,7 @@ export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?
     ? "🚨🔴 <b>CAIXA ZERO · TODOS FORNECEDORES SEM SALDO</b>\n<i>Pedido segurado em fila. Recarregue AGORA para liberar entregas.</i>"
     : a.saldoCritical
       ? "⚠️ <b>ATENÇÃO DIRETOR</b>: Saldo pulmão crítico abaixo de R$ 5.\n<i>Copie o Pix abaixo para reabastecer a carteira usando o lucro acumulado no Mercado Pago.</i>"
-      : "🟡 <b>v174 · Provisão Necessária</b>";
+      : "🟡 <b>v181 · Provisão Necessária</b>";
   const linhas = [
     header,
     `Pedido: <code>${a.pedidoId}</code>`,
@@ -82,8 +81,9 @@ export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
     a.fornecedor ? `Fornecedor: <b>${a.fornecedor}</b>` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
-    `Custo depósito: <b>${fmtBrl(custo)}</b>`,
-    `Lucro líq. (~300%): ${fmtBrl(lucroLiquido)}`,
+    `Taxa Pix MP: ${fmtBrl(Number((a.vendaBrl * 0.0099 + 0.49).toFixed(2)))}`,
+    `Custo fornecedor: <b>${fmtBrl(custo)}</b>`,
+    `Lucro líq. (ROI ${roi}%): ${fmtBrl(lucroLiquido)}`,
     showPix ? `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)` : null,
     a.motivo ? `Motivo: ${a.motivo}` : null,
   ].filter(Boolean);
