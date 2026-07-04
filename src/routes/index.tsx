@@ -612,7 +612,7 @@ function Landing() {
     <MobileFrame bg="hsl(var(--background))" route="/">
       <PlansShowcaseProvider accent="#FFD700">
       {/* NAV */}
-      <header className={`sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
+      <header className={`sticky top-0 z-50 bg-background/95 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
         <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>
           <div className="flex items-center gap-2">
             <BrandHeader subtitle="Seguidores Reais no Instagram via Pix" />

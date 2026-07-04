@@ -13,7 +13,7 @@ export function BlogLayout({
 }) {
   return (
     <div className="dark min-h-screen text-foreground">
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b border-border">
+      <header className="sticky top-0 z-50 bg-background/95 border-b border-border">
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
