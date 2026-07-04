@@ -46,12 +46,11 @@ export const Route = createFileRoute("/sitemap.xml")({
           `</urlset>`,
         ].join("\n");
 
-        return new Response(xml, {
-          headers: {
-            "Content-Type": "application/xml",
-            "Cache-Control": "public, max-age=3600",
-          },
-        });
+        const headers = new Headers();
+        headers.set("Content-Type", "application/xml; charset=utf-8");
+        headers.set("Cache-Control", "public, max-age=3600");
+        headers.set("X-Content-Type-Options", "nosniff");
+        return new Response(xml, { status: 200, headers });
       },
     },
   },
