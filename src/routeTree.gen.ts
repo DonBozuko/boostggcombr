@@ -25,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
@@ -123,6 +124,11 @@ const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
   id: '/dashboard/seo',
   path: '/dashboard/seo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
@@ -244,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog': typeof BlogIndexRoute
@@ -319,6 +327,7 @@ export interface FileRoutesById {
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
@@ -358,6 +367,7 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/~flock.js'
     | '/admin/catalog'
+    | '/blog/$slug'
     | '/dashboard/seo'
     | '/~api/analytics'
     | '/blog/'
@@ -395,6 +405,7 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/~flock.js'
     | '/admin/catalog'
+    | '/blog/$slug'
     | '/dashboard/seo'
     | '/~api/analytics'
     | '/blog'
@@ -432,6 +443,7 @@ export interface FileRouteTypes {
     | '/youtube'
     | '/~flock.js'
     | '/admin/catalog'
+    | '/blog/$slug'
     | '/dashboard/seo'
     | '/~api/analytics'
     | '/blog/'
@@ -469,6 +481,7 @@ export interface RootRouteChildren {
   TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   DashboardSeoRoute: typeof DashboardSeoRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -604,6 +617,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/seo'
       fullPath: '/dashboard/seo'
       preLoaderRoute: typeof DashboardSeoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/catalog': {
@@ -766,6 +786,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
   Char126flockDotjsRoute: Char126flockDotjsRoute,
+  BlogSlugRoute: BlogSlugRoute,
   DashboardSeoRoute: DashboardSeoRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   BlogIndexRoute: BlogIndexRoute,
@@ -791,3 +812,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
