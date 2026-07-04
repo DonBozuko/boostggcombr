@@ -22,6 +22,7 @@ import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
@@ -107,6 +108,11 @@ const AdminRoute = AdminRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/admin/catalog': typeof AdminCatalogRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
+  '/blog/': typeof BlogIndexRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/admin/catalog': typeof AdminCatalogRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
+  '/blog': typeof BlogIndexRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -313,6 +321,7 @@ export interface FileRoutesById {
   '/admin/catalog': typeof AdminCatalogRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
+  '/blog/': typeof BlogIndexRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -351,6 +360,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/dashboard/seo'
     | '/~api/analytics'
+    | '/blog/'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
@@ -387,6 +397,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/dashboard/seo'
     | '/~api/analytics'
+    | '/blog'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/dashboard/seo'
     | '/~api/analytics'
+    | '/blog/'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
     | '/api/public/mp-webhook'
@@ -459,6 +471,7 @@ export interface RootRouteChildren {
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
   DashboardSeoRoute: typeof DashboardSeoRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
@@ -570,6 +583,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/~api/analytics': {
@@ -748,6 +768,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char126flockDotjsRoute: Char126flockDotjsRoute,
   DashboardSeoRoute: DashboardSeoRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
