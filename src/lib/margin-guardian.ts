@@ -36,15 +36,11 @@ export function effectiveProfitMult(qty: number): number {
 }
 
 /**
- * v174 — Piso escalar por quantidade.
-/**
  * v175 — Piso escalar contínuo desde qty=50 (elimina achatamento visual
  * do piso fixo R$5 nos pacotes pequenos). Progressão crível para o cliente:
- *   qty 50      → R$ 5,00
- *   qty 100     → R$ 6,50
- *   qty 150     → R$ 7,50
- *   qty 200     → R$ 8,50
- *   qty 300     → R$ 10,00
+ *   qty  50     → R$ 5,00
+ *   qty 100     → R$ 5,89
+ *   qty 200     → R$ 7,67
  *   qty 500     → R$ 13,00
  *   qty 1.000   → R$ 14,00
  *   qty 3.000   → R$ 18,00
@@ -55,11 +51,13 @@ export function scaledFloor(qty: number): number {
   const q = Number(qty);
   if (!Number.isFinite(q) || q <= 50) return FLOOR_BRL;
   if (q <= 500) {
-    // Rampa densa: +R$1,50 a cada 50 seguidores → R$5 (50) até R$13 (500)
-    return FLOOR_BRL + ((q - 50) / 50) * 1.5 * (8 / 13.5);
+    // Rampa linear 50→500 seguidores: R$5 → R$13 (+R$8 em 450 qty)
+    return FLOOR_BRL + ((q - 50) / 450) * 8.0;
   }
-  // Acima de 500: mantém a rampa antiga (R$13 base + R$2/mil)
+  // Acima de 500: R$13 base + R$2 por mil (rampa antiga preservada)
   return 13.0 + ((q - 500) / 1000) * 2.0;
+}
+
 }
 
 
