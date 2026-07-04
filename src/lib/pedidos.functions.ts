@@ -145,9 +145,12 @@ export const criarPedido = createServerFn({ method: "POST" })
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
     // Cupom PRIME15 = 15% off aplicado server-side. BRINDE50 = bônus em seguidores (não desconta).
+    // v180 — Removido Math.max(5,...) que engolia o desconto quando o piso escalar do
+    // pricing_items batia em R$5,00 (ex: p50 5,89 × 0,85 = 5,00 = floor → cliente pagava cheio).
+    // O piso mínimo já é garantido pelo trigger enforce_pricing_markup em pricing_items.
     const cupom = (data.cupom ?? "").trim().toUpperCase();
     const discount = cupom.split(/[,\s]+/).includes("PRIME15") ? 0.15 : 0;
-    const valorCobrar = Math.max(5, Number((valorBase * (1 - discount)).toFixed(2)));
+    const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
 
 
