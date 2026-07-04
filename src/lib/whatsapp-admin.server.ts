@@ -22,10 +22,23 @@ function fmtBrl(v: number): string {
   return `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
 }
 
-/** Estima o custo bruto a partir do preço de venda quando não temos rate. */
-function estimateCost(vendaBrl: number): number {
-  // v168: preço = (custo * 4.0 * 1.15 + 0.49) / 0.9901 → custo = (venda * 0.9901 - 0.49) / 4.6
-  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (4.0 * 1.15)).toFixed(2));
+/** v181 — Estima custo bruto usando o mesmo tier multiplier de profit-markup.ts.
+ *  Fórmula inversa: preço = (custo × tier × 1.15 + 0.49) / 0.9901 → custo = (venda×0.9901 − 0.49) / (tier×1.15). */
+function tierMult(qty: number): number {
+  const q = Number(qty) || 0;
+  if (q <= 500) return 5.0;
+  if (q <= 5_000) return 8.0;
+  if (q <= 15_000) return 8.0 + ((q - 5000) / 10000) * 4.0;
+  return 12.0;
+}
+function estimateCost(vendaBrl: number, quantidade?: number | null): number {
+  const tier = tierMult(Number(quantidade ?? 0));
+  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (tier * 1.15)).toFixed(2));
+}
+function roiPct(venda: number, custo: number): number {
+  const liquido = venda * 0.9901 - 0.49 - custo * 1.15;
+  if (custo <= 0) return 0;
+  return Math.round((liquido / custo) * 100);
 }
 
 /** Retorna o Pix Copia-e-Cola do fornecedor alvo (ou null). */
