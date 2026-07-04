@@ -24,6 +24,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
+import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
@@ -121,6 +122,12 @@ const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
   path: '/~api/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FerramentasContadorSeguidoresRoute =
+  FerramentasContadorSeguidoresRouteImport.update({
+    id: '/ferramentas/contador-seguidores',
+    path: '/ferramentas/contador-seguidores',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
   id: '/dashboard/seo',
   path: '/dashboard/seo',
@@ -252,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -290,6 +298,7 @@ export interface FileRoutesByTo {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog': typeof BlogIndexRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -329,6 +338,7 @@ export interface FileRoutesById {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
     | '/api/public/check-saldo'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog'
     | '/api/public/check-saldo'
@@ -445,6 +457,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
     | '/api/public/check-saldo'
@@ -483,6 +496,7 @@ export interface RootRouteChildren {
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
   BlogSlugRoute: typeof BlogSlugRoute
   DashboardSeoRoute: typeof DashboardSeoRoute
+  FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
@@ -610,6 +624,13 @@ declare module '@tanstack/react-router' {
       path: '/~api/analytics'
       fullPath: '/~api/analytics'
       preLoaderRoute: typeof Char126apiAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ferramentas/contador-seguidores': {
+      id: '/ferramentas/contador-seguidores'
+      path: '/ferramentas/contador-seguidores'
+      fullPath: '/ferramentas/contador-seguidores'
+      preLoaderRoute: typeof FerramentasContadorSeguidoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/seo': {
@@ -788,6 +809,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char126flockDotjsRoute: Char126flockDotjsRoute,
   BlogSlugRoute: BlogSlugRoute,
   DashboardSeoRoute: DashboardSeoRoute,
+  FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   BlogIndexRoute: BlogIndexRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,

@@ -1,4 +1,6 @@
-import { createFileRoute, Link, useServerFn } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { contarSeguidores } from "@/lib/contador-seguidores.functions";
@@ -42,8 +44,10 @@ function ContadorPage() {
     if (username.trim()) mut.mutate(username);
   };
 
-  const data = mut.data && mut.data.ok ? mut.data : null;
-  const erro = mut.data && !mut.data.ok ? mut.data.error : null;
+  const res = mut.data;
+  const data = res && res.ok ? res : null;
+  const erro = res && !res.ok ? res.error : null;
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
