@@ -449,7 +449,7 @@ function FacebookLanding() {
                     />
                   <div className="flex justify-center">
                     <div className="rounded-xl bg-white p-3" style={{ boxShadow: `0 0 25px ${BLUE}aa` }}>
-                      <img src={qrCodeUrl} alt="QR Code Pix" width={220} height={220} className="block" />
+                      <img src={qrCodeUrl} alt="QR Code Pix" className="block w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56" />
                     </div>
                   </div>
                   <div className="space-y-2">

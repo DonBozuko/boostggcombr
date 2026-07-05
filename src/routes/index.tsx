@@ -897,9 +897,7 @@ function Landing() {
                         <img
                           src={qrCodeUrl}
                           alt="QR Code Pix"
-                          width={220}
-                          height={220}
-                          className="block"
+                          className="block w-40 h-40 sm:w-48 sm:h-48 lg:w-56 lg:h-56"
                         />
                       </div>
                     </div>
