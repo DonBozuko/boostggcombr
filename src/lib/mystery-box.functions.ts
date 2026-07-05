@@ -25,7 +25,7 @@ export const redeemMysteryBox = createServerFn({ method: "POST" })
 
     if (error || !pedido) return { ok: false as const, error: "PEDIDO_NAO_ENCONTRADO" };
     if (pedido.status !== "paid") return { ok: false as const, error: "PEDIDO_NAO_PAGO" };
-    if (Number(pedido.quantidade) <= 200) return { ok: false as const, error: "QTD_INSUFICIENTE" };
+    if (Number(pedido.quantidade) < MIN_QTY) return { ok: false as const, error: "QTD_INSUFICIENTE" };
 
     const detail = String(pedido.error_detail ?? "");
     const already = detail.match(MB_MARKER);
