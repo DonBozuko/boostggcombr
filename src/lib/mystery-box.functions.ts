@@ -4,7 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const MIN_QTY = 201; // estritamente ACIMA de 200
+const MIN_QTY = 300; // regra oficial: bônus só para pedidos >= 300 seguidores
 const MB_MARKER = /MB_REDEEMED:(\d+)/i;
 
 const input = z.object({
@@ -25,7 +25,7 @@ export const redeemMysteryBox = createServerFn({ method: "POST" })
 
     if (error || !pedido) return { ok: false as const, error: "PEDIDO_NAO_ENCONTRADO" };
     if (pedido.status !== "paid") return { ok: false as const, error: "PEDIDO_NAO_PAGO" };
-    if (Number(pedido.quantidade) <= 200) return { ok: false as const, error: "QTD_INSUFICIENTE" };
+    if (Number(pedido.quantidade) < MIN_QTY) return { ok: false as const, error: "QTD_INSUFICIENTE" };
 
     const detail = String(pedido.error_detail ?? "");
     const already = detail.match(MB_MARKER);
@@ -33,20 +33,17 @@ export const redeemMysteryBox = createServerFn({ method: "POST" })
       return { ok: false as const, error: "JA_RESGATADO", bonus: Number(already[1]) };
     }
 
-    // v143 — Brindes decrescentes por rede social (custo × margem).
-    // /trafego: BLOQUEADO (bônus = 0). YouTube: 10-20. TikTok/Facebook/Telegram: 21-35. Instagram: 36-50.
+    // v182 — Bônus inteligente: faixa oficial 10..50, /trafego bloqueado.
+    // Distribuição pseudo-aleatória com viés anti-repetição por pedido (hash do id
+    // desloca a base para evitar padrões previsíveis entre resgates consecutivos).
     const rede = String((pedido as any).rede_social ?? "instagram").toLowerCase();
-    const rand = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
-    let bonus: number;
     if (rede === "trafego") {
       return { ok: false as const, error: "BONUS_INDISPONIVEL_TRAFEGO" };
-    } else if (rede === "youtube") {
-      bonus = rand(10, 20);
-    } else if (rede === "tiktok" || rede === "facebook" || rede === "telegram") {
-      bonus = rand(21, 35);
-    } else {
-      bonus = rand(36, 50);
     }
+    const seed = Array.from(pedido.id).reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+    const jitter = (seed % 41); // 0..40
+    const roll = Math.floor(Math.random() * 41); // 0..40
+    const bonus = 10 + ((jitter + roll) % 41); // 10..50 uniforme com deslocamento
 
 
     // Trava atômica: só grava marcador se ainda não existir
