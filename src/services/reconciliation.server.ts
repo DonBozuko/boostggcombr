@@ -49,13 +49,14 @@ export async function runReconciliation(hours = 24): Promise<ReconReport> {
   }
 
   const { data: ledger } = await supabaseAdmin
-    .from("admin_treasury" as any)
-    .select("pedido_id, faturamento")
+    .from("financial_ledger" as any)
+    .select("pedido_id, valor_brl, origem")
+    .eq("origem", "mercado_pago")
     .gte("created_at", since);
 
   const ledgerSet = new Set<string>();
   for (const l of (ledger as any[]) ?? []) {
-    report.receita_ledger += Number(l.faturamento) || 0;
+    report.receita_ledger += Number(l.valor_brl) || 0;
     if (l.pedido_id) ledgerSet.add(l.pedido_id);
   }
 
