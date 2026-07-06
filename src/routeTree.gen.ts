@@ -35,6 +35,7 @@ import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/s
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
+import { Route as ApiPublicLgpdDeleteRouteImport } from './routes/api/public/lgpd-delete'
 import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -184,6 +185,11 @@ const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
   path: '/api/public/mp-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicLgpdDeleteRoute = ApiPublicLgpdDeleteRouteImport.update({
+  id: '/api/public/lgpd-delete',
+  path: '/api/public/lgpd-delete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJarvisPipelineRoute = ApiPublicJarvisPipelineRouteImport.update({
   id: '/api/public/jarvis-pipeline',
   path: '/api/public/jarvis-pipeline',
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
+  '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
+  '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
+  '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
@@ -427,6 +436,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
+    | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
+    | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
@@ -513,6 +524,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
+    | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
@@ -556,6 +568,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
+  ApiPublicLgpdDeleteRoute: typeof ApiPublicLgpdDeleteRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
   ApiPublicSyncSmmpanelRoute: typeof ApiPublicSyncSmmpanelRoute
@@ -758,6 +771,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMpWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/lgpd-delete': {
+      id: '/api/public/lgpd-delete'
+      path: '/api/public/lgpd-delete'
+      fullPath: '/api/public/lgpd-delete'
+      preLoaderRoute: typeof ApiPublicLgpdDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jarvis-pipeline': {
       id: '/api/public/jarvis-pipeline'
       path: '/api/public/jarvis-pipeline'
@@ -902,6 +922,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
+  ApiPublicLgpdDeleteRoute: ApiPublicLgpdDeleteRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
   ApiPublicSyncSmmpanelRoute: ApiPublicSyncSmmpanelRoute,
