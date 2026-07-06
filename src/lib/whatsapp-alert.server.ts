@@ -5,7 +5,7 @@ export type { InlineKeyboardButton };
 
 export function buildSmmhypeAlertMessage(saldoBrl: number | null): string {
   const valor = saldoBrl == null ? "indisponível" : `R$ ${saldoBrl.toFixed(2)}`;
-  return `⚠️ Fornecedor SMMHype abaixo do limite. Saldo atual: ${valor}`;
+  return `⚠️ SALDO BAIXO NO FORNECEDOR\n\nPROBLEMA: fornecedor SMMHype está quase sem dinheiro.\nSaldo atual: ${valor}\n\nO QUE FAZER: recarregar antes que novos pedidos falhem.`;
 }
 
 export async function dispatchWhatsappAlert(

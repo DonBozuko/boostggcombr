@@ -163,7 +163,7 @@ export async function runAutoHealer(): Promise<HealReport> {
     if (criticos.length > 0) {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
       await dispatchWhatsappAlert(
-        `⚠️ SALDO PULMÃO CRÍTICO\n\nFornecedores abaixo de R$10:\n${criticos.join("\n")}\n\nRecarregue para evitar refunds em cadeia.`,
+        `⚠️ SALDO BAIXO NO FORNECEDOR\n\nPROBLEMA: fornecedor(es) quase sem dinheiro (menos de R$10).\n\n${criticos.join("\n")}\n\nO QUE FAZER: recarregar agora, antes que novos pedidos comecem a falhar.`,
       ).catch(() => {});
     }
   } catch (e: any) {

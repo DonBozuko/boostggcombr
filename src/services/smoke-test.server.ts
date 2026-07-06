@@ -99,11 +99,12 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   if (!report.ok) {
     try {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-      const parts = [`🚨 SMOKE TEST FALHOU (${report.ts})`];
-      if (providersDown.length > 0) parts.push(`• Fornecedores offline: ${providersDown.join(", ")}`);
-      if (report.packages_without_valid_id.length > 0) parts.push(`• Pacotes sem service_id: ${report.packages_without_valid_id.slice(0, 5).join(", ")}${report.packages_without_valid_id.length > 5 ? "..." : ""}`);
-      if (report.packages_below_margin.length > 0) parts.push(`• Margem furada: ${report.packages_below_margin.slice(0, 5).join(", ")}`);
-      if (healerStale) parts.push(`• Auto-healer parado há ${report.auto_healer_last_run_min_ago ?? "??"} min`);
+      const parts = [`🚨 SISTEMA COM DEFEITO\n\nPROBLEMA: teste automático encontrou coisa quebrada.`];
+      if (providersDown.length > 0) parts.push(`• Fornecedor(es) fora do ar: ${providersDown.join(", ")}`);
+      if (report.packages_without_valid_id.length > 0) parts.push(`• Pacote(s) sem produto vinculado: ${report.packages_without_valid_id.slice(0, 5).join(", ")}${report.packages_without_valid_id.length > 5 ? "..." : ""}`);
+      if (report.packages_below_margin.length > 0) parts.push(`• Pacote(s) vendendo com prejuízo: ${report.packages_below_margin.slice(0, 5).join(", ")}`);
+      if (healerStale) parts.push(`• Piloto automático travado há ${report.auto_healer_last_run_min_ago ?? "??"} min`);
+      parts.push(`\nO QUE FAZER: abrir /admin e conferir os itens acima.`);
       await dispatchWhatsappAlert(parts.join("\n")).catch(() => {});
     } catch (e: any) { report.errors.push(`alert failed: ${e?.message}`); }
   }

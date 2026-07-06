@@ -329,7 +329,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       try {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
         await dispatchTelegramAlert(
-          `⏳ <b>PEDIDO PARQUEADO (SLA 24h)</b>\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nRecarregue fornecedor até ${new Date(deadline).toLocaleString("pt-BR")} ou refund automático.\n\nTentativas:\n${tentativas.join("\n")}`,
+          `⏳ <b>PEDIDO EM ESPERA — RECARREGAR EM 24h</b>\n\nPROBLEMA: cliente pagou mas nenhum fornecedor tinha saldo pra entregar.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: recarregar qualquer fornecedor até ${new Date(deadline).toLocaleString("pt-BR")} e apertar "Recarga Confirmada". Se passar do prazo, cliente é reembolsado automático.\n\nTentativas:\n${tentativas.join("\n")}`,
           { inlineKeyboard: [[{ text: "✅ Recarga Confirmada", callback_data: `recharge:${pedido.id}` }]] },
         ).catch(() => {});
       } catch { /* */ }
