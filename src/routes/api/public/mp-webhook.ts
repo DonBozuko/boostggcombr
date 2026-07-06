@@ -93,8 +93,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           if (topic && !/payment/i.test(topic)) {
             return;
           }
+          // v182 — Kill Switch Global: aborta antes de qualquer processamento.
+          // Retorna 200 pro MP não retentar; pedido fica pendente pra resolução manual.
+          {
+            const { isGloballyBlocked } = await import("@/lib/kill-switch.server");
+            if (await isGloballyBlocked()) {
+              console.warn("[mp-webhook] v182 kill switch ATIVO — ignorando", { paymentId, topic });
+              return;
+            }
+          }
 
-          // v181 — Idempotência forte via webhook_events: insert com UNIQUE(provider, event_id).
+
           // Se MP reenviar o mesmo evento, o INSERT falha com 23505 e nós saímos silenciosos.
           {
             const { supabaseAdmin: adminIdem } = await import("@/integrations/supabase/client.server");
