@@ -5,6 +5,7 @@ import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reproc
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
+import { runBackupDrill, getBackupDrillStatus } from "@/lib/backup-drill.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Settings, Terminal, Search, Tag, Compass, BarChart3, Briefcase, Bot, Lock, LogOut, ChevronRight } from "lucide-react";
@@ -936,6 +937,33 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       if (error) { window.alert("Falha: " + error.message); return; }
       setKillOn(false);
       setKillReason("");
+    }
+  };
+
+  // v182 — Backup Drill
+  const [drillStatus, setDrillStatus] = useState<{ ran_at: string | null; ok: boolean | null; total_rows: number; days_ago: number | null } | null>(null);
+  const [drillBusy, setDrillBusy] = useState(false);
+  const runDrillFn = useServerFn(runBackupDrill);
+  const getDrillFn = useServerFn(getBackupDrillStatus);
+  useEffect(() => { (async () => { try { setDrillStatus(await getDrillFn()); } catch { /* ignore */ } })(); }, [getDrillFn]);
+  const runDrill = async () => {
+    if (drillBusy) return;
+    setDrillBusy(true);
+    try {
+      const res = await runDrillFn();
+      const blob = new Blob([JSON.stringify(res, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup-drill-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`Drill OK · ${res.total_rows.toLocaleString("pt-BR")} linhas · snapshot baixado`);
+      setDrillStatus(await getDrillFn());
+    } catch (err) {
+      toast.error("Falha no drill: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setDrillBusy(false);
     }
   };
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
@@ -1969,6 +1997,36 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                 <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${killOn ? "left-6" : "left-1"}`} />
               </button>
             </div>
+
+            {/* 💾 Backup Drill (v182) — teste mensal de integridade + snapshot JSON */}
+            {(() => {
+              const stale = drillStatus?.days_ago == null || drillStatus.days_ago > 30;
+              return (
+                <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${stale ? "border-amber-500/60 bg-amber-500/10" : "border-border bg-card/40"}`}>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold flex items-center gap-2">💾 Backup Drill <span className="text-xs text-muted-foreground">(mensal · valida integridade + baixa snapshot)</span></h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Conta linhas das 9 tabelas críticas, extrai os últimos 50 pedidos + 100 lançamentos do ledger + todas as configs e baixa como JSON. Rode 1× por mês e guarde o arquivo fora do Lovable.
+                    </p>
+                    <p className="text-[11px] mt-1 font-semibold">
+                      {drillStatus?.ran_at
+                        ? <>Último drill: <span className={stale ? "text-amber-300" : "text-emerald-400"}>{drillStatus.days_ago} dia{drillStatus.days_ago === 1 ? "" : "s"} atrás</span> · {drillStatus.total_rows.toLocaleString("pt-BR")} linhas · {drillStatus.ok ? "✅ OK" : "⚠️ falhas"}</>
+                        : <span className="text-amber-300">Nunca executado — rode agora.</span>}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={runDrill}
+                    disabled={drillBusy}
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60 whitespace-nowrap"
+                  >
+                    {drillBusy ? "Rodando…" : "Rodar drill"}
+                  </button>
+                </div>
+              );
+            })()}
+
+
 
 
             {/* 🧪 Modo Sandbox (frontend-only) */}
