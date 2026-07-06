@@ -87,6 +87,14 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {
+    // v182 — Kill Switch Global: para tudo em emergência.
+    {
+      const { isGloballyBlocked } = await import("./kill-switch.server");
+      if (await isGloballyBlocked()) {
+        console.warn("[criarPedido] BLOQUEADO por kill switch global");
+        return { ok: false as const, error: "GLOBAL_KILL" as const };
+      }
+    }
     const pkg = data.pacote.toLowerCase();
     const isTelegram = pkg.startsWith("tg");
     const isTrafego = !isTelegram && pkg.startsWith("w");
