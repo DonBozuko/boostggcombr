@@ -94,6 +94,33 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return;
           }
 
+          // v181 — Idempotência forte via webhook_events: insert com UNIQUE(provider, event_id).
+          // Se MP reenviar o mesmo evento, o INSERT falha com 23505 e nós saímos silenciosos.
+          {
+            const { supabaseAdmin: adminIdem } = await import("@/integrations/supabase/client.server");
+            let rawParsed: unknown = null;
+            try { rawParsed = rawBody ? JSON.parse(rawBody) : null; } catch { rawParsed = { raw: rawBody }; }
+            const { error: dupErr } = await adminIdem
+              .from("webhook_events" as any)
+              .insert({
+                provider: "mercado_pago",
+                event_id: String(paymentId),
+                topic: topic ?? null,
+                raw_payload: rawParsed as any,
+                client_ip: clientIp,
+              } as any);
+            if (dupErr) {
+              // 23505 = unique_violation → já processamos antes, MP está retentando.
+              if ((dupErr as { code?: string }).code === "23505") {
+                console.log("[mp-webhook] v181 idempotency: evento duplicado ignorado", { paymentId });
+                return;
+              }
+              console.warn("[mp-webhook] v181 webhook_events insert non-dup fail", dupErr);
+              // segue mesmo assim — não bloqueia processamento por falha de auditoria
+            }
+          }
+
+
           // 1) Busca o pagamento no MP para confirmar status
           const mpRes = await fetch(`${MP_PAYMENTS_ENDPOINT}/${paymentId}`, {
             headers: { Authorization: `Bearer ${mpToken}` },

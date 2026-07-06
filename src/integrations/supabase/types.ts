@@ -825,6 +825,48 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_events: {
+        Row: {
+          client_ip: string | null
+          error_detail: string | null
+          event_id: string
+          id: string
+          pedido_id: string | null
+          processed_at: string | null
+          processed_ok: boolean
+          provider: string
+          raw_payload: Json | null
+          received_at: string
+          topic: string | null
+        }
+        Insert: {
+          client_ip?: string | null
+          error_detail?: string | null
+          event_id: string
+          id?: string
+          pedido_id?: string | null
+          processed_at?: string | null
+          processed_ok?: boolean
+          provider: string
+          raw_payload?: Json | null
+          received_at?: string
+          topic?: string | null
+        }
+        Update: {
+          client_ip?: string | null
+          error_detail?: string | null
+          event_id?: string
+          id?: string
+          pedido_id?: string | null
+          processed_at?: string | null
+          processed_ok?: boolean
+          provider?: string
+          raw_payload?: Json | null
+          received_at?: string
+          topic?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       smmhype_services_cache: {
