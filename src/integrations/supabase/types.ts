@@ -307,6 +307,33 @@ export type Database = {
         }
         Relationships: []
       }
+      lgpd_requests: {
+        Row: {
+          client_ip: string | null
+          created_at: string
+          id: string
+          mercado_pago_id: string | null
+          outcome: string
+          pedido_id: string | null
+        }
+        Insert: {
+          client_ip?: string | null
+          created_at?: string
+          id?: string
+          mercado_pago_id?: string | null
+          outcome: string
+          pedido_id?: string | null
+        }
+        Update: {
+          client_ip?: string | null
+          created_at?: string
+          id?: string
+          mercado_pago_id?: string | null
+          outcome?: string
+          pedido_id?: string | null
+        }
+        Relationships: []
+      }
       monitoramento_saldo: {
         Row: {
           data_hora: string
@@ -904,6 +931,7 @@ export type Database = {
       }
     }
     Functions: {
+      anonimizar_pedidos_antigos: { Args: never; Returns: number }
       get_cron_status: {
         Args: { _jobname?: string }
         Returns: {
@@ -928,6 +956,13 @@ export type Database = {
         }[]
       }
       is_director: { Args: never; Returns: boolean }
+      solicitar_exclusao_pedido: {
+        Args: { _client_ip?: string; _mp_id: string }
+        Returns: {
+          message: string
+          ok: boolean
+        }[]
+      }
       wallet_credit: {
         Args: { _amount: number; _wallet_key: string }
         Returns: number
