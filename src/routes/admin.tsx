@@ -1943,6 +1943,33 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                 );
               })()}
             </div>
+            {/* 🛑 Kill Switch Global (v182) — botão único de parada de emergência */}
+            <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${killOn ? "border-red-600 bg-red-600/15" : "border-border bg-card/40"}`}>
+              <div className="min-w-0">
+                <h3 className="font-semibold flex items-center gap-2">
+                  🛑 Kill Switch Global <span className="text-xs text-muted-foreground">(emergência)</span>
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Ligar = <b>trava tudo</b>: nenhum novo checkout entra, webhook do Mercado Pago ignora aprovações (não credita, não envia à API). Use em fraude, bug crítico ou provider comprometido.
+                </p>
+                {killOn && (
+                  <p className="text-[11px] text-red-300 mt-1 font-semibold">
+                    ⚠️ SISTEMA PARADO — motivo: {killReason || "(não informado)"}
+                  </p>
+                )}
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={killOn}
+                onClick={toggleKill}
+                disabled={killBusy}
+                className={`relative h-7 w-12 rounded-full transition-colors disabled:opacity-60 ${killOn ? "bg-red-600" : "bg-zinc-700"}`}
+              >
+                <span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition-all ${killOn ? "left-6" : "left-1"}`} />
+              </button>
+            </div>
+
 
             {/* 🧪 Modo Sandbox (frontend-only) */}
             <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${sandbox ? "border-red-500/60 bg-red-500/10" : "border-border bg-card/40"}`}>
