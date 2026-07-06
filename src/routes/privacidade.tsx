@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Lock, Database, Mail, TrendingUp } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
@@ -78,11 +79,12 @@ function TrustPage() {
             usado para marketing de terceiros e não é compartilhado.
           </Section>
 
-          <Section icon={Database} title="Retenção e exclusão">
-            Mantemos os dados do pedido pelo tempo necessário para atendimento,
-            suporte e obrigações fiscais. Para solicitar a exclusão dos seus
-            dados, entre em contato pelo WhatsApp informado no momento do
-            pedido.
+          <Section icon={Database} title="Retenção e exclusão (LGPD)">
+            Os dados pessoais do pedido (@ do perfil e WhatsApp) são
+            automaticamente anonimizados após 5 anos. Para pedir a exclusão
+            imediata dos seus dados de um pedido específico, use o formulário
+            abaixo com o ID do pagamento do Mercado Pago que você recebeu.
+            <LgpdDeleteForm />
           </Section>
 
           <Section icon={ShieldCheck} title="Contato de segurança">
@@ -111,6 +113,57 @@ function TrustPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function LgpdDeleteForm() {
+  const [mpId, setMpId] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setResult(null);
+    try {
+      const res = await fetch("/api/public/lgpd-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mercado_pago_id: mpId.trim() }),
+      });
+      const json = (await res.json()) as { ok: boolean; message: string };
+      setResult(json);
+      if (json.ok) setMpId("");
+    } catch {
+      setResult({ ok: false, message: "Falha de rede. Tente novamente." });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <form onSubmit={submit} className="mt-4 flex flex-col sm:flex-row gap-2">
+      <input
+        type="text"
+        value={mpId}
+        onChange={(e) => setMpId(e.target.value)}
+        placeholder="ID do pagamento Mercado Pago"
+        className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+        maxLength={60}
+        required
+      />
+      <button
+        type="submit"
+        disabled={busy || mpId.trim().length < 4}
+        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+      >
+        {busy ? "Enviando…" : "Excluir meus dados"}
+      </button>
+      {result && (
+        <p className={`sm:w-full text-xs mt-1 ${result.ok ? "text-emerald-400" : "text-red-400"}`}>
+          {result.message}
+        </p>
+      )}
+    </form>
   );
 }
 
