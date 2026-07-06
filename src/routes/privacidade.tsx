@@ -79,11 +79,12 @@ function TrustPage() {
             usado para marketing de terceiros e não é compartilhado.
           </Section>
 
-          <Section icon={Database} title="Retenção e exclusão">
-            Mantemos os dados do pedido pelo tempo necessário para atendimento,
-            suporte e obrigações fiscais. Para solicitar a exclusão dos seus
-            dados, entre em contato pelo WhatsApp informado no momento do
-            pedido.
+          <Section icon={Database} title="Retenção e exclusão (LGPD)">
+            Os dados pessoais do pedido (@ do perfil e WhatsApp) são
+            automaticamente anonimizados após 5 anos. Para pedir a exclusão
+            imediata dos seus dados de um pedido específico, use o formulário
+            abaixo com o ID do pagamento do Mercado Pago que você recebeu.
+            <LgpdDeleteForm />
           </Section>
 
           <Section icon={ShieldCheck} title="Contato de segurança">
