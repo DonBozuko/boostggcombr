@@ -939,6 +939,33 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       setKillReason("");
     }
   };
+
+  // v182 — Backup Drill
+  const [drillStatus, setDrillStatus] = useState<{ ran_at: string | null; ok: boolean | null; total_rows: number; days_ago: number | null } | null>(null);
+  const [drillBusy, setDrillBusy] = useState(false);
+  const runDrillFn = useServerFn(runBackupDrill);
+  const getDrillFn = useServerFn(getBackupDrillStatus);
+  useEffect(() => { (async () => { try { setDrillStatus(await getDrillFn()); } catch { /* ignore */ } })(); }, [getDrillFn]);
+  const runDrill = async () => {
+    if (drillBusy) return;
+    setDrillBusy(true);
+    try {
+      const res = await runDrillFn();
+      const blob = new Blob([JSON.stringify(res, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup-drill-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success(`Drill OK · ${res.total_rows.toLocaleString("pt-BR")} linhas · snapshot baixado`);
+      setDrillStatus(await getDrillFn());
+    } catch (err) {
+      toast.error("Falha no drill: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setDrillBusy(false);
+    }
+  };
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
