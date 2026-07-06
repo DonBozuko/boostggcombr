@@ -1959,33 +1959,55 @@ function AdminPage({ initialToken }: { initialToken: string }) {
               )}
             </div>
 
-            {/* Fornecedores (multi — placeholder) */}
-            <div className="rounded-2xl border border-border bg-card/40 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="min-w-0">
-                <h3 className="font-semibold">Fornecedores</h3>
-                <p className="text-xs text-muted-foreground">Atualmente: SMMhype. Suporte a múltiplos fornecedores em breve.</p>
+            {/* Fornecedores ativos (real) */}
+            <div className="rounded-2xl border border-border bg-card/40 p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="font-semibold">Fornecedores ativos</h3>
+                  <p className="text-xs text-muted-foreground">Status ao vivo · saldo, ligado/desligado, última checagem</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={load} disabled={loading}>
+                  ↻ Atualizar
+                </Button>
               </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">+ Cadastrar fornecedor</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Cadastrar novo fornecedor</DialogTitle>
-                    <DialogDescription>
-                      Em breve. Estrutura preparada para herdar a tabela <code>fornecedores</code>.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-3 opacity-60 pointer-events-none">
-                    <Input placeholder="Nome (ex: SMMPanel)" disabled />
-                    <Input placeholder="URL da API" disabled />
-                    <Input placeholder="Nome da secret (ex: SMMPANEL_API_KEY)" disabled />
-                  </div>
-                  <DialogFooter>
-                    <Button disabled>Cadastrar (em breve)</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              {fornecedores.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Nenhum fornecedor cadastrado.</p>
+              ) : (
+                <div className="grid gap-2">
+                  {fornecedores.map((f) => {
+                    const saldo = typeof f.saldo_atual === "number" ? f.saldo_atual : null;
+                    const saldoLow = saldo !== null && saldo < 10;
+                    const ultima = f.ultima_verificacao
+                      ? new Date(f.ultima_verificacao).toLocaleString("pt-BR")
+                      : "nunca";
+                    return (
+                      <div
+                        key={f.id}
+                        className={`flex items-center justify-between rounded-lg border p-3 ${f.ativo ? "border-emerald-500/30 bg-emerald-500/5" : "border-zinc-700 bg-zinc-900/40 opacity-70"}`}
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-block w-2 h-2 rounded-full ${f.ativo ? "bg-emerald-400" : "bg-zinc-500"}`} />
+                            <span className="font-semibold text-sm">{f.nome}</span>
+                            <span className="text-[10px] text-muted-foreground">({f.slug})</span>
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-0.5">
+                            Última checagem: {ultima}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-sm font-bold ${saldoLow ? "text-red-400" : "text-emerald-300"}`}>
+                            {saldo !== null ? `R$ ${saldo.toFixed(2)}` : "—"}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {f.ativo ? "ligado" : "desligado"}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         )}
