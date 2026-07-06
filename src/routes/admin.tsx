@@ -895,6 +895,49 @@ function AdminPage({ initialToken }: { initialToken: string }) {
     if (error) { window.alert("Falha ao salvar: " + error.message); return; }
     setSandbox(next);
   };
+
+  // v182 — Kill Switch Global (emergência)
+  const [killOn, setKillOn] = useState(false);
+  const [killBusy, setKillBusy] = useState(false);
+  const [killReason, setKillReason] = useState<string>("");
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_settings").select("value").eq("key", "global_kill").maybeSingle();
+      const v = (data?.value ?? {}) as { blocked?: boolean; reason?: string | null };
+      setKillOn(!!v.blocked);
+      setKillReason(v.reason ?? "");
+    })();
+  }, []);
+  const toggleKill = async () => {
+    if (killBusy) return;
+    const next = !killOn;
+    if (next) {
+      const reason = window.prompt("MOTIVO da parada de emergência (fica no log):", "");
+      if (reason == null) return;
+      setKillReason(reason);
+      setKillBusy(true);
+      const { error } = await supabase.from("admin_settings").upsert({
+        key: "global_kill",
+        value: { blocked: true, reason, activated_at: new Date().toISOString() },
+        updated_at: new Date().toISOString(),
+      });
+      setKillBusy(false);
+      if (error) { window.alert("Falha: " + error.message); return; }
+      setKillOn(true);
+    } else {
+      if (!window.confirm("Reativar checkouts e processamento de pagamentos?")) return;
+      setKillBusy(true);
+      const { error } = await supabase.from("admin_settings").upsert({
+        key: "global_kill",
+        value: { blocked: false, reason: null, activated_at: null },
+        updated_at: new Date().toISOString(),
+      });
+      setKillBusy(false);
+      if (error) { window.alert("Falha: " + error.message); return; }
+      setKillOn(false);
+      setKillReason("");
+    }
+  };
   const [faturamento, setFaturamento] = useState<{ geral: number; count: number; totais: Record<string, { total: number; count: number }> } | null>(null);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [falhos, setFalhos] = useState<Pedido[]>([]);
