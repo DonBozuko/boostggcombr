@@ -5,6 +5,7 @@ import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reproc
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
 import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
+import { runBackupDrill, getBackupDrillStatus } from "@/lib/backup-drill.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Settings, Terminal, Search, Tag, Compass, BarChart3, Briefcase, Bot, Lock, LogOut, ChevronRight } from "lucide-react";
