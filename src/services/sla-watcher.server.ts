@@ -103,8 +103,8 @@ export async function runSlaWatcher(): Promise<SlaReport> {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
       await dispatchWhatsappAlert(
         refund.ok
-          ? `🔄 REFUND AUTOMÁTICO (SLA)\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\nSLA de 24h expirou sem recarga. Cliente reembolsado.`
-          : `🚨 REFUND FALHOU (SLA)\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\nMP retornou erro: ${refund.detail}\n\nAÇÃO MANUAL NECESSÁRIA.`,
+          ? `🔄 CLIENTE REEMBOLSADO AUTOMÁTICO\n\nPROBLEMA: passaram 24h sem recarregar o fornecedor.\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\n\nO QUE FAZER: nada. Dinheiro já voltou pro cliente.`
+          : `🚨 NÃO CONSEGUI REEMBOLSAR O CLIENTE\n\nPROBLEMA: passaram 24h, tentei devolver o dinheiro e o Mercado Pago recusou.\nErro: ${refund.detail}\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\n\nO QUE FAZER: abrir Mercado Pago e reembolsar na mão AGORA.`,
       ).catch(() => {});
     } catch { /* */ }
   }

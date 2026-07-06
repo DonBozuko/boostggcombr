@@ -80,14 +80,16 @@ export async function runReconciliation(hours = 24): Promise<ReconReport> {
     report.ok = false;
     try {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-      const parts = [`📊 RECONCILIAÇÃO ${hours}h — DIVERGÊNCIA`];
-      parts.push(`Receita pedidos: R$${report.receita_pedidos.toFixed(2)}`);
-      parts.push(`Receita ledger:  R$${report.receita_ledger.toFixed(2)}`);
-      parts.push(`Divergência:     R$${report.divergencia_receita.toFixed(2)}`);
+      const parts = [`📊 CONTAS NÃO BATEM (${hours}h)`];
+      parts.push(`\nPROBLEMA: o dinheiro dos pedidos não fecha com o dinheiro registrado no caixa.`);
+      parts.push(`\nPedidos: R$${report.receita_pedidos.toFixed(2)}`);
+      parts.push(`Caixa:   R$${report.receita_ledger.toFixed(2)}`);
+      parts.push(`Diferença: R$${report.divergencia_receita.toFixed(2)}`);
       if (report.pedidos_paid_sem_ledger.length > 0)
-        parts.push(`⚠️ ${report.pedidos_paid_sem_ledger.length} pedido(s) pago(s) SEM ledger`);
+        parts.push(`⚠️ ${report.pedidos_paid_sem_ledger.length} pedido(s) pago(s) que NÃO entraram no caixa`);
       if (report.pedidos_ledger_sem_paid.length > 0)
-        parts.push(`⚠️ ${report.pedidos_ledger_sem_paid.length} ledger(s) SEM pedido pago`);
+        parts.push(`⚠️ ${report.pedidos_ledger_sem_paid.length} lançamento(s) no caixa SEM pedido pago`);
+      parts.push(`\nO QUE FAZER: me manda esse alerta que eu audito hoje mesmo.`);
       await dispatchWhatsappAlert(parts.join("\n")).catch(() => {});
     } catch { /* */ }
   }
