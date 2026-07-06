@@ -80,12 +80,19 @@ export async function runSlaWatcher(): Promise<SlaReport> {
       continue;
     }
 
-    const refund = await refundMercadoPago(String(p.mercado_pago_id));
+    // v181 — refund com retry 3x (backoff 500ms → 1.5s → 4.5s) antes de cair em SMM_FAILED
+    let refund = await refundMercadoPago(String(p.mercado_pago_id));
+    const refundAttempts: string[] = [`t1: ${refund.ok ? "OK" : refund.detail}`];
+    for (let attempt = 2; attempt <= 3 && !refund.ok; attempt++) {
+      await new Promise((r) => setTimeout(r, 500 * Math.pow(3, attempt - 2)));
+      refund = await refundMercadoPago(String(p.mercado_pago_id));
+      refundAttempts.push(`t${attempt}: ${refund.ok ? "OK" : refund.detail}`);
+    }
     await supabaseAdmin
       .from("pedidos")
       .update({
         status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-        error_detail: `SLA 24h expirado. Refund ${refund.ok ? "OK" : "FALHOU"}: ${refund.detail}`.slice(0, 500),
+        error_detail: `SLA 24h expirado. Refund ${refund.ok ? "OK" : "FALHOU"} (${refundAttempts.join(" | ")})`.slice(0, 500),
       } as any)
       .eq("id", p.id);
 
