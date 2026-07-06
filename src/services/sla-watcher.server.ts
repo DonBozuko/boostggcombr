@@ -92,7 +92,7 @@ export async function runSlaWatcher(): Promise<SlaReport> {
       .from("pedidos")
       .update({
         status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-        error_detail: `SLA 24h expirado. Refund ${refund.ok ? "OK" : "FALHOU"}: ${refund.detail}`.slice(0, 500),
+        error_detail: `SLA 24h expirado. Refund ${refund.ok ? "OK" : "FALHOU"} (${refundAttempts.join(" | ")})`.slice(0, 500),
       } as any)
       .eq("id", p.id);
 
