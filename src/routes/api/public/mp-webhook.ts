@@ -103,7 +103,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
           }
 
-
+          // v181 — Idempotência forte via webhook_events: insert com UNIQUE(provider, event_id).
           // Se MP reenviar o mesmo evento, o INSERT falha com 23505 e nós saímos silenciosos.
           {
             const { supabaseAdmin: adminIdem } = await import("@/integrations/supabase/client.server");
