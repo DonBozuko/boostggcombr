@@ -1998,6 +1998,36 @@ function AdminPage({ initialToken }: { initialToken: string }) {
               </button>
             </div>
 
+            {/* 💾 Backup Drill (v182) — teste mensal de integridade + snapshot JSON */}
+            {(() => {
+              const stale = drillStatus?.days_ago == null || drillStatus.days_ago > 30;
+              return (
+                <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${stale ? "border-amber-500/60 bg-amber-500/10" : "border-border bg-card/40"}`}>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold flex items-center gap-2">💾 Backup Drill <span className="text-xs text-muted-foreground">(mensal · valida integridade + baixa snapshot)</span></h3>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Conta linhas das 9 tabelas críticas, extrai os últimos 50 pedidos + 100 lançamentos do ledger + todas as configs e baixa como JSON. Rode 1× por mês e guarde o arquivo fora do Lovable.
+                    </p>
+                    <p className="text-[11px] mt-1 font-semibold">
+                      {drillStatus?.ran_at
+                        ? <>Último drill: <span className={stale ? "text-amber-300" : "text-emerald-400"}>{drillStatus.days_ago} dia{drillStatus.days_ago === 1 ? "" : "s"} atrás</span> · {drillStatus.total_rows.toLocaleString("pt-BR")} linhas · {drillStatus.ok ? "✅ OK" : "⚠️ falhas"}</>
+                        : <span className="text-amber-300">Nunca executado — rode agora.</span>}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={runDrill}
+                    disabled={drillBusy}
+                    className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60 whitespace-nowrap"
+                  >
+                    {drillBusy ? "Rodando…" : "Rodar drill"}
+                  </button>
+                </div>
+              );
+            })()}
+
+
+
 
             {/* 🧪 Modo Sandbox (frontend-only) */}
             <div className={`rounded-2xl border p-4 flex items-center justify-between gap-3 ${sandbox ? "border-red-500/60 bg-red-500/10" : "border-border bg-card/40"}`}>
