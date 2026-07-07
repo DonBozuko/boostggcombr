@@ -191,6 +191,7 @@ export async function pickCheapestFornecedorSlug(pacote: string, quantidade: num
 export async function markProviderUnstable(slug: string, errorMsg: string): Promise<void> {
   // v67 — Perpetual Balance Force: nunca marcar unstable se o fornecedor
   // possui saldo real ativo. O failover é em runtime, sem desativar botões.
+  const confirmedOutage = /verificações automáticas seguidas/i.test(errorMsg);
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: f } = await supabaseAdmin
@@ -198,7 +199,7 @@ export async function markProviderUnstable(slug: string, errorMsg: string): Prom
       .select("saldo_atual, ativo")
       .eq("slug", slug)
       .maybeSingle();
-    if (f && (f as any).ativo && Number((f as any).saldo_atual) > 0) {
+    if (!confirmedOutage && f && (f as any).ativo && Number((f as any).saldo_atual) > 0) {
       console.warn(`[smart-routing] ${slug} instável mas mantido ATIVO (saldo>0): ${errorMsg.slice(0,120)}`);
       return;
     }
