@@ -9,6 +9,7 @@
 type SmokeReport = {
   ok: boolean;
   provider_reachability: Record<string, boolean>;
+  provider_consecutive_failures: Record<string, number>;
   packages_without_valid_id: string[];
   packages_below_margin: string[];
   auto_healer_last_run_min_ago: number | null;
@@ -16,13 +17,15 @@ type SmokeReport = {
   ts: string;
 };
 
+const PROVIDER_ALERT_THRESHOLD = 3;
+
 const PROVIDERS = [
   { slug: "smmhype", endpoint: "https://smmhype.com/api/v2", envKey: "SMMHYPE_API_KEY" },
   { slug: "smmpainel", endpoint: "https://smmpainel.com/api/v2", envKey: "SMMPAINEL_API_KEY" },
   { slug: "verified", endpoint: "https://verifiedatacado.com/api/v2", envKey: "VERIFIED_API_KEY" },
 ] as const;
 
-async function pingProvider(endpoint: string, apiKey: string): Promise<boolean> {
+async function pingProviderOnce(endpoint: string, apiKey: string): Promise<boolean> {
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 8000);
@@ -41,10 +44,40 @@ async function pingProvider(endpoint: string, apiKey: string): Promise<boolean> 
   } catch { return false; }
 }
 
+async function pingProvider(endpoint: string, apiKey: string): Promise<boolean> {
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    if (await pingProviderOnce(endpoint, apiKey)) return true;
+  }
+  return false;
+}
+
+async function countConsecutiveProviderFailures(
+  supabaseAdmin: any,
+  slug: string,
+  currentOk: boolean,
+): Promise<number> {
+  if (currentOk) return 0;
+  const { data } = await supabaseAdmin
+    .from("admin_audit_logs" as any)
+    .select("detail")
+    .eq("action", "smoke_test_v178")
+    .order("created_at", { ascending: false })
+    .limit(PROVIDER_ALERT_THRESHOLD - 1);
+
+  let failures = 1;
+  for (const row of (data as any[]) ?? []) {
+    const previousOk = row?.detail?.provider_reachability?.[slug];
+    if (previousOk === false) failures += 1;
+    else break;
+  }
+  return failures;
+}
+
 export async function runSmokeTest(): Promise<SmokeReport> {
   const report: SmokeReport = {
     ok: true,
     provider_reachability: {},
+    provider_consecutive_failures: {},
     packages_without_valid_id: [],
     packages_below_margin: [],
     auto_healer_last_run_min_ago: null,
@@ -59,6 +92,11 @@ export async function runSmokeTest(): Promise<SmokeReport> {
     const key = process.env[p.envKey];
     if (!key) { report.provider_reachability[p.slug] = false; continue; }
     report.provider_reachability[p.slug] = await pingProvider(p.endpoint, key);
+    report.provider_consecutive_failures[p.slug] = await countConsecutiveProviderFailures(
+      supabaseAdmin,
+      p.slug,
+      report.provider_reachability[p.slug],
+    );
   }
 
   // 2) Todo pacote tem pelo menos 1 ID válido?
@@ -89,10 +127,28 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   }
 
   // Avaliação
-  const providersDown = Object.entries(report.provider_reachability).filter(([, ok]) => !ok).map(([s]) => s);
+  const providersDown = Object.entries(report.provider_consecutive_failures)
+    .filter(([, failures]) => failures >= PROVIDER_ALERT_THRESHOLD)
+    .map(([s]) => s);
+  const providersTransient = Object.entries(report.provider_consecutive_failures)
+    .filter(([, failures]) => failures > 0 && failures < PROVIDER_ALERT_THRESHOLD)
+    .map(([s, failures]) => `${s} (${failures}/${PROVIDER_ALERT_THRESHOLD})`);
   const healerStale = report.auto_healer_last_run_min_ago == null || report.auto_healer_last_run_min_ago > 15;
   if (providersDown.length > 0 || report.packages_without_valid_id.length > 0 || report.packages_below_margin.length > 0 || healerStale) {
     report.ok = false;
+  }
+
+  if (providersTransient.length > 0) {
+    report.errors.push(`instabilidade temporária sem alerta: ${providersTransient.join(", ")}`);
+  }
+
+  for (const slug of providersDown) {
+    try {
+      const { markProviderUnstable } = await import("@/lib/smart-routing.server");
+      await markProviderUnstable(slug, `Fornecedor falhou em ${PROVIDER_ALERT_THRESHOLD} verificações automáticas seguidas`);
+    } catch (e: any) {
+      report.errors.push(`não consegui pausar ${slug}: ${e?.message ?? "erro desconhecido"}`);
+    }
   }
 
   // 4) Alerta Telegram só se algo quebrou
@@ -100,7 +156,7 @@ export async function runSmokeTest(): Promise<SmokeReport> {
     try {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
       const parts = [`🚨 SISTEMA COM DEFEITO\n\nPROBLEMA: teste automático encontrou coisa quebrada.`];
-      if (providersDown.length > 0) parts.push(`• Fornecedor(es) fora do ar: ${providersDown.join(", ")}`);
+      if (providersDown.length > 0) parts.push(`• Fornecedor(es) fora do ar por 3 verificações seguidas: ${providersDown.join(", ")}`);
       if (report.packages_without_valid_id.length > 0) parts.push(`• Pacote(s) sem produto vinculado: ${report.packages_without_valid_id.slice(0, 5).join(", ")}${report.packages_without_valid_id.length > 5 ? "..." : ""}`);
       if (report.packages_below_margin.length > 0) parts.push(`• Pacote(s) vendendo com prejuízo: ${report.packages_below_margin.slice(0, 5).join(", ")}`);
       if (healerStale) parts.push(`• Piloto automático travado há ${report.auto_healer_last_run_min_ago ?? "??"} min`);
