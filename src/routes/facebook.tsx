@@ -32,7 +32,7 @@ import PixCountdown from "@/components/PixCountdown";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
-import { getUtmSource } from "@/lib/utm";
+import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogFacebook from "@/assets/og-facebook.jpg";
@@ -192,7 +192,7 @@ function FacebookLanding() {
           valor: selected.valor,
           email: "cliente@facebook.eliteboostprime.com",
           rede_social: "facebook",
-          utm_source: getUtmSource(),
+          ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
       });

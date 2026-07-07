@@ -32,7 +32,7 @@ import PixCountdown from "@/components/PixCountdown";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
-import { getUtmSource } from "@/lib/utm";
+import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogYoutube from "@/assets/og-youtube.jpg";
@@ -199,7 +199,7 @@ function YoutubeLanding() {
           valor: selected.valor,
           email: "cliente@youtube.eliteboostprime.com",
           rede_social: "youtube",
-          utm_source: getUtmSource(),
+          ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
       });

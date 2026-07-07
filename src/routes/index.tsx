@@ -60,7 +60,7 @@ import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { simulatePurchase } from "@/lib/simulate-purchase.functions";
-import { getUtmSource } from "@/lib/utm";
+import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 
@@ -551,7 +551,7 @@ function Landing() {
           valor: selected.valor,
           email: result.data.email,
           whatsapp_contato: result.data.contact,
-          utm_source: getUtmSource(),
+          ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
       });
