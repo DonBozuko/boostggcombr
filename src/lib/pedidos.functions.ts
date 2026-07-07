@@ -10,8 +10,15 @@ const pedidoSchema = z.object({
   whatsapp_contato: z.string().min(5).max(50).optional(),
   rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram"]).optional(),
   utm_source: z.string().max(60).optional().nullable(),
+  utm_medium: z.string().max(60).optional().nullable(),
+  utm_campaign: z.string().max(60).optional().nullable(),
+  utm_content: z.string().max(60).optional().nullable(),
+  utm_term: z.string().max(60).optional().nullable(),
   cupom: z.string().max(20).optional().nullable(),
 });
+
+const utmClean = (v: string | null | undefined) =>
+  v ? v.toLowerCase().slice(0, 60) : null;
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 
@@ -227,7 +234,11 @@ export const criarPedido = createServerFn({ method: "POST" })
           status: "pending",
           mercado_pago_id: mpId,
           rede_social: rede,
-          utm_source: data.utm_source ? data.utm_source.toLowerCase().slice(0, 60) : null,
+          utm_source: utmClean(data.utm_source),
+          utm_medium: utmClean(data.utm_medium),
+          utm_campaign: utmClean(data.utm_campaign),
+          utm_content: utmClean(data.utm_content),
+          utm_term: utmClean(data.utm_term),
           cupom: cupom || null,
         })
         .select("id")
