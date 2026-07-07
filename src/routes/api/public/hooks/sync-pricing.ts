@@ -6,6 +6,10 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const token = request.headers.get("x-admin-token") ?? "";
+        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+          return new Response("Unauthorized", { status: 401 });
+        }
         try {
           const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
           const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
@@ -33,6 +37,10 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
         }
       },
       GET: async ({ request }) => {
+        const token = request.headers.get("x-admin-token") ?? "";
+        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+          return new Response("Unauthorized", { status: 401 });
+        }
         try {
           const { syncPricingCacheAll } = await import("@/lib/pricing-engine.server");
           const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
