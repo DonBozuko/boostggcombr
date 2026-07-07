@@ -52,6 +52,7 @@ import { WaitingProvisionQueue } from "@/components/WaitingProvisionQueue";
 import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
+import { RoasPanel } from "@/components/RoasPanel";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
@@ -1433,6 +1434,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         {folder === "buscas" && (
           <div className="space-y-4">
             <InsightsIA token={token} />
+            <RoasPanel token={token} />
             <ConversionAnalytics />
             {!loaded ? (
               <div className="flex justify-center py-6">
