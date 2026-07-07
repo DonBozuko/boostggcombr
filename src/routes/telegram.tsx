@@ -31,7 +31,7 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
-import { getUtmSource } from "@/lib/utm";
+import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
@@ -177,7 +177,7 @@ function TelegramLanding() {
           valor: selected.valor,
           email: "cliente@telegram.eliteboostprime.com",
           rede_social: "telegram",
-          utm_source: getUtmSource(),
+          ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
       });

@@ -387,7 +387,11 @@ export type Database = {
           rede_social: string
           sla_deadline: string | null
           status: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
           utm_source: string | null
+          utm_term: string | null
           valor: number
         }
         Insert: {
@@ -404,7 +408,11 @@ export type Database = {
           rede_social?: string
           sla_deadline?: string | null
           status?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
           utm_source?: string | null
+          utm_term?: string | null
           valor: number
         }
         Update: {
@@ -421,7 +429,11 @@ export type Database = {
           rede_social?: string
           sla_deadline?: string | null
           status?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
           utm_source?: string | null
+          utm_term?: string | null
           valor?: number
         }
         Relationships: []
