@@ -6,10 +6,8 @@ export const Route = createFileRoute("/api/public/hooks/recover-abandoned")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Validação leve: exige apikey (anon) — bloqueia tráfego de internet aleatório.
-        const apikey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-        if (!apikey || !expected || apikey !== expected) {
+        const token = request.headers.get("x-admin-token") ?? "";
+        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
           return new Response("Unauthorized", { status: 401 });
         }
 

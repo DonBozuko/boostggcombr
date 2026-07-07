@@ -4,8 +4,8 @@ export const Route = createFileRoute("/api/public/hooks/reconciliation")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apikey = request.headers.get("apikey");
-        if (!apikey || apikey !== process.env.SUPABASE_PUBLISHABLE_KEY) {
+        const token = request.headers.get("x-admin-token") ?? "";
+        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },
