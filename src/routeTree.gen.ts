@@ -45,6 +45,7 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
+import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public/queue/reprocess'
 import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
@@ -240,6 +241,11 @@ const ApiPublicQueueWaitingRoute = ApiPublicQueueWaitingRouteImport.update({
   path: '/api/public/queue/waiting',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQueueReprocessRoute = ApiPublicQueueReprocessRouteImport.update({
+  id: '/api/public/queue/reprocess',
+  path: '/api/public/queue/reprocess',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicQueueConfirmRoute = ApiPublicQueueConfirmRouteImport.update({
   id: '/api/public/queue/confirm',
   path: '/api/public/queue/confirm',
@@ -336,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
+  '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
+  '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -431,6 +439,7 @@ export interface FileRoutesById {
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
+  '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
@@ -480,6 +489,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/queue/confirm'
+    | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/queue/confirm'
+    | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
@@ -574,6 +585,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/queue/confirm'
+    | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
@@ -621,6 +633,7 @@ export interface RootRouteChildren {
   ApiPublicHooksSmokeTestRoute: typeof ApiPublicHooksSmokeTestRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
   ApiPublicQueueConfirmRoute: typeof ApiPublicQueueConfirmRoute
+  ApiPublicQueueReprocessRoute: typeof ApiPublicQueueReprocessRoute
   ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
@@ -880,6 +893,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQueueWaitingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/queue/reprocess': {
+      id: '/api/public/queue/reprocess'
+      path: '/api/public/queue/reprocess'
+      fullPath: '/api/public/queue/reprocess'
+      preLoaderRoute: typeof ApiPublicQueueReprocessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/queue/confirm': {
       id: '/api/public/queue/confirm'
       path: '/api/public/queue/confirm'
@@ -999,6 +1019,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSmokeTestRoute: ApiPublicHooksSmokeTestRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
   ApiPublicQueueConfirmRoute: ApiPublicQueueConfirmRoute,
+  ApiPublicQueueReprocessRoute: ApiPublicQueueReprocessRoute,
   ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,

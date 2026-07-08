@@ -153,45 +153,10 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     });
   } catch (e) { console.warn("[contingency] v155 telegram universal fail", e); }
 
-  // v164 — contingência também só enfileira; não despacha direto ao fornecedor.
-  try {
-    const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
-    const ranked = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: Number(pedido.quantidade) });
-    const top = ranked.find((p) => p.cost_brl != null) ?? ranked[0] ?? null;
-    const custoEstim = top?.cost_brl ?? null;
-    await supabaseAdmin
-      .from("pedidos")
-      .update({
-        status: "waiting_provision",
-        error_detail: `Contingência: Aguardando Automação/Saldo${top?.slug ? ` · fornecedor sugerido: ${top.slug}` : ""}`,
-        ...(custoEstim != null ? { custo_real: Number(custoEstim.toFixed(4)) } : {}),
-      })
-      .eq("id", pedido.id);
-    if (custoEstim != null && custoEstim > 0) {
-      await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: Number(custoEstim.toFixed(4)) });
-      await supabaseAdmin.from("financial_ledger" as any).insert({
-        valor_brl: Number(custoEstim.toFixed(4)),
-        origem: "wallet:geral",
-        destino: "wallet:reservado",
-        pedido_id: pedido.id,
-        fornecedor_slug: top?.slug ?? null,
-        telemetry: { event: "WAITING_AUTOMATION_BALANCE", source: "contingency", provider: top?.slug ?? null, cost_brl: custoEstim },
-      } as any);
-    }
-    try {
-      const { notifyAdminProvisioning } = await import("@/lib/whatsapp-admin.server");
-      await notifyAdminProvisioning({
-        pedidoId: String(pedido.id),
-        vendaBrl: Number(pedido.valor),
-        custoBrl: custoEstim,
-        fornecedor: top?.slug ?? null,
-        motivo: "Pagamento aprovado via contingência · aguardando robô externo",
-      });
-    } catch (e) { console.warn("[contingency] v164 queue notify fail", e); }
-    return { ok: true, status: "waiting_provision", recovered: true, note: "queued for robot" };
-  } catch (e) {
-    console.warn("[contingency] v164 queue fail", e);
-  }
+  // v187 — removido early-return v164 que travava todo pedido em waiting_provision.
+  // Dispatch A→B→C abaixo já cobre: sucesso → paid; sem saldo → waiting_provision c/ SLA 24h;
+  // todos falham → refund. Robô externo não é mais requisito pra entrega automática.
+
 
 
   // 4) Dispatch failover A→B→C (somente fornecedores ativos com saldo > 0)
