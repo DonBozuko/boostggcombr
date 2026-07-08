@@ -509,6 +509,15 @@ function YoutubeLanding() {
           )}
         </DialogContent>
       </Dialog>
+      <OrderBumpDialog
+        open={bumpOpen}
+        current={pendingOrder?.plan ?? null}
+        allPlans={currentPlans}
+        unitLabel={categoria === "inscritos" ? "Inscritos" : "Views"}
+        onAccept={handleBumpAccept}
+        onDecline={handleBumpDecline}
+        loading={loading}
+      />
       </ShowcaseShell>
       </PlansShowcaseProvider>
           <FaqSection network="youtube" />
