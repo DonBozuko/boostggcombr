@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Home } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { trackCompletePayment } from "@/lib/tiktok-pixel";
+
 
 declare global {
   interface Window {
