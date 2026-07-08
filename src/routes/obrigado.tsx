@@ -46,7 +46,13 @@ function ObrigadoPage() {
       currency: "BRL",
       transaction_id: orderId,
     });
-  }, [orderId, value]);
+    trackCompletePayment({
+      orderId,
+      value: numericValue,
+      contentName: tier || undefined,
+    });
+  }, [orderId, value, tier]);
+
 
 
   return (
