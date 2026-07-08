@@ -98,9 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       { src: "/~flock.js", async: true, defer: true },
-      { src: "https://www.googletagmanager.com/gtag/js?id=G-BF7NHT50FZ", async: true },
-      {
-        children: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-BF7NHT50FZ');`,
+
       },
       {
         children: `!function (w, d, t) {
