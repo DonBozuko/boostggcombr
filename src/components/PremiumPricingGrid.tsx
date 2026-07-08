@@ -28,15 +28,6 @@ function useCountdown(seconds: number): string {
   return `${m}:${s}`;
 }
 
-// Determinístico por id para hidratar SSR/CSR igual
-function seededInt(seed: string, min: number, max: number): number {
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) {
-    h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
-  }
-  const v = Math.abs(h) % (max - min + 1);
-  return min + v;
-}
 
 function parseBRL(p: string): number {
   const n = parseFloat(
