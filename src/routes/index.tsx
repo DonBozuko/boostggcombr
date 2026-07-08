@@ -558,7 +558,14 @@ function Landing() {
         toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
         return;
       }
+      trackInitiateCheckout({
+        orderId: res.pedidoId ?? "",
+        value: selected.valor,
+        contentId: selected.id,
+        contentName: `${selected.tier} instagram`,
+      });
       setPaid(false);
+
       setRejectionMsg(null);
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,
