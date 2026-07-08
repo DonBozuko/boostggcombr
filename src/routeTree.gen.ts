@@ -17,6 +17,7 @@ import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FacebookRouteImport } from './routes/facebook'
@@ -90,6 +91,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObrigadoRoute = ObrigadoRouteImport.update({
+  id: '/obrigado',
+  path: '/obrigado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -282,6 +288,7 @@ export interface FileRoutesByFullPath {
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -326,6 +333,7 @@ export interface FileRoutesByTo {
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -371,6 +379,7 @@ export interface FileRoutesById {
   '/facebook': typeof FacebookRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
+  '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/login'
     | '/mcp'
+    | '/obrigado'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/login'
     | '/mcp'
+    | '/obrigado'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -505,6 +516,7 @@ export interface FileRouteTypes {
     | '/facebook'
     | '/login'
     | '/mcp'
+    | '/obrigado'
     | '/privacidade'
     | '/sitemap.xml'
     | '/status'
@@ -550,6 +562,7 @@ export interface RootRouteChildren {
   FacebookRoute: typeof FacebookRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
+  ObrigadoRoute: typeof ObrigadoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -643,6 +656,13 @@ declare module '@tanstack/react-router' {
       path: '/privacidade'
       fullPath: '/privacidade'
       preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/obrigado': {
+      id: '/obrigado'
+      path: '/obrigado'
+      fullPath: '/obrigado'
+      preLoaderRoute: typeof ObrigadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -903,6 +923,7 @@ const rootRouteChildren: RootRouteChildren = {
   FacebookRoute: FacebookRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
+  ObrigadoRoute: ObrigadoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,

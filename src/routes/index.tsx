@@ -518,6 +518,21 @@ function Landing() {
     return () => { stop(); clearTimeout(hardStop); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, rejectionMsg, getStatusFn]);
 
+  // Redirect para /obrigado quando pagamento confirmado (dispara pixel de conversão)
+  useEffect(() => {
+    if (!paid || !pedidoInfo?.pedidoId) return;
+    const t = setTimeout(() => {
+      const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : "";
+      const q = new URLSearchParams({
+        order: String(pedidoInfo.pedidoId),
+        value: String(valorNum ?? ""),
+        tier: String(pedidoInfo?.tier ?? ""),
+      }).toString();
+      window.location.assign(`/obrigado?${q}`);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [paid, pedidoInfo?.pedidoId, pedidoInfo?.price, pedidoInfo?.tier]);
+
 
   const dispatchPedido = async (selected: typeof dynAllPlans[number], profile: string, email: string, contact: string, bumpUpgrade: boolean) => {
     setLoading(true);
