@@ -982,6 +982,15 @@ function Landing() {
           </DialogContent>
         </Dialog>
       </section>)}
+      <OrderBumpDialog
+        open={bumpOpen}
+        current={pendingOrder?.selected ?? null}
+        allPlans={categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans}
+        unitLabel={categoria === "seguidores" ? "Seguidores" : categoria === "curtidas" ? "Curtidas" : "Visualizações"}
+        onAccept={handleBumpAccept}
+        onDecline={handleBumpDecline}
+        loading={loading}
+      />
       </ShowcaseShell>
 
 
