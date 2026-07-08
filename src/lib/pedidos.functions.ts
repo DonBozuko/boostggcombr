@@ -249,8 +249,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         .from("pedidos")
         .insert({
           instagram_user: clean(data.instagram_user),
-          pacote: clean(data.pacote),
-          quantidade: data.quantidade,
+          pacote: clean(pacoteEfetivo),
+          quantidade: quantidadeEfetiva,
           valor: valorCobrar,
           status: "pending",
           mercado_pago_id: mpId,
