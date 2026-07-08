@@ -277,6 +277,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         valorCobrado: valorCobrar,
         valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
         cupomAplicado: discount > 0 ? cupom : null,
+        bumpAplicado,
+        pacoteFinal: pacoteEfetivo,
+        quantidadeFinal: quantidadeEfetiva,
       };
     } catch (err) {
       console.error("Erro inesperado no Supabase:", err);
