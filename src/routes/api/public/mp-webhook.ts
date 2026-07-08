@@ -246,6 +246,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return;
           }
 
+          // TikTok Events API — server-side CompletePayment (dedup por event_id com pixel client)
+          try {
+            const { sendTikTokServerEvent } = await import("@/lib/tiktok-events-api.server");
+            void sendTikTokServerEvent({
+              event: "CompletePayment",
+              orderId: String(pedido.id),
+              value: Number(pedido.valor),
+              contentName: String(pedido.pacote ?? ""),
+            });
+          } catch (e) { console.warn("[mp-webhook] tiktok eapi fail", e); }
+
           // v116 — Banco Interno Virtual: credita Carteira Geral + registra ledger imutável.
           try {
             await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
