@@ -133,11 +133,15 @@ export const criarPedido = createServerFn({ method: "POST" })
     // PRICE_TABLE permanece apenas como fallback de último recurso.
     let valorBase: number | null = null;
     let qtdOficial: number = data.quantidade;
+    let gridRef: Awaited<ReturnType<typeof import("./pricing-engine.server").getPricingGridImpl>> | null = null;
+    let catRef: string | null = null;
     try {
       const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
       const cat = categoryFromPacote(pkg);
       if (cat) {
+        catRef = cat;
         const grid = await getPricingGridImpl(cat);
+        gridRef = grid;
         const item = grid.items.find((i) => i.id === pkg);
         if (item) {
           valorBase = item.valor;
@@ -160,10 +164,26 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
+
+    // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
+    // Margem preservada (base já tem 5-12x multiplicador; -20% sai da margem, nunca do custo).
+    let pacoteEfetivo = data.pacote;
+    let quantidadeEfetiva = qtdOficial;
+    let bumpAplicado = false;
+    if (data.bump_upgrade && gridRef) {
+      const next = gridRef.items
+        .filter((i) => i.quantidade > qtdOficial)
+        .sort((a, b) => a.quantidade - b.quantidade)[0];
+      if (next) {
+        pacoteEfetivo = next.id;
+        quantidadeEfetiva = next.quantidade;
+        valorBase = Number((next.valor * 0.80).toFixed(2));
+        bumpAplicado = true;
+        console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
+      }
+    }
+
     // Cupom PRIME15 = 15% off aplicado server-side. BRINDE50 = bônus em seguidores (não desconta).
-    // v180 — Removido Math.max(5,...) que engolia o desconto quando o piso escalar do
-    // pricing_items batia em R$5,00 (ex: p50 5,89 × 0,85 = 5,00 = floor → cliente pagava cheio).
-    // O piso mínimo já é garantido pelo trigger enforce_pricing_markup em pricing_items.
     const cupom = (data.cupom ?? "").trim().toUpperCase();
     const discount = cupom.split(/[,\s]+/).includes("PRIME15") ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
