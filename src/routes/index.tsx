@@ -82,15 +82,27 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
       gtag?: (...a: unknown[]) => void;
       dataLayer?: unknown[];
       fbq?: (...a: unknown[]) => void;
+      ttq?: { track: (n: string, p?: unknown) => void; page?: () => void };
     };
     w.gtag?.("event", name, payload);
     w.dataLayer?.push({ event: name, ...payload });
     w.fbq?.("trackCustom", name, payload);
+    // TikTok Pixel: mapeia p/ eventos padrão quando aplicável
+    const ttqMap: Record<string, string> = {
+      checkout_submit: "InitiateCheckout",
+      purchase: "CompletePayment",
+    };
+    const ttqEvent = ttqMap[name] ?? name;
+    const value = typeof payload.value === "number" ? payload.value
+      : typeof payload.plan_value === "number" ? payload.plan_value
+      : undefined;
+    w.ttq?.track(ttqEvent, value !== undefined ? { value, currency: "BRL", ...payload } : payload);
     if (import.meta.env.DEV) console.debug("[track]", name, payload);
   } catch (err) {
     console.error("[trackEvent]", err);
   }
 }
+
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -469,11 +481,16 @@ function Landing() {
         if (res.status === "paid" || res.status === "Enviado") {
           const m = String((res as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
           if (m) setMysteryBonus(Number(m[1]));
+          const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : undefined;
+          trackEvent("purchase", { value: valorNum, currency: "BRL", order_id: id, tier: pedidoInfo?.tier });
           stop(); setPaid(true); playSuccessAudio(); return;
         }
         if (res.status === "waiting_provision") {
+          const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : undefined;
+          trackEvent("purchase", { value: valorNum, currency: "BRL", order_id: id, tier: pedidoInfo?.tier });
           stop(); setWaitingProvision(true); setPaid(true); playSuccessAudio(); return;
         }
+
         if (res.status === "mp_rejected_insufficient") {
           stop();
           setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
