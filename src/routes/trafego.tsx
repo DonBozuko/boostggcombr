@@ -183,7 +183,14 @@ function TrafegoLanding() {
         },
       });
       if (!res?.ok) { toast.error("Não foi possível gerar o Pix."); return; }
+      trackInitiateCheckout({
+        orderId: res.pedidoId ?? "",
+        value: selected.valor,
+        contentId: selected.id,
+        contentName: `${selected.tier} trafego`,
+      });
       setPaid(false);
+
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: res.qrCode, qrCodeBase64: res.qrCodeBase64, pedidoId: res.pedidoId,
