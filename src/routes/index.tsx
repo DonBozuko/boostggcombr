@@ -59,6 +59,7 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 import { simulatePurchase } from "@/lib/simulate-purchase.functions";
 import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
