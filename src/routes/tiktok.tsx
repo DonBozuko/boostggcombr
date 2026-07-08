@@ -37,6 +37,7 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
 import { BrandHeader } from "@/components/BrandHeader";
+import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
