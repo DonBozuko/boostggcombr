@@ -171,22 +171,19 @@ export const criarPedido = createServerFn({ method: "POST" })
     let quantidadeEfetiva = qtdOficial;
     let bumpAplicado = false;
     if (data.bump_upgrade && gridRef) {
-      const next = gridRef.items
+      // v184 — Smart-skip: pega menor tier cujo -20% ainda gera uplift ≥15%.
+      const candidates = gridRef.items
         .filter((i) => i.quantidade > qtdOficial)
-        .sort((a, b) => a.quantidade - b.quantidade)[0];
+        .sort((a, b) => a.quantidade - b.quantidade);
+      const next = candidates.find((i) => i.valor * 0.80 >= valorBase * 1.15);
       if (next) {
-        const bumpValor = Number((next.valor * 0.80).toFixed(2));
-        // v184 — Guarda anti-inversão: grid não escala linear. Bump só vale se
-        // gera uplift ≥15% de receita. Senão, ignora silenciosamente (pedido normal).
-        if (bumpValor >= valorBase * 1.15) {
-          pacoteEfetivo = next.id;
-          quantidadeEfetiva = next.quantidade;
-          valorBase = bumpValor;
-          bumpAplicado = true;
-          console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
-        } else {
-          console.log("[criarPedido] bump rejeitado (uplift <15%):", data.pacote, "→", next.id, `R$${bumpValor} vs R$${valorBase}`);
-        }
+        pacoteEfetivo = next.id;
+        quantidadeEfetiva = next.quantidade;
+        valorBase = Number((next.valor * 0.80).toFixed(2));
+        bumpAplicado = true;
+        console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
+      } else {
+        console.log("[criarPedido] bump rejeitado (nenhum tier válido):", data.pacote);
       }
     }
 
