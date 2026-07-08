@@ -183,25 +183,20 @@ function YoutubeLanding() {
   const dynAllPlans = [...dyn.inscritos, ...dyn.visualizacoes];
   const isSubs = categoria === "inscritos";
 
-  const submit = async (selected: Plan) => {
-    const schema = selected.id.startsWith("ys") ? channelSchema : videoSchema;
-    const parsed = schema.safeParse({ plan: selected.id, profile });
-    if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
-      return;
-    }
+  const dispatchPedido = async (selected: Plan, profileValue: string, bumpUpgrade: boolean) => {
     setPlanId(selected.id);
     setLoading(true);
     try {
       if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
       const res = await criarPedidoFn({
         data: {
-          instagram_user: parsed.data.profile,
+          instagram_user: profileValue,
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
           email: "cliente@youtube.eliteboostprime.com",
           rede_social: "youtube",
+          bump_upgrade: bumpUpgrade,
           ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
@@ -214,11 +209,11 @@ function YoutubeLanding() {
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
-        profile: parsed.data.profile,
+        profile: profileValue,
         pixCode: res.qrCode,
         qrCodeBase64: res.qrCodeBase64,
         pedidoId: res.pedidoId,
-        quantidade: selected.quantidade,
+        quantidade: res.quantidadeFinal ?? selected.quantidade,
       });
       setModalOpen(true);
     } catch (err) {
@@ -227,6 +222,36 @@ function YoutubeLanding() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const submit = async (selected: Plan) => {
+    const schema = selected.id.startsWith("ys") ? channelSchema : videoSchema;
+    const parsed = schema.safeParse({ plan: selected.id, profile });
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    const upgrade = findUpgrade(selected, currentPlans);
+    if (upgrade) {
+      setPendingOrder({ plan: selected, profile: parsed.data.profile });
+      setBumpOpen(true);
+      return;
+    }
+    await dispatchPedido(selected, parsed.data.profile, false);
+  };
+
+  const handleBumpAccept = async () => {
+    if (!pendingOrder) return;
+    setBumpOpen(false);
+    await dispatchPedido(pendingOrder.plan, pendingOrder.profile, true);
+    setPendingOrder(null);
+  };
+
+  const handleBumpDecline = async () => {
+    if (!pendingOrder) return;
+    setBumpOpen(false);
+    await dispatchPedido(pendingOrder.plan, pendingOrder.profile, false);
+    setPendingOrder(null);
   };
 
   const copyPix = async () => {
