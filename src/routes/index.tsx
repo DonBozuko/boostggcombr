@@ -502,6 +502,48 @@ function Landing() {
   }, [modalOpen, pedidoInfo?.pedidoId, paid, rejectionMsg, getStatusFn]);
 
 
+  const dispatchPedido = async (selected: typeof dynAllPlans[number], profile: string, email: string, contact: string, bumpUpgrade: boolean) => {
+    setLoading(true);
+    try {
+      if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
+      const res = await criarPedidoFn({
+        data: {
+          instagram_user: profile,
+          pacote: selected.id,
+          quantidade: selected.quantidade,
+          valor: selected.valor,
+          email,
+          whatsapp_contato: contact,
+          bump_upgrade: bumpUpgrade,
+          ...getUtmParams(),
+          cupom: getAppliedCoupon(),
+        },
+      });
+      if (!res?.ok) {
+        console.error("criarPedido falhou:", res);
+        toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
+        return;
+      }
+      setPaid(false);
+      setRejectionMsg(null);
+      setPedidoInfo({
+        price: res.valorFormatado ?? selected.price,
+        tier: selected.tier,
+        profile,
+        pixCode: res.qrCode,
+        qrCodeBase64: res.qrCodeBase64,
+        pedidoId: res.pedidoId,
+        quantidade: res.quantidadeFinal ?? selected.quantidade,
+      });
+      setModalOpen(true);
+    } catch (err) {
+      console.error("Erro inesperado em criarPedido:", err);
+      toast.error("Erro ao registrar pedido. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = orderSchema.safeParse(form);
@@ -519,23 +561,17 @@ function Landing() {
       plan_tier: selected.tier,
       plan_value: selected.valor,
     });
-    setLoading(true);
-    try {
-      // v176 Shadow Mode: admin com localStorage.ADMIN_SHADOW='1' roda dry-run
-      // ao invés de criar pedido MP real. Cliente comum não tem a flag → paga normal.
-      const shadow =
-        typeof window !== "undefined" &&
-        window.localStorage.getItem("ADMIN_SHADOW") === "1" &&
-        !!window.localStorage.getItem("eliteboost_prime_admin_token");
-      if (shadow) {
+    // v176 Shadow Mode: admin dry-run — skip bump
+    const shadow =
+      typeof window !== "undefined" &&
+      window.localStorage.getItem("ADMIN_SHADOW") === "1" &&
+      !!window.localStorage.getItem("eliteboost_prime_admin_token");
+    if (shadow) {
+      setLoading(true);
+      try {
         const token = window.localStorage.getItem("eliteboost_prime_admin_token")!;
         const simRes = await simulatePurchaseFn({
-          data: {
-            token,
-            pacote: selected.id,
-            quantidade: selected.quantidade,
-            handle: result.data.profile,
-          },
+          data: { token, pacote: selected.id, quantidade: selected.quantidade, handle: result.data.profile },
         });
         if (!simRes?.ok) {
           toast.error(`Simulação falhou: ${(simRes as { error?: string })?.error ?? "erro"}`);
@@ -543,46 +579,34 @@ function Landing() {
         }
         toast.success(`🧪 SHADOW OK · pedido SIM ${String(simRes.pedidoId).slice(0, 8)} · ${simRes.totalMs}ms — nenhum Pix real gerado`);
         console.info("[shadow] steps:", simRes.steps);
-        return;
+      } finally {
+        setLoading(false);
       }
-      if (typeof window !== "undefined") window.dispatchEvent(new Event("eliteboost:upsell-intent"));
-      const res = await criarPedidoFn({
-        data: {
-          instagram_user: result.data.profile,
-          pacote: selected.id,
-          quantidade: selected.quantidade,
-          valor: selected.valor,
-          email: result.data.email,
-          whatsapp_contato: result.data.contact,
-          ...getUtmParams(),
-          cupom: getAppliedCoupon(),
-        },
-      });
-      if (!res?.ok) {
-        console.error("criarPedido falhou:", res);
-      }
-      if (!res?.ok) {
-        toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
-        return;
-      }
-      setPaid(false);
-      setRejectionMsg(null);
-      setPedidoInfo({
-        price: res.valorFormatado ?? selected.price,
-        tier: selected.tier,
-        profile: result.data.profile,
-        pixCode: res.qrCode,
-        qrCodeBase64: res.qrCodeBase64,
-        pedidoId: res.pedidoId,
-        quantidade: selected.quantidade,
-      });
-      setModalOpen(true);
-    } catch (err) {
-      console.error("Erro inesperado em criarPedido:", err);
-      toast.error("Erro ao registrar pedido. Tente novamente.");
-    } finally {
-      setLoading(false);
+      return;
     }
+    // v183 Order Bump: se existe upgrade no mesmo grupo, abre modal antes do Pix
+    const currentPlans = categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans;
+    const upgrade = findUpgrade(selected, currentPlans);
+    if (upgrade) {
+      setPendingOrder({ selected, profile: result.data.profile, email: result.data.email, contact: result.data.contact });
+      setBumpOpen(true);
+      return;
+    }
+    await dispatchPedido(selected, result.data.profile, result.data.email, result.data.contact, false);
+  };
+
+  const handleBumpAccept = async () => {
+    if (!pendingOrder) return;
+    setBumpOpen(false);
+    await dispatchPedido(pendingOrder.selected, pendingOrder.profile, pendingOrder.email, pendingOrder.contact, true);
+    setPendingOrder(null);
+  };
+
+  const handleBumpDecline = async () => {
+    if (!pendingOrder) return;
+    setBumpOpen(false);
+    await dispatchPedido(pendingOrder.selected, pendingOrder.profile, pendingOrder.email, pendingOrder.contact, false);
+    setPendingOrder(null);
   };
 
   const copyPix = async () => {
