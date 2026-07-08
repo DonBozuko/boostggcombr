@@ -375,6 +375,8 @@ function Landing() {
   const [mysteryBonus, setMysteryBonus] = useState<number>(0);
   const [rejectionMsg, setRejectionMsg] = useState<string | null>(null);
   const [waitingProvision, setWaitingProvision] = useState(false);
+  const [bumpOpen, setBumpOpen] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState<{ selected: any; profile: string; email: string; contact: string } | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
   const simulatePurchaseFn = useServerFn(simulatePurchase);
   const getStatusFn = useServerFn(getPedidoStatus);
