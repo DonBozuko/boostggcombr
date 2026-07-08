@@ -535,9 +535,19 @@ function TiktokLanding() {
           )}
         </DialogContent>
       </Dialog>
+      <OrderBumpDialog
+        open={bumpOpen}
+        current={pendingOrder?.plan ?? null}
+        allPlans={currentPlans}
+        unitLabel={categoria === "seguidores" ? "Seguidores" : categoria === "curtidas" ? "Curtidas" : "Views"}
+        onAccept={handleBumpAccept}
+        onDecline={handleBumpDecline}
+        loading={loading}
+      />
       </ShowcaseShell>
       </PlansShowcaseProvider>
           <FaqSection network="tiktok" />
       </MobileFrame>
   );
 }
+
