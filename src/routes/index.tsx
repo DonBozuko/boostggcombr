@@ -59,6 +59,8 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
+
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 import { simulatePurchase } from "@/lib/simulate-purchase.functions";
 import { getUtmParams } from "@/lib/utm";
@@ -556,7 +558,14 @@ function Landing() {
         toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
         return;
       }
+      trackInitiateCheckout({
+        orderId: res.pedidoId ?? "",
+        value: selected.valor,
+        contentId: selected.id,
+        contentName: `${selected.tier} instagram`,
+      });
       setPaid(false);
+
       setRejectionMsg(null);
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,

@@ -26,6 +26,8 @@ import PixCountdown from "@/components/PixCountdown";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
+
 import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { getSandboxEnabled } from "@/lib/sandbox.functions";
@@ -181,7 +183,14 @@ function TrafegoLanding() {
         },
       });
       if (!res?.ok) { toast.error("Não foi possível gerar o Pix."); return; }
+      trackInitiateCheckout({
+        orderId: res.pedidoId ?? "",
+        value: selected.valor,
+        contentId: selected.id,
+        contentName: `${selected.tier} trafego`,
+      });
       setPaid(false);
+
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price, tier: selected.tier, profile: parsed.data.profile,
         pixCode: res.qrCode, qrCodeBase64: res.qrCodeBase64, pedidoId: res.pedidoId,

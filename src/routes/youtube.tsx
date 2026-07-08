@@ -32,6 +32,8 @@ import PixCountdown from "@/components/PixCountdown";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
+
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
@@ -205,7 +207,14 @@ function YoutubeLanding() {
         toast.error("Não foi possível gerar o Pix. Tente novamente.");
         return;
       }
+      trackInitiateCheckout({
+        orderId: res.pedidoId ?? "",
+        value: selected.valor,
+        contentId: selected.id,
+        contentName: `${selected.tier} youtube`,
+      });
       setPaid(false);
+
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
