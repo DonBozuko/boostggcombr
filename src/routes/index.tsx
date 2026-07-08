@@ -1147,10 +1147,13 @@ function Landing() {
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
             <span className="font-display font-semibold text-foreground">ELITEBOOST PRIME</span>
           </div>
-          <div className="flex items-center gap-4">
-            <a href="/privacidade" className="hover:text-foreground">Privacidade & Segurança</a>
+          <div className="flex items-center gap-4 flex-wrap justify-center">
+            <a href="/privacidade" className="hover:text-foreground">Privacidade</a>
+            <a href="/termos" className="hover:text-foreground">Termos</a>
+            <a href="/reembolso" className="hover:text-foreground">Reembolso</a>
             <span>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</span>
           </div>
+
         </div>
       </footer>
       </PlansShowcaseProvider>
