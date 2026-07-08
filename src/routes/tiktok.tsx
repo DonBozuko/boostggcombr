@@ -229,7 +229,14 @@ function TiktokLanding() {
         toast.error("Não foi possível gerar o Pix. Tente novamente.");
         return;
       }
+      trackInitiateCheckout({
+        orderId: res.pedidoId ?? "",
+        value: selected.valor,
+        contentId: selected.id,
+        contentName: `${selected.tier} ${categoria}`,
+      });
       setPaid(false);
+
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,
         tier: selected.tier,
