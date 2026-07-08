@@ -15,6 +15,7 @@ const pedidoSchema = z.object({
   utm_content: z.string().max(60).optional().nullable(),
   utm_term: z.string().max(60).optional().nullable(),
   cupom: z.string().max(20).optional().nullable(),
+  bump_upgrade: z.boolean().optional(),
 });
 
 const utmClean = (v: string | null | undefined) =>
