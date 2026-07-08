@@ -175,7 +175,8 @@ export const criarPedido = createServerFn({ method: "POST" })
       const candidates = gridRef.items
         .filter((i) => i.quantidade > qtdOficial)
         .sort((a, b) => a.quantidade - b.quantidade);
-      const next = candidates.find((i) => i.valor * 0.80 >= valorBase * 1.15);
+      const baseRef = valorBase!;
+      const next = candidates.find((i) => i.valor * 0.80 >= baseRef * 1.15);
       if (next) {
         pacoteEfetivo = next.id;
         quantidadeEfetiva = next.quantidade;
