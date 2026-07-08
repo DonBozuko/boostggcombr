@@ -13,9 +13,11 @@ import { Route as Char126flockDotjsRouteImport } from './routes/~flock[.]js'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -73,6 +75,11 @@ const TiktokRoute = TiktokRouteImport.update({
   path: '/tiktok',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TelegramRoute = TelegramRouteImport.update({
   id: '/telegram',
   path: '/telegram',
@@ -86,6 +93,11 @@ const StatusRoute = StatusRouteImport.update({
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReembolsoRoute = ReembolsoRouteImport.update({
+  id: '/reembolso',
+  path: '/reembolso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -290,9 +302,11 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/reembolso': typeof ReembolsoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
+  '/termos': typeof TermosRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
@@ -335,9 +349,11 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/reembolso': typeof ReembolsoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
+  '/termos': typeof TermosRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
@@ -381,9 +397,11 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/reembolso': typeof ReembolsoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
+  '/termos': typeof TermosRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/youtube': typeof YoutubeRoute
@@ -428,9 +446,11 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/obrigado'
     | '/privacidade'
+    | '/reembolso'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
+    | '/termos'
     | '/tiktok'
     | '/trafego'
     | '/youtube'
@@ -473,9 +493,11 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/obrigado'
     | '/privacidade'
+    | '/reembolso'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
+    | '/termos'
     | '/tiktok'
     | '/trafego'
     | '/youtube'
@@ -518,9 +540,11 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/obrigado'
     | '/privacidade'
+    | '/reembolso'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
+    | '/termos'
     | '/tiktok'
     | '/trafego'
     | '/youtube'
@@ -564,9 +588,11 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  ReembolsoRoute: typeof ReembolsoRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   TelegramRoute: typeof TelegramRoute
+  TermosRoute: typeof TermosRoute
   TiktokRoute: typeof TiktokRoute
   TrafegoRoute: typeof TrafegoRoute
   YoutubeRoute: typeof YoutubeRoute
@@ -630,6 +656,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TiktokRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/telegram': {
       id: '/telegram'
       path: '/telegram'
@@ -649,6 +682,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reembolso': {
+      id: '/reembolso'
+      path: '/reembolso'
+      fullPath: '/reembolso'
+      preLoaderRoute: typeof ReembolsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -925,9 +965,11 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  ReembolsoRoute: ReembolsoRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   TelegramRoute: TelegramRoute,
+  TermosRoute: TermosRoute,
   TiktokRoute: TiktokRoute,
   TrafegoRoute: TrafegoRoute,
   YoutubeRoute: YoutubeRoute,
