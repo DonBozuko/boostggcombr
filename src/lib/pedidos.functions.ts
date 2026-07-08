@@ -15,6 +15,7 @@ const pedidoSchema = z.object({
   utm_content: z.string().max(60).optional().nullable(),
   utm_term: z.string().max(60).optional().nullable(),
   cupom: z.string().max(20).optional().nullable(),
+  bump_upgrade: z.boolean().optional(),
 });
 
 const utmClean = (v: string | null | undefined) =>
@@ -132,11 +133,15 @@ export const criarPedido = createServerFn({ method: "POST" })
     // PRICE_TABLE permanece apenas como fallback de último recurso.
     let valorBase: number | null = null;
     let qtdOficial: number = data.quantidade;
+    let gridRef: Awaited<ReturnType<typeof import("./pricing-engine.server").getPricingGridImpl>> | null = null;
+    let catRef: string | null = null;
     try {
       const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
       const cat = categoryFromPacote(pkg);
       if (cat) {
+        catRef = cat;
         const grid = await getPricingGridImpl(cat);
+        gridRef = grid;
         const item = grid.items.find((i) => i.id === pkg);
         if (item) {
           valorBase = item.valor;
@@ -159,10 +164,26 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
+
+    // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
+    // Margem preservada (base já tem 5-12x multiplicador; -20% sai da margem, nunca do custo).
+    let pacoteEfetivo = data.pacote;
+    let quantidadeEfetiva = qtdOficial;
+    let bumpAplicado = false;
+    if (data.bump_upgrade && gridRef) {
+      const next = gridRef.items
+        .filter((i) => i.quantidade > qtdOficial)
+        .sort((a, b) => a.quantidade - b.quantidade)[0];
+      if (next) {
+        pacoteEfetivo = next.id;
+        quantidadeEfetiva = next.quantidade;
+        valorBase = Number((next.valor * 0.80).toFixed(2));
+        bumpAplicado = true;
+        console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
+      }
+    }
+
     // Cupom PRIME15 = 15% off aplicado server-side. BRINDE50 = bônus em seguidores (não desconta).
-    // v180 — Removido Math.max(5,...) que engolia o desconto quando o piso escalar do
-    // pricing_items batia em R$5,00 (ex: p50 5,89 × 0,85 = 5,00 = floor → cliente pagava cheio).
-    // O piso mínimo já é garantido pelo trigger enforce_pricing_markup em pricing_items.
     const cupom = (data.cupom ?? "").trim().toUpperCase();
     const discount = cupom.split(/[,\s]+/).includes("PRIME15") ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
@@ -191,7 +212,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         },
         body: JSON.stringify({
           transaction_amount: Number(valorCobrar.toFixed(2)),
-          description: `EliteBoost Prime - ${rede.toUpperCase()} pacote ${clean(data.pacote)} (${data.quantidade} ${categoria}) para ${clean(data.instagram_user)}`,
+          description: `EliteBoost Prime - ${rede.toUpperCase()} pacote ${clean(pacoteEfetivo)} (${quantidadeEfetiva} ${categoria}) para ${clean(data.instagram_user)}${bumpAplicado ? " [UPGRADE]" : ""}`,
           payment_method_id: "pix",
           payer: { email: data.email.trim().toLowerCase() },
         }),
@@ -228,8 +249,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         .from("pedidos")
         .insert({
           instagram_user: clean(data.instagram_user),
-          pacote: clean(data.pacote),
-          quantidade: data.quantidade,
+          pacote: clean(pacoteEfetivo),
+          quantidade: quantidadeEfetiva,
           valor: valorCobrar,
           status: "pending",
           mercado_pago_id: mpId,
@@ -256,6 +277,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         valorCobrado: valorCobrar,
         valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
         cupomAplicado: discount > 0 ? cupom : null,
+        bumpAplicado,
+        pacoteFinal: pacoteEfetivo,
+        quantidadeFinal: quantidadeEfetiva,
       };
     } catch (err) {
       console.error("Erro inesperado no Supabase:", err);
