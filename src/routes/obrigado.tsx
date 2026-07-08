@@ -33,6 +33,20 @@ function ObrigadoPage() {
   const value = params?.get("value") ?? "";
   const tier = params?.get("tier") ?? "";
 
+  const fired = useRef(false);
+  useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
+    const numericValue = parseFloat(value) || 1.0;
+    window.gtag?.("event", "conversion", {
+      send_to: "AW-16655771808/jbsRCMOT8cwcEKDRi4Y-",
+      value: numericValue,
+      currency: "BRL",
+      transaction_id: orderId,
+    });
+  }, [orderId, value]);
+
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center space-y-6">
