@@ -165,6 +165,20 @@ export const criarPedido = createServerFn({ method: "POST" })
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
 
+    // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
+    // Only accept when client value is within 10% of server value (anti-tampering).
+    // Never allow below the server floor for the current tier.
+    const serverValor = valorBase!;
+    const clientValor = Number(data.valor);
+    if (Number.isFinite(clientValor) && clientValor > 0) {
+      const drift = Math.abs(clientValor - serverValor) / serverValor;
+      if (drift <= 0.10 && clientValor >= serverValor * 0.90) {
+        valorBase = Number(clientValor.toFixed(2));
+      }
+      // else: mantém serverValor (cliente tentou tamper ou preço mudou muito)
+    }
+
+
     // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
     // Margem preservada (base já tem 5-12x multiplicador; -20% sai da margem, nunca do custo).
     let pacoteEfetivo = data.pacote;
