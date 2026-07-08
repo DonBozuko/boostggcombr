@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Home } from "lucide-react";
+import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { trackCompletePayment } from "@/lib/tiktok-pixel";
+
 
 
 declare global {
@@ -75,7 +76,30 @@ function ObrigadoPage() {
             {value && <div className="text-zinc-400">Valor: <span className="text-white">R$ {value}</span></div>}
           </div>
         )}
-        <Button asChild className="w-full">
+        <div className="rounded-xl border-2 border-yellow-400/40 bg-gradient-to-br from-yellow-500/10 to-orange-500/5 p-5 text-left space-y-4">
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-yellow-400" />
+            <h2 className="font-bold text-yellow-400 uppercase text-sm tracking-wide">Turbine seu resultado</h2>
+          </div>
+          <p className="text-xs text-zinc-400">
+            Perfil com seguidores + curtidas + views converte <span className="text-white font-semibold">até 4x mais</span>. Complete o combo agora:
+          </p>
+          <div className="grid gap-2">
+            <Link to="/" className="flex items-center justify-between rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700 px-3 py-2.5 transition">
+              <span className="flex items-center gap-2 text-sm"><Heart className="w-4 h-4 text-pink-400" /> Adicionar Curtidas</span>
+              <span className="text-xs text-yellow-400 font-bold">TURBINAR →</span>
+            </Link>
+            <Link to="/" className="flex items-center justify-between rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700 px-3 py-2.5 transition">
+              <span className="flex items-center gap-2 text-sm"><Eye className="w-4 h-4 text-blue-400" /> Adicionar Visualizações</span>
+              <span className="text-xs text-yellow-400 font-bold">TURBINAR →</span>
+            </Link>
+            <Link to="/" className="flex items-center justify-between rounded-lg bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700 px-3 py-2.5 transition">
+              <span className="flex items-center gap-2 text-sm"><TrendingUp className="w-4 h-4 text-emerald-400" /> Mais Seguidores</span>
+              <span className="text-xs text-yellow-400 font-bold">TURBINAR →</span>
+            </Link>
+          </div>
+        </div>
+        <Button asChild variant="outline" className="w-full">
           <Link to="/"><Home className="w-4 h-4 mr-2" />Voltar ao início</Link>
         </Button>
       </div>
