@@ -103,8 +103,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-TKGLV8VB6W');`,
+gtag('config', 'G-TKGLV8VB6W');
+gtag('config', 'AW-16655771808');`,
       },
+
       {
 
         children: `!function (w, d, t) {

@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, Home } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 
 export const Route = createFileRoute("/obrigado")({
   head: () => {
@@ -24,6 +32,20 @@ function ObrigadoPage() {
   const orderId = params?.get("order") ?? "";
   const value = params?.get("value") ?? "";
   const tier = params?.get("tier") ?? "";
+
+  const fired = useRef(false);
+  useEffect(() => {
+    if (fired.current) return;
+    fired.current = true;
+    const numericValue = parseFloat(value) || 1.0;
+    window.gtag?.("event", "conversion", {
+      send_to: "AW-16655771808/jbsRCMOT8cwcEKDRi4Y-",
+      value: numericValue,
+      currency: "BRL",
+      transaction_id: orderId,
+    });
+  }, [orderId, value]);
+
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white flex items-center justify-center px-4">
