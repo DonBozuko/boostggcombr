@@ -504,6 +504,15 @@ function FacebookLanding() {
           )}
         </DialogContent>
       </Dialog>
+      <OrderBumpDialog
+        open={bumpOpen}
+        current={pendingOrder?.plan ?? null}
+        allPlans={currentPlans}
+        unitLabel={categoria === "seguidores" ? "Seguidores" : "Curtidas"}
+        onAccept={handleBumpAccept}
+        onDecline={handleBumpDecline}
+        loading={loading}
+      />
       </ShowcaseShell>
       </PlansShowcaseProvider>
           <FaqSection network="facebook" />
