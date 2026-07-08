@@ -481,11 +481,16 @@ function Landing() {
         if (res.status === "paid" || res.status === "Enviado") {
           const m = String((res as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
           if (m) setMysteryBonus(Number(m[1]));
+          const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : undefined;
+          trackEvent("purchase", { value: valorNum, currency: "BRL", order_id: id, tier: pedidoInfo?.tier });
           stop(); setPaid(true); playSuccessAudio(); return;
         }
         if (res.status === "waiting_provision") {
+          const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : undefined;
+          trackEvent("purchase", { value: valorNum, currency: "BRL", order_id: id, tier: pedidoInfo?.tier });
           stop(); setWaitingProvision(true); setPaid(true); playSuccessAudio(); return;
         }
+
         if (res.status === "mp_rejected_insufficient") {
           stop();
           setRejectionMsg("❌ Pagamento recusado pela sua instituição financeira por saldo insuficiente. Tente outro método ou banco.");
