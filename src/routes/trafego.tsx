@@ -128,6 +128,21 @@ function TrafegoLanding() {
     return () => { stop(); clearTimeout(hardStop); };
   }, [modalOpen, pedidoInfo?.pedidoId, paid, rejected, getStatusFn]);
 
+  // Redirect para /obrigado quando pagamento confirmado (dispara pixel de conversão)
+  useEffect(() => {
+    if (!paid || !pedidoInfo?.pedidoId) return;
+    const t = setTimeout(() => {
+      const valorNum = pedidoInfo?.price ? Number(String(pedidoInfo.price).replace(/[^\d,]/g, "").replace(",", ".")) : "";
+      const q = new URLSearchParams({
+        order: String(pedidoInfo.pedidoId),
+        value: String(valorNum ?? ""),
+        tier: String((pedidoInfo as { tier?: string })?.tier ?? "trafego"),
+      }).toString();
+      window.location.assign(`/obrigado?${q}`);
+    }, 2500);
+    return () => clearTimeout(t);
+  }, [paid, pedidoInfo?.pedidoId, pedidoInfo?.price]);
+
   const dyn = useDynamicPlans({
     brasil:  { category: "trafego:br",     fallback: brPlans, unitLabel: "Visitas" },
     mundial: { category: "trafego:global", fallback: glPlans, unitLabel: "Visitas" },
