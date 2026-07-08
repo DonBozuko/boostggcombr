@@ -28,15 +28,6 @@ function useCountdown(seconds: number): string {
   return `${m}:${s}`;
 }
 
-// Determinístico por id para hidratar SSR/CSR igual
-function seededInt(seed: string, min: number, max: number): number {
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) {
-    h = Math.imul(h ^ seed.charCodeAt(i), 16777619);
-  }
-  const v = Math.abs(h) % (max - min + 1);
-  return min + v;
-}
 
 function parseBRL(p: string): number {
   const n = parseFloat(
@@ -57,25 +48,6 @@ function tonePalette(id: string, fire?: boolean): { border: string; glow: string
   return { border: "#38BDF8", glow: "#38BDF8aa", chip: "#38BDF8", label: "ECONÔMICO" };
 }
 
-function BuyerTicker({ seed }: { seed: string }) {
-  const base = seededInt(seed, 340, 490);
-  const [n, setN] = useState(base);
-  useEffect(() => {
-    const t = setInterval(() => {
-      setN((v) => {
-        const delta = Math.floor(Math.random() * 7) - 3;
-        const next = Math.max(340, Math.min(490, v + delta));
-        return next;
-      });
-    }, 3500 + (base % 1500));
-    return () => clearInterval(t);
-  }, [base]);
-  return (
-    <span className="text-[8px] md:text-[9px] font-semibold text-emerald-300/90 leading-none">
-      🟢 {n} comprando agora
-    </span>
-  );
-}
 
 export function PremiumPricingGrid({
   cols = 3,
@@ -187,7 +159,7 @@ export function PremiumPricingGrid({
                 {p.price}
               </div>
 
-              <BuyerTicker seed={p.id} />
+              
 
               <button
                 type="button"

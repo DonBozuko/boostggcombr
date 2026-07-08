@@ -285,7 +285,6 @@ function TelegramLanding() {
         items={[
           { key: "canal",  label: "Membros Canal", emoji: "📣", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
           { key: "grupo",  label: "Membros Grupo", emoji: "👥", badge: "Em Alta",          badgeColor: "#fe0979" },
-          { key: "_views", label: "Views Posts",   emoji: "🎬", badge: "Recomendado",      badgeColor: AERO },
         ]}
       />
       <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">

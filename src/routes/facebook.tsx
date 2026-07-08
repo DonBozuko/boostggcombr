@@ -300,7 +300,6 @@ function FacebookLanding() {
         items={[
           { key: "seguidores", label: "Seguidores", emoji: "🔵", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
           { key: "curtidas",   label: "Curtidas",   emoji: "👍", badge: "Em Alta",          badgeColor: "#fe0979" },
-          { key: "_views",     label: "Em Breve",   emoji: "🎬", badge: "Recomendado",      badgeColor: BLUE },
         ]}
       />
       <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
