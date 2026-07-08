@@ -22,6 +22,10 @@ export type BumpUpgrade = {
   extraUnits: number;
 };
 
+// v184 — Guarda anti-inversão: grid de preços não escala linearmente.
+// Se próximo tier * 0.80 for menor que preço atual * 1.15, o bump gera
+// PREJUÍZO vs baseline (cliente paga menos por mais). Nesse caso, não oferece.
+const BUMP_MIN_UPLIFT = 1.15; // bump precisa cobrar ≥ 15% a mais que original
 export function findUpgrade(current: BumpPlan, allPlans: BumpPlan[]): BumpUpgrade | null {
   const prefix = current.id.match(/^[a-z]+/)?.[0] ?? "";
   const next = allPlans
@@ -29,6 +33,8 @@ export function findUpgrade(current: BumpPlan, allPlans: BumpPlan[]): BumpUpgrad
     .sort((a, b) => a.quantidade - b.quantidade)[0];
   if (!next) return null;
   const discountedValor = Number((next.valor * 0.80).toFixed(2));
+  // Guarda: só oferece se bump gera uplift real de receita
+  if (discountedValor < current.valor * BUMP_MIN_UPLIFT) return null;
   const perUnitCurrent = current.valor / current.quantidade;
   const perUnitBump = discountedValor / next.quantidade;
   const economyPct = Math.max(0, Math.round((1 - perUnitBump / perUnitCurrent) * 100));
