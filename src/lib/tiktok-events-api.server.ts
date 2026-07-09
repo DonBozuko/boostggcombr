@@ -64,10 +64,13 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<Se
     const json = (await res.json().catch(() => ({}))) as { code?: number; message?: string };
     if (!res.ok || (json.code !== undefined && json.code !== 0)) {
       console.error("[tiktok-eapi] falhou", res.status, json);
-    } else {
-      console.log("[tiktok-eapi] ok", input.event, input.orderId);
+      return { ok: false, reason: json.message ?? `http ${res.status}`, response: json, status: res.status };
     }
+    console.log("[tiktok-eapi] ok", input.event, input.orderId);
+    return { ok: true, response: json };
   } catch (err) {
     console.error("[tiktok-eapi] exception", err);
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) };
   }
 }
+
