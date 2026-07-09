@@ -49,8 +49,8 @@ export const Route = createFileRoute("/telegram")({
     const title = "Comprar Membros Telegram Grupo e Canal | EliteBoost";
     const description =
       "Compre membros reais para grupo e canal do Telegram com entrega imediata via Pix. Alta retenção e reposição garantida.";
-    const url = "https://eliteboostprime.lovable.app/telegram";
-    const ogImage = `https://eliteboostprime.lovable.app${ogTelegram}?v=48`;
+    const url = "https://boostgg.com.br/telegram";
+    const ogImage = `https://boostgg.com.br${ogTelegram}?v=48`;
     return {
       meta: [
         { title }, { name: "description", content: description },

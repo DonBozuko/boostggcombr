@@ -46,8 +46,8 @@ export const Route = createFileRoute("/tiktok")({
     const title = "Comprar Seguidores TikTok Barato | EliteBoost Prime";
     const description =
       "Compre seguidores, curtidas e views de TikTok reais com entrega imediata via Pix. Alta retenção, orgânico e reposição garantida.";
-    const url = "https://eliteboostprime.lovable.app/tiktok";
-    const ogImage = `https://eliteboostprime.lovable.app${ogTiktok}?v=48`;
+    const url = "https://boostgg.com.br/tiktok";
+    const ogImage = `https://boostgg.com.br${ogTiktok}?v=48`;
     return {
       meta: [
         { title },

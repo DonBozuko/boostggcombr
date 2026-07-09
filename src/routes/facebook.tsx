@@ -46,8 +46,8 @@ export const Route = createFileRoute("/facebook")({
     const title = "Comprar Curtidas e Seguidores Facebook | EliteBoost";
     const description =
       "Compre curtidas, seguidores e views de Facebook reais com entrega via Pix. Engajamento orgânico, alta retenção e reposição garantida.";
-    const url = "https://eliteboostprime.lovable.app/facebook";
-    const ogImage = `https://eliteboostprime.lovable.app${ogFacebook}?v=48`;
+    const url = "https://boostgg.com.br/facebook";
+    const ogImage = `https://boostgg.com.br${ogFacebook}?v=48`;
     return {
       meta: [
         { title },

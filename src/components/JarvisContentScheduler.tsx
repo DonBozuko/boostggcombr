@@ -140,11 +140,11 @@ export function JarvisContentScheduler() {
   }, []);
 
   const ROUTE_BY_NET: Record<Network, { url: string; pitch: string }> = {
-    instagram: { url: "eliteboostprime.lovable.app",          pitch: "seguidores reais no Instagram" },
-    tiktok:    { url: "eliteboostprime.lovable.app/tiktok",   pitch: "views virais no TikTok" },
-    facebook:  { url: "eliteboostprime.lovable.app/facebook", pitch: "curtidas blindadas no Facebook" },
-    youtube:   { url: "eliteboostprime.lovable.app/youtube",  pitch: "inscritos premium no YouTube" },
-    telegram:  { url: "eliteboostprime.lovable.app/telegram", pitch: "membros ativos no Telegram" },
+    instagram: { url: "boostgg.com.br",          pitch: "seguidores reais no Instagram" },
+    tiktok:    { url: "boostgg.com.br/tiktok",   pitch: "views virais no TikTok" },
+    facebook:  { url: "boostgg.com.br/facebook", pitch: "curtidas blindadas no Facebook" },
+    youtube:   { url: "boostgg.com.br/youtube",  pitch: "inscritos premium no YouTube" },
+    telegram:  { url: "boostgg.com.br/telegram", pitch: "membros ativos no Telegram" },
   };
 
   const HASHTAGS: Record<Network, string> = {
@@ -451,11 +451,11 @@ type UtmProps = { networks: Network[]; format: Format };
 
 function UtmLinkGenerator({ networks, format }: UtmProps) {
   const BASE_BY_NET: Record<Network, string> = {
-    instagram: "https://eliteboostprime.lovable.app",
-    tiktok: "https://eliteboostprime.lovable.app/tiktok",
-    facebook: "https://eliteboostprime.lovable.app/facebook",
-    youtube: "https://eliteboostprime.lovable.app/youtube",
-    telegram: "https://eliteboostprime.lovable.app/telegram",
+    instagram: "https://boostgg.com.br",
+    tiktok: "https://boostgg.com.br/tiktok",
+    facebook: "https://boostgg.com.br/facebook",
+    youtube: "https://boostgg.com.br/youtube",
+    telegram: "https://boostgg.com.br/telegram",
   };
   const [selected, setSelected] = useState<Network>(networks[0] ?? "instagram");
   const [copied, setCopied] = useState(false);

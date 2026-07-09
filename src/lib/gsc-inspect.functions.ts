@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-const SITE = "https://eliteboostprime.lovable.app/";
+const SITE = "https://boostgg.com.br/";
 const ROUTES = ["/", "/tiktok", "/youtube", "/facebook", "/telegram", "/trafego"];
 
 export type InspectRow = {
@@ -24,7 +24,7 @@ export type InspectResult = {
 };
 
 async function inspectOne(path: string): Promise<InspectRow> {
-  const url = `https://eliteboostprime.lovable.app${path}`;
+  const url = `https://boostgg.com.br${path}`;
   try {
     const res = await fetch(
       "https://connector-gateway.lovable.dev/google_search_console/v1/urlInspection/index:inspect",
