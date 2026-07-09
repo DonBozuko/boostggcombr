@@ -65,8 +65,7 @@ export const Route = createFileRoute("/api/public/hooks/waiting-watcher")({
             });
             await supabaseAdmin
               .from("pedidos")
-              // @ts-expect-error alerted_at recém-criado, types ainda não regenerados
-              .update({ alerted_at: new Date().toISOString() })
+              .update({ alerted_at: new Date().toISOString() } as never)
               .eq("id", p.id);
             results.push({ id: p.id, sent: true });
           } catch (e) {
