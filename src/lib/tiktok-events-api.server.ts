@@ -11,6 +11,7 @@ type ServerEventInput = {
   ip?: string;
   userAgent?: string;
   ttp?: string; // TikTok browser cookie _ttp se disponível
+  testEventCode?: string; // TEST_ code do Test Events tab
 };
 
 export async function sendTikTokServerEvent(input: ServerEventInput): Promise<void> {
@@ -22,9 +23,10 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<vo
   }
 
   const prefix = input.event === "CompletePayment" ? "cp_" : "ic_";
-  const body = {
+  const body: Record<string, unknown> = {
     event_source: "web",
     event_source_id: pixelCode,
+    ...(input.testEventCode ? { test_event_code: input.testEventCode } : {}),
     data: [
       {
         event: input.event,
