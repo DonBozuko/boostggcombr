@@ -234,6 +234,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           description: `EliteBoost Prime - ${rede.toUpperCase()} pacote ${clean(pacoteEfetivo)} (${quantidadeEfetiva} ${categoria}) para ${clean(data.instagram_user)}${bumpAplicado ? " [UPGRADE]" : ""}`,
           payment_method_id: "pix",
           payer: { email: data.email.trim().toLowerCase() },
+          notification_url: "https://boostgg.com.br/api/public/mp-webhook",
         }),
       });
       const mpJson: unknown = await mpRes.json().catch(() => ({}));
