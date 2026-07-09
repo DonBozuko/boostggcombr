@@ -143,6 +143,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             status_detail?: string;
             id?: string | number;
             transaction_amount?: number;
+            payer?: { id?: string | number; email?: string | null };
           };
           if (payment.status !== "approved") {
             console.warn("[mp-webhook] MP recusou", {
@@ -254,6 +255,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               orderId: String(pedido.id),
               value: Number(pedido.valor),
               contentName: String(pedido.pacote ?? ""),
+              email: payment.payer?.email ?? undefined,
+              externalId: String(payment.payer?.id ?? pedido.id),
             });
           } catch (e) { console.warn("[mp-webhook] tiktok eapi fail", e); }
 
