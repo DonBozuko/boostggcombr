@@ -54,9 +54,12 @@ function KitCreatorPage() {
   useEffect(() => {
     fetchGrid({ data: { category: "instagram:seguidores" } })
       .then((g) => {
-        const plans: BumpPlan[] = (g?.items ?? []).map((it: { id: string; quantidade: number; valor: number; price: string }) => ({
-          id: it.id, quantidade: it.quantidade, valor: it.valor, price: it.price, tier: it.id,
-        }));
+        // v185 — Aplica PRIME15 (-15%) no allPlans + priceBase pra o OrderBump
+        // exibir o valor REAL cobrado (server soma bump-20% + cupom-15%).
+        const plans: BumpPlan[] = (g?.items ?? []).map((it: { id: string; quantidade: number; valor: number; price: string }) => {
+          const v = +(it.valor * 0.85).toFixed(2);
+          return { id: it.id, quantidade: it.quantidade, valor: v, price: `R$ ${v.toFixed(2).replace(".", ",")}`, tier: it.id };
+        });
         setAllPlans(plans);
         const base = plans.find((p) => p.id === PACOTE_ID);
         if (base) setPriceBase(base.valor);
@@ -72,7 +75,9 @@ function KitCreatorPage() {
     };
   }, [priceBase]);
 
-  const precoFinal = priceBase != null ? +(priceBase * 0.85).toFixed(2) : null;
+  // priceBase já vem com PRIME15 aplicado; precoFinal = priceBase.
+  const precoFinal = priceBase;
+  const priceOriginal = priceBase != null ? +(priceBase / 0.85).toFixed(2) : null;
   const bumpAvailable = !!(currentPlan && allPlans.length > 0 && findUpgrade(currentPlan, allPlans));
 
   const doCreate = async (withBump: boolean) => {
