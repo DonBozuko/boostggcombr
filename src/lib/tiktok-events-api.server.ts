@@ -14,12 +14,16 @@ type ServerEventInput = {
   testEventCode?: string; // TEST_ code do Test Events tab
 };
 
-export async function sendTikTokServerEvent(input: ServerEventInput): Promise<void> {
+export type ServerEventResult =
+  | { ok: true; response: unknown }
+  | { ok: false; reason: string; response?: unknown; status?: number };
+
+export async function sendTikTokServerEvent(input: ServerEventInput): Promise<ServerEventResult> {
   const pixelCode = process.env.TIKTOK_PIXEL_ID;
   const token = process.env.TIKTOK_ACCESS_TOKEN;
   if (!pixelCode || !token) {
     console.warn("[tiktok-eapi] pixel/token ausente, pulando");
-    return;
+    return { ok: false, reason: `env ausente: pixel=${!!pixelCode} token=${!!token}` };
   }
 
   const prefix = input.event === "CompletePayment" ? "cp_" : "ic_";
@@ -60,10 +64,13 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<vo
     const json = (await res.json().catch(() => ({}))) as { code?: number; message?: string };
     if (!res.ok || (json.code !== undefined && json.code !== 0)) {
       console.error("[tiktok-eapi] falhou", res.status, json);
-    } else {
-      console.log("[tiktok-eapi] ok", input.event, input.orderId);
+      return { ok: false, reason: json.message ?? `http ${res.status}`, response: json, status: res.status };
     }
+    console.log("[tiktok-eapi] ok", input.event, input.orderId);
+    return { ok: true, response: json };
   } catch (err) {
     console.error("[tiktok-eapi] exception", err);
+    return { ok: false, reason: err instanceof Error ? err.message : String(err) };
   }
 }
+

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/public/test-tiktok-event")({
         const testCode = url.searchParams.get("code") ?? undefined;
         const orderId = `test_${Date.now()}`;
 
-        await sendTikTokServerEvent({
+        const result = await sendTikTokServerEvent({
           event: "CompletePayment",
           orderId,
           value: 9.9,
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/public/test-tiktok-event")({
           testEventCode: testCode,
         });
 
-        return Response.json({ ok: true, orderId, testCode });
+        return Response.json({ orderId, testCode, result });
       },
     },
   },
