@@ -44,6 +44,7 @@ function Promo5Page() {
   const [email, setEmail] = useState("");
   const [whats, setWhats] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pix, setPix] = useState<{ code: string; base64: string; valor: string } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,7 +54,6 @@ function Promo5Page() {
     }
     setLoading(true);
     try {
-      trackInitiateCheckout({ value: PRECO_FINAL, currency: "BRL" });
       const utm = getUtmParams();
       const r = await criar({
         data: {
@@ -72,11 +72,21 @@ function Promo5Page() {
           utm_term: utm.utm_term,
         },
       });
-      if (r?.pix_url || r?.init_point) {
-        window.location.href = (r.pix_url || r.init_point) as string;
-      } else {
+      if (!r?.ok) {
         toast.error("Falha ao gerar Pix. Tenta de novo.");
+        return;
       }
+      trackInitiateCheckout({
+        orderId: r.pedidoId ?? "",
+        value: PRECO_FINAL,
+        contentId: PACOTE_ID,
+        contentName: "100 seguidores instagram",
+      });
+      setPix({
+        code: r.qrCode ?? "",
+        base64: r.qrCodeBase64 ?? "",
+        valor: r.valorFormatado ?? `R$ ${PRECO_FINAL.toFixed(2).replace(".", ",")}`,
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao processar");
     } finally {
