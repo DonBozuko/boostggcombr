@@ -758,6 +758,9 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         }))}
         onBuy={(id) => {
           setForm((f) => ({ ...f, plan: id }));
+          const plans = categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans;
+          const chosen = plans.find((p) => p.id === id);
+          if (chosen) trackAddToCart({ planId: id, value: chosen.valor, contentName: `${chosen.quantidade} ${categoria}` });
           document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth" });
         }}
       />
