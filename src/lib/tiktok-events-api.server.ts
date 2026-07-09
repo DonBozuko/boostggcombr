@@ -45,6 +45,9 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<Se
           ...(input.ip ? { ip: input.ip } : {}),
           ...(input.userAgent ? { user_agent: input.userAgent } : {}),
           ...(input.ttp ? { ttp: input.ttp } : {}),
+          ...(input.email ? { email: sha256(input.email) } : {}),
+          ...(input.phone ? { phone: sha256(input.phone) } : {}),
+          ...(input.externalId ? { external_id: sha256(input.externalId) } : {}),
         },
         properties: {
           currency: "BRL",
