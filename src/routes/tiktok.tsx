@@ -237,9 +237,10 @@ function TiktokLanding() {
       });
       setPaid(false);
 
+      const finalPlan = res.pacoteFinal ? dynAllPlans.find((p) => p.id === res.pacoteFinal) : undefined;
       setPedidoInfo({
         price: res.valorFormatado ?? selected.price,
-        tier: selected.tier,
+        tier: finalPlan?.tier ?? selected.tier,
         profile: profileValue,
         pixCode: res.qrCode,
         qrCodeBase64: res.qrCodeBase64,
