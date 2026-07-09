@@ -11,6 +11,7 @@ type ServerEventInput = {
   ip?: string;
   userAgent?: string;
   ttp?: string; // TikTok browser cookie _ttp se disponível
+  testEventCode?: string; // TEST_ code do Test Events tab
 };
 
 export async function sendTikTokServerEvent(input: ServerEventInput): Promise<void> {
