@@ -375,6 +375,7 @@ export type Database = {
       pedidos: {
         Row: {
           abandono_notificado_at: string | null
+          alerted_at: string | null
           created_at: string
           cupom: string | null
           custo_real: number | null
@@ -396,6 +397,7 @@ export type Database = {
         }
         Insert: {
           abandono_notificado_at?: string | null
+          alerted_at?: string | null
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
@@ -417,6 +419,7 @@ export type Database = {
         }
         Update: {
           abandono_notificado_at?: string | null
+          alerted_at?: string | null
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
