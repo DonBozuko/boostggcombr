@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Instagram, Zap, ShieldCheck, Check, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { criarPedido } from "@/lib/pedidos.functions";
+import { getPricingGrid } from "@/lib/pricing.functions";
 import { getUtmParams } from "@/lib/utm";
 import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
+import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/promo-5reais")({
   head: () => ({
