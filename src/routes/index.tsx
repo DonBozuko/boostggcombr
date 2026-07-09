@@ -1156,7 +1156,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">ELITEBOOST PRIME</span>
+            <span className="font-display font-semibold text-foreground">ELITE BOOST PRIME</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <a href="/privacidade" className="hover:text-foreground">Privacidade</a>
