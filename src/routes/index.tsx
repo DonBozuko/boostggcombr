@@ -59,7 +59,7 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
-import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
+import { trackInitiateCheckout, trackViewContent, trackAddToCart } from "@/lib/tiktok-pixel";
 
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 import { simulatePurchase } from "@/lib/simulate-purchase.functions";
@@ -411,6 +411,7 @@ function Landing() {
   const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
     seguidores: [], curtidas: [], visualizacoes: [],
   });
+useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   useEffect(() => {
     let cancelled = false;
     try { window.localStorage.removeItem("ebp_pricing_overrides_v1"); } catch {}
@@ -757,6 +758,9 @@ function Landing() {
         }))}
         onBuy={(id) => {
           setForm((f) => ({ ...f, plan: id }));
+          const plans = categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans;
+          const chosen = plans.find((p) => p.id === id);
+          if (chosen) trackAddToCart({ planId: id, value: chosen.valor, contentName: `${chosen.quantidade} ${categoria}` });
           document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth" });
         }}
       />
