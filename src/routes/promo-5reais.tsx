@@ -42,18 +42,34 @@ const PRECO_FINAL = +(PRECO_BASE * 0.85).toFixed(2); // R$ 4,25
 
 function Promo5Page() {
   const criar = useServerFn(criarPedido);
+  const fetchGrid = useServerFn(getPricingGrid);
   const [instagram, setInstagram] = useState("");
   const [email, setEmail] = useState("");
   const [whats, setWhats] = useState("");
   const [loading, setLoading] = useState(false);
   const [pix, setPix] = useState<{ code: string; base64: string; valor: string } | null>(null);
+  const [allPlans, setAllPlans] = useState<BumpPlan[]>([]);
+  const [bumpOpen, setBumpOpen] = useState(false);
+  const [pendingForm, setPendingForm] = useState<null | (() => Promise<void>)>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!instagram || !email || !whats) {
-      toast.error("Preenche todos os campos");
-      return;
-    }
+  useEffect(() => {
+    fetchGrid({ data: { category: "instagram:seguidores" } })
+      .then((g) => {
+        const plans: BumpPlan[] = (g?.items ?? []).map((it: { id: string; quantidade: number; valor: number; price: string }) => ({
+          id: it.id, quantidade: it.quantidade, valor: it.valor, price: it.price, tier: it.id,
+        }));
+        setAllPlans(plans);
+      })
+      .catch(() => { /* fallback: sem bump, fluxo normal */ });
+  }, [fetchGrid]);
+
+  const currentPlan: BumpPlan = {
+    id: PACOTE_ID, quantidade: 100, valor: PRECO_BASE,
+    price: `R$ ${PRECO_BASE.toFixed(2).replace(".", ",")}`, tier: PACOTE_ID,
+  };
+  const bumpAvailable = allPlans.length > 0 && !!findUpgrade(currentPlan, allPlans);
+
+  const doCreate = async (withBump: boolean) => {
     setLoading(true);
     try {
       const utm = getUtmParams();
@@ -67,6 +83,7 @@ function Promo5Page() {
           whatsapp_contato: whats.trim(),
           rede_social: "instagram",
           cupom: CUPOM,
+          bump_upgrade: withBump,
           utm_source: utm.utm_source ?? "promo5",
           utm_medium: utm.utm_medium ?? "landing",
           utm_campaign: utm.utm_campaign ?? "promo-5reais",
@@ -80,9 +97,9 @@ function Promo5Page() {
       }
       trackInitiateCheckout({
         orderId: r.pedidoId ?? "",
-        value: PRECO_FINAL,
+        value: Number(r.valorCobrar ?? PRECO_FINAL),
         contentId: PACOTE_ID,
-        contentName: "100 seguidores instagram",
+        contentName: withBump ? "bump upgrade instagram" : "100 seguidores instagram",
       });
       setPix({
         code: r.qrCode ?? "",
@@ -93,8 +110,25 @@ function Promo5Page() {
       toast.error(err instanceof Error ? err.message : "Erro ao processar");
     } finally {
       setLoading(false);
+      setBumpOpen(false);
+      setPendingForm(null);
     }
   };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!instagram || !email || !whats) {
+      toast.error("Preenche todos os campos");
+      return;
+    }
+    if (bumpAvailable) {
+      setPendingForm(() => () => doCreate(true));
+      setBumpOpen(true);
+      return;
+    }
+    await doCreate(false);
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1a0033] via-[#0d0018] to-black text-white overflow-x-hidden">
