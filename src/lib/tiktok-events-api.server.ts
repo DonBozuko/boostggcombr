@@ -23,9 +23,10 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<vo
   }
 
   const prefix = input.event === "CompletePayment" ? "cp_" : "ic_";
-  const body = {
+  const body: Record<string, unknown> = {
     event_source: "web",
     event_source_id: pixelCode,
+    ...(input.testEventCode ? { test_event_code: input.testEventCode } : {}),
     data: [
       {
         event: input.event,
