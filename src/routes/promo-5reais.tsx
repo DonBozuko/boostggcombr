@@ -97,7 +97,7 @@ function Promo5Page() {
       }
       trackInitiateCheckout({
         orderId: r.pedidoId ?? "",
-        value: Number(r.valorCobrar ?? PRECO_FINAL),
+        value: Number(r.valorCobrado ?? PRECO_FINAL),
         contentId: PACOTE_ID,
         contentName: withBump ? "bump upgrade instagram" : "100 seguidores instagram",
       });
