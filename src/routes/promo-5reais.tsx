@@ -241,6 +241,42 @@ function Promo5Page() {
           +3.500 clientes já testaram · avaliação 4.9/5
         </div>
       </main>
+
+      {pix && (
+        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur flex items-center justify-center p-5">
+          <div className="max-w-sm w-full rounded-2xl border border-fuchsia-400/40 bg-gradient-to-b from-[#1a0033] to-black p-6 text-center">
+            <div className="text-fuchsia-300 text-xs uppercase tracking-widest font-bold">
+              Pix gerado
+            </div>
+            <div className="mt-1 text-3xl font-black text-white">{pix.valor}</div>
+            {pix.base64 && (
+              <img
+                src={`data:image/png;base64,${pix.base64}`}
+                alt="QR Code Pix"
+                className="mt-4 mx-auto w-56 h-56 rounded-lg bg-white p-2"
+              />
+            )}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(pix.code);
+                toast.success("Código Pix copiado!");
+              }}
+              className="mt-4 w-full h-12 rounded-lg bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black text-sm"
+            >
+              COPIAR CÓDIGO PIX
+            </button>
+            <p className="mt-3 text-[11px] text-white/50">
+              Após o pagamento, envio automático em minutos.
+            </p>
+            <button
+              onClick={() => setPix(null)}
+              className="mt-2 text-xs text-white/40 underline"
+            >
+              fechar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
