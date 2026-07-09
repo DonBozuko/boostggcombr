@@ -16,8 +16,10 @@ export const Route = createFileRoute("/api/public/test-tiktok-event")({
           orderId,
           value: 9.9,
           contentName: "Teste eAPI",
-          userAgent: request.headers.get("user-agent") ?? undefined,
-          ip: request.headers.get("cf-connecting-ip") ?? undefined,
+          userAgent: request.headers.get("user-agent") ?? "Mozilla/5.0",
+          ip: request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "127.0.0.1",
+          email: "teste@boostgg.com.br",
+          externalId: orderId,
           testEventCode: testCode,
         });
 

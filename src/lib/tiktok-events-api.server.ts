@@ -1,7 +1,9 @@
 // TikTok Events API (server-side) — dobra sinal com o pixel client.
 // event_id igual ao do pixel (`cp_${orderId}` / `ic_${orderId}`) garante dedup.
+import { createHash } from "crypto";
 
 const ENDPOINT = "https://business-api.tiktok.com/open_api/v1.3/event/track/";
+const sha256 = (v: string) => createHash("sha256").update(v.trim().toLowerCase()).digest("hex");
 
 type ServerEventInput = {
   event: "CompletePayment" | "InitiateCheckout";
@@ -11,6 +13,9 @@ type ServerEventInput = {
   ip?: string;
   userAgent?: string;
   ttp?: string; // TikTok browser cookie _ttp se disponível
+  email?: string; // será hasheado
+  phone?: string; // será hasheado (E.164)
+  externalId?: string; // será hasheado (user id)
   testEventCode?: string; // TEST_ code do Test Events tab
 };
 
@@ -40,6 +45,9 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<Se
           ...(input.ip ? { ip: input.ip } : {}),
           ...(input.userAgent ? { user_agent: input.userAgent } : {}),
           ...(input.ttp ? { ttp: input.ttp } : {}),
+          ...(input.email ? { email: sha256(input.email) } : {}),
+          ...(input.phone ? { phone: sha256(input.phone) } : {}),
+          ...(input.externalId ? { external_id: sha256(input.externalId) } : {}),
         },
         properties: {
           currency: "BRL",
