@@ -84,7 +84,7 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
       gtag?: (...a: unknown[]) => void;
       dataLayer?: unknown[];
       fbq?: (...a: unknown[]) => void;
-      ttq?: { track: (n: string, p?: unknown) => void; page?: () => void };
+      ttq?: { track: (n: string, p?: unknown, opts?: { event_id?: string }) => void; page?: () => void };
     };
     w.gtag?.("event", name, payload);
     w.dataLayer?.push({ event: name, ...payload });
@@ -98,7 +98,11 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
     const value = typeof payload.value === "number" ? payload.value
       : typeof payload.plan_value === "number" ? payload.plan_value
       : undefined;
-    w.ttq?.track(ttqEvent, value !== undefined ? { value, currency: "BRL", ...payload } : payload);
+    const ttqOptions =
+      name === "purchase" && (typeof payload.order_id === "string" || typeof payload.order_id === "number")
+        ? { event_id: `cp_${payload.order_id}` }
+        : undefined;
+    w.ttq?.track(ttqEvent, value !== undefined ? { value, currency: "BRL", ...payload } : payload, ttqOptions);
     if (import.meta.env.DEV) console.debug("[track]", name, payload);
   } catch (err) {
     console.error("[trackEvent]", err);
