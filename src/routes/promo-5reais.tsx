@@ -313,6 +313,16 @@ function Promo5Page() {
           </div>
         </div>
       )}
+
+      <OrderBumpDialog
+        open={bumpOpen}
+        current={currentPlan}
+        allPlans={allPlans}
+        unitLabel="seguidores"
+        loading={loading}
+        onAccept={() => { if (pendingForm) pendingForm(); }}
+        onDecline={() => { setBumpOpen(false); setPendingForm(null); doCreate(false); }}
+      />
     </div>
   );
 }
