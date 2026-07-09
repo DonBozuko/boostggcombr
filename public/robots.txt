@@ -9,4 +9,4 @@ Disallow: /status
 Disallow: /dashboard
 Disallow: /~flock.js
 
-Sitemap: https://eliteboostprime.lovable.app/sitemap.xml
+Sitemap: https://boostgg.com.br/sitemap.xml
