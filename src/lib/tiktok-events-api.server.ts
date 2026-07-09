@@ -52,8 +52,13 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<Se
         properties: {
           currency: "BRL",
           value: Number(input.value.toFixed(2)),
-          content_type: "product",
-          content_id: input.orderId,
+          contents: [
+            {
+              content_id: input.orderId,
+              content_type: "product",
+              ...(input.contentName ? { content_name: input.contentName } : {}),
+            },
+          ],
           ...(input.contentName ? { content_name: input.contentName } : {}),
         },
       },
