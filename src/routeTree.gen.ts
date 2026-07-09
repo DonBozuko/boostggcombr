@@ -23,6 +23,7 @@ import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as KitCreatorRouteImport } from './routes/kit-creator'
 import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -128,6 +129,11 @@ const McpRoute = McpRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KitCreatorRoute = KitCreatorRouteImport.update({
+  id: '/kit-creator',
+  path: '/kit-creator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FacebookRoute = FacebookRouteImport.update({
@@ -331,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
+  '/kit-creator': typeof KitCreatorRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
@@ -383,6 +390,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteWithChildren
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
+  '/kit-creator': typeof KitCreatorRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
@@ -436,6 +444,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
+  '/kit-creator': typeof KitCreatorRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
@@ -490,6 +499,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/diagnostico'
     | '/facebook'
+    | '/kit-creator'
     | '/login'
     | '/mcp'
     | '/obrigado'
@@ -542,6 +552,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/diagnostico'
     | '/facebook'
+    | '/kit-creator'
     | '/login'
     | '/mcp'
     | '/obrigado'
@@ -594,6 +605,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/diagnostico'
     | '/facebook'
+    | '/kit-creator'
     | '/login'
     | '/mcp'
     | '/obrigado'
@@ -647,6 +659,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   DiagnosticoRoute: typeof DiagnosticoRoute
   FacebookRoute: typeof FacebookRoute
+  KitCreatorRoute: typeof KitCreatorRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
@@ -792,6 +805,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kit-creator': {
+      id: '/kit-creator'
+      path: '/kit-creator'
+      fullPath: '/kit-creator'
+      preLoaderRoute: typeof KitCreatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/facebook': {
@@ -1064,6 +1084,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   DiagnosticoRoute: DiagnosticoRoute,
   FacebookRoute: FacebookRoute,
+  KitCreatorRoute: KitCreatorRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,

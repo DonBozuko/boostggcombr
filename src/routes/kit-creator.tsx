@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { Instagram, Zap, ShieldCheck, Check, Send } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Instagram, Zap, ShieldCheck, Check, Send, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,34 +13,32 @@ import { getUtmParams } from "@/lib/utm";
 import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
 import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderBumpDialog";
 
-export const Route = createFileRoute("/promo-5reais")({
+export const Route = createFileRoute("/kit-creator")({
   head: () => ({
     meta: [
-      { title: "100 Seguidores no Instagram por R$5 — EliteBoost Prime" },
+      { title: "Kit Creator — 1.000 Seguidores Instagram | BoostGG" },
       {
         name: "description",
         content:
-          "Promoção relâmpago: 100 seguidores reais no Instagram por R$5 via Pix. Cupom PRIME15 dá mais 15% off. Entrega em minutos.",
+          "Pacote Creator: 1.000 seguidores reais no Instagram via Pix. Entrega em minutos, reposição 30 dias, sem senha. Cupom PRIME15 aplicado.",
       },
       { name: "robots", content: "index,follow" },
-      { property: "og:title", content: "100 Seguidores por R$5 — Pix instantâneo" },
-      {
-        property: "og:description",
-        content: "Teste real. R$5 no Pix, 100 seguidores em minutos. Cupom PRIME15.",
-      },
+      { property: "og:title", content: "Kit Creator — 1.000 Seguidores Instagram" },
+      { property: "og:description", content: "Cresce de verdade com 1k seguidores no Pix. Reposição garantida." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Promo5Page,
+  component: KitCreatorPage,
 });
 
-const PACOTE_ID = "p100";
-const PRECO_BASE = 5.0;
+// v1 — Kit Creator landing: ticket alto (p1k IG), OrderBump ativo,
+// preço dinâmico do grid. URL alvo pra ads TikTok (ticket ≥ R$30 = CPA viável).
+const PACOTE_ID = "p1k";
+const QTD = 1000;
 const CUPOM = "PRIME15";
-const PRECO_FINAL = +(PRECO_BASE * 0.85).toFixed(2); // R$ 4,25
 
-function Promo5Page() {
+function KitCreatorPage() {
   const criar = useServerFn(criarPedido);
   const fetchGrid = useServerFn(getPricingGrid);
   const [instagram, setInstagram] = useState("");
@@ -49,6 +47,7 @@ function Promo5Page() {
   const [loading, setLoading] = useState(false);
   const [pix, setPix] = useState<{ code: string; base64: string; valor: string } | null>(null);
   const [allPlans, setAllPlans] = useState<BumpPlan[]>([]);
+  const [priceBase, setPriceBase] = useState<number | null>(null);
   const [bumpOpen, setBumpOpen] = useState(false);
   const [pendingForm, setPendingForm] = useState<null | (() => Promise<void>)>(null);
 
@@ -59,17 +58,25 @@ function Promo5Page() {
           id: it.id, quantidade: it.quantidade, valor: it.valor, price: it.price, tier: it.id,
         }));
         setAllPlans(plans);
+        const base = plans.find((p) => p.id === PACOTE_ID);
+        if (base) setPriceBase(base.valor);
       })
-      .catch(() => { /* fallback: sem bump, fluxo normal */ });
+      .catch(() => { /* fallback: sem grid, mostra loading */ });
   }, [fetchGrid]);
 
-  const currentPlan: BumpPlan = {
-    id: PACOTE_ID, quantidade: 100, valor: PRECO_BASE,
-    price: `R$ ${PRECO_BASE.toFixed(2).replace(".", ",")}`, tier: PACOTE_ID,
-  };
-  const bumpAvailable = allPlans.length > 0 && !!findUpgrade(currentPlan, allPlans);
+  const currentPlan = useMemo<BumpPlan | null>(() => {
+    if (priceBase == null) return null;
+    return {
+      id: PACOTE_ID, quantidade: QTD, valor: priceBase,
+      price: `R$ ${priceBase.toFixed(2).replace(".", ",")}`, tier: PACOTE_ID,
+    };
+  }, [priceBase]);
+
+  const precoFinal = priceBase != null ? +(priceBase * 0.85).toFixed(2) : null;
+  const bumpAvailable = !!(currentPlan && allPlans.length > 0 && findUpgrade(currentPlan, allPlans));
 
   const doCreate = async (withBump: boolean) => {
+    if (priceBase == null) return;
     setLoading(true);
     try {
       const utm = getUtmParams();
@@ -77,16 +84,16 @@ function Promo5Page() {
         data: {
           instagram_user: instagram.replace(/^@/, "").trim(),
           pacote: PACOTE_ID,
-          quantidade: 100,
-          valor: PRECO_BASE,
+          quantidade: QTD,
+          valor: priceBase,
           email: email.trim(),
           whatsapp_contato: whats.trim(),
           rede_social: "instagram",
           cupom: CUPOM,
           bump_upgrade: withBump,
-          utm_source: utm.utm_source ?? "promo5",
+          utm_source: utm.utm_source ?? "kit-creator",
           utm_medium: utm.utm_medium ?? "landing",
-          utm_campaign: utm.utm_campaign ?? "promo-5reais",
+          utm_campaign: utm.utm_campaign ?? "kit-creator",
           utm_content: utm.utm_content,
           utm_term: utm.utm_term,
         },
@@ -97,14 +104,14 @@ function Promo5Page() {
       }
       trackInitiateCheckout({
         orderId: r.pedidoId ?? "",
-        value: Number(r.valorCobrado ?? PRECO_FINAL),
+        value: Number(r.valorCobrado ?? precoFinal ?? priceBase),
         contentId: PACOTE_ID,
-        contentName: withBump ? "bump upgrade instagram" : "100 seguidores instagram",
+        contentName: withBump ? "kit creator bump" : "kit creator 1k",
       });
       setPix({
         code: r.qrCode ?? "",
         base64: r.qrCodeBase64 ?? "",
-        valor: r.valorFormatado ?? `R$ ${PRECO_FINAL.toFixed(2).replace(".", ",")}`,
+        valor: r.valorFormatado ?? `R$ ${(precoFinal ?? priceBase).toFixed(2).replace(".", ",")}`,
       });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao processar");
@@ -121,6 +128,10 @@ function Promo5Page() {
       toast.error("Preenche todos os campos");
       return;
     }
+    if (priceBase == null) {
+      toast.error("Aguarda carregar o preço...");
+      return;
+    }
     if (bumpAvailable) {
       setPendingForm(() => () => doCreate(true));
       setBumpOpen(true);
@@ -129,13 +140,11 @@ function Promo5Page() {
     await doCreate(false);
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a0033] via-[#0d0018] to-black text-white overflow-x-hidden">
-      {/* Glow bg */}
+    <div className="min-h-screen bg-gradient-to-b from-[#0a0028] via-[#0d0018] to-black text-white overflow-x-hidden">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-fuchsia-600/20 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-fuchsia-500/15 rounded-full blur-3xl" />
       </div>
 
       <main className="relative max-w-lg mx-auto px-5 pt-10 pb-16">
@@ -144,8 +153,8 @@ function Promo5Page() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-center gap-2 mb-6"
         >
-          <div className="px-3 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-bold tracking-wider uppercase animate-pulse">
-            🔥 Oferta relâmpago · hoje
+          <div className="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold tracking-wider uppercase flex items-center gap-1">
+            <Crown className="w-3 h-3" /> Kit Creator · Ticket Prime
           </div>
         </motion.div>
 
@@ -155,12 +164,12 @@ function Promo5Page() {
           transition={{ delay: 0.1 }}
           className="text-4xl sm:text-5xl font-black text-center leading-tight"
         >
-          <span className="block text-white">100 Seguidores</span>
-          <span className="block bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-            por R$ 5
+          <span className="block text-white">1.000 Seguidores</span>
+          <span className="block bg-gradient-to-r from-amber-300 to-fuchsia-400 bg-clip-text text-transparent">
+            Instagram
           </span>
           <span className="block text-white/80 text-2xl sm:text-3xl mt-2">
-            no Pix. Direto.
+            Pix rápido · reposição 30 dias
           </span>
         </motion.h1>
 
@@ -168,25 +177,27 @@ function Promo5Page() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="mt-6 mx-auto max-w-sm rounded-2xl border border-fuchsia-400/40 bg-gradient-to-br from-fuchsia-500/10 to-purple-900/20 p-4 text-center"
+          className="mt-6 mx-auto max-w-sm rounded-2xl border border-amber-400/40 bg-gradient-to-br from-amber-500/10 to-fuchsia-900/20 p-4 text-center"
         >
-          <div className="text-xs text-fuchsia-200 uppercase tracking-widest font-semibold">
-            Cupom já aplicado
+          <div className="text-xs text-amber-200 uppercase tracking-widest font-semibold">
+            Cupom PRIME15 aplicado
           </div>
-          <div className="mt-1 text-2xl font-black text-white">{CUPOM}</div>
-          <div className="mt-1 text-sm text-white/70">
-            15% off automático · você paga só{" "}
-            <span className="text-fuchsia-300 font-bold">
-              R$ {PRECO_FINAL.toFixed(2).replace(".", ",")}
-            </span>
+          <div className="mt-1 text-4xl font-black text-white">
+            {precoFinal != null ? `R$ ${precoFinal.toFixed(2).replace(".", ",")}` : "..."}
           </div>
+          {priceBase != null && precoFinal != null && (
+            <div className="mt-1 text-sm text-white/60 line-through">
+              R$ {priceBase.toFixed(2).replace(".", ",")}
+            </div>
+          )}
         </motion.div>
 
         <ul className="mt-8 space-y-3 text-white/90">
           {[
-            { icon: Zap, txt: "Entrega em minutos após o Pix" },
-            { icon: ShieldCheck, txt: "Perfil público · nada de senha" },
-            { icon: Check, txt: "Reposição grátis se cair em 30 dias" },
+            { icon: Zap, txt: "Entrega em minutos após confirmação Pix" },
+            { icon: ShieldCheck, txt: "Perfil público · sem senha · 100% seguro" },
+            { icon: Check, txt: "Reposição grátis por 30 dias" },
+            { icon: Crown, txt: "Suporte prioritário no WhatsApp" },
           ].map(({ icon: Icon, txt }, i) => (
             <motion.li
               key={txt}
@@ -195,8 +206,8 @@ function Promo5Page() {
               transition={{ delay: 0.25 + i * 0.05 }}
               className="flex items-center gap-3 text-sm"
             >
-              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-fuchsia-500/20 flex items-center justify-center">
-                <Icon className="w-4 h-4 text-fuchsia-300" />
+              <span className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
+                <Icon className="w-4 h-4 text-amber-300" />
               </span>
               <span>{txt}</span>
             </motion.li>
@@ -211,11 +222,9 @@ function Promo5Page() {
           className="mt-8 rounded-2xl border border-white/10 bg-black/40 backdrop-blur p-5 space-y-4"
         >
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider">
-              Seu @ do Instagram
-            </Label>
+            <Label className="text-white/80 text-xs uppercase tracking-wider">Seu @ do Instagram</Label>
             <div className="relative mt-1">
-              <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fuchsia-400" />
+              <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400" />
               <Input
                 value={instagram}
                 onChange={(e) => setInstagram(e.target.value)}
@@ -227,9 +236,7 @@ function Promo5Page() {
           </div>
 
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider">
-              E-mail (recibo do Pix)
-            </Label>
+            <Label className="text-white/80 text-xs uppercase tracking-wider">E-mail</Label>
             <Input
               type="email"
               value={email}
@@ -241,9 +248,7 @@ function Promo5Page() {
           </div>
 
           <div>
-            <Label className="text-white/80 text-xs uppercase tracking-wider">
-              WhatsApp (envio do Pix)
-            </Label>
+            <Label className="text-white/80 text-xs uppercase tracking-wider">WhatsApp</Label>
             <Input
               value={whats}
               onChange={(e) => setWhats(e.target.value)}
@@ -255,21 +260,23 @@ function Promo5Page() {
 
           <Button
             type="submit"
-            disabled={loading}
-            className="w-full h-14 text-base font-black bg-gradient-to-r from-yellow-400 to-amber-500 text-black hover:from-yellow-300 hover:to-amber-400 shadow-[0_0_40px_-10px_rgba(250,204,21,0.6)]"
+            disabled={loading || priceBase == null}
+            className="w-full h-14 text-base font-black bg-gradient-to-r from-amber-400 to-fuchsia-500 text-black hover:from-amber-300 hover:to-fuchsia-400 shadow-[0_0_40px_-10px_rgba(250,204,21,0.6)]"
           >
             {loading ? (
               "Gerando Pix..."
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                PAGAR R$ {PRECO_FINAL.toFixed(2).replace(".", ",")} NO PIX
+                {precoFinal != null
+                  ? `PAGAR R$ ${precoFinal.toFixed(2).replace(".", ",")} NO PIX`
+                  : "CARREGANDO..."}
               </>
             )}
           </Button>
 
           <p className="text-center text-[11px] text-white/40">
-            Pagamento processado pelo Mercado Pago · EliteBoost Prime
+            Pagamento processado pelo Mercado Pago · BoostGG
           </p>
         </motion.form>
 
@@ -280,10 +287,8 @@ function Promo5Page() {
 
       {pix && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur flex items-center justify-center p-5">
-          <div className="max-w-sm w-full rounded-2xl border border-fuchsia-400/40 bg-gradient-to-b from-[#1a0033] to-black p-6 text-center">
-            <div className="text-fuchsia-300 text-xs uppercase tracking-widest font-bold">
-              Pix gerado
-            </div>
+          <div className="max-w-sm w-full rounded-2xl border border-amber-400/40 bg-gradient-to-b from-[#0a0028] to-black p-6 text-center">
+            <div className="text-amber-300 text-xs uppercase tracking-widest font-bold">Pix gerado</div>
             <div className="mt-1 text-3xl font-black text-white">{pix.valor}</div>
             {pix.base64 && (
               <img
@@ -297,17 +302,12 @@ function Promo5Page() {
                 navigator.clipboard.writeText(pix.code);
                 toast.success("Código Pix copiado!");
               }}
-              className="mt-4 w-full h-12 rounded-lg bg-gradient-to-r from-yellow-400 to-amber-500 text-black font-black text-sm"
+              className="mt-4 w-full h-12 rounded-lg bg-gradient-to-r from-amber-400 to-fuchsia-500 text-black font-black text-sm"
             >
               COPIAR CÓDIGO PIX
             </button>
-            <p className="mt-3 text-[11px] text-white/50">
-              Após o pagamento, envio automático em minutos.
-            </p>
-            <button
-              onClick={() => setPix(null)}
-              className="mt-2 text-xs text-white/40 underline"
-            >
+            <p className="mt-3 text-[11px] text-white/50">Após o pagamento, envio automático em minutos.</p>
+            <button onClick={() => setPix(null)} className="mt-2 text-xs text-white/40 underline">
               fechar
             </button>
           </div>
