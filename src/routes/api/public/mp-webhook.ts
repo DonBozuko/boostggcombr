@@ -119,12 +119,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 client_ip: clientIp,
               } as any);
             if (dupErr) {
-              // 23505 = unique_violation → já processamos antes, MP está retentando.
+              // 23505 = unique_violation → MP reenvia o mesmo payment_id em estados diferentes.
+              // NÃO podemos sair aqui: o primeiro evento pode ser "pending" e o próximo "approved".
               if ((dupErr as { code?: string }).code === "23505") {
-                console.log("[mp-webhook] v181 idempotency: evento duplicado ignorado", { paymentId });
-                return;
-              }
+                console.log("[mp-webhook] v188 idempotency: evento repetido, reconsultando MP", { paymentId });
+              } else {
               console.warn("[mp-webhook] v181 webhook_events insert non-dup fail", dupErr);
+              }
               // segue mesmo assim — não bloqueia processamento por falha de auditoria
             }
           }
@@ -149,6 +150,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.warn("[mp-webhook] MP recusou", {
               paymentId, status: payment.status, status_detail: payment.status_detail,
             });
+            if (["pending", "in_process"].includes(String(payment.status))) {
+              // Estado transitório: manter pedido como pending para o front continuar aguardando.
+              return;
+            }
             // Audit: registra recusa no pedido se existir
             const { supabaseAdmin: admin } = await import("@/integrations/supabase/client.server");
             await admin

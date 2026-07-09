@@ -19,7 +19,8 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   if (error || !pedido) return { ok: false, status: null, error: "PEDIDO_NOT_FOUND" };
 
   // Already advanced — nothing to do.
-  if (pedido.status !== "pending") {
+  const recoverableStatuses = ["pending", "mp_pending", "mp_in_process"];
+  if (!recoverableStatuses.includes(String(pedido.status))) {
     return { ok: true, status: pedido.status, recovered: false };
   }
   if (!pedido.mercado_pago_id) {
@@ -55,7 +56,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       .from("pedidos")
       .update({ status: newStatus, error_detail: msg })
       .eq("id", pedido.id)
-      .eq("status", "pending");
+      .in("status", recoverableStatuses);
     if (isInsufficient) {
       try {
         await supabaseAdmin.from("admin_audit_logs" as any).insert({
@@ -97,7 +98,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     .from("pedidos")
     .update({ status: "paid", error_detail: "Contingência: webhook ausente, polling confirmou pagamento." })
     .eq("id", pedido.id)
-    .eq("status", "pending")
+    .in("status", recoverableStatuses)
     .select("id")
     .maybeSingle();
   if (!upd) {
