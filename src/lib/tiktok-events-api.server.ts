@@ -13,6 +13,9 @@ type ServerEventInput = {
   ip?: string;
   userAgent?: string;
   ttp?: string; // TikTok browser cookie _ttp se disponível
+  email?: string; // será hasheado
+  phone?: string; // será hasheado (E.164)
+  externalId?: string; // será hasheado (user id)
   testEventCode?: string; // TEST_ code do Test Events tab
 };
 
