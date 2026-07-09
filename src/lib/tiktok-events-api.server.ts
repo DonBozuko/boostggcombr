@@ -14,12 +14,16 @@ type ServerEventInput = {
   testEventCode?: string; // TEST_ code do Test Events tab
 };
 
-export async function sendTikTokServerEvent(input: ServerEventInput): Promise<void> {
+export type ServerEventResult =
+  | { ok: true; response: unknown }
+  | { ok: false; reason: string; response?: unknown; status?: number };
+
+export async function sendTikTokServerEvent(input: ServerEventInput): Promise<ServerEventResult> {
   const pixelCode = process.env.TIKTOK_PIXEL_ID;
   const token = process.env.TIKTOK_ACCESS_TOKEN;
   if (!pixelCode || !token) {
     console.warn("[tiktok-eapi] pixel/token ausente, pulando");
-    return;
+    return { ok: false, reason: `env ausente: pixel=${!!pixelCode} token=${!!token}` };
   }
 
   const prefix = input.event === "CompletePayment" ? "cp_" : "ic_";
