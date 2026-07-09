@@ -49,9 +49,11 @@ import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$n
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
 import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public/queue/reprocess'
 import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
+import { Route as ApiPublicHooksWaitingWatcherRouteImport } from './routes/api/public/hooks/waiting-watcher'
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
 import { Route as ApiPublicHooksSlaWatcherRouteImport } from './routes/api/public/hooks/sla-watcher'
+import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/public/hooks/reprocess-one'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
@@ -264,6 +266,12 @@ const ApiPublicQueueConfirmRoute = ApiPublicQueueConfirmRouteImport.update({
   path: '/api/public/queue/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksWaitingWatcherRoute =
+  ApiPublicHooksWaitingWatcherRouteImport.update({
+    id: '/api/public/hooks/waiting-watcher',
+    path: '/api/public/hooks/waiting-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksSyncPricingRoute =
   ApiPublicHooksSyncPricingRouteImport.update({
     id: '/api/public/hooks/sync-pricing',
@@ -279,6 +287,12 @@ const ApiPublicHooksSlaWatcherRoute =
   ApiPublicHooksSlaWatcherRouteImport.update({
     id: '/api/public/hooks/sla-watcher',
     path: '/api/public/hooks/sla-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksReprocessOneRoute =
+  ApiPublicHooksReprocessOneRouteImport.update({
+    id: '/api/public/hooks/reprocess-one',
+    path: '/api/public/hooks/reprocess-one',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksRecoverAbandonedRoute =
@@ -353,9 +367,11 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
+  '/api/public/hooks/waiting-watcher': typeof ApiPublicHooksWaitingWatcherRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
@@ -403,9 +419,11 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
+  '/api/public/hooks/waiting-watcher': typeof ApiPublicHooksWaitingWatcherRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
@@ -454,9 +472,11 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
+  '/api/public/hooks/waiting-watcher': typeof ApiPublicHooksWaitingWatcherRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
@@ -506,9 +526,11 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
+    | '/api/public/hooks/waiting-watcher'
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
@@ -556,9 +578,11 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
+    | '/api/public/hooks/waiting-watcher'
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
@@ -606,9 +630,11 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
+    | '/api/public/hooks/waiting-watcher'
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
@@ -656,9 +682,11 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
+  ApiPublicHooksReprocessOneRoute: typeof ApiPublicHooksReprocessOneRoute
   ApiPublicHooksSlaWatcherRoute: typeof ApiPublicHooksSlaWatcherRoute
   ApiPublicHooksSmokeTestRoute: typeof ApiPublicHooksSmokeTestRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
+  ApiPublicHooksWaitingWatcherRoute: typeof ApiPublicHooksWaitingWatcherRoute
   ApiPublicQueueConfirmRoute: typeof ApiPublicQueueConfirmRoute
   ApiPublicQueueReprocessRoute: typeof ApiPublicQueueReprocessRoute
   ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
@@ -948,6 +976,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQueueConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/waiting-watcher': {
+      id: '/api/public/hooks/waiting-watcher'
+      path: '/api/public/hooks/waiting-watcher'
+      fullPath: '/api/public/hooks/waiting-watcher'
+      preLoaderRoute: typeof ApiPublicHooksWaitingWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/sync-pricing': {
       id: '/api/public/hooks/sync-pricing'
       path: '/api/public/hooks/sync-pricing'
@@ -967,6 +1002,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hooks/sla-watcher'
       fullPath: '/api/public/hooks/sla-watcher'
       preLoaderRoute: typeof ApiPublicHooksSlaWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/reprocess-one': {
+      id: '/api/public/hooks/reprocess-one'
+      path: '/api/public/hooks/reprocess-one'
+      fullPath: '/api/public/hooks/reprocess-one'
+      preLoaderRoute: typeof ApiPublicHooksReprocessOneRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/recover-abandoned': {
@@ -1058,9 +1100,11 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
+  ApiPublicHooksReprocessOneRoute: ApiPublicHooksReprocessOneRoute,
   ApiPublicHooksSlaWatcherRoute: ApiPublicHooksSlaWatcherRoute,
   ApiPublicHooksSmokeTestRoute: ApiPublicHooksSmokeTestRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
+  ApiPublicHooksWaitingWatcherRoute: ApiPublicHooksWaitingWatcherRoute,
   ApiPublicQueueConfirmRoute: ApiPublicQueueConfirmRoute,
   ApiPublicQueueReprocessRoute: ApiPublicQueueReprocessRoute,
   ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,
