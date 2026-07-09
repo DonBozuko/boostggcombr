@@ -90,7 +90,7 @@ function KitCreatorPage() {
           instagram_user: instagram.replace(/^@/, "").trim(),
           pacote: PACOTE_ID,
           quantidade: QTD,
-          valor: priceBase,
+          valor: priceOriginal ?? priceBase,
           email: email.trim(),
           whatsapp_contato: whats.trim(),
           rede_social: "instagram",
