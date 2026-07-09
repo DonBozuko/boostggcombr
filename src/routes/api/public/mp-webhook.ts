@@ -250,11 +250,13 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           // TikTok Events API — server-side CompletePayment (dedup por event_id com pixel client)
           try {
             const { sendTikTokServerEvent } = await import("@/lib/tiktok-events-api.server");
-            void sendTikTokServerEvent({
+            await sendTikTokServerEvent({
               event: "CompletePayment",
               orderId: String(pedido.id),
               value: Number(pedido.valor),
               contentName: String(pedido.pacote ?? ""),
+              ip: clientIp !== "unknown" ? clientIp : undefined,
+              userAgent: request.headers.get("user-agent") ?? undefined,
               email: payment.payer?.email ?? undefined,
               externalId: String(payment.payer?.id ?? pedido.id),
             });

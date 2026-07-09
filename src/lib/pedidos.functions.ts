@@ -287,6 +287,19 @@ export const criarPedido = createServerFn({ method: "POST" })
         console.error("Erro ao inserir pedido:", error);
         return { ok: false as const, error: "DB_FAILED" as const };
       }
+      try {
+        const { sendTikTokServerEvent } = await import("@/lib/tiktok-events-api.server");
+        await sendTikTokServerEvent({
+          event: "InitiateCheckout",
+          orderId: String(inserted.id),
+          value: valorCobrar,
+          contentName: `${quantidadeEfetiva} ${categoria} ${rede}`,
+          email: data.email,
+          externalId: String(inserted.id),
+        });
+      } catch (err) {
+        console.warn("[criarPedido] TikTok InitiateCheckout server-side falhou", err);
+      }
       return {
         ok: true as const,
         pedidoId: inserted.id,
