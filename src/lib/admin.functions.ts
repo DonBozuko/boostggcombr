@@ -13,7 +13,7 @@ export const getPedidoStatus = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error || !row) return { ok: false as const, status: null, error_detail: null as string | null };
 
-    if (row.status === "pending") {
+    if (["pending", "mp_pending", "mp_in_process"].includes(String(row.status))) {
       try {
         const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
         const r = await confirmAndDispatchIfPaid(data.id);
@@ -22,7 +22,8 @@ export const getPedidoStatus = createServerFn({ method: "GET" })
         console.warn("[getPedidoStatus] contingency falhou", e);
       }
     }
-    return { ok: true as const, status: row.status as string, error_detail: (row as { error_detail?: string | null }).error_detail ?? null };
+    const safeStatus = ["mp_pending", "mp_in_process"].includes(String(row.status)) ? "pending" : String(row.status);
+    return { ok: true as const, status: safeStatus, error_detail: (row as { error_detail?: string | null }).error_detail ?? null };
   });
 
 // === ADMIN: listar pedidos pagos e reprocessar ===
