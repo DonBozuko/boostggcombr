@@ -37,7 +37,7 @@ export const Route = createFileRoute("/api/public/hooks/reprocess-one")({
 
         try {
           const { reprocessWaitingProvision } = await import("@/lib/reprocess-waiting.server");
-          const result = await reprocessWaitingProvision({ pedidoId: id });
+          const result = await reprocessWaitingProvision(id);
           if (result.ok) {
             return html(
               "✅ Pedido reprocessado",
