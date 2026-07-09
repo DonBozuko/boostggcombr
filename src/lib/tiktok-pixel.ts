@@ -11,6 +11,29 @@ function ttq(): TTQ | null {
   const w = window as unknown as { ttq?: TTQ };
   return w.ttq ?? null;
 }
+export function trackViewContent(params?: { contentId?: string; contentName?: string; value?: number }) {
+  ttq()?.track("ViewContent", {
+    content_type: "product",
+    content_id: params?.contentId ?? "landing",
+    content_name: params?.contentName ?? "Landing Page",
+    ...(params?.value !== undefined ? { value: params.value, currency: "BRL" } : {}),
+  });
+}
+
+export function trackAddToCart(params: { planId: string; value: number; contentName?: string }) {
+  ttq()?.track(
+    "AddToCart",
+    {
+      value: params.value,
+      currency: "BRL",
+      content_type: "product",
+      content_id: params.planId,
+      content_name: params.contentName,
+    },
+    { event_id: `atc_${params.planId}_${Date.now()}` },
+  );
+}
+
 
 export function trackInitiateCheckout(params: {
   orderId: string;
