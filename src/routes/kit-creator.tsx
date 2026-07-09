@@ -190,9 +190,9 @@ function KitCreatorPage() {
           <div className="mt-1 text-4xl font-black text-white">
             {precoFinal != null ? `R$ ${precoFinal.toFixed(2).replace(".", ",")}` : "..."}
           </div>
-          {priceBase != null && precoFinal != null && (
+          {priceOriginal != null && precoFinal != null && (
             <div className="mt-1 text-sm text-white/60 line-through">
-              R$ {priceBase.toFixed(2).replace(".", ",")}
+              R$ {priceOriginal.toFixed(2).replace(".", ",")}
             </div>
           )}
         </motion.div>
