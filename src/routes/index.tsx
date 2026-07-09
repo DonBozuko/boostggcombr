@@ -411,6 +411,7 @@ function Landing() {
   const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
     seguidores: [], curtidas: [], visualizacoes: [],
   });
+useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   useEffect(() => {
     let cancelled = false;
     try { window.localStorage.removeItem("ebp_pricing_overrides_v1"); } catch {}
