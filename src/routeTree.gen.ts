@@ -18,6 +18,7 @@ import { Route as TelegramRouteImport } from './routes/telegram'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
+import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -99,6 +100,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const ReembolsoRoute = ReembolsoRouteImport.update({
   id: '/reembolso',
   path: '/reembolso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Promo5reaisRoute = Promo5reaisRouteImport.update({
+  id: '/promo-5reais',
+  path: '/promo-5reais',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/promo-5reais': typeof Promo5reaisRoute
   '/reembolso': typeof ReembolsoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/promo-5reais': typeof Promo5reaisRoute
   '/reembolso': typeof ReembolsoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -405,6 +413,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
+  '/promo-5reais': typeof Promo5reaisRoute
   '/reembolso': typeof ReembolsoRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -455,6 +464,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/obrigado'
     | '/privacidade'
+    | '/promo-5reais'
     | '/reembolso'
     | '/sitemap.xml'
     | '/status'
@@ -503,6 +513,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/obrigado'
     | '/privacidade'
+    | '/promo-5reais'
     | '/reembolso'
     | '/sitemap.xml'
     | '/status'
@@ -551,6 +562,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/obrigado'
     | '/privacidade'
+    | '/promo-5reais'
     | '/reembolso'
     | '/sitemap.xml'
     | '/status'
@@ -600,6 +612,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
+  Promo5reaisRoute: typeof Promo5reaisRoute
   ReembolsoRoute: typeof ReembolsoRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -702,6 +715,13 @@ declare module '@tanstack/react-router' {
       path: '/reembolso'
       fullPath: '/reembolso'
       preLoaderRoute: typeof ReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo-5reais': {
+      id: '/promo-5reais'
+      path: '/promo-5reais'
+      fullPath: '/promo-5reais'
+      preLoaderRoute: typeof Promo5reaisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -985,6 +1005,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
+  Promo5reaisRoute: Promo5reaisRoute,
   ReembolsoRoute: ReembolsoRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
