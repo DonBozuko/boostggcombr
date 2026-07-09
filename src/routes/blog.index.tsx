@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TrendingUp } from "lucide-react";
 
-const BASE = "https://eliteboostprime.lovable.app";
+const BASE = "https://boostgg.com.br";
 
 const POSTS = [
   {

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Share2, Check, Gift } from "lucide-react";
 import { setBrindeApplied } from "@/components/CouponField";
 
-const SITE = "https://eliteboostprime.lovable.app";
+const SITE = "https://boostgg.com.br";
 
 // v104 — Voucher de retenção viral em SEGUIDORES (sem prejuízo em cash).
 const SHARE_TEXT =

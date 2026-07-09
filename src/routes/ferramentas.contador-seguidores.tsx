@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Users, UserPlus, Image as ImageIcon, BadgeCheck, Lock } from "lucide-react";
 
-const CANON = "https://eliteboostprime.lovable.app/ferramentas/contador-seguidores";
+const CANON = "https://boostgg.com.br/ferramentas/contador-seguidores";
 
 export const Route = createFileRoute("/ferramentas/contador-seguidores")({
   head: () => ({
