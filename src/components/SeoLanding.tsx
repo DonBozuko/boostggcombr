@@ -1,5 +1,5 @@
 // v200 — Componente reutilizável para landing pages SEO (keyword-alvo → CTA no checkout real).
-import { Link } from "@tanstack/react-router";
+
 import { BrandHeader } from "@/components/BrandHeader";
 import { MobileFrame } from "@/components/MobileFrame";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
@@ -47,8 +47,8 @@ export function SeoLanding(p: SeoLandingProps) {
         <p className="mt-4 text-center text-zinc-400 text-base">{p.intro}</p>
 
         <div className="mt-6 flex justify-center">
-          <Link
-            to={p.ctaHref}
+          <a
+            href={p.ctaHref}
             className="inline-flex items-center gap-2 rounded-xl px-6 py-4 font-black text-base"
             style={{
               background: `linear-gradient(135deg, ${p.accent}, ${p.accent}dd)`,
@@ -57,7 +57,7 @@ export function SeoLanding(p: SeoLandingProps) {
             }}
           >
             <Zap className="w-5 h-5" /> {p.ctaLabel}
-          </Link>
+          </a>
         </div>
 
         {/* Benefícios */}
@@ -107,13 +107,13 @@ export function SeoLanding(p: SeoLandingProps) {
             </table>
           </div>
           <div className="mt-4 flex justify-center">
-            <Link
-              to={p.ctaHref}
+            <a
+              href={p.ctaHref}
               className="inline-flex items-center gap-2 rounded-xl px-6 py-3 font-black text-sm"
               style={{ background: p.accent, color: "#000" }}
             >
               Ver todos os pacotes →
-            </Link>
+            </a>
           </div>
         </section>
 
@@ -143,8 +143,8 @@ export function SeoLanding(p: SeoLandingProps) {
         </section>
 
         <div className="mt-12 flex justify-center pb-8">
-          <Link
-            to={p.ctaHref}
+          <a
+            href={p.ctaHref}
             className="inline-flex items-center gap-2 rounded-xl px-8 py-4 font-black text-base"
             style={{
               background: `linear-gradient(135deg, ${p.accent}, ${p.accent}dd)`,
@@ -153,7 +153,7 @@ export function SeoLanding(p: SeoLandingProps) {
             }}
           >
             <Zap className="w-5 h-5" /> {p.ctaLabel}
-          </Link>
+          </a>
         </div>
       </main>
     </MobileFrame>
