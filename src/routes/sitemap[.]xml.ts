@@ -35,6 +35,13 @@ const buildSitemapXml = () => {
     { path: "/ferramentas/contador-seguidores", changefreq: "weekly", priority: "0.7" },
     { path: "/kit-creator", changefreq: "weekly", priority: "0.9" },
     { path: "/promo-5reais", changefreq: "weekly", priority: "0.8" },
+    // v200 — SEO landings (keyword-alvo)
+    { path: "/comprar-seguidores-instagram", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-curtidas-instagram", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-seguidores-tiktok", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-seguidores-brasileiros", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-visualizacoes-tiktok", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-inscritos-youtube", changefreq: "weekly", priority: "0.9" },
   ];
 
 
