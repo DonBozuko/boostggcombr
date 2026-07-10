@@ -53,7 +53,6 @@ export const Route = createFileRoute("/comprar-visualizacoes-tiktok")({
 function Page() {
   return (
     <SeoLanding
-      route="/comprar-visualizacoes-tiktok"
       accent="#00f2fe"
       h1="Comprar Visualizações TikTok — Views Rápidas via Pix"
       subtitle="Views TikTok que impulsionam o algoritmo"

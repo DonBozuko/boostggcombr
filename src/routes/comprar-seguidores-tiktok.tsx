@@ -53,7 +53,6 @@ export const Route = createFileRoute("/comprar-seguidores-tiktok")({
 function Page() {
   return (
     <SeoLanding
-      route="/comprar-seguidores-tiktok"
       accent="#00f2fe"
       h1="Comprar Seguidores TikTok — Baratos, Rápido, com Pix"
       subtitle="Seguidores TikTok em minutos"

@@ -53,7 +53,6 @@ export const Route = createFileRoute("/comprar-inscritos-youtube")({
 function Page() {
   return (
     <SeoLanding
-      route="/comprar-inscritos-youtube"
       accent="#ff0000"
       h1="Comprar Inscritos YouTube — Reais, Gradual, via Pix"
       subtitle="Acelere seus 1.000 inscritos para monetizar"

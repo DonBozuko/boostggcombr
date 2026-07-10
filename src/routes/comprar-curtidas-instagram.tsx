@@ -57,7 +57,6 @@ export const Route = createFileRoute("/comprar-curtidas-instagram")({
 function Page() {
   return (
     <SeoLanding
-      route="/comprar-curtidas-instagram"
       accent="#e1306c"
       h1="Comprar Curtidas Instagram — Entrega em Segundos via Pix"
       subtitle="Curtidas Instagram instantâneas"

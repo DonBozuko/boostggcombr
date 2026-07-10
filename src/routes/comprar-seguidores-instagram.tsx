@@ -57,7 +57,6 @@ export const Route = createFileRoute("/comprar-seguidores-instagram")({
 function Page() {
   return (
     <SeoLanding
-      route="/comprar-seguidores-instagram"
       accent="#e1306c"
       h1="Comprar Seguidores Instagram — Reais, Baratos e com Pix"
       subtitle="Seguidores Instagram entregues em minutos"

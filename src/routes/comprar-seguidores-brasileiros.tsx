@@ -53,7 +53,6 @@ export const Route = createFileRoute("/comprar-seguidores-brasileiros")({
 function Page() {
   return (
     <SeoLanding
-      route="/comprar-seguidores-brasileiros"
       accent="#39ff14"
       h1="Comprar Seguidores Brasileiros Reais para Instagram"
       subtitle="Seguidores BR que engajam de verdade"
