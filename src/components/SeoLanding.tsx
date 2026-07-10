@@ -9,7 +9,6 @@ export type SeoFaq = { q: string; a: string };
 export type SeoPricingRow = { qty: string; price: string; note?: string };
 
 export interface SeoLandingProps {
-  route: string;
   accent: string;
   h1: string;
   subtitle: string;
@@ -27,7 +26,7 @@ const iconMap = { check: CheckCircle2, zap: Zap, shield: Shield, clock: Clock };
 
 export function SeoLanding(p: SeoLandingProps) {
   return (
-    <MobileFrame bg="#0a0a0a" route={p.route}>
+    <MobileFrame bg="#0a0a0a">
       <header
         className="sticky top-0 z-50 bg-black/90 border-b"
         style={{ borderColor: `${p.accent}66` }}
