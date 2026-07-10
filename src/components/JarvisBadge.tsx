@@ -199,12 +199,15 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     };
 
     const timer = window.setTimeout(fire, AUTO_FIRE_MS);
-    const events: Array<keyof WindowEventMap> = ["touchstart", "pointerdown", "scroll", "keydown", "wheel"];
+    const events: Array<keyof WindowEventMap> = ["click", "mousedown", "touchstart", "pointerdown", "scroll", "keydown", "wheel"];
     const cleanup = () => {
       window.clearTimeout(timer);
       events.forEach((e) => window.removeEventListener(e, fire as EventListener));
+      document.removeEventListener("click", fire as EventListener, true);
     };
     rearm();
+    // Fallback capture-phase no documento — pega qualquer clique mesmo se stopPropagation
+    document.addEventListener("click", fire as EventListener, { capture: true, once: true } as AddEventListenerOptions);
 
     return () => {
       cleanup();
