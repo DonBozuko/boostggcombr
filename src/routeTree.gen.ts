@@ -26,6 +26,12 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as KitCreatorRouteImport } from './routes/kit-creator'
 import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
+import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
+import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
+import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
+import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
+import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
+import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -146,6 +152,40 @@ const DiagnosticoRoute = DiagnosticoRouteImport.update({
   path: '/diagnostico',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComprarVisualizacoesTiktokRoute =
+  ComprarVisualizacoesTiktokRouteImport.update({
+    id: '/comprar-visualizacoes-tiktok',
+    path: '/comprar-visualizacoes-tiktok',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComprarSeguidoresTiktokRoute = ComprarSeguidoresTiktokRouteImport.update({
+  id: '/comprar-seguidores-tiktok',
+  path: '/comprar-seguidores-tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComprarSeguidoresInstagramRoute =
+  ComprarSeguidoresInstagramRouteImport.update({
+    id: '/comprar-seguidores-instagram',
+    path: '/comprar-seguidores-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComprarSeguidoresBrasileirosRoute =
+  ComprarSeguidoresBrasileirosRouteImport.update({
+    id: '/comprar-seguidores-brasileiros',
+    path: '/comprar-seguidores-brasileiros',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComprarInscritosYoutubeRoute = ComprarInscritosYoutubeRouteImport.update({
+  id: '/comprar-inscritos-youtube',
+  path: '/comprar-inscritos-youtube',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComprarCurtidasInstagramRoute =
+  ComprarCurtidasInstagramRouteImport.update({
+    id: '/comprar-curtidas-instagram',
+    path: '/comprar-curtidas-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -335,6 +375,12 @@ const ApiPublicAdminPricingConfigRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
+  '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
+  '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
+  '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
+  '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
+  '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/kit-creator': typeof KitCreatorRoute
@@ -388,6 +434,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
+  '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
+  '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
+  '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
+  '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
+  '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/kit-creator': typeof KitCreatorRoute
@@ -442,6 +494,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
+  '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
+  '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
+  '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
+  '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
+  '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/facebook': typeof FacebookRoute
   '/kit-creator': typeof KitCreatorRoute
@@ -497,6 +555,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/comprar-curtidas-instagram'
+    | '/comprar-inscritos-youtube'
+    | '/comprar-seguidores-brasileiros'
+    | '/comprar-seguidores-instagram'
+    | '/comprar-seguidores-tiktok'
+    | '/comprar-visualizacoes-tiktok'
     | '/diagnostico'
     | '/facebook'
     | '/kit-creator'
@@ -550,6 +614,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/comprar-curtidas-instagram'
+    | '/comprar-inscritos-youtube'
+    | '/comprar-seguidores-brasileiros'
+    | '/comprar-seguidores-instagram'
+    | '/comprar-seguidores-tiktok'
+    | '/comprar-visualizacoes-tiktok'
     | '/diagnostico'
     | '/facebook'
     | '/kit-creator'
@@ -603,6 +673,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/comprar-curtidas-instagram'
+    | '/comprar-inscritos-youtube'
+    | '/comprar-seguidores-brasileiros'
+    | '/comprar-seguidores-instagram'
+    | '/comprar-seguidores-tiktok'
+    | '/comprar-visualizacoes-tiktok'
     | '/diagnostico'
     | '/facebook'
     | '/kit-creator'
@@ -657,6 +733,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
+  ComprarInscritosYoutubeRoute: typeof ComprarInscritosYoutubeRoute
+  ComprarSeguidoresBrasileirosRoute: typeof ComprarSeguidoresBrasileirosRoute
+  ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
+  ComprarSeguidoresTiktokRoute: typeof ComprarSeguidoresTiktokRoute
+  ComprarVisualizacoesTiktokRoute: typeof ComprarVisualizacoesTiktokRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   FacebookRoute: typeof FacebookRoute
   KitCreatorRoute: typeof KitCreatorRoute
@@ -826,6 +908,48 @@ declare module '@tanstack/react-router' {
       path: '/diagnostico'
       fullPath: '/diagnostico'
       preLoaderRoute: typeof DiagnosticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-visualizacoes-tiktok': {
+      id: '/comprar-visualizacoes-tiktok'
+      path: '/comprar-visualizacoes-tiktok'
+      fullPath: '/comprar-visualizacoes-tiktok'
+      preLoaderRoute: typeof ComprarVisualizacoesTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-seguidores-tiktok': {
+      id: '/comprar-seguidores-tiktok'
+      path: '/comprar-seguidores-tiktok'
+      fullPath: '/comprar-seguidores-tiktok'
+      preLoaderRoute: typeof ComprarSeguidoresTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-seguidores-instagram': {
+      id: '/comprar-seguidores-instagram'
+      path: '/comprar-seguidores-instagram'
+      fullPath: '/comprar-seguidores-instagram'
+      preLoaderRoute: typeof ComprarSeguidoresInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-seguidores-brasileiros': {
+      id: '/comprar-seguidores-brasileiros'
+      path: '/comprar-seguidores-brasileiros'
+      fullPath: '/comprar-seguidores-brasileiros'
+      preLoaderRoute: typeof ComprarSeguidoresBrasileirosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-inscritos-youtube': {
+      id: '/comprar-inscritos-youtube'
+      path: '/comprar-inscritos-youtube'
+      fullPath: '/comprar-inscritos-youtube'
+      preLoaderRoute: typeof ComprarInscritosYoutubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-curtidas-instagram': {
+      id: '/comprar-curtidas-instagram'
+      path: '/comprar-curtidas-instagram'
+      fullPath: '/comprar-curtidas-instagram'
+      preLoaderRoute: typeof ComprarCurtidasInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1082,6 +1206,12 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
+  ComprarInscritosYoutubeRoute: ComprarInscritosYoutubeRoute,
+  ComprarSeguidoresBrasileirosRoute: ComprarSeguidoresBrasileirosRoute,
+  ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
+  ComprarSeguidoresTiktokRoute: ComprarSeguidoresTiktokRoute,
+  ComprarVisualizacoesTiktokRoute: ComprarVisualizacoesTiktokRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   FacebookRoute: FacebookRoute,
   KitCreatorRoute: KitCreatorRoute,
