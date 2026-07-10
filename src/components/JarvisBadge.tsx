@@ -173,6 +173,12 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     audio.volume = 0.95;
     const unregister = registerJarvisAudio(audio);
 
+    const rearm = () => {
+      events.forEach((e) =>
+        window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions),
+      );
+    };
+
     const fire = () => {
       if (firedRef.current) return;
       firedRef.current = true;
@@ -180,10 +186,16 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       audio.onended = () => safeClose();
       audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
       const p = audio.play();
-      if (p && typeof p.catch === "function") {
-        p.catch(() => { firedRef.current = false; safeClose(); });
+      if (p && typeof p.then === "function") {
+        p.then(() => { cleanup(); }).catch(() => {
+          // Autoplay bloqueado (ex.: home no primeiro load). Re-arma listeners pra tocar no próximo gesto.
+          firedRef.current = false;
+          safeClose();
+          rearm();
+        });
+      } else {
+        cleanup();
       }
-      cleanup();
     };
 
     const timer = window.setTimeout(fire, AUTO_FIRE_MS);
@@ -192,9 +204,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       window.clearTimeout(timer);
       events.forEach((e) => window.removeEventListener(e, fire as EventListener));
     };
-    events.forEach((e) =>
-      window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions),
-    );
+    rearm();
+
     return () => {
       cleanup();
       if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
