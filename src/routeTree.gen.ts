@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as Char126flockDotjsRouteImport } from './routes/~flock[.]js'
 import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as ViewsTiktokRouteImport } from './routes/views-tiktok'
+import { Route as TurbinarTiktokRouteImport } from './routes/turbinar-tiktok'
 import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
 import { Route as TermosRouteImport } from './routes/termos'
@@ -24,14 +26,18 @@ import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KitCreatorRouteImport } from './routes/kit-creator'
+import { Route as ImpulsionarInstagramRouteImport } from './routes/impulsionar-instagram'
 import { Route as FacebookRouteImport } from './routes/facebook'
+import { Route as EngajamentoInstagramRouteImport } from './routes/engajamento-instagram'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
+import { Route as CrescerYoutubeRouteImport } from './routes/crescer-youtube'
 import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
 import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
 import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
 import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
 import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
 import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
+import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -75,6 +81,16 @@ const Char126flockDotjsRoute = Char126flockDotjsRouteImport.update({
 const YoutubeRoute = YoutubeRouteImport.update({
   id: '/youtube',
   path: '/youtube',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ViewsTiktokRoute = ViewsTiktokRouteImport.update({
+  id: '/views-tiktok',
+  path: '/views-tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TurbinarTiktokRoute = TurbinarTiktokRouteImport.update({
+  id: '/turbinar-tiktok',
+  path: '/turbinar-tiktok',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TrafegoRoute = TrafegoRouteImport.update({
@@ -142,14 +158,29 @@ const KitCreatorRoute = KitCreatorRouteImport.update({
   path: '/kit-creator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ImpulsionarInstagramRoute = ImpulsionarInstagramRouteImport.update({
+  id: '/impulsionar-instagram',
+  path: '/impulsionar-instagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FacebookRoute = FacebookRouteImport.update({
   id: '/facebook',
   path: '/facebook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EngajamentoInstagramRoute = EngajamentoInstagramRouteImport.update({
+  id: '/engajamento-instagram',
+  path: '/engajamento-instagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiagnosticoRoute = DiagnosticoRouteImport.update({
   id: '/diagnostico',
   path: '/diagnostico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrescerYoutubeRoute = CrescerYoutubeRouteImport.update({
+  id: '/crescer-youtube',
+  path: '/crescer-youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComprarVisualizacoesTiktokRoute =
@@ -186,6 +217,11 @@ const ComprarCurtidasInstagramRoute =
     path: '/comprar-curtidas-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
+  id: '/audiencia-brasileira',
+  path: '/audiencia-brasileira',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -375,14 +411,18 @@ const ApiPublicAdminPricingConfigRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
+  '/crescer-youtube': typeof CrescerYoutubeRoute
   '/diagnostico': typeof DiagnosticoRoute
+  '/engajamento-instagram': typeof EngajamentoInstagramRoute
   '/facebook': typeof FacebookRoute
+  '/impulsionar-instagram': typeof ImpulsionarInstagramRoute
   '/kit-creator': typeof KitCreatorRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
@@ -396,6 +436,8 @@ export interface FileRoutesByFullPath {
   '/termos': typeof TermosRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
+  '/turbinar-tiktok': typeof TurbinarTiktokRoute
+  '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -434,14 +476,18 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
+  '/crescer-youtube': typeof CrescerYoutubeRoute
   '/diagnostico': typeof DiagnosticoRoute
+  '/engajamento-instagram': typeof EngajamentoInstagramRoute
   '/facebook': typeof FacebookRoute
+  '/impulsionar-instagram': typeof ImpulsionarInstagramRoute
   '/kit-creator': typeof KitCreatorRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
@@ -455,6 +501,8 @@ export interface FileRoutesByTo {
   '/termos': typeof TermosRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
+  '/turbinar-tiktok': typeof TurbinarTiktokRoute
+  '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -494,14 +542,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
+  '/crescer-youtube': typeof CrescerYoutubeRoute
   '/diagnostico': typeof DiagnosticoRoute
+  '/engajamento-instagram': typeof EngajamentoInstagramRoute
   '/facebook': typeof FacebookRoute
+  '/impulsionar-instagram': typeof ImpulsionarInstagramRoute
   '/kit-creator': typeof KitCreatorRoute
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
@@ -515,6 +567,8 @@ export interface FileRoutesById {
   '/termos': typeof TermosRoute
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
+  '/turbinar-tiktok': typeof TurbinarTiktokRoute
+  '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
@@ -555,14 +609,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/audiencia-brasileira'
     | '/comprar-curtidas-instagram'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
+    | '/crescer-youtube'
     | '/diagnostico'
+    | '/engajamento-instagram'
     | '/facebook'
+    | '/impulsionar-instagram'
     | '/kit-creator'
     | '/login'
     | '/mcp'
@@ -576,6 +634,8 @@ export interface FileRouteTypes {
     | '/termos'
     | '/tiktok'
     | '/trafego'
+    | '/turbinar-tiktok'
+    | '/views-tiktok'
     | '/youtube'
     | '/~flock.js'
     | '/.mcp/list-tools'
@@ -614,14 +674,18 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/audiencia-brasileira'
     | '/comprar-curtidas-instagram'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
+    | '/crescer-youtube'
     | '/diagnostico'
+    | '/engajamento-instagram'
     | '/facebook'
+    | '/impulsionar-instagram'
     | '/kit-creator'
     | '/login'
     | '/mcp'
@@ -635,6 +699,8 @@ export interface FileRouteTypes {
     | '/termos'
     | '/tiktok'
     | '/trafego'
+    | '/turbinar-tiktok'
+    | '/views-tiktok'
     | '/youtube'
     | '/~flock.js'
     | '/.mcp/list-tools'
@@ -673,14 +739,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/audiencia-brasileira'
     | '/comprar-curtidas-instagram'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
+    | '/crescer-youtube'
     | '/diagnostico'
+    | '/engajamento-instagram'
     | '/facebook'
+    | '/impulsionar-instagram'
     | '/kit-creator'
     | '/login'
     | '/mcp'
@@ -694,6 +764,8 @@ export interface FileRouteTypes {
     | '/termos'
     | '/tiktok'
     | '/trafego'
+    | '/turbinar-tiktok'
+    | '/views-tiktok'
     | '/youtube'
     | '/~flock.js'
     | '/.mcp/list-tools'
@@ -733,14 +805,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
   ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
   ComprarInscritosYoutubeRoute: typeof ComprarInscritosYoutubeRoute
   ComprarSeguidoresBrasileirosRoute: typeof ComprarSeguidoresBrasileirosRoute
   ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
   ComprarSeguidoresTiktokRoute: typeof ComprarSeguidoresTiktokRoute
   ComprarVisualizacoesTiktokRoute: typeof ComprarVisualizacoesTiktokRoute
+  CrescerYoutubeRoute: typeof CrescerYoutubeRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
+  EngajamentoInstagramRoute: typeof EngajamentoInstagramRoute
   FacebookRoute: typeof FacebookRoute
+  ImpulsionarInstagramRoute: typeof ImpulsionarInstagramRoute
   KitCreatorRoute: typeof KitCreatorRoute
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
@@ -754,6 +830,8 @@ export interface RootRouteChildren {
   TermosRoute: typeof TermosRoute
   TiktokRoute: typeof TiktokRoute
   TrafegoRoute: typeof TrafegoRoute
+  TurbinarTiktokRoute: typeof TurbinarTiktokRoute
+  ViewsTiktokRoute: typeof ViewsTiktokRoute
   YoutubeRoute: typeof YoutubeRoute
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
@@ -803,6 +881,20 @@ declare module '@tanstack/react-router' {
       path: '/youtube'
       fullPath: '/youtube'
       preLoaderRoute: typeof YoutubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/views-tiktok': {
+      id: '/views-tiktok'
+      path: '/views-tiktok'
+      fullPath: '/views-tiktok'
+      preLoaderRoute: typeof ViewsTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/turbinar-tiktok': {
+      id: '/turbinar-tiktok'
+      path: '/turbinar-tiktok'
+      fullPath: '/turbinar-tiktok'
+      preLoaderRoute: typeof TurbinarTiktokRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/trafego': {
@@ -896,6 +988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof KitCreatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/impulsionar-instagram': {
+      id: '/impulsionar-instagram'
+      path: '/impulsionar-instagram'
+      fullPath: '/impulsionar-instagram'
+      preLoaderRoute: typeof ImpulsionarInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/facebook': {
       id: '/facebook'
       path: '/facebook'
@@ -903,11 +1002,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacebookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/engajamento-instagram': {
+      id: '/engajamento-instagram'
+      path: '/engajamento-instagram'
+      fullPath: '/engajamento-instagram'
+      preLoaderRoute: typeof EngajamentoInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/diagnostico': {
       id: '/diagnostico'
       path: '/diagnostico'
       fullPath: '/diagnostico'
       preLoaderRoute: typeof DiagnosticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crescer-youtube': {
+      id: '/crescer-youtube'
+      path: '/crescer-youtube'
+      fullPath: '/crescer-youtube'
+      preLoaderRoute: typeof CrescerYoutubeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comprar-visualizacoes-tiktok': {
@@ -950,6 +1063,13 @@ declare module '@tanstack/react-router' {
       path: '/comprar-curtidas-instagram'
       fullPath: '/comprar-curtidas-instagram'
       preLoaderRoute: typeof ComprarCurtidasInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/audiencia-brasileira': {
+      id: '/audiencia-brasileira'
+      path: '/audiencia-brasileira'
+      fullPath: '/audiencia-brasileira'
+      preLoaderRoute: typeof AudienciaBrasileiraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1206,14 +1326,18 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
   ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
   ComprarInscritosYoutubeRoute: ComprarInscritosYoutubeRoute,
   ComprarSeguidoresBrasileirosRoute: ComprarSeguidoresBrasileirosRoute,
   ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
   ComprarSeguidoresTiktokRoute: ComprarSeguidoresTiktokRoute,
   ComprarVisualizacoesTiktokRoute: ComprarVisualizacoesTiktokRoute,
+  CrescerYoutubeRoute: CrescerYoutubeRoute,
   DiagnosticoRoute: DiagnosticoRoute,
+  EngajamentoInstagramRoute: EngajamentoInstagramRoute,
   FacebookRoute: FacebookRoute,
+  ImpulsionarInstagramRoute: ImpulsionarInstagramRoute,
   KitCreatorRoute: KitCreatorRoute,
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
@@ -1227,6 +1351,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermosRoute: TermosRoute,
   TiktokRoute: TiktokRoute,
   TrafegoRoute: TrafegoRoute,
+  TurbinarTiktokRoute: TurbinarTiktokRoute,
+  ViewsTiktokRoute: ViewsTiktokRoute,
   YoutubeRoute: YoutubeRoute,
   Char126flockDotjsRoute: Char126flockDotjsRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
