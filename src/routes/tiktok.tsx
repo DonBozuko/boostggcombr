@@ -200,10 +200,29 @@ function TiktokLanding() {
     curtidas:      { category: "tiktok:curtidas",      fallback: likesPlans,     unitLabel: "Curtidas" },
     visualizacoes: { category: "tiktok:visualizacoes", fallback: viewsPlans,     unitLabel: "Views" },
   });
+  // v202 — BR toggle: busca variante brasileira via getBrPricingGrid
+  const getBrFn = useServerFn(getBrPricingGrid);
+  const [seguidoresBr, setSeguidoresBr] = useState<Plan[]>([]);
+  const [soBr, setSoBr] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    getBrFn({ data: { network: "tiktok", kind: "seguidores" } })
+      .then((r) => {
+        if (cancelled || !r?.items?.length) return;
+        setSeguidoresBr(r.items.map((it: any) => ({
+          id: it.id, tier: `${it.quantidade.toLocaleString("pt-BR")} Seguidores BR`,
+          tag: "🇧🇷 BR", qty: it.quantidade.toLocaleString("pt-BR"),
+          quantidade: it.quantidade, valor: it.valor, price: it.price,
+          benefit: "Perfis brasileiros reais",
+        } as Plan)));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [getBrFn]);
   const currentPlans =
-    categoria === "seguidores" ? dyn.seguidores :
+    categoria === "seguidores" ? (soBr && seguidoresBr.length ? seguidoresBr : dyn.seguidores) :
     categoria === "curtidas" ? dyn.curtidas : dyn.visualizacoes;
-  const dynAllPlans = [...dyn.seguidores, ...dyn.curtidas, ...dyn.visualizacoes];
+  const dynAllPlans = [...dyn.seguidores, ...seguidoresBr, ...dyn.curtidas, ...dyn.visualizacoes];
 
   const isFollowers = categoria === "seguidores";
 
