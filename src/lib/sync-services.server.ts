@@ -101,6 +101,9 @@ export async function syncSmmhypeServices() {
   // Garante presença dos IDs estáveis (fallback) mesmo se o fornecedor não os retornar
   await ensureFallback();
 
+  // Auto-popula service_id_matrix com variantes BR e mundial detectadas via regex no nome.
+  const brStats = await autoPopulateServiceMatrix(rows).catch((e) => ({ error: String(e?.message ?? e) }));
+
   const monitoradosFaltando: number[] = []; // garantidos via fallback
 
   return {
@@ -109,7 +112,88 @@ export async function syncSmmhypeServices() {
     synced_at: new Date().toISOString(),
     removed: aRemover.length,
     missing_monitored: monitoradosFaltando,
+    matrix: brStats,
   };
+}
+
+// ============================================================================
+// Auto-populador de service_id_matrix — detecta BR/mundial + tipo + faixa de qty
+// direto do catálogo sincronizado. Sem intervenção manual.
+// ============================================================================
+type CatalogRow = { provider_service_id: number; category: string; name: string; min: number; max: number; rate: number };
+
+function classifyService(row: CatalogRow): { network: string; service_type: string } | null {
+  const hay = `${row.category} ${row.name}`.toLowerCase();
+  // BR: bandeira, "brazil", "brasil", "br]", "[br", "portugues", "português"
+  const isBr = /🇧🇷|brazil|brasil|\bbr\b|\[br|br\]|portugues|português/i.test(hay);
+  const suffix = isBr ? "_br" : "";
+
+  let network: string | null = null;
+  if (/instagram|\big\b/.test(hay)) network = "instagram";
+  else if (/tiktok|\btt\b/.test(hay)) network = "tiktok";
+  else if (/youtube|\byt\b/.test(hay)) network = "youtube";
+  else if (/facebook|\bfb\b/.test(hay)) network = "facebook";
+  else if (/telegram/.test(hay)) network = "telegram";
+  if (!network) return null;
+
+  let type: string | null = null;
+  if (/follower|seguidor|subscribe|inscrito|member|membro/.test(hay)) type = network === "youtube" ? "followers" : "followers";
+  else if (/\blike|curtida/.test(hay)) type = "likes";
+  else if (/view|visualiza|reels view|video view/.test(hay)) type = "views";
+  else if (/canal|channel/.test(hay) && network === "telegram") type = "canal";
+  else if (/grupo|group/.test(hay) && network === "telegram") type = "grupo";
+  if (!type) return null;
+
+  return { network, service_type: type + suffix };
+}
+
+// Faixas padrão de tier (paridade com dispatcher).
+const TIERS: Array<{ label: string; min: number; max: number }> = [
+  { label: "pequeno", min: 100, max: 2000 },
+  { label: "medio", min: 2001, max: 20000 },
+  { label: "grande", min: 20001, max: 1000000 },
+];
+
+async function autoPopulateServiceMatrix(rows: CatalogRow[]) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // Agrupa serviços classificáveis por (network, service_type), ordena por rate asc (mais barato ganha).
+  const buckets = new Map<string, CatalogRow[]>();
+  for (const r of rows) {
+    const c = classifyService(r);
+    if (!c) continue;
+    if (!Number.isFinite(r.min) || !Number.isFinite(r.max) || r.max <= 0) continue;
+    const key = `${c.network}|${c.service_type}`;
+    if (!buckets.has(key)) buckets.set(key, []);
+    buckets.get(key)!.push(r);
+  }
+
+  const toUpsert: Array<{ network: string; service_type: string; min_qty: number; max_qty: number; service_id: number; tier_label: string; notes: string }> = [];
+  for (const [key, list] of buckets) {
+    const [network, service_type] = key.split("|");
+    list.sort((a, b) => (a.rate || 999) - (b.rate || 999));
+    for (const tier of TIERS) {
+      // pega o serviço mais barato que cobre a faixa inteira do tier
+      const match = list.find((s) => s.min <= tier.min && s.max >= tier.max);
+      if (!match) continue;
+      toUpsert.push({
+        network,
+        service_type,
+        min_qty: tier.min,
+        max_qty: tier.max,
+        service_id: match.provider_service_id,
+        tier_label: tier.label,
+        notes: `auto:${match.provider_service_id}·${(match.name || "").slice(0, 60)}`,
+      });
+    }
+  }
+
+  if (toUpsert.length === 0) return { populated: 0, buckets: buckets.size };
+
+  const { error } = await supabaseAdmin
+    .from("service_id_matrix" as any)
+    .upsert(toUpsert as any, { onConflict: "network,service_type,min_qty,max_qty" });
+  if (error) console.warn("[autoPopulateServiceMatrix] upsert falhou:", error.message);
+  return { populated: toUpsert.length, buckets: buckets.size, error: error?.message };
 }
 
 // Executa fallback imediatamente em runtime (popula cache em cold start se vazio)
