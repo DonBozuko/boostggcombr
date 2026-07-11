@@ -284,7 +284,9 @@ export const criarPedido = createServerFn({ method: "POST" })
           utm_content: utmClean(data.utm_content),
           utm_term: utmClean(data.utm_term),
           cupom: cupom || null,
-        })
+          bump_offered: !!data.bump_offered,
+          bump_accepted: bumpAplicado,
+        } as any)
         .select("id")
         .single();
       if (error || !inserted) {
