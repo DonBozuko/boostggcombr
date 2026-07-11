@@ -236,7 +236,7 @@ export function MobileFrame({
 
         <div className="bg-red-950/80 border border-dashed border-red-500 p-2 rounded-lg text-center mb-4 mx-3 mt-2 shrink-0" role="status" aria-live="polite" style={{ backdropFilter: "blur(8px)", boxShadow: "0 0 18px rgba(220,38,38,0.45)" }}>
           <p className="text-white font-extrabold uppercase tracking-wider text-[12px] leading-tight" style={{ textShadow: "0 0 6px rgba(0,0,0,0.9)" }}>
-            🎟️ USE O CUPOM: <span style={{ color: data.accent }}>PRIME15</span> (15% DE DESCONTO EM TODOS OS PACOTES)
+            🎟️ USE O CUPOM: <span style={{ color: data.accent }}>PRIME15</span> (15% OFF EM PEDIDOS ACIMA DE R$ 30)
           </p>
         </div>
         <RouteHeader brand={data.brand} dominio={data.dominio} accent={data.accent} tagline={data.title} />
