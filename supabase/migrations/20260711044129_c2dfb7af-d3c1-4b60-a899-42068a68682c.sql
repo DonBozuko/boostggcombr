@@ -1,0 +1,1 @@
+DELETE FROM public.service_id_matrix WHERE notes LIKE 'auto:%';
