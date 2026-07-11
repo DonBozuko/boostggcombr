@@ -202,9 +202,11 @@ export const criarPedido = createServerFn({ method: "POST" })
       }
     }
 
-    // Cupom PRIME15 = 15% off aplicado server-side. BRINDE50 = bônus em seguidores (não desconta).
+    // v189 — PRIME15 (15% off) só vale em pedidos ≥ R$ 30 (protege ticket médio).
+    // Pedido abaixo de R$ 30 ignora cupom silenciosamente — cliente já vê preço cheio no checkout.
     const cupom = (data.cupom ?? "").trim().toUpperCase();
-    const discount = cupom.split(/[,\s]+/).includes("PRIME15") ? 0.15 : 0;
+    const hasPrime = cupom.split(/[,\s]+/).includes("PRIME15");
+    const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
 
