@@ -12,6 +12,7 @@ import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { useDynamicPlans } from "@/hooks/useDynamicPlans";
+import { getBrPricingGrid } from "@/lib/pricing.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
