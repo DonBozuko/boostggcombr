@@ -357,6 +357,21 @@ function TiktokLanding() {
         <SocialProofPopup route="/tiktok" />
         <JarvisBadge variant="tiktok" inline />
       </div>
+      {categoria === "seguidores" && seguidoresBr.length > 0 && (
+        <div className="mx-auto mb-2 flex w-full max-w-[550px] items-center justify-center gap-2 px-3">
+          <button type="button" onClick={() => setSoBr(false)}
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider"
+            style={{ background: !soBr ? CYAN : "rgba(255,255,255,0.06)", color: !soBr ? "#0a0a0a" : "#e5e5e5", border: `1px solid ${!soBr ? CYAN : "rgba(255,255,255,0.15)"}` }}>
+            🌎 Mix Global
+          </button>
+          <button type="button" onClick={() => setSoBr(true)}
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider"
+            style={{ background: soBr ? "linear-gradient(180deg,#00c853,#005f2b)" : "rgba(255,255,255,0.06)", color: soBr ? "#fff" : "#e5e5e5", border: `1px solid ${soBr ? "#00c853" : "rgba(255,255,255,0.15)"}` }}
+            title="Perfis brasileiros reais">
+            🇧🇷 Só Brasileiros
+          </button>
+        </div>
+      )}
       <PremiumPricingGrid
         accent={CYAN}
         disabled={tipoBloqueado}
