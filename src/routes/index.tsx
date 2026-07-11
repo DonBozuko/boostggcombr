@@ -69,7 +69,7 @@ import { CheckCircle2 } from "lucide-react";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
-import { getPricingGrid } from "@/lib/pricing.functions";
+import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
 import { BrandHeader } from "@/components/BrandHeader";
 
 
