@@ -406,10 +406,13 @@ function Landing() {
   // Proibido cachear em localStorage (gerava drift entre builds antigos com
   // markup estático e o valor real do banco, causando oscilação R$3↔R$5).
   const getPricingGridFn = useServerFn(getPricingGrid);
+  const getBrPricingGridFn = useServerFn(getBrPricingGrid);
   type GridItem = { id: string; quantidade: number; valor: number; price: string };
   const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
     seguidores: [], curtidas: [], visualizacoes: [],
   });
+  const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>([]);
+  const [soBr, setSoBr] = useState(false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   useEffect(() => {
     let cancelled = false;
@@ -430,8 +433,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           setGridBy(next);
         }
       });
+    getBrPricingGridFn({ data: { network: "instagram", kind: "seguidores" } })
+      .then((r) => { if (!cancelled && r?.items?.length) setSeguidoresBr(r.items as GridItem[]); })
+      .catch(() => {});
     return () => { cancelled = true; };
-  }, [getPricingGridFn]);
+  }, [getPricingGridFn, getBrPricingGridFn]);
 
   const staticById = useMemo(() => {
     const m = new Map<string, Plan>();
