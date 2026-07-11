@@ -1,41 +1,32 @@
 import { useEffect, useState } from "react";
 
-// v56-Final — Strict Raw Component Injection
-// Cupom PRIME15 FIXO, sempre visível, auto-aplicado no mount.
-// Sem cronômetros, sem áudio, sem delays, sem retorno null.
+// v189 — PRIME15 restrito a pedidos ≥ R$ 30 (server-side valida).
+// UI auto-aplica e mostra a regra explícita — sem BRINDE50 fake.
 
 const VALID = "PRIME15";
 const KEY = "eb_coupon";
 const DISCOUNT = 0.15;
+const MIN_BRL = 30;
 
-// v104 — BRINDE50 (bônus em seguidores, não em cash).
-const BRINDE = "BRINDE50";
-const BRINDE_KEY = "eb_brinde";
-
-export function getCouponDiscount(): number {
+export function getCouponDiscount(valorBrl?: number): number {
   if (typeof window === "undefined") return 0;
-  try { return localStorage.getItem(KEY) === VALID ? DISCOUNT : 0; } catch { return 0; }
+  try {
+    if (localStorage.getItem(KEY) !== VALID) return 0;
+    if (typeof valorBrl === "number" && valorBrl < MIN_BRL) return 0;
+    return DISCOUNT;
+  } catch { return 0; }
 }
 
 export function getAppliedCoupon(): string | null {
   if (typeof window === "undefined") return null;
   try {
-    const parts: string[] = [];
-    if (localStorage.getItem(KEY) === VALID) parts.push(VALID);
-    if (localStorage.getItem(BRINDE_KEY) === BRINDE) parts.push(BRINDE);
-    return parts.length ? parts.join(",") : null;
+    return localStorage.getItem(KEY) === VALID ? VALID : null;
   } catch { return null; }
-}
-
-export function setBrindeApplied() {
-  if (typeof window === "undefined") return;
-  try { localStorage.setItem(BRINDE_KEY, BRINDE); } catch {}
 }
 
 export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
   const [applied, setApplied] = useState(false);
 
-  // Auto-aplica PRIME15 no primeiro render — banner sempre verdadeiro.
   useEffect(() => {
     try {
       localStorage.setItem(KEY, VALID);
@@ -63,22 +54,21 @@ export function CouponField({ accent = "#FFD700" }: { accent?: string }) {
           letterSpacing: "0.05em",
         }}
       >
-        🎟️ CUPOM ATIVO: <span style={{ color: accent }}>PRIME15</span>
+        🎟️ CUPOM: <span style={{ color: accent }}>PRIME15</span>
         <br />
         <span className="text-white/95 font-bold text-[12px]">
-          APLIQUE 15% DE DESCONTO EXTRA NO CHECKOUT
+          15% DE DESCONTO EM PEDIDOS ACIMA DE R$ 30
         </span>
       </p>
       {applied && (
         <p className="mt-2 text-[11px] font-bold text-emerald-300">
-          ✓ Desconto será aplicado automaticamente no Pix.
+          ✓ Aplicado automaticamente quando o pedido atinge R$ 30.
         </p>
       )}
     </div>
   );
 }
 
-// Alias direto — rotas que importam DelayedCouponField recebem o banner fixo.
 export function DelayedCouponField({ accent = "#FFD700" }: { accent?: string }) {
   return <CouponField accent={accent} />;
 }

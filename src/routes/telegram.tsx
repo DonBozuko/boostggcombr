@@ -3,7 +3,6 @@ import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
-import { ViralShare } from "@/components/ViralShare";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
@@ -398,7 +397,6 @@ function TelegramLanding() {
                   accent={AERO}
                 />
               )}
-              <ViralShare route="/telegram" quantidade={pedidoInfo?.quantidade ?? 0} />
               <Button size="lg" className="w-full h-12 font-bold" style={{ background: AERO, color: "#000" }} onClick={() => setModalOpen(false)}>
                 Fechar
               </Button>

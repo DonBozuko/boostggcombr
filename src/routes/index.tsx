@@ -1,7 +1,6 @@
 import ogInstagram from "@/assets/og-instagram.jpg";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
-import { ViralShare } from "@/components/ViralShare";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
@@ -938,7 +937,6 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                     </p>
                   )}
                 </div>
-                <ViralShare route="/" quantidade={pedidoInfo?.quantidade ?? 0} />
                 <Button
                   size="lg"
                   className="w-full h-12 bg-[image:var(--gradient-cta)] text-background font-bold"
