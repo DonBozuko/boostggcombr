@@ -12,6 +12,7 @@ import { MobileFrame } from "@/components/MobileFrame";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { useDynamicPlans } from "@/hooks/useDynamicPlans";
+import { getBrPricingGrid } from "@/lib/pricing.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -199,10 +200,29 @@ function TiktokLanding() {
     curtidas:      { category: "tiktok:curtidas",      fallback: likesPlans,     unitLabel: "Curtidas" },
     visualizacoes: { category: "tiktok:visualizacoes", fallback: viewsPlans,     unitLabel: "Views" },
   });
+  // v202 — BR toggle: busca variante brasileira via getBrPricingGrid
+  const getBrFn = useServerFn(getBrPricingGrid);
+  const [seguidoresBr, setSeguidoresBr] = useState<Plan[]>([]);
+  const [soBr, setSoBr] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    getBrFn({ data: { network: "tiktok", kind: "seguidores" } })
+      .then((r) => {
+        if (cancelled || !r?.items?.length) return;
+        setSeguidoresBr(r.items.map((it: any) => ({
+          id: it.id, tier: `${it.quantidade.toLocaleString("pt-BR")} Seguidores BR`,
+          tag: "🇧🇷 BR", qty: it.quantidade.toLocaleString("pt-BR"),
+          quantidade: it.quantidade, valor: it.valor, price: it.price,
+          benefit: "Perfis brasileiros reais",
+        } as Plan)));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [getBrFn]);
   const currentPlans =
-    categoria === "seguidores" ? dyn.seguidores :
+    categoria === "seguidores" ? (soBr && seguidoresBr.length ? seguidoresBr : dyn.seguidores) :
     categoria === "curtidas" ? dyn.curtidas : dyn.visualizacoes;
-  const dynAllPlans = [...dyn.seguidores, ...dyn.curtidas, ...dyn.visualizacoes];
+  const dynAllPlans = [...dyn.seguidores, ...seguidoresBr, ...dyn.curtidas, ...dyn.visualizacoes];
 
   const isFollowers = categoria === "seguidores";
 
@@ -337,6 +357,21 @@ function TiktokLanding() {
         <SocialProofPopup route="/tiktok" />
         <JarvisBadge variant="tiktok" inline />
       </div>
+      {categoria === "seguidores" && seguidoresBr.length > 0 && (
+        <div className="mx-auto mb-2 flex w-full max-w-[550px] items-center justify-center gap-2 px-3">
+          <button type="button" onClick={() => setSoBr(false)}
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider"
+            style={{ background: !soBr ? CYAN : "rgba(255,255,255,0.06)", color: !soBr ? "#0a0a0a" : "#e5e5e5", border: `1px solid ${!soBr ? CYAN : "rgba(255,255,255,0.15)"}` }}>
+            🌎 Mix Global
+          </button>
+          <button type="button" onClick={() => setSoBr(true)}
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider"
+            style={{ background: soBr ? "linear-gradient(180deg,#00c853,#005f2b)" : "rgba(255,255,255,0.06)", color: soBr ? "#fff" : "#e5e5e5", border: `1px solid ${soBr ? "#00c853" : "rgba(255,255,255,0.15)"}` }}
+            title="Perfis brasileiros reais">
+            🇧🇷 Só Brasileiros
+          </button>
+        </div>
+      )}
       <PremiumPricingGrid
         accent={CYAN}
         disabled={tipoBloqueado}

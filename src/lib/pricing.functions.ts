@@ -43,3 +43,31 @@ export const getPricingGrid = createServerFn({ method: "GET" })
     } catch { /* sem request context: ignora */ }
     return result;
   });
+
+// v202 — Grid BR curado (lê pricing_items direto, categoria 'x:y:br').
+// Usado pelo toggle "🇧🇷 Só brasileiros" nos cards IG/TikTok.
+export const getBrPricingGrid = createServerFn({ method: "GET" })
+  .inputValidator((data: { network: "instagram" | "tiktok"; kind: "seguidores" }) => {
+    if (!data || !["instagram", "tiktok"].includes(data.network)) throw new Error("network inválida");
+    if (data.kind !== "seguidores") throw new Error("kind inválido");
+    return data;
+  })
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const cat = `${data.network}:${data.kind}:br`;
+    const { data: rows } = await supabaseAdmin
+      .from("pricing_items")
+      .select("pacote, quantidade, price_brl")
+      .eq("category", cat)
+      .order("quantidade", { ascending: true });
+    const items = (rows ?? []).map((r: any) => ({
+      id: r.pacote as string,
+      quantidade: Number(r.quantidade),
+      valor: Number(r.price_brl),
+      price: `R$ ${Number(r.price_brl).toFixed(2).replace(".", ",")}`,
+    }));
+    try {
+      setResponseHeader("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
+    } catch {}
+    return { category: cat, source: "curado" as const, items, generated_at: new Date().toISOString() };
+  });

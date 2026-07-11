@@ -69,7 +69,7 @@ import { CheckCircle2 } from "lucide-react";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
-import { getPricingGrid } from "@/lib/pricing.functions";
+import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
 import { BrandHeader } from "@/components/BrandHeader";
 
 
@@ -406,10 +406,13 @@ function Landing() {
   // Proibido cachear em localStorage (gerava drift entre builds antigos com
   // markup estático e o valor real do banco, causando oscilação R$3↔R$5).
   const getPricingGridFn = useServerFn(getPricingGrid);
+  const getBrPricingGridFn = useServerFn(getBrPricingGrid);
   type GridItem = { id: string; quantidade: number; valor: number; price: string };
   const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
     seguidores: [], curtidas: [], visualizacoes: [],
   });
+  const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>([]);
+  const [soBr, setSoBr] = useState(false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   useEffect(() => {
     let cancelled = false;
@@ -430,8 +433,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           setGridBy(next);
         }
       });
+    getBrPricingGridFn({ data: { network: "instagram", kind: "seguidores" } })
+      .then((r) => { if (!cancelled && r?.items?.length) setSeguidoresBr(r.items as GridItem[]); })
+      .catch(() => {});
     return () => { cancelled = true; };
-  }, [getPricingGridFn]);
+  }, [getPricingGridFn, getBrPricingGridFn]);
 
   const staticById = useMemo(() => {
     const m = new Map<string, Plan>();
@@ -467,7 +473,9 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     });
   };
 
-  const dynPlans      = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores]);
+  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores]);
+  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr]);
+  const dynPlans        = categoria === "seguidores" && soBr ? dynPlansBr : dynPlansMundial;
   const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas]);
   const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
@@ -746,6 +754,35 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         <SocialProofPopup route="/" />
         <JarvisBadge variant="instagram" inline />
       </div>
+      {categoria === "seguidores" && seguidoresBr.length > 0 && (
+        <div className="mx-auto mb-2 flex w-full max-w-[550px] items-center justify-center gap-2 px-3">
+          <button
+            type="button"
+            onClick={() => setSoBr(false)}
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider transition"
+            style={{
+              background: !soBr ? "linear-gradient(180deg,#FFD700,#b8860b)" : "rgba(255,255,255,0.06)",
+              color: !soBr ? "#0a0a0a" : "#e5e5e5",
+              border: `1px solid ${!soBr ? "#FFD700" : "rgba(255,255,255,0.15)"}`,
+            }}
+          >
+            🌎 Mix Global
+          </button>
+          <button
+            type="button"
+            onClick={() => setSoBr(true)}
+            className="rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider transition"
+            style={{
+              background: soBr ? "linear-gradient(180deg,#00c853,#005f2b)" : "rgba(255,255,255,0.06)",
+              color: soBr ? "#fff" : "#e5e5e5",
+              border: `1px solid ${soBr ? "#00c853" : "rgba(255,255,255,0.15)"}`,
+            }}
+            title="Perfis brasileiros reais — engajam de verdade"
+          >
+            🇧🇷 Só Brasileiros
+          </button>
+        </div>
+      )}
       <PremiumPricingGrid
         cols={2}
         accent="#FFD700"
