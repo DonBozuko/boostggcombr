@@ -153,11 +153,11 @@ function classifyService(row: CatalogRow): { network: string; service_type: stri
   return { network, service_type: type + suffix };
 }
 
-// Faixas padrão de tier (paridade com dispatcher).
+// Faixas padrão de tier. Grande limitado a 100k (BR real raramente cobre 1M).
 const TIERS: Array<{ label: string; min: number; max: number }> = [
   { label: "pequeno", min: 100, max: 2000 },
   { label: "medio", min: 2001, max: 20000 },
-  { label: "grande", min: 20001, max: 1000000 },
+  { label: "grande", min: 20001, max: 100000 },
 ];
 
 async function autoPopulateServiceMatrix(rows: CatalogRow[]) {
