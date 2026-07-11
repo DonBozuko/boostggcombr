@@ -50,22 +50,26 @@ export function resolveServiceId(pacote: string, quantidade: number): number | n
 }
 
 // Mapeia prefixo do pacote para (rede, tipo) usado na chave de override.
+// Prefixo `br-` força variante brasileira (populada automaticamente pelo autoPopulateBrMatrix no sync).
 export function packageToNetworkType(pacote: string): { network: string; type: string } | null {
-  const p = String(pacote ?? "").trim().toLowerCase();
-  if (p.startsWith("tgc") || p.startsWith("tgm")) return { network: "telegram", type: "canal" };
-  if (p.startsWith("tgg")) return { network: "telegram", type: "grupo" };
-  if (p.startsWith("tf")) return { network: "tiktok", type: "followers" };
-  if (p.startsWith("tl")) return { network: "tiktok", type: "likes" };
-  if (p.startsWith("tv")) return { network: "tiktok", type: "views" };
-  if (p.startsWith("ys")) return { network: "youtube", type: "followers" };
-  if (p.startsWith("yv")) return { network: "youtube", type: "views" };
-  if (p.startsWith("ff")) return { network: "facebook", type: "followers" };
-  if (p.startsWith("fl")) return { network: "facebook", type: "likes" };
+  let p = String(pacote ?? "").trim().toLowerCase();
+  const isBr = p.startsWith("br-");
+  if (isBr) p = p.slice(3);
+  const suffix = isBr ? "_br" : "";
+  if (p.startsWith("tgc") || p.startsWith("tgm")) return { network: "telegram", type: "canal" + suffix };
+  if (p.startsWith("tgg")) return { network: "telegram", type: "grupo" + suffix };
+  if (p.startsWith("tf")) return { network: "tiktok", type: "followers" + suffix };
+  if (p.startsWith("tl")) return { network: "tiktok", type: "likes" + suffix };
+  if (p.startsWith("tv")) return { network: "tiktok", type: "views" + suffix };
+  if (p.startsWith("ys")) return { network: "youtube", type: "followers" + suffix };
+  if (p.startsWith("yv")) return { network: "youtube", type: "views" + suffix };
+  if (p.startsWith("ff")) return { network: "facebook", type: "followers" + suffix };
+  if (p.startsWith("fl")) return { network: "facebook", type: "likes" + suffix };
   if (p.startsWith("wbr")) return { network: "trafego", type: "br" };
   if (p.startsWith("wgl")) return { network: "trafego", type: "global" };
-  if (p.startsWith("v"))  return { network: "instagram", type: "views" };
-  if (p.startsWith("l"))  return { network: "instagram", type: "likes" };
-  if (p.startsWith("p"))  return { network: "instagram", type: "followers" };
+  if (p.startsWith("v"))  return { network: "instagram", type: "views" + suffix };
+  if (p.startsWith("l"))  return { network: "instagram", type: "likes" + suffix };
+  if (p.startsWith("p"))  return { network: "instagram", type: "followers" + suffix };
   return null;
 }
 
