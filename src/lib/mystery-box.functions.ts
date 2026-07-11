@@ -4,7 +4,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const MIN_QTY = 300; // regra oficial: bônus só para pedidos >= 300 seguidores
+const MIN_QTY = 200; // v190 — alinhado à UI (Bônus Especial promete "acima de 200 unidades")
 const MB_MARKER = /MB_REDEEMED:(\d+)/i;
 
 const input = z.object({
