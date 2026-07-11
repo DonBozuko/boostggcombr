@@ -12,7 +12,9 @@ type ProviderService = {
   refill?: boolean;
 };
 
-export const SERVICOS_MONITORADOS = [14325, 14225, 18860];
+// IDs curados manualmente. Mundiais: 14325/14225 (IG followers), 18860 (IG likes).
+// BR reais validados no catálogo SMMhype: 4100 (IG followers BR), 14441/9264 (IG likes BR), 4292 (TikTok followers BR).
+export const SERVICOS_MONITORADOS = [14325, 14225, 18860, 4100, 14441, 9264, 4292];
 
 // Fallback fixo: IDs estáveis garantidos no cache mesmo se a API do fornecedor
 // não os retornar (evita falsos positivos de "serviço sumiu").
