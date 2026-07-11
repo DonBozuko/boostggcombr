@@ -103,9 +103,6 @@ export async function syncSmmhypeServices() {
   // Garante presença dos IDs estáveis (fallback) mesmo se o fornecedor não os retornar
   await ensureFallback();
 
-  // Auto-popula service_id_matrix com variantes BR e mundial detectadas via regex no nome.
-  const brStats = await autoPopulateServiceMatrix(rows).catch((e) => ({ error: String(e?.message ?? e) }));
-
   const monitoradosFaltando: number[] = []; // garantidos via fallback
 
   return {
@@ -114,7 +111,6 @@ export async function syncSmmhypeServices() {
     synced_at: new Date().toISOString(),
     removed: aRemover.length,
     missing_monitored: monitoradosFaltando,
-    matrix: brStats,
   };
 }
 
