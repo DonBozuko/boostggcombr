@@ -124,24 +124,30 @@ type CatalogRow = { provider_service_id: number; category: string; name: string;
 
 function classifyService(row: CatalogRow): { network: string; service_type: string } | null {
   const hay = `${row.category} ${row.name}`.toLowerCase();
-  // BR: bandeira, "brazil", "brasil", "br]", "[br", "portugues", "português"
-  const isBr = /🇧🇷|brazil|brasil|\bbr\b|\[br|br\]|portugues|português/i.test(hay);
+  // Exclusões duras: ADS, comentários, saves, story, thread/channel-member confundido com follower
+  if (/\bads\b|adsense|comment|coment|\bsave|story views|shares?\b/.test(hay)) return null;
+
+  // BR: bandeira, "brazil", "brasil", "português", "[br]"; exige token isolado (não pega "bright", "brand")
+  const isBr = /🇧🇷|brazil|brasil|portugues|português|\[br\]|\bbr\s|\-\s?br\b/i.test(hay);
   const suffix = isBr ? "_br" : "";
 
   let network: string | null = null;
-  if (/instagram|\big\b/.test(hay)) network = "instagram";
-  else if (/tiktok|\btt\b/.test(hay)) network = "tiktok";
-  else if (/youtube|\byt\b/.test(hay)) network = "youtube";
-  else if (/facebook|\bfb\b/.test(hay)) network = "facebook";
+  if (/\binstagram\b|\big\b/.test(hay)) network = "instagram";
+  else if (/\btiktok\b|\btt\b/.test(hay)) network = "tiktok";
+  else if (/\byoutube\b|\byt\b/.test(hay)) network = "youtube";
+  else if (/\bfacebook\b|\bfb\b/.test(hay)) network = "facebook";
   else if (/telegram/.test(hay)) network = "telegram";
   if (!network) return null;
 
   let type: string | null = null;
-  if (/follower|seguidor|subscribe|inscrito|member|membro/.test(hay)) type = network === "youtube" ? "followers" : "followers";
-  else if (/\blike|curtida/.test(hay)) type = "likes";
-  else if (/view|visualiza|reels view|video view/.test(hay)) type = "views";
-  else if (/canal|channel/.test(hay) && network === "telegram") type = "canal";
-  else if (/grupo|group/.test(hay) && network === "telegram") type = "grupo";
+  // Followers: exige "follower/seguidor/subscribe/inscrito"; para IG/TT/FB EXCLUI "channel", "thread", "group", "member"
+  const isChannelish = /channel|thread|group|grupo|\bmember\b|membro/.test(hay);
+  if (/follower|seguidor|subscribe|inscrito/.test(hay) && !(isChannelish && network !== "telegram")) {
+    type = "followers";
+  } else if (/\blike|curtida/.test(hay)) type = "likes";
+  else if (/view|visualiza/.test(hay)) type = "views";
+  else if (network === "telegram" && /canal|channel/.test(hay)) type = "canal";
+  else if (network === "telegram" && (/grupo|group/.test(hay) || /\bmember\b/.test(hay))) type = "grupo";
   if (!type) return null;
 
   return { network, service_type: type + suffix };
