@@ -12,7 +12,9 @@ type ProviderService = {
   refill?: boolean;
 };
 
-export const SERVICOS_MONITORADOS = [14325, 14225, 18860];
+// IDs curados manualmente. Mundiais: 14325/14225 (IG followers), 18860 (IG likes).
+// BR reais validados no catálogo SMMhype: 4100 (IG followers BR), 14441/9264 (IG likes BR), 4292 (TikTok followers BR).
+export const SERVICOS_MONITORADOS = [14325, 14225, 18860, 4100, 14441, 9264, 4292];
 
 // Fallback fixo: IDs estáveis garantidos no cache mesmo se a API do fornecedor
 // não os retornar (evita falsos positivos de "serviço sumiu").
@@ -101,9 +103,6 @@ export async function syncSmmhypeServices() {
   // Garante presença dos IDs estáveis (fallback) mesmo se o fornecedor não os retornar
   await ensureFallback();
 
-  // Auto-popula service_id_matrix com variantes BR e mundial detectadas via regex no nome.
-  const brStats = await autoPopulateServiceMatrix(rows).catch((e) => ({ error: String(e?.message ?? e) }));
-
   const monitoradosFaltando: number[] = []; // garantidos via fallback
 
   return {
@@ -112,95 +111,11 @@ export async function syncSmmhypeServices() {
     synced_at: new Date().toISOString(),
     removed: aRemover.length,
     missing_monitored: monitoradosFaltando,
-    matrix: brStats,
   };
 }
 
-// ============================================================================
-// Auto-populador de service_id_matrix — detecta BR/mundial + tipo + faixa de qty
-// direto do catálogo sincronizado. Sem intervenção manual.
-// ============================================================================
-type CatalogRow = { provider_service_id: number; category: string; name: string; min: number; max: number; rate: number };
-
-function classifyService(row: CatalogRow): { network: string; service_type: string } | null {
-  const hay = `${row.category} ${row.name}`.toLowerCase();
-  // Exclusões duras: ADS, comentários, saves, story, thread/channel-member confundido com follower
-  if (/\bads\b|adsense|comment|coment|\bsave|story views|shares?\b/.test(hay)) return null;
-
-  // BR: bandeira, "brazil", "brasil", "português", "[br]"; exige token isolado (não pega "bright", "brand")
-  const isBr = /🇧🇷|brazil|brasil|portugues|português|\[br\]|\bbr\s|\-\s?br\b/i.test(hay);
-  const suffix = isBr ? "_br" : "";
-
-  let network: string | null = null;
-  if (/\binstagram\b|\big\b/.test(hay)) network = "instagram";
-  else if (/\btiktok\b|\btt\b/.test(hay)) network = "tiktok";
-  else if (/\byoutube\b|\byt\b/.test(hay)) network = "youtube";
-  else if (/\bfacebook\b|\bfb\b/.test(hay)) network = "facebook";
-  else if (/telegram/.test(hay)) network = "telegram";
-  if (!network) return null;
-
-  let type: string | null = null;
-  // Followers: exige "follower/seguidor/subscribe/inscrito"; para IG/TT/FB EXCLUI "channel", "thread", "group", "member"
-  const isChannelish = /channel|thread|group|grupo|\bmember\b|membro/.test(hay);
-  if (/follower|seguidor|subscribe|inscrito/.test(hay) && !(isChannelish && network !== "telegram")) {
-    type = "followers";
-  } else if (/\blike|curtida/.test(hay)) type = "likes";
-  else if (/view|visualiza/.test(hay)) type = "views";
-  else if (network === "telegram" && /canal|channel/.test(hay)) type = "canal";
-  else if (network === "telegram" && (/grupo|group/.test(hay) || /\bmember\b/.test(hay))) type = "grupo";
-  if (!type) return null;
-
-  return { network, service_type: type + suffix };
-}
-
-// Faixas padrão de tier. Grande limitado a 100k (BR real raramente cobre 1M).
-const TIERS: Array<{ label: string; min: number; max: number }> = [
-  { label: "pequeno", min: 100, max: 2000 },
-  { label: "medio", min: 2001, max: 20000 },
-  { label: "grande", min: 20001, max: 100000 },
-];
-
-async function autoPopulateServiceMatrix(rows: CatalogRow[]) {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  // Agrupa serviços classificáveis por (network, service_type), ordena por rate asc (mais barato ganha).
-  const buckets = new Map<string, CatalogRow[]>();
-  for (const r of rows) {
-    const c = classifyService(r);
-    if (!c) continue;
-    if (!Number.isFinite(r.min) || !Number.isFinite(r.max) || r.max <= 0) continue;
-    const key = `${c.network}|${c.service_type}`;
-    if (!buckets.has(key)) buckets.set(key, []);
-    buckets.get(key)!.push(r);
-  }
-
-  const toUpsert: Array<{ network: string; service_type: string; min_qty: number; max_qty: number; service_id: number; tier_label: string; notes: string }> = [];
-  for (const [key, list] of buckets) {
-    const [network, service_type] = key.split("|");
-    list.sort((a, b) => (a.rate || 999) - (b.rate || 999));
-    for (const tier of TIERS) {
-      // pega o serviço mais barato que cobre a faixa inteira do tier
-      const match = list.find((s) => s.min <= tier.min && s.max >= tier.max);
-      if (!match) continue;
-      toUpsert.push({
-        network,
-        service_type,
-        min_qty: tier.min,
-        max_qty: tier.max,
-        service_id: match.provider_service_id,
-        tier_label: tier.label,
-        notes: `auto:${match.provider_service_id}·${(match.name || "").slice(0, 60)}`,
-      });
-    }
-  }
-
-  if (toUpsert.length === 0) return { populated: 0, buckets: buckets.size };
-
-  const { error } = await supabaseAdmin
-    .from("service_id_matrix" as any)
-    .upsert(toUpsert as any, { onConflict: "network,service_type,min_qty,max_qty" });
-  if (error) console.warn("[autoPopulateServiceMatrix] upsert falhou:", error.message);
-  return { populated: toUpsert.length, buckets: buckets.size, error: error?.message };
-}
+// v172 — auto-populador removido: gerava IDs falsos (Channel Member como follower_br etc).
+// service_id_matrix é 100% curadoria manual via migration (SEEDs) + smoke-test antes de publicar SKU.
 
 // Executa fallback imediatamente em runtime (popula cache em cold start se vazio)
 ensureFallback().catch(() => { /* silencioso: chamado novamente no próximo sync */ });
