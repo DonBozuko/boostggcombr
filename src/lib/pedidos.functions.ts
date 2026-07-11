@@ -184,20 +184,23 @@ export const criarPedido = createServerFn({ method: "POST" })
     let pacoteEfetivo = data.pacote;
     let quantidadeEfetiva = qtdOficial;
     let bumpAplicado = false;
-    if (data.bump_upgrade && gridRef) {
+    let bumpOfertado = false;
+    if (gridRef) {
       // v184 — Smart-skip: pega menor tier cujo -20% ainda gera uplift ≥15%.
       const candidates = gridRef.items
         .filter((i) => i.quantidade > qtdOficial)
         .sort((a, b) => a.quantidade - b.quantidade);
       const baseRef = valorBase!;
       const next = candidates.find((i) => i.valor * 0.80 >= baseRef * 1.15);
-      if (next) {
+      // v190 — Telemetria: se existe tier válido, o dialog foi mostrado no front.
+      bumpOfertado = !!next;
+      if (data.bump_upgrade && next) {
         pacoteEfetivo = next.id;
         quantidadeEfetiva = next.quantidade;
         valorBase = Number((next.valor * 0.80).toFixed(2));
         bumpAplicado = true;
         console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
-      } else {
+      } else if (data.bump_upgrade) {
         console.log("[criarPedido] bump rejeitado (nenhum tier válido):", data.pacote);
       }
     }
@@ -283,7 +286,9 @@ export const criarPedido = createServerFn({ method: "POST" })
           utm_content: utmClean(data.utm_content),
           utm_term: utmClean(data.utm_term),
           cupom: cupom || null,
-        })
+          bump_offered: bumpOfertado,
+          bump_accepted: bumpAplicado,
+        } as any)
         .select("id")
         .single();
       if (error || !inserted) {
