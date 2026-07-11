@@ -3,7 +3,6 @@ import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
-import { ViralShare } from "@/components/ViralShare";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
@@ -479,7 +478,6 @@ function TiktokLanding() {
                   accent={CYAN}
                 />
               )}
-              <ViralShare route="/tiktok" quantidade={pedidoInfo?.quantidade ?? 0} />
               <Button
                 size="lg"
                 className="w-full h-12 font-bold"
