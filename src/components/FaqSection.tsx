@@ -58,7 +58,7 @@ export function FaqSection({ network }: { network: keyof typeof FAQS }) {
         {items.map((item, i) => (
           <details
             key={i}
-            className="group rounded-lg border border-white/10 bg-white/5 p-4 backdrop-blur"
+            className="group rounded-lg border border-white/10 bg-white/5 p-4"
           >
             <summary className="cursor-pointer list-none flex items-center justify-between gap-3 text-white font-medium">
               <span>{item.q}</span>

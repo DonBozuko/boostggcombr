@@ -9,7 +9,7 @@ export function LivePurchasesTicker({ accent = "#00f2fe" }: { accent?: string })
   const loop = [...MESSAGES, ...MESSAGES];
   return (
     <div
-      className="mx-2 mt-1 mb-1 overflow-hidden rounded-lg border backdrop-blur-md"
+      className="mx-2 mt-1 mb-1 overflow-hidden rounded-lg border bg-black/70"
       style={{
         borderColor: `${accent}40`,
         background: "rgba(255,255,255,0.03)",
