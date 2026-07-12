@@ -42,9 +42,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/facebook")({
   head: () => {
-    const title = "Comprar Curtidas e Seguidores Facebook | EliteBoost";
+    const title = "Impulsionar Facebook — Curtidas e Seguidores Reais | EliteBoost";
     const description =
-      "Compre curtidas, seguidores e views de Facebook reais com entrega via Pix. Engajamento orgânico, alta retenção e reposição garantida.";
+      "Impulsione seu Facebook com curtidas, seguidores e views reais via Pix. Engajamento orgânico, alta retenção e reposição garantida.";
     const url = "https://boostgg.com.br/facebook";
     const ogImage = `https://boostgg.com.br${ogFacebook}?v=48`;
     return {
@@ -280,7 +280,7 @@ function FacebookLanding() {
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Comprar Curtidas e Seguidores Facebook
+        Impulsionar Facebook — Curtidas e Seguidores
       </h1>
       <ShowcaseShell>
       {/* v115 — Mystery Box Banner (>200) */}

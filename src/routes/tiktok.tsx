@@ -43,9 +43,9 @@ import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Comprar Seguidores TikTok Barato | EliteBoost Prime";
+    const title = "Turbinar TikTok — Seguidores, Curtidas e Views Reais | EliteBoost Prime";
     const description =
-      "Compre seguidores, curtidas e views de TikTok reais com entrega imediata via Pix. Alta retenção, orgânico e reposição garantida.";
+      "Turbine seu TikTok com seguidores, curtidas e views reais via Pix. Entrega imediata, alta retenção e reposição garantida.";
     const url = "https://boostgg.com.br/tiktok";
     const ogImage = `https://boostgg.com.br${ogTiktok}?v=48`;
     return {
