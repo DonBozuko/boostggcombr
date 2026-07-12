@@ -39,9 +39,9 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/trafego")({
   head: () => {
-    const title = "Comprar Tráfego Web Real BR e Global | EliteBoost";
+    const title = "Tráfego Web Real BR e Global — Segmentado | EliteBoost";
     const description =
-      "Compre tráfego web real, do Brasil ou global, com entrega imediata via Pix. Segmentado, seguro e com reposição garantida.";
+      "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega imediata, segmentado, seguro e com reposição garantida.";
     const url = "https://boostgg.com.br/trafego";
     const ogImage = `https://boostgg.com.br${ogTrafego}?v=48`;
     return {
@@ -223,7 +223,7 @@ function TrafegoLanding() {
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Comprar Tráfego Web Real
+        Tráfego Web Real Segmentado
       </h1>
       <ShowcaseShell>
       <PremiumCategorySelector

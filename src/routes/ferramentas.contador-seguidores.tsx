@@ -132,7 +132,7 @@ function ContadorPage() {
                   to="/"
                   className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
                 >
-                  Comprar seguidores no Pix →
+                  Impulsionar perfil no Pix →
                 </Link>
               </div>
             </div>

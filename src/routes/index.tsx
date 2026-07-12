@@ -111,9 +111,9 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Comprar Seguidores Instagram no Pix — Reais e Baratos | EliteBoost Prime";
+    const title = "Impulsionar Instagram no Pix — Crescimento Real e Rápido | EliteBoost Prime";
     const description =
-      "Comprar seguidores Instagram reais com pagamento no Pix e entrega em minutos. Preços baratos, alta retenção, reposição garantida e 100% seguro.";
+      "Impulsione seu Instagram com audiência real via Pix e entrega em minutos. Alta retenção, reposição garantida e 100% seguro.";
     const url = "https://boostgg.com.br/";
     const ogImage = `https://boostgg.com.br${ogInstagram}?v=48`;
     return {
@@ -704,7 +704,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Comprar Seguidores Instagram Reais
+        Impulsionar Instagram com Audiência Real
       </h1>
       <ShowcaseShell>
 
@@ -1167,7 +1167,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       <section id="faq" className="container mx-auto px-6 py-24 max-w-3xl">
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold">Perguntas frequentes</h2>
-          <p className="mt-3 text-zinc-300">Tudo o que você precisa saber antes de comprar.</p>
+          <p className="mt-3 text-zinc-300">Tudo o que você precisa saber antes de contratar.</p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
