@@ -516,6 +516,63 @@ export type Database = {
         }
         Relationships: []
       }
+      pix_recovery_queue: {
+        Row: {
+          attempts: number
+          contacted_at: string | null
+          created_at: string
+          first_seen_at: string
+          id: number
+          instagram_user: string | null
+          mercado_pago_id: string | null
+          next_action_at: string
+          notes: string | null
+          pacote: string | null
+          pedido_id: string
+          rede_social: string | null
+          status: string
+          updated_at: string
+          valor: number
+          whatsapp: string | null
+        }
+        Insert: {
+          attempts?: number
+          contacted_at?: string | null
+          created_at?: string
+          first_seen_at?: string
+          id?: number
+          instagram_user?: string | null
+          mercado_pago_id?: string | null
+          next_action_at?: string
+          notes?: string | null
+          pacote?: string | null
+          pedido_id: string
+          rede_social?: string | null
+          status?: string
+          updated_at?: string
+          valor?: number
+          whatsapp?: string | null
+        }
+        Update: {
+          attempts?: number
+          contacted_at?: string | null
+          created_at?: string
+          first_seen_at?: string
+          id?: number
+          instagram_user?: string | null
+          mercado_pago_id?: string | null
+          next_action_at?: string
+          notes?: string | null
+          pacote?: string | null
+          pedido_id?: string
+          rede_social?: string | null
+          status?: string
+          updated_at?: string
+          valor?: number
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       pricing_cache: {
         Row: {
           category: string
