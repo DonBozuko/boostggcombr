@@ -1167,28 +1167,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </section>
 
-      {/* FAQ */}
-      <section id="faq" className="container mx-auto px-6 py-24 max-w-3xl">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold">Perguntas frequentes</h2>
-          <p className="mt-3 text-zinc-300">Tudo o que você precisa saber antes de contratar.</p>
-        </div>
+      {/* FAQ movida para <FaqSection /> abaixo (evita duplicação) */}
 
-        <Accordion type="single" collapsible className="space-y-3">
-          {faqs.map((f, i) => (
-            <AccordionItem
-              key={i}
-              value={`item-${i}`}
-              className="rounded-xl border border-border bg-card/60 px-6 border-b"
-            >
-              <AccordionTrigger className="text-left font-display font-semibold hover:no-underline py-5">
-                {f.q}
-              </AccordionTrigger>
-              <AccordionContent className="text-zinc-300 pb-5">{f.a}</AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </section>
 
       {/* FOOTER */}
       <footer className="border-t border-border py-10">
