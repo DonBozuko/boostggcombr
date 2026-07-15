@@ -83,7 +83,7 @@ function Page() {
           body: "Perfil pequeno perde antes mesmo de ser lido. Ninguém segue quem tem 40 seguidores — é prova social invertida. Comprar seguidores no Instagram é um empurrão inicial que quebra essa barreira: sua conta passa a parecer confiável, o algoritmo começa a distribuir mais, e cada novo Reels chega em mais gente. Não substitui conteúdo bom, mas acelera o efeito.",
         },
         {
-          h2: "Como funciona a compra na EliteBoost",
+          h2: "Como funciona a compra na BoostGG",
           body: "1. Escolha o pacote (100 a 100.000 seguidores).\n2. Cole o @ do seu Instagram (sem senha).\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos os primeiros seguidores começam a entrar.\n5. Reposição automática por 30 dias se cair qualquer coisa.",
         },
         {

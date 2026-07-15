@@ -39,13 +39,13 @@ const POSTS = [
 export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
-      { title: "Blog EliteBoost Prime — Crescimento no Instagram" },
+      { title: "Blog BoostGG — Crescimento no Instagram" },
       {
         name: "description",
         content:
           "Guias práticos sobre crescer no Instagram, comprar seguidores com segurança e escolher os melhores serviços em 2026.",
       },
-      { property: "og:title", content: "Blog EliteBoost Prime" },
+      { property: "og:title", content: "Blog BoostGG" },
       { property: "og:description", content: "Guias práticos sobre crescimento no Instagram." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: `${BASE}/blog` },

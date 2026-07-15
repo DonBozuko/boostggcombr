@@ -83,7 +83,7 @@ function Page() {
           body: "O algoritmo do Instagram decide se vai mostrar seu post pra mais gente nos primeiros 30-60 minutos. Se nesse intervalo o post recebe muitas curtidas, ele viaja pra explore, sugestões, hashtags. Se recebe pouca, morre. Comprar curtidas nesse primeiro momento é literalmente comprar o gatilho de distribuição.",
         },
         {
-          h2: "Como comprar curtidas Instagram na EliteBoost",
+          h2: "Como comprar curtidas Instagram na BoostGG",
           body: "1. Escolha a quantidade (100 a 100.000).\n2. Cole o link do post que quer turbinar.\n3. Pague o Pix (QR Code ou copia e cola).\n4. Em segundos as curtidas começam a entrar.\n5. Se cair, reposição automática por 30 dias.",
         },
         {
