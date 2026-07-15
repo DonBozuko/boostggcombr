@@ -713,4 +713,84 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
   });
 
 
+// === CENTRAL DE RECUPERAÇÃO DE PIX (Etapa 2 Growth) ===
+
+export const getRecoveryQueue = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ token: z.string().min(8) }).parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("pix_recovery_queue")
+      .select("*")
+      .in("status", ["novo", "contatado"])
+      .order("valor", { ascending: false })
+      .limit(100);
+    if (error) return { ok: false as const, error: error.message };
+    const totalValor = (rows ?? []).reduce((a, r) => a + Number((r as { valor?: number }).valor ?? 0), 0);
+    return { ok: true as const, rows: rows ?? [], totalValor };
+  });
+
+export const markRecoveryContacted = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({
+    token: z.string().min(8),
+    id: z.number().int(),
+  }).parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("pix_recovery_queue")
+      .update({
+        status: "contatado",
+        contacted_at: new Date().toISOString(),
+        next_action_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      })
+      // @ts-expect-error - attempts increment
+      .update({ attempts: (v: number) => (v ?? 0) + 1 })
+      .eq("id", data.id);
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });
+
+export const dismissRecovery = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({
+    token: z.string().min(8),
+    id: z.number().int(),
+    reason: z.string().max(200).optional(),
+  }).parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("pix_recovery_queue")
+      .update({ status: "descartado", notes: data.reason ?? null })
+      .eq("id", data.id);
+    if (error) return { ok: false as const, error: error.message };
+    return { ok: true as const };
+  });
+
+export const getRecoveryStats = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ token: z.string().min(8) }).parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: rows, error } = await supabaseAdmin
+      .from("pix_recovery_queue")
+      .select("status, valor")
+      .gte("created_at", since);
+    if (error) return { ok: false as const, error: error.message };
+    const stats = { novo: 0, contatado: 0, recuperado: 0, descartado: 0, valor_recuperado: 0 };
+    for (const r of rows ?? []) {
+      const s = String((r as { status?: string }).status ?? "");
+      const v = Number((r as { valor?: number }).valor ?? 0);
+      if (s in stats) (stats as Record<string, number>)[s]++;
+      if (s === "recuperado") stats.valor_recuperado += v;
+    }
+    return { ok: true as const, stats };
+  });
+
+
+
 
