@@ -10,12 +10,13 @@ const ITEMS = [
 
 export function TrustBadges({ accent = "#FFD700" }: { accent?: string }) {
   return (
-    <section className="mx-auto w-full max-w-7xl px-2 mt-1 mb-1" aria-label="Por que escolher a EliteBoost Prime">
+    <section className="mx-auto w-full max-w-7xl px-2 mt-1 mb-1" aria-label="Por que escolher a BoostGG">
+
       <p
         className="text-center text-[8px] font-black tracking-[0.3em] mb-1"
         style={{ color: accent, textShadow: `0 0 6px ${accent}` }}
       >
-        POR QUE ESCOLHER A ELITEBOOST?
+        POR QUE ESCOLHER A BOOSTGG?
       </p>
       <div className="grid grid-cols-5 gap-1">
         {ITEMS.map(({ Icon, label }) => (
