@@ -5,6 +5,7 @@ const BASE = "https://boostgg.com.br";
 
 type Post = {
   title: string;
+  seoTitle?: string;
   description: string;
   subtitle: string;
   datePublished: string;
