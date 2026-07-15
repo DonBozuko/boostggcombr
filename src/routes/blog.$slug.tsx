@@ -289,7 +289,7 @@ export const Route = createFileRoute("/blog/$slug")({
     const url = `${BASE}/blog/${slug}`;
     return {
       meta: [
-        { title: `${post.title} — EliteBoost Prime` },
+        { title: `${post.seoTitle ?? post.title} — BoostGG` },
         { name: "description", content: post.description },
         { property: "og:title", content: post.title },
         { property: "og:description", content: post.description },
