@@ -29,6 +29,7 @@ import {
   Star,
 } from "lucide-react";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
+import { useBestsellers } from "@/hooks/useBestsellers";
 
 
 import { Button } from "@/components/ui/button";
@@ -445,6 +446,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     return m;
   }, []);
 
+  const bestsellers = useBestsellers();
+
   const buildDyn = (items: GridItem[], fallback: Plan[], unitLabel: string): Plan[] => {
     if (!items.length) return fallback;
     const tagFor = (q: number): string => {
@@ -459,25 +462,26 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     return items.map((it) => {
       const s = staticById.get(it.id);
       const qtyStr = it.quantidade.toLocaleString("pt-BR");
+      const isBestseller = bestsellers[it.id] === true;
       return {
         id: it.id,
         tier: s?.tier ?? `${qtyStr} ${unitLabel}`,
-        tag: s?.tag ?? tagFor(it.quantidade),
+        tag: isBestseller ? "🔥 MAIS VENDIDO 24H" : (s?.tag ?? tagFor(it.quantidade)),
         qty: qtyStr,
         quantidade: it.quantidade,
         valor: it.valor,
         price: it.price,
-        benefit: s?.benefit ?? "Entrega rápida e segura",
-        highlight: s?.highlight,
+        benefit: isBestseller ? "🔥 Escolha dos clientes nas últimas 24h" : (s?.benefit ?? "Entrega rápida e segura"),
+        highlight: isBestseller ? true : s?.highlight,
       };
     });
   };
 
-  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores]);
-  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr]);
+  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores, bestsellers]);
+  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr, bestsellers]);
   const dynPlans        = categoria === "seguidores" && soBr ? dynPlansBr : dynPlansMundial;
-  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas]);
-  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes]);
+  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas, bestsellers]);
+  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes, bestsellers]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
 
   // Polling: a cada 5s consulta o status do pedido até detectar 'paid' ou rejeição.

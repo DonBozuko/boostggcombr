@@ -72,7 +72,7 @@ export const Route = createFileRoute("/tiktok")({
 });
 
 type Categoria = "seguidores" | "curtidas" | "visualizacoes";
-type Plan = { id: string; tier: string; qty: string; quantidade: number; valor: number; price: string };
+type Plan = { id: string; tier: string; qty: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
 const FOLLOWER_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
 const LIKE_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
@@ -381,7 +381,7 @@ function TiktokLanding() {
           id: p.id,
           qty: p.quantidade.toLocaleString("pt-BR"),
           price: p.price,
-          fire: i === 1,
+          fire: p.highlight === true || i === 1,
         }))}
         onBuy={(id) => { setPlanId(id); document.getElementById("tt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
       />

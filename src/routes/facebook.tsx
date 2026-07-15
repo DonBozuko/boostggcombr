@@ -71,7 +71,7 @@ export const Route = createFileRoute("/facebook")({
 });
 
 type Categoria = "seguidores" | "curtidas";
-type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
+type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
 const FB_FOLLOWER_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
 const FB_LIKE_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
@@ -316,7 +316,7 @@ function FacebookLanding() {
           id: p.id,
           qty: p.quantidade.toLocaleString("pt-BR"),
           price: p.price,
-          fire: i === 1,
+          fire: p.highlight === true || i === 1,
         }))}
         onBuy={(id) => { setPlanId(id); document.getElementById("fb-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
       />
