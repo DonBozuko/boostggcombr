@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-seguidores-instagram";
-const TITLE = "Comprar Seguidores Instagram Reais e Baratos — Entrega Imediata via Pix";
+const TITLE = "Comprar Seguidores Instagram Reais e Baratos via Pix";
 const DESC =
   "Compre seguidores para Instagram com entrega em minutos, pagamento via Pix e reposição garantida. Perfis brasileiros, sem senha, 100% seguro.";
 
