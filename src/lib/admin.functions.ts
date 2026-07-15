@@ -739,15 +739,20 @@ export const markRecoveryContacted = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: cur } = await supabaseAdmin
+      .from("pix_recovery_queue")
+      .select("attempts")
+      .eq("id", data.id)
+      .maybeSingle();
+    const attempts = Number((cur as { attempts?: number } | null)?.attempts ?? 0) + 1;
     const { error } = await supabaseAdmin
       .from("pix_recovery_queue")
       .update({
         status: "contatado",
         contacted_at: new Date().toISOString(),
         next_action_at: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+        attempts,
       })
-      // @ts-expect-error - attempts increment
-      .update({ attempts: (v: number) => (v ?? 0) + 1 })
       .eq("id", data.id);
     if (error) return { ok: false as const, error: error.message };
     return { ok: true as const };
