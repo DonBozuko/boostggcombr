@@ -42,6 +42,14 @@ const buildSitemapXml = () => {
     { path: "/comprar-seguidores-brasileiros", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-visualizacoes-tiktok", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-inscritos-youtube", changefreq: "weekly", priority: "0.9" },
+    { path: "/audiencia-brasileira", changefreq: "weekly", priority: "0.8" },
+    { path: "/crescer-youtube", changefreq: "weekly", priority: "0.8" },
+    { path: "/engajamento-instagram", changefreq: "weekly", priority: "0.8" },
+    { path: "/impulsionar-instagram", changefreq: "weekly", priority: "0.8" },
+    { path: "/turbinar-tiktok", changefreq: "weekly", priority: "0.8" },
+    { path: "/views-tiktok", changefreq: "weekly", priority: "0.8" },
+    { path: "/termos", changefreq: "yearly", priority: "0.3" },
+    { path: "/reembolso", changefreq: "yearly", priority: "0.3" },
   ];
 
 
