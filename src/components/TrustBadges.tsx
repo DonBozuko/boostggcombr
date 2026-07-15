@@ -16,7 +16,7 @@ export function TrustBadges({ accent = "#FFD700" }: { accent?: string }) {
         className="text-center text-[8px] font-black tracking-[0.3em] mb-1"
         style={{ color: accent, textShadow: `0 0 6px ${accent}` }}
       >
-        POR QUE ESCOLHER A ELITEBOOST?
+        POR QUE ESCOLHER A BOOSTGG?
       </p>
       <div className="grid grid-cols-5 gap-1">
         {ITEMS.map(({ Icon, label }) => (
