@@ -112,12 +112,12 @@ function RouteHeader({
       className="px-3 pt-2 pb-1 text-center select-none"
       style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
     >
-      <h1
+      <div
         className="text-[20px] sm:text-[22px] font-extrabold tracking-tight text-white leading-tight"
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", letterSpacing: "-0.01em" }}
       >
         {dominio}
-      </h1>
+      </div>
       <p
         className="mt-1 text-[11px] sm:text-[12px] font-semibold text-white/85 max-w-[520px] mx-auto"
         style={{ textShadow: `0 0 10px ${accent}55` }}
