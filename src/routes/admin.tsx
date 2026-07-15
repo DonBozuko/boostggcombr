@@ -53,6 +53,7 @@ import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { RoasPanel } from "@/components/RoasPanel";
+import { FunnelPanel } from "@/components/FunnelPanel";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
