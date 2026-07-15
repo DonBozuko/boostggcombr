@@ -17,7 +17,7 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
           // Busca pedidos pendentes na janela
           const { data: pendentes, error } = await supabaseAdmin
             .from("pedidos")
-            .select("id, mercado_pago_id, valor, rede_social, pacote, whatsapp_contato, instagram_user, created_at, status")
+            .select("id, mercado_pago_id, valor, rede_social, pacote, instagram_user, created_at, status")
             .in("status", ["pending", "mp_pending", "mp_in_process"])
             .gte("created_at", from)
             .lte("created_at", to)
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
               valor: Number(r.valor ?? 0),
               rede_social: r.rede_social ?? null,
               pacote: r.pacote ?? null,
-              whatsapp: r.whatsapp_contato ?? null,
+              whatsapp: null,
               instagram_user: r.instagram_user ?? null,
               status: "novo",
               first_seen_at: new Date().toISOString(),
