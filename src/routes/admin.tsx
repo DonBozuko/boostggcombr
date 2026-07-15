@@ -1433,6 +1433,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "buscas" ? "block" : "hidden"}`}>
         {folder === "buscas" && (
           <div className="space-y-4">
+            <FunnelPanel token={token} />
             <InsightsIA token={token} />
             <RoasPanel token={token} />
             <ConversionAnalytics />
