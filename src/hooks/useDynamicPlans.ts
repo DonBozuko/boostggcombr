@@ -102,7 +102,7 @@ export function useDynamicPlans<K extends string>(
           valor: it.valor,
           price: it.price,
           benefit: isBestseller ? "🔥 Escolha dos clientes nas últimas 24h" : (s?.benefit ?? "Entrega rápida e segura"),
-          highlight: isBestseller ? "true" : s?.highlight,
+          highlight: isBestseller ? true : (s?.highlight as boolean | undefined),
         };
       });
     }
