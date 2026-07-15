@@ -122,6 +122,7 @@ const POSTS: Record<string, Post> = {
   },
   "melhor-site-comprar-seguidores": {
     title: "Melhor Site Para Comprar Seguidores: 5 Critérios Que Importam",
+    seoTitle: "Melhor Site Para Comprar Seguidores: 5 Critérios",
     description:
       "Como escolher onde comprar seguidores sem perder dinheiro: 5 critérios objetivos para avaliar qualquer serviço antes de pagar.",
     subtitle: "Cinco critérios objetivos que separam serviço sério de furada.",
