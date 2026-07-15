@@ -81,6 +81,8 @@ export function useDynamicPlans<K extends string>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const bestsellers = useBestsellers();
+
   return useMemo(() => {
     const out = {} as Record<K, DynPlan[]>;
     for (const k of keys) {
@@ -90,20 +92,21 @@ export function useDynamicPlans<K extends string>(
       out[k] = items.map((it) => {
         const s = staticById.get(it.id);
         const qtyStr = it.quantidade.toLocaleString("pt-BR");
+        const isBestseller = bestsellers[it.id] === true;
         return {
           id: it.id,
           tier: s?.tier ?? `${qtyStr} ${unitLabel}`,
-          tag: s?.tag ?? tagFor(it.quantidade),
+          tag: isBestseller ? "🔥 MAIS VENDIDO 24H" : (s?.tag ?? tagFor(it.quantidade)),
           qty: qtyStr,
           quantidade: it.quantidade,
           valor: it.valor,
           price: it.price,
-          benefit: s?.benefit ?? "Entrega rápida e segura",
-          highlight: s?.highlight,
+          benefit: isBestseller ? "🔥 Escolha dos clientes nas últimas 24h" : (s?.benefit ?? "Entrega rápida e segura"),
+          highlight: isBestseller ? "true" : s?.highlight,
         };
       });
     }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gridBy]);
+  }, [gridBy, bestsellers]);
 }
