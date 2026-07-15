@@ -20,9 +20,11 @@ export const consultarPedidoPublico = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const raw = data.pedidoId.trim();
     // Aceita UUID parcial (primeiros 8) ou mercado_pago_id
+    // IMPORTANTE: nunca expor PII (instagram_user, mercado_pago_id, valor, whatsapp).
+    // Retornar apenas campos mínimos para exibir status ao cliente.
     let q = supabaseAdmin
       .from("pedidos")
-      .select("id, status, rede_social, pacote, quantidade, created_at")
+      .select("status, rede_social, pacote, quantidade")
       .limit(1);
     if (/^[0-9a-fA-F-]{8,}$/.test(raw)) {
       q = q.or(`id.eq.${raw},mercado_pago_id.eq.${raw}`);
@@ -40,4 +42,5 @@ export const consultarPedidoPublico = createServerFn({ method: "POST" })
       message: `${base} (${r.rede_social ?? "rede"} · ${r.pacote} · ${r.quantidade}).`,
       status: r.status,
     };
+
   });
