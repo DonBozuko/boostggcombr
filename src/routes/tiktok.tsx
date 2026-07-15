@@ -381,7 +381,7 @@ function TiktokLanding() {
           id: p.id,
           qty: p.quantidade.toLocaleString("pt-BR"),
           price: p.price,
-          fire: i === 1,
+          fire: p.highlight === true || i === 1,
         }))}
         onBuy={(id) => { setPlanId(id); document.getElementById("tt-pedido")?.scrollIntoView({ behavior: "smooth" }); }}
       />
