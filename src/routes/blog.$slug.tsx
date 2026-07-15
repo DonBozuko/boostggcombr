@@ -178,6 +178,7 @@ const POSTS: Record<string, Post> = {
   },
   "comprar-seguidores-pix": {
     title: "Comprar Seguidores no Pix: Como Funciona e Por Que É a Forma Mais Segura",
+    seoTitle: "Comprar Seguidores no Pix: Como Funciona",
     description:
       "Comprar seguidores Instagram no Pix é mais rápido, rastreável e barato que cartão. Entenda como funciona a entrega automática e o que verificar antes de pagar.",
     subtitle:
