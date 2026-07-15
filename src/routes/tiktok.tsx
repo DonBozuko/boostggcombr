@@ -43,7 +43,7 @@ import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Turbinar TikTok — Seguidores, Curtidas e Views Reais | EliteBoost Prime";
+    const title = "Turbinar TikTok — Seguidores e Views Reais | EliteBoost";
     const description =
       "Turbine seu TikTok com seguidores, curtidas e views reais via Pix. Entrega imediata, alta retenção e reposição garantida.";
     const url = "https://boostgg.com.br/tiktok";

@@ -111,7 +111,7 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Impulsionar Instagram no Pix — Crescimento Real e Rápido | EliteBoost Prime";
+    const title = "Impulsionar Instagram no Pix | EliteBoost Prime";
     const description =
       "Impulsione seu Instagram com audiência real via Pix e entrega em minutos. Alta retenção, reposição garantida e 100% seguro.";
     const url = "https://boostgg.com.br/";
