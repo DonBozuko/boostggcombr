@@ -32,6 +32,7 @@ const buildSitemapXml = () => {
     { path: "/blog/melhor-site-comprar-seguidores", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/comprar-seguidores-pix", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/seguidores-instagram-baratos", changefreq: "monthly", priority: "0.6" },
+    { path: "/blog/como-tirar-instagram-privado", changefreq: "monthly", priority: "0.6" },
     { path: "/ferramentas/contador-seguidores", changefreq: "weekly", priority: "0.7" },
     { path: "/kit-creator", changefreq: "weekly", priority: "0.9" },
     { path: "/promo-5reais", changefreq: "weekly", priority: "0.8" },
