@@ -25,7 +25,7 @@ export const Route = createFileRoute("/api/public/track")({
           // Bot filter simples
           const ua = request.headers.get("user-agent") ?? "";
           if (/bot|crawler|spider|preview|monitor|curl|wget/i.test(ua)) {
-            return new Response("ok", { status: 204 });
+            return new Response(null, { status: 204 });
           }
 
           const country = request.headers.get("cf-ipcountry") ?? null;
@@ -43,10 +43,10 @@ export const Route = createFileRoute("/api/public/track")({
             country,
           });
 
-          return new Response("ok", { status: 204 });
+          return new Response(null, { status: 204 });
         } catch {
           // Nunca falhar o beacon — apenas ignora
-          return new Response("ok", { status: 204 });
+          return new Response(null, { status: 204 });
         }
       },
       OPTIONS: async () => new Response(null, { status: 204 }),
