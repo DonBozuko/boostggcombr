@@ -8,5 +8,7 @@ Disallow: /login
 Disallow: /status
 Disallow: /dashboard
 Disallow: /~flock.js
+Disallow: /mcp
+Disallow: /obrigado
 
 Sitemap: https://boostgg.com.br/sitemap.xml
