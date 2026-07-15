@@ -48,6 +48,7 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
 import { Route as ApiPublicTestTiktokEventRouteImport } from './routes/api/public/test-tiktok-event'
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
@@ -275,6 +276,11 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTrackRoute = ApiPublicTrackRouteImport.update({
+  id: '/api/public/track',
+  path: '/api/public/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTestTiktokEventRoute =
   ApiPublicTestTiktokEventRouteImport.update({
     id: '/api/public/test-tiktok-event',
@@ -457,6 +463,7 @@ export interface FileRoutesByFullPath {
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
+  '/api/public/track': typeof ApiPublicTrackRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -522,6 +529,7 @@ export interface FileRoutesByTo {
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
+  '/api/public/track': typeof ApiPublicTrackRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -588,6 +596,7 @@ export interface FileRoutesById {
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
+  '/api/public/track': typeof ApiPublicTrackRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -655,6 +664,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
     | '/api/public/test-tiktok-event'
+    | '/api/public/track'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -720,6 +730,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
     | '/api/public/test-tiktok-event'
+    | '/api/public/track'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -785,6 +796,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
     | '/api/public/test-tiktok-event'
+    | '/api/public/track'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -850,6 +862,7 @@ export interface RootRouteChildren {
   ApiPublicSyncSmmpanelRoute: typeof ApiPublicSyncSmmpanelRoute
   ApiPublicSyncVerifiedRoute: typeof ApiPublicSyncVerifiedRoute
   ApiPublicTestTiktokEventRoute: typeof ApiPublicTestTiktokEventRoute
+  ApiPublicTrackRoute: typeof ApiPublicTrackRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -1142,6 +1155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/track': {
+      id: '/api/public/track'
+      path: '/api/public/track'
+      fullPath: '/api/public/track'
+      preLoaderRoute: typeof ApiPublicTrackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/test-tiktok-event': {
       id: '/api/public/test-tiktok-event'
       path: '/api/public/test-tiktok-event'
@@ -1372,6 +1392,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSyncSmmpanelRoute: ApiPublicSyncSmmpanelRoute,
   ApiPublicSyncVerifiedRoute: ApiPublicSyncVerifiedRoute,
   ApiPublicTestTiktokEventRoute: ApiPublicTestTiktokEventRoute,
+  ApiPublicTrackRoute: ApiPublicTrackRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
