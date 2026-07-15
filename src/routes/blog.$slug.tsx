@@ -5,6 +5,7 @@ const BASE = "https://boostgg.com.br";
 
 type Post = {
   title: string;
+  seoTitle?: string;
   description: string;
   subtitle: string;
   datePublished: string;
@@ -121,6 +122,7 @@ const POSTS: Record<string, Post> = {
   },
   "melhor-site-comprar-seguidores": {
     title: "Melhor Site Para Comprar Seguidores: 5 Critérios Que Importam",
+    seoTitle: "Melhor Site Para Comprar Seguidores: 5 Critérios",
     description:
       "Como escolher onde comprar seguidores sem perder dinheiro: 5 critérios objetivos para avaliar qualquer serviço antes de pagar.",
     subtitle: "Cinco critérios objetivos que separam serviço sério de furada.",
@@ -176,6 +178,7 @@ const POSTS: Record<string, Post> = {
   },
   "comprar-seguidores-pix": {
     title: "Comprar Seguidores no Pix: Como Funciona e Por Que É a Forma Mais Segura",
+    seoTitle: "Comprar Seguidores no Pix: Como Funciona",
     description:
       "Comprar seguidores Instagram no Pix é mais rápido, rastreável e barato que cartão. Entenda como funciona a entrega automática e o que verificar antes de pagar.",
     subtitle:
@@ -286,7 +289,7 @@ export const Route = createFileRoute("/blog/$slug")({
     const url = `${BASE}/blog/${slug}`;
     return {
       meta: [
-        { title: `${post.title} — EliteBoost Prime` },
+        { title: `${post.seoTitle ?? post.title} — BoostGG` },
         { name: "description", content: post.description },
         { property: "og:title", content: post.title },
         { property: "og:description", content: post.description },
@@ -303,8 +306,8 @@ export const Route = createFileRoute("/blog/$slug")({
             headline: post.title,
             description: post.description,
             datePublished: post.datePublished,
-            author: { "@type": "Organization", name: "EliteBoost Prime" },
-            publisher: { "@type": "Organization", name: "EliteBoost Prime" },
+            author: { "@type": "Organization", name: "BoostGG" },
+            publisher: { "@type": "Organization", name: "BoostGG" },
             mainEntityOfPage: url,
           }),
         },
