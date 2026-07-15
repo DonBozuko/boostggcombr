@@ -188,6 +188,20 @@ function RootComponent() {
     return () => { unsub(); };
   }, [router]);
 
+  // Beacon de page view (funil de conversão). Silencioso, não bloqueia.
+  useEffect(() => {
+    let last = "";
+    const fire = () => {
+      const p = window.location.pathname;
+      if (p === last) return;
+      last = p;
+      import("@/lib/pageview-beacon").then((m) => m.trackPageView(p)).catch(() => {});
+    };
+    fire();
+    const unsub = router.subscribe("onResolved", fire);
+    return () => { unsub(); };
+  }, [router]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrandGuard />

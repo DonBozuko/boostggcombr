@@ -53,6 +53,7 @@ import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { RoasPanel } from "@/components/RoasPanel";
+import { FunnelPanel } from "@/components/FunnelPanel";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
@@ -1433,6 +1434,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "buscas" ? "block" : "hidden"}`}>
         {folder === "buscas" && (
           <div className="space-y-4">
+            <FunnelPanel token={token} />
             <InsightsIA token={token} />
             <RoasPanel token={token} />
             <ConversionAnalytics />

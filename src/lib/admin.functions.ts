@@ -620,3 +620,97 @@ export const getBlockedMap = createServerFn({ method: "GET" })
   });
 
 
+// === FUNIL DE CONVERSÃO (Etapa 1 Growth) ===
+// Lê page_views + pedidos e retorna funil diário: visitas → pix gerado → pix pago.
+export const getFunnelDaily = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({
+    token: z.string().min(8),
+    days: z.number().int().min(1).max(90).default(30),
+  }).parse(input))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - data.days * 24 * 60 * 60 * 1000).toISOString();
+
+    const [viewsRes, pedidosRes] = await Promise.all([
+      supabaseAdmin.from("page_views")
+        .select("created_at, path, utm_source")
+        .gte("created_at", since)
+        .limit(50000),
+      supabaseAdmin.from("pedidos")
+        .select("created_at, status, valor, rede_social")
+        .gte("created_at", since)
+        .limit(20000),
+    ]);
+
+    if (viewsRes.error) return { ok: false as const, error: viewsRes.error.message };
+    if (pedidosRes.error) return { ok: false as const, error: pedidosRes.error.message };
+
+    type Row = { day: string; visits: number; pix_criados: number; pix_pagos: number; faturamento: number };
+    const map = new Map<string, Row>();
+    const dayOf = (iso: string) => iso.slice(0, 10);
+    const ensure = (d: string): Row => {
+      let r = map.get(d);
+      if (!r) { r = { day: d, visits: 0, pix_criados: 0, pix_pagos: 0, faturamento: 0 }; map.set(d, r); }
+      return r;
+    };
+
+    for (const v of viewsRes.data ?? []) {
+      ensure(dayOf(v.created_at as string)).visits++;
+    }
+
+    const paidStatuses = new Set(["approved", "paid", "provisioning", "provisioned", "completed", "concluido", "concluído"]);
+    for (const p of pedidosRes.data ?? []) {
+      const d = dayOf(p.created_at as string);
+      const row = ensure(d);
+      row.pix_criados++;
+      if (paidStatuses.has(String(p.status).toLowerCase())) {
+        row.pix_pagos++;
+        row.faturamento += Number(p.valor ?? 0);
+      }
+    }
+
+    // Breakdown por rede (agregado no período)
+    const byNetwork = new Map<string, { rede: string; pix_criados: number; pix_pagos: number; faturamento: number }>();
+    for (const p of pedidosRes.data ?? []) {
+      const rede = String(p.rede_social ?? "outros").toLowerCase();
+      let r = byNetwork.get(rede);
+      if (!r) { r = { rede, pix_criados: 0, pix_pagos: 0, faturamento: 0 }; byNetwork.set(rede, r); }
+      r.pix_criados++;
+      if (paidStatuses.has(String(p.status).toLowerCase())) {
+        r.pix_pagos++;
+        r.faturamento += Number(p.valor ?? 0);
+      }
+    }
+
+    // Breakdown por UTM source (agregado no período)
+    const byUtm = new Map<string, { source: string; visits: number }>();
+    for (const v of viewsRes.data ?? []) {
+      const s = String((v as { utm_source?: string | null }).utm_source ?? "direto").toLowerCase();
+      let r = byUtm.get(s);
+      if (!r) { r = { source: s, visits: 0 }; byUtm.set(s, r); }
+      r.visits++;
+    }
+
+    const daily = [...map.values()].sort((a, b) => a.day.localeCompare(b.day));
+    const totals = daily.reduce(
+      (acc, r) => ({
+        visits: acc.visits + r.visits,
+        pix_criados: acc.pix_criados + r.pix_criados,
+        pix_pagos: acc.pix_pagos + r.pix_pagos,
+        faturamento: acc.faturamento + r.faturamento,
+      }),
+      { visits: 0, pix_criados: 0, pix_pagos: 0, faturamento: 0 },
+    );
+
+    return {
+      ok: true as const,
+      totals,
+      daily,
+      byNetwork: [...byNetwork.values()].sort((a, b) => b.faturamento - a.faturamento),
+      byUtm: [...byUtm.values()].sort((a, b) => b.visits - a.visits).slice(0, 8),
+    };
+  });
+
+
+
