@@ -11,21 +11,77 @@ import { Loader2, Users, UserPlus, Image as ImageIcon, BadgeCheck, Lock } from "
 
 const CANON = "https://boostgg.com.br/ferramentas/contador-seguidores";
 
+const FAQ = [
+  {
+    q: "O contador de seguidores do Instagram é gratuito?",
+    a: "Sim. Nosso contador de seguidores Instagram é 100% grátis, sem login, sem cadastro e sem limite de consultas. Basta digitar o @usuario e ver os números em tempo real.",
+  },
+  {
+    q: "Como saber quantos seguidores um perfil do Instagram tem?",
+    a: "Digite o nome de usuário (@usuario) no campo acima e clique em 'Contar seguidores'. Em segundos mostramos seguidores, seguindo, número de posts e status de verificação do perfil público.",
+  },
+  {
+    q: "Funciona para qualquer perfil do Instagram?",
+    a: "Funciona para todos os perfis públicos. Contas privadas exibem apenas nome de usuário, foto e status; os números de seguidores/seguindo/posts só aparecem em perfis abertos.",
+  },
+  {
+    q: "Preciso fazer login no Instagram para usar?",
+    a: "Não. Nunca pedimos sua senha do Instagram. Usamos apenas dados públicos, então sua conta continua 100% segura.",
+  },
+  {
+    q: "Os dados do contador são atualizados em tempo real?",
+    a: "Sim. Cada consulta busca a informação diretamente do perfil público naquele momento, então o número de seguidores é o mesmo que aparece no app do Instagram.",
+  },
+  {
+    q: "Posso usar para analisar concorrentes e influenciadores?",
+    a: "Sim, essa é uma das principais funções. Compare a razão seguidores/seguindo para identificar perfis com engajamento real e evitar influenciadores com números inflados.",
+  },
+];
+
 export const Route = createFileRoute("/ferramentas/contador-seguidores")({
   head: () => ({
     meta: [
-      { title: "Contador de Seguidores Instagram Grátis — EliteBoost Prime" },
+      { title: "Contador de Seguidores Instagram Grátis em Tempo Real 2026" },
       {
         name: "description",
         content:
-          "Contador de seguidores Instagram grátis, em tempo real. Digite @usuario e veja seguidores, seguindo, posts e status de verificação. Sem login.",
+          "Contador de seguidores do Instagram grátis e em tempo real. Digite o @usuario e veja seguidores, seguindo, posts e verificação. Sem login, sem cadastro.",
       },
-      { property: "og:title", content: "Contador de Seguidores Instagram Grátis" },
-      { property: "og:description", content: "Descubra em segundos quantos seguidores um perfil tem no Instagram." },
+      { name: "keywords", content: "contador de seguidores instagram, contador seguidores, ver seguidores instagram, quantos seguidores tem, contador insta grátis" },
+      { property: "og:title", content: "Contador de Seguidores Instagram Grátis em Tempo Real" },
+      { property: "og:description", content: "Descubra em segundos quantos seguidores qualquer perfil do Instagram tem. Grátis, sem login." },
       { property: "og:url", content: CANON },
       { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: CANON }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: FAQ.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          name: "Contador de Seguidores Instagram",
+          url: CANON,
+          applicationCategory: "UtilityApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+          description:
+            "Ferramenta gratuita para contar seguidores, seguindo e posts de qualquer perfil público do Instagram em tempo real.",
+        }),
+      },
+    ],
   }),
   component: ContadorPage,
 });
@@ -54,11 +110,11 @@ function ContadorPage() {
       <div className="mx-auto max-w-3xl px-4 py-12">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold md:text-4xl">
-            Contador de Seguidores Instagram <span className="text-primary">Grátis</span>
+            Contador de Seguidores do Instagram <span className="text-primary">Grátis</span>
           </h1>
           <p className="mt-3 text-muted-foreground">
-            Digite qualquer <strong>@usuario</strong> e veja seguidores, seguindo, posts e status em tempo real.
-            Sem login, sem cadastro.
+            Descubra em segundos quantos seguidores qualquer perfil público do Instagram tem. Digite o <strong>@usuario</strong> abaixo
+            e veja seguidores, seguindo, posts e verificação em <strong>tempo real</strong> — sem login, sem cadastro, ilimitado.
           </p>
         </div>
 
@@ -100,10 +156,9 @@ function ContadorPage() {
             <div className="mt-6 rounded-lg border bg-card p-5">
               <div className="flex items-center gap-4">
                 {data.avatar ? (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={data.avatar}
-                    alt={data.username}
+                    alt={`Foto do perfil @${data.username} no Instagram`}
                     className="h-16 w-16 rounded-full border object-cover"
                     referrerPolicy="no-referrer"
                   />
@@ -139,18 +194,67 @@ function ContadorPage() {
           )}
         </Card>
 
-        <section className="mt-10 space-y-4 text-sm text-muted-foreground">
-          <h2 className="text-lg font-semibold text-foreground">Como funciona</h2>
+        <section className="mt-12 space-y-4 text-sm text-muted-foreground">
+          <h2 className="text-2xl font-bold text-foreground">Como funciona o contador de seguidores</h2>
           <p>
-            Consultamos o perfil público do Instagram e devolvemos os números atualizados em segundos. Só funciona para perfis
-            <strong> públicos</strong>; contas privadas mostram apenas nome e foto.
+            O <strong>contador de seguidores do Instagram</strong> da BoostGG consulta os dados públicos do perfil informado e
+            devolve os números atualizados em segundos. Não é preciso instalar app, dar permissão à sua conta ou informar
+            senha. É a mesma informação que aparece no aplicativo oficial, só que sem precisar abrir o Instagram.
           </p>
-          <h2 className="text-lg font-semibold text-foreground">Para que serve</h2>
+          <ol className="list-decimal space-y-1 pl-5">
+            <li>Digite o <strong>@usuario</strong> do Instagram que você quer analisar (sem espaços).</li>
+            <li>Clique em <strong>“Contar seguidores”</strong> e aguarde 2–3 segundos.</li>
+            <li>Veja seguidores, seguindo, posts, foto de perfil e status de verificação.</li>
+          </ol>
+
+          <h2 className="pt-4 text-2xl font-bold text-foreground">Para que serve um contador de seguidores</h2>
+          <p>
+            Muito mais do que curiosidade. Um bom contador de seguidores é ferramenta essencial para quem trabalha com marketing,
+            faz parcerias com influenciadores ou está construindo autoridade no Instagram:
+          </p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>Analisar concorrentes antes de investir em conteúdo.</li>
-            <li>Acompanhar o crescimento de perfis parceiros.</li>
-            <li>Validar se um influencer tem engajamento real (razão seguidores/seguindo).</li>
+            <li><strong>Analisar concorrentes</strong> antes de investir em conteúdo ou tráfego pago.</li>
+            <li><strong>Verificar influenciadores</strong>: perfil que segue muita gente e tem poucos seguidores costuma ter engajamento fraco.</li>
+            <li><strong>Acompanhar o crescimento</strong> de perfis parceiros, clientes ou seu próprio.</li>
+            <li><strong>Validar entregas</strong> de campanhas de seguidores comprados ou orgânicos.</li>
+            <li><strong>Benchmark</strong> rápido de nichos e categorias.</li>
           </ul>
+
+          <h2 className="pt-4 text-2xl font-bold text-foreground">Contas privadas x contas públicas</h2>
+          <p>
+            Perfis <strong>públicos</strong> mostram todos os números: seguidores, seguindo, posts e verificação. Perfis
+            <strong> privados</strong> exibem apenas nome de usuário, nome real e foto — os números ficam ocultos por decisão do
+            próprio Instagram, e nenhuma ferramenta legítima consegue burlar isso.
+          </p>
+
+          <h2 className="pt-4 text-2xl font-bold text-foreground">É seguro usar?</h2>
+          <p>
+            Sim. Nunca pedimos sua senha do Instagram, não instalamos nada no seu dispositivo e não guardamos histórico das
+            consultas. Usamos apenas dados <strong>públicos</strong> do perfil pesquisado. Sua conta continua 100% segura.
+          </p>
+
+          <h2 className="pt-6 text-2xl font-bold text-foreground">Perguntas frequentes</h2>
+          <div className="space-y-4">
+            {FAQ.map((f) => (
+              <div key={f.q} className="rounded-lg border bg-card p-4">
+                <h3 className="font-semibold text-foreground">{f.q}</h3>
+                <p className="mt-1 text-sm">{f.a}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-10 rounded-lg border border-primary/40 bg-primary/5 p-5 text-center">
+            <p className="text-base font-semibold text-foreground">
+              Já sabe quantos seguidores tem — que tal <span className="text-primary">crescer o seu</span>?
+            </p>
+            <p className="mt-1 text-sm">Seguidores brasileiros reais, entrega no Pix em minutos.</p>
+            <Link
+              to="/comprar-seguidores-instagram"
+              className="mt-3 inline-flex items-center justify-center rounded-md bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              Comprar seguidores Instagram →
+            </Link>
+          </div>
         </section>
       </div>
     </div>
