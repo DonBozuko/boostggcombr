@@ -477,11 +477,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     });
   };
 
-  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores]);
-  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr]);
+  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores, bestsellers]);
+  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr, bestsellers]);
   const dynPlans        = categoria === "seguidores" && soBr ? dynPlansBr : dynPlansMundial;
-  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas]);
-  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes]);
+  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas, bestsellers]);
+  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes, bestsellers]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
 
   // Polling: a cada 5s consulta o status do pedido até detectar 'paid' ou rejeição.
