@@ -68,6 +68,7 @@ import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/publ
 import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
 import { Route as ApiPublicHooksSlaWatcherRouteImport } from './routes/api/public/hooks/sla-watcher'
 import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/public/hooks/reprocess-one'
+import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/public/hooks/recovery-scan'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
@@ -383,6 +384,12 @@ const ApiPublicHooksReprocessOneRoute =
     path: '/api/public/hooks/reprocess-one',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRecoveryScanRoute =
+  ApiPublicHooksRecoveryScanRouteImport.update({
+    id: '/api/public/hooks/recovery-scan',
+    path: '/api/public/hooks/recovery-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRecoverAbandonedRoute =
   ApiPublicHooksRecoverAbandonedRouteImport.update({
     id: '/api/public/hooks/recover-abandoned',
@@ -469,6 +476,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
@@ -535,6 +543,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
@@ -602,6 +611,7 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
@@ -670,6 +680,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
@@ -736,6 +747,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
@@ -802,6 +814,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
@@ -868,6 +881,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
+  ApiPublicHooksRecoveryScanRoute: typeof ApiPublicHooksRecoveryScanRoute
   ApiPublicHooksReprocessOneRoute: typeof ApiPublicHooksReprocessOneRoute
   ApiPublicHooksSlaWatcherRoute: typeof ApiPublicHooksSlaWatcherRoute
   ApiPublicHooksSmokeTestRoute: typeof ApiPublicHooksSmokeTestRoute
@@ -1295,6 +1309,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReprocessOneRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/recovery-scan': {
+      id: '/api/public/hooks/recovery-scan'
+      path: '/api/public/hooks/recovery-scan'
+      fullPath: '/api/public/hooks/recovery-scan'
+      preLoaderRoute: typeof ApiPublicHooksRecoveryScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/recover-abandoned': {
       id: '/api/public/hooks/recover-abandoned'
       path: '/api/public/hooks/recover-abandoned'
@@ -1398,6 +1419,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
+  ApiPublicHooksRecoveryScanRoute: ApiPublicHooksRecoveryScanRoute,
   ApiPublicHooksReprocessOneRoute: ApiPublicHooksReprocessOneRoute,
   ApiPublicHooksSlaWatcherRoute: ApiPublicHooksSlaWatcherRoute,
   ApiPublicHooksSmokeTestRoute: ApiPublicHooksSmokeTestRoute,
