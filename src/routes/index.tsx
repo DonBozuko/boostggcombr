@@ -29,6 +29,7 @@ import {
   Star,
 } from "lucide-react";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
+import { useBestsellers } from "@/hooks/useBestsellers";
 
 
 import { Button } from "@/components/ui/button";
