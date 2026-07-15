@@ -71,7 +71,7 @@ export const Route = createFileRoute("/youtube")({
 });
 
 type Categoria = "inscritos" | "visualizacoes";
-type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
+type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
 const SUB_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000,200000,500000];
 const YT_VIEW_QTYS = [1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,7500000,10000000,15000000,20000000,30000000,50000000];

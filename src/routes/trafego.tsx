@@ -64,7 +64,7 @@ export const Route = createFileRoute("/trafego")({
 });
 
 type Categoria = "brasil" | "mundial";
-type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string };
+type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
 const TRAFEGO_QTYS = [1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,10000000];
 
