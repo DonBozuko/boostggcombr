@@ -12,7 +12,7 @@ export type DynPlan = {
   valor: number;
   price: string;
   benefit?: string;
-  highlight?: string;
+  highlight?: boolean;
 };
 
 type GridItem = { id: string; quantidade: number; valor: number; price: string };
