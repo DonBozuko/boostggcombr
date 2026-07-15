@@ -29,6 +29,11 @@ const POSTS = [
     title: "Seguidores Instagram Baratos: Vale a Pena? O Que Observar",
     excerpt: "Barato demais quase sempre é bot. Como diferenciar preço justo de armadilha.",
   },
+  {
+    slug: "como-tirar-instagram-privado",
+    title: "Como Tirar o Instagram do Privado: Passo a Passo (iOS e Android)",
+    excerpt: "Guia rápido para deixar seu perfil público — requisito obrigatório para receber seguidores e aparecer no Explorar.",
+  },
 ];
 
 export const Route = createFileRoute("/blog/")({
