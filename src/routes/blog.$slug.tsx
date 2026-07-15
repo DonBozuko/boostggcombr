@@ -271,6 +271,112 @@ const POSTS: Record<string, Post> = {
       </>
     ),
   },
+  "como-tirar-instagram-privado": {
+    title: "Como Tirar o Instagram do Privado: Passo a Passo (iOS e Android)",
+    seoTitle: "Como Tirar o Instagram do Privado",
+    description:
+      "Aprenda como tirar o Instagram do privado em 2 minutos no iPhone e Android. Guia atualizado 2026 com o que muda ao virar público e por que isso é obrigatório para receber seguidores.",
+    subtitle:
+      "Passo a passo atualizado para deixar seu perfil público — e por que isso é obrigatório antes de qualquer campanha de crescimento.",
+    datePublished: "2026-03-01",
+    body: (
+      <>
+        <p>
+          Se você quer <strong>tirar o Instagram do privado</strong>, o motivo
+          normalmente é um só: crescer. Perfil trancado não recebe seguidores
+          novos de forma orgânica, não aparece na aba Explorar, não recebe
+          entrega de campanhas pagas de seguidores e curtidas, e afasta marcas
+          que pesquisam parceiros. Este guia mostra o passo a passo real,
+          atualizado para 2026, no iPhone e no Android — e o que muda depois.
+        </p>
+
+        <h2>Passo a passo no iPhone (iOS)</h2>
+        <ol>
+          <li>Abra o app do Instagram e toque na sua foto de perfil no canto inferior direito.</li>
+          <li>Toque no ícone de <strong>três linhas horizontais</strong> no canto superior direito.</li>
+          <li>Selecione <strong>Configurações e atividade</strong>.</li>
+          <li>Role até <strong>Quem pode ver seu conteúdo</strong> e toque em <strong>Privacidade da conta</strong>.</li>
+          <li>Desative o botão <strong>Conta privada</strong>. Confirme em <em>Alterar para pública</em>.</li>
+        </ol>
+        <p>Pronto. O cadeado ao lado do seu @ desaparece na hora.</p>
+
+        <h2>Passo a passo no Android</h2>
+        <ol>
+          <li>Abra o Instagram e toque na sua foto de perfil.</li>
+          <li>Toque no menu <strong>três linhas</strong> no topo.</li>
+          <li>Vá em <strong>Configurações e atividade</strong> → <strong>Privacidade da conta</strong>.</li>
+          <li>Desmarque <strong>Conta privada</strong> e confirme.</li>
+        </ol>
+
+        <h2>E se eu não achar a opção "Privacidade da conta"?</h2>
+        <p>
+          Isso acontece em <strong>Contas Profissionais</strong> (Criador de
+          Conteúdo ou Empresa). Nesse tipo de conta, o perfil já é público por
+          padrão e o Instagram esconde o botão. Se você está em conta
+          profissional e mesmo assim aparece cadeado, mude para conta pessoal
+          temporariamente em <em>Configurações → Tipo de conta e ferramentas
+          → Mudar para conta pessoal</em>, ajuste a privacidade, e depois volte
+          para profissional.
+        </p>
+
+        <h2>O que muda quando o perfil vira público</h2>
+        <ul>
+          <li>Qualquer pessoa pode seguir sem aprovação manual.</li>
+          <li>Suas fotos e Reels passam a aparecer na aba <strong>Explorar</strong>.</li>
+          <li>Hashtags começam a funcionar — antes, posts de conta privada não indexavam.</li>
+          <li>Você pode ativar <strong>Insights</strong> completos (só existe em perfil público).</li>
+          <li>Serviços de crescimento — seguidores, curtidas, views — só entregam em perfil público.</li>
+        </ul>
+
+        <h2>Por que serviços de seguidores exigem perfil público</h2>
+        <p>
+          A entrega funciona assim: nossa fila envia perfis reais para seguir
+          o seu @. Se o perfil está trancado, cada seguidor cai numa fila de
+          <em> solicitação pendente</em> — não conta como seguidor até você
+          aprovar um por um. Em pacotes de 1.000+, isso é inviável. Por isso
+          todo serviço sério (BoostGG incluído) só processa pedidos de contas
+          públicas. É verificação automática, não decisão comercial.
+        </p>
+
+        <h2>"Ficar público é seguro?"</h2>
+        <p>
+          Depende do que você posta. Se o perfil já é usado para vender,
+          divulgar trabalho ou construir marca pessoal, ser público é
+          requisito. Se é conta 100% pessoal com fotos de família, o correto
+          é criar um <strong>segundo perfil</strong> para o negócio e manter
+          o pessoal privado. Instagram permite até 5 contas logadas
+          simultaneamente sem precisar deslogar.
+        </p>
+
+        <h2>O que fazer imediatamente depois de virar público</h2>
+        <ol>
+          <li><strong>Foto de perfil profissional</strong> — sem ela, seguidores novos não convertem.</li>
+          <li><strong>Bio clara</strong> em uma frase: o que você faz e para quem.</li>
+          <li><strong>Link no Bio</strong> (WhatsApp, site, Linktree) — perfil público sem CTA é audiência morta.</li>
+          <li><strong>3 posts fixados</strong> mostrando seu melhor conteúdo. É a vitrine que decide quem segue.</li>
+        </ol>
+
+        <h2>Erro comum: virar público e não postar</h2>
+        <p>
+          Muita gente abre a conta, contrata pacote de seguidores e some. O
+          algoritmo interpreta como perfil abandonado e para de distribuir.
+          Regra prática: ao virar público, poste pelo menos <strong>3 Reels
+          na primeira semana</strong>. Isso mantém o perfil aquecido enquanto
+          os seguidores novos chegam.
+        </p>
+
+        <h2>Pronto para acelerar?</h2>
+        <p>
+          Com perfil público, foto boa e bio funcionando, faz sentido acelerar
+          o crescimento com um impulso inicial de seguidores reais. Isso reduz
+          o atrito de conversão — perfis com números baixos assustam marcas e
+          visitantes. Confira nossos <a href="/comprar-seguidores-brasileiros">pacotes
+          de seguidores brasileiros</a> ou volte para o <a href="/blog">blog</a> para
+          mais guias práticos.
+        </p>
+      </>
+    ),
+  },
 };
 
 export const Route = createFileRoute("/blog/$slug")({
