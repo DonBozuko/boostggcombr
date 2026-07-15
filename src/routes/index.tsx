@@ -446,6 +446,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     return m;
   }, []);
 
+  const bestsellers = useBestsellers();
+
   const buildDyn = (items: GridItem[], fallback: Plan[], unitLabel: string): Plan[] => {
     if (!items.length) return fallback;
     const tagFor = (q: number): string => {
@@ -460,16 +462,17 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     return items.map((it) => {
       const s = staticById.get(it.id);
       const qtyStr = it.quantidade.toLocaleString("pt-BR");
+      const isBestseller = bestsellers[it.id] === true;
       return {
         id: it.id,
         tier: s?.tier ?? `${qtyStr} ${unitLabel}`,
-        tag: s?.tag ?? tagFor(it.quantidade),
+        tag: isBestseller ? "🔥 MAIS VENDIDO 24H" : (s?.tag ?? tagFor(it.quantidade)),
         qty: qtyStr,
         quantidade: it.quantidade,
         valor: it.valor,
         price: it.price,
-        benefit: s?.benefit ?? "Entrega rápida e segura",
-        highlight: s?.highlight,
+        benefit: isBestseller ? "🔥 Escolha dos clientes nas últimas 24h" : (s?.benefit ?? "Entrega rápida e segura"),
+        highlight: isBestseller ? true : s?.highlight,
       };
     });
   };
