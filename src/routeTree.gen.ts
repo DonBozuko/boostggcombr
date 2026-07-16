@@ -33,6 +33,7 @@ import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as CrescerYoutubeRouteImport } from './routes/crescer-youtube'
 import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
 import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
+import { Route as ComprarSeguidoresInstagramBaratoRouteImport } from './routes/comprar-seguidores-instagram-barato'
 import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
 import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
 import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
@@ -197,6 +198,12 @@ const ComprarSeguidoresTiktokRoute = ComprarSeguidoresTiktokRouteImport.update({
   path: '/comprar-seguidores-tiktok',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComprarSeguidoresInstagramBaratoRoute =
+  ComprarSeguidoresInstagramBaratoRouteImport.update({
+    id: '/comprar-seguidores-instagram-barato',
+    path: '/comprar-seguidores-instagram-barato',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComprarSeguidoresInstagramRoute =
   ComprarSeguidoresInstagramRouteImport.update({
     id: '/comprar-seguidores-instagram',
@@ -436,6 +443,7 @@ export interface FileRoutesByFullPath {
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
+  '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -504,6 +512,7 @@ export interface FileRoutesByTo {
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
+  '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -573,6 +582,7 @@ export interface FileRoutesById {
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
+  '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -643,6 +653,7 @@ export interface FileRouteTypes {
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
+    | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -711,6 +722,7 @@ export interface FileRouteTypes {
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
+    | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -779,6 +791,7 @@ export interface FileRouteTypes {
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
+    | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -848,6 +861,7 @@ export interface RootRouteChildren {
   ComprarInscritosYoutubeRoute: typeof ComprarInscritosYoutubeRoute
   ComprarSeguidoresBrasileirosRoute: typeof ComprarSeguidoresBrasileirosRoute
   ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
+  ComprarSeguidoresInstagramBaratoRoute: typeof ComprarSeguidoresInstagramBaratoRoute
   ComprarSeguidoresTiktokRoute: typeof ComprarSeguidoresTiktokRoute
   ComprarVisualizacoesTiktokRoute: typeof ComprarVisualizacoesTiktokRoute
   CrescerYoutubeRoute: typeof CrescerYoutubeRoute
@@ -1076,6 +1090,13 @@ declare module '@tanstack/react-router' {
       path: '/comprar-seguidores-tiktok'
       fullPath: '/comprar-seguidores-tiktok'
       preLoaderRoute: typeof ComprarSeguidoresTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-seguidores-instagram-barato': {
+      id: '/comprar-seguidores-instagram-barato'
+      path: '/comprar-seguidores-instagram-barato'
+      fullPath: '/comprar-seguidores-instagram-barato'
+      preLoaderRoute: typeof ComprarSeguidoresInstagramBaratoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comprar-seguidores-instagram': {
@@ -1393,6 +1414,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComprarInscritosYoutubeRoute: ComprarInscritosYoutubeRoute,
   ComprarSeguidoresBrasileirosRoute: ComprarSeguidoresBrasileirosRoute,
   ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
+  ComprarSeguidoresInstagramBaratoRoute: ComprarSeguidoresInstagramBaratoRoute,
   ComprarSeguidoresTiktokRoute: ComprarSeguidoresTiktokRoute,
   ComprarVisualizacoesTiktokRoute: ComprarVisualizacoesTiktokRoute,
   CrescerYoutubeRoute: CrescerYoutubeRoute,
