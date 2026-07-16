@@ -4,7 +4,7 @@ import { RefreshCw, Clock, ShieldCheck, XCircle, Wallet, TrendingUp } from "luci
 export const Route = createFileRoute("/reembolso")({
   head: () => ({
     meta: [
-      { title: "Reembolso e Reposição — Elite Boost Prime" },
+      { title: "Reembolso e Reposição — BoostGG" },
       {
         name: "description",
         content:
