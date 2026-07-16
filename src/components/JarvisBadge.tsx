@@ -174,6 +174,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     const unregister = registerJarvisAudio(audio);
 
     let played = false;
+    let attempting = false;
     let timer: number | null = null;
     let speechProbeTimer: number | null = null;
     let fallbackUtterance: SpeechSynthesisUtterance | null = null;
@@ -219,26 +220,48 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       }
     };
 
-    const tryPlay = () => {
-      if (played) return;
+    const markPlayed = () => {
+      played = true;
+      attempting = false;
+      firedRef.current = true;
+      setOpen(true);
+      detach();
+    };
+
+    const tryPlay = (event?: Event) => {
+      if (played || attempting) return;
+      attempting = true;
+      const fromGesture = Boolean(event?.isTrusted);
       audio.onended = () => safeClose();
       audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
+
+      // Primeiro acesso da home: Chrome bloqueia áudio com som, mas permite iniciar mudo.
+      // Então damos start mudo, zeramos e abrimos o som imediatamente — sem precisar sair/voltar rota.
+      if (!fromGesture) {
+        audio.muted = true;
+        audio.volume = 0;
+      } else {
+        audio.muted = false;
+        audio.volume = 0.95;
+      }
+
       const p = audio.play();
       if (p && typeof p.then === "function") {
         p.then(() => {
-          played = true;
-          firedRef.current = true;
+          if (!fromGesture) {
+            try { audio.currentTime = 0; } catch {}
+            audio.volume = 0.95;
+            audio.muted = false;
+          }
           setOpen(true);
-          detach();
+          markPlayed();
         }).catch(() => {
           // Autoplay bloqueado no primeiro acesso — tenta voz nativa e mantém listeners armados.
+          attempting = false;
           speakFallback();
         });
       } else {
-        played = true;
-        firedRef.current = true;
-        setOpen(true);
-        detach();
+        markPlayed();
       }
     };
 
