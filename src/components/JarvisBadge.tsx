@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
-import { Volume2 } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 
 import type { FabianoVariant } from "./FabianoBadge";
 import armorAsset from "@/assets/jarvis-armor.png.asset.json";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
-import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
+import { registerJarvisAudio, setJarvisMuted, stopAllJarvis, useJarvisMuted } from "@/hooks/useJarvis";
 
 const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
   instagram: "Diretor Fabiano, os parâmetros de engajamento do Instagram foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar a autoridade e o alcance deste cliente. Senhor!",
