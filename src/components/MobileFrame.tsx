@@ -138,7 +138,7 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden lg:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
+      className="hidden xl:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
       style={{
         background: data.gradient,
         left: side === "left" ? 0 : "auto",
