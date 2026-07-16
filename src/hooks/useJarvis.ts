@@ -88,6 +88,38 @@ export function useJarvisHistory(): JarvisHistoryEntry[] {
   return HISTORY;
 }
 
+// ----- Mute global (persistido) -----
+const MUTED_KEY = "boostgg-jarvis-muted";
+let muted = false;
+const MUTED_LISTENERS = new Set<(m: boolean) => void>();
+function loadMuted() {
+  if (typeof window === "undefined") return;
+  try { muted = window.localStorage.getItem(MUTED_KEY) === "1"; } catch { /* noop */ }
+}
+loadMuted();
+function notifyMuted() {
+  MUTED_LISTENERS.forEach((l) => l(muted));
+}
+export function isJarvisMuted(): boolean { return muted; }
+export function setJarvisMuted(value: boolean) {
+  muted = value;
+  if (typeof window !== "undefined") {
+    try { window.localStorage.setItem(MUTED_KEY, muted ? "1" : "0"); } catch { /* noop */ }
+  }
+  notifyMuted();
+  if (muted) stopAllJarvis();
+}
+export function useJarvisMuted(): [boolean, (value: boolean) => void] {
+  const [m, setM] = useState(muted);
+  useEffect(() => {
+    setM(muted);
+    const l = (v: boolean) => setM(v);
+    MUTED_LISTENERS.add(l);
+    return () => { MUTED_LISTENERS.delete(l); };
+  }, []);
+  return [m, setJarvisMuted];
+}
+
 // ----- Native <audio> pool -----
 const pool: Partial<Record<JarvisEvent, HTMLAudioElement>> = {};
 let unlocked = false;
@@ -150,6 +182,7 @@ export function stopAllJarvis() {
 }
 
 function playNative(evt: JarvisEvent) {
+  if (muted) return;
   let a = pool[evt];
   if (!a) {
     a = makeAudio(evt);

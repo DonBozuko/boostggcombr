@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useServerFn } from "@tanstack/react-start";
-import { Volume2 } from "lucide-react";
+import { Volume2, VolumeX } from "lucide-react";
 
 import type { FabianoVariant } from "./FabianoBadge";
 import armorAsset from "@/assets/jarvis-armor.png.asset.json";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
-import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
+import { registerJarvisAudio, setJarvisMuted, stopAllJarvis, useJarvisMuted } from "@/hooks/useJarvis";
 
 const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
   instagram: "Diretor Fabiano, os parâmetros de engajamento do Instagram foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar a autoridade e o alcance deste cliente. Senhor!",
@@ -138,6 +138,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
+  const [muted] = useJarvisMuted();
   const lockOpenRef = useRef(false);
   const errorTimerRef = useRef<number | null>(null);
   const consultar = useServerFn(consultarPedidoPublico);
@@ -189,7 +190,17 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const playBadgeAudio = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    // Toggle: se já tá tocando, pausa e reinicia (usuário clicou de novo).
+
+    // Se está mudo global, o clique ativa som e toca.
+    if (muted) {
+      setJarvisMuted(false);
+    } else if (!audio.paused) {
+      // Se já está tocando, o clique silencia o Jarvis globalmente.
+      setJarvisMuted(true);
+      return;
+    }
+
+    // Toca o áudio da variante atual.
     try {
       audio.pause();
       audio.currentTime = 0;
@@ -282,20 +293,24 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante — clique aciona áudio */}
           <button
             type="button"
-            aria-label="Ativar voz do J.A.R.V.I.S."
+            aria-label={muted ? "Ativar som do J.A.R.V.I.S." : "Pausar som do J.A.R.V.I.S."}
             onClick={(e) => { e.stopPropagation(); playBadgeAudio(); }}
             className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full cursor-pointer p-0 border-0"
             style={{
               width: 18,
               height: 18,
-              background: t.arc,
-              color: t.arc.toLowerCase() === "#ffffff" ? "#0a0a0a" : "#ffffff",
-              boxShadow: `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
-              animation: "jb-arc 1.6s ease-in-out infinite",
+              background: muted ? "#4b4b4b" : t.arc,
+              color: t.arc.toLowerCase() === "#ffffff" && !muted ? "#0a0a0a" : "#ffffff",
+              boxShadow: muted ? "inset 0 0 4px rgba(0,0,0,0.5)" : `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
+              animation: muted ? "none" : "jb-arc 1.6s ease-in-out infinite",
               transform: "translate(-50%,-50%)",
             }}
           >
-            <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
+            {muted ? (
+              <VolumeX size={12} strokeWidth={2.5} />
+            ) : (
+              <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
+            )}
           </button>
         </div>
         {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
