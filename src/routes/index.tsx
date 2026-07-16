@@ -9,7 +9,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { useScrolledPast } from "@/hooks/useScroll";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
