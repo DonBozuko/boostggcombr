@@ -147,12 +147,6 @@ function Billboard({
         overflow: "visible",
       } as any}
       data-billboard={side}
-      style={{
-        background: data.gradient,
-        left: side === "left" ? 0 : "auto",
-        right: side === "right" ? 0 : "auto",
-        overflow: "visible",
-      }}
     >
       <div
         className="absolute inset-0"
