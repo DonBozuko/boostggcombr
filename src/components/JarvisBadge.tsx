@@ -293,20 +293,24 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante — clique aciona áudio */}
           <button
             type="button"
-            aria-label="Ativar voz do J.A.R.V.I.S."
+            aria-label={muted ? "Ativar som do J.A.R.V.I.S." : "Pausar som do J.A.R.V.I.S."}
             onClick={(e) => { e.stopPropagation(); playBadgeAudio(); }}
             className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full cursor-pointer p-0 border-0"
             style={{
               width: 18,
               height: 18,
-              background: t.arc,
-              color: t.arc.toLowerCase() === "#ffffff" ? "#0a0a0a" : "#ffffff",
-              boxShadow: `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
-              animation: "jb-arc 1.6s ease-in-out infinite",
+              background: muted ? "#4b4b4b" : t.arc,
+              color: t.arc.toLowerCase() === "#ffffff" && !muted ? "#0a0a0a" : "#ffffff",
+              boxShadow: muted ? "inset 0 0 4px rgba(0,0,0,0.5)" : `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
+              animation: muted ? "none" : "jb-arc 1.6s ease-in-out infinite",
               transform: "translate(-50%,-50%)",
             }}
           >
-            <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
+            {muted ? (
+              <VolumeX size={12} strokeWidth={2.5} />
+            ) : (
+              <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
+            )}
           </button>
         </div>
         {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
