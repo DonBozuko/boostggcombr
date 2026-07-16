@@ -1188,9 +1188,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             <span className="font-display font-semibold text-foreground">BOOSTGG</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
-            <a href="/privacidade" className="hover:text-foreground">Privacidade</a>
-            <a href="/termos" className="hover:text-foreground">Termos</a>
-            <a href="/reembolso" className="hover:text-foreground">Reembolso</a>
+            <Link to="/ferramentas" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Ferramentas</Link>
+            <Link to="/privacidade" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Privacidade</Link>
+            <Link to="/termos" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Termos</Link>
+            <Link to="/reembolso" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Reembolso</Link>
             <span>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</span>
           </div>
 
