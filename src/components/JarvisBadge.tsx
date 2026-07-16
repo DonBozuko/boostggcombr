@@ -231,7 +231,9 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     const tryPlay = (event?: Event) => {
       if (played || attempting) return;
       attempting = true;
-      const fromGesture = Boolean(event?.isTrusted);
+      const fromGesture = Boolean(
+        event?.isTrusted && ["pointerdown", "click", "touchstart", "keydown"].includes(event.type),
+      );
       audio.onended = () => safeClose();
       audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
 
