@@ -33,7 +33,7 @@ export const Route = createFileRoute("/api/public/hooks/recover-abandoned")({
         for (const p of rows ?? []) {
           const handle = p.instagram_user?.startsWith("@") ? p.instagram_user : `@${p.instagram_user}`;
           const msg =
-            `🔍 <b>Carrinho abandonado — Elite Boost Prime</b>\n` +
+            `🔍 <b>Carrinho abandonado — BoostGG</b>\n` +
             `Cliente: <b>${handle}</b>\n` +
             `Pacote: <b>${p.pacote} (${p.quantidade})</b>\n` +
             `Ref: <code>${p.id.slice(0, 8)}</code>\n\n` +

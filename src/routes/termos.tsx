@@ -4,7 +4,7 @@ import { FileText, ShieldCheck, CreditCard, AlertTriangle, Scale, TrendingUp } f
 export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso — Elite Boost Prime" },
+      { title: "Termos de Uso — BoostGG" },
       {
         name: "description",
         content:

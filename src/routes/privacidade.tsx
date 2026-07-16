@@ -5,7 +5,7 @@ import { useState } from "react";
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
     meta: [
-      { title: "Privacidade e Segurança — Elite Boost Prime" },
+      { title: "Privacidade e Segurança — BoostGG" },
       {
         name: "description",
         content:
