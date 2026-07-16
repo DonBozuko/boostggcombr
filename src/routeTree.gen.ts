@@ -41,6 +41,7 @@ import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-c
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
@@ -241,6 +242,11 @@ const AdminRoute = AdminRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FerramentasIndexRoute = FerramentasIndexRouteImport.update({
+  id: '/ferramentas/',
+  path: '/ferramentas/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
@@ -484,6 +490,7 @@ export interface FileRoutesByFullPath {
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
+  '/ferramentas/': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -554,6 +561,7 @@ export interface FileRoutesByTo {
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog': typeof BlogIndexRoute
+  '/ferramentas': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -625,6 +633,7 @@ export interface FileRoutesById {
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
+  '/ferramentas/': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
@@ -697,6 +706,7 @@ export interface FileRouteTypes {
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
+    | '/ferramentas/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -767,6 +777,7 @@ export interface FileRouteTypes {
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog'
+    | '/ferramentas'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -837,6 +848,7 @@ export interface FileRouteTypes {
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
+    | '/ferramentas/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/jarvis-pipeline'
@@ -907,6 +919,7 @@ export interface RootRouteChildren {
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  FerramentasIndexRoute: typeof FerramentasIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
@@ -1160,6 +1173,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ferramentas/': {
+      id: '/ferramentas/'
+      path: '/ferramentas'
+      fullPath: '/ferramentas/'
+      preLoaderRoute: typeof FerramentasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/': {
@@ -1470,6 +1490,7 @@ const rootRouteChildren: RootRouteChildren = {
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   BlogIndexRoute: BlogIndexRoute,
+  FerramentasIndexRoute: FerramentasIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
