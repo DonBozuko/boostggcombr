@@ -1181,7 +1181,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             <a href="/privacidade" className="hover:text-foreground">Privacidade</a>
             <a href="/termos" className="hover:text-foreground">Termos</a>
             <a href="/reembolso" className="hover:text-foreground">Reembolso</a>
-            <span>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</span>
+            <span>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</span>
           </div>
 
         </div>

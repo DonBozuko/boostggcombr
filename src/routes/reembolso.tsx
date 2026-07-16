@@ -4,11 +4,11 @@ import { RefreshCw, Clock, ShieldCheck, XCircle, Wallet, TrendingUp } from "luci
 export const Route = createFileRoute("/reembolso")({
   head: () => ({
     meta: [
-      { title: "Reembolso e Reposição — EliteBoost Prime" },
+      { title: "Reembolso e Reposição — Elite Boost Prime" },
       {
         name: "description",
         content:
-          "Política de reembolso e reposição da EliteBoost Prime: quando pedir, prazos, cobertura de queda natural e como solicitar.",
+          "Política de reembolso e reposição da Elite Boost Prime: quando pedir, prazos, cobertura de queda natural e como solicitar.",
       },
     ],
   }),
@@ -24,7 +24,7 @@ function ReembolsoPage() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">EliteBoost Prime</span>
+            <span className="font-display font-bold text-lg">Elite Boost Prime</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Voltar à página inicial
@@ -94,9 +94,9 @@ function ReembolsoPage() {
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">EliteBoost Prime</span>
+            <span className="font-display font-semibold text-foreground">Elite Boost Prime</span>
           </div>
-          <p>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</p>
+          <p>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</p>
         </div>
       </footer>
     </div>

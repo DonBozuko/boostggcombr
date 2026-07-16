@@ -5,11 +5,11 @@ import { useState } from "react";
 export const Route = createFileRoute("/privacidade")({
   head: () => ({
     meta: [
-      { title: "Privacidade e Segurança — EliteBoost Prime" },
+      { title: "Privacidade e Segurança — Elite Boost Prime" },
       {
         name: "description",
         content:
-          "Como a EliteBoost Prime coleta, usa e protege seus dados. Página mantida pela EliteBoost Prime para esclarecer dúvidas sobre privacidade e segurança.",
+          "Como a Elite Boost Prime coleta, usa e protege seus dados. Página mantida pela Elite Boost Prime para esclarecer dúvidas sobre privacidade e segurança.",
       },
     ],
   }),
@@ -25,7 +25,7 @@ function TrustPage() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">EliteBoost Prime</span>
+            <span className="font-display font-bold text-lg">Elite Boost Prime</span>
           </Link>
           <Link
             to="/"
@@ -42,7 +42,7 @@ function TrustPage() {
             Privacidade & Segurança
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Esta página é mantida pela EliteBoost Prime para responder dúvidas comuns
+            Esta página é mantida pela Elite Boost Prime para responder dúvidas comuns
             sobre segurança e privacidade no uso dos nossos serviços. Não é uma
             certificação independente.
           </p>
@@ -62,7 +62,7 @@ function TrustPage() {
 
           <Section icon={Lock} title="Como esses dados são protegidos">
             Os dados do pedido são armazenados em banco de dados gerenciado
-            com acesso restrito ao backend da EliteBoost Prime. O acesso público de
+            com acesso restrito ao backend da Elite Boost Prime. O acesso público de
             leitura está bloqueado por políticas explícitas — nenhum visitante
             consegue listar pedidos de outros clientes pelo navegador.
           </Section>
@@ -89,14 +89,14 @@ function TrustPage() {
 
           <Section icon={ShieldCheck} title="Contato de segurança">
             Encontrou um problema de segurança ou tem dúvidas sobre o
-            tratamento dos seus dados? Fale com a equipe da EliteBoost Prime pelo
+            tratamento dos seus dados? Fale com a equipe da Elite Boost Prime pelo
             mesmo WhatsApp de atendimento usado no fluxo de compra.
           </Section>
         </div>
 
         <p className="mt-16 text-xs text-muted-foreground">
-          EliteBoost Prime não é afiliada ao Instagram ou à Meta. Esta página descreve
-          práticas atuais da EliteBoost Prime e pode ser atualizada conforme o serviço
+          Elite Boost Prime não é afiliada ao Instagram ou à Meta. Esta página descreve
+          práticas atuais da Elite Boost Prime e pode ser atualizada conforme o serviço
           evolui.
         </p>
       </main>
@@ -106,10 +106,10 @@ function TrustPage() {
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
             <span className="font-display font-semibold text-foreground">
-              EliteBoost Prime
+              Elite Boost Prime
             </span>
           </div>
-          <p>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</p>
+          <p>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</p>
         </div>
       </footer>
     </div>

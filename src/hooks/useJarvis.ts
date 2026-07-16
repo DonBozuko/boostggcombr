@@ -18,7 +18,7 @@ const SRC: Record<JarvisEvent, string> = {
 
 
 export const SUBTITLES: Record<JarvisEvent, string> = {
-  welcome: "Sessão iniciada com sucesso. Bem-vindo de volta ao comando central, Diretor Fabiano. Todos os sistemas de auto-reparo e o monitor de Uptime das 6 rotas públicas da EliteBoost Prime estão operando com 100% de estabilidade.",
+  welcome: "Sessão iniciada com sucesso. Bem-vindo de volta ao comando central, Diretor Fabiano. Todos os sistemas de auto-reparo e o monitor de Uptime das 6 rotas públicas da Elite Boost Prime estão operando com 100% de estabilidade.",
   optimized: "Calibração concluída. Sistemas operando em performance máxima.",
   warning: "Alerta: carrinho abandonado detectado no funil.",
   critical: "Atenção crítica: saldo do fornecedor abaixo de cinquenta reais.",

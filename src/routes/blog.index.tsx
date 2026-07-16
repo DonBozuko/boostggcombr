@@ -95,7 +95,7 @@ function BlogIndex() {
 
       <footer className="border-t border-border py-10 mt-8">
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
-          © 2026 EliteBoost Prime.
+          © 2026 Elite Boost Prime.
         </div>
       </footer>
     </div>

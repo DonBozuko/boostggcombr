@@ -5,7 +5,7 @@ import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 export const Route = createFileRoute("/admin/catalog")({
   head: () => ({
     meta: [
-      { title: "Catálogo · EliteBoost Prime Admin" },
+      { title: "Catálogo · Elite Boost Prime Admin" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

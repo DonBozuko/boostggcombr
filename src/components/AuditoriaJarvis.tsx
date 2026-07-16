@@ -87,7 +87,7 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
     const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
     doc.setFontSize(16);
     doc.setTextColor(190, 30, 50);
-    doc.text("EliteBoost Prime — Auditoria Contábil J.A.R.V.I.S.", 40, 40);
+    doc.text("Elite Boost Prime — Auditoria Contábil J.A.R.V.I.S.", 40, 40);
     doc.setFontSize(10);
     doc.setTextColor(60);
     doc.text(`Fornecedor: ${current.fornecedor}  ·  Cotação: R$ ${current.cotacao.toFixed(2)}  ·  ${new Date(current.scannedAt).toLocaleString("pt-BR")}`, 40, 58);
