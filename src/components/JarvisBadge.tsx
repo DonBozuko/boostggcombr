@@ -138,6 +138,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
+  const [muted] = useJarvisMuted();
   const lockOpenRef = useRef(false);
   const errorTimerRef = useRef<number | null>(null);
   const consultar = useServerFn(consultarPedidoPublico);
