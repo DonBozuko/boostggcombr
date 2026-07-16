@@ -169,11 +169,11 @@ export function PremiumPricingGrid({
                 style={{
                   background: disabled
                     ? "#222"
-                    : "linear-gradient(180deg, #ff2d2d 0%, #b80000 100%)",
+                    : "linear-gradient(180deg, #16a34a 0%, #14532d 100%)",
                   color: disabled ? "#888" : "#fff",
                   boxShadow: disabled
                     ? "none"
-                    : "0 0 12px #ff2d2dcc, 0 2px 3px rgba(0,0,0,0.45)",
+                    : "0 0 12px #16a34acc, 0 2px 3px rgba(0,0,0,0.45)",
                   textShadow: "0 1px 1px rgba(0,0,0,0.45)",
                 }}
               >
