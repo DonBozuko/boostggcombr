@@ -77,7 +77,6 @@ export const Route = createFileRoute("/ferramentas/contador-seguidores")({
           applicationCategory: "UtilityApplication",
           operatingSystem: "Any",
           offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
-          aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "1847" },
           description:
             "Ferramenta gratuita para contar seguidores, seguindo e posts de qualquer perfil público do Instagram em tempo real.",
         }),
