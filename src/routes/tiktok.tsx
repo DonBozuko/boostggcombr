@@ -331,6 +331,9 @@ function TiktokLanding() {
           <ShowcaseTrigger />
         </div>
       </header>
+      <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
+        Turbinar TikTok — Seguidores, Curtidas e Views
+      </h1>
       <ShowcaseShell>
       {/* v115 — Mystery Box Banner (>200) */}
       <div className="mx-2 mt-2 mb-1">
