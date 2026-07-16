@@ -294,6 +294,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       <style>{`
         @keyframes jb-float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-6px) } }
         @keyframes jb-arc { 0%,100% { opacity:.85; transform: translate(-50%,-50%) scale(1) } 50% { opacity:1; transform: translate(-50%,-50%) scale(1.18) } }
+        @keyframes jb-pulse-icon { 0%,100% { transform: scale(1); opacity:.9 } 50% { transform: scale(1.25); opacity:1 } }
       `}</style>
       <div
         className={inline
