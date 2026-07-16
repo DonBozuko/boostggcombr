@@ -174,34 +174,94 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     const unregister = registerJarvisAudio(audio);
 
     let played = false;
+    let attempting = false;
     let timer: number | null = null;
+    let speechProbeTimer: number | null = null;
+    let fallbackUtterance: SpeechSynthesisUtterance | null = null;
+    const fallbackText = SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram;
     const events: Array<keyof WindowEventMap> = ["pointerdown", "click", "touchstart", "keydown", "scroll", "wheel"];
 
     const detach = () => {
       events.forEach((e) => window.removeEventListener(e, tryPlay as EventListener, true));
       document.removeEventListener("pointerdown", tryPlay as EventListener, true);
       if (timer != null) { window.clearTimeout(timer); timer = null; }
+      if (speechProbeTimer != null) { window.clearTimeout(speechProbeTimer); speechProbeTimer = null; }
     };
 
-    const tryPlay = () => {
-      if (played) return;
-      audio.onended = () => safeClose();
-      audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
-      const p = audio.play();
-      if (p && typeof p.then === "function") {
-        p.then(() => {
+    const speakFallback = () => {
+      if (played || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
+      let started = false;
+      try {
+        fallbackUtterance = new SpeechSynthesisUtterance(fallbackText);
+        fallbackUtterance.lang = "pt-BR";
+        fallbackUtterance.rate = 1.02;
+        fallbackUtterance.pitch = 0.82;
+        fallbackUtterance.volume = 1;
+        fallbackUtterance.onstart = () => {
+          started = true;
           played = true;
           firedRef.current = true;
           setOpen(true);
           detach();
+        };
+        fallbackUtterance.onend = () => safeClose();
+        fallbackUtterance.onerror = () => {
+          if (started) safeClose();
+        };
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(fallbackUtterance);
+        speechProbeTimer = window.setTimeout(() => {
+          if (!started && !played) speechProbeTimer = null;
+        }, 6000);
+      } catch {
+        fallbackUtterance = null;
+      }
+    };
+
+    const markPlayed = () => {
+      played = true;
+      attempting = false;
+      firedRef.current = true;
+      setOpen(true);
+      detach();
+    };
+
+    const tryPlay = (event?: Event) => {
+      if (played || attempting) return;
+      attempting = true;
+      const fromGesture = Boolean(
+        event?.isTrusted && ["pointerdown", "click", "touchstart", "keydown"].includes(event.type),
+      );
+      audio.onended = () => safeClose();
+      audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
+
+      // Primeiro acesso da home: Chrome bloqueia áudio com som, mas permite iniciar mudo.
+      // Então damos start mudo, zeramos e abrimos o som imediatamente — sem precisar sair/voltar rota.
+      if (!fromGesture) {
+        audio.muted = true;
+        audio.volume = 0;
+      } else {
+        audio.muted = false;
+        audio.volume = 0.95;
+      }
+
+      const p = audio.play();
+      if (p && typeof p.then === "function") {
+        p.then(() => {
+          if (!fromGesture) {
+            try { audio.currentTime = 0; } catch {}
+            audio.volume = 0.95;
+            audio.muted = false;
+          }
+          setOpen(true);
+          markPlayed();
         }).catch(() => {
-          // Autoplay bloqueado — mantém listeners ativos, dispara no próximo gesture.
+          // Autoplay bloqueado no primeiro acesso — tenta voz nativa e mantém listeners armados.
+          attempting = false;
+          speakFallback();
         });
       } else {
-        played = true;
-        firedRef.current = true;
-        setOpen(true);
-        detach();
+        markPlayed();
       }
     };
 
@@ -214,10 +274,13 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     return () => {
       detach();
       if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
+      if (speechProbeTimer != null) window.clearTimeout(speechProbeTimer);
+      try { window.speechSynthesis?.cancel(); } catch {}
       try { audio.pause(); audio.currentTime = 0; } catch {}
+      fallbackUtterance = null;
       unregister();
     };
-  }, []);
+  }, [variant]);
 
 
   // Rotação dinâmica de mensagens persuasivas (a cada 11s, só quando o balão está aberto e não consultando).
