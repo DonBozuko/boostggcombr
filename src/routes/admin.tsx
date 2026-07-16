@@ -1375,6 +1375,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       <div className="max-w-[1200px] mx-auto space-y-4 relative z-10">
         <ExecutiveHeader soundOn={soundOn} toggleSound={toggleSound} />
 
+        <AdsHardwarePauseBanner />
+
         {/* v66 · Strict Action-Triggered UI Isolation Matrix */}
         {(() => {
           const TABS = [
