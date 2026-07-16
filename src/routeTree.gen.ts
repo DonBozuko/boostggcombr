@@ -44,6 +44,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
+import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
@@ -259,6 +260,12 @@ const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
   path: '/~api/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FerramentasGeradorLegendaInstagramRoute =
+  FerramentasGeradorLegendaInstagramRouteImport.update({
+    id: '/ferramentas/gerador-legenda-instagram',
+    path: '/ferramentas/gerador-legenda-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FerramentasContadorSeguidoresRoute =
   FerramentasContadorSeguidoresRouteImport.update({
     id: '/ferramentas/contador-seguidores',
@@ -488,6 +495,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
+  '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
@@ -559,6 +567,7 @@ export interface FileRoutesByTo {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
+  '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog': typeof BlogIndexRoute
   '/ferramentas': typeof FerramentasIndexRoute
@@ -631,6 +640,7 @@ export interface FileRoutesById {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
+  '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
@@ -704,6 +714,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
+    | '/ferramentas/gerador-legenda-instagram'
     | '/~api/analytics'
     | '/blog/'
     | '/ferramentas/'
@@ -775,6 +786,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
+    | '/ferramentas/gerador-legenda-instagram'
     | '/~api/analytics'
     | '/blog'
     | '/ferramentas'
@@ -846,6 +858,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
+    | '/ferramentas/gerador-legenda-instagram'
     | '/~api/analytics'
     | '/blog/'
     | '/ferramentas/'
@@ -917,6 +930,7 @@ export interface RootRouteChildren {
   DashboardSeoRoute: typeof DashboardSeoRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
+  FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   BlogIndexRoute: typeof BlogIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
@@ -1194,6 +1208,13 @@ declare module '@tanstack/react-router' {
       path: '/~api/analytics'
       fullPath: '/~api/analytics'
       preLoaderRoute: typeof Char126apiAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ferramentas/gerador-legenda-instagram': {
+      id: '/ferramentas/gerador-legenda-instagram'
+      path: '/ferramentas/gerador-legenda-instagram'
+      fullPath: '/ferramentas/gerador-legenda-instagram'
+      preLoaderRoute: typeof FerramentasGeradorLegendaInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ferramentas/contador-seguidores': {
@@ -1488,6 +1509,8 @@ const rootRouteChildren: RootRouteChildren = {
   FerramentasCalculadoraEngajamentoInstagramRoute:
     FerramentasCalculadoraEngajamentoInstagramRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
+  FerramentasGeradorLegendaInstagramRoute:
+    FerramentasGeradorLegendaInstagramRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   BlogIndexRoute: BlogIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
