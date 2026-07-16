@@ -138,7 +138,7 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden xl:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
+      className="hidden 2xl:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
       style={{
         background: data.gradient,
         left: side === "left" ? 0 : "auto",
@@ -147,7 +147,7 @@ function Billboard({
       }}
     >
       <div
-        className="absolute inset-0 backdrop-blur-md"
+        className="absolute inset-0"
         style={{
           boxShadow:
             "inset 0 0 120px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.6)",
@@ -168,7 +168,7 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
   if (!mounted || !chars || typeof document === "undefined") return null;
 
   return createPortal(
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden xl:block overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden 2xl:block overflow-hidden">
       <img
         src={chars.left}
         alt=""
@@ -176,7 +176,7 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
         className="fixed bottom-0 left-0 h-[95vh] z-0 object-contain object-bottom select-none"
-        style={{ width: "min(28vw, calc((100vw - 820px) / 2))", maxWidth: "none", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+        style={{ width: "min(26vw, calc((100vw - 900px) / 2))", maxWidth: "none" }}
       />
       <img
         src={chars.right}
@@ -185,7 +185,7 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
         className="fixed bottom-0 right-0 h-[95vh] z-0 object-contain object-bottom select-none"
-        style={{ width: "min(28vw, calc((100vw - 820px) / 2))", maxWidth: "none", transform: "scaleX(-1)", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+        style={{ width: "min(26vw, calc((100vw - 900px) / 2))", maxWidth: "none", transform: "scaleX(-1)" }}
       />
     </div>,
     document.body,
@@ -231,7 +231,7 @@ export function MobileFrame({
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
       <div
-        className={`mf-shell w-full md:max-w-[640px] lg:max-w-[700px] xl:max-w-[760px] 2xl:max-w-[800px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible lg:overflow-hidden z-10 flex flex-col font-sans bg-black/40 backdrop-blur-md border-x border-white/10`}
+        className={`mf-shell w-full md:max-w-[640px] lg:max-w-[700px] xl:max-w-[760px] 2xl:max-w-[800px] min-h-screen h-auto text-white shadow-[0_0_60px_rgba(0,0,0,0.6)] relative overflow-visible lg:overflow-hidden z-10 flex flex-col font-sans bg-black/85 border-x border-white/10`}
         style={{ fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, sans-serif" }}
       >
 
