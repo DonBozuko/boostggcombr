@@ -178,29 +178,31 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     let unregister = registerJarvisAudio(audio);
 
     let played = false;
-    let attempting = false;
     let timer: number | null = null;
-    const events: Array<keyof WindowEventMap> = ["pointerdown", "click", "touchstart", "keydown", "scroll", "wheel"];
+    // Gestos que Chrome/Safari CONTAM como user activation (autoplay unlock).
+    // scroll/wheel NÃO contam — não adianta escutar.
+    const gestureEvents: Array<keyof WindowEventMap> = [
+      "pointerdown", "pointerup", "mousedown", "mouseup",
+      "touchstart", "touchend", "click", "keydown",
+    ];
 
     const detach = () => {
-      events.forEach((e) => window.removeEventListener(e, tryPlay as EventListener, true));
-      document.removeEventListener("pointerdown", tryPlay as EventListener, true);
+      gestureEvents.forEach((e) => {
+        window.removeEventListener(e, tryPlay as EventListener, true);
+        document.removeEventListener(e, tryPlay as EventListener, true);
+      });
       if (timer != null) { window.clearTimeout(timer); timer = null; }
     };
 
     const markPlayed = () => {
       played = true;
-      attempting = false;
       setOpen(true);
       detach();
     };
 
     const tryPlay = (event?: Event) => {
-      if (played || attempting) return;
-      attempting = true;
-      const fromGesture = Boolean(
-        event?.isTrusted && ["pointerdown", "click", "touchstart", "keydown"].includes(event.type),
-      );
+      if (played) return;
+      const fromGesture = Boolean(event?.isTrusted);
       if (fromGesture) {
         // iPhone/Chrome móvel exigem que o elemento de mídia nasça DENTRO do toque.
         try { unregister(); audio.pause(); audio.currentTime = 0; } catch {}
@@ -219,20 +221,20 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           setOpen(true);
           markPlayed();
         }).catch(() => {
-          // Autoplay bloqueado no primeiro acesso — mantém listeners armados para o primeiro toque real.
-          attempting = false;
-          // Nunca usar voz sintética do navegador: se o autoplay bloquear, fica armado para o próximo toque real.
+          // Autoplay bloqueado — mantém listeners armados para o próximo gesto real.
         });
       } else {
         markPlayed();
       }
     };
 
-    // Tentativa automática aos 2s: toca SOMENTE o mp3 real do Jarvis, nunca voz sintética.
+    // Tentativa automática aos 2s (funciona quando o tab já teve user activation prévia — rotas navegadas).
     timer = window.setTimeout(tryPlay, AUTO_FIRE_MS);
-    // Fallback: qualquer gesture do usuário destrava e toca imediatamente.
-    events.forEach((e) => window.addEventListener(e, tryPlay as EventListener, { passive: true, capture: true } as AddEventListenerOptions));
-    document.addEventListener("pointerdown", tryPlay as EventListener, { capture: true } as AddEventListenerOptions);
+    // Fallback universal: QUALQUER gesto real (tap/click/tecla) na página destrava.
+    gestureEvents.forEach((e) => {
+      window.addEventListener(e, tryPlay as EventListener, { passive: true, capture: true } as AddEventListenerOptions);
+      document.addEventListener(e, tryPlay as EventListener, { capture: true } as AddEventListenerOptions);
+    });
 
     return () => {
       detach();
