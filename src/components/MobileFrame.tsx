@@ -138,7 +138,15 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden 2xl:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
+      className="hidden xl:block fixed top-0 bottom-0 z-0 pointer-events-none"
+      style={{
+        background: data.gradient,
+        left: side === "left" ? 0 : "auto",
+        right: side === "right" ? 0 : "auto",
+        width: "calc((100vw - 820px) / 2)",
+        overflow: "visible",
+      } as any}
+      data-billboard={side}
       style={{
         background: data.gradient,
         left: side === "left" ? 0 : "auto",
