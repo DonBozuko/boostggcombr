@@ -1177,7 +1177,40 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </section>
 
+      {/* SEO CONTENT — explica o serviço para ranquear em "comprar seguidores instagram" */}
+      <section className="container mx-auto px-6 py-16 max-w-4xl">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
+          Por que comprar seguidores Instagram na BoostGG
+        </h2>
+        <div className="space-y-4 text-zinc-300 text-sm leading-relaxed">
+          <p>
+            Comprar seguidores Instagram é uma estratégia usada por criadores, empresas e influenciadores para acelerar a credibilidade do perfil. Na <strong className="text-foreground">BoostGG</strong>, você compra seguidores reais e brasileiros com entrega automática no Pix, sem precisar informar senha. O processo é seguro, discreto e começa em poucos minutos após a confirmação do pagamento.
+          </p>
+          <p>
+            Além de seguidores, você também pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link>, visualizações para Reels e seguidores brasileiros segmentados. Todos os pacotes incluem garantia de reposição de 30 dias e suporte no WhatsApp.
+          </p>
+          <h3 className="text-lg font-semibold text-foreground pt-2">Como funciona</h3>
+          <ol className="list-decimal pl-5 space-y-1">
+            <li>Escolha o pacote de seguidores (100 a 100.000) e selecione a opção Brasil ou Mix Global.</li>
+            <li>Informe o @ do perfil público do Instagram que receberá os seguidores.</li>
+            <li>Pague via Pix e acompanhe o crescimento em tempo real.</li>
+          </ol>
+          <h3 className="text-lg font-semibold text-foreground pt-2">Diferenciais Elite Boost Prime</h3>
+          <ul className="list-disc pl-5 space-y-1">
+            <li><strong>Seguidores reais</strong> — perfis ativos, sem bots ou contas vazias.</li>
+            <li><strong>Entrega via Pix</strong> — confirmação instantânea e início rápido.</li>
+            <li><strong>Reposição garantida</strong> — se cair, a gente repõe automaticamente.</li>
+            <li><strong>Sem senha</strong> — basta informar o @ do perfil público.</li>
+            <li><strong>Suporte humano</strong> — atendimento no WhatsApp 24 horas.</li>
+          </ul>
+          <p>
+            Se ainda não tem certeza de quantos seguidores precisa, use nossa <Link to="/ferramentas/contador-seguidores" className="text-primary underline">contador de seguidores Instagram</Link> gratuita para analisar o perfil antes de comprar. Para verificar a qualidade do engajamento, teste também a <Link to="/ferramentas/calculadora-engajamento-instagram" className="text-primary underline">calculadora de engajamento</Link>.
+          </p>
+        </div>
+      </section>
+
       {/* FAQ movida para <FaqSection /> abaixo (evita duplicação) */}
+
 
 
       {/* FOOTER */}
