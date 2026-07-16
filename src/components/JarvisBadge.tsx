@@ -8,7 +8,7 @@ import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
 import { registerJarvisAudio, stopAllJarvis } from "@/hooks/useJarvis";
 
 const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
-  instagram: "Diretor, o algoritmo do Instagram está aquecido. Seguidores reais, curtidas e visualizações entregues em minutos para escalar este perfil ao topo da explore page.",
+  instagram: "Diretor Fabiano, os parâmetros de engajamento do Instagram foram elevados ao nível máximo. Os servidores de entrega imediata estão prontos para alavancar a autoridade e o alcance deste cliente. Senhor!",
   tiktok:    "Senhor, o For You Page do TikTok favorece engajamento explosivo. Disparando seguidores, curtidas e views virais para detonar o algoritmo agora.",
   youtube:   "Diretor, o YouTube recompensa retenção e inscritos ativos. Subindo o canal nas recomendações com inscritos reais e views de alta qualidade.",
   facebook:  "Senhor, o Facebook ainda domina a confiança de compra. Reforçando seguidores e curtidas para blindar a autoridade da página imediatamente.",
