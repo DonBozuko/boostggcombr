@@ -9,7 +9,7 @@ export const Route = createFileRoute("/privacidade")({
       {
         name: "description",
         content:
-          "Como a Elite Boost Prime coleta, usa e protege seus dados. Página mantida pela Elite Boost Prime para esclarecer dúvidas sobre privacidade e segurança.",
+          "Como a BoostGG coleta, usa e protege seus dados. Página mantida pela BoostGG para esclarecer dúvidas sobre privacidade e segurança.",
       },
     ],
   }),
@@ -25,7 +25,7 @@ function TrustPage() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">Elite Boost Prime</span>
+            <span className="font-display font-bold text-lg">BoostGG</span>
           </Link>
           <Link
             to="/"
