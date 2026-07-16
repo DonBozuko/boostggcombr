@@ -226,6 +226,7 @@ const POSTS: Record<string, Post> = {
   },
   "seguidores-instagram-baratos": {
     title: "Seguidores Instagram Baratos: Vale a Pena? O Que Observar",
+    seoTitle: "Seguidores Instagram Baratos: Vale a Pena?",
     description:
       "Seguidores Instagram baratos podem ser bots descartáveis. Aprenda a diferenciar preço justo de armadilha e o que observar antes de comprar.",
     subtitle:
@@ -275,7 +276,7 @@ const POSTS: Record<string, Post> = {
     title: "Como Tirar o Instagram do Privado: Passo a Passo (iOS e Android)",
     seoTitle: "Como Tirar o Instagram do Privado",
     description:
-      "Aprenda como tirar o Instagram do privado em 2 minutos no iPhone e Android. Guia atualizado 2026 com o que muda ao virar público e por que isso é obrigatório para receber seguidores.",
+      "Como tirar o Instagram do privado em 2 minutos no iPhone e Android. Guia 2026: o que muda ao virar público e por que é obrigatório para crescer.",
     subtitle:
       "Passo a passo atualizado para deixar seu perfil público — e por que isso é obrigatório antes de qualquer campanha de crescimento.",
     datePublished: "2026-03-01",
