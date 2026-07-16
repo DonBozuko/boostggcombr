@@ -1,7 +1,7 @@
 // v201 — SEO landing: "comprar seguidores instagram barato" (1.300/mês, KDI 29)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
-import { buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { buildFaqJsonLd, buildProductJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-seguidores-instagram-barato";
 const TITLE = "Seguidores Instagram Barato — Elite Boost Prime | BoostGG";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/comprar-seguidores-instagram-barato")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ)],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC })],
   }),
   component: Page,
 });
