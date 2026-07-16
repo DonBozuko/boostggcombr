@@ -226,6 +226,7 @@ const POSTS: Record<string, Post> = {
   },
   "seguidores-instagram-baratos": {
     title: "Seguidores Instagram Baratos: Vale a Pena? O Que Observar",
+    seoTitle: "Seguidores Instagram Baratos: Vale a Pena?",
     description:
       "Seguidores Instagram baratos podem ser bots descartáveis. Aprenda a diferenciar preço justo de armadilha e o que observar antes de comprar.",
     subtitle:
