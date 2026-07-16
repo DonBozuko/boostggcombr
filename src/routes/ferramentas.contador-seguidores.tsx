@@ -110,11 +110,11 @@ function ContadorPage() {
       <div className="mx-auto max-w-3xl px-4 py-12">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold md:text-4xl">
-            Veja quantos seguidores faltam pra sua <span className="text-primary">próxima meta</span>
+            Contador de <span className="text-primary">Seguidores Instagram</span> grátis
           </h1>
           <p className="mt-3 text-muted-foreground">
-            Digite o <strong>@usuario</strong> e descubra em tempo real quantos seguidores faltam pra desbloquear
-            monetização, link na bio ou o número que você quer bater — <strong>grátis, sem login, ilimitado</strong>.
+            Digite o <strong>@usuario</strong> e veja em tempo real quantos <strong>seguidores</strong>, seguindo e posts
+            qualquer perfil público do Instagram tem — <strong>grátis, sem login, ilimitado</strong>.
           </p>
         </div>
 
