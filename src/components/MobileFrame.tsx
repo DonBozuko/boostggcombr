@@ -138,7 +138,7 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden lg:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
+      className="hidden xl:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
       style={{
         background: data.gradient,
         left: side === "left" ? 0 : "auto",
@@ -168,15 +168,15 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
   if (!mounted || !chars || typeof document === "undefined") return null;
 
   return createPortal(
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden lg:block overflow-visible">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden xl:block overflow-hidden">
       <img
         src={chars.left}
         alt=""
         loading="eager"
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-        className="fixed bottom-0 left-0 h-[95vh] w-auto z-0 object-contain object-bottom select-none"
-        style={{ maxWidth: "none", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+        className="fixed bottom-0 left-0 h-[95vh] z-0 object-contain object-bottom select-none"
+        style={{ width: "min(28vw, calc((100vw - 820px) / 2))", maxWidth: "none", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
       />
       <img
         src={chars.right}
@@ -184,12 +184,13 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
         loading="eager"
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-        className="fixed bottom-0 right-0 h-[95vh] w-auto z-0 object-contain object-bottom scale-x-[-1] select-none"
-        style={{ maxWidth: "none", transform: "scaleX(-1)", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
+        className="fixed bottom-0 right-0 h-[95vh] z-0 object-contain object-bottom select-none"
+        style={{ width: "min(28vw, calc((100vw - 820px) / 2))", maxWidth: "none", transform: "scaleX(-1)", filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.9)) drop-shadow(0 0 30px ${data.accent}66)` }}
       />
     </div>,
     document.body,
   );
+
 }
 
 
