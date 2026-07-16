@@ -18,7 +18,7 @@ export async function confirmRobotDispatch(input: {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, pacote, quantidade, instagram_user, valor, custo_real")
+    .select("id, status, pacote, quantidade, instagram_user, valor, custo_real, mercado_pago_id")
     .eq("id", input.pedidoId)
     .maybeSingle();
   if (error || !pedido) return { ok: false, error: "PEDIDO_NAO_ENCONTRADO" };
@@ -26,6 +26,19 @@ export async function confirmRobotDispatch(input: {
   if (pedido.status !== "waiting_provision" && pedido.status !== "MARGIN_HOLD" && pedido.status !== "SMM_FAILED") {
     return { ok: false, error: `STATUS_${pedido.status}` };
   }
+
+  // v189 — Anti dupla-entrega: robô externo não pode confirmar envio se MP já refundou.
+  if (pedido.status === "SMM_FAILED" && (pedido as any).mercado_pago_id) {
+    const { hasMpRefund } = await import("@/lib/dispatcher-fallback.server");
+    if (await hasMpRefund(String((pedido as any).mercado_pago_id))) {
+      await supabaseAdmin
+        .from("pedidos")
+        .update({ status: "mp_refunded", error_detail: "v189 abortado: MP já registrou refund. Cliente foi reembolsado." } as any)
+        .eq("id", pedido.id);
+      return { ok: false, error: "JA_REEMBOLSADO_NO_MP" };
+    }
+  }
+
 
   let fornecedor = input.fornecedor ?? null;
   let custoBrl = typeof input.valorPagoBrl === "number" && Number.isFinite(input.valorPagoBrl) && input.valorPagoBrl >= 0
