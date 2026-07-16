@@ -211,10 +211,8 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(fallbackUtterance);
         speechProbeTimer = window.setTimeout(() => {
-          if (!started && !played) {
-            try { window.speechSynthesis.cancel(); } catch {}
-          }
-        }, 900);
+          if (!started && !played) speechProbeTimer = null;
+        }, 6000);
       } catch {
         fallbackUtterance = null;
       }
