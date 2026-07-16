@@ -9,7 +9,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { useScrolledPast } from "@/hooks/useScroll";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
@@ -705,7 +705,16 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           <div className="flex items-center gap-2">
             <BrandHeader subtitle="Seguidores Reais no Instagram via Pix" />
           </div>
-          <ShowcaseTrigger />
+          <div className="flex items-center gap-4">
+            <Link
+              to="/ferramentas"
+              className="text-sm text-zinc-300 hover:text-foreground transition-colors"
+              activeProps={{ className: "text-foreground font-medium" }}
+            >
+              Ferramentas
+            </Link>
+            <ShowcaseTrigger />
+          </div>
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
@@ -1179,9 +1188,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             <span className="font-display font-semibold text-foreground">BOOSTGG</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
-            <a href="/privacidade" className="hover:text-foreground">Privacidade</a>
-            <a href="/termos" className="hover:text-foreground">Termos</a>
-            <a href="/reembolso" className="hover:text-foreground">Reembolso</a>
+            <Link to="/ferramentas" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Ferramentas</Link>
+            <Link to="/privacidade" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Privacidade</Link>
+            <Link to="/termos" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Termos</Link>
+            <Link to="/reembolso" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Reembolso</Link>
             <span>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</span>
           </div>
 
