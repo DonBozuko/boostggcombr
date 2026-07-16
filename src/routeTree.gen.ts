@@ -44,6 +44,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
+import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
@@ -256,6 +257,12 @@ const FerramentasContadorSeguidoresRoute =
   FerramentasContadorSeguidoresRouteImport.update({
     id: '/ferramentas/contador-seguidores',
     path: '/ferramentas/contador-seguidores',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FerramentasCalculadoraEngajamentoInstagramRoute =
+  FerramentasCalculadoraEngajamentoInstagramRouteImport.update({
+    id: '/ferramentas/calculadora-engajamento-instagram',
+    path: '/ferramentas/calculadora-engajamento-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
@@ -473,6 +480,7 @@ export interface FileRoutesByFullPath {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
@@ -542,6 +550,7 @@ export interface FileRoutesByTo {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog': typeof BlogIndexRoute
@@ -612,6 +621,7 @@ export interface FileRoutesById {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/~api/analytics': typeof Char126apiAnalyticsRoute
   '/blog/': typeof BlogIndexRoute
@@ -683,6 +693,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
@@ -752,6 +763,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog'
@@ -821,6 +833,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/~api/analytics'
     | '/blog/'
@@ -890,6 +903,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlogSlugRoute: typeof BlogSlugRoute
   DashboardSeoRoute: typeof DashboardSeoRoute
+  FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -1169,6 +1183,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FerramentasContadorSeguidoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ferramentas/calculadora-engajamento-instagram': {
+      id: '/ferramentas/calculadora-engajamento-instagram'
+      path: '/ferramentas/calculadora-engajamento-instagram'
+      fullPath: '/ferramentas/calculadora-engajamento-instagram'
+      preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/seo': {
       id: '/dashboard/seo'
       path: '/dashboard/seo'
@@ -1444,6 +1465,8 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlogSlugRoute: BlogSlugRoute,
   DashboardSeoRoute: DashboardSeoRoute,
+  FerramentasCalculadoraEngajamentoInstagramRoute:
+    FerramentasCalculadoraEngajamentoInstagramRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
   Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
   BlogIndexRoute: BlogIndexRoute,
