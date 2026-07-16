@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/impulsionar-instagram";
-const TITLE = "Impulsionar Instagram — Gestão de Crescimento Profissional | BoostGG";
+const TITLE = "Impulsionar Instagram — Gestão de Crescimento Profissional — Elite Boost Prime | BoostGG";
 const DESC =
   "Serviço de gestão e impulsionamento de perfil no Instagram. Alcance mais pessoas, aumente a prova social e acelere seu crescimento com pagamento via Pix.";
 
