@@ -190,7 +190,17 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const playBadgeAudio = () => {
     const audio = audioRef.current;
     if (!audio) return;
-    // Toggle: se já tá tocando, pausa e reinicia (usuário clicou de novo).
+
+    // Se está mudo global, o clique ativa som e toca.
+    if (muted) {
+      setJarvisMuted(false);
+    } else if (!audio.paused) {
+      // Se já está tocando, o clique silencia o Jarvis globalmente.
+      setJarvisMuted(true);
+      return;
+    }
+
+    // Toca o áudio da variante atual.
     try {
       audio.pause();
       audio.currentTime = 0;
