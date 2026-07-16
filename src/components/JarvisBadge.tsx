@@ -167,11 +167,16 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     if (typeof window === "undefined") return;
     stopAllJarvis();
 
-    const audio = new Audio(AUDIO_BY_VARIANT[variant] ?? AUDIO_BY_VARIANT.instagram);
-    audio.crossOrigin = "anonymous";
-    audio.preload = "auto";
-    audio.volume = 0.95;
-    const unregister = registerJarvisAudio(audio);
+    const audioSrc = AUDIO_BY_VARIANT[variant] ?? AUDIO_BY_VARIANT.instagram;
+    const makeBadgeAudio = () => {
+      const next = new Audio(audioSrc);
+      next.crossOrigin = "anonymous";
+      next.preload = "auto";
+      next.volume = 0.95;
+      return next;
+    };
+    let audio = makeBadgeAudio();
+    let unregister = registerJarvisAudio(audio);
 
     let played = false;
     let attempting = false;
@@ -232,33 +237,27 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
       const fromGesture = Boolean(
         event?.isTrusted && ["pointerdown", "click", "touchstart", "keydown"].includes(event.type),
       );
+      if (fromGesture) {
+        // iPhone/Chrome móvel exigem que o elemento de mídia nasça DENTRO do toque.
+        try { unregister(); audio.pause(); audio.currentTime = 0; } catch {}
+        audio = makeBadgeAudio();
+        unregister = registerJarvisAudio(audio);
+      }
+
+      audio.muted = false;
+      audio.volume = 0.95;
       audio.onended = () => safeClose();
       audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
-
-      // Primeiro acesso da home: Chrome bloqueia áudio com som, mas permite iniciar mudo.
-      // Então damos start mudo, zeramos e abrimos o som imediatamente — sem precisar sair/voltar rota.
-      if (!fromGesture) {
-        audio.muted = true;
-        audio.volume = 0;
-      } else {
-        audio.muted = false;
-        audio.volume = 0.95;
-      }
 
       const p = audio.play();
       if (p && typeof p.then === "function") {
         p.then(() => {
-          if (!fromGesture) {
-            try { audio.currentTime = 0; } catch {}
-            audio.volume = 0.95;
-            audio.muted = false;
-          }
           setOpen(true);
           markPlayed();
         }).catch(() => {
-          // Autoplay bloqueado no primeiro acesso — tenta voz nativa e mantém listeners armados.
+          // Autoplay bloqueado no primeiro acesso — mantém listeners armados para o primeiro toque real.
           attempting = false;
-          speakFallback();
+          if (fromGesture) speakFallback();
         });
       } else {
         markPlayed();
