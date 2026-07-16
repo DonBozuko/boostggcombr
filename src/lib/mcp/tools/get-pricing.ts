@@ -5,7 +5,7 @@ export default defineTool({
   name: "get_pricing",
   title: "Consultar preços de pacotes",
   description:
-    "Lista os pacotes disponíveis (rede social, quantidade, preço em BRL) da vitrine pública do EliteBoost Prime.",
+    "Lista os pacotes disponíveis (rede social, quantidade, preço em BRL) da vitrine pública do BoostGG.",
   inputSchema: {
     network: z
       .enum(["tiktok", "instagram", "youtube", "facebook", "telegram", "trafego"])

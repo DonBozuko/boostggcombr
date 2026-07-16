@@ -25,7 +25,7 @@ export function BenefitsGrid({
     NETWORK_BENEFIT[route] ?? "Crescimento Real",
   ];
   return (
-    <section className="mx-2 mt-1 mb-1" aria-label="Benefícios EliteBoost Prime">
+    <section className="mx-2 mt-1 mb-1" aria-label="Benefícios BoostGG">
       <div className="grid grid-cols-2 gap-1.5">
         {items.map((t) => (
           <div

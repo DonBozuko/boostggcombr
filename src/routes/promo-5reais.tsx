@@ -16,7 +16,7 @@ import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderB
 export const Route = createFileRoute("/promo-5reais")({
   head: () => ({
     meta: [
-      { title: "100 Seguidores no Instagram por R$5 — EliteBoost Prime" },
+      { title: "100 Seguidores no Instagram por R$5 — BoostGG" },
       {
         name: "description",
         content:
@@ -269,7 +269,7 @@ function Promo5Page() {
           </Button>
 
           <p className="text-center text-[11px] text-white/40">
-            Pagamento processado pelo Mercado Pago · EliteBoost Prime
+            Pagamento processado pelo Mercado Pago · BoostGG
           </p>
         </motion.form>
 

@@ -19,7 +19,7 @@ export function BlogLayout({
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">EliteBoost Prime</span>
+            <span className="font-display font-bold text-lg">BoostGG</span>
           </Link>
           <Link to="/blog" className="text-sm text-muted-foreground hover:text-foreground">
             Blog
@@ -52,7 +52,7 @@ export function BlogLayout({
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">EliteBoost Prime</span>
+            <span className="font-display font-semibold text-foreground">BoostGG</span>
           </div>
           <p>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</p>
         </div>

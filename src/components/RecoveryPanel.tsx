@@ -35,7 +35,7 @@ function buildMessage(r: Row): string {
   const nome = r.instagram_user ? `@${r.instagram_user.replace(/^@/, "")}` : "olá";
   return (
     `Oi ${nome}! 👋\n\n` +
-    `Vi aqui que você começou um pedido na EliteBoost Prime (${r.pacote ?? "impulso"}) mas o Pix ficou pendente. ` +
+    `Vi aqui que você começou um pedido na BoostGG (${r.pacote ?? "impulso"}) mas o Pix ficou pendente. ` +
     `Deu tudo certo? Se precisar de ajuda ou um novo link de pagamento, é só responder aqui — libero na hora! 🚀`
   );
 }
