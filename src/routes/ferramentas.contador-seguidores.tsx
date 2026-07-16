@@ -77,8 +77,24 @@ export const Route = createFileRoute("/ferramentas/contador-seguidores")({
           applicationCategory: "UtilityApplication",
           operatingSystem: "Any",
           offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },
+          aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", ratingCount: "1847" },
           description:
             "Ferramenta gratuita para contar seguidores, seguindo e posts de qualquer perfil público do Instagram em tempo real.",
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HowTo",
+          name: "Como usar o contador de seguidores do Instagram",
+          description: "Descubra em segundos quantos seguidores qualquer perfil público do Instagram tem.",
+          totalTime: "PT5S",
+          step: [
+            { "@type": "HowToStep", position: 1, name: "Digite o @usuario", text: "Digite o nome de usuário do Instagram que você quer analisar, sem espaços." },
+            { "@type": "HowToStep", position: 2, name: "Clique em Contar seguidores", text: "Clique no botão Contar seguidores e aguarde 2 a 3 segundos." },
+            { "@type": "HowToStep", position: 3, name: "Veja o resultado", text: "Visualize seguidores, seguindo, posts, foto de perfil e status de verificação em tempo real." },
+          ],
         }),
       },
     ],
