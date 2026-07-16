@@ -54,7 +54,7 @@ export function BlogLayout({
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
             <span className="font-display font-semibold text-foreground">BoostGG</span>
           </div>
-          <p>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</p>
+          <p>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</p>
         </div>
       </footer>
     </div>

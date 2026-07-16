@@ -4,11 +4,11 @@ import { FileText, ShieldCheck, CreditCard, AlertTriangle, Scale, TrendingUp } f
 export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
-      { title: "Termos de Uso — EliteBoost Prime" },
+      { title: "Termos de Uso — Elite Boost Prime" },
       {
         name: "description",
         content:
-          "Termos de uso da EliteBoost Prime: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.",
+          "Termos de uso da Elite Boost Prime: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.",
       },
     ],
   }),
@@ -24,7 +24,7 @@ function TermosPage() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">EliteBoost Prime</span>
+            <span className="font-display font-bold text-lg">Elite Boost Prime</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Voltar à página inicial
@@ -36,14 +36,14 @@ function TermosPage() {
         <div className="mb-12">
           <h1 className="text-4xl md:text-5xl font-bold">Termos de Uso</h1>
           <p className="mt-4 text-muted-foreground">
-            Ao contratar um pacote da EliteBoost Prime, você concorda com os
+            Ao contratar um pacote da Elite Boost Prime, você concorda com os
             termos abaixo. Última atualização: 2026.
           </p>
         </div>
 
         <div className="space-y-8">
           <Section icon={FileText} title="O que é o serviço">
-            A EliteBoost Prime intermedia a entrega de engajamento social
+            A Elite Boost Prime intermedia a entrega de engajamento social
             (seguidores, curtidas, visualizações) em perfis públicos. Somos um
             serviço de marketing digital independente, não afiliado ao
             Instagram, TikTok, YouTube, Facebook, Telegram ou Meta.
@@ -66,7 +66,7 @@ function TermosPage() {
           <Section icon={AlertTriangle} title="Limites e recusas">
             Recusamos pedidos para perfis privados, inexistentes, com conteúdo
             ilegal ou que violem os termos da rede social de destino. A
-            EliteBoost Prime pode cancelar e reembolsar pedidos que
+            Elite Boost Prime pode cancelar e reembolsar pedidos que
             identifiquem risco de bloqueio para o cliente ou para o serviço.
           </Section>
 
@@ -99,9 +99,9 @@ function TermosPage() {
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">EliteBoost Prime</span>
+            <span className="font-display font-semibold text-foreground">Elite Boost Prime</span>
           </div>
-          <p>© 2026 EliteBoost Prime. Não somos afiliados ao Instagram ou Meta.</p>
+          <p>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</p>
         </div>
       </footer>
     </div>

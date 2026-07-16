@@ -66,7 +66,7 @@ export function TreasuryPanel({ token }: { token: string }) {
       doc.setTextColor(255, 215, 0);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
-      doc.text("EliteBoost Prime · Livro Contábil", 40, 32);
+      doc.text("Elite Boost Prime · Livro Contábil", 40, 32);
       doc.setFontSize(10);
       doc.setTextColor(200, 200, 200);
       doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")} · Diretor: Fabiano`, 40, 52);
@@ -141,7 +141,7 @@ export function TreasuryPanel({ token }: { token: string }) {
       for (let i = 1; i <= pages; i++) {
         doc.setPage(i);
         doc.setFontSize(8); doc.setTextColor(120);
-        doc.text(`EliteBoost Prime · Confidencial · Página ${i}/${pages}`, 40, 820);
+        doc.text(`Elite Boost Prime · Confidencial · Página ${i}/${pages}`, 40, 820);
       }
 
       doc.save(`livro-contabil-${Date.now()}.pdf`);

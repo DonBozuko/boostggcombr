@@ -154,7 +154,7 @@ export const jarvisChat = createServerFn({ method: "POST" })
         body: JSON.stringify({
           model: "google/gemini-2.5-flash",
           messages: [
-            { role: "system", content: "Você é J.A.R.V.I.S., assistente executivo do Diretor Fabiano na EliteBoost Prime. Responda em PT-BR, curto (max 4 linhas), com dados reais do contexto. Trate o usuário por 'Diretor'." },
+            { role: "system", content: "Você é J.A.R.V.I.S., assistente executivo do Diretor Fabiano na Elite Boost Prime. Responda em PT-BR, curto (max 4 linhas), com dados reais do contexto. Trate o usuário por 'Diretor'." },
             { role: "user", content: `Pergunta: ${data.question}\n\nDados reais (JSON):\n${JSON.stringify(ctx)}` },
           ],
         }),

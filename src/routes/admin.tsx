@@ -74,7 +74,7 @@ function AdminSettingsButton() {
         <DialogHeader>
           <DialogTitle>⚙️ Configurações Gerais</DialogTitle>
           <DialogDescription>
-            Preferências do painel EliteBoost Prime · sessão atual.
+            Preferências do painel Elite Boost Prime · sessão atual.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 text-sm">
@@ -229,7 +229,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Admin · EliteBoost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
+  head: () => ({ meta: [{ title: "Admin · Elite Boost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: AdminGate,
 });
 
@@ -413,7 +413,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
           <div className="text-center space-y-2">
             <div className="text-4xl">🔐</div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
-              Painel EliteBoost Prime
+              Painel Elite Boost Prime
             </h1>
             <p className="text-xs text-zinc-400">Supabase Auth · Administrador-Mestre</p>
           </div>
@@ -725,7 +725,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   const recuperarVenda = (_p: { instagram_user: string; pacote: string; quantidade: number; rede_social?: string | null; id: string }) => {
     const tpl =
       "Olá! Identificamos uma instabilidade temporária no nosso checkout de Pix " +
-      "enquanto você finalizava o seu pedido na EliteBoost Prime. Pedimos sinceras " +
+      "enquanto você finalizava o seu pedido na Elite Boost Prime. Pedimos sinceras " +
       "desculpas pelo inconveniente! 🙏 Para garantir que você não perca os seus " +
       "bônus de crescimento de algoritmo, geramos um link de contingência direto e " +
       "seguro. Basta clicar para finalizar com ativação imediata: https://t.me";
@@ -2151,7 +2151,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
         <footer className="pt-6 pb-2 text-center text-[11px] tracking-wider text-muted-foreground/60 font-mono uppercase">
-          EliteBoost Prime Admin · v1.0.0-LAUNCH
+          Elite Boost Prime Admin · v1.0.0-LAUNCH
         </footer>
       </div>
     </div>
