@@ -233,6 +233,16 @@ function ContadorPage() {
             consultas. Usamos apenas dados <strong>públicos</strong> do perfil pesquisado. Sua conta continua 100% segura.
           </p>
 
+          <div className="mt-6 rounded-lg border bg-card p-4 text-sm">
+            <strong className="text-foreground">Ferramenta relacionada:</strong>{" "}
+            <Link to="/ferramentas/calculadora-engajamento-instagram" className="text-primary underline">
+              Calculadora de Engajamento Instagram
+            </Link>{" "}
+            — descubra se o perfil tem engajamento real ou seguidores inflados.
+          </div>
+
+
+
           <h2 className="pt-6 text-2xl font-bold text-foreground">Perguntas frequentes</h2>
           <div className="space-y-4">
             {FAQ.map((f) => (
