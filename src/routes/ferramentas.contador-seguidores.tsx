@@ -96,6 +96,18 @@ export const Route = createFileRoute("/ferramentas/contador-seguidores")({
           ],
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://boostgg.com.br/" },
+            { "@type": "ListItem", position: 2, name: "Ferramentas", item: "https://boostgg.com.br/ferramentas" },
+            { "@type": "ListItem", position: 3, name: "Contador de Seguidores Instagram", item: CANON },
+          ],
+        }),
+      },
     ],
   }),
   component: ContadorPage,
@@ -221,6 +233,11 @@ function ContadorPage() {
             <li>Clique em <strong>“Contar seguidores”</strong> e aguarde 2–3 segundos.</li>
             <li>Veja seguidores, seguindo, posts, foto de perfil e status de verificação.</li>
           </ol>
+
+          <h2 className="pt-4 text-2xl font-bold text-foreground">Contador de seguidores antes de comprar</h2>
+          <p>
+            Usar o contador de seguidores Instagram antes de <Link to="/comprar-seguidores-instagram" className="text-primary underline">comprar seguidores Instagram</Link> é o jeito mais inteligente de medir o resultado. Anote o número atual, faça o pedido na BoostGG e consulte novamente em 24 horas para ver o crescimento real. A ferramenta é grátis, então você pode usar quantas vezes quiser para acompanhar perfis próprios, de concorrentes ou de influenciadores.
+          </p>
 
           <h2 className="pt-4 text-2xl font-bold text-foreground">Para que serve um contador de seguidores</h2>
           <p>
