@@ -68,7 +68,7 @@ const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
   telegram:  "/api/public/sfx/jarvis-telegram.mp3?v=34",
   trafego:   "/api/public/sfx/jarvis-trafego.mp3?v=34",
 };
-const AUTO_FIRE_MS = 2000;
+
 
 // Dynamic Omnichannel Glow Filters por rede social.
 // `filter` aplica matiz/saturação sobre a armadura base (vermelha+dourada).
@@ -279,10 +279,12 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             className="h-full w-full object-cover"
             style={{ filter: t.filter }}
           />
-          {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante */}
-          <span
-            aria-hidden
-            className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full"
+          {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante — clique aciona áudio */}
+          <button
+            type="button"
+            aria-label="Ativar voz do J.A.R.V.I.S."
+            onClick={(e) => { e.stopPropagation(); playBadgeAudio(); }}
+            className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full cursor-pointer p-0 border-0"
             style={{
               width: 18,
               height: 18,
@@ -290,10 +292,11 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
               color: t.arc.toLowerCase() === "#ffffff" ? "#0a0a0a" : "#ffffff",
               boxShadow: `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
               animation: "jb-arc 1.6s ease-in-out infinite",
+              transform: "translate(-50%,-50%)",
             }}
           >
             <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
-          </span>
+          </button>
         </div>
         {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
 
