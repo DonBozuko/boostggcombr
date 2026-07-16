@@ -128,13 +128,26 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, pacote, quantidade, instagram_user, valor")
+    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id")
     .eq("id", pedidoId)
     .maybeSingle();
   if (error || !pedido) return { ok: false, error: "PEDIDO_NAO_ENCONTRADO" };
   if (pedido.status !== "waiting_provision" && pedido.status !== "MARGIN_HOLD" && pedido.status !== "SMM_FAILED") {
     return { ok: false, error: `STATUS_${pedido.status}` };
   }
+
+  // v189 — Anti dupla-entrega: se MP já registrou refund, marca mp_refunded e aborta.
+  if (pedido.status === "SMM_FAILED" && (pedido as any).mercado_pago_id) {
+    const { hasMpRefund } = await import("@/lib/dispatcher-fallback.server");
+    if (await hasMpRefund(String((pedido as any).mercado_pago_id))) {
+      await supabaseAdmin
+        .from("pedidos")
+        .update({ status: "mp_refunded", error_detail: "v189 abortado: MP já registrou refund. Cliente foi reembolsado." } as any)
+        .eq("id", pedido.id);
+      return { ok: false, error: "JA_REEMBOLSADO_NO_MP" };
+    }
+  }
+
 
   const { rankProvidersByCost, markProviderUnstable, clearProviderUnstable } = await import("@/lib/smart-routing.server");
   const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
