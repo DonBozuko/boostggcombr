@@ -182,6 +182,7 @@ export function stopAllJarvis() {
 }
 
 function playNative(evt: JarvisEvent) {
+  if (muted) return;
   let a = pool[evt];
   if (!a) {
     a = makeAudio(evt);
