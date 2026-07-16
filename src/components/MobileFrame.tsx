@@ -138,13 +138,15 @@ function Billboard({
   return (
     <aside
       aria-hidden="true"
-      className="hidden 2xl:block fixed top-0 bottom-0 z-0 w-[calc((100vw-450px)/2)] max-w-[560px] pointer-events-none"
+      className="hidden xl:block fixed top-0 bottom-0 z-0 pointer-events-none"
       style={{
         background: data.gradient,
         left: side === "left" ? 0 : "auto",
         right: side === "right" ? 0 : "auto",
+        width: "calc((100vw - 820px) / 2)",
         overflow: "visible",
-      }}
+      } as any}
+      data-billboard={side}
     >
       <div
         className="absolute inset-0"
@@ -168,15 +170,15 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
   if (!mounted || !chars || typeof document === "undefined") return null;
 
   return createPortal(
-    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden 2xl:block overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden xl:block overflow-hidden">
       <img
         src={chars.left}
         alt=""
         loading="eager"
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-        className="fixed bottom-0 left-0 h-[95vh] z-0 object-contain object-bottom select-none"
-        style={{ width: "min(26vw, calc((100vw - 900px) / 2))", maxWidth: "none" }}
+        className="fixed bottom-0 left-0 h-[92vh] z-0 object-contain object-bottom select-none"
+        style={{ width: "calc((100vw - 820px) / 2)", maxWidth: "460px" }}
       />
       <img
         src={chars.right}
@@ -184,8 +186,8 @@ function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; 
         loading="eager"
         decoding="async"
         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-        className="fixed bottom-0 right-0 h-[95vh] z-0 object-contain object-bottom select-none"
-        style={{ width: "min(26vw, calc((100vw - 900px) / 2))", maxWidth: "none", transform: "scaleX(-1)" }}
+        className="fixed bottom-0 right-0 h-[92vh] z-0 object-contain object-bottom select-none"
+        style={{ width: "calc((100vw - 820px) / 2)", maxWidth: "460px", transform: "scaleX(-1)" }}
       />
     </div>,
     document.body,
