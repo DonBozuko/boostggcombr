@@ -173,49 +173,52 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     audio.volume = 0.95;
     const unregister = registerJarvisAudio(audio);
 
-    const rearm = () => {
-      events.forEach((e) =>
-        window.addEventListener(e, fire as EventListener, { passive: true, once: true } as AddEventListenerOptions),
-      );
+    let played = false;
+    let timer: number | null = null;
+    const events: Array<keyof WindowEventMap> = ["pointerdown", "click", "touchstart", "keydown", "scroll", "wheel"];
+
+    const detach = () => {
+      events.forEach((e) => window.removeEventListener(e, tryPlay as EventListener, true));
+      document.removeEventListener("pointerdown", tryPlay as EventListener, true);
+      if (timer != null) { window.clearTimeout(timer); timer = null; }
     };
 
-    const fire = () => {
-      if (firedRef.current) return;
-      firedRef.current = true;
-      setOpen(true);
+    const tryPlay = () => {
+      if (played) return;
       audio.onended = () => safeClose();
       audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
       const p = audio.play();
       if (p && typeof p.then === "function") {
-        p.then(() => { cleanup(); }).catch(() => {
-          // Autoplay bloqueado (ex.: home no primeiro load). Re-arma listeners pra tocar no próximo gesto.
-          firedRef.current = false;
-          safeClose();
-          rearm();
+        p.then(() => {
+          played = true;
+          firedRef.current = true;
+          setOpen(true);
+          detach();
+        }).catch(() => {
+          // Autoplay bloqueado — mantém listeners ativos, dispara no próximo gesture.
         });
       } else {
-        cleanup();
+        played = true;
+        firedRef.current = true;
+        setOpen(true);
+        detach();
       }
     };
 
-    const timer = window.setTimeout(fire, AUTO_FIRE_MS);
-    const events: Array<keyof WindowEventMap> = ["click", "mousedown", "touchstart", "pointerdown", "scroll", "keydown", "wheel"];
-    const cleanup = () => {
-      window.clearTimeout(timer);
-      events.forEach((e) => window.removeEventListener(e, fire as EventListener));
-      document.removeEventListener("click", fire as EventListener, true);
-    };
-    rearm();
-    // Fallback capture-phase no documento — pega qualquer clique mesmo se stopPropagation
-    document.addEventListener("click", fire as EventListener, { capture: true, once: true } as AddEventListenerOptions);
+    // Tentativa automática aos 2s (funciona se browser já concedeu MEI/gesture recente).
+    timer = window.setTimeout(tryPlay, AUTO_FIRE_MS);
+    // Fallback: qualquer gesture do usuário destrava e toca imediatamente.
+    events.forEach((e) => window.addEventListener(e, tryPlay as EventListener, { passive: true, capture: true } as AddEventListenerOptions));
+    document.addEventListener("pointerdown", tryPlay as EventListener, { capture: true } as AddEventListenerOptions);
 
     return () => {
-      cleanup();
+      detach();
       if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
       try { audio.pause(); audio.currentTime = 0; } catch {}
       unregister();
     };
   }, []);
+
 
   // Rotação dinâmica de mensagens persuasivas (a cada 11s, só quando o balão está aberto e não consultando).
   useEffect(() => {
