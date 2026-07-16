@@ -129,3 +129,27 @@ export async function refundMercadoPago(paymentId: string): Promise<{ ok: boolea
     return { ok: false, detail: (e as Error).message };
   }
 }
+
+// v189 — Anti dupla-entrega: consulta MP se já existe refund registrado pro payment.
+// Retorna true SOMENTE se MP confirmou refund. Em erro/timeout retorna false (fail-open p/ não travar reprocesso legítimo).
+export async function hasMpRefund(paymentId: string): Promise<boolean> {
+  const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  if (!token || !paymentId) return false;
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    try {
+      const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}/refunds`, {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: ctrl.signal,
+      });
+      if (!res.ok) return false;
+      const arr = JSON.parse(await res.text());
+      return Array.isArray(arr) && arr.length > 0;
+    } finally {
+      clearTimeout(timer);
+    }
+  } catch {
+    return false;
+  }
+}
