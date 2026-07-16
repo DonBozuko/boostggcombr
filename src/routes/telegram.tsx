@@ -45,7 +45,7 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/telegram")({
   head: () => {
-    const title = "Crescer Telegram — Membros para Grupo e Canal | BoostGG";
+    const title = "Crescer Telegram — Membros para Grupo e Canal — Elite Boost Prime | BoostGG";
     const description =
       "Cresça seu grupo e canal do Telegram com membros reais via Pix. Entrega imediata, alta retenção e reposição garantida.";
     const url = "https://boostgg.com.br/telegram";

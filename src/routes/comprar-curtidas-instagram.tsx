@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Comprar Curtidas Instagram — Entrega Instantânea via Pix";
+const TITLE = "Comprar Curtidas Instagram — Entrega Instantânea via Pix — Elite Boost Prime | BoostGG";
 const DESC =
   "Compre curtidas para posts do Instagram a partir de R$ 2,90. Entrega em segundos, sem senha, com reposição garantida. Pague via Pix.";
 

@@ -39,7 +39,7 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/trafego")({
   head: () => {
-    const title = "Tráfego Web Real BR e Global — Segmentado | BoostGG";
+    const title = "Tráfego Web Real BR e Global — Segmentado — Elite Boost Prime | BoostGG";
     const description =
       "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega imediata, segmentado, seguro e com reposição garantida.";
     const url = "https://boostgg.com.br/trafego";

@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-seguidores-tiktok";
-const TITLE = "Comprar Seguidores TikTok Baratos — Entrega Rápida via Pix";
+const TITLE = "Comprar Seguidores TikTok Baratos — Entrega Rápida via Pix — Elite Boost Prime | BoostGG";
 const DESC =
   "Compre seguidores para TikTok com entrega imediata, pagamento via Pix e reposição por 30 dias. Sem senha, sem risco, a partir de R$ 4,90.";
 
