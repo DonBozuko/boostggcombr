@@ -112,11 +112,11 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Impulsionar Instagram no Pix | BoostGG";
+    const title = "Elite Boost Prime — Impulsionar Instagram no Pix";
     const description =
       "Impulsione seu Instagram com audiência real via Pix e entrega em minutos. Alta retenção, reposição garantida e 100% seguro.";
     const url = "https://boostgg.com.br/";
-    const ogImage = `https://boostgg.com.br${ogInstagram}?v=48`;
+    const ogImage = `https://boostgg.com.br${ogInstagram}?v=49`;
     return {
       meta: [
         { title },
@@ -130,7 +130,7 @@ export const Route = createFileRoute("/")({
         { property: "og:image", content: ogImage },
         { property: "og:image:width", content: "1216" },
         { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "BoostGG — Seguidores reais no Instagram via Pix" },
+        { property: "og:image:alt", content: "Elite Boost Prime — Seguidores reais no Instagram via Pix" },
         { property: "og:site_name", content: "BoostGG" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
