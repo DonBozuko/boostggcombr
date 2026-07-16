@@ -60,7 +60,7 @@ const UPSELL_BY_VARIANT: Record<FabianoVariant, string> = {
 };
 
 const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
-  instagram: "/api/public/sfx/jarvis-instagram.mp3?v=34",
+  instagram: "/api/public/sfx/jarvis-instagram.mp3?v=35",
   tiktok:    "/api/public/sfx/jarvis-tiktok.mp3?v=34",
   youtube:   "/api/public/sfx/jarvis-youtube.mp3?v=34",
   facebook:  "/api/public/sfx/jarvis-facebook.mp3?v=34",
