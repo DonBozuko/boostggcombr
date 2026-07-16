@@ -705,7 +705,16 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           <div className="flex items-center gap-2">
             <BrandHeader subtitle="Seguidores Reais no Instagram via Pix" />
           </div>
-          <ShowcaseTrigger />
+          <div className="flex items-center gap-4">
+            <Link
+              to="/ferramentas"
+              className="text-sm text-zinc-300 hover:text-foreground transition-colors"
+              activeProps={{ className: "text-foreground font-medium" }}
+            >
+              Ferramentas
+            </Link>
+            <ShowcaseTrigger />
+          </div>
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
