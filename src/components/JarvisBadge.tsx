@@ -68,7 +68,7 @@ const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
   telegram:  "/api/public/sfx/jarvis-telegram.mp3?v=34",
   trafego:   "/api/public/sfx/jarvis-trafego.mp3?v=34",
 };
-const AUTO_FIRE_MS = 2000;
+
 
 // Dynamic Omnichannel Glow Filters por rede social.
 // `filter` aplica matiz/saturação sobre a armadura base (vermelha+dourada).
@@ -163,87 +163,49 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     setOpen(true);
   };
 
+  // Áudio só toca no clique do ícone pulsante (arc reactor). Sem autoplay, sem listener global.
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const playedRef = useRef(false);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     stopAllJarvis();
-
+    playedRef.current = false;
     const audioSrc = AUDIO_BY_VARIANT[variant] ?? AUDIO_BY_VARIANT.instagram;
-    const makeBadgeAudio = () => {
-      const next = new Audio(audioSrc);
-      next.crossOrigin = "anonymous";
-      next.preload = "auto";
-      next.volume = 0.95;
-      return next;
-    };
-    let audio = makeBadgeAudio();
-    let unregister = registerJarvisAudio(audio);
-
-    let played = false;
-    let timer: number | null = null;
-    // Gestos que Chrome/Safari CONTAM como user activation (autoplay unlock).
-    // scroll/wheel NÃO contam — não adianta escutar.
-    const gestureEvents: Array<keyof WindowEventMap> = [
-      "pointerdown", "pointerup", "mousedown", "mouseup",
-      "touchstart", "touchend", "click", "keydown",
-    ];
-
-    const detach = () => {
-      gestureEvents.forEach((e) => {
-        window.removeEventListener(e, tryPlay as EventListener, true);
-        document.removeEventListener(e, tryPlay as EventListener, true);
-      });
-      if (timer != null) { window.clearTimeout(timer); timer = null; }
-    };
-
-    const markPlayed = () => {
-      played = true;
-      setOpen(true);
-      detach();
-    };
-
-    const tryPlay = (event?: Event) => {
-      if (played) return;
-      const fromGesture = Boolean(event?.isTrusted);
-      if (fromGesture) {
-        // iPhone/Chrome móvel exigem que o elemento de mídia nasça DENTRO do toque.
-        try { unregister(); audio.pause(); audio.currentTime = 0; } catch {}
-        audio = makeBadgeAudio();
-        unregister = registerJarvisAudio(audio);
-      }
-
-      audio.muted = false;
-      audio.volume = 0.95;
-      audio.onended = () => safeClose();
-      audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
-
-      const p = audio.play();
-      if (p && typeof p.then === "function") {
-        p.then(() => {
-          setOpen(true);
-          markPlayed();
-        }).catch(() => {
-          // Autoplay bloqueado — mantém listeners armados para o próximo gesto real.
-        });
-      } else {
-        markPlayed();
-      }
-    };
-
-    // Tentativa automática aos 2s (funciona quando o tab já teve user activation prévia — rotas navegadas).
-    timer = window.setTimeout(tryPlay, AUTO_FIRE_MS);
-    // Fallback universal: QUALQUER gesto real (tap/click/tecla) na página destrava.
-    gestureEvents.forEach((e) => {
-      window.addEventListener(e, tryPlay as EventListener, { passive: true, capture: true } as AddEventListenerOptions);
-      document.addEventListener(e, tryPlay as EventListener, { capture: true } as AddEventListenerOptions);
-    });
-
+    const audio = new Audio(audioSrc);
+    audio.crossOrigin = "anonymous";
+    audio.preload = "auto";
+    audio.volume = 0.95;
+    const unregister = registerJarvisAudio(audio);
+    audioRef.current = audio;
     return () => {
-      detach();
       if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
       try { audio.pause(); audio.currentTime = 0; } catch {}
       unregister();
+      audioRef.current = null;
     };
   }, [variant]);
+
+  const playBadgeAudio = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    // Toggle: se já tá tocando, pausa e reinicia (usuário clicou de novo).
+    try {
+      audio.pause();
+      audio.currentTime = 0;
+    } catch {}
+    audio.muted = false;
+    audio.volume = 0.95;
+    audio.onended = () => safeClose();
+    audio.onerror = () => { errorTimerRef.current = window.setTimeout(safeClose, 12000); };
+    setOpen(true);
+    const p = audio.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => { playedRef.current = true; }).catch(() => {});
+    } else {
+      playedRef.current = true;
+    }
+  };
 
 
   // Rotação dinâmica de mensagens persuasivas (a cada 11s, só quando o balão está aberto e não consultando).
@@ -317,10 +279,12 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             className="h-full w-full object-cover"
             style={{ filter: t.filter }}
           />
-          {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante */}
-          <span
-            aria-hidden
-            className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full"
+          {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante — clique aciona áudio */}
+          <button
+            type="button"
+            aria-label="Ativar voz do J.A.R.V.I.S."
+            onClick={(e) => { e.stopPropagation(); playBadgeAudio(); }}
+            className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full cursor-pointer p-0 border-0"
             style={{
               width: 18,
               height: 18,
@@ -328,10 +292,11 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
               color: t.arc.toLowerCase() === "#ffffff" ? "#0a0a0a" : "#ffffff",
               boxShadow: `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
               animation: "jb-arc 1.6s ease-in-out infinite",
+              transform: "translate(-50%,-50%)",
             }}
           >
             <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
-          </span>
+          </button>
         </div>
         {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
 
