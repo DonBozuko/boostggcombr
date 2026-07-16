@@ -158,6 +158,72 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
   );
 }
 
+function AdsHardwarePauseBanner() {
+  const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_settings").select("value").eq("key", "ads_hardware_pause").maybeSingle();
+      const v = (data?.value ?? {}) as { active?: boolean; reason?: string };
+      setActive(!!v.active);
+    })();
+  }, []);
+
+  if (!active || dismissed) return null;
+
+  const liberar = async () => {
+    if (!window.confirm("O celular e chip novos já chegaram? Isso remove o bloqueio de lembrete dos anúncios.")) return;
+    setLoading(true);
+    const { error } = await supabase.from("admin_settings").upsert({
+      key: "ads_hardware_pause",
+      value: { active: false, reason: "Bloqueio removido pelo administrador.", cleared_at: new Date().toISOString() },
+      updated_at: new Date().toISOString(),
+    });
+    setLoading(false);
+    if (error) { toast.error("Falha ao liberar: " + error.message); return; }
+    setActive(false);
+    setDismissed(true);
+    toast.success("Lembrete de anúncios liberado. Pode reativar campanhas seguindo o protocolo.");
+  };
+
+  return (
+    <div className="rounded-2xl border border-amber-500/50 bg-amber-950/40 backdrop-blur-xl p-4 shadow-[0_0_30px_rgba(245,158,11,0.35)]">
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5 text-amber-400">
+          <AlertTriangle size={22} />
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-extrabold tracking-wide text-amber-100">Anúncios pausados — aguardando hardware</h3>
+          <p className="text-xs text-amber-200/80 mt-1">
+            Não reativar campanhas no Meta Ads até chegar o <strong>celular novo + chip novo</strong>.
+            A conta comercial ainda está restrita e o protocolo de segurança exige dispositivo limpo.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            disabled={loading}
+            onClick={liberar}
+            className="bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs"
+          >
+            {loading ? "Salvando..." : "Já chegou — liberar"}
+          </Button>
+          <button
+            type="button"
+            aria-label="Fechar lembrete"
+            onClick={() => setDismissed(true)}
+            className="p-1 rounded-full text-amber-300 hover:text-amber-100 hover:bg-amber-500/20 transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export type AdminTab = "buscar" | "explorar" | "pedidos" | "servicos" | "jarvis" | "alertas" | "noc" | "auditoria" | "tesouraria" | "custos";
 
 const MENU_ITEMS: Array<{ id: AdminTab; icon: typeof Search; label: string; hint?: string; badge?: string }> = [
