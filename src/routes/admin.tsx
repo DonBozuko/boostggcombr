@@ -725,7 +725,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
   const recuperarVenda = (_p: { instagram_user: string; pacote: string; quantidade: number; rede_social?: string | null; id: string }) => {
     const tpl =
       "Olá! Identificamos uma instabilidade temporária no nosso checkout de Pix " +
-      "enquanto você finalizava o seu pedido na Elite Boost Prime. Pedimos sinceras " +
+      "enquanto você finalizava o seu pedido na BoostGG. Pedimos sinceras " +
       "desculpas pelo inconveniente! 🙏 Para garantir que você não perca os seus " +
       "bônus de crescimento de algoritmo, geramos um link de contingência direto e " +
       "seguro. Basta clicar para finalizar com ativação imediata: https://t.me";

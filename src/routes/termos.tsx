@@ -8,7 +8,7 @@ export const Route = createFileRoute("/termos")({
       {
         name: "description",
         content:
-          "Termos de uso da Elite Boost Prime: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.",
+          "Termos de uso da BoostGG: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.",
       },
     ],
   }),
@@ -24,7 +24,7 @@ function TermosPage() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">Elite Boost Prime</span>
+            <span className="font-display font-bold text-lg">BoostGG</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Voltar à página inicial

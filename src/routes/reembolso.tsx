@@ -8,7 +8,7 @@ export const Route = createFileRoute("/reembolso")({
       {
         name: "description",
         content:
-          "Política de reembolso e reposição da Elite Boost Prime: quando pedir, prazos, cobertura de queda natural e como solicitar.",
+          "Política de reembolso e reposição da BoostGG: quando pedir, prazos, cobertura de queda natural e como solicitar.",
       },
     ],
   }),
@@ -24,7 +24,7 @@ function ReembolsoPage() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">Elite Boost Prime</span>
+            <span className="font-display font-bold text-lg">BoostGG</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Voltar à página inicial
