@@ -317,29 +317,20 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
             className="h-full w-full object-cover"
             style={{ filter: t.filter }}
           />
-          {/* Arc Reactor pulsante */}
+          {/* Arc Reactor / boca do JARVIS com ícone de voz pulsante */}
           <span
             aria-hidden
-            className="absolute left-1/2 top-1/2 rounded-full"
+            className="absolute left-1/2 top-1/2 flex items-center justify-center rounded-full"
             style={{
-              width: 10,
-              height: 10,
+              width: 18,
+              height: 18,
               background: t.arc,
-              boxShadow: `0 0 12px ${t.arc}, 0 0 4px #fff inset`,
+              color: t.arc.toLowerCase() === "#ffffff" ? "#0a0a0a" : "#ffffff",
+              boxShadow: `0 0 14px ${t.arc}, 0 0 5px #fff inset`,
               animation: "jb-arc 1.6s ease-in-out infinite",
             }}
-          />
-          {/* Ícone de voz pulsante — indica que o JARVIS está falando */}
-          <span
-            aria-hidden
-            className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black border-2"
-            style={{
-              borderColor: t.arc,
-              boxShadow: `0 0 10px ${t.arc}`,
-              animation: "jb-pulse-icon 1.1s ease-in-out infinite",
-            }}
           >
-            <Volume2 size={10} color={t.arc} strokeWidth={2.5} />
+            <Volume2 size={12} strokeWidth={2.5} style={{ animation: "jb-pulse-icon 1.1s ease-in-out infinite" }} />
           </span>
         </div>
         {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
