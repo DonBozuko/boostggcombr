@@ -329,19 +329,21 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
               animation: "jb-arc 1.6s ease-in-out infinite",
             }}
           />
+          {/* Ícone de voz pulsante — indica que o JARVIS está falando */}
+          <span
+            aria-hidden
+            className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black border-2"
+            style={{
+              borderColor: t.arc,
+              boxShadow: `0 0 10px ${t.arc}`,
+              animation: "jb-pulse-icon 1.1s ease-in-out infinite",
+            }}
+          >
+            <Volume2 size={10} color={t.arc} strokeWidth={2.5} />
+          </span>
         </div>
-        {/* Ícone de voz pulsante — indica que o JARVIS está falando */}
-        <span
-          aria-hidden
-          className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-black border-2"
-          style={{
-            borderColor: t.arc,
-            boxShadow: `0 0 10px ${t.arc}`,
-            animation: "jb-pulse-icon 1.1s ease-in-out infinite",
-          }}
-        >
-          <Volume2 size={12} color={t.arc} strokeWidth={2.5} />
         {/* v142: balão de conversa removido — avatar limpo, sem sobreposição de texto */}
+
 
         {hudMode && (
           <form
