@@ -141,6 +141,35 @@ export function SeoLanding(p: SeoLandingProps) {
           </div>
         </section>
 
+        {/* Ferramentas grátis — link juice interno pras ferramentas SEO */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold text-white mb-3">Ferramentas grátis pra analisar antes de comprar</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <a
+              href="/ferramentas/contador-seguidores"
+              className="rounded-xl p-4 block hover:opacity-90 transition-opacity"
+              style={{ background: "#111", border: `1px solid ${p.accent}55` }}
+            >
+              <div className="font-bold text-white text-sm mb-1">Contador de seguidores Instagram</div>
+              <div className="text-zinc-400 text-xs leading-relaxed">
+                Digite o @ e veja em tempo real quantos seguidores qualquer perfil público tem — grátis, sem login.
+              </div>
+            </a>
+            <a
+              href="/ferramentas/calculadora-engajamento-instagram"
+              className="rounded-xl p-4 block hover:opacity-90 transition-opacity"
+              style={{ background: "#111", border: `1px solid ${p.accent}55` }}
+            >
+              <div className="font-bold text-white text-sm mb-1">Calculadora de engajamento Instagram</div>
+              <div className="text-zinc-400 text-xs leading-relaxed">
+                Descubra se um perfil tem engajamento real ou seguidores inflados antes de investir.
+              </div>
+            </a>
+          </div>
+        </section>
+
+
+
         <div className="mt-12 flex justify-center pb-8">
           <a
             href={p.ctaHref}
