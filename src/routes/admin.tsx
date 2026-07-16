@@ -8,7 +8,7 @@ import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.fu
 import { runBackupDrill, getBackupDrillStatus } from "@/lib/backup-drill.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Settings, Terminal, Search, Tag, Compass, BarChart3, Briefcase, Bot, Lock, LogOut, ChevronRight } from "lucide-react";
+import { Eye, EyeOff, Settings, Terminal, Search, Tag, Compass, BarChart3, Briefcase, Bot, Lock, LogOut, ChevronRight, AlertTriangle, X } from "lucide-react";
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
