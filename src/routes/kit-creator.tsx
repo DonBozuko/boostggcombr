@@ -12,22 +12,26 @@ import { getPricingGrid } from "@/lib/pricing.functions";
 import { getUtmParams } from "@/lib/utm";
 import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
 import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderBumpDialog";
+import { buildProductJsonLd } from "@/lib/seo-jsonld";
+
+const KIT_URL = "https://boostgg.com.br/kit-creator";
+const KIT_DESC =
+  "Pacote Creator: 1.000 seguidores reais no Instagram via Pix. Entrega em minutos, reposição 30 dias, sem senha. Cupom PRIME15 aplicado.";
 
 export const Route = createFileRoute("/kit-creator")({
   head: () => ({
     meta: [
       { title: "Kit Creator — 1.000 Seguidores Instagram | BoostGG" },
-      {
-        name: "description",
-        content:
-          "Pacote Creator: 1.000 seguidores reais no Instagram via Pix. Entrega em minutos, reposição 30 dias, sem senha. Cupom PRIME15 aplicado.",
-      },
+      { name: "description", content: KIT_DESC },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Kit Creator — 1.000 Seguidores Instagram" },
       { property: "og:description", content: "Cresce de verdade com 1k seguidores no Pix. Reposição garantida." },
-      { property: "og:type", content: "website" },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: KIT_URL },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: KIT_URL }],
+    scripts: [buildProductJsonLd({ network: "Instagram (Kit Creator)", url: KIT_URL, description: KIT_DESC })],
   }),
   component: KitCreatorPage,
 });

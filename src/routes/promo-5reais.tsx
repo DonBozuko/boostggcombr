@@ -12,25 +12,26 @@ import { getPricingGrid } from "@/lib/pricing.functions";
 import { getUtmParams } from "@/lib/utm";
 import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
 import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderBumpDialog";
+import { buildProductJsonLd } from "@/lib/seo-jsonld";
+
+const PROMO_URL = "https://boostgg.com.br/promo-5reais";
+const PROMO_DESC =
+  "Promoção relâmpago: 100 seguidores reais no Instagram por R$5 via Pix. Cupom PRIME15 dá mais 15% off. Entrega em minutos.";
 
 export const Route = createFileRoute("/promo-5reais")({
   head: () => ({
     meta: [
       { title: "100 Seguidores no Instagram por R$5 — BoostGG" },
-      {
-        name: "description",
-        content:
-          "Promoção relâmpago: 100 seguidores reais no Instagram por R$5 via Pix. Cupom PRIME15 dá mais 15% off. Entrega em minutos.",
-      },
+      { name: "description", content: PROMO_DESC },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "100 Seguidores por R$5 — Pix instantâneo" },
-      {
-        property: "og:description",
-        content: "Teste real. R$5 no Pix, 100 seguidores em minutos. Cupom PRIME15.",
-      },
-      { property: "og:type", content: "website" },
+      { property: "og:description", content: "Teste real. R$5 no Pix, 100 seguidores em minutos. Cupom PRIME15." },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: PROMO_URL },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: PROMO_URL }],
+    scripts: [buildProductJsonLd({ network: "Instagram (Promo R$5)", url: PROMO_URL, description: PROMO_DESC })],
   }),
   component: Promo5Page,
 });
