@@ -112,7 +112,7 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Impulsionar Instagram no Pix | EliteBoost Prime";
+    const title = "Impulsionar Instagram no Pix | BoostGG";
     const description =
       "Impulsione seu Instagram com audiência real via Pix e entrega em minutos. Alta retenção, reposição garantida e 100% seguro.";
     const url = "https://boostgg.com.br/";
@@ -130,8 +130,8 @@ export const Route = createFileRoute("/")({
         { property: "og:image", content: ogImage },
         { property: "og:image:width", content: "1216" },
         { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "EliteBoost Prime — Seguidores reais no Instagram via Pix" },
-        { property: "og:site_name", content: "EliteBoost Prime" },
+        { property: "og:image:alt", content: "BoostGG — Seguidores reais no Instagram via Pix" },
+        { property: "og:site_name", content: "BoostGG" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
@@ -148,7 +148,7 @@ export const Route = createFileRoute("/")({
               {
                 "@type": "Organization",
                 "@id": "https://boostgg.com.br/#organization",
-                name: "EliteBoost Prime",
+                name: "BoostGG",
                 url: "https://boostgg.com.br/",
                 logo: ogImage,
                 description,
@@ -160,7 +160,7 @@ export const Route = createFileRoute("/")({
                 "@type": "WebSite",
                 "@id": "https://boostgg.com.br/#website",
                 url: "https://boostgg.com.br/",
-                name: "EliteBoost Prime",
+                name: "BoostGG",
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://boostgg.com.br/#organization" },
               },
@@ -212,9 +212,9 @@ export const Route = createFileRoute("/")({
               {
                 "@type": "Product",
                 "@id": "https://boostgg.com.br/#product",
-                name: "Seguidores Reais para Instagram - EliteBoost Prime",
+                name: "Seguidores Reais para Instagram - BoostGG",
                 description,
-                brand: { "@type": "Brand", name: "EliteBoost Prime" },
+                brand: { "@type": "Brand", name: "BoostGG" },
                 image: ogImage,
                 aggregateRating: {
                   "@type": "AggregateRating",
@@ -686,7 +686,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     "https://t.me/boostgramseguidores_bot";
   const supportHref = pedidoInfo
     ? `https://t.me/share/url?url=${encodeURIComponent(telegramSupportBase)}&text=${encodeURIComponent(
-        `Olá, acabei de realizar o pagamento do Pix na EliteBoost Prime para o pedido #${pedidoInfo.pedidoId} e estou enviando o comprovante para acompanhamento de rede.`,
+        `Olá, acabei de realizar o pagamento do Pix na BoostGG para o pedido #${pedidoInfo.pedidoId} e estou enviando o comprovante para acompanhamento de rede.`,
       )}`
     : telegramSupportBase;
 
@@ -1175,7 +1175,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">ELITE BOOST PRIME</span>
+            <span className="font-display font-semibold text-foreground">BOOSTGG</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <a href="/privacidade" className="hover:text-foreground">Privacidade</a>

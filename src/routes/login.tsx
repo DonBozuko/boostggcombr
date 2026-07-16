@@ -51,7 +51,7 @@ function LoginPage() {
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 border border-border rounded-lg p-6 bg-card">
         <div>
           <h1 className="text-xl font-bold">🔐 Login Admin</h1>
-          <p className="text-sm text-muted-foreground">Acesso restrito · EliteBoost Prime</p>
+          <p className="text-sm text-muted-foreground">Acesso restrito · BoostGG</p>
         </div>
         <Input
           type="password"

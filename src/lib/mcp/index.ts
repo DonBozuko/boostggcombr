@@ -4,9 +4,9 @@ import consultarPedidoTool from "./tools/consultar-pedido";
 
 export default defineMcp({
   name: "eliteboost-prime-mcp",
-  title: "EliteBoost Prime",
+  title: "BoostGG",
   version: "0.1.0",
   instructions:
-    "Ferramentas públicas do EliteBoost Prime: consultar preços da vitrine (get_pricing) e status de pedido por ID (consultar_pedido).",
+    "Ferramentas públicas do BoostGG: consultar preços da vitrine (get_pricing) e status de pedido por ID (consultar_pedido).",
   tools: [getPricingTool, consultarPedidoTool],
 });

@@ -6,7 +6,7 @@ import { inspectAllRoutes, type InspectRow } from "@/lib/gsc-inspect.functions";
 export const Route = createFileRoute("/dashboard/seo")({
   head: () => ({
     meta: [
-      { title: "SEO Dashboard | EliteBoost Prime" },
+      { title: "SEO Dashboard | BoostGG" },
       { name: "description", content: "Status de indexação e cobertura Google Search Console." },
       { name: "robots", content: "noindex,nofollow" },
     ],

@@ -64,7 +64,7 @@ function BlogIndex() {
             <div className="size-8 rounded-lg bg-[image:var(--gradient-cta)] grid place-items-center shadow-glow">
               <TrendingUp className="size-4 text-background" />
             </div>
-            <span className="font-display font-bold text-lg">EliteBoost Prime</span>
+            <span className="font-display font-bold text-lg">BoostGG</span>
           </Link>
           <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
             Voltar

@@ -9,13 +9,13 @@
     "server": {
       "name": "eliteboost-prime-mcp",
       "version": "0.1.0",
-      "title": "EliteBoost Prime"
+      "title": "BoostGG"
     },
     "tools": [
       {
         "name": "get_pricing",
         "title": "Consultar preços de pacotes",
-        "description": "Lista os pacotes disponíveis (rede social, quantidade, preço em BRL) da vitrine pública do EliteBoost Prime.",
+        "description": "Lista os pacotes disponíveis (rede social, quantidade, preço em BRL) da vitrine pública do BoostGG.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -45,7 +45,7 @@
       {
         "name": "consultar_pedido",
         "title": "Consultar status de pedido",
-        "description": "Consulta o status de um pedido do EliteBoost Prime pelo ID público (retorna status, rede, quantidade e valor).",
+        "description": "Consulta o status de um pedido do BoostGG pelo ID público (retorna status, rede, quantidade e valor).",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,

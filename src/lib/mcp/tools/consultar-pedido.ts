@@ -5,7 +5,7 @@ export default defineTool({
   name: "consultar_pedido",
   title: "Consultar status de pedido",
   description:
-    "Consulta o status de um pedido do EliteBoost Prime pelo ID público (retorna status, rede, quantidade e valor).",
+    "Consulta o status de um pedido do BoostGG pelo ID público (retorna status, rede, quantidade e valor).",
   inputSchema: {
     pedido_id: z.string().min(4).describe("ID público do pedido"),
   },

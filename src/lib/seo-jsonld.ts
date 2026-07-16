@@ -10,9 +10,9 @@ export function buildProductJsonLd(opts: {
     children: JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Product",
-      name: `Serviços de Engajamento ${opts.network} — EliteBoost Prime`,
+      name: `Serviços de Engajamento ${opts.network} — BoostGG`,
       description: opts.description,
-      brand: { "@type": "Brand", name: "EliteBoost Prime" },
+      brand: { "@type": "Brand", name: "BoostGG" },
       url: opts.url,
       aggregateRating: {
         "@type": "AggregateRating",
