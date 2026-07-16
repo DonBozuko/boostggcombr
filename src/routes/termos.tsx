@@ -10,7 +10,9 @@ export const Route = createFileRoute("/termos")({
         content:
           "Termos de uso da BoostGG: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.",
       },
+      { property: "og:url", content: "https://boostgg.com.br/termos" },
     ],
+    links: [{ rel: "canonical", href: "https://boostgg.com.br/termos" }],
   }),
   component: TermosPage,
 });
