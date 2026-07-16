@@ -1,13 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
-import { Calculator, Users, ArrowRight } from "lucide-react";
+import { Calculator, Users, Sparkles, ArrowRight } from "lucide-react";
 
 const CANON = "https://boostgg.com.br/ferramentas";
 const TITLE = "Ferramentas Grátis para Instagram | BoostGG";
 const DESC =
-  "Ferramentas 100% grátis para creators: contador de seguidores em tempo real e calculadora de engajamento do Instagram. Sem login, sem cadastro.";
+  "Ferramentas 100% grátis para creators: gerador de legenda com IA, contador de seguidores em tempo real e calculadora de engajamento do Instagram. Sem login.";
 
 const TOOLS = [
+  {
+    to: "/ferramentas/gerador-legenda-instagram",
+    icon: Sparkles,
+    title: "Gerador de Legenda com IA",
+    desc: "3 legendas persuasivas em segundos com gancho, CTA e hashtags. Grátis, sem login.",
+  },
   {
     to: "/ferramentas/contador-seguidores",
     icon: Users,
