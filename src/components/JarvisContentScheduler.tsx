@@ -391,7 +391,7 @@ export function JarvisContentScheduler() {
                 <video src={bgVideo} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover opacity-80" />
               ) : null}
               {imageUrl && (
-                <img src={imageUrl} alt="overlay" className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60" />
+                <img src={imageUrl} alt="Prévia da criativo agendado no scheduler de conteúdo" className="absolute inset-0 w-full h-full object-cover mix-blend-screen opacity-60" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               {script && (
