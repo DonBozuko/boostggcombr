@@ -81,6 +81,21 @@ export const Route = createFileRoute("/ferramentas/contador-seguidores")({
             "Ferramenta gratuita para contar seguidores, seguindo e posts de qualquer perfil público do Instagram em tempo real.",
         }),
       },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "HowTo",
+          name: "Como usar o contador de seguidores do Instagram",
+          description: "Descubra em segundos quantos seguidores qualquer perfil público do Instagram tem.",
+          totalTime: "PT5S",
+          step: [
+            { "@type": "HowToStep", position: 1, name: "Digite o @usuario", text: "Digite o nome de usuário do Instagram que você quer analisar, sem espaços." },
+            { "@type": "HowToStep", position: 2, name: "Clique em Contar seguidores", text: "Clique no botão Contar seguidores e aguarde 2 a 3 segundos." },
+            { "@type": "HowToStep", position: 3, name: "Veja o resultado", text: "Visualize seguidores, seguindo, posts, foto de perfil e status de verificação em tempo real." },
+          ],
+        }),
+      },
     ],
   }),
   component: ContadorPage,
@@ -110,11 +125,11 @@ function ContadorPage() {
       <div className="mx-auto max-w-3xl px-4 py-12">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold md:text-4xl">
-            Veja quantos seguidores faltam pra sua <span className="text-primary">próxima meta</span>
+            Contador de <span className="text-primary">Seguidores Instagram</span> grátis
           </h1>
           <p className="mt-3 text-muted-foreground">
-            Digite o <strong>@usuario</strong> e descubra em tempo real quantos seguidores faltam pra desbloquear
-            monetização, link na bio ou o número que você quer bater — <strong>grátis, sem login, ilimitado</strong>.
+            Digite o <strong>@usuario</strong> e veja em tempo real quantos <strong>seguidores</strong>, seguindo e posts
+            qualquer perfil público do Instagram tem — <strong>grátis, sem login, ilimitado</strong>.
           </p>
         </div>
 
