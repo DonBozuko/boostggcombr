@@ -137,7 +137,6 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
   const [speech, setSpeech] = useState(SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram);
   const [pedidoId, setPedidoId] = useState("");
   const [consulting, setConsulting] = useState(false);
-  const firedRef = useRef(false);
   const lockOpenRef = useRef(false);
   const errorTimerRef = useRef<number | null>(null);
   const consultar = useServerFn(consultarPedidoPublico);
@@ -181,52 +180,17 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     let played = false;
     let attempting = false;
     let timer: number | null = null;
-    let speechProbeTimer: number | null = null;
-    let fallbackUtterance: SpeechSynthesisUtterance | null = null;
-    const fallbackText = SPEECH_BY_VARIANT[variant] ?? SPEECH_BY_VARIANT.instagram;
     const events: Array<keyof WindowEventMap> = ["pointerdown", "click", "touchstart", "keydown", "scroll", "wheel"];
 
     const detach = () => {
       events.forEach((e) => window.removeEventListener(e, tryPlay as EventListener, true));
       document.removeEventListener("pointerdown", tryPlay as EventListener, true);
       if (timer != null) { window.clearTimeout(timer); timer = null; }
-      if (speechProbeTimer != null) { window.clearTimeout(speechProbeTimer); speechProbeTimer = null; }
-    };
-
-    const speakFallback = () => {
-      if (played || !("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) return;
-      let started = false;
-      try {
-        fallbackUtterance = new SpeechSynthesisUtterance(fallbackText);
-        fallbackUtterance.lang = "pt-BR";
-        fallbackUtterance.rate = 1.02;
-        fallbackUtterance.pitch = 0.82;
-        fallbackUtterance.volume = 1;
-        fallbackUtterance.onstart = () => {
-          started = true;
-          played = true;
-          firedRef.current = true;
-          setOpen(true);
-          detach();
-        };
-        fallbackUtterance.onend = () => safeClose();
-        fallbackUtterance.onerror = () => {
-          if (started) safeClose();
-        };
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(fallbackUtterance);
-        speechProbeTimer = window.setTimeout(() => {
-          if (!started && !played) speechProbeTimer = null;
-        }, 6000);
-      } catch {
-        fallbackUtterance = null;
-      }
     };
 
     const markPlayed = () => {
       played = true;
       attempting = false;
-      firedRef.current = true;
       setOpen(true);
       detach();
     };
@@ -257,14 +221,14 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
         }).catch(() => {
           // Autoplay bloqueado no primeiro acesso — mantém listeners armados para o primeiro toque real.
           attempting = false;
-          if (fromGesture) speakFallback();
+          // Nunca usar voz sintética do navegador: se o autoplay bloquear, fica armado para o próximo toque real.
         });
       } else {
         markPlayed();
       }
     };
 
-    // Tentativa automática aos 2s (funciona se browser já concedeu MEI/gesture recente).
+    // Tentativa automática aos 2s: toca SOMENTE o mp3 real do Jarvis, nunca voz sintética.
     timer = window.setTimeout(tryPlay, AUTO_FIRE_MS);
     // Fallback: qualquer gesture do usuário destrava e toca imediatamente.
     events.forEach((e) => window.addEventListener(e, tryPlay as EventListener, { passive: true, capture: true } as AddEventListenerOptions));
@@ -273,10 +237,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
     return () => {
       detach();
       if (errorTimerRef.current != null) window.clearTimeout(errorTimerRef.current);
-      if (speechProbeTimer != null) window.clearTimeout(speechProbeTimer);
-      try { window.speechSynthesis?.cancel(); } catch {}
       try { audio.pause(); audio.currentTime = 0; } catch {}
-      fallbackUtterance = null;
       unregister();
     };
   }, [variant]);
