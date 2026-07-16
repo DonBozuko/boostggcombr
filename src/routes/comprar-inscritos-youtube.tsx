@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-inscritos-youtube";
-const TITLE = "Comprar Inscritos YouTube Reais — Monetização e Pix — Elite Boost Prime | BoostGG";
+const TITLE = "Comprar Inscritos YouTube — Elite Boost Prime | BoostGG";
 const DESC =
   "Compre inscritos para canal do YouTube com entrega gradual, sem senha e via Pix. Acelere os 1.000 inscritos do Programa de Parcerias.";
 
