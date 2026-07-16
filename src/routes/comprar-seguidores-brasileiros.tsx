@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-seguidores-brasileiros";
-const TITLE = "Comprar Seguidores Brasileiros Reais para Instagram — Pix — Elite Boost Prime | BoostGG";
+const TITLE = "Seguidores Brasileiros — Elite Boost Prime | BoostGG";
 const DESC =
   "Seguidores brasileiros reais para Instagram, com foto e postagens. Entrega gradual, pagamento via Pix e reposição garantida. Ideal para vender no Brasil.";
 
