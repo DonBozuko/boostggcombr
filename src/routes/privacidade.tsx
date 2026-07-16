@@ -11,7 +11,9 @@ export const Route = createFileRoute("/privacidade")({
         content:
           "Como a BoostGG coleta, usa e protege seus dados. Página mantida pela BoostGG para esclarecer dúvidas sobre privacidade e segurança.",
       },
+      { property: "og:url", content: "https://boostgg.com.br/privacidade" },
     ],
+    links: [{ rel: "canonical", href: "https://boostgg.com.br/privacidade" }],
   }),
   component: TrustPage,
 });

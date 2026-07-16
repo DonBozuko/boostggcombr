@@ -10,7 +10,9 @@ export const Route = createFileRoute("/reembolso")({
         content:
           "Política de reembolso e reposição da BoostGG: quando pedir, prazos, cobertura de queda natural e como solicitar.",
       },
+      { property: "og:url", content: "https://boostgg.com.br/reembolso" },
     ],
+    links: [{ rel: "canonical", href: "https://boostgg.com.br/reembolso" }],
   }),
   component: ReembolsoPage,
 });
