@@ -77,12 +77,25 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: pedido, error } = await supabaseAdmin
       .from("pedidos")
-      .select("id, status, pacote, quantidade, instagram_user")
+      .select("id, status, pacote, quantidade, instagram_user, mercado_pago_id")
       .eq("id", data.pedidoId)
       .maybeSingle();
     if (error || !pedido) return { ok: false as const, error: "NOT_FOUND" as const };
     if (pedido.status !== "paid" && pedido.status !== "SMM_FAILED")
       return { ok: false as const, error: `STATUS_${pedido.status}` as const };
+
+    // v189 — Anti dupla-entrega: bloqueia reprocesso manual se MP já refundou.
+    if (pedido.status === "SMM_FAILED" && (pedido as any).mercado_pago_id) {
+      const { hasMpRefund } = await import("@/lib/dispatcher-fallback.server");
+      if (await hasMpRefund(String((pedido as any).mercado_pago_id))) {
+        await supabaseAdmin
+          .from("pedidos")
+          .update({ status: "mp_refunded", error_detail: "v189 abortado: MP já registrou refund. Cliente foi reembolsado." } as any)
+          .eq("id", pedido.id);
+        return { ok: false as const, error: "JA_REEMBOLSADO_NO_MP" as const };
+      }
+    }
+
 
     const { dispatchSmmhype } = await import("@/lib/smmhype.server");
     const smm = await dispatchSmmhype({
