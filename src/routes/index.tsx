@@ -718,7 +718,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Comprar Seguidores Instagram Reais com Entrega no Pix
+        Comprar Seguidores Reais no Instagram — Brasileiros, com Entrega Rápida via Pix
       </h1>
       <ShowcaseShell>
 
