@@ -884,7 +884,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
 
             <div className="space-y-2">
-              <Label htmlFor="email">E-mail (para o recibo do Mercado Pago)</Label>
+              <Label htmlFor="email">E-mail <span className="text-xs text-zinc-400">(opcional — para recibo)</span></Label>
               <Input
                 id="email"
                 type="email"
