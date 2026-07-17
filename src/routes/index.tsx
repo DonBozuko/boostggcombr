@@ -1082,7 +1082,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             )}
           </DialogContent>
         </Dialog>
-      </section>)}
+      </section>
       <OrderBumpDialog
         open={bumpOpen}
         current={pendingOrder?.selected ?? null}
