@@ -824,7 +824,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
 
       {/* ORDER FORM */}
-      {form.plan && (<section id="pedido" className="py-16 sm:py-24 border-y border-border bg-card/30">
+      <section id="pedido" className="py-16 sm:py-24 border-y border-border bg-card/30">
         <div className="container mx-auto px-4 sm:px-6 max-w-2xl">
           <div className="text-center mb-8 sm:mb-10">
             <p className="text-sm sm:text-base text-zinc-300">
