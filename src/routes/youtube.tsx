@@ -42,9 +42,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/youtube")({
   head: () => {
-    const title = "Crescer YouTube — Inscritos e Views Reais — Elite Boost Prime | BoostGG";
+    const title = "Crescer YouTube — Inscritos e Views — Elite Boost Prime | BoostGG";
     const description =
-      "Cresça no YouTube com inscritos, views e likes reais via Pix. Acelera monetização, alta retenção e reposição garantida.";
+      "Cresça no YouTube com inscritos, views e likes via Pix. Acelera monetização e reposição garantida.";
     const url = "https://boostgg.com.br/youtube";
     const ogImage = `https://boostgg.com.br${ogYoutube}?v=48`;
     return {
