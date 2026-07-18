@@ -70,6 +70,7 @@ import { CheckCircle2 } from "lucide-react";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { TrustBadges } from "@/components/TrustBadges";
 import { LivePurchasesTicker } from "@/components/LivePurchasesTicker";
+import { CheckoutFaq } from "@/components/CheckoutFaq";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
@@ -839,6 +840,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
           <LivePurchasesTicker accent="#00f2fe" />
           <TrustBadges accent="#FFD700" />
+          <CheckoutFaq />
 
 
 
