@@ -1,7 +1,7 @@
 // v200 — SEO landing: "comprar curtidas instagram" (9.900/mês, KDI 17 — ALVO PRINCIPAL)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
-import { buildFaqJsonLd, buildProductJsonLd } from "@/lib/seo-jsonld";
+import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-curtidas-instagram";
 const TITLE = "Comprar Curtidas Instagram — Elite Boost Prime | BoostGG";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/comprar-curtidas-instagram")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC })],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Curtidas Instagram", url: URL }])],
   }),
   component: Page,
 });

@@ -1,7 +1,7 @@
 // v200 — SEO landing: "comprar inscritos youtube"
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
-import { buildFaqJsonLd, buildProductJsonLd } from "@/lib/seo-jsonld";
+import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-inscritos-youtube";
 const TITLE = "Comprar Inscritos YouTube — Elite Boost Prime | BoostGG";
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/comprar-inscritos-youtube")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "YouTube", url: URL, description: DESC })],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "YouTube", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Inscritos YouTube", url: URL }])],
   }),
   component: Page,
 });

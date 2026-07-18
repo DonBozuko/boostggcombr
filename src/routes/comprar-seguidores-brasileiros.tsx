@@ -1,7 +1,7 @@
 // v200 — SEO landing: "seguidores brasileiros instagram" (1.300/mês, KDI 21)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
-import { buildFaqJsonLd, buildProductJsonLd } from "@/lib/seo-jsonld";
+import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://boostgg.com.br/comprar-seguidores-brasileiros";
 const TITLE = "Seguidores Brasileiros — Elite Boost Prime | BoostGG";
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/comprar-seguidores-brasileiros")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC })],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Seguidores Brasileiros", url: URL }])],
   }),
   component: Page,
 });
