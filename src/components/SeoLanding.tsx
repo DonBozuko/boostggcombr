@@ -2,6 +2,7 @@
 
 import { BrandHeader } from "@/components/BrandHeader";
 import { MobileFrame } from "@/components/MobileFrame";
+import { RelatedLinks } from "@/components/RelatedLinks";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
 
 export type SeoBenefit = { icon: "check" | "zap" | "shield" | "clock"; title: string; text: string };
@@ -177,6 +178,9 @@ export function SeoLanding(p: SeoLandingProps) {
             </a>
           </div>
         </section>
+
+        <RelatedLinks accent={p.accent} />
+
 
 
 
