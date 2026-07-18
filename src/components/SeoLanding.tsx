@@ -203,6 +203,8 @@ export function SeoLanding(p: SeoLandingProps) {
         <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">
           <a href="/" className="hover:text-white transition-colors">Início</a>
           <a href="/ferramentas" className="hover:text-white transition-colors">Ferramentas grátis</a>
+          <a href="/promo-5reais" className="hover:text-white transition-colors">Promo R$ 5</a>
+          <a href="/kit-creator" className="hover:text-white transition-colors">Kit Creator</a>
           <a href="/blog" className="hover:text-white transition-colors">Blog</a>
           <a href="/termos" className="hover:text-white transition-colors">Termos</a>
           <a href="/reembolso" className="hover:text-white transition-colors">Reembolso</a>

@@ -8,7 +8,7 @@ const RELATED: Record<string, Link[]> = {
   "/comprar-seguidores-instagram": [
     { href: "/comprar-curtidas-instagram", title: "Comprar Curtidas Instagram", desc: "Boost em posts específicos com entrega em minutos." },
     { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Perfis BR reais pra quem vende no Brasil." },
-    { href: "/comprar-seguidores-instagram-barato", title: "Seguidores Baratos", desc: "Pacotes com o menor preço do mercado." },
+    { href: "/kit-creator", title: "Kit Creator", desc: "Combo pra criador: seguidores + curtidas + views com desconto." },
   ],
   "/comprar-curtidas-instagram": [
     { href: "/comprar-seguidores-instagram", title: "Comprar Seguidores Instagram", desc: "Cresça sua base — Pix + entrega em minutos." },
@@ -21,9 +21,9 @@ const RELATED: Record<string, Link[]> = {
     { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Reforço em posts específicos." },
   ],
   "/comprar-seguidores-instagram-barato": [
-    { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Versão premium com entrega gradual." },
     { href: "/promo-5reais", title: "Promo R$ 5", desc: "Teste o serviço pagando só 5 reais." },
-    { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Combine seguidores + curtidas pra maior efeito." },
+    { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Versão premium com entrega gradual." },
+    { href: "/kit-creator", title: "Kit Creator", desc: "Combo criador com preço fechado." },
   ],
   // TikTok
   "/comprar-seguidores-tiktok": [
