@@ -173,7 +173,7 @@ export const Route = createFileRoute("/")({
                 serviceType: "Marketing de Instagram e Engajamento Social",
                 provider: { "@id": "https://boostgg.com.br/#organization" },
                 areaServed: { "@type": "Country", name: "Brasil" },
-                name: "Compra de Seguidores Reais no Instagram",
+                name: "Compra de Seguidores no Instagram",
                 description,
                 offers: {
                   "@type": "AggregateOffer",
@@ -189,10 +189,10 @@ export const Route = createFileRoute("/")({
                 mainEntity: [
                   {
                     "@type": "Question",
-                    name: "Os seguidores são reais?",
+                    name: "Os seguidores são brasileiros?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Sim. Entregamos seguidores reais com perfis ativos, sem bots, com entrega imediata via Pix.",
+                      text: "Sim. Entregamos seguidores com perfis brasileiros, com entrega imediata via Pix.",
                     },
                   },
                   {
