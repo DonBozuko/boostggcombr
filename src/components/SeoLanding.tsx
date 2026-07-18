@@ -194,6 +194,20 @@ export function SeoLanding(p: SeoLandingProps) {
           </a>
         </div>
       </main>
+
+      <footer className="border-t border-zinc-800 mt-8 py-6 px-4">
+        <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">
+          <a href="/" className="hover:text-white transition-colors">Início</a>
+          <a href="/ferramentas" className="hover:text-white transition-colors">Ferramentas grátis</a>
+          <a href="/blog" className="hover:text-white transition-colors">Blog</a>
+          <a href="/termos" className="hover:text-white transition-colors">Termos</a>
+          <a href="/reembolso" className="hover:text-white transition-colors">Reembolso</a>
+          <a href="/privacidade" className="hover:text-white transition-colors">Privacidade</a>
+        </div>
+        <div className="text-center text-[10px] text-zinc-600 mt-3">
+          © Elite Boost Prime · BoostGG — Pagamento via Pix, entrega automática 24/7.
+        </div>
+      </footer>
     </MobileFrame>
   );
 }
