@@ -17,64 +17,66 @@ function useShowcase() {
 }
 
 const SLOT_WORDS = ["VER", "TODOS", "OS", "PLANOS"];
+const STEP_SECONDS = 1.4;
 
 export function ShowcaseTrigger({ label }: { label?: string }) {
   const { setOpen, accent } = useShowcase();
   void label;
   const n = SLOT_WORDS.length;
-  const stepDur = 1.7; // seconds per word
-  const total = (stepDur * n).toFixed(2);
+  const total = (STEP_SECONDS * n).toFixed(2);
+  const half = (100 / n).toFixed(2);
   return (
     <>
       <style>{`
-        @keyframes vertical-carousel-3d-${n} {
+        @keyframes slot-word-fade-${n} {
           ${SLOT_WORDS.map((_, i) => {
-            const startPct = ((i / n) * 100).toFixed(2);
-            const holdPct = (((i + 0.82) / n) * 100).toFixed(2);
-            const deg = -90 * i;
-            return `${startPct}% { transform: rotateX(${deg}deg); } ${holdPct}% { transform: rotateX(${deg}deg); }`;
+            const start = ((i / n) * 100).toFixed(2);
+            const peak = (((i + 0.25) / n) * 100).toFixed(2);
+            const end = (((i + 0.75) / n) * 100).toFixed(2);
+            const next = (((i + 1) / n) * 100).toFixed(2);
+            return `${start}% { opacity: 0; transform: translateY(8px) scale(0.92); }
+${peak}% { opacity: 1; transform: translateY(0) scale(1); }
+${end}% { opacity: 1; transform: translateY(0) scale(1); }
+${next}% { opacity: 0; transform: translateY(-8px) scale(0.92); }`;
           }).join("\n")}
-          100% { transform: rotateX(-360deg); }
         }
-        .slot-3d-stage { perspective: 200px; }
-        .slot-3d-ring {
-          transform-style: preserve-3d;
-          animation: vertical-carousel-3d-${n} ${total}s cubic-bezier(.7,.05,.3,1) infinite;
+        .slot-word-track {
+          animation: slot-word-fade-${n} ${total}s ease-in-out infinite;
         }
-        .slot-3d-face {
-          position: absolute; inset: 0;
-          display: flex; align-items: center; justify-content: center;
-          backface-visibility: hidden;
-        }
+        .slot-word-track:nth-child(1) { animation-delay: 0s; }
+        .slot-word-track:nth-child(2) { animation-delay: -${(STEP_SECONDS * 1).toFixed(2)}s; }
+        .slot-word-track:nth-child(3) { animation-delay: -${(STEP_SECONDS * 2).toFixed(2)}s; }
+        .slot-word-track:nth-child(4) { animation-delay: -${(STEP_SECONDS * 3).toFixed(2)}s; }
       `}</style>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ver todos os planos"
-        className="relative w-[100px] h-[36px] rounded-md flex items-center justify-center overflow-hidden transition-transform hover:scale-105 active:scale-95"
+        className="group relative h-9 px-4 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           border: `1px solid ${accent}`,
-          background: "rgba(0,0,0,0.82)",
-          boxShadow: `0 0 10px ${accent}55, inset 0 0 6px ${accent}22`,
+          background: `linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%)`,
+          boxShadow: `0 0 0 1px ${accent}22, 0 4px 14px ${accent}22, inset 0 1px 0 ${accent}15`,
         }}
       >
-        <div className="slot-3d-stage absolute inset-0">
-          <div className="slot-3d-ring relative w-full h-full">
-            {SLOT_WORDS.map((w, i) => (
-              <div
-                key={w}
-                className="slot-3d-face text-[12px] font-black tracking-wider uppercase"
-                style={{
-                  color: accent,
-                  textShadow: `0 0 6px ${accent}aa`,
-                  transform: `rotateX(${90 * i}deg) translateZ(18px)`,
-                }}
-              >
-                {w}
-              </div>
-            ))}
-          </div>
-        </div>
+        <span className="relative flex items-center justify-center min-w-[92px] h-[20px]">
+          {SLOT_WORDS.map((w) => (
+            <span
+              key={w}
+              className="slot-word-track absolute inset-0 flex items-center justify-center text-[11px] font-bold tracking-[0.12em] uppercase whitespace-nowrap"
+              style={{
+                color: accent,
+                textShadow: `0 0 8px ${accent}66`,
+              }}
+            >
+              {w}
+            </span>
+          ))}
+        </span>
+        <span
+          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+          style={{ background: `radial-gradient(circle at center, ${accent}14 0%, transparent 70%)` }}
+        />
       </button>
     </>
   );
