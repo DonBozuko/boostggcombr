@@ -21,9 +21,9 @@ const RELATED: Record<string, Link[]> = {
     { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Reforço em posts específicos." },
   ],
   "/comprar-seguidores-instagram-barato": [
-    { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Versão premium com entrega gradual." },
     { href: "/promo-5reais", title: "Promo R$ 5", desc: "Teste o serviço pagando só 5 reais." },
-    { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Combine seguidores + curtidas pra maior efeito." },
+    { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Versão premium com entrega gradual." },
+    { href: "/kit-creator", title: "Kit Creator", desc: "Combo criador com preço fechado." },
   ],
   // TikTok
   "/comprar-seguidores-tiktok": [
