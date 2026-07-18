@@ -68,6 +68,8 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
+import { TrustBadges } from "@/components/TrustBadges";
+import { LivePurchasesTicker } from "@/components/LivePurchasesTicker";
 import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
@@ -834,6 +836,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
               ⚡ Início da entrega: imediato na maioria dos pedidos · até 24h em picos de demanda.
             </p>
           </div>
+
+          <LivePurchasesTicker accent="#00f2fe" />
+          <TrustBadges accent="#FFD700" />
+
+
 
 
 
