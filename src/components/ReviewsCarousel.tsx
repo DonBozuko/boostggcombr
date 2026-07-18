@@ -16,12 +16,12 @@ export function ReviewsCarousel({ accent = "#00f2fe" }: { accent?: string }) {
     >
       <div className="flex items-center justify-between px-1 mb-1">
         <span
-          className="text-[8px] font-black tracking-[0.3em] uppercase"
+          className="text-[10px] font-black tracking-[0.2em] uppercase whitespace-nowrap"
           style={{ color: accent, textShadow: `0 0 5px ${accent}` }}
         >
-          ★★★★★ AVALIAÇÕES DE QUEM JÁ CRESCEU
+          ★★★★★ AVALIAÇÕES
         </span>
-        <span className="text-[8px] text-white/40">arraste →</span>
+        <span className="text-[10px] text-white/40 ml-2 shrink-0">deslize →</span>
       </div>
       <div
         className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1"
