@@ -295,7 +295,7 @@ function GeradorLegendaPage() {
             Legenda boa acelera engajamento, mas quem já começa com <strong>prova social</strong> ganha o
             algoritmo mais rápido. Se você quer que o algoritmo empurre seu conteúdo desde o primeiro minuto,{" "}
             <Link to="/comprar-seguidores-instagram" className="text-primary underline">
-              comprar seguidores brasileiros reais no Pix
+              comprar seguidores brasileiros no Pix
             </Link>{" "}
             é o atalho que os grandes perfis usam em silêncio.
           </p>

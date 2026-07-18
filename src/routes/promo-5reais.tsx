@@ -16,7 +16,7 @@ import { buildProductJsonLd } from "@/lib/seo-jsonld";
 
 const PROMO_URL = "https://boostgg.com.br/promo-5reais";
 const PROMO_DESC =
-  "Promoção relâmpago: 100 seguidores reais no Instagram por R$5 via Pix. Cupom PRIME15 dá mais 15% off. Entrega em minutos.";
+  "Promoção relâmpago: 100 seguidores no Instagram por R$5 via Pix. Cupom PRIME15 dá mais 15% off. Entrega em minutos.";
 
 export const Route = createFileRoute("/promo-5reais")({
   head: () => ({
