@@ -216,7 +216,7 @@ export const Route = createFileRoute("/")({
               {
                 "@type": "Product",
                 "@id": "https://boostgg.com.br/#product",
-                name: "Seguidores Reais para Instagram - BoostGG",
+                name: "Seguidores para Instagram - BoostGG",
                 description,
                 brand: { "@type": "Brand", name: "BoostGG" },
                 image: ogImage,
@@ -706,7 +706,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       <header className={`sticky top-0 z-50 bg-background/95 border-b transition-all duration-300 ${scrolled ? "border-[hsl(var(--primary))]/60 shadow-[0_2px_24px_-12px_hsl(var(--primary)/0.6)]" : "border-border"}`}>
         <div className={`container mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "h-12" : "h-16"}`}>
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Seguidores Reais no Instagram via Pix" />
+            <BrandHeader subtitle="Seguidores Brasileiros no Instagram via Pix" />
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -721,7 +721,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Comprar Seguidores Reais no Instagram — Brasileiros, com Entrega Rápida via Pix
+        Comprar Seguidores no Instagram — Brasileiros, com Entrega Rápida via Pix
       </h1>
       <ShowcaseShell>
 
