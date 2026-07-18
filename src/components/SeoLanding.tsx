@@ -179,6 +179,9 @@ export function SeoLanding(p: SeoLandingProps) {
           </div>
         </section>
 
+        <RelatedLinks accent={p.accent} />
+
+
 
 
         <div className="mt-12 flex justify-center pb-8">
