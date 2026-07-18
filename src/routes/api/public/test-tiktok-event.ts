@@ -7,6 +7,10 @@ export const Route = createFileRoute("/api/public/test-tiktok-event")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        const token = request.headers.get("x-admin-token") ?? new URL(request.url).searchParams.get("token") ?? "";
+        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+          return new Response("Unauthorized", { status: 401 });
+        }
         const url = new URL(request.url);
         const testCode = url.searchParams.get("code") ?? undefined;
         const orderId = `test_${Date.now()}`;
