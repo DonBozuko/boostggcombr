@@ -47,7 +47,7 @@ export const Route = createFileRoute("/telegram")({
   head: () => {
     const title = "Crescer Telegram — Membros para Grupo e Canal — Elite Boost Prime | BoostGG";
     const description =
-      "Cresça seu grupo e canal do Telegram com membros reais via Pix. Entrega imediata, alta retenção e reposição garantida.";
+      "Cresça seu grupo e canal do Telegram com membros via Pix. Entrega imediata e reposição garantida.";
     const url = "https://boostgg.com.br/telegram";
     const ogImage = `https://boostgg.com.br${ogTelegram}?v=48`;
     return {
@@ -259,13 +259,13 @@ function TelegramLanding() {
       <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${AERO}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Membros Reais no Telegram via Pix" />
+            <BrandHeader subtitle="Membros para Telegram via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>
       </header>
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Crescer Telegram — Membros Reais
+        Crescer Telegram — Membros para Grupo e Canal
       </h1>
       <ShowcaseShell>
       {/* v115 — Mystery Box Banner (>200) */}

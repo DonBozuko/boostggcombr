@@ -43,9 +43,9 @@ import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Turbinar TikTok — Seguidores e Views Reais — Elite Boost Prime | BoostGG";
+    const title = "Turbinar TikTok — Seguidores e Views — Elite Boost Prime | BoostGG";
     const description =
-      "Turbine seu TikTok com seguidores, curtidas e views reais via Pix. Entrega imediata, alta retenção e reposição garantida.";
+      "Turbine seu TikTok com seguidores, curtidas e views via Pix. Entrega imediata e reposição garantida.";
     const url = "https://boostgg.com.br/tiktok";
     const ogImage = `https://boostgg.com.br${ogTiktok}?v=48`;
     return {
@@ -326,7 +326,7 @@ function TiktokLanding() {
       <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${CYAN}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Seguidores Reais no TikTok via Pix" />
+            <BrandHeader subtitle="Seguidores Brasileiros no TikTok via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>

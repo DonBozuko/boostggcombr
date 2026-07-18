@@ -42,9 +42,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/facebook")({
   head: () => {
-    const title = "Impulsionar Facebook — Curtidas e Seguidores Reais — Elite Boost Prime | BoostGG";
+    const title = "Impulsionar Facebook — Curtidas e Seguidores — Elite Boost Prime | BoostGG";
     const description =
-      "Impulsione seu Facebook com curtidas, seguidores e views reais via Pix. Engajamento orgânico, alta retenção e reposição garantida.";
+      "Impulsione seu Facebook com curtidas, seguidores e views via Pix. Engajamento orgânico, entrega rápida e reposição garantida.";
     const url = "https://boostgg.com.br/facebook";
     const ogImage = `https://boostgg.com.br${ogFacebook}?v=48`;
     return {
@@ -274,7 +274,7 @@ function FacebookLanding() {
       <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${BLUE}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Curtidas e Seguidores Reais no Facebook via Pix" />
+            <BrandHeader subtitle="Curtidas e Seguidores no Facebook via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>

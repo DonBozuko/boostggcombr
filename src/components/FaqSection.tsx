@@ -3,14 +3,14 @@ export type FaqItem = { q: string; a: string };
 
 export const FAQS: Record<string, FaqItem[]> = {
   instagram: [
-    { q: "Seguidores de Instagram caem depois de alguns dias?", a: "Nossos planos incluem reposição gratuita por 30 dias. Se houver queda, repomos sem custo. Trabalhamos com perfis de alta retenção para minimizar drops." },
+    { q: "Seguidores de Instagram caem depois de alguns dias?", a: "Nossos planos incluem reposição gratuita por 30 dias. Se houver queda, repomos sem custo. A entrega é gradual para minimizar drops." },
     { q: "Em quanto tempo os seguidores começam a entrar?", a: "A entrega inicia em até 5 minutos após a confirmação do Pix. A velocidade é gradual (500-2000/dia) para simular crescimento orgânico e evitar bloqueios do Instagram." },
     { q: "Posso comprar seguidores para conta privada?", a: "Não. O perfil precisa estar público durante a entrega. Após concluída, você pode voltar para privado normalmente." },
     { q: "É seguro? Minha conta pode ser banida?", a: "Sim, é seguro. Não pedimos senha e usamos apenas o @ do perfil. Nunca tivemos relato de banimento em mais de 3.100 pedidos." },
     { q: "Vocês emitem nota fiscal?", a: "Emitimos NF-e para pedidos empresariais. Basta solicitar pelo WhatsApp após o pagamento com CNPJ e dados de faturamento." },
   ],
   tiktok: [
-    { q: "Seguidores de TikTok são reais ou bots?", a: "Trabalhamos com contas ativas com foto, bio e histórico. Não são bots vazios. A retenção é significativamente maior que a média do mercado." },
+    { q: "Seguidores de TikTok são reais ou bots?", a: "Entregamos seguidores com perfis brasileiros para prova social. Não são bots vazios, mas também não garantimos interação orgânica." },
     { q: "Comprar views atrapalha o algoritmo do TikTok?", a: "Pelo contrário — views iniciais aceleram a distribuição na For You Page. O algoritmo prioriza vídeos com tração precoce nas primeiras 2 horas." },
     { q: "Consigo comprar curtidas para um vídeo específico?", a: "Sim. Basta colar o link do vídeo no checkout. As curtidas caem apenas naquele vídeo, sem afetar os outros do perfil." },
     { q: "Qual a diferença entre views brasileiras e globais?", a: "Views globais entregam em minutos e custam menos. Views BR são mais lentas mas melhoram o CTR local se seu público é Brasil. Para viralizar, globais bastam." },

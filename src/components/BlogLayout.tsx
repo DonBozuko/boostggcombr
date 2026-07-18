@@ -37,7 +37,7 @@ export function BlogLayout({
         <div className="mt-16 rounded-2xl border border-border bg-card/60 p-8 text-center">
           <h2 className="font-display font-bold text-2xl mb-2">Pronto para crescer?</h2>
           <p className="text-muted-foreground mb-6">
-            Escolha o pacote ideal e receba seguidores reais em minutos.
+            Escolha o pacote ideal e receba seguidores brasileiros em minutos.
           </p>
           <Link
             to="/"

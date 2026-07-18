@@ -140,7 +140,7 @@ export function JarvisContentScheduler() {
   }, []);
 
   const ROUTE_BY_NET: Record<Network, { url: string; pitch: string }> = {
-    instagram: { url: "boostgg.com.br",          pitch: "seguidores reais no Instagram" },
+    instagram: { url: "boostgg.com.br",          pitch: "seguidores brasileiros no Instagram" },
     tiktok:    { url: "boostgg.com.br/tiktok",   pitch: "views virais no TikTok" },
     facebook:  { url: "boostgg.com.br/facebook", pitch: "curtidas blindadas no Facebook" },
     youtube:   { url: "boostgg.com.br/youtube",  pitch: "inscritos premium no YouTube" },

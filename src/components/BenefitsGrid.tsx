@@ -1,12 +1,12 @@
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
 
 const NETWORK_BENEFIT: Record<RouteKey, string> = {
-  "/": "Seguidores Reais e Curtidas",
-  "/tiktok": "Seguidores Reais e Curtidas",
-  "/youtube": "Inscritos Reais e Watch Time",
-  "/facebook": "Seguidores Reais e Curtidas",
-  "/telegram": "Membros Reais e Visualizações",
-  "/trafego": "Visitas Reais Geo-segmentadas",
+  "/": "Seguidores Brasileiros e Curtidas",
+  "/tiktok": "Seguidores Brasileiros e Curtidas",
+  "/youtube": "Inscritos e Watch Time",
+  "/facebook": "Seguidores Brasileiros e Curtidas",
+  "/telegram": "Membros e Visualizações",
+  "/trafego": "Visitas Geo-segmentadas",
 };
 
 export function BenefitsGrid({
@@ -17,11 +17,11 @@ export function BenefitsGrid({
   accent?: string;
 }) {
   const items = [
-    "Serviços Reais",
+    "Perfis Brasileiros",
     "Entrega Automática",
     "Pagamento via Pix",
     "Sem solicitar senha",
-    "Alta Retenção",
+    "Garantia de Reposição",
     NETWORK_BENEFIT[route] ?? "Crescimento Real",
   ];
   return (

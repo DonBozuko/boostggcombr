@@ -42,9 +42,9 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/youtube")({
   head: () => {
-    const title = "Crescer YouTube — Inscritos e Views Reais — Elite Boost Prime | BoostGG";
+    const title = "Crescer YouTube — Inscritos e Views — Elite Boost Prime | BoostGG";
     const description =
-      "Cresça no YouTube com inscritos, views e likes reais via Pix. Acelera monetização, alta retenção e reposição garantida.";
+      "Cresça no YouTube com inscritos, views e likes via Pix. Acelera monetização e reposição garantida.";
     const url = "https://boostgg.com.br/youtube";
     const ogImage = `https://boostgg.com.br${ogYoutube}?v=48`;
     return {
@@ -282,7 +282,7 @@ function YoutubeLanding() {
       <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${RED}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Inscritos e Views Reais no YouTube via Pix" />
+            <BrandHeader subtitle="Inscritos e Views no YouTube via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>

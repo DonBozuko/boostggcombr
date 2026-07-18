@@ -16,7 +16,7 @@ import { buildProductJsonLd } from "@/lib/seo-jsonld";
 
 const KIT_URL = "https://boostgg.com.br/kit-creator";
 const KIT_DESC =
-  "Pacote Creator: 1.000 seguidores reais no Instagram via Pix. Entrega em minutos, reposição 30 dias, sem senha. Cupom PRIME15 aplicado.";
+  "Pacote Creator: 1.000 seguidores no Instagram via Pix. Entrega em minutos, reposição 30 dias, sem senha. Cupom PRIME15 aplicado.";
 
 export const Route = createFileRoute("/kit-creator")({
   head: () => ({
