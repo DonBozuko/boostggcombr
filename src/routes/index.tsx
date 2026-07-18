@@ -1296,6 +1296,16 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       </footer>
       </PlansShowcaseProvider>
           <FaqSection network="instagram" />
+      <ExitRecoveryModal
+        open={exitOpen}
+        onClose={() => { setExitOpen(false); resetExit(); }}
+        onContinue={() => {
+          setExitOpen(false);
+          resetExit();
+          profileInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => profileInputRef.current?.focus(), 400);
+        }}
+      />
       </MobileFrame>
   );
 }
