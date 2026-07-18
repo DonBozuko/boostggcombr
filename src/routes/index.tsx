@@ -457,6 +457,45 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     return () => { cancelled = true; };
   }, [getPricingGridFn, getBrPricingGridFn]);
 
+  // v190 — Recuperação de checkout (exit intent).
+  // Só arma quando usuário já preencheu @; abre modal reforçando garantia + rolando ao form.
+  const hasProfile = form.profile.trim().length >= 2;
+  const { triggered: exitTriggered, reset: resetExit } = useExitIntent({
+    enabled: hasProfile && !modalOpen && !exitOpen && !paid,
+    minDwellMs: 8000,
+  });
+  useEffect(() => {
+    if (exitTriggered && !exitOpen) setExitOpen(true);
+  }, [exitTriggered, exitOpen]);
+
+  const saveCheckoutAttempt = async (profile: string) => {
+    if (attemptLoggedRef.current) return;
+    if (!profile || profile.trim().length < 2) return;
+    attemptLoggedRef.current = true;
+    try {
+      const selected = dynAllPlans.find((p) => p.id === form.plan);
+      const payload: Record<string, unknown> = {
+        instagram_user: profile.trim().slice(0, 120),
+        plan_id: selected?.id ?? null,
+        network: "instagram",
+        categoria,
+        quantidade: selected?.quantidade ?? null,
+        valor: selected?.valor ?? null,
+        url: typeof window !== "undefined" ? window.location.href.slice(0, 500) : null,
+        ...getUtmParams(),
+      };
+      await fetch("/api/public/checkout-attempt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
+    } catch {
+      // silencioso — recuperação é best-effort
+      attemptLoggedRef.current = false;
+    }
+  };
+
   const staticById = useMemo(() => {
     const m = new Map<string, Plan>();
     for (const p of [...plans, ...likesPlans, ...viewsPlans]) m.set(p.id, p);
