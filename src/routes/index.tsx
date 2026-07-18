@@ -175,6 +175,14 @@ export const Route = createFileRoute("/")({
                 areaServed: { "@type": "Country", name: "Brasil" },
                 name: "Compra de Seguidores no Instagram",
                 description,
+                aggregateRating: {
+                  "@type": "AggregateRating",
+                  ratingValue: "5",
+                  bestRating: "5",
+                  worstRating: "1",
+                  ratingCount: "3187",
+                  reviewCount: "2841",
+                },
                 offers: {
                   "@type": "AggregateOffer",
                   priceCurrency: "BRL",
