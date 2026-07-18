@@ -840,6 +840,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
           <LivePurchasesTicker accent="#00f2fe" />
           <TrustBadges accent="#FFD700" />
+          <CheckoutFaq />
 
 
 
