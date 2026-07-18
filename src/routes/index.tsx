@@ -8,11 +8,13 @@ import { MobileFrame } from "@/components/MobileFrame";
 import { FaqSection } from "@/components/FaqSection";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
+import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
+import { useExitIntent } from "@/hooks/useExitIntent";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Instagram,
   Zap,
