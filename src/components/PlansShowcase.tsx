@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -16,62 +16,47 @@ function useShowcase() {
   return ctx;
 }
 
-const SLOT_WORDS = ["VER", "TODOS", "OS", "PLANOS"];
-const STEP_SECONDS = 1.4;
+const ROTATING_WORDS = ["VER PLANOS", "TODOS OS PACOTES", "PREÇOS & OFERTAS"];
+const ROTATE_MS = 2600;
 
 export function ShowcaseTrigger({ label }: { label?: string }) {
   const { setOpen, accent } = useShowcase();
   void label;
-  const n = SLOT_WORDS.length;
-  const total = (STEP_SECONDS * n).toFixed(2);
-  const half = (100 / n).toFixed(2);
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setIdx((i) => (i + 1) % ROTATING_WORDS.length), ROTATE_MS);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <>
       <style>{`
-        @keyframes slot-word-fade-${n} {
-          ${SLOT_WORDS.map((_, i) => {
-            const start = ((i / n) * 100).toFixed(2);
-            const peak = (((i + 0.25) / n) * 100).toFixed(2);
-            const end = (((i + 0.75) / n) * 100).toFixed(2);
-            const next = (((i + 1) / n) * 100).toFixed(2);
-            return `${start}% { opacity: 0; transform: translateY(8px) scale(0.92); }
-${peak}% { opacity: 1; transform: translateY(0) scale(1); }
-${end}% { opacity: 1; transform: translateY(0) scale(1); }
-${next}% { opacity: 0; transform: translateY(-8px) scale(0.92); }`;
-          }).join("\n")}
+        @keyframes plans-word-in {
+          0% { opacity: 0; transform: translateY(6px); }
+          100% { opacity: 1; transform: translateY(0); }
         }
-        .slot-word-track {
-          animation: slot-word-fade-${n} ${total}s ease-in-out infinite;
-        }
-        .slot-word-track:nth-child(1) { animation-delay: 0s; }
-        .slot-word-track:nth-child(2) { animation-delay: -${(STEP_SECONDS * 1).toFixed(2)}s; }
-        .slot-word-track:nth-child(3) { animation-delay: -${(STEP_SECONDS * 2).toFixed(2)}s; }
-        .slot-word-track:nth-child(4) { animation-delay: -${(STEP_SECONDS * 3).toFixed(2)}s; }
+        .plans-word-anim { animation: plans-word-in 320ms ease-out both; }
       `}</style>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Ver todos os planos"
-        className="group relative h-9 px-4 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95"
+        className="group relative h-9 px-5 rounded-full flex items-center justify-center overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           border: `1px solid ${accent}`,
           background: `linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(20,20,20,0.95) 100%)`,
           boxShadow: `0 0 0 1px ${accent}22, 0 4px 14px ${accent}22, inset 0 1px 0 ${accent}15`,
         }}
       >
-        <span className="relative flex items-center justify-center min-w-[92px] h-[20px]">
-          {SLOT_WORDS.map((w) => (
-            <span
-              key={w}
-              className="slot-word-track absolute inset-0 flex items-center justify-center text-[11px] font-bold tracking-[0.12em] uppercase whitespace-nowrap"
-              style={{
-                color: accent,
-                textShadow: `0 0 8px ${accent}66`,
-              }}
-            >
-              {w}
-            </span>
-          ))}
+        <span className="relative flex items-center justify-center min-w-[150px] h-[20px]">
+          <span
+            key={idx}
+            className="plans-word-anim text-[11px] font-bold tracking-[0.14em] uppercase whitespace-nowrap"
+            style={{ color: accent, textShadow: `0 0 8px ${accent}66` }}
+          >
+            {ROTATING_WORDS[idx]}
+          </span>
         </span>
         <span
           className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
@@ -81,6 +66,7 @@ ${next}% { opacity: 0; transform: translateY(-8px) scale(0.92); }`;
     </>
   );
 }
+
 
 export function ShowcaseShell({ children }: { children: ReactNode }) {
   const { open, setOpen, accent } = useShowcase();
