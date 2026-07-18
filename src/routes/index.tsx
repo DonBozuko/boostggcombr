@@ -932,16 +932,19 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 )}
                 <Input
                   id="profile"
+                  ref={profileInputRef}
                   placeholder={form.plan.startsWith("v")
                     ? "https://instagram.com/reel/..."
                     : "@seu_perfil ou instagram.com/seu_perfil"}
                   className="h-12 pl-10"
                   value={form.profile}
                   onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
+                  onBlur={(e) => { void saveCheckoutAttempt(e.target.value); }}
                   maxLength={200}
                 />
               </div>
             </div>
+
 
 
             <div className="space-y-2">
