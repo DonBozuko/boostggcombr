@@ -409,6 +409,9 @@ function Landing() {
   const [waitingProvision, setWaitingProvision] = useState(false);
   const [bumpOpen, setBumpOpen] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<{ selected: any; profile: string; email: string; contact: string } | null>(null);
+  const [exitOpen, setExitOpen] = useState(false);
+  const attemptLoggedRef = useRef(false);
+  const profileInputRef = useRef<HTMLInputElement | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
   const simulatePurchaseFn = useServerFn(simulatePurchase);
   const getStatusFn = useServerFn(getPedidoStatus);
