@@ -166,6 +166,66 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_attempts: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          id: number
+          instagram_user: string
+          network: string | null
+          plan_id: string | null
+          quantidade: number | null
+          recovered_at: string | null
+          recovered_pedido_id: string | null
+          url: string | null
+          user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          valor: number | null
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          id?: number
+          instagram_user: string
+          network?: string | null
+          plan_id?: string | null
+          quantidade?: number | null
+          recovered_at?: string | null
+          recovered_pedido_id?: string | null
+          url?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          valor?: number | null
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          id?: number
+          instagram_user?: string
+          network?: string | null
+          plan_id?: string | null
+          quantidade?: number | null
+          recovered_at?: string | null
+          recovered_pedido_id?: string | null
+          url?: string | null
+          user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          valor?: number | null
+        }
+        Relationships: []
+      }
       connection_tests: {
         Row: {
           created_at: string

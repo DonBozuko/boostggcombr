@@ -8,11 +8,13 @@ import { MobileFrame } from "@/components/MobileFrame";
 import { FaqSection } from "@/components/FaqSection";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
+import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
+import { useExitIntent } from "@/hooks/useExitIntent";
 import { useScrolledPast } from "@/hooks/useScroll";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Instagram,
   Zap,
@@ -407,6 +409,9 @@ function Landing() {
   const [waitingProvision, setWaitingProvision] = useState(false);
   const [bumpOpen, setBumpOpen] = useState(false);
   const [pendingOrder, setPendingOrder] = useState<{ selected: any; profile: string; email: string; contact: string } | null>(null);
+  const [exitOpen, setExitOpen] = useState(false);
+  const attemptLoggedRef = useRef(false);
+  const profileInputRef = useRef<HTMLInputElement | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
   const simulatePurchaseFn = useServerFn(simulatePurchase);
   const getStatusFn = useServerFn(getPedidoStatus);
@@ -451,6 +456,45 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       .catch(() => {});
     return () => { cancelled = true; };
   }, [getPricingGridFn, getBrPricingGridFn]);
+
+  // v190 — Recuperação de checkout (exit intent).
+  // Só arma quando usuário já preencheu @; abre modal reforçando garantia + rolando ao form.
+  const hasProfile = form.profile.trim().length >= 2;
+  const { triggered: exitTriggered, reset: resetExit } = useExitIntent({
+    enabled: hasProfile && !modalOpen && !exitOpen && !paid,
+    minDwellMs: 8000,
+  });
+  useEffect(() => {
+    if (exitTriggered && !exitOpen) setExitOpen(true);
+  }, [exitTriggered, exitOpen]);
+
+  const saveCheckoutAttempt = async (profile: string) => {
+    if (attemptLoggedRef.current) return;
+    if (!profile || profile.trim().length < 2) return;
+    attemptLoggedRef.current = true;
+    try {
+      const selected = dynAllPlans.find((p) => p.id === form.plan);
+      const payload: Record<string, unknown> = {
+        instagram_user: profile.trim().slice(0, 120),
+        plan_id: selected?.id ?? null,
+        network: "instagram",
+        categoria,
+        quantidade: selected?.quantidade ?? null,
+        valor: selected?.valor ?? null,
+        url: typeof window !== "undefined" ? window.location.href.slice(0, 500) : null,
+        ...getUtmParams(),
+      };
+      await fetch("/api/public/checkout-attempt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        keepalive: true,
+      });
+    } catch {
+      // silencioso — recuperação é best-effort
+      attemptLoggedRef.current = false;
+    }
+  };
 
   const staticById = useMemo(() => {
     const m = new Map<string, Plan>();
@@ -888,16 +932,19 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 )}
                 <Input
                   id="profile"
+                  ref={profileInputRef}
                   placeholder={form.plan.startsWith("v")
                     ? "https://instagram.com/reel/..."
                     : "@seu_perfil ou instagram.com/seu_perfil"}
                   className="h-12 pl-10"
                   value={form.profile}
                   onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
+                  onBlur={(e) => { void saveCheckoutAttempt(e.target.value); }}
                   maxLength={200}
                 />
               </div>
             </div>
+
 
 
             <div className="space-y-2">
@@ -1249,6 +1296,16 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       </footer>
       </PlansShowcaseProvider>
           <FaqSection network="instagram" />
+      <ExitRecoveryModal
+        open={exitOpen}
+        onClose={() => { setExitOpen(false); resetExit(); }}
+        onContinue={() => {
+          setExitOpen(false);
+          resetExit();
+          profileInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          setTimeout(() => profileInputRef.current?.focus(), 400);
+        }}
+      />
       </MobileFrame>
   );
 }
