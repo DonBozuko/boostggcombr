@@ -134,7 +134,7 @@ export const Route = createFileRoute("/")({
         { property: "og:image", content: ogImage },
         { property: "og:image:width", content: "1216" },
         { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "Elite Boost Prime — Seguidores reais no Instagram via Pix" },
+        { property: "og:image:alt", content: "Elite Boost Prime — Seguidores Brasileiros no Instagram via Pix" },
         { property: "og:site_name", content: "BoostGG" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -744,7 +744,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           >
             <span className="text-[18px]">🎁</span> <span style={{ color: "#FFD700" }}>BÔNUS ESPECIAL!</span> Nas compras acima de <span style={{ color: "#FFD700" }}>200 seguidores</span>,
             <br />
-            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores reais</span> após o Pix aprovado!
+            ganhe um bônus surpresa de <span style={{ color: "#39ff14" }}>10 a 50 seguidores brasileiros</span> após o Pix aprovado!
             <br />
             <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-black/40 text-[11px] uppercase tracking-wider">
               ✨ Resgate na Caixa Misteriosa após o pagamento ✨
@@ -1193,7 +1193,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </h2>
         <div className="space-y-4 text-zinc-300 text-sm leading-relaxed">
           <p>
-            Comprar seguidores Instagram é uma estratégia usada por criadores, empresas e influenciadores para acelerar a credibilidade do perfil. Na <strong className="text-foreground">BoostGG</strong>, você compra seguidores reais e brasileiros com entrega automática no Pix, sem precisar informar senha. O processo é seguro, discreto e começa em poucos minutos após a confirmação do pagamento.
+            Comprar seguidores Instagram é uma estratégia usada por criadores, empresas e influenciadores para acelerar a credibilidade do perfil. Na <strong className="text-foreground">BoostGG</strong>, você compra seguidores brasileiros com entrega automática no Pix, sem precisar informar senha. O processo é seguro, discreto e começa em poucos minutos após a confirmação do pagamento.
           </p>
           <p>
             Além de seguidores, você também pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link>, visualizações para Reels e seguidores brasileiros segmentados. Todos os pacotes incluem garantia de reposição de 30 dias e suporte no WhatsApp.
