@@ -1,6 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createHmac, timingSafeEqual } from "crypto";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
+
+// v189 — Valida HMAC do Mercado Pago antes de processar qualquer payload.
+function verifyMpSignature(rawBody: string, signatureHeader: string | null, secret: string): boolean {
+  if (!signatureHeader) return false;
+  const tsMatch = signatureHeader.match(/ts=(\d+)/);
+  const v1Match = signatureHeader.match(/v1=([a-f0-9]+)/);
+  if (!tsMatch || !v1Match) return false;
+  const ts = tsMatch[1];
+  const expected = createHmac("sha256", secret).update(`ts:${ts}.${rawBody}`).digest("hex");
+  const provided = v1Match[1];
+  if (expected.length !== provided.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(provided, "hex"));
+  } catch {
+    return false;
+  }
+}
 
 // v129 — Strict IP Rate Limiter (5 req/s por IP, in-memory sliding window)
 const RATE_LIMIT_MAX = 5;
@@ -52,6 +70,18 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           rawBody = await request.text();
         } catch (err) {
           console.warn("[mp-webhook] body read falhou; respondendo 200 mesmo assim", err);
+        }
+
+        // v189 — Rejeita webhooks sem assinatura válida do Mercado Pago.
+        const mpWebhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+        if (!mpWebhookSecret) {
+          console.error("[mp-webhook] MERCADO_PAGO_WEBHOOK_SECRET não configurado");
+          return new Response("Webhook secret not configured", { status: 500, headers: { "cache-control": "no-store" } });
+        }
+        const signatureHeader = request.headers.get("x-signature");
+        if (!verifyMpSignature(rawBody, signatureHeader, mpWebhookSecret)) {
+          console.warn("[mp-webhook] assinatura inválida", { signatureHeader: signatureHeader ? "presente" : "ausente", bodyLen: rawBody.length });
+          return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
         const backgroundJob = Promise.resolve().then(async () => {
