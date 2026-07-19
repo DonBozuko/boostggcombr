@@ -38,6 +38,7 @@ import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar
 import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
 import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
 import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
+import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -232,6 +233,11 @@ const ComprarCurtidasInstagramRoute =
     path: '/comprar-curtidas-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AvaliacoesRoute = AvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
   id: '/audiencia-brasileira',
   path: '/audiencia-brasileira',
@@ -473,6 +479,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
+  '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
+  '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
@@ -622,6 +630,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
+  '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
@@ -698,6 +707,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/audiencia-brasileira'
+    | '/avaliacoes'
     | '/comprar-curtidas-instagram'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
@@ -772,6 +782,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/audiencia-brasileira'
+    | '/avaliacoes'
     | '/comprar-curtidas-instagram'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
@@ -846,6 +857,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/audiencia-brasileira'
+    | '/avaliacoes'
     | '/comprar-curtidas-instagram'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
@@ -921,6 +933,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
+  AvaliacoesRoute: typeof AvaliacoesRoute
   ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
   ComprarInscritosYoutubeRoute: typeof ComprarInscritosYoutubeRoute
   ComprarSeguidoresBrasileirosRoute: typeof ComprarSeguidoresBrasileirosRoute
@@ -1194,6 +1207,13 @@ declare module '@tanstack/react-router' {
       path: '/comprar-curtidas-instagram'
       fullPath: '/comprar-curtidas-instagram'
       preLoaderRoute: typeof ComprarCurtidasInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/avaliacoes': {
+      id: '/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/avaliacoes'
+      preLoaderRoute: typeof AvaliacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/audiencia-brasileira': {
@@ -1514,6 +1534,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
+  AvaliacoesRoute: AvaliacoesRoute,
   ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
   ComprarInscritosYoutubeRoute: ComprarInscritosYoutubeRoute,
   ComprarSeguidoresBrasileirosRoute: ComprarSeguidoresBrasileirosRoute,
