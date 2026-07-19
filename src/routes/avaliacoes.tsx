@@ -49,7 +49,7 @@ function AvaliacoesPage() {
             title="Trustpilot"
             description="Plataforma internacional de reviews. Ideal para quem busca o serviço no Google e nas IAs."
             cta="Deixar avaliação no Trustpilot"
-            href="https://br.trustpilot.com/evaluate/www.boostgg.com.br"
+            href="https://br.trustpilot.com/review/boostgg.com.br"
             status="ativo"
           />
           <ReviewCard
