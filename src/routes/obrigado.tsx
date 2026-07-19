@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp } from "lucide-react";
+import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp, Star, ExternalLink } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { trackCompletePayment } from "@/lib/tiktok-pixel";
@@ -99,6 +99,25 @@ function ObrigadoPage() {
             </Link>
           </div>
         </div>
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-5 text-left space-y-3">
+          <div className="flex items-center gap-2">
+            <Star className="w-5 h-5 text-emerald-400" />
+            <h2 className="font-bold text-emerald-400 uppercase text-sm tracking-wide">Sua avaliação vale ouro</h2>
+          </div>
+          <p className="text-sm text-zinc-400">
+            Depois de receber seus seguidores, deixe uma avaliação no Trustpilot. Leva menos de 1 minuto e ajuda outras pessoas a confiarem na BoostGG.
+          </p>
+          <a
+            href="https://br.trustpilot.com/review/boostgg.com.br"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 px-4 py-2.5 text-sm font-semibold text-emerald-400 transition"
+          >
+            Avaliar no Trustpilot
+            <ExternalLink className="w-4 h-4" />
+          </a>
+        </div>
+
         <Button asChild variant="outline" className="w-full">
           <Link to="/"><Home className="w-4 h-4 mr-2" />Voltar ao início</Link>
         </Button>
