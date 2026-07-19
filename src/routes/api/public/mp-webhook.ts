@@ -1,6 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createHmac, timingSafeEqual } from "crypto";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
+
+// v189 — Valida HMAC do Mercado Pago antes de processar qualquer payload.
+function verifyMpSignature(rawBody: string, signatureHeader: string | null, secret: string): boolean {
+  if (!signatureHeader) return false;
+  const tsMatch = signatureHeader.match(/ts=(\d+)/);
+  const v1Match = signatureHeader.match(/v1=([a-f0-9]+)/);
+  if (!tsMatch || !v1Match) return false;
+  const ts = tsMatch[1];
+  const expected = createHmac("sha256", secret).update(`ts:${ts}.${rawBody}`).digest("hex");
+  const provided = v1Match[1];
+  if (expected.length !== provided.length) return false;
+  try {
+    return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(provided, "hex"));
+  } catch {
+    return false;
+  }
+}
 
 // v129 — Strict IP Rate Limiter (5 req/s por IP, in-memory sliding window)
 const RATE_LIMIT_MAX = 5;
