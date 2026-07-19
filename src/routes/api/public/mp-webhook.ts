@@ -72,6 +72,18 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           console.warn("[mp-webhook] body read falhou; respondendo 200 mesmo assim", err);
         }
 
+        // v189 — Rejeita webhooks sem assinatura válida do Mercado Pago.
+        const mpWebhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+        if (!mpWebhookSecret) {
+          console.error("[mp-webhook] MERCADO_PAGO_WEBHOOK_SECRET não configurado");
+          return new Response("Webhook secret not configured", { status: 500, headers: { "cache-control": "no-store" } });
+        }
+        const signatureHeader = request.headers.get("x-signature");
+        if (!verifyMpSignature(rawBody, signatureHeader, mpWebhookSecret)) {
+          console.warn("[mp-webhook] assinatura inválida", { signatureHeader: signatureHeader ? "presente" : "ausente", bodyLen: rawBody.length });
+          return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
+        }
+
         const backgroundJob = Promise.resolve().then(async () => {
           // Sempre 200 — MP reenvia se for !=2xx. Logamos erros e seguimos.
           try {
