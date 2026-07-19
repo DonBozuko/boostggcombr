@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp } from "lucide-react";
+import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp, Star, ExternalLink } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { trackCompletePayment } from "@/lib/tiktok-pixel";
