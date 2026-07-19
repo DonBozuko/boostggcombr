@@ -63,6 +63,7 @@ import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public
 import { Route as ApiPublicCheckoutAttemptRouteImport } from './routes/api/public/checkout-attempt'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
@@ -364,6 +365,12 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTelegramWebhookRoute =
   ApiPublicTelegramWebhookRouteImport.update({
     id: '/api/public/telegram/webhook',
@@ -534,6 +541,7 @@ export interface FileRoutesByFullPath {
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -607,6 +615,7 @@ export interface FileRoutesByTo {
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -681,6 +690,7 @@ export interface FileRoutesById {
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -756,6 +766,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -829,6 +840,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -902,6 +914,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/waiting'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -975,6 +988,7 @@ export interface RootRouteChildren {
   ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1357,6 +1371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/telegram/webhook': {
       id: '/api/public/telegram/webhook'
       path: '/api/public/telegram/webhook'
@@ -1563,6 +1584,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
