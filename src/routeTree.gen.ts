@@ -85,6 +85,7 @@ import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
+import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
@@ -495,6 +496,12 @@ const ApiPublicHooksBestsellerScanRoute =
     path: '/api/public/hooks/bestseller-scan',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBackupDrillRoute =
+  ApiPublicHooksBackupDrillRouteImport.update({
+    id: '/api/public/hooks/backup-drill',
+    path: '/api/public/hooks/backup-drill',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBackfillSmmhypeIdsRoute =
   ApiPublicHooksBackfillSmmhypeIdsRouteImport.update({
     id: '/api/public/hooks/backfill-smmhype-ids',
@@ -576,6 +583,7 @@ export interface FileRoutesByFullPath {
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -657,6 +665,7 @@ export interface FileRoutesByTo {
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -739,6 +748,7 @@ export interface FileRoutesById {
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -822,6 +832,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
+    | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -903,6 +914,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
+    | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -984,6 +996,7 @@ export interface FileRouteTypes {
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
+    | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -1065,6 +1078,7 @@ export interface RootRouteChildren {
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
+  ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
@@ -1619,6 +1633,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBestsellerScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/backup-drill': {
+      id: '/api/public/hooks/backup-drill'
+      path: '/api/public/hooks/backup-drill'
+      fullPath: '/api/public/hooks/backup-drill'
+      preLoaderRoute: typeof ApiPublicHooksBackupDrillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/backfill-smmhype-ids': {
       id: '/api/public/hooks/backfill-smmhype-ids'
       path: '/api/public/hooks/backfill-smmhype-ids'
@@ -1717,6 +1738,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
+  ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
