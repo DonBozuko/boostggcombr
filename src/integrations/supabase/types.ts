@@ -570,6 +570,7 @@ export type Database = {
           created_at: string
           cupom: string | null
           custo_real: number | null
+          email_contato: string | null
           error_detail: string | null
           id: string
           instagram_user: string
@@ -577,6 +578,7 @@ export type Database = {
           pacote: string
           quantidade: number
           rede_social: string
+          review_email_sent_at: string | null
           sla_deadline: string | null
           status: string
           utm_campaign: string | null
@@ -594,6 +596,7 @@ export type Database = {
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
+          email_contato?: string | null
           error_detail?: string | null
           id?: string
           instagram_user: string
@@ -601,6 +604,7 @@ export type Database = {
           pacote: string
           quantidade: number
           rede_social?: string
+          review_email_sent_at?: string | null
           sla_deadline?: string | null
           status?: string
           utm_campaign?: string | null
@@ -618,6 +622,7 @@ export type Database = {
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
+          email_contato?: string | null
           error_detail?: string | null
           id?: string
           instagram_user?: string
@@ -625,6 +630,7 @@ export type Database = {
           pacote?: string
           quantidade?: number
           rede_social?: string
+          review_email_sent_at?: string | null
           sla_deadline?: string | null
           status?: string
           utm_campaign?: string | null
