@@ -25,6 +25,11 @@ const POSTS = [
     excerpt: "Por que pagar seguidores via Pix é mais rápido, rastreável e seguro que cartão ou boleto.",
   },
   {
+    slug: "comprar-seguidores-cai",
+    title: "Comprar Seguidores no Instagram Cai? O Que Acontece Depois",
+    excerpt: "Entenda retenção, reposição e os sinais de que seu serviço entregou seguidores reais — ou bots descartáveis.",
+  },
+  {
     slug: "seguidores-instagram-baratos",
     title: "Seguidores Instagram Baratos: Vale a Pena? O Que Observar",
     excerpt: "Barato demais quase sempre é bot. Como diferenciar preço justo de armadilha.",
