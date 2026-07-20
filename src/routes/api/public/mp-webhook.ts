@@ -266,9 +266,16 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
 
           // v116 — Pessimistic lock via conditional update: só passa 1 worker.
+          const payerEmail = payment.payer?.email && /.+@.+\..+/.test(String(payment.payer.email))
+            ? String(payment.payer.email).toLowerCase().slice(0, 320)
+            : null;
           const { data: lockRow, error: updErr } = await supabaseAdmin
             .from("pedidos")
-            .update({ status: "paid", error_detail: isLatePayment ? "v98 late-payment catch: processado pós-timeout" : null })
+            .update({
+              status: "paid",
+              error_detail: isLatePayment ? "v98 late-payment catch: processado pós-timeout" : null,
+              ...(payerEmail ? { email_contato: payerEmail } as any : {}),
+            })
             .eq("id", pedido.id)
             .neq("status", "paid")
             .select("id")
