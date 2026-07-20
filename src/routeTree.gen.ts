@@ -48,11 +48,13 @@ import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
 import { Route as ApiPublicTestTiktokEventRouteImport } from './routes/api/public/test-tiktok-event'
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
@@ -64,6 +66,8 @@ import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public
 import { Route as ApiPublicCheckoutAttemptRouteImport } from './routes/api/public/checkout-attempt'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
@@ -286,6 +290,11 @@ const FerramentasCalculadoraEngajamentoInstagramRoute =
     path: '/ferramentas/calculadora-engajamento-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
   id: '/dashboard/seo',
   path: '/dashboard/seo',
@@ -313,6 +322,11 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicTrackRoute = ApiPublicTrackRouteImport.update({
   id: '/api/public/track',
   path: '/api/public/track',
@@ -369,6 +383,18 @@ const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
     path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailQueueProcessRoute =
@@ -514,6 +540,7 @@ export interface FileRoutesByFullPath {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -531,6 +558,7 @@ export interface FileRoutesByFullPath {
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
   '/api/public/track': typeof ApiPublicTrackRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -549,6 +577,8 @@ export interface FileRoutesByFullPath {
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -589,6 +619,7 @@ export interface FileRoutesByTo {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -606,6 +637,7 @@ export interface FileRoutesByTo {
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
   '/api/public/track': typeof ApiPublicTrackRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -624,6 +656,8 @@ export interface FileRoutesByTo {
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -665,6 +699,7 @@ export interface FileRoutesById {
   '/admin/catalog': typeof AdminCatalogRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -682,6 +717,7 @@ export interface FileRoutesById {
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
   '/api/public/track': typeof ApiPublicTrackRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -700,6 +736,8 @@ export interface FileRoutesById {
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -742,6 +780,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -759,6 +798,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-verified'
     | '/api/public/test-tiktok-event'
     | '/api/public/track'
+    | '/lovable/email/suppression'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -777,6 +817,8 @@ export interface FileRouteTypes {
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -817,6 +859,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -834,6 +877,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-verified'
     | '/api/public/test-tiktok-event'
     | '/api/public/track'
+    | '/lovable/email/suppression'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -852,6 +896,8 @@ export interface FileRouteTypes {
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   id:
     | '__root__'
     | '/'
@@ -892,6 +938,7 @@ export interface FileRouteTypes {
     | '/admin/catalog'
     | '/blog/$slug'
     | '/dashboard/seo'
+    | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -909,6 +956,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-verified'
     | '/api/public/test-tiktok-event'
     | '/api/public/track'
+    | '/lovable/email/suppression'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -927,6 +975,8 @@ export interface FileRouteTypes {
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -967,6 +1017,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlogSlugRoute: typeof BlogSlugRoute
   DashboardSeoRoute: typeof DashboardSeoRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
@@ -984,6 +1035,7 @@ export interface RootRouteChildren {
   ApiPublicSyncVerifiedRoute: typeof ApiPublicSyncVerifiedRoute
   ApiPublicTestTiktokEventRoute: typeof ApiPublicTestTiktokEventRoute
   ApiPublicTrackRoute: typeof ApiPublicTrackRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -1002,6 +1054,8 @@ export interface RootRouteChildren {
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1279,6 +1333,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/seo': {
       id: '/dashboard/seo'
       path: '/dashboard/seo'
@@ -1312,6 +1373,13 @@ declare module '@tanstack/react-router' {
       path: '/.mcp/list-tools'
       fullPath: '/.mcp/list-tools'
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/track': {
@@ -1389,6 +1457,20 @@ declare module '@tanstack/react-router' {
       path: '/.mcp/invoke-tool/$tool'
       fullPath: '/.mcp/invoke-tool/$tool'
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/queue/process': {
@@ -1569,6 +1651,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   BlogSlugRoute: BlogSlugRoute,
   DashboardSeoRoute: DashboardSeoRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FerramentasCalculadoraEngajamentoInstagramRoute:
     FerramentasCalculadoraEngajamentoInstagramRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
@@ -1588,6 +1671,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSyncVerifiedRoute: ApiPublicSyncVerifiedRoute,
   ApiPublicTestTiktokEventRoute: ApiPublicTestTiktokEventRoute,
   ApiPublicTrackRoute: ApiPublicTrackRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
@@ -1606,6 +1690,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
