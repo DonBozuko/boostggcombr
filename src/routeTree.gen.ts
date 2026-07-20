@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as Char126flockDotjsRouteImport } from './routes/~flock[.]js'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as ViewsTiktokRouteImport } from './routes/views-tiktok'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TurbinarTiktokRouteImport } from './routes/turbinar-tiktok'
 import { Route as TrafegoRouteImport } from './routes/trafego'
 import { Route as TiktokRouteImport } from './routes/tiktok'
@@ -78,6 +79,7 @@ import { Route as ApiPublicHooksWaitingWatcherRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
 import { Route as ApiPublicHooksSlaWatcherRouteImport } from './routes/api/public/hooks/sla-watcher'
+import { Route as ApiPublicHooksReviewRequestScanRouteImport } from './routes/api/public/hooks/review-request-scan'
 import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/public/hooks/reprocess-one'
 import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/public/hooks/recovery-scan'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
@@ -100,6 +102,11 @@ const YoutubeRoute = YoutubeRouteImport.update({
 const ViewsTiktokRoute = ViewsTiktokRouteImport.update({
   id: '/views-tiktok',
   path: '/views-tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TurbinarTiktokRoute = TurbinarTiktokRouteImport.update({
@@ -452,6 +459,12 @@ const ApiPublicHooksSlaWatcherRoute =
     path: '/api/public/hooks/sla-watcher',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksReviewRequestScanRoute =
+  ApiPublicHooksReviewRequestScanRouteImport.update({
+    id: '/api/public/hooks/review-request-scan',
+    path: '/api/public/hooks/review-request-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksReprocessOneRoute =
   ApiPublicHooksReprocessOneRouteImport.update({
     id: '/api/public/hooks/reprocess-one',
@@ -532,6 +545,7 @@ export interface FileRoutesByFullPath {
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/turbinar-tiktok': typeof TurbinarTiktokRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
@@ -567,6 +581,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
+  '/api/public/hooks/review-request-scan': typeof ApiPublicHooksReviewRequestScanRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -611,6 +626,7 @@ export interface FileRoutesByTo {
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/turbinar-tiktok': typeof TurbinarTiktokRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
@@ -646,6 +662,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
+  '/api/public/hooks/review-request-scan': typeof ApiPublicHooksReviewRequestScanRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -691,6 +708,7 @@ export interface FileRoutesById {
   '/tiktok': typeof TiktokRoute
   '/trafego': typeof TrafegoRoute
   '/turbinar-tiktok': typeof TurbinarTiktokRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
   '/~flock.js': typeof Char126flockDotjsRoute
@@ -726,6 +744,7 @@ export interface FileRoutesById {
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
+  '/api/public/hooks/review-request-scan': typeof ApiPublicHooksReviewRequestScanRoute
   '/api/public/hooks/sla-watcher': typeof ApiPublicHooksSlaWatcherRoute
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
@@ -772,6 +791,7 @@ export interface FileRouteTypes {
     | '/tiktok'
     | '/trafego'
     | '/turbinar-tiktok'
+    | '/unsubscribe'
     | '/views-tiktok'
     | '/youtube'
     | '/~flock.js'
@@ -807,6 +827,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
+    | '/api/public/hooks/review-request-scan'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
@@ -851,6 +872,7 @@ export interface FileRouteTypes {
     | '/tiktok'
     | '/trafego'
     | '/turbinar-tiktok'
+    | '/unsubscribe'
     | '/views-tiktok'
     | '/youtube'
     | '/~flock.js'
@@ -886,6 +908,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
+    | '/api/public/hooks/review-request-scan'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
@@ -930,6 +953,7 @@ export interface FileRouteTypes {
     | '/tiktok'
     | '/trafego'
     | '/turbinar-tiktok'
+    | '/unsubscribe'
     | '/views-tiktok'
     | '/youtube'
     | '/~flock.js'
@@ -965,6 +989,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
+    | '/api/public/hooks/review-request-scan'
     | '/api/public/hooks/sla-watcher'
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
@@ -1010,6 +1035,7 @@ export interface RootRouteChildren {
   TiktokRoute: typeof TiktokRoute
   TrafegoRoute: typeof TrafegoRoute
   TurbinarTiktokRoute: typeof TurbinarTiktokRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   ViewsTiktokRoute: typeof ViewsTiktokRoute
   YoutubeRoute: typeof YoutubeRoute
   Char126flockDotjsRoute: typeof Char126flockDotjsRoute
@@ -1044,6 +1070,7 @@ export interface RootRouteChildren {
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicHooksRecoveryScanRoute: typeof ApiPublicHooksRecoveryScanRoute
   ApiPublicHooksReprocessOneRoute: typeof ApiPublicHooksReprocessOneRoute
+  ApiPublicHooksReviewRequestScanRoute: typeof ApiPublicHooksReviewRequestScanRoute
   ApiPublicHooksSlaWatcherRoute: typeof ApiPublicHooksSlaWatcherRoute
   ApiPublicHooksSmokeTestRoute: typeof ApiPublicHooksSmokeTestRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
@@ -1079,6 +1106,13 @@ declare module '@tanstack/react-router' {
       path: '/views-tiktok'
       fullPath: '/views-tiktok'
       preLoaderRoute: typeof ViewsTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/turbinar-tiktok': {
@@ -1543,6 +1577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSlaWatcherRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/review-request-scan': {
+      id: '/api/public/hooks/review-request-scan'
+      path: '/api/public/hooks/review-request-scan'
+      fullPath: '/api/public/hooks/review-request-scan'
+      preLoaderRoute: typeof ApiPublicHooksReviewRequestScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/reprocess-one': {
       id: '/api/public/hooks/reprocess-one'
       path: '/api/public/hooks/reprocess-one'
@@ -1643,6 +1684,7 @@ const rootRouteChildren: RootRouteChildren = {
   TiktokRoute: TiktokRoute,
   TrafegoRoute: TrafegoRoute,
   TurbinarTiktokRoute: TurbinarTiktokRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   ViewsTiktokRoute: ViewsTiktokRoute,
   YoutubeRoute: YoutubeRoute,
   Char126flockDotjsRoute: Char126flockDotjsRoute,
@@ -1680,6 +1722,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicHooksRecoveryScanRoute: ApiPublicHooksRecoveryScanRoute,
   ApiPublicHooksReprocessOneRoute: ApiPublicHooksReprocessOneRoute,
+  ApiPublicHooksReviewRequestScanRoute: ApiPublicHooksReviewRequestScanRoute,
   ApiPublicHooksSlaWatcherRoute: ApiPublicHooksSlaWatcherRoute,
   ApiPublicHooksSmokeTestRoute: ApiPublicHooksSmokeTestRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
