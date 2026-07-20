@@ -11,4 +11,6 @@ Toda integração com fornecedor (SMMhype, SMMPainel, Verified, MP, TikTok, etc)
 Autonomia: quando a opção é claramente segura (não quebra receita, não apaga dado, não expõe segredo, reversível), EXECUTA direto sem pedir confirmação. Só pergunta em decisões irreversíveis ou trade-off real de negócio.
 
 ## Memories
+- [Evolução futura](mem://preferences/evolucao-futura) — Lembrar de evoluir módulos "honestos mas limitados" (ex: JarvisContentScheduler → publicação real) quando chip/warmup/API estiverem prontos. Usuário quer evoluir TUDO no futuro.
+
 
