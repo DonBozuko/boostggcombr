@@ -46,7 +46,7 @@ export const Route = createFileRoute("/api/public/hooks/waiting-watcher")({
             continue;
           }
 
-          const tkn = signPedidoToken(p.id, secret);
+          const tkn = signPedidoToken(p.id, (secret ?? cronSecret) as string);
           const link = `${PUBLIC_BASE}/api/public/hooks/reprocess-one?id=${encodeURIComponent(p.id)}&t=${tkn}`;
           const idadeMin = Math.round((Date.now() - new Date(p.created_at).getTime()) / 60000);
           const urgent = idadeMin > 120 ? "🚨 URGENTE " : "⚠️ ";
