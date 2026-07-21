@@ -775,6 +775,9 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
         Comprar Seguidores no Instagram — Brasileiros, com Entrega Rápida via Pix
       </h1>
+      <p className="text-center text-sm sm:text-base text-zinc-300 mt-1 mb-3 px-4 max-w-2xl mx-auto">
+        Crescimento real para Instagram, TikTok, YouTube, Facebook e Telegram. Não trabalhamos com boost de jogos — apenas engajamento social.
+      </p>
       <ShowcaseShell>
 
       {/* v115 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras acima de 200 */}
