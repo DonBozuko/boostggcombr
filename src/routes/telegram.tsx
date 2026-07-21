@@ -1,4 +1,5 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
@@ -116,6 +117,7 @@ function TelegramLanding() {
   const [categoria, setCategoria] = useState<Categoria>("canal");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
@@ -170,7 +172,7 @@ function TelegramLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@telegram.eliteboostprime.com",
+          email: resolveCheckoutEmail(email, "telegram"),
           rede_social: "telegram",
           bump_upgrade: bumpUpgrade,
           ...getUtmParams(),
@@ -218,6 +220,7 @@ function TelegramLanding() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
     const upgrade = findUpgrade(selected, currentPlans);
     if (upgrade) {
       setPendingOrder({ plan: selected, profile: parsed.data.profile });
@@ -343,6 +346,21 @@ function TelegramLanding() {
                 className="h-12"
                 style={{ background: "#111", borderColor: `${AERO}66`, color: "#fff" }}
                 maxLength={300}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tg-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Input
+                id="tg-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@email.com"
+                className="h-12"
+                style={{ background: "#111", borderColor: `${AERO}66`, color: "#fff" }}
+                maxLength={200}
+                autoComplete="email"
+                inputMode="email"
               />
             </div>
             <DelayedCouponField accent={AERO} />

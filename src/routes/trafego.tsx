@@ -1,4 +1,5 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE_CLEAN } from "@/lib/checkout-messages";
@@ -91,6 +92,7 @@ function TrafegoLanding() {
   const [categoria, setCategoria] = useState<Categoria>("brasil");
   const [planId, setPlanId] = useState("");
   const [profile, setProfile] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
@@ -154,6 +156,7 @@ function TrafegoLanding() {
   const submit = async (selected: Plan) => {
     const parsed = urlSchema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
+    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
 
     // Sandbox Mode — flag global em admin_settings (server-only; nunca exposto publicamente)
     const sb = await getSandboxFn().catch(() => ({ enabled: false }));
@@ -177,7 +180,7 @@ function TrafegoLanding() {
         data: {
           instagram_user: parsed.data.profile, pacote: selected.id,
           quantidade: selected.quantidade, valor: selected.valor,
-          email: "cliente@trafego.eliteboostprime.com", rede_social: "trafego", ...getUtmParams(),
+          email: resolveCheckoutEmail(email, "trafego"), rede_social: "trafego", ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
       });
@@ -279,6 +282,13 @@ function TrafegoLanding() {
               <Input id="tw-url" value={profile} onChange={(e) => setProfile(e.target.value)}
                 placeholder="https://seusite.com.br/landing"
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }} maxLength={500} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tw-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Input id="tw-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@email.com"
+                className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }}
+                maxLength={200} autoComplete="email" inputMode="email" />
             </div>
             <DelayedCouponField accent={NEON} />
             <Button type="button" size="lg" disabled={loading || !planId || tipoBloqueado}
