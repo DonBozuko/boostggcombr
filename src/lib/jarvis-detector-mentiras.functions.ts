@@ -1,13 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 
 /**
- * JARVIS DETECTOR DE MENTIRAS v48
- * Audita o que o agente prometeu vs o que o código realmente entrega:
- *  - pricing_items deve ter pelo menos N itens com price_brl > 0 e cost_per_1k_brl > 0
- *  - admin_treasury deve estar acessível e somar valores reais
- *  - pedidos.functions deve estar exportando criarPedido
- *  - fornecedor ativo deve existir
- * Retorna um relatório com PASS/FAIL e bloqueia deploy quando houver regressão.
+ * JARVIS DETECTOR DE MENTIRAS v49
+ * Não confia em check raso ("existe fornecedor? existe pricing?"). Bate o olho
+ * nos SINTOMAS que o Telegram grita: alerta aberto, pedido travado, cron parado,
+ * webhook MP instável, reconciliador em falha.
  */
 export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
   async () => {
@@ -17,55 +14,37 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-      // 1. pricing_items integridade 1:1
+      // 1. pricing_items — mapeamento pacote→rota
       const { data: items, error: itemsErr } = await supabaseAdmin
         .from("pricing_items")
-        .select("pacote, price_brl, cost_brl, provider_service_id, smmhype_service_id, smmpanel_service_id, verified_service_id");
+        .select("pacote, price_brl, provider_service_id, smmhype_service_id, smmpanel_service_id, verified_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id");
       if (itemsErr) {
         checks.push({ id: "pricing_items", label: "pricing_items acessível", ok: false, detail: itemsErr.message });
         blockDeploy = true;
       } else {
         const total = items?.length ?? 0;
-        // v177 — Alerta vermelho SÓ quando não há NENHUMA rota de dispatch (todos os 4 IDs nulos)
-        // ou preço abaixo do piso de R$ 5,00. Ter só SMMPanel + Verified é 100% íntegro.
-        const broken = (items ?? []).filter((i) => {
+        const broken = (items ?? []).filter((i: Record<string, unknown>) => {
           const semPreco = !i.price_brl || Number(i.price_brl) < 5;
           const semRota =
-            !i.provider_service_id &&
-            !i.smmhype_service_id &&
-            !i.smmpanel_service_id &&
-            !i.verified_service_id;
+            !i.provider_service_id && !i.smmhype_service_id && !i.smmpanel_service_id && !i.verified_service_id &&
+            !i.smmhype_auto_id && !i.smmpanel_auto_id && !i.verified_auto_id;
           return semPreco || semRota;
         });
         const ok = total > 0 && broken.length === 0;
-        const amostra = broken.slice(0, 5).map((b) => b.pacote).join(", ");
+        const amostra = broken.slice(0, 5).map((b: Record<string, unknown>) => b.pacote).join(", ");
         checks.push({
           id: "pricing_items",
-          label: `Mapeamento pacote→rota de dispatch (${total} itens, ${broken.length} órfãos)`,
+          label: `Mapeamento pacote→rota (${total} itens, ${broken.length} órfãos)`,
           ok,
-          detail: ok
-            ? "íntegro — todo pacote tem ao menos 1 rota SMM ativa"
-            : `${broken.length} sem rota/preço: ${amostra}${broken.length > 5 ? "…" : ""}`,
+          detail: ok ? "todo pacote com rota + preço" : `${broken.length} sem rota/preço: ${amostra}${broken.length > 5 ? "…" : ""}`,
         });
         if (!ok) blockDeploy = true;
       }
 
-      // 2. Tesouraria
-      const { error: trErr } = await supabaseAdmin
-        .from("admin_treasury")
-        .select("id", { count: "exact", head: true });
-      checks.push({
-        id: "treasury",
-        label: "admin_treasury ledger",
-        ok: !trErr,
-        detail: trErr?.message ?? "ledger acessível",
-      });
-      if (trErr) blockDeploy = true;
-
-      // 3. Fornecedor ativo
+      // 2. Fornecedor ativo
       const { data: forn } = await supabaseAdmin
         .from("fornecedores")
-        .select("id, nome, ativo")
+        .select("nome, ativo")
         .eq("ativo", true);
       const fOk = (forn?.length ?? 0) >= 1;
       checks.push({
@@ -76,17 +55,108 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
       });
       if (!fOk) blockDeploy = true;
 
-      // 4. Cache de preço populado
-      const { count: cacheCount } = await supabaseAdmin
-        .from("pricing_cache")
-        .select("*", { count: "exact", head: true });
-      const cOk = (cacheCount ?? 0) > 0;
+      // 3. Alertas Jarvis abertos (últimas 6h) — SINTOMA REAL
+      const { data: alertas } = await supabaseAdmin
+        .from("jarvis_alerts")
+        .select("severidade, origem, mensagem, created_at")
+        .gte("created_at", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString())
+        .order("created_at", { ascending: false });
+      const errors = (alertas ?? []).filter((a) => a.severidade === "error" || a.severidade === "critical");
+      const warns = (alertas ?? []).filter((a) => a.severidade === "warning");
+      const alertOk = errors.length === 0;
       checks.push({
-        id: "pricing_cache",
-        label: `pricing_cache populado (${cacheCount ?? 0})`,
-        ok: cOk,
-        detail: cOk ? "ok" : "cache vazio — rode sync",
+        id: "jarvis_alerts",
+        label: `Alertas nas últimas 6h (${errors.length} erros, ${warns.length} avisos)`,
+        ok: alertOk,
+        detail: alertOk
+          ? warns.length > 0
+            ? `sem erros — último aviso: ${warns[0]?.mensagem?.slice(0, 60)}`
+            : "silêncio total, tudo saudável"
+          : `⚠️ ${errors[0]?.mensagem?.slice(0, 80)}`,
       });
+      if (!alertOk) blockDeploy = true;
+
+      // 4. Pedidos travados (paid há mais de 15min sem provider_order_id) — SINTOMA REAL
+      const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+      const { data: travados } = await supabaseAdmin
+        .from("pedidos")
+        .select("id, mercado_pago_id, created_at")
+        .eq("status", "paid")
+        .is("provider_order_id", null)
+        .lt("created_at", cutoff);
+      const travadosCount = travados?.length ?? 0;
+      const trOk = travadosCount === 0;
+      checks.push({
+        id: "pedidos_travados",
+        label: `Pedidos pagos sem despacho >15min (${travadosCount})`,
+        ok: trOk,
+        detail: trOk ? "todos os pagos foram despachados" : `🚨 ${travadosCount} travados — reconciliador não pegou`,
+      });
+      if (!trOk) blockDeploy = true;
+
+      // 5. Reconciliador rodando (audit log últimos 20min) — SINTOMA REAL
+      const runCutoff = new Date(Date.now() - 20 * 60 * 1000).toISOString();
+      const { count: recRuns } = await supabaseAdmin
+        .from("admin_audit_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("action", "pedido_reconciler_v179")
+        .gte("created_at", runCutoff);
+      const recOk = (recRuns ?? 0) >= 1;
+      checks.push({
+        id: "reconciler_alive",
+        label: `Reconciliador rodou nos últimos 20min (${recRuns ?? 0}x)`,
+        ok: recOk,
+        detail: recOk ? "cron ativo" : "🚨 cron parado — pedido travado não seria salvo",
+      });
+      if (!recOk) blockDeploy = true;
+
+      // 6. Smoke test rodando (últimos 30min)
+      const smokeCutoff = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { count: smokeRuns } = await supabaseAdmin
+        .from("admin_audit_logs")
+        .select("*", { count: "exact", head: true })
+        .eq("action", "smoke_test_v178")
+        .gte("created_at", smokeCutoff);
+      const smOk = (smokeRuns ?? 0) >= 1;
+      checks.push({
+        id: "smoke_alive",
+        label: `Smoke test rodou nos últimos 30min (${smokeRuns ?? 0}x)`,
+        ok: smOk,
+        detail: smOk ? "auditoria ativa" : "cron de auditoria parado",
+      });
+      if (!smOk) blockDeploy = true;
+
+      // 7. Webhook MP: quantas vezes o pooling teve que salvar nas últimas 24h
+      const dayCutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count: contingencias } = await supabaseAdmin
+        .from("jarvis_alerts")
+        .select("*", { count: "exact", head: true })
+        .eq("origem", "contingency-pooling")
+        .gte("created_at", dayCutoff);
+      const cn = contingencias ?? 0;
+      // >5 em 24h = webhook está falhando de verdade
+      const wOk = cn <= 5;
+      checks.push({
+        id: "webhook_mp",
+        label: `Webhook MP — pooling salvou ${cn}x em 24h`,
+        ok: wOk,
+        detail: wOk
+          ? cn === 0 ? "webhook 100%" : `${cn} salvamentos — dentro do aceitável`
+          : `🚨 ${cn} salvamentos — assinatura do webhook está falhando`,
+      });
+      if (!wOk) blockDeploy = true;
+
+      // 8. Tesouraria acessível
+      const { error: trErr } = await supabaseAdmin
+        .from("admin_treasury")
+        .select("id", { count: "exact", head: true });
+      checks.push({
+        id: "treasury",
+        label: "admin_treasury ledger",
+        ok: !trErr,
+        detail: trErr?.message ?? "ledger acessível",
+      });
+      if (trErr) blockDeploy = true;
     } catch (e) {
       checks.push({
         id: "fatal",
@@ -99,7 +169,7 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
 
     const passed = checks.filter((c) => c.ok).length;
     return {
-      version: "v48",
+      version: "v49",
       timestamp: new Date().toISOString(),
       passed,
       total: checks.length,
