@@ -74,13 +74,14 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
       .eq("id", p.id);
 
     try {
-      const r = await confirmAndDispatchIfPaid(p.id);
+      const { redispatchPaidOrphan } = await import("@/lib/payment-contingency.server");
+      const r = await redispatchPaidOrphan(p.id);
       if (r.ok) {
         report.redispatch_sucesso++;
-        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `OK_${r.fornecedor ?? "?"}` });
+        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `OK_${r.fornecedor}` });
       } else {
         report.redispatch_falha++;
-        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FALHA: ${(r as any).error ?? "unknown"}` });
+        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FALHA: ${r.error}` });
       }
     } catch (e) {
       report.redispatch_falha++;
