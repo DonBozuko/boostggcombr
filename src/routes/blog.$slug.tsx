@@ -294,6 +294,62 @@ const POSTS: Record<string, Post> = {
       </>
     ),
   },
+  "boostgg-nao-e-boost-de-jogos": {
+    title: "BoostGG Não é Boost de Jogos: Entenda a Diferença",
+    seoTitle: "BoostGG Não é Boost de Jogos: Entenda a Diferença",
+    description:
+      "BoostGG é serviço de crescimento em redes sociais, não Elo boosting ou subida de ranqueada em jogos. Entenda a diferença e por que a marca é de social media.",
+    subtitle:
+      "Redes sociais, não games: o que a BoostGG realmente entrega.",
+    datePublished: "2026-07-21",
+    body: (
+      <>
+        <p>
+          O nome <strong>BoostGG</strong> pode confundir quem está acostumado com o termo "boost" no mundo dos games. Mas a BoostGG <strong>não vende Elo boosting, subida de ranqueada, itens, skins, contas ou coaching de jogos</strong>. A gente vende crescimento em redes sociais: seguidores, curtidas, visualizações e inscritos para Instagram, TikTok, YouTube, Facebook e Telegram.
+        </p>
+
+        <h2>O que é Elo boosting?</h2>
+        <p>
+          Elo boosting é um serviço de jogos em que um jogador experiente acessa a conta de outro jogador para subir seu ranking (ou "Elo") em jogos competitivos como League of Legends, Valorant, Dota 2, CS2, etc. Esse tipo de serviço é contra os termos da maioria dos jogos e pode resultar em banimento da conta.
+        </p>
+
+        <h2>O que a BoostGG entrega?</h2>
+        <p>
+          A BoostGG é uma plataforma de marketing de influência e crescimento social. Nossos serviços incluem:
+        </p>
+        <ul>
+          <li>Seguidores brasileiros e reais para Instagram</li>
+          <li>Curtidas e visualizações em posts e Reels</li>
+          <li>Inscritos para canais no YouTube</li>
+          <li>Seguidores e visualizações no TikTok</li>
+          <li>Engajamento para Telegram e Facebook</li>
+        </ul>
+        <p>
+          Não pedimos senha de nenhuma rede social. Trabalhamos apenas com o link ou @ público do perfil. Pagamento é 100% via Pix, com entrega automática e garantia de reposição de 30 dias.
+        </p>
+
+        <h2>Por que a confusão acontece?</h2>
+        <p>
+          "Boost" é uma palavra comum em dois mercados diferentes: games e redes sociais. Em games, significa subir de nível. Em social media, significa impulsionar o alcance, o engajamento e a prova social de um perfil. A sigla "GG" (good game) reforça a associação com games, mas na BoostGG é apenas parte da marca — a sigla não indica serviço de jogos.
+        </p>
+
+        <h2>Como escolher o serviço certo?</h2>
+        <p>
+          Se você quer crescer no Instagram, TikTok ou YouTube, a BoostGG é o lugar certo. Se você quer subir de rank em algum jogo, precisa de um serviço especializado em Elo boosting — e deve saber que isso é arriscado e contra as regras das plataformas de games.
+        </p>
+
+        <h2>A empresa é de confiança?</h2>
+        <p>
+          Sim. A BoostGG opera sob a razão social <strong>Elite Boost Prime</strong>, CNPJ 47.363.210/0001-08. O site é boostgg.com.br e o atendimento é feito por chat e WhatsApp. Não há relação com qualquer serviço de jogos, sites de skin ou contas de ranqueada.
+        </p>
+
+        <h2>Conclusão</h2>
+        <p>
+          BoostGG é crescimento social, não boost de jogos. Se você procura Elo boosting, não encontrará aqui. Se você quer mais seguidores, curtidas e visualizações no Instagram, TikTok ou YouTube, com entrega via Pix e suporte real, a BoostGG foi feita para isso.
+        </p>
+      </>
+    ),
+  },
   "seguidores-instagram-baratos": {
     title: "Seguidores Instagram Baratos: Vale a Pena? O Que Observar",
     seoTitle: "Seguidores Instagram Baratos: Vale a Pena?",

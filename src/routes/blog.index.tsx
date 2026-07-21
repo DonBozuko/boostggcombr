@@ -25,6 +25,11 @@ const POSTS = [
     excerpt: "Por que pagar seguidores via Pix é mais rápido, rastreável e seguro que cartão ou boleto.",
   },
   {
+    slug: "boostgg-nao-e-boost-de-jogos",
+    title: "BoostGG Não é Boost de Jogos: Entenda a Diferença",
+    excerpt: "A BoostGG é crescimento social para Instagram, TikTok e YouTube. Não vendemos Elo boosting, ranqueada ou serviços de games.",
+  },
+  {
     slug: "comprar-seguidores-cai",
     title: "Comprar Seguidores no Instagram Cai? O Que Acontece Depois",
     excerpt: "Entenda retenção, reposição e os sinais de que seu serviço entregou seguidores reais — ou bots descartáveis.",
