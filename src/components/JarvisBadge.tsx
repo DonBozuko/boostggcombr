@@ -50,6 +50,11 @@ const ROTATING: Record<FabianoVariant, string[]> = {
     "Volumes de 5k+ visitas aceleram indexação no Google em até 60%.",
     "Cupom PRIME15 ativo — 15% off direto no Pix.",
   ],
+  kwai: [
+    "Kwai é o oceano azul do momento no Brasil: baixa concorrência e alcance orgânico gigante para quem se posiciona agora.",
+    "Combine seguidores + curtidas + views no Kwai — o algoritmo premia o combo com distribuição massiva.",
+    "Cupom PRIME15 ativo: 15% off no Pix. Aproveite antes que a janela feche.",
+  ],
 };
 
 const UPSELL_BY_VARIANT: Record<FabianoVariant, string> = {
