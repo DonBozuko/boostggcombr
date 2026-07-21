@@ -1,37 +1,37 @@
-// v200 — SEO landing: "comprar curtidas instagram" (9.900/mês, KDI 17 — ALVO PRINCIPAL)
+// v202 — SEO landing: "comprar curtidas instagram" (9.900/mês, KDI 17)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/comprar-curtidas-instagram";
+const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
 const TITLE = "Comprar Curtidas Instagram — Elite Boost Prime | BoostGG";
 const DESC =
-  "Compre curtidas para posts do Instagram a partir de R$ 2,90. Entrega em segundos, sem senha, com reposição garantida. Pague via Pix.";
+  "Compre curtidas para Instagram com entrega rápida, pagamento via Pix e reposição garantida. Aumente o alcance dos seus Reels e posts sem senha.";
 
 const FAQ = [
   {
-    q: "As curtidas entram em qual post?",
-    a: "Você cola o link exato do post (feed, Reels ou carrossel) que quer receber as curtidas. Só entram nesse post, não em outros.",
+    q: "Comprar curtidas no Instagram funciona?",
+    a: "Sim. As curtidas atuam como prova social: posts com mais reações são interpretados pelo algoritmo como conteúdo relevante e ganham mais distribuição no feed e no Reels.",
   },
   {
-    q: "Quanto tempo leva pra receber?",
-    a: "Curtidas entram em segundos após o Pix aprovado. Um pedido de 1.000 curtidas fica completo em 3-8 minutos, com velocidade natural.",
+    q: "Em quanto tempo as curtidas entram?",
+    a: "Após o Pix aprovado, as curtidas começam em 1 a 5 minutos. Posts e Reels recebem de forma gradual para manter a naturalidade.",
   },
   {
-    q: "Comprar curtidas pode banir minha conta?",
-    a: "Não. Não temos acesso ao seu perfil (não pedimos senha) e usamos entrega gradual. O Instagram não bane contas por receber curtidas — ele só bane quem envia spam.",
+    q: "Preciso passar a senha do Instagram?",
+    a: "Não. Nunca pedimos senha. Basta enviar o link do post ou Reel que você quer impulsionar.",
   },
   {
-    q: "As curtidas ficam permanentes?",
-    a: "Sim. Todo pacote acompanha reposição por 30 dias caso caia alguma curtida.",
+    q: "As curtidas são de perfis brasileiros?",
+    a: "Oferecemos mix internacional e brasileiro. Na hora da compra você escolhe a melhor opção para o seu objetivo e orçamento.",
   },
   {
-    q: "Posso comprar curtidas para Reels?",
-    a: "Pode. Curtidas em Reels contam do mesmo jeito e ajudam no ranking. Cole o link do Reels no campo do pedido.",
+    q: "Se cair curtida, tem reposição?",
+    a: "Sim. Garantia de reposição por 30 dias. Se houver queda, abra um ticket e recompomos sem custo adicional.",
   },
   {
-    q: "É melhor comprar curtidas ou seguidores?",
-    a: "Depende do objetivo. Curtidas mostram que o post é bom (empurra no algoritmo, aumenta alcance orgânico). Seguidores mostram autoridade da conta. O ideal é combinar: seguidores base + curtidas nos posts recentes.",
+    q: "Posso dividir as curtidas entre vários posts?",
+    a: "Cada pacote é vinculado a um link por vez. Para dividir, basta fazer pedidos menores separados — cada um com o link do post desejado.",
   },
 ];
 
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/comprar-curtidas-instagram")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Curtidas Instagram", url: URL }])],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://www.boostgg.com.br/" }, { name: "Curtidas Instagram", url: URL }])],
   }),
   component: Page,
 });
@@ -58,37 +58,37 @@ function Page() {
   return (
     <SeoLanding
       accent="#e1306c"
-      h1="Comprar Curtidas Instagram — Entrega em Segundos via Pix"
-      subtitle="Curtidas Instagram instantâneas"
-      intro="Boost de curtidas em qualquer post do Instagram (feed, Reels, carrossel). Pague com Pix, receba em segundos e ganhe alcance orgânico automático pelo algoritmo."
+      h1="Comprar Curtidas Instagram — Reais, Rápidas e com Pix"
+      subtitle="Curtidas para posts e Reels entregues em minutos"
+      intro="Dê aquele empurrão nos seus posts e Reels: pague com Pix, receba curtidas em minutos e aumente o alcance orgânico. Sem senha, sem risco, sem cadastro."
       ctaHref="/"
       ctaLabel="Comprar curtidas agora"
       benefits={[
-        { icon: "zap", title: "Segundos, não minutos", text: "Curtidas começam a cair em <60s após o Pix." },
-        { icon: "shield", title: "Sem senha", text: "Só precisamos do link do post. Sua conta segue segura." },
-        { icon: "check", title: "Empurra o algoritmo", text: "Curtidas altas nos primeiros minutos = mais alcance orgânico." },
-        { icon: "clock", title: "Reposição 30 dias", text: "Se cair, recolocamos sem cobrar de novo." },
+        { icon: "zap", title: "Entrega em minutos", text: "Primeiras curtidas em 1-5 min após Pix aprovado." },
+        { icon: "shield", title: "100% seguro", text: "Não pedimos senha. Só o link do post ou Reel público." },
+        { icon: "check", title: "Reposição garantida", text: "Qualquer queda dentro de 30 dias nós recolocamos." },
+        { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela de preços — curtidas Instagram"
       pricing={[
-        { qty: "100 curtidas", price: "R$ 2,90" },
+        { qty: "100 curtidas", price: "R$ 3,90" },
         { qty: "500 curtidas", price: "R$ 9,90", note: "Mais vendido" },
-        { qty: "1.000 curtidas", price: "R$ 17,90" },
-        { qty: "5.000 curtidas", price: "R$ 69,90" },
-        { qty: "10.000 curtidas", price: "R$ 129,90" },
+        { qty: "1.000 curtidas", price: "R$ 14,90" },
+        { qty: "5.000 curtidas", price: "R$ 49,90" },
+        { qty: "10.000 curtidas", price: "R$ 89,90" },
       ]}
       bodySections={[
         {
-          h2: "Por que curtidas no Instagram valem mais que parecem",
-          body: "O algoritmo do Instagram decide se vai mostrar seu post pra mais gente nos primeiros 30-60 minutos. Se nesse intervalo o post recebe muitas curtidas, ele viaja pra explore, sugestões, hashtags. Se recebe pouca, morre. Comprar curtidas nesse primeiro momento é literalmente comprar o gatilho de distribuição.",
+          h2: "Por que comprar curtidas Instagram faz diferença",
+          body: "O algoritmo do Instagram distribui conteúdo que já mostra engajamento. Post com zero curtida morre no feed; post com centenas de reações ganha velocidade e aparece para mais pessoas. Comprar curtidas é o gatilho inicial que quebra o ciclo: prova social atrai prova social. Não substitui boa criação, mas amplia quem chega até você.",
         },
         {
-          h2: "Como comprar curtidas Instagram na BoostGG",
-          body: "1. Escolha a quantidade (100 a 100.000).\n2. Cole o link do post que quer turbinar.\n3. Pague o Pix (QR Code ou copia e cola).\n4. Em segundos as curtidas começam a entrar.\n5. Se cair, reposição automática por 30 dias.",
+          h2: "Como funciona a compra na BoostGG",
+          body: "1. Escolha o pacote (100 a 10.000 curtidas).\n2. Cole o link do post ou Reel público.\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos as curtidas começam a entrar.\n5. Reposição automática por 30 dias se cair qualquer coisa.",
         },
         {
-          h2: "Curtidas em Reels vs. feed vs. carrossel",
-          body: "Todos funcionam. Curtidas em Reels ainda são o formato de maior peso no algoritmo (Reels é a prioridade da Meta). Se o objetivo é viralizar, invista em curtidas + views nos Reels. Se é prova social num post-vitrine (produto, portfólio), curtidas no feed já resolvem.",
+          h2: "Curtidas em posts ou Reels: qual escolher?",
+          body: "Curtidas em posts aumentam a autoridade do perfil e melhoram a impressão de quem visita seu feed. Curtidas em Reels são ideais para viralização: o algoritmo entende o sinal como sinal de qualidade e pode impulsionar sua distribuição no Explore. Ambos funcionam — escolha de acordo com o objetivo do momento.",
         },
       ]}
       faq={FAQ}
