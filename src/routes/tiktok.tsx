@@ -39,6 +39,7 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogTiktok from "@/assets/og-tiktok.jpg";
 import { BrandHeader } from "@/components/BrandHeader";
+import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/tiktok")({
@@ -145,6 +146,7 @@ function TiktokLanding() {
   const [categoria, setCategoria] = useState<Categoria>("seguidores");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
@@ -237,7 +239,7 @@ function TiktokLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@tiktok.eliteboostprime.com",
+          email: resolveCheckoutEmail(email, "tiktok"),
           rede_social: "tiktok",
           bump_upgrade: bumpUpgrade,
           ...getUtmParams(),
@@ -450,6 +452,22 @@ function TiktokLanding() {
                 className="h-12"
                 style={{ background: "#111", borderColor: `${CYAN}55`, color: "#fff" }}
                 maxLength={300}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tt-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Input
+                id="tt-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@email.com"
+                className="h-12"
+                style={{ background: "#111", borderColor: `${CYAN}55`, color: "#fff" }}
+                maxLength={200}
+                autoComplete="email"
+                inputMode="email"
               />
             </div>
 

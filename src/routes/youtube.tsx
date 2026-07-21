@@ -39,6 +39,7 @@ import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import ogYoutube from "@/assets/og-youtube.jpg";
 import { BrandHeader } from "@/components/BrandHeader";
+import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 
 export const Route = createFileRoute("/youtube")({
   head: () => {
@@ -196,7 +197,7 @@ function YoutubeLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: "cliente@youtube.eliteboostprime.com",
+          email: resolveCheckoutEmail(email, "youtube"),
           rede_social: "youtube",
           bump_upgrade: bumpUpgrade,
           ...getUtmParams(),
@@ -239,6 +240,10 @@ function YoutubeLanding() {
     const parsed = schema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) {
       toast.error(parsed.error.issues[0].message);
+      return;
+    }
+    if (!isValidEmailOrEmpty(email)) {
+      toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido.");
       return;
     }
     const upgrade = findUpgrade(selected, currentPlans);
@@ -390,6 +395,22 @@ function YoutubeLanding() {
                 className="h-12"
                 style={{ background: "#111", borderColor: `${RED}66`, color: "#fff" }}
                 maxLength={300}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="yt-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Input
+                id="yt-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="voce@email.com"
+                className="h-12"
+                style={{ background: "#111", borderColor: `${RED}66`, color: "#fff" }}
+                maxLength={200}
+                autoComplete="email"
+                inputMode="email"
               />
             </div>
 
