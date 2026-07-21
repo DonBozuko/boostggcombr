@@ -36,8 +36,9 @@ export function CatalogTelemetryPanel({ token }: { token: string }) {
                 <span className="text-cyan-200 font-bold">{p.nome}</span>
                 <span className={p.ativo ? "text-emerald-400" : "text-zinc-500"}>{p.ativo ? "ATIVO" : "OFF"}</span>
               </div>
-              <div className="flex justify-between text-zinc-300"><span>Saldo:</span><span className="text-emerald-300">R$ {p.saldo_brl.toFixed(2)}</span></div>
+              {/* v181 — saldo removido daqui: fonte única no NOC. Mantido só cotação (dado exclusivo). */}
               <div className="flex justify-between text-zinc-300"><span>Cotação USD:</span><span>R$ {p.cotacao_brl.toFixed(4)}</span></div>
+
               <div className="flex justify-between text-zinc-300"><span>Pacotes mapeados:</span><span className="text-cyan-300">{p.pacotes_mapeados}</span></div>
               {p.catalogo_indexado != null && (
                 <div className="flex justify-between text-zinc-300"><span>Catálogo indexado:</span><span className="text-cyan-300">{p.catalogo_indexado}</span></div>
