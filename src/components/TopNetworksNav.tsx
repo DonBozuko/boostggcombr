@@ -43,11 +43,18 @@ const IconWeb = () => (
     <path d="M2 12h20M4 6h16M4 18h16" stroke="#A855F7" strokeWidth="1.8" fill="none" />
   </svg>
 );
+const IconKW = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+    <circle cx="12" cy="12" r="11" fill="#FF6600" />
+    <path fill="#fff" d="M8 6.5v11l3-2.4v-2.6l4.5 5h3.5l-6-6.5L18.5 6.5H15L11 11V6.5z"/>
+  </svg>
+);
 
 const items: { to: Route; Icon: React.FC; label: string; full: string; color: string }[] = [
   { to: "/", Icon: IconIG, label: "IG", full: "Instagram", color: "#FF1F8F" },
   { to: "/tiktok", Icon: IconTT, label: "TT", full: "TikTok", color: "#00f2fe" },
   { to: "/youtube", Icon: IconYT, label: "YT", full: "YouTube", color: "#FF0000" },
+  { to: "/kwai", Icon: IconKW, label: "KW", full: "Kwai", color: "#FF6600" },
   { to: "/facebook", Icon: IconFB, label: "FB", full: "Facebook", color: "#1877F2" },
   { to: "/telegram", Icon: IconTG, label: "TG", full: "Telegram", color: "#37BBFE" },
   { to: "/trafego", Icon: IconWeb, label: "WEB", full: "Tráfego", color: "#A855F7" },
@@ -59,7 +66,7 @@ export function TopNetworksNav({ active }: { active: Route }) {
       aria-label="Trocar de rede social"
       className="mx-3 mt-1 mb-1 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md px-2 py-1"
     >
-      <ul className="grid grid-cols-6 items-center">
+      <ul className="grid grid-cols-7 items-center">
         {items.map(({ to, Icon, label, full, color }) => {
           const isActive = active === to;
           return (
