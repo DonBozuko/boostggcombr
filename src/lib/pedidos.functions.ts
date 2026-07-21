@@ -8,7 +8,7 @@ const pedidoSchema = z.object({
   valor: z.number().positive(),
   email: z.string().email().max(200),
   whatsapp_contato: z.string().min(5).max(50).optional(),
-  rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram"]).optional(),
+  rede_social: z.enum(["instagram", "tiktok", "youtube", "facebook", "trafego", "telegram", "kwai"]).optional(),
   utm_source: z.string().max(60).optional().nullable(),
   utm_medium: z.string().max(60).optional().nullable(),
   utm_campaign: z.string().max(60).optional().nullable(),
@@ -109,7 +109,8 @@ export const criarPedido = createServerFn({ method: "POST" })
     const isTiktok = !isTelegram && !isTrafego && pkg.startsWith("t");
     const isYoutube = pkg.startsWith("y");
     const isFacebook = pkg.startsWith("f");
-    const isInstagram = !isTelegram && !isTrafego && !isTiktok && !isYoutube && !isFacebook;
+    const isKwai = pkg.startsWith("k");
+    const isInstagram = !isTelegram && !isTrafego && !isTiktok && !isYoutube && !isFacebook && !isKwai;
     const rede =
       data.rede_social ??
       (isTelegram ? "telegram"
@@ -117,6 +118,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         : isFacebook ? "facebook"
         : isYoutube ? "youtube"
         : isTiktok ? "tiktok"
+        : isKwai ? "kwai"
         : "instagram");
     const categoria =
       isTelegram ? "membros"
@@ -127,6 +129,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         ? (pkg.startsWith("yv") ? "visualizacoes" : "inscritos")
         : isTiktok
         ? (pkg.startsWith("tl") ? "curtidas" : pkg.startsWith("tv") ? "visualizacoes" : "seguidores")
+        : isKwai
+        ? (pkg.startsWith("kl") ? "curtidas" : pkg.startsWith("kv") ? "visualizacoes" : "seguidores")
         : (pkg.startsWith("l") ? "curtidas" : pkg.startsWith("v") ? "visualizacoes" : "seguidores");
 
     // Universal Single Source of Truth: pricing-engine para TODAS as 6 redes.

@@ -19,6 +19,9 @@ const VALID: PricingCategory[] = [
   "telegram:grupo",
   "trafego:br",
   "trafego:global",
+  "kwai:seguidores",
+  "kwai:curtidas",
+  "kwai:visualizacoes",
 ];
 
 export const getPricingGrid = createServerFn({ method: "GET" })

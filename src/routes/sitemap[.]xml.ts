@@ -55,6 +55,8 @@ const buildSitemapXml = () => {
     { path: "/impulsionar-instagram", changefreq: "weekly", priority: "0.8" },
     { path: "/turbinar-tiktok", changefreq: "weekly", priority: "0.8" },
     { path: "/views-tiktok", changefreq: "weekly", priority: "0.8" },
+    { path: "/kwai", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-seguidores-kwai", changefreq: "weekly", priority: "0.9" },
     { path: "/termos", changefreq: "yearly", priority: "0.3" },
     { path: "/reembolso", changefreq: "yearly", priority: "0.3" },
   ];

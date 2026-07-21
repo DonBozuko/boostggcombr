@@ -44,6 +44,13 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Tráfego pago dispara flag no AdSense?", a: "Não injetamos cliques em anúncios. O tráfego navega o site normalmente. Não recomendamos combinar com AdSense se seu objetivo é monetizar via ads." },
     { q: "Em quanto tempo entrega 10.000 visitas?", a: "Direto: 24-48h. Orgânico: 5-10 dias. A distribuição é escalonada para não gerar picos suspeitos no seu servidor ou analytics." },
   ],
+  kwai: [
+    { q: "Comprar seguidores no Kwai é seguro?", a: "Sim. Não pedimos senha e usamos apenas o @ ou link do perfil. Entregamos com perfis brasileiros reais para prova social sem risco de banimento." },
+    { q: "Em quanto tempo os seguidores caem no meu Kwai?", a: "A entrega inicia em 5-30 minutos após o Pix confirmado. Distribuímos gradualmente (300-1000/dia) pra parecer crescimento orgânico e evitar drop." },
+    { q: "Views do Kwai contam pra Kwai Rewards / monetização?", a: "Contam pra contagem pública do vídeo. A monetização Kwai Rewards depende de tempo de retenção e origem — combine com conteúdo bom pra maximizar." },
+    { q: "Consigo comprar curtidas pra um vídeo específico?", a: "Sim. No checkout, cole o link do vídeo Kwai (kwai.com/@user/vídeo). As curtidas caem só naquele post, sem espalhar." },
+    { q: "Seguidores caem depois?", a: "Reposição garantida por 30 dias em qualquer queda acima de 5%. Basta abrir chamado no WhatsApp/Jivo com o link do perfil." },
+  ],
 };
 
 export function FaqSection({ network }: { network: keyof typeof FAQS }) {

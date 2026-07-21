@@ -22,6 +22,10 @@ const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
 // Telegram (SMMhype) — homologados
 const TG_CHANNEL_SERVICE_ID = 19106; // Membros para Canal
 const TG_GROUP_SERVICE_ID = 19107;   // Membros para Grupo
+// Kwai (SMMhype) — v210
+const KW_FOLLOWERS_SERVICE_ID = 8330; // Seguidores BR (refill 30d)
+const KW_LIKES_SERVICE_ID = 8331;     // Curtidas BR (refill 30d)
+const KW_VIEWS_SERVICE_ID = 2758;     // Views HQ
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
@@ -42,6 +46,10 @@ export function resolveServiceId(pacote: string, quantidade: number): number | n
   if (p.startsWith("tf")) return TT_FOLLOWERS_SERVICE_ID;
   if (p.startsWith("tl")) return TT_LIKES_SERVICE_ID;
   if (p.startsWith("tv")) return TT_VIEWS_SERVICE_ID;
+  // Kwai prefixes: kf* / kl* / kv*
+  if (p.startsWith("kf")) return KW_FOLLOWERS_SERVICE_ID;
+  if (p.startsWith("kl")) return KW_LIKES_SERVICE_ID;
+  if (p.startsWith("kv")) return KW_VIEWS_SERVICE_ID;
   if (p.startsWith("v")) return VIEWS_SERVICE_ID;
   if (p.startsWith("l")) return LIKES_SERVICE_ID;
   if (quantidade >= 100 && quantidade <= 2000) return 14325;
@@ -67,6 +75,9 @@ export function packageToNetworkType(pacote: string): { network: string; type: s
   if (p.startsWith("fl")) return { network: "facebook", type: "likes" + suffix };
   if (p.startsWith("wbr")) return { network: "trafego", type: "br" };
   if (p.startsWith("wgl")) return { network: "trafego", type: "global" };
+  if (p.startsWith("kf")) return { network: "kwai", type: "followers" };
+  if (p.startsWith("kl")) return { network: "kwai", type: "likes" };
+  if (p.startsWith("kv")) return { network: "kwai", type: "views" };
   if (p.startsWith("v"))  return { network: "instagram", type: "views" + suffix };
   if (p.startsWith("l"))  return { network: "instagram", type: "likes" + suffix };
   if (p.startsWith("p"))  return { network: "instagram", type: "followers" + suffix };

@@ -18,7 +18,10 @@ export type Category =
   | "telegram:canal"
   | "telegram:grupo"
   | "trafego:br"
-  | "trafego:global";
+  | "trafego:global"
+  | "kwai:seguidores"
+  | "kwai:curtidas"
+  | "kwai:visualizacoes";
 
 const SEGUIDORES_QTYS = [
   100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000,
@@ -59,6 +62,10 @@ const TG_CANAL_QTYS = [100,250,500,1000,2000,3000,5000,10000,25000,50000];
 const TG_GRUPO_QTYS = [100,250,500,1000,2000,3000,5000,10000,25000,50000];
 const TRAF_BR_QTYS  = [1000,2500,5000,10000,25000,50000,75000,100000,200000,500000];
 const TRAF_GL_QTYS  = [1000,2500,5000,10000,25000,50000,75000,100000,200000,500000];
+// v210 — Kwai (SMMhype). Foco em BR: seguidores/curtidas/views.
+const KW_SEG_QTYS   = [100,250,500,1000,2000,3000,5000,10000,20000,50000,100000];
+const KW_LIKE_QTYS  = [100,500,1000,2500,5000,10000,25000,50000,100000];
+const KW_VIEW_QTYS  = [1000,5000,10000,25000,50000,100000,250000,500000,1000000];
 
 const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
   "instagram:seguidores":    IG_SEG_QTYS.map((q) => pid("p", q)),
@@ -75,6 +82,9 @@ const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
   "telegram:grupo":          TG_GRUPO_QTYS.map((q) => pid("tgg", q)),
   "trafego:br":              TRAF_BR_QTYS.map((q) => pid("wbr", q)),
   "trafego:global":          TRAF_GL_QTYS.map((q) => pid("wgl", q)),
+  "kwai:seguidores":         KW_SEG_QTYS.map((q) => pid("kf", q)),
+  "kwai:curtidas":           KW_LIKE_QTYS.map((q) => pid("kl", q)),
+  "kwai:visualizacoes":      KW_VIEW_QTYS.map((q) => pid("kv", q)),
 };
 
 // v126 — total canônico local (fallback quando pricing_items retorna vazio)
@@ -98,6 +108,9 @@ const PROBE: Record<Category, { pacote: string; qty: number }> = {
   "telegram:grupo":          { pacote: "tgg1k", qty: 1000 },
   "trafego:br":              { pacote: "wbr1k", qty: 1000 },
   "trafego:global":          { pacote: "wgl1k", qty: 1000 },
+  "kwai:seguidores":         { pacote: "kf1k", qty: 1000 },
+  "kwai:curtidas":           { pacote: "kl1k", qty: 1000 },
+  "kwai:visualizacoes":      { pacote: "kv1k", qty: 1000 },
 };
 
 // Hardcoded Financial Fallback Core v50-Patch — custos BRL/1000 salvos no código.
@@ -117,6 +130,9 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
   "telegram:grupo":          18.0,
   "trafego:br":               4.0,
   "trafego:global":           2.0,
+  "kwai:seguidores":          5.5,
+  "kwai:curtidas":            3.0,
+  "kwai:visualizacoes":       2.7,
 };
 
 const USD_TO_BRL = 7.0;
@@ -676,6 +692,9 @@ export function categoryFromPacote(pacote: string): Category | null {
   if (p.startsWith("tf"))  return "tiktok:seguidores";
   if (p.startsWith("tl"))  return "tiktok:curtidas";
   if (p.startsWith("tv"))  return "tiktok:visualizacoes";
+  if (p.startsWith("kf"))  return "kwai:seguidores";
+  if (p.startsWith("kl"))  return "kwai:curtidas";
+  if (p.startsWith("kv"))  return "kwai:visualizacoes";
   if (p.startsWith("l"))   return "instagram:curtidas";
   if (p.startsWith("v"))   return "instagram:visualizacoes";
   if (p.startsWith("p"))   return "instagram:seguidores";

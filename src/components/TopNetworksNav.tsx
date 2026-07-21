@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-type Route = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
+type Route = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego" | "/kwai";
 
 const IconIG = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
