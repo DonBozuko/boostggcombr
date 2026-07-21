@@ -140,6 +140,7 @@ function YoutubeLanding() {
   const [categoria, setCategoria] = useState<Categoria>("inscritos");
   const [planId, setPlanId] = useState<string>("");
   const [profile, setProfile] = useState("");
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [pedidoInfo, setPedidoInfo] = useState<PedidoInfo | null>(null);
