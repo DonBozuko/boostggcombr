@@ -52,6 +52,7 @@ import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from '
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -313,6 +314,11 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminScriptsRoute = AdminScriptsRouteImport.update({
+  id: '/scripts',
+  path: '/scripts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -559,6 +565,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -641,6 +648,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -724,6 +732,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -808,6 +817,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
+    | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
     | '/email/unsubscribe'
@@ -890,6 +900,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
+    | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
     | '/email/unsubscribe'
@@ -972,6 +983,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
+    | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
     | '/email/unsubscribe'
@@ -1402,6 +1414,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/scripts': {
+      id: '/admin/scripts'
+      path: '/scripts'
+      fullPath: '/admin/scripts'
+      preLoaderRoute: typeof AdminScriptsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/catalog': {
       id: '/admin/catalog'
       path: '/catalog'
@@ -1666,10 +1685,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminScriptsRoute: typeof AdminScriptsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
+  AdminScriptsRoute: AdminScriptsRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
