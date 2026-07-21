@@ -194,6 +194,7 @@ export async function autoResolveAll(): Promise<AutoResolveResult[]> {
   ];
 
   const results: AutoResolveResult[] = [];
+  const failuresToAlert: Array<{ pacote: string; provider: Provider; count: number }> = [];
 
   for (const { p, cache, manualCol, autoCol } of providers) {
     const updates: Array<{ pacote: string; auto_id: string | null }> = [];
@@ -205,7 +206,6 @@ export async function autoResolveAll(): Promise<AutoResolveResult[]> {
       const chosen = pickBest(cache, it);
       if (!chosen) {
         noMatch.push(it.pacote);
-        // limpa auto antigo se não achou mais nada
         if (it[autoCol]) updates.push({ pacote: it.pacote, auto_id: null });
         continue;
       }
@@ -214,12 +214,54 @@ export async function autoResolveAll(): Promise<AutoResolveResult[]> {
       }
     }
 
-    // Executa updates em batch.
     for (const u of updates) {
       await supabaseAdmin
         .from("pricing_items" as any)
         .update({ [autoCol]: u.auto_id, auto_resolved_at: new Date().toISOString() } as any)
         .eq("pacote", u.pacote);
+    }
+
+    // Sucesso: limpa registro de falha para pacotes que resolveram.
+    const succeeded = (items as PricingItem[])
+      .filter((it) => !it[manualCol] && !noMatch.includes(it.pacote))
+      .map((it) => it.pacote);
+    if (succeeded.length > 0) {
+      await supabaseAdmin
+        .from("auto_resolver_failures" as any)
+        .delete()
+        .eq("provider", p)
+        .in("pacote", succeeded);
+    }
+
+    // Falha: incrementa contador.
+    for (const pacote of noMatch) {
+      const { data: existing } = await supabaseAdmin
+        .from("auto_resolver_failures" as any)
+        .select("fail_count, last_alerted_at")
+        .eq("pacote", pacote)
+        .eq("provider", p)
+        .maybeSingle();
+      const prev = (existing as any) ?? { fail_count: 0, last_alerted_at: null };
+      const newCount = (prev.fail_count ?? 0) + 1;
+      const nowIso = new Date().toISOString();
+      await supabaseAdmin.from("auto_resolver_failures" as any).upsert({
+        pacote,
+        provider: p,
+        fail_count: newCount,
+        last_failed_at: nowIso,
+        first_failed_at: prev.fail_count ? undefined : nowIso,
+      } as any, { onConflict: "pacote,provider" } as any);
+
+      const alertedRecently = prev.last_alerted_at &&
+        (Date.now() - new Date(prev.last_alerted_at).getTime()) < 24 * 60 * 60 * 1000;
+      if (newCount >= 3 && !alertedRecently) {
+        failuresToAlert.push({ pacote, provider: p, count: newCount });
+        await supabaseAdmin
+          .from("auto_resolver_failures" as any)
+          .update({ last_alerted_at: nowIso } as any)
+          .eq("pacote", pacote)
+          .eq("provider", p);
+      }
     }
 
     results.push({
@@ -228,6 +270,25 @@ export async function autoResolveAll(): Promise<AutoResolveResult[]> {
       skipped_no_match: noMatch,
       skipped_already_manual: alreadyManual,
     });
+  }
+
+  // Dispara UM alerta agregado por rodada.
+  if (failuresToAlert.length > 0) {
+    try {
+      const { dispatchTelegramAlert } = await import("./messaging");
+      const linhas = failuresToAlert
+        .slice(0, 15)
+        .map((f) => `• ${f.pacote} (${f.provider}) — ${f.count}x seguidas`)
+        .join("\n");
+      const extra = failuresToAlert.length > 15 ? `\n…e mais ${failuresToAlert.length - 15}` : "";
+      const msg =
+        `⚠️ PACOTE SEM FORNECEDOR AUTOMÁTICO\n\n` +
+        `PROBLEMA: o robô tentou 3+ vezes e não achou serviço equivalente para:\n${linhas}${extra}\n\n` +
+        `O QUE FAZER: abrir Admin → Expansão do Catálogo e vincular o ID manualmente, ou revisar filtros de categoria.`;
+      await dispatchTelegramAlert(msg);
+    } catch (e) {
+      console.error("[auto-resolver] falha ao enviar alerta Telegram", e);
+    }
   }
 
   return results;
