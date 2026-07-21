@@ -21,7 +21,8 @@ export const Route = createFileRoute("/api/public/hooks/waiting-watcher")({
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
         const secret = process.env.ADMIN_TOKEN;
-        if (!secret || token !== secret) return new Response("Unauthorized", { status: 401 });
+        const cronSecret = process.env.CRON_ADMIN_TOKEN;
+        if ((!secret && !cronSecret) || (token !== secret && token !== cronSecret)) return new Response("Unauthorized", { status: 401 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");

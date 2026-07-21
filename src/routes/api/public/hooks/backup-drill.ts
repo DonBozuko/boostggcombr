@@ -24,7 +24,7 @@ export const Route = createFileRoute('/api/public/hooks/backup-drill')({
           request.headers.get('x-admin-token') ??
           request.headers.get('authorization')?.replace(/^Bearer\s+/i, '') ??
           '';
-        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+        if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
           return new Response(JSON.stringify({ error: 'unauthorized' }), {
             status: 401,
             headers: { 'Content-Type': 'application/json' },

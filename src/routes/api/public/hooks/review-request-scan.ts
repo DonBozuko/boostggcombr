@@ -8,7 +8,7 @@ export const Route = createFileRoute('/api/public/hooks/review-request-scan')({
     handlers: {
       POST: async ({ request }) => {
         const adminToken = request.headers.get('x-admin-token')
-        if (!adminToken || adminToken !== process.env.ADMIN_TOKEN) {
+        if (!adminToken || (adminToken !== process.env.ADMIN_TOKEN && adminToken !== process.env.CRON_ADMIN_TOKEN)) {
           return new Response(JSON.stringify({ error: 'unauthorized' }), {
             status: 401,
             headers: { 'Content-Type': 'application/json' },
