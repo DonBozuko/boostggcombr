@@ -33,7 +33,10 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
       .gte("data_hora", since)
       .order("data_hora", { ascending: true });
 
-    const saldoBrl = fornecedor.saldo_atual != null ? fornecedor.saldo_atual * cotacao : null;
+    // v184 — fix: `fornecedores.saldo_atual` já é BRL; `monitoramento_saldo.saldo` é USD.
+    // Antes multiplicava BRL × cotação → mostrava R$ 880 quando o real era R$ 172,59.
+    const saldoBrl = fornecedor.saldo_atual != null ? Number(fornecedor.saldo_atual) : null;
+    const saldoUsd = saldoBrl != null && cotacao > 0 ? Number((saldoBrl / cotacao).toFixed(2)) : null;
 
     return {
       ok: true as const,
@@ -41,7 +44,7 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
         id: fornecedor.id,
         nome: fornecedor.nome,
         status: fornecedor.status,
-        saldo_usd: fornecedor.saldo_atual,
+        saldo_usd: saldoUsd,
         saldo_brl: saldoBrl,
         nivel_alerta: classifyBalance(saldoBrl),
         ultima_verificacao: fornecedor.ultima_verificacao,
@@ -52,7 +55,7 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
       historico: (historico ?? []).map((h) => ({
         t: h.data_hora,
         saldo_usd: h.saldo,
-        saldo_brl: h.saldo != null ? h.saldo * cotacao : null,
+        saldo_brl: h.saldo != null ? Number(h.saldo) * cotacao : null,
         status: h.status,
       })),
     };
