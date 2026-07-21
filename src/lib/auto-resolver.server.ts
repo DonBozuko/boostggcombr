@@ -114,8 +114,9 @@ function scoreCandidate(row: CacheRow, opts: { qty: number; wantBr: boolean; wan
   // Quantidade cabe?
   if (!(row.min <= opts.qty && opts.qty <= row.max)) return null;
 
-  // Refill obrigatório quando pedido.
-  if (opts.wantRefill && row.refill === false) return null;
+  // v187 — refill é PREFERÊNCIA, não filtro. Rejeitar por refill=false deixava Kwai
+  // 100% órfão no Verified (todos os serviços Kwai lá são sem-refill). Melhor ter
+  // fallback sem-refill do que pedido travado quando primário cai.
 
   // BR: se pacote é BR, o serviço PRECISA ter hint BR e não pode ter hint estrangeiro.
   // Se pacote NÃO é BR, prefere sem hint estrangeiro (mas aceita).
@@ -131,9 +132,11 @@ function scoreCandidate(row: CacheRow, opts: { qty: number; wantBr: boolean; wan
     }
   }
 
-  // Score = rate (menor = melhor). Refill dá pequeno bônus.
+  // Score = rate (menor = melhor). Refill dá bônus; sem-refill leva penalidade leve
+  // pra ficar atrás de opções com refill, mas ainda elegível como fallback.
   let score = row.rate;
-  if (row.refill) score *= 0.98;
+  if (row.refill === true) score *= 0.98;
+  else if (row.refill === false && opts.wantRefill) score *= 1.5;
   return score;
 }
 
