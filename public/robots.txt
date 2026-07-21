@@ -7,7 +7,7 @@ Disallow: /diagnostico
 Disallow: /login
 Disallow: /status
 Disallow: /dashboard
-Disallow: /~flock.js
+Disallow: /~beat.js
 Disallow: /mcp
 Disallow: /obrigado
 
