@@ -15,6 +15,7 @@ const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
   facebook:  "Senhor, o Facebook ainda domina a confiança de compra. Reforçando seguidores e curtidas para blindar a autoridade da página imediatamente.",
   telegram:  "Diretor, o Telegram é o canal de conversão mais alto do mercado. Inflando membros reais para destravar prova social e vendas no grupo.",
   trafego:   "Senhor, tráfego web qualificado em rota. Visitantes reais direcionados ao funil para multiplicar conversão e ranqueamento orgânico.",
+  kwai:      "Diretor Fabiano, o Kwai está em expansão acelerada no Brasil. Ativei o pacote de aceleração para escalar seguidores, curtidas e visualizações reais com entrega imediata. Senhor!",
 };
 
 // Rotação dinâmica de mensagens persuasivas legítimas por rede.
@@ -49,6 +50,11 @@ const ROTATING: Record<FabianoVariant, string[]> = {
     "Volumes de 5k+ visitas aceleram indexação no Google em até 60%.",
     "Cupom PRIME15 ativo — 15% off direto no Pix.",
   ],
+  kwai: [
+    "Kwai é o oceano azul do momento no Brasil: baixa concorrência e alcance orgânico gigante para quem se posiciona agora.",
+    "Combine seguidores + curtidas + views no Kwai — o algoritmo premia o combo com distribuição massiva.",
+    "Cupom PRIME15 ativo: 15% off no Pix. Aproveite antes que a janela feche.",
+  ],
 };
 
 const UPSELL_BY_VARIANT: Record<FabianoVariant, string> = {
@@ -58,6 +64,7 @@ const UPSELL_BY_VARIANT: Record<FabianoVariant, string> = {
   facebook:  "⚡ Seguidores blindados por curtidas geram autoridade real. Adicione no mesmo Pix e economize.",
   telegram:  "⚡ Membros + reações = grupo ativo aos olhos do Telegram. Combo blinda contra purgas.",
   trafego:   "⚡ Tráfego puro converte pouco sem retargeting. Posso somar visitas globais para reforçar a base.",
+  kwai:      "⚡ Diretor: no Kwai o combo seguidores+curtidas+views multiplica o alcance por 3. Adicione no mesmo Pix e economize.",
 };
 
 const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
@@ -67,6 +74,7 @@ const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
   facebook:  "/api/public/sfx/jarvis-facebook.mp3?v=34",
   telegram:  "/api/public/sfx/jarvis-telegram.mp3?v=34",
   trafego:   "/api/public/sfx/jarvis-trafego.mp3?v=34",
+  kwai:      "/api/public/sfx/jarvis-kwai.mp3?v=1",
 };
 
 
@@ -127,6 +135,15 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
     accent: "text-green-400",
     glow: "drop-shadow-[0_0_8px_rgba(34,255,122,1)]",
     bubble: "bg-green-950/30 border-green-400/40",
+  },
+  kwai: {
+    filter: "hue-rotate(20deg) saturate(1.4) brightness(1.05)",
+    arc: "#fb923c",
+    ring: "0 0 32px rgba(251,146,60,0.9), 0 0 14px rgba(255,215,0,0.5)",
+    border: "border-orange-400/90",
+    accent: "text-orange-400",
+    glow: "drop-shadow-[0_0_8px_rgba(251,146,60,1)]",
+    bubble: "bg-orange-950/30 border-orange-400/40",
   },
 };
 
