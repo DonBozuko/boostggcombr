@@ -86,10 +86,10 @@ export function ClaudeCodeInspector() {
                   <span className="ml-1 text-[10px] text-cyan-300/80">(Contingência de Configuração Local Ativa)</span>
                 )}
               </div>
-              <div>Mapeamento Triplo Real: <span className="text-emerald-300">{data.catalog.withTriple}</span></div>
-              <div>IDs SMMhype: {data.catalog.withSmmhype}</div>
-              <div>IDs SMMPainel: {data.catalog.withSmmpanel}</div>
-              <div>IDs Verified: {data.catalog.withVerified}</div>
+              <div>Mapeamento Triplo Real: <span className="text-emerald-300">{data.catalog.withTriple}</span> <span className="text-[10px] text-cyan-300/70">(manual + auto-resolver)</span></div>
+              <div>IDs SMMhype: {data.catalog.withSmmhype}{(data.catalog as any).autoOnly?.smmhype ? <span className="text-emerald-300/70 text-[10px]"> ({(data.catalog as any).autoOnly.smmhype} via auto)</span> : null}</div>
+              <div>IDs SMMPainel: {data.catalog.withSmmpanel}{(data.catalog as any).autoOnly?.smmpanel ? <span className="text-emerald-300/70 text-[10px]"> ({(data.catalog as any).autoOnly.smmpanel} via auto)</span> : null}</div>
+              <div>IDs Verified: {data.catalog.withVerified}{(data.catalog as any).autoOnly?.verified ? <span className="text-emerald-300/70 text-[10px]"> ({(data.catalog as any).autoOnly.verified} via auto)</span> : null}</div>
             </div>
 
 
