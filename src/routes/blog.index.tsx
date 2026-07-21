@@ -41,22 +41,33 @@ const POSTS = [
   },
 ];
 
+const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+
 export const Route = createFileRoute("/blog/")({
-  head: () => ({
-    meta: [
-      { title: "Blog BoostGG — Crescimento no Instagram" },
-      {
-        name: "description",
-        content:
-          "Guias práticos sobre crescer no Instagram, comprar seguidores com segurança e escolher os melhores serviços em 2026.",
-      },
-      { property: "og:title", content: "Blog BoostGG" },
-      { property: "og:description", content: "Guias práticos sobre crescimento no Instagram." },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${BASE}/blog` },
-    ],
-    links: [{ rel: "canonical", href: `${BASE}/blog` }],
-  }),
+  head: () => {
+    const title = "Blog BoostGG — Crescimento no Instagram";
+    const description = "Guias práticos sobre crescer no Instagram, comprar seguidores com segurança e escolher os melhores serviços em 2026.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: `${BASE}/blog` },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:alt", content: title },
+        { property: "og:site_name", content: "BoostGG" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: `${BASE}/blog` }],
+    };
+  },
   component: BlogIndex,
 });
 

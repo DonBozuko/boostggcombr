@@ -1,19 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RefreshCw, Clock, ShieldCheck, XCircle, Wallet, TrendingUp } from "lucide-react";
 
+const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+
 export const Route = createFileRoute("/reembolso")({
-  head: () => ({
-    meta: [
-      { title: "Reembolso e Reposição — BoostGG" },
-      {
-        name: "description",
-        content:
-          "Política de reembolso e reposição da BoostGG: quando pedir, prazos, cobertura de queda natural e como solicitar.",
-      },
-      { property: "og:url", content: "https://boostgg.com.br/reembolso" },
-    ],
-    links: [{ rel: "canonical", href: "https://boostgg.com.br/reembolso" }],
-  }),
+  head: () => {
+    const title = "Reembolso e Reposição — BoostGG";
+    const description = "Política de reembolso e reposição da BoostGG: quando pedir, prazos, cobertura de queda natural e como solicitar.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: "https://boostgg.com.br/reembolso" },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:alt", content: title },
+        { property: "og:site_name", content: "BoostGG" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: "https://boostgg.com.br/reembolso" }],
+    };
+  },
   component: ReembolsoPage,
 });
 

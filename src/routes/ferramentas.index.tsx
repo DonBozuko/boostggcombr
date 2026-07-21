@@ -28,18 +28,26 @@ const TOOLS = [
   },
 ];
 
+const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+
 export const Route = createFileRoute("/ferramentas/")({
   head: () => ({
     meta: [
       { title: TITLE },
       { name: "description", content: DESC },
+      { name: "robots", content: "index, follow" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANON },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:alt", content: TITLE },
+      { property: "og:site_name", content: "BoostGG" },
+      { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESC },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [{ rel: "canonical", href: CANON }],
     scripts: [
