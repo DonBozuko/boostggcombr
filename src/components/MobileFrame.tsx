@@ -265,7 +265,7 @@ export function MobileFrame({
 
         <div className="shrink-0">
           <TrustBadges accent={data.accent} />
-          <ReviewsCarousel accent={data.accent} />
+          <ReviewsCarousel accent={data.accent} route={route} />
           <BenefitsGrid route={route} accent={data.accent} />
           <footer
             className="mt-0.5 mb-1 px-3 text-center select-none"
