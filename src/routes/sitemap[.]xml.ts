@@ -57,6 +57,11 @@ const buildSitemapXml = () => {
     { path: "/views-tiktok", changefreq: "weekly", priority: "0.8" },
     { path: "/kwai", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-kwai", changefreq: "weekly", priority: "0.9" },
+    { path: "/avaliacoes", changefreq: "weekly", priority: "0.7" },
+    { path: "/diagnostico", changefreq: "weekly", priority: "0.7" },
+    { path: "/mcp", changefreq: "monthly", priority: "0.5" },
+    { path: "/login", changefreq: "yearly", priority: "0.3" },
+    { path: "/admin", changefreq: "yearly", priority: "0.3" },
     { path: "/termos", changefreq: "yearly", priority: "0.3" },
     { path: "/reembolso", changefreq: "yearly", priority: "0.3" },
   ];
