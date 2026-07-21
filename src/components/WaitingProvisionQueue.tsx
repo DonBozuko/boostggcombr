@@ -30,6 +30,7 @@ export function WaitingProvisionQueue({ token }: { token: string }) {
   const [flash, setFlash] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    if (!token) { setLoading(false); return; } // v186 — sem token = sessão ainda hidratando; evita 401 UNAUTHORIZED espúrio
     setLoading(true); setError(null);
     try {
       const res = await fetch("/api/public/queue/waiting", { headers: { "x-admin-token": token } });
