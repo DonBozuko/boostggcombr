@@ -57,7 +57,7 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, category, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, source, synced_at")
+      .select("pacote, category, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, source, synced_at")
       .order("category", { ascending: true })
       .order("quantidade", { ascending: true });
     if (error) return { ok: false, error: error.message };
