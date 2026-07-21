@@ -26,6 +26,9 @@ export type PricingCatalogRow = {
   smmhype_service_id: string | null;
   smmpanel_service_id: string | null;
   verified_service_id: string | null;
+  smmhype_auto_id: string | null;
+  smmpanel_auto_id: string | null;
+  verified_auto_id: string | null;
   source: string;
   synced_at: string;
 };
