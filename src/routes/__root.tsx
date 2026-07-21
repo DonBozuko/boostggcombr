@@ -100,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Cinzel:wght@500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" },
     ],
     scripts: [
-      { src: "/~flock.js", async: true, defer: true },
+      { src: "/~beat.js", async: true, defer: true },
       { src: "https://www.googletagmanager.com/gtag/js?id=G-TKGLV8VB6W", async: true },
       {
         children: `window.dataLayer = window.dataLayer || [];
