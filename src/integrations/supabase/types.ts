@@ -570,13 +570,18 @@ export type Database = {
           created_at: string
           cupom: string | null
           custo_real: number | null
+          dispatched_at: string | null
           email_contato: string | null
           error_detail: string | null
           id: string
           instagram_user: string
+          last_reconciled_at: string | null
           mercado_pago_id: string | null
           pacote: string
+          provider_order_id: string | null
+          provider_slug: string | null
           quantidade: number
+          reconcile_attempts: number
           rede_social: string
           review_email_sent_at: string | null
           sla_deadline: string | null
@@ -596,13 +601,18 @@ export type Database = {
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
+          dispatched_at?: string | null
           email_contato?: string | null
           error_detail?: string | null
           id?: string
           instagram_user: string
+          last_reconciled_at?: string | null
           mercado_pago_id?: string | null
           pacote: string
+          provider_order_id?: string | null
+          provider_slug?: string | null
           quantidade: number
+          reconcile_attempts?: number
           rede_social?: string
           review_email_sent_at?: string | null
           sla_deadline?: string | null
@@ -622,13 +632,18 @@ export type Database = {
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
+          dispatched_at?: string | null
           email_contato?: string | null
           error_detail?: string | null
           id?: string
           instagram_user?: string
+          last_reconciled_at?: string | null
           mercado_pago_id?: string | null
           pacote?: string
+          provider_order_id?: string | null
+          provider_slug?: string | null
           quantidade?: number
+          reconcile_attempts?: number
           rede_social?: string
           review_email_sent_at?: string | null
           sla_deadline?: string | null
