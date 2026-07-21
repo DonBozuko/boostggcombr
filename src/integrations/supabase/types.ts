@@ -139,6 +139,33 @@ export type Database = {
         }
         Relationships: []
       }
+      auto_resolver_failures: {
+        Row: {
+          fail_count: number
+          first_failed_at: string
+          last_alerted_at: string | null
+          last_failed_at: string
+          pacote: string
+          provider: string
+        }
+        Insert: {
+          fail_count?: number
+          first_failed_at?: string
+          last_alerted_at?: string | null
+          last_failed_at?: string
+          pacote: string
+          provider: string
+        }
+        Update: {
+          fail_count?: number
+          first_failed_at?: string
+          last_alerted_at?: string | null
+          last_failed_at?: string
+          pacote?: string
+          provider?: string
+        }
+        Relationships: []
+      }
       bank_accounts: {
         Row: {
           created_at: string
