@@ -31,7 +31,7 @@ export function JarvisDetectorMentiras() {
         <div>
           <h3 className="text-sm font-bold text-red-400 tracking-wider flex items-center gap-2">
             <ShieldAlert className="h-4 w-4" />
-            JARVIS DETECTOR DE MENTIRAS v48
+            JARVIS DETECTOR DE MENTIRAS v49
           </h3>
           <p className="text-xs text-white/60">
             Audita o que foi prometido vs o que está realmente em produção.
