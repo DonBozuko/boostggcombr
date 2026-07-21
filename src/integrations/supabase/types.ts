@@ -749,42 +749,54 @@ export type Database = {
       }
       pricing_items: {
         Row: {
+          auto_resolved_at: string | null
           category: string
           cost_brl: number
           pacote: string
           price_brl: number
           provider_service_id: number | null
           quantidade: number
+          smmhype_auto_id: string | null
           smmhype_service_id: string | null
+          smmpanel_auto_id: string | null
           smmpanel_service_id: string | null
           source: string
           synced_at: string
+          verified_auto_id: string | null
           verified_service_id: string | null
         }
         Insert: {
+          auto_resolved_at?: string | null
           category: string
           cost_brl?: number
           pacote: string
           price_brl?: number
           provider_service_id?: number | null
           quantidade: number
+          smmhype_auto_id?: string | null
           smmhype_service_id?: string | null
+          smmpanel_auto_id?: string | null
           smmpanel_service_id?: string | null
           source?: string
           synced_at?: string
+          verified_auto_id?: string | null
           verified_service_id?: string | null
         }
         Update: {
+          auto_resolved_at?: string | null
           category?: string
           cost_brl?: number
           pacote?: string
           price_brl?: number
           provider_service_id?: number | null
           quantidade?: number
+          smmhype_auto_id?: string | null
           smmhype_service_id?: string | null
+          smmpanel_auto_id?: string | null
           smmpanel_service_id?: string | null
           source?: string
           synced_at?: string
+          verified_auto_id?: string | null
           verified_service_id?: string | null
         }
         Relationships: []

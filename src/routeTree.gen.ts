@@ -90,6 +90,7 @@ import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
+import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './routes/api/public/hooks/auto-resolve-service-ids'
 import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
 
@@ -526,6 +527,12 @@ const ApiPublicHooksBackfillSmmhypeIdsRoute =
     path: '/api/public/hooks/backfill-smmhype-ids',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksAutoResolveServiceIdsRoute =
+  ApiPublicHooksAutoResolveServiceIdsRouteImport.update({
+    id: '/api/public/hooks/auto-resolve-service-ids',
+    path: '/api/public/hooks/auto-resolve-service-ids',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksAutoHealerRoute =
   ApiPublicHooksAutoHealerRouteImport.update({
     id: '/api/public/hooks/auto-healer',
@@ -603,6 +610,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
+  '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
@@ -688,6 +696,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
+  '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
@@ -774,6 +783,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
+  '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
@@ -861,6 +871,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
+    | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
@@ -946,6 +957,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
+    | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
@@ -1031,6 +1043,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
+    | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
@@ -1115,6 +1128,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
+  ApiPublicHooksAutoResolveServiceIdsRoute: typeof ApiPublicHooksAutoResolveServiceIdsRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
@@ -1706,6 +1720,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/auto-resolve-service-ids': {
+      id: '/api/public/hooks/auto-resolve-service-ids'
+      path: '/api/public/hooks/auto-resolve-service-ids'
+      fullPath: '/api/public/hooks/auto-resolve-service-ids'
+      preLoaderRoute: typeof ApiPublicHooksAutoResolveServiceIdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/auto-healer': {
       id: '/api/public/hooks/auto-healer'
       path: '/api/public/hooks/auto-healer'
@@ -1800,6 +1821,8 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
+  ApiPublicHooksAutoResolveServiceIdsRoute:
+    ApiPublicHooksAutoResolveServiceIdsRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
