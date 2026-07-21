@@ -15,6 +15,7 @@ const SPEECH_BY_VARIANT: Record<FabianoVariant, string> = {
   facebook:  "Senhor, o Facebook ainda domina a confiança de compra. Reforçando seguidores e curtidas para blindar a autoridade da página imediatamente.",
   telegram:  "Diretor, o Telegram é o canal de conversão mais alto do mercado. Inflando membros reais para destravar prova social e vendas no grupo.",
   trafego:   "Senhor, tráfego web qualificado em rota. Visitantes reais direcionados ao funil para multiplicar conversão e ranqueamento orgânico.",
+  kwai:      "Diretor Fabiano, o Kwai está em expansão acelerada no Brasil. Ativei o pacote de aceleração para escalar seguidores, curtidas e visualizações reais com entrega imediata. Senhor!",
 };
 
 // Rotação dinâmica de mensagens persuasivas legítimas por rede.
