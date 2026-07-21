@@ -213,8 +213,13 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
           status: "paid",
           error_detail: `Contingência OK · ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
-        })
-        .eq("id", pedido.id);
+          provider_slug: f.slug,
+          provider_order_id: r.orderId != null ? String(r.orderId) : null,
+          dispatched_at: new Date().toISOString(),
+          last_reconciled_at: new Date().toISOString(),
+        } as any)
+        .eq("id", pedido.id)
+        .is("provider_order_id", null);
 
       // v174 — ledger + treasury: fecha o buraco de auditoria do path legado
       try {
