@@ -8,11 +8,27 @@ import { runAutoResolveIds } from "@/lib/auto-resolver.functions";
 
 export function CatalogTelemetryPanel({ token }: { token: string }) {
   const fn = useServerFn(getCatalogTelemetry);
+  const resolveFn = useServerFn(runAutoResolveIds);
   const [rows, setRows] = useState<ProviderTelemetry[] | null>(null);
   const [ts, setTs] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [resolving, setResolving] = useState(false);
+  const [resolveMsg, setResolveMsg] = useState<string | null>(null);
+
+  const runResolve = async () => {
+    setResolving(true); setResolveMsg(null);
+    try {
+      const r: any = await resolveFn({ data: { token } });
+      const total = (r ?? []).reduce((a: number, x: any) => a + (x.filled ?? 0), 0);
+      const per = (r ?? []).map((x: any) => `${x.provider}:${x.filled}`).join(" · ");
+      setResolveMsg(`✅ ${total} IDs preenchidos (${per})`);
+      load();
+    } catch (e: any) { setResolveMsg(`⚠ ${e?.message ?? String(e)}`); }
+    finally { setResolving(false); }
+  };
 
   const load = () => {
+
     fn({ data: { token } })
       .then((r: any) => {
         if (r?.ok) { setRows(r.providers); setTs(r.generated_at); setErr(null); }
