@@ -3,15 +3,24 @@ import { createHmac, timingSafeEqual } from "crypto";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
 
-// v189 — Valida HMAC do Mercado Pago antes de processar qualquer payload.
-function verifyMpSignature(rawBody: string, signatureHeader: string | null, secret: string): boolean {
-  if (!signatureHeader) return false;
-  const tsMatch = signatureHeader.match(/ts=(\d+)/);
-  const v1Match = signatureHeader.match(/v1=([a-f0-9]+)/);
+// v190 — Valida HMAC do Mercado Pago conforme manifesto oficial:
+//   id:<data.id>;request-id:<x-request-id>;ts:<ts>;
+// Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
+function verifyMpSignature(params: {
+  signatureHeader: string | null;
+  requestIdHeader: string | null;
+  dataId: string | null;
+  secret: string;
+}): boolean {
+  const { signatureHeader, requestIdHeader, dataId, secret } = params;
+  if (!signatureHeader || !dataId) return false;
+  const tsMatch = signatureHeader.match(/ts=([^,]+)/);
+  const v1Match = signatureHeader.match(/v1=([a-f0-9]+)/i);
   if (!tsMatch || !v1Match) return false;
-  const ts = tsMatch[1];
-  const expected = createHmac("sha256", secret).update(`ts:${ts}.${rawBody}`).digest("hex");
-  const provided = v1Match[1];
+  const ts = tsMatch[1].trim();
+  const provided = v1Match[1].trim().toLowerCase();
+  const manifest = `id:${dataId};request-id:${requestIdHeader ?? ""};ts:${ts};`;
+  const expected = createHmac("sha256", secret).update(manifest).digest("hex");
   if (expected.length !== provided.length) return false;
   try {
     return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(provided, "hex"));
@@ -72,15 +81,28 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           console.warn("[mp-webhook] body read falhou; respondendo 200 mesmo assim", err);
         }
 
-        // v189 — Rejeita webhooks sem assinatura válida do Mercado Pago.
+        // v190 — Rejeita webhooks sem assinatura válida do Mercado Pago.
         const mpWebhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
         if (!mpWebhookSecret) {
           console.error("[mp-webhook] MERCADO_PAGO_WEBHOOK_SECRET não configurado");
           return new Response("Webhook secret not configured", { status: 500, headers: { "cache-control": "no-store" } });
         }
         const signatureHeader = request.headers.get("x-signature");
-        if (!verifyMpSignature(rawBody, signatureHeader, mpWebhookSecret)) {
-          console.warn("[mp-webhook] assinatura inválida", { signatureHeader: signatureHeader ? "presente" : "ausente", bodyLen: rawBody.length });
+        const requestIdHeader = request.headers.get("x-request-id");
+        // Extrai data.id (query tem prioridade — é o valor que o MP usa no manifesto)
+        let sigDataId: string | null = null;
+        try {
+          const u = new URL(request.url);
+          sigDataId = u.searchParams.get("data.id") ?? u.searchParams.get("id");
+        } catch { /* noop */ }
+        if (!sigDataId && rawBody) {
+          try {
+            const parsed = JSON.parse(rawBody) as { data?: { id?: string | number } };
+            if (parsed?.data?.id != null) sigDataId = String(parsed.data.id);
+          } catch { /* noop */ }
+        }
+        if (!verifyMpSignature({ signatureHeader, requestIdHeader, dataId: sigDataId, secret: mpWebhookSecret })) {
+          console.warn("[mp-webhook] assinatura inválida", { hasSig: !!signatureHeader, hasReqId: !!requestIdHeader, hasDataId: !!sigDataId, bodyLen: rawBody.length });
           return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
