@@ -227,7 +227,7 @@ export function TreasuryPanel({ token }: { token: string }) {
       {wallets && wallets.ok && (
         <div className="mt-3 border-t border-cyan-400/20 pt-2">
           <div className="flex items-center justify-between mb-1">
-            <h4 className="text-[10px] uppercase tracking-[0.18em] text-cyan-300/90">🏦 Banco Interno Virtual</h4>
+            <h4 className="text-[10px] uppercase tracking-[0.18em] text-cyan-300/90">🏦 Contabilidade Interna (saldos de fornecedor: ver NOC)</h4>
             <span className="text-[9px] text-amber-200/80">Fila Aguardando Processamento Financeiro: <strong className="text-amber-100">{wallets.queueCount}</strong></span>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
