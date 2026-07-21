@@ -102,10 +102,13 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   // 2) Todo pacote tem pelo menos 1 ID válido?
   const { data: items } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id");
 
   for (const it of (items as any[]) ?? []) {
-    const hasId = it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id;
+    // v180 — auto_id (auto-resolver v171) é caminho válido de dispatch, conta como ID.
+    const hasId =
+      it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id ||
+      it.smmhype_auto_id || it.smmpanel_auto_id || it.verified_auto_id;
     if (!hasId) report.packages_without_valid_id.push(it.pacote);
 
     const cost = Number(it.cost_brl) || 0;
