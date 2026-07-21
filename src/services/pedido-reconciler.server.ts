@@ -48,7 +48,6 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
 
   report.orfaos_encontrados = (orfaos ?? []).length;
 
-  const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
   const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
 
   for (const p of (orfaos as any[]) ?? []) {
