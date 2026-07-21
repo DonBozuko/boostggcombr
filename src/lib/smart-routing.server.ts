@@ -98,7 +98,7 @@ export async function rankProvidersByCost(opts: {
 
   const serviceId = await resolveServiceIdAsync(opts.pacote, opts.quantidade);
 
-  const [{ data: forn }, { data: svc }, { data: health }, pricingItem] = await Promise.all([
+  const [{ data: forn }, { data: svc }, { data: health }, pricingItem, { data: autoIds }] = await Promise.all([
     supabaseAdmin
       .from("fornecedores")
       .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade")
@@ -108,12 +108,14 @@ export async function rankProvidersByCost(opts: {
       : Promise.resolve({ data: null } as any),
     supabaseAdmin.from("provider_health" as any).select("slug, unstable_until"),
     getPricingRow(opts.pacote),
+    supabaseAdmin.from("pricing_items" as any).select("smmhype_auto_id, smmpanel_auto_id, verified_auto_id").eq("pacote", opts.pacote).maybeSingle(),
   ]);
 
+  // Failover triplo: ID manual (curado) tem prioridade, cai no auto-resolvido.
   const providerIdMap: Record<string, string | null> = {
-    smmhype: (pricingItem as any)?.smmhype_service_id ?? (serviceId != null ? String(serviceId) : null),
-    smmpainel: (pricingItem as any)?.smmpanel_service_id ?? null,
-    verified: (pricingItem as any)?.verified_service_id ?? null,
+    smmhype: (pricingItem as any)?.smmhype_service_id ?? (autoIds as any)?.smmhype_auto_id ?? (serviceId != null ? String(serviceId) : null),
+    smmpainel: (pricingItem as any)?.smmpanel_service_id ?? (autoIds as any)?.smmpanel_auto_id ?? null,
+    verified: (pricingItem as any)?.verified_service_id ?? (autoIds as any)?.verified_auto_id ?? null,
   };
 
   const smmhypeRate = Number((svc as any)?.rate);
