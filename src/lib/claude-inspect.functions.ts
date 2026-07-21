@@ -21,13 +21,22 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
     // Panel 2 — pricing_items canonical count + triple-ID coverage
     const { data: rows, count } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, quantidade, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id", { count: "exact" });
+      .select("pacote, quantidade, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id", { count: "exact" });
     const items = (rows as any[]) ?? [];
     let total = count ?? items.length;
-    let withSmmhype = items.filter((r) => !!r.smmhype_service_id).length;
-    const withSmmpanel = items.filter((r) => !!r.smmpanel_service_id).length;
-    const withVerified = items.filter((r) => !!r.verified_service_id).length;
-    const withTriple = items.filter((r) => !!r.smmhype_service_id && !!r.smmpanel_service_id && !!r.verified_service_id).length;
+    // v190 — Conta manual OR auto (auto-resolver preenche fallback em runtime).
+    const hasHype = (r: any) => !!r.smmhype_service_id || !!r.smmhype_auto_id;
+    const hasPanel = (r: any) => !!r.smmpanel_service_id || !!r.smmpanel_auto_id;
+    const hasVerified = (r: any) => !!r.verified_service_id || !!r.verified_auto_id;
+    let withSmmhype = items.filter(hasHype).length;
+    const withSmmpanel = items.filter(hasPanel).length;
+    const withVerified = items.filter(hasVerified).length;
+    const withTriple = items.filter((r) => hasHype(r) && hasPanel(r) && hasVerified(r)).length;
+    const autoOnly = {
+      smmhype: items.filter((r) => !r.smmhype_service_id && !!r.smmhype_auto_id).length,
+      smmpanel: items.filter((r) => !r.smmpanel_service_id && !!r.smmpanel_auto_id).length,
+      verified: items.filter((r) => !r.verified_service_id && !!r.verified_auto_id).length,
+    };
 
     // v126 — Fallback local: se pricing_items retornou vazio, monta o contador
     // canônico a partir do CANONICAL_QTYS local (pricing.config in-code).
@@ -88,6 +97,7 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
         withSmmpanel,
         withVerified,
         withTriple,
+        autoOnly,
         fallbackApplied,
       },
       providers,

@@ -268,9 +268,9 @@ export function PricingCatalogEditor({ token }: { token: string }) {
                       {live.toFixed(2)}
                       {drift && <span className="ml-1 text-[9px] text-amber-400/80">↺</span>}
                     </td>
-                    <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
-                    <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
-                    <td className="px-2 py-1 font-mono">{r.verified_service_id ?? <span className="text-yellow-400">⚠️ Cadastrar ID</span>}</td>
+                    <td className="px-2 py-1 font-mono">{r.smmhype_service_id ?? (r.smmhype_auto_id ? <span className="text-emerald-300/90" title="Preenchido pelo Auto-resolver">Auto: {r.smmhype_auto_id}</span> : <span className="text-yellow-400">⚠️ Cadastrar ID</span>)}</td>
+                    <td className="px-2 py-1 font-mono">{r.smmpanel_service_id ?? (r.smmpanel_auto_id ? <span className="text-emerald-300/90" title="Preenchido pelo Auto-resolver">Auto: {r.smmpanel_auto_id}</span> : <span className="text-yellow-400">⚠️ Cadastrar ID</span>)}</td>
+                    <td className="px-2 py-1 font-mono">{r.verified_service_id ?? (r.verified_auto_id ? <span className="text-emerald-300/90" title="Preenchido pelo Auto-resolver">Auto: {r.verified_auto_id}</span> : <span className="text-yellow-400">⚠️ Cadastrar ID</span>)}</td>
                     <td className="px-2 py-1 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                       <button onClick={() => edit(r)} className="text-amber-300 hover:underline mr-2">editar</button>
                       <button onClick={() => remove(r.pacote)} className="text-red-400 hover:underline">excluir</button>
