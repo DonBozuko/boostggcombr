@@ -1,7 +1,10 @@
 // v162 — Painel read-only de telemetria dos 3 catálogos.
+// v183 — botão Auto-resolver v171 para preencher IDs faltantes por match fuzzy.
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getCatalogTelemetry, type ProviderTelemetry } from "@/lib/catalog-telemetry.functions";
+import { runAutoResolveIds } from "@/lib/auto-resolver.functions";
+
 
 export function CatalogTelemetryPanel({ token }: { token: string }) {
   const fn = useServerFn(getCatalogTelemetry);
