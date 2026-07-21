@@ -41,10 +41,22 @@ export function CatalogTelemetryPanel({ token }: { token: string }) {
 
   return (
     <div className="rounded-2xl border-2 border-cyan-500/60 bg-gradient-to-br from-black via-cyan-950/20 to-black p-4 shadow-[0_0_30px_rgba(0,200,255,0.25)] space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="font-mono text-sm text-cyan-300">📡 TELEMETRIA DE CATÁLOGOS (READ-ONLY)</h3>
-        <button onClick={load} className="text-xs text-cyan-400 hover:text-cyan-200 font-mono">↻ atualizar</button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={runResolve}
+            disabled={resolving}
+            className="text-xs px-2 py-1 rounded border border-emerald-500/50 text-emerald-200 hover:bg-emerald-500/10 font-mono disabled:opacity-50"
+            title="Preenche automaticamente IDs faltantes (SMMPanel/Verified/SMMhype) por match fuzzy de nome+categoria+quantidade"
+          >
+            {resolving ? "🔎 resolvendo…" : "🧠 Auto-resolver IDs faltantes"}
+          </button>
+          <button onClick={load} className="text-xs text-cyan-400 hover:text-cyan-200 font-mono">↻ atualizar</button>
+        </div>
       </div>
+      {resolveMsg && <div className="text-xs font-mono text-emerald-300">{resolveMsg}</div>}
+
       {err && <div className="text-xs text-red-300 font-mono">⚠ {err}</div>}
       {!rows && !err && <div className="text-xs text-cyan-200/70 font-mono">carregando…</div>}
       {rows && (
