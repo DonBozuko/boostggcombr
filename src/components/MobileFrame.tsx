@@ -19,7 +19,7 @@ import fbRight from "@/assets/char-fb-right.png";
 import tgLeft from "@/assets/char-tg-left.png";
 import tgRight from "@/assets/char-tg-right.png";
 
-type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
+type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego" | "/kwai";
 
 const characters: Partial<Record<RouteKey, { left: string; right: string; leftCta: string; rightCta: string }>> = {
   "/": { left: igLeft, right: igRight, leftCta: "Marcas reconhecem autoridade.", rightCta: "Glamour que converte parcerias." },
@@ -93,6 +93,16 @@ const billboards: Record<
     tag: "TRÁFEGO",
     brand: "TRÁFEGO WEB",
     dominio: "Domine o Tráfego Web",
+  },
+  "/kwai": {
+    gradient:
+      "radial-gradient(circle at 30% 30%, rgba(255,102,0,0.4), transparent 60%), radial-gradient(circle at 70% 70%, rgba(255,179,0,0.25), transparent 60%), #0a0a0a",
+    accent: "#FF6600",
+    title: "Kwai brasileiro em explosão",
+    sub: "Seguidores BR · Kwai Rewards · Viralização real",
+    tag: "KWAI",
+    brand: "KWAI",
+    dominio: "Domine o Kwai",
   },
 };
 
