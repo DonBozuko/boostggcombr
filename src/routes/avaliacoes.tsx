@@ -1,19 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star, MessageSquare, ExternalLink, ShieldCheck, TrendingUp } from "lucide-react";
 
+const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+
 export const Route = createFileRoute("/avaliacoes")({
-  head: () => ({
-    meta: [
-      { title: "Avalie a BoostGG — Sua opinião fortalece a marca" },
-      {
-        name: "description",
-        content:
-          "Veja onde deixar sua avaliação sobre a BoostGG. Sua experiência ajuda outras pessoas a confiarem no serviço.",
-      },
-      { property: "og:url", content: "https://boostgg.com.br/avaliacoes" },
-    ],
-    links: [{ rel: "canonical", href: "https://boostgg.com.br/avaliacoes" }],
-  }),
+  head: () => {
+    const title = "Avalie a BoostGG — Sua opinião fortalece a marca";
+    const description = "Veja onde deixar sua avaliação sobre a BoostGG. Sua experiência ajuda outras pessoas a confiarem no serviço.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: "https://boostgg.com.br/avaliacoes" },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:alt", content: title },
+        { property: "og:site_name", content: "BoostGG" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: "https://boostgg.com.br/avaliacoes" }],
+    };
+  },
   component: AvaliacoesPage,
 });
 

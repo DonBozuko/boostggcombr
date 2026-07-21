@@ -1,19 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileText, ShieldCheck, CreditCard, AlertTriangle, Scale, TrendingUp } from "lucide-react";
 
+const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+
 export const Route = createFileRoute("/termos")({
-  head: () => ({
-    meta: [
-      { title: "Termos de Uso — BoostGG" },
-      {
-        name: "description",
-        content:
-          "Termos de uso da BoostGG: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.",
-      },
-      { property: "og:url", content: "https://boostgg.com.br/termos" },
-    ],
-    links: [{ rel: "canonical", href: "https://boostgg.com.br/termos" }],
-  }),
+  head: () => {
+    const title = "Termos de Uso — BoostGG";
+    const description = "Termos de uso da BoostGG: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: "https://boostgg.com.br/termos" },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:alt", content: title },
+        { property: "og:site_name", content: "BoostGG" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: "https://boostgg.com.br/termos" }],
+    };
+  },
   component: TermosPage,
 });
 

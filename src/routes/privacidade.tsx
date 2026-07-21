@@ -2,19 +2,33 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Lock, Database, Mail, TrendingUp } from "lucide-react";
 import { useState } from "react";
 
+const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+
 export const Route = createFileRoute("/privacidade")({
-  head: () => ({
-    meta: [
-      { title: "Privacidade e Segurança — BoostGG" },
-      {
-        name: "description",
-        content:
-          "Como a BoostGG coleta, usa e protege seus dados. Página mantida pela BoostGG para esclarecer dúvidas sobre privacidade e segurança.",
-      },
-      { property: "og:url", content: "https://boostgg.com.br/privacidade" },
-    ],
-    links: [{ rel: "canonical", href: "https://boostgg.com.br/privacidade" }],
-  }),
+  head: () => {
+    const title = "Privacidade e Segurança — BoostGG";
+    const description = "Como a BoostGG coleta, usa e protege seus dados. Página mantida pela BoostGG para esclarecer dúvidas sobre privacidade e segurança.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow" },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: "https://boostgg.com.br/privacidade" },
+        { property: "og:type", content: "website" },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:alt", content: title },
+        { property: "og:site_name", content: "BoostGG" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: OG_IMAGE },
+      ],
+      links: [{ rel: "canonical", href: "https://boostgg.com.br/privacidade" }],
+    };
+  },
   component: TrustPage,
 });
 
