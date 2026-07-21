@@ -136,6 +136,15 @@ const SKINS: Record<FabianoVariant, { filter: string; arc: string; ring: string;
     glow: "drop-shadow-[0_0_8px_rgba(34,255,122,1)]",
     bubble: "bg-green-950/30 border-green-400/40",
   },
+  kwai: {
+    filter: "hue-rotate(20deg) saturate(1.4) brightness(1.05)",
+    arc: "#fb923c",
+    ring: "0 0 32px rgba(251,146,60,0.9), 0 0 14px rgba(255,215,0,0.5)",
+    border: "border-orange-400/90",
+    accent: "text-orange-400",
+    glow: "drop-shadow-[0_0_8px_rgba(251,146,60,1)]",
+    bubble: "bg-orange-950/30 border-orange-400/40",
+  },
 };
 
 export function JarvisBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
