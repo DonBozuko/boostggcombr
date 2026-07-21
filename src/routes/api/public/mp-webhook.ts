@@ -81,15 +81,28 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           console.warn("[mp-webhook] body read falhou; respondendo 200 mesmo assim", err);
         }
 
-        // v189 — Rejeita webhooks sem assinatura válida do Mercado Pago.
+        // v190 — Rejeita webhooks sem assinatura válida do Mercado Pago.
         const mpWebhookSecret = process.env.MERCADO_PAGO_WEBHOOK_SECRET;
         if (!mpWebhookSecret) {
           console.error("[mp-webhook] MERCADO_PAGO_WEBHOOK_SECRET não configurado");
           return new Response("Webhook secret not configured", { status: 500, headers: { "cache-control": "no-store" } });
         }
         const signatureHeader = request.headers.get("x-signature");
-        if (!verifyMpSignature(rawBody, signatureHeader, mpWebhookSecret)) {
-          console.warn("[mp-webhook] assinatura inválida", { signatureHeader: signatureHeader ? "presente" : "ausente", bodyLen: rawBody.length });
+        const requestIdHeader = request.headers.get("x-request-id");
+        // Extrai data.id (query tem prioridade — é o valor que o MP usa no manifesto)
+        let sigDataId: string | null = null;
+        try {
+          const u = new URL(request.url);
+          sigDataId = u.searchParams.get("data.id") ?? u.searchParams.get("id");
+        } catch { /* noop */ }
+        if (!sigDataId && rawBody) {
+          try {
+            const parsed = JSON.parse(rawBody) as { data?: { id?: string | number } };
+            if (parsed?.data?.id != null) sigDataId = String(parsed.data.id);
+          } catch { /* noop */ }
+        }
+        if (!verifyMpSignature({ signatureHeader, requestIdHeader, dataId: sigDataId, secret: mpWebhookSecret })) {
+          console.warn("[mp-webhook] assinatura inválida", { hasSig: !!signatureHeader, hasReqId: !!requestIdHeader, hasDataId: !!sigDataId, bodyLen: rawBody.length });
           return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
