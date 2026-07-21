@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Server-Side CAPI: recebe eventos do beacon mascarado /~flock.js
+// Server-Side CAPI: recebe eventos do beacon interno /~beat.js
 // e encaminha (server-to-server) para Meta CAPI / GA4 quando configurado.
 // Sem credenciais → grava no Supabase para auditoria, sem quebrar.
 
