@@ -2,14 +2,14 @@ import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import fabiano from "@/assets/fabiano.png.asset.json";
 
-export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego";
+export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego" | "kwai";
 
 const DEFAULT_BOT_USERNAME = "boostgramseguidores_bot";
 const BOT_USERNAME =
   (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string | undefined)?.trim() || DEFAULT_BOT_USERNAME;
 
 const START_PARAM: Record<FabianoVariant, string> = {
-  instagram: "ig", tiktok: "tk", youtube: "yt", facebook: "fb", telegram: "tg", trafego: "tf",
+  instagram: "ig", tiktok: "tk", youtube: "yt", facebook: "fb", telegram: "tg", trafego: "tf", kwai: "kw",
 };
 
 function buildLinks(variant: FabianoVariant) {
