@@ -64,6 +64,7 @@ const UPSELL_BY_VARIANT: Record<FabianoVariant, string> = {
   facebook:  "⚡ Seguidores blindados por curtidas geram autoridade real. Adicione no mesmo Pix e economize.",
   telegram:  "⚡ Membros + reações = grupo ativo aos olhos do Telegram. Combo blinda contra purgas.",
   trafego:   "⚡ Tráfego puro converte pouco sem retargeting. Posso somar visitas globais para reforçar a base.",
+  kwai:      "⚡ Diretor: no Kwai o combo seguidores+curtidas+views multiplica o alcance por 3. Adicione no mesmo Pix e economize.",
 };
 
 const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
