@@ -1,0 +1,1 @@
+DELETE FROM admin_audit_logs WHERE action = 'SIMULATE_UNSTABLE';
