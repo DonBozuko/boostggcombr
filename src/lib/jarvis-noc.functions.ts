@@ -45,10 +45,18 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     const pagos = (pedidos24 ?? []).filter((p: any) => ["paid","pago","completed"].includes(p.status)).length;
     const pendentes = (pedidos24 ?? []).filter((p: any) => ["pending","pendente"].includes(p.status)).length;
 
+    // v191 — Health probe: qualquer resposta HTTP < 500 conta como "API viva"
+    // (raiz de smmhype.com / api.mercadopago.com devolve 404/405 e não é falha).
+    // Falha real = timeout, DNS, 5xx, ou latência > 3s.
     const probeLatency = async (name: string, url: string) => {
       const t0 = Date.now();
-      try { const r = await fetch(url, { method: "GET" }); return { name, ms: Date.now() - t0, ok: r.ok }; }
-      catch { return { name, ms: Date.now() - t0, ok: false }; }
+      try {
+        const r = await fetch(url, { method: "GET", signal: AbortSignal.timeout(3000) });
+        const ms = Date.now() - t0;
+        return { name, ms, ok: r.status < 500 && ms < 3000 };
+      } catch {
+        return { name, ms: Date.now() - t0, ok: false };
+      }
     };
     const apiLatency = await Promise.all([
       probeLatency("SMMhype", "https://smmhype.com/"),
