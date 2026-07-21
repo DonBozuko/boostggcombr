@@ -46,6 +46,7 @@ export function WaitingProvisionQueue({ token }: { token: string }) {
   useAdminRealtime(["pedidos"], load);
 
   const confirm = async (pedido_id: string) => {
+    if (!token) { setFlash("❌ Sessão expirada — refaça login"); return; }
     setBusyId(pedido_id); setFlash(null);
     try {
       const res = await fetch("/api/public/queue/confirm", {
