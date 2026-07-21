@@ -1,4 +1,4 @@
-type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego";
+type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego" | "/kwai";
 
 const NETWORK_BENEFIT: Record<RouteKey, string> = {
   "/": "Seguidores Brasileiros e Curtidas",
@@ -7,6 +7,7 @@ const NETWORK_BENEFIT: Record<RouteKey, string> = {
   "/facebook": "Seguidores Brasileiros e Curtidas",
   "/telegram": "Membros e Visualizações",
   "/trafego": "Visitas Geo-segmentadas",
+  "/kwai": "Seguidores BR e Views Kwai",
 };
 
 export function BenefitsGrid({
