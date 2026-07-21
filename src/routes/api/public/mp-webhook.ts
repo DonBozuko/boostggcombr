@@ -535,8 +535,14 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                   status: "paid",
                   error_detail: `${mysteryBonus > 0 ? `MB:${mysteryBonus} · ` : ""}Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
                   ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
-                })
-                .eq("id", pedido.id);
+                  // v179 Reconciliador: colunas estruturadas p/ auditoria contínua
+                  provider_slug: f.slug,
+                  provider_order_id: r.orderId != null ? String(r.orderId) : null,
+                  dispatched_at: new Date().toISOString(),
+                  last_reconciled_at: new Date().toISOString(),
+                } as any)
+                .eq("id", pedido.id)
+                .is("provider_order_id", null); // idempotency: só grava se ainda não despachado
 
               // ===== Tesouraria: registra ledger idempotente =====
               try {
