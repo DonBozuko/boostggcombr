@@ -199,8 +199,13 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
           status: "Enviado",
           error_detail: `v151 recarga manual · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
-        })
-        .eq("id", pedido.id);
+          provider_slug: f.slug,
+          provider_order_id: r.orderId != null ? String(r.orderId) : null,
+          dispatched_at: new Date().toISOString(),
+          last_reconciled_at: new Date().toISOString(),
+        } as any)
+        .eq("id", pedido.id)
+        .is("provider_order_id", null);
       // Registra ledger de auditoria PROVIDER_RECHARGE_MANUAL
       try {
         if (f.cost_brl != null && f.cost_brl > 0) {

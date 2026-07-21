@@ -213,8 +213,13 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
           status: "paid",
           error_detail: `Contingência OK · ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
-        })
-        .eq("id", pedido.id);
+          provider_slug: f.slug,
+          provider_order_id: r.orderId != null ? String(r.orderId) : null,
+          dispatched_at: new Date().toISOString(),
+          last_reconciled_at: new Date().toISOString(),
+        } as any)
+        .eq("id", pedido.id)
+        .is("provider_order_id", null);
 
       // v174 — ledger + treasury: fecha o buraco de auditoria do path legado
       try {
@@ -317,3 +322,68 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
   return { ok: true, status: "paid", recovered: true, note: `via ${fornecedorOk}` };
 }
+
+// v179 Etapa 3 — Redispatch órfão: pedido paid sem provider_order_id.
+// Usado pelo Reconciliador Universal. Só age se pedido continua paid + órfão.
+export type OrphanRedispatchResult =
+  | { ok: true; fornecedor: string; orderId: string | null }
+  | { ok: false; error: string; tentativas: string[] };
+
+export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedispatchResult> {
+  const { data: pedido } = await supabaseAdmin
+    .from("pedidos")
+    .select("id, status, pacote, quantidade, instagram_user, valor, provider_order_id, mercado_pago_id")
+    .eq("id", pedidoId)
+    .maybeSingle();
+  if (!pedido) return { ok: false, error: "PEDIDO_NAO_ENCONTRADO", tentativas: [] };
+  if (pedido.status !== "paid") return { ok: false, error: `STATUS_${pedido.status}`, tentativas: [] };
+  if ((pedido as any).provider_order_id) return { ok: false, error: "JA_DESPACHADO", tentativas: [] };
+
+  const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
+  const { respectsMinMargin } = await import("@/lib/margin-guardian");
+  const ranked = await rankProvidersByCost({
+    pacote: pedido.pacote,
+    quantidade: Number(pedido.quantidade),
+  }).catch(() => [] as any[]);
+
+  const tentativas: string[] = [];
+  for (const f of ranked as any[]) {
+    if (f.unstable) { tentativas.push(`${f.slug}: instável`); continue; }
+    if (Number(f.saldo_atual) <= 0) { tentativas.push(`${f.slug}: saldo zero`); continue; }
+    if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) { tentativas.push(`${f.slug}: saldo<custo`); continue; }
+    if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
+      tentativas.push(`${f.slug}: margem<300%`); continue;
+    }
+    const r = await dispatchByFornecedor(f.slug, {
+      pacote: pedido.pacote,
+      quantidade: Number(pedido.quantidade),
+      instagram_user: pedido.instagram_user,
+      serviceIdOverride: f.provider_service_id ?? null,
+    });
+    if (r.ok) {
+      // Idempotency: só grava se ainda for órfão. Se outro processo despachou paralelo, aborta.
+      const { data: gravado } = await supabaseAdmin
+        .from("pedidos")
+        .update({
+          provider_slug: f.slug,
+          provider_order_id: r.orderId != null ? String(r.orderId) : null,
+          dispatched_at: new Date().toISOString(),
+          last_reconciled_at: new Date().toISOString(),
+          error_detail: `Reconciliador redispatch OK · ${f.nome ?? f.slug} (order ${r.orderId ?? "?"})`,
+          ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
+        } as any)
+        .eq("id", pedido.id)
+        .is("provider_order_id", null)
+        .select("id")
+        .maybeSingle();
+      if (!gravado) {
+        // Corrida perdida: outro caminho já despachou. Não é erro.
+        return { ok: false, error: "CORRIDA_JA_DESPACHOU", tentativas };
+      }
+      return { ok: true, fornecedor: f.slug, orderId: r.orderId != null ? String(r.orderId) : null };
+    }
+    tentativas.push(`${f.slug}: ${r.error ?? "falha"}`);
+  }
+  return { ok: false, error: "TODOS_FORNECEDORES_FALHARAM", tentativas };
+}
+
