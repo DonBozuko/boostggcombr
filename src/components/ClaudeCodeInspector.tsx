@@ -113,8 +113,9 @@ export function ClaudeCodeInspector() {
                           {dot} {p.state}
                         </span>
                         <span className="text-cyan-100/60 text-[10px]">
-                          R$ {Number(p.saldo).toFixed(2)} · {p.hasKey ? "key✓" : "key✗"}
+                          {p.hasKey ? "key✓" : "key✗"}
                         </span>
+
                       </div>
                     );
                   })}

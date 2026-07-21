@@ -186,20 +186,11 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
               >
                 {busy === f.id ? "📊..." : "📊"}
               </Button>
-              <span className="text-[10px] font-mono">
-                {f.saldo_usd != null ? (
-                  <>
-                    <span className="text-cyan-200 font-bold">US$ {f.saldo_usd.toFixed(2)}</span>
-                    {f.saldo_atual != null && (
-                      <span className="text-emerald-300"> (R$ {Number(f.saldo_atual).toFixed(2)})</span>
-                    )}
-                  </>
-                ) : f.saldo_atual != null ? (
-                  <span className="text-emerald-300">R$ {Number(f.saldo_atual).toFixed(2)}</span>
-                ) : (
-                  <span className="text-white/50">saldo não lido</span>
-                )}
+              <span className="text-[10px] font-mono text-white/40">
+                {/* v181 — saldo removido daqui: fonte única no NOC. Botões acima persistem saldo no banco. */}
+                conciliação USD→BRL
               </span>
+
             </div>
           </div>
         ))}
