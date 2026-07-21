@@ -156,6 +156,7 @@ function TrafegoLanding() {
   const submit = async (selected: Plan) => {
     const parsed = urlSchema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
+    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
 
     // Sandbox Mode — flag global em admin_settings (server-only; nunca exposto publicamente)
     const sb = await getSandboxFn().catch(() => ({ enabled: false }));

@@ -235,6 +235,7 @@ function FacebookLanding() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
     const upgrade = findUpgrade(selected, currentPlans);
     if (upgrade) {
       setPendingOrder({ plan: selected, profile: parsed.data.profile });

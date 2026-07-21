@@ -284,6 +284,7 @@ function TiktokLanding() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
+    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
     // v183 — Se existe upgrade disponível, abre bump antes do Pix. Senão dispara direto.
     const upgrade = findUpgrade(selected, currentPlans);
     if (upgrade) {
