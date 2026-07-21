@@ -74,6 +74,7 @@ const AUDIO_BY_VARIANT: Record<FabianoVariant, string> = {
   facebook:  "/api/public/sfx/jarvis-facebook.mp3?v=34",
   telegram:  "/api/public/sfx/jarvis-telegram.mp3?v=34",
   trafego:   "/api/public/sfx/jarvis-trafego.mp3?v=34",
+  kwai:      "/api/public/sfx/jarvis-kwai.mp3?v=1",
 };
 
 
