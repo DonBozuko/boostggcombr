@@ -1,15 +1,34 @@
 // v162 — Painel read-only de telemetria dos 3 catálogos.
+// v183 — botão Auto-resolver v171 para preencher IDs faltantes por match fuzzy.
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getCatalogTelemetry, type ProviderTelemetry } from "@/lib/catalog-telemetry.functions";
+import { runAutoResolveIds } from "@/lib/auto-resolver.functions";
+
 
 export function CatalogTelemetryPanel({ token }: { token: string }) {
   const fn = useServerFn(getCatalogTelemetry);
+  const resolveFn = useServerFn(runAutoResolveIds);
   const [rows, setRows] = useState<ProviderTelemetry[] | null>(null);
   const [ts, setTs] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [resolving, setResolving] = useState(false);
+  const [resolveMsg, setResolveMsg] = useState<string | null>(null);
+
+  const runResolve = async () => {
+    setResolving(true); setResolveMsg(null);
+    try {
+      const r: any = await resolveFn({ data: { token } });
+      const total = (r ?? []).reduce((a: number, x: any) => a + (x.filled ?? 0), 0);
+      const per = (r ?? []).map((x: any) => `${x.provider}:${x.filled}`).join(" · ");
+      setResolveMsg(`✅ ${total} IDs preenchidos (${per})`);
+      load();
+    } catch (e: any) { setResolveMsg(`⚠ ${e?.message ?? String(e)}`); }
+    finally { setResolving(false); }
+  };
 
   const load = () => {
+
     fn({ data: { token } })
       .then((r: any) => {
         if (r?.ok) { setRows(r.providers); setTs(r.generated_at); setErr(null); }
@@ -22,10 +41,22 @@ export function CatalogTelemetryPanel({ token }: { token: string }) {
 
   return (
     <div className="rounded-2xl border-2 border-cyan-500/60 bg-gradient-to-br from-black via-cyan-950/20 to-black p-4 shadow-[0_0_30px_rgba(0,200,255,0.25)] space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="font-mono text-sm text-cyan-300">📡 TELEMETRIA DE CATÁLOGOS (READ-ONLY)</h3>
-        <button onClick={load} className="text-xs text-cyan-400 hover:text-cyan-200 font-mono">↻ atualizar</button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={runResolve}
+            disabled={resolving}
+            className="text-xs px-2 py-1 rounded border border-emerald-500/50 text-emerald-200 hover:bg-emerald-500/10 font-mono disabled:opacity-50"
+            title="Preenche automaticamente IDs faltantes (SMMPanel/Verified/SMMhype) por match fuzzy de nome+categoria+quantidade"
+          >
+            {resolving ? "🔎 resolvendo…" : "🧠 Auto-resolver IDs faltantes"}
+          </button>
+          <button onClick={load} className="text-xs text-cyan-400 hover:text-cyan-200 font-mono">↻ atualizar</button>
+        </div>
       </div>
+      {resolveMsg && <div className="text-xs font-mono text-emerald-300">{resolveMsg}</div>}
+
       {err && <div className="text-xs text-red-300 font-mono">⚠ {err}</div>}
       {!rows && !err && <div className="text-xs text-cyan-200/70 font-mono">carregando…</div>}
       {rows && (
