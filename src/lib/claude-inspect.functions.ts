@@ -97,6 +97,7 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
         withSmmpanel,
         withVerified,
         withTriple,
+        autoOnly,
         fallbackApplied,
       },
       providers,
