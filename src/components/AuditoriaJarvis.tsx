@@ -186,10 +186,8 @@ export function AuditoriaJarvis({ token, onBalanceSynced }: { token: string; onB
               >
                 {busy === f.id ? "📊..." : "📊"}
               </Button>
-              <span className="text-[10px] font-mono text-white/40">
-                {/* v181 — saldo removido daqui: fonte única no NOC. Botões acima persistem saldo no banco. */}
-                conciliação USD→BRL
-              </span>
+              {/* v182 — legenda "conciliação USD→BRL" removida: era ruído visual repetido 3x (uma por fornecedor). Botão 📊 já tem title explicativo. */}
+
 
             </div>
           </div>
