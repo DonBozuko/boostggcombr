@@ -9,7 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as Char126flockDotjsRouteImport } from './routes/~flock[.]js'
+import { Route as Char126beatDotjsRouteImport } from './routes/~beat[.]js'
 import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as ViewsTiktokRouteImport } from './routes/views-tiktok'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
@@ -47,7 +47,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as Char126apiAnalyticsRouteImport } from './routes/~api.analytics'
+import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
@@ -93,9 +93,9 @@ import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/a
 import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
 
-const Char126flockDotjsRoute = Char126flockDotjsRouteImport.update({
-  id: '/~flock.js',
-  path: '/~flock.js',
+const Char126beatDotjsRoute = Char126beatDotjsRouteImport.update({
+  id: '/~beat.js',
+  path: '/~beat.js',
   getParentRoute: () => rootRouteImport,
 } as any)
 const YoutubeRoute = YoutubeRouteImport.update({
@@ -288,9 +288,9 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char126apiAnalyticsRoute = Char126apiAnalyticsRouteImport.update({
-  id: '/~api/analytics',
-  path: '/~api/analytics',
+const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
+  id: '/~api/beat',
+  path: '/~api/beat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FerramentasGeradorLegendaInstagramRoute =
@@ -575,7 +575,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
-  '/~flock.js': typeof Char126flockDotjsRoute
+  '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
@@ -586,7 +586,7 @@ export interface FileRoutesByFullPath {
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
-  '/~api/analytics': typeof Char126apiAnalyticsRoute
+  '/~api/beat': typeof Char126apiBeatRoute
   '/blog/': typeof BlogIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -660,7 +660,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
-  '/~flock.js': typeof Char126flockDotjsRoute
+  '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
@@ -671,7 +671,7 @@ export interface FileRoutesByTo {
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
-  '/~api/analytics': typeof Char126apiAnalyticsRoute
+  '/~api/beat': typeof Char126apiBeatRoute
   '/blog': typeof BlogIndexRoute
   '/ferramentas': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -746,7 +746,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/views-tiktok': typeof ViewsTiktokRoute
   '/youtube': typeof YoutubeRoute
-  '/~flock.js': typeof Char126flockDotjsRoute
+  '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
@@ -757,7 +757,7 @@ export interface FileRoutesById {
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
-  '/~api/analytics': typeof Char126apiAnalyticsRoute
+  '/~api/beat': typeof Char126apiBeatRoute
   '/blog/': typeof BlogIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -833,7 +833,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/views-tiktok'
     | '/youtube'
-    | '/~flock.js'
+    | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
@@ -844,7 +844,7 @@ export interface FileRouteTypes {
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
-    | '/~api/analytics'
+    | '/~api/beat'
     | '/blog/'
     | '/ferramentas/'
     | '/.mcp/invoke-tool/$tool'
@@ -918,7 +918,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/views-tiktok'
     | '/youtube'
-    | '/~flock.js'
+    | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
@@ -929,7 +929,7 @@ export interface FileRouteTypes {
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
-    | '/~api/analytics'
+    | '/~api/beat'
     | '/blog'
     | '/ferramentas'
     | '/.mcp/invoke-tool/$tool'
@@ -1003,7 +1003,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/views-tiktok'
     | '/youtube'
-    | '/~flock.js'
+    | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
@@ -1014,7 +1014,7 @@ export interface FileRouteTypes {
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
-    | '/~api/analytics'
+    | '/~api/beat'
     | '/blog/'
     | '/ferramentas/'
     | '/.mcp/invoke-tool/$tool'
@@ -1089,7 +1089,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   ViewsTiktokRoute: typeof ViewsTiktokRoute
   YoutubeRoute: typeof YoutubeRoute
-  Char126flockDotjsRoute: typeof Char126flockDotjsRoute
+  Char126beatDotjsRoute: typeof Char126beatDotjsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   BlogSlugRoute: typeof BlogSlugRoute
@@ -1098,7 +1098,7 @@ export interface RootRouteChildren {
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
-  Char126apiAnalyticsRoute: typeof Char126apiAnalyticsRoute
+  Char126apiBeatRoute: typeof Char126apiBeatRoute
   BlogIndexRoute: typeof BlogIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1139,11 +1139,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/~flock.js': {
-      id: '/~flock.js'
-      path: '/~flock.js'
-      fullPath: '/~flock.js'
-      preLoaderRoute: typeof Char126flockDotjsRouteImport
+    '/~beat.js': {
+      id: '/~beat.js'
+      path: '/~beat.js'
+      fullPath: '/~beat.js'
+      preLoaderRoute: typeof Char126beatDotjsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/youtube': {
@@ -1405,11 +1405,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/~api/analytics': {
-      id: '/~api/analytics'
-      path: '/~api/analytics'
-      fullPath: '/~api/analytics'
-      preLoaderRoute: typeof Char126apiAnalyticsRouteImport
+    '/~api/beat': {
+      id: '/~api/beat'
+      path: '/~api/beat'
+      fullPath: '/~api/beat'
+      preLoaderRoute: typeof Char126apiBeatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ferramentas/gerador-legenda-instagram': {
@@ -1771,7 +1771,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   ViewsTiktokRoute: ViewsTiktokRoute,
   YoutubeRoute: YoutubeRoute,
-  Char126flockDotjsRoute: Char126flockDotjsRoute,
+  Char126beatDotjsRoute: Char126beatDotjsRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
@@ -1783,7 +1783,7 @@ const rootRouteChildren: RootRouteChildren = {
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
   FerramentasGeradorLegendaInstagramRoute:
     FerramentasGeradorLegendaInstagramRoute,
-  Char126apiAnalyticsRoute: Char126apiAnalyticsRoute,
+  Char126apiBeatRoute: Char126apiBeatRoute,
   BlogIndexRoute: BlogIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,

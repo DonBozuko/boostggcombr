@@ -33,7 +33,7 @@ async function forwardMetaCapi(event: any) {
   }
 }
 
-export const Route = createFileRoute("/~api/analytics")({
+export const Route = createFileRoute("/~api/beat")({
   server: {
     handlers: {
       OPTIONS: async () => new Response(null, { status: 204, headers: CORS }),
