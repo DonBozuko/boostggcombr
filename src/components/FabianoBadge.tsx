@@ -29,6 +29,7 @@ const SKINS: Record<FabianoVariant, Skin> = {
   facebook:  { accent: "text-[#1877F2]",   border: "border-[#1877F2]/80",   ring: "shadow-[0_0_24px_rgba(24,119,242,0.55)] ring-[#1877F2]/20", dot: "bg-[#1877F2]" },
   telegram:  { accent: "text-cyan-300",    border: "border-cyan-300/80",    ring: "shadow-[0_0_24px_rgba(34,211,238,0.55)] ring-cyan-300/20",  dot: "bg-cyan-300" },
   trafego:   { accent: "text-purple-400",  border: "border-purple-400/80",  ring: "shadow-[0_0_24px_rgba(168,85,247,0.55)] ring-purple-400/20", dot: "bg-purple-400" },
+  kwai:      { accent: "text-orange-400",  border: "border-orange-400/80",  ring: "shadow-[0_0_24px_rgba(251,146,60,0.55)] ring-orange-400/20", dot: "bg-orange-400" },
 };
 
 export function FabianoBadge({ variant = "instagram", inline = false }: { variant?: FabianoVariant; inline?: boolean }) {
