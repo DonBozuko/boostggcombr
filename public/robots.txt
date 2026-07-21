@@ -48,4 +48,4 @@ Allow: /
 User-agent: Meta-ExternalAgent
 Allow: /
 
-Sitemap: https://boostgg.com.br/sitemap.xml
+Sitemap: https://www.boostgg.com.br/sitemap.xml
