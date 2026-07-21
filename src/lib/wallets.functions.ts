@@ -24,7 +24,7 @@ export const walletsSnapshot = createServerFn({ method: "POST" })
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: ws }, { count }] = await Promise.all([
-      supabaseAdmin.from("virtual_wallets" as any).select("wallet_key,label,fornecedor_slug,saldo_brl,reserved_brl,updated_at").order("wallet_key"),
+      supabaseAdmin.from("virtual_wallets" as any).select("wallet_key,label,fornecedor_slug,saldo_brl,reserved_brl,updated_at").not("wallet_key", "like", "prov_%").order("wallet_key"),
       supabaseAdmin.from("pedidos").select("id", { count: "exact", head: true }).eq("status", "waiting_provision"),
     ]);
     return {
