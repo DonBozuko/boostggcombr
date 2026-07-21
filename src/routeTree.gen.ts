@@ -87,6 +87,7 @@ import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/public/hooks/recovery-scan'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
+import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
@@ -509,6 +510,12 @@ const ApiPublicHooksReconciliationRoute =
     path: '/api/public/hooks/reconciliation',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksPedidoReconcilerRoute =
+  ApiPublicHooksPedidoReconcilerRouteImport.update({
+    id: '/api/public/hooks/pedido-reconciler',
+    path: '/api/public/hooks/pedido-reconciler',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBestsellerScanRoute =
   ApiPublicHooksBestsellerScanRouteImport.update({
     id: '/api/public/hooks/bestseller-scan',
@@ -614,6 +621,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
@@ -700,6 +708,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
@@ -787,6 +796,7 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
@@ -875,6 +885,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/recovery-scan'
@@ -961,6 +972,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/recovery-scan'
@@ -1047,6 +1059,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
     | '/api/public/hooks/recovery-scan'
@@ -1132,6 +1145,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
+  ApiPublicHooksPedidoReconcilerRoute: typeof ApiPublicHooksPedidoReconcilerRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
   ApiPublicHooksRecoveryScanRoute: typeof ApiPublicHooksRecoveryScanRoute
@@ -1699,6 +1713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksReconciliationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/pedido-reconciler': {
+      id: '/api/public/hooks/pedido-reconciler'
+      path: '/api/public/hooks/pedido-reconciler'
+      fullPath: '/api/public/hooks/pedido-reconciler'
+      preLoaderRoute: typeof ApiPublicHooksPedidoReconcilerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/bestseller-scan': {
       id: '/api/public/hooks/bestseller-scan'
       path: '/api/public/hooks/bestseller-scan'
@@ -1826,6 +1847,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
+  ApiPublicHooksPedidoReconcilerRoute: ApiPublicHooksPedidoReconcilerRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
   ApiPublicHooksRecoveryScanRoute: ApiPublicHooksRecoveryScanRoute,
