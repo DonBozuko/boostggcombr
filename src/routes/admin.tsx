@@ -1607,7 +1607,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
             🩺 Ferramentas de Saúde
           </div>
           <div className="flex flex-wrap gap-2">
-            <a href="/admin/health-catalog" target="_blank" rel="noopener noreferrer"
+            <a href="/admin-health-catalog" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold text-xs px-3 py-2 hover:scale-105 transition-transform">
               🩺 Saúde do Catálogo (Pode/Não Pode Vender) ↗
             </a>
