@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Check, MessageSquare } from "lucide-react";
 import { jivoScripts } from "@/lib/jivo-scripts";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 
 export const Route = createFileRoute("/admin/scripts")({
   head: () => ({ meta: [{ title: "Scripts Jivo · Admin | BoostGG" }, { name: "robots", content: "noindex,nofollow" }] }),
@@ -20,7 +23,25 @@ const LABELS: Record<keyof typeof jivoScripts, { title: string; when: string }> 
 };
 
 function ScriptsPage() {
+  const navigate = useNavigate();
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+
+  // v209 — Gate real: só o admin master vê os scripts. Antes só tinha noindex, qualquer URL vazava.
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      const email = data.session?.user?.email?.toLowerCase() ?? "";
+      if (email !== ADMIN_EMAIL) {
+        toast.error("Acesso restrito");
+        void navigate({ to: "/admin", replace: true });
+        setAuthed(false);
+      } else {
+        setAuthed(true);
+      }
+    })();
+  }, [navigate]);
+
 
   const copy = async (key: string, text: string) => {
     await navigator.clipboard.writeText(text);
@@ -29,8 +50,13 @@ function ScriptsPage() {
     setTimeout(() => setCopied(null), 1800);
   };
 
+  if (authed !== true) {
+    return <div className="min-h-screen bg-slate-950 text-slate-400 flex items-center justify-center text-sm">verificando acesso…</div>;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+
       <div className="max-w-4xl mx-auto">
         <header className="mb-8 flex items-center gap-3">
           <MessageSquare className="text-emerald-400" size={28} />

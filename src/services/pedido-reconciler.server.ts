@@ -88,11 +88,43 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
     }
   }
 
+  // v208 — SWEEP DE PENDING: pedidos em 'pending' há > 30min sem paid nem cancel.
+  // Antes: só o polling do cliente (aba aberta) chamava confirmAndDispatchIfPaid.
+  // Se o cliente fechava a aba após pagar e o webhook falhava, o pedido virava zumbi eterno.
+  // Agora: reconciliador varre o MP direto pelos pending antigos.
+  const PENDING_CUTOFF_MIN = 30;
+  const pendingCutoff = new Date(Date.now() - PENDING_CUTOFF_MIN * 60_000).toISOString();
+  const { data: pendings } = await supabaseAdmin
+    .from("pedidos")
+    .select("id, created_at, mercado_pago_id, valor, instagram_user")
+    .in("status", ["pending", "mp_pending", "mp_in_process"])
+    .not("mercado_pago_id", "is", null)
+    .lt("created_at", pendingCutoff)
+    .order("created_at", { ascending: true })
+    .limit(50);
+
+  const pendingList = (pendings as any[]) ?? [];
+  if (pendingList.length > 0) {
+    const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
+    for (const p of pendingList) {
+      try {
+        const r = await confirmAndDispatchIfPaid(p.id);
+        report.detalhes.push({
+          id: p.id,
+          created_at: p.created_at,
+          result: `PENDING_SWEEP: ${r.ok ? (r.recovered ? "RECOVERED" : `status=${r.status}`) : `err=${r.error}`}`,
+        });
+      } catch (e) {
+        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `PENDING_SWEEP_EX: ${(e as Error).message}` });
+      }
+    }
+  }
+
   // Log de auditoria (mesmo quando 0 órfãos — prova que o cron rodou)
   try {
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
       admin_email: "system@pedido-reconciler",
-      action: "pedido_reconciler_v179",
+      action: "pedido_reconciler_v208",
       detail: report as any,
       created_at: new Date().toISOString(),
     });

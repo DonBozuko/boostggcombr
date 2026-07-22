@@ -1,4 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 
 export const getSandboxEnabled = createServerFn({ method: "GET" }).handler(async () => {
   try {
@@ -21,13 +24,18 @@ export const getSandboxEnabled = createServerFn({ method: "GET" }).handler(async
 /**
  * Modo Teste Global: zera saldo_atual de TODOS fornecedores ativos (guardando backup)
  * ou restaura de backup. NÃO toca em painel real dos fornecedores.
- * Uso: validar fluxo waiting_provision + PIX Telegram + botão Recarga Confirmada
- * sem gastar dinheiro real. Cliente segue vendo checkout normal — pedido entra em
- * waiting_provision e Telegram alerta o admin.
+ *
+ * v206 — Auth obrigatória. Só o admin master pode chamar.
+ * Antes: qualquer chamador da server function zerava saldo do banco.
  */
 export const toggleSandboxAllProviders = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { enable: boolean }) => input)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
+    if (email !== ADMIN_EMAIL) {
+      throw new Error("Forbidden");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: forn, error: fErr } = await supabaseAdmin
       .from("fornecedores")
@@ -35,12 +43,10 @@ export const toggleSandboxAllProviders = createServerFn({ method: "POST" })
     if (fErr) throw new Error(fErr.message);
 
     if (data.enable) {
-      // Zerar: guarda saldo real em backup (se ainda não guardado) e zera
       for (const f of forn ?? []) {
         if (!f.ativo) continue;
         const backup = (f as any).saldo_atual_backup;
         const saldo = Number((f as any).saldo_atual);
-        // Só guarda backup se ainda não tem OU se saldo atual > 0 (evita perder backup ao re-zerar)
         const newBackup = backup != null ? backup : saldo;
         await supabaseAdmin
           .from("fornecedores")
@@ -48,7 +54,6 @@ export const toggleSandboxAllProviders = createServerFn({ method: "POST" })
           .eq("slug", (f as any).slug);
       }
     } else {
-      // Restaurar: volta saldo_atual do backup e limpa backup
       for (const f of forn ?? []) {
         const backup = (f as any).saldo_atual_backup;
         if (backup == null) continue;
@@ -63,13 +68,22 @@ export const toggleSandboxAllProviders = createServerFn({ method: "POST" })
       .from("admin_settings")
       .upsert({ key: "sandbox_mode", value: { enabled: data.enable, ts: new Date().toISOString() } as any }, { onConflict: "key" });
 
+    // v206 — Log agora quebra silêncio: se audit falhar, alerta o admin.
     try {
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
-        admin_email: "admin",
+        admin_email: email,
         action: data.enable ? "SANDBOX_ENABLE_ALL" : "SANDBOX_DISABLE_ALL",
         detail: { fornecedores: (forn ?? []).map((f: any) => f.slug) },
       } as any);
-    } catch { /* noop */ }
+    } catch (e) {
+      console.error("[sandbox] falha no audit log — ação executou mas sem rastro:", e);
+      try {
+        const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+        await dispatchWhatsappAlert(
+          `⚠️ SANDBOX SEM RASTRO\n\nPROBLEMA: ${email} ${data.enable ? "ATIVOU" : "DESLIGOU"} o modo teste (zera saldos) mas o log de auditoria falhou.\n\nO QUE FAZER: revisar admin_audit_logs; se admin_email='${email}' não aparece nas últimas horas, temos problema de RLS/tabela.`,
+        ).catch(() => {});
+      } catch { /* */ }
+    }
 
     return { ok: true, enabled: data.enable };
   });
