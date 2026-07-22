@@ -90,6 +90,18 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   // Telegram — Grupo (service 19107)
   tgg500: { quantidade: 500,  valor: 19.0 },
   tgg1k:  { quantidade: 1000, valor: 35.0 },
+  // Kwai — fallback estático (v203). Se pricing_engine cair, Kwai continua vendendo.
+  // Preços refletem a categoria em pricing_engine (kf/kl/kv). Ajuste via admin altera engine;
+  // essa tabela só entra em ação se o pricing-engine.server falhar.
+  kf500:  { quantidade: 500,   valor: 19.0 },
+  kf1k:   { quantidade: 1000,  valor: 29.0 },
+  kf2k:   { quantidade: 2000,  valor: 49.0 },
+  kf5k:   { quantidade: 5000,  valor: 99.0 },
+  kl500:  { quantidade: 500,   valor: 9.0 },
+  kl1k:   { quantidade: 1000,  valor: 15.0 },
+  kl2k:   { quantidade: 2000,  valor: 27.0 },
+  kv5k:   { quantidade: 5000,  valor: 9.0 },
+  kv10k:  { quantidade: 10000, valor: 15.0 },
 };
 
 export const criarPedido = createServerFn({ method: "POST" })
@@ -231,49 +243,61 @@ export const criarPedido = createServerFn({ method: "POST" })
       return { ok: false as const, error: "MP_TOKEN_MISSING" as const };
     }
 
-    // 1) Cria o pagamento Pix no Mercado Pago
+    // 1) Cria o pagamento Pix no Mercado Pago (v204: retry com backoff — 3 tentativas)
+    // Mesma X-Idempotency-Key em todas retries → MP nunca cria pagamento duplicado.
     let mpId: string | null = null;
     let qrCode = "";
     let qrCodeBase64 = "";
-    try {
-      const idempotencyKey =
-        (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
-      const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${mpToken}`,
-          "X-Idempotency-Key": idempotencyKey,
-        },
-        body: JSON.stringify({
-          transaction_amount: Number(valorCobrar.toFixed(2)),
-          description: `BoostGG - ${rede.toUpperCase()} pacote ${clean(pacoteEfetivo)} (${quantidadeEfetiva} ${categoria}) para ${clean(data.instagram_user)}${bumpAplicado ? " [UPGRADE]" : ""}`,
-          payment_method_id: "pix",
-          payer: { email: data.email.trim().toLowerCase() },
-          notification_url: "https://boostgg.com.br/api/public/mp-webhook",
-        }),
-      });
-      const mpJson: unknown = await mpRes.json().catch(() => ({}));
-      if (!mpRes.ok) {
-        console.error("Mercado Pago erro:", mpRes.status, mpJson);
-        return { ok: false as const, error: "MP_FAILED" as const };
-      }
-      const mp = mpJson as {
-        id?: number | string;
-        point_of_interaction?: {
-          transaction_data?: { qr_code?: string; qr_code_base64?: string };
+    const idempotencyKey =
+      (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
+    const mpBody = JSON.stringify({
+      transaction_amount: Number(valorCobrar.toFixed(2)),
+      description: `BoostGG - ${rede.toUpperCase()} pacote ${clean(pacoteEfetivo)} (${quantidadeEfetiva} ${categoria}) para ${clean(data.instagram_user)}${bumpAplicado ? " [UPGRADE]" : ""}`,
+      payment_method_id: "pix",
+      payer: { email: data.email.trim().toLowerCase() },
+      notification_url: "https://boostgg.com.br/api/public/mp-webhook",
+    });
+    const backoffs = [0, 500, 1500];
+    let mpErrLast = "";
+    for (let attempt = 0; attempt < backoffs.length; attempt++) {
+      if (backoffs[attempt] > 0) await new Promise((r) => setTimeout(r, backoffs[attempt]));
+      try {
+        const mpRes = await fetch("https://api.mercadopago.com/v1/payments", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${mpToken}`,
+            "X-Idempotency-Key": idempotencyKey,
+          },
+          body: mpBody,
+        });
+        const mpJson: unknown = await mpRes.json().catch(() => ({}));
+        if (!mpRes.ok) {
+          mpErrLast = `HTTP ${mpRes.status}`;
+          console.warn(`[criarPedido] MP attempt ${attempt + 1} falhou:`, mpRes.status, mpJson);
+          // Só tenta de novo em 5xx/timeout. 4xx (rejeição) sai direto.
+          if (mpRes.status < 500) return { ok: false as const, error: "MP_FAILED" as const };
+          continue;
+        }
+        const mp = mpJson as {
+          id?: number | string;
+          point_of_interaction?: { transaction_data?: { qr_code?: string; qr_code_base64?: string } };
         };
-      };
-      mpId = mp.id != null ? String(mp.id) : null;
-      qrCode = mp.point_of_interaction?.transaction_data?.qr_code ?? "";
-      qrCodeBase64 =
-        mp.point_of_interaction?.transaction_data?.qr_code_base64 ?? "";
-      if (!qrCode || !qrCodeBase64) {
-        console.error("MP sem QR Code no retorno:", mpJson);
-        return { ok: false as const, error: "MP_NO_QR" as const };
+        mpId = mp.id != null ? String(mp.id) : null;
+        qrCode = mp.point_of_interaction?.transaction_data?.qr_code ?? "";
+        qrCodeBase64 = mp.point_of_interaction?.transaction_data?.qr_code_base64 ?? "";
+        if (!qrCode || !qrCodeBase64) {
+          console.error("MP sem QR Code no retorno:", mpJson);
+          return { ok: false as const, error: "MP_NO_QR" as const };
+        }
+        break; // sucesso
+      } catch (err) {
+        mpErrLast = String((err as Error)?.message ?? err);
+        console.warn(`[criarPedido] MP attempt ${attempt + 1} exception:`, err);
       }
-    } catch (err) {
-      console.error("Falha de rede ao chamar Mercado Pago:", err);
+    }
+    if (!mpId || !qrCode) {
+      console.error("Mercado Pago falhou após 3 tentativas:", mpErrLast);
       return { ok: false as const, error: "MP_FAILED" as const };
     }
 
@@ -304,6 +328,17 @@ export const criarPedido = createServerFn({ method: "POST" })
         .single();
       if (error || !inserted) {
         console.error("Erro ao inserir pedido:", error);
+        // v205 — Anti-perda-de-dinheiro: MP já cobrou, banco falhou → refund automático + alerta.
+        try {
+          const { refundMercadoPago } = await import("./dispatcher-fallback.server");
+          const r = mpId ? await refundMercadoPago(mpId) : { ok: false, detail: "no mpId" };
+          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+          await dispatchWhatsappAlert(
+            `🚨 COBRANÇA SEM PEDIDO NO BANCO\n\nPROBLEMA: MP cobrou R$${valorCobrar.toFixed(2)} do cliente ${data.email} mas o INSERT no banco falhou. Refund automático: ${r.ok ? "OK" : "FALHOU"}${r.ok ? "" : ` — ${r.detail}`}.\nMP payment id: ${mpId}\n\nO QUE FAZER: ${r.ok ? "só confirmar no MP se o estorno aparece." : "abrir o MP MANUALMENTE e estornar o payment " + mpId + " AGORA."}`,
+          ).catch(() => {});
+        } catch (e) {
+          console.error("[criarPedido] falha no refund automático:", e);
+        }
         return { ok: false as const, error: "DB_FAILED" as const };
       }
       try {
