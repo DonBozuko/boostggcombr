@@ -103,7 +103,11 @@ export const criarPedido = createServerFn({ method: "POST" })
         return { ok: false as const, error: "GLOBAL_KILL" as const };
       }
     }
-    const pkg = data.pacote.toLowerCase();
+    const pacoteRaw = data.pacote.toLowerCase();
+    // v192 — pacotes com prefixo `br-` (variante brasileira) precisam ser normalizados
+    // para lookup de preço/categoria, mas o prefixo é preservado para dispatch (SMMhype BR).
+    const isBrVariant = pacoteRaw.startsWith("br-");
+    const pkg = isBrVariant ? pacoteRaw.slice(3) : pacoteRaw;
     const isTelegram = pkg.startsWith("tg");
     const isTrafego = !isTelegram && pkg.startsWith("w");
     const isTiktok = !isTelegram && !isTrafego && pkg.startsWith("t");
@@ -111,6 +115,7 @@ export const criarPedido = createServerFn({ method: "POST" })
     const isFacebook = pkg.startsWith("f");
     const isKwai = pkg.startsWith("k");
     const isInstagram = !isTelegram && !isTrafego && !isTiktok && !isYoutube && !isFacebook && !isKwai;
+
     const rede =
       data.rede_social ??
       (isTelegram ? "telegram"
