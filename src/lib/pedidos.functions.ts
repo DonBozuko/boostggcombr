@@ -218,6 +218,37 @@ export const criarPedido = createServerFn({ method: "POST" })
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
 
+    // v213 — Trava sellable: bloqueia pacote sem NENHUM provedor vinculado.
+    // Evita cobrar cliente e depois falhar no dispatch por "no provider available".
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: sellRow } = await supabaseAdmin
+        .from("pricing_items" as any)
+        .select("cost_brl, smmhype_service_id, smmpanel_service_id, verified_service_id")
+        .eq("pacote", pacoteRaw)
+        .maybeSingle();
+      if (sellRow) {
+        const hasProvider =
+          !!(sellRow as any).smmhype_service_id ||
+          !!(sellRow as any).smmpanel_service_id ||
+          !!(sellRow as any).verified_service_id;
+        const hasCost = Number((sellRow as any).cost_brl) > 0;
+        if (!hasProvider || !hasCost) {
+          try {
+            const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+            await dispatchWhatsappAlert(
+              `🛑 PACOTE BLOQUEADO ANTES DE COBRAR\n\nPROBLEMA: cliente tentou "${data.pacote}" (${data.quantidade} ${categoria} ${rede}) mas ${!hasProvider ? "nenhum fornecedor está mapeado" : "custo está zerado"}. Bloqueei o pagamento pra não cobrar sem conseguir entregar.\n\nO QUE FAZER: abrir Admin › Catálogo, vincular ID de fornecedor pra esse pacote OU tirar ele do site.`,
+            ).catch(() => {});
+          } catch { /* noop */ }
+          return { ok: false as const, error: "INVALID_PACKAGE" as const };
+        }
+      }
+    } catch (err) {
+      console.error("[criarPedido] sellable check falhou:", err);
+      // não bloqueia — falha do check não deve derrubar venda válida
+    }
+
+
 
     // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
     // Only accept when client value is within 10% of server value (anti-tampering).
