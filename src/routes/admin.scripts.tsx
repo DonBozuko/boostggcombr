@@ -50,8 +50,13 @@ function ScriptsPage() {
     setTimeout(() => setCopied(null), 1800);
   };
 
+  if (authed !== true) {
+    return <div className="min-h-screen bg-slate-950 text-slate-400 flex items-center justify-center text-sm">verificando acesso…</div>;
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
+
       <div className="max-w-4xl mx-auto">
         <header className="mb-8 flex items-center gap-3">
           <MessageSquare className="text-emerald-400" size={28} />
