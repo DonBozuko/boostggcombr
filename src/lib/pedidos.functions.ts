@@ -191,7 +191,7 @@ export const criarPedido = createServerFn({ method: "POST" })
 
     // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
     // Margem preservada (base já tem 5-12x multiplicador; -20% sai da margem, nunca do custo).
-    let pacoteEfetivo = data.pacote;
+    let pacoteEfetivo = isBrVariant ? `br-${pkg}` : data.pacote;
     let quantidadeEfetiva = qtdOficial;
     let bumpAplicado = false;
     let bumpOfertado = false;
