@@ -65,6 +65,7 @@ import { Route as ApiPublicTestTiktokEventRouteImport } from './routes/api/publi
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
+import { Route as ApiPublicStatusRouteImport } from './routes/api/public/status'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicLgpdDeleteRouteImport } from './routes/api/public/lgpd-delete'
 import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
@@ -389,6 +390,11 @@ const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
   path: '/api/public/sync-services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStatusRoute = ApiPublicStatusRouteImport.update({
+  id: '/api/public/status',
+  path: '/api/public/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
   id: '/api/public/mp-webhook',
   path: '/api/public/mp-webhook',
@@ -630,6 +636,7 @@ export interface FileRoutesByFullPath {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
+  '/api/public/status': typeof ApiPublicStatusRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
@@ -720,6 +727,7 @@ export interface FileRoutesByTo {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
+  '/api/public/status': typeof ApiPublicStatusRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
@@ -811,6 +819,7 @@ export interface FileRoutesById {
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
+  '/api/public/status': typeof ApiPublicStatusRoute
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
@@ -903,6 +912,7 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
+    | '/api/public/status'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
@@ -993,6 +1003,7 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
+    | '/api/public/status'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
@@ -1083,6 +1094,7 @@ export interface FileRouteTypes {
     | '/api/public/jarvis-pipeline'
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
+    | '/api/public/status'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
@@ -1172,6 +1184,7 @@ export interface RootRouteChildren {
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicLgpdDeleteRoute: typeof ApiPublicLgpdDeleteRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
+  ApiPublicStatusRoute: typeof ApiPublicStatusRoute
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
   ApiPublicSyncSmmpanelRoute: typeof ApiPublicSyncSmmpanelRoute
   ApiPublicSyncVerifiedRoute: typeof ApiPublicSyncVerifiedRoute
@@ -1600,6 +1613,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSyncServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/status': {
+      id: '/api/public/status'
+      path: '/api/public/status'
+      fullPath: '/api/public/status'
+      preLoaderRoute: typeof ApiPublicStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/mp-webhook': {
       id: '/api/public/mp-webhook'
       path: '/api/public/mp-webhook'
@@ -1897,6 +1917,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicLgpdDeleteRoute: ApiPublicLgpdDeleteRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
+  ApiPublicStatusRoute: ApiPublicStatusRoute,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
   ApiPublicSyncSmmpanelRoute: ApiPublicSyncSmmpanelRoute,
   ApiPublicSyncVerifiedRoute: ApiPublicSyncVerifiedRoute,
