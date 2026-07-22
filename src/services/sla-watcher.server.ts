@@ -26,7 +26,7 @@ export async function runSlaWatcher(): Promise<SlaReport> {
 
   const { data: parqueados, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, sla_deadline, mercado_pago_id, valor, pacote")
+    .select("id, status, sla_deadline, mercado_pago_id, valor, pacote, email_contato")
     .eq("status", "waiting_provision")
     .not("sla_deadline", "is", null);
 
@@ -99,11 +99,36 @@ export async function runSlaWatcher(): Promise<SlaReport> {
     if (refund.ok) report.refunded++;
     else report.refund_failed++;
 
+    // v215 — Aviso ao cliente por e-mail quando refund automático dá certo
+    if (refund.ok) {
+      const email = String(p.email_contato ?? "").toLowerCase().trim();
+      const validEmail = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && !email.includes("anonimizado") && !email.endsWith("@webhook");
+      if (validEmail) {
+        try {
+          await supabaseAdmin.rpc("enqueue_email" as any, {
+            queue_name: "transactional_emails",
+            payload: {
+              template_name: "refund-notice",
+              recipient_email: email,
+              idempotency_key: `refund-notice-${p.id}`,
+              template_data: {
+                pacote: p.pacote ?? null,
+                valor: Number(p.valor ?? 0).toFixed(2).replace(".", ","),
+                pedidoId: String(p.id).slice(0, 8),
+              },
+            },
+          } as any);
+        } catch (e: any) {
+          report.errors.push(`refund email enqueue ${p.id}: ${e?.message ?? "unknown"}`);
+        }
+      }
+    }
+
     try {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
       await dispatchWhatsappAlert(
         refund.ok
-          ? `🔄 CLIENTE REEMBOLSADO AUTOMÁTICO\n\nPROBLEMA: passaram 24h sem recarregar o fornecedor.\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\n\nO QUE FAZER: nada. Dinheiro já voltou pro cliente.`
+          ? `🔄 CLIENTE REEMBOLSADO AUTOMÁTICO\n\nPROBLEMA: passaram 24h sem recarregar o fornecedor.\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\n\nO QUE FAZER: nada. Dinheiro já voltou pro cliente e ele foi avisado por e-mail.`
           : `🚨 NÃO CONSEGUI REEMBOLSAR O CLIENTE\n\nPROBLEMA: passaram 24h, tentei devolver o dinheiro e o Mercado Pago recusou.\nErro: ${refund.detail}\n\nPedido ${p.id.slice(0, 8)} · R$${Number(p.valor).toFixed(2)}\n\nO QUE FAZER: abrir Mercado Pago e reembolsar na mão AGORA.`,
       ).catch(() => {});
     } catch { /* */ }
