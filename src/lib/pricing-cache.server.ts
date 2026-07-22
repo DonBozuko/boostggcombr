@@ -151,6 +151,18 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }): Promise<{
       : Promise.resolve(null),
   ]);
 
+  // v213 — Alerta se NENHUM fornecedor respondeu com catálogo.
+  // Antes: sync retornava "0 updates" silencioso (parecia sucesso). Agora dispara Telegram.
+  const catalogsAlive = [hypeList, panelList, verifiedList].filter((l) => Array.isArray(l) && l.length > 0).length;
+  if (catalogsAlive === 0) {
+    try {
+      const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      await dispatchWhatsappAlert(
+        `🚨 SINCRONIZAÇÃO DE PREÇOS FALHOU\n\nPROBLEMA: nenhum dos 3 fornecedores (SMMHype, SMMPainel, Verified) devolveu catálogo. Preços do site podem ficar desatualizados.\n\nO QUE FAZER: verificar se as APIs dos fornecedores estão fora do ar ou se alguma chave expirou. Enquanto isso, os preços antigos continuam valendo.`,
+      ).catch(() => {});
+    } catch { /* noop */ }
+  }
+
   const hypeIdx = indexById(hypeList);
   const panelIdx = indexById(panelList);
   const verifiedIdx = indexById(verifiedList);
