@@ -1601,7 +1601,21 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           </div>
         </div>
 
+        {/* v214 — Atalhos de saúde operacional */}
+        <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/20 p-3">
+          <div className="text-xs font-bold uppercase tracking-wider text-emerald-300 mb-2">
+            🩺 Ferramentas de Saúde
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a href="/admin/health-catalog" target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold text-xs px-3 py-2 hover:scale-105 transition-transform">
+              🩺 Saúde do Catálogo (Pode/Não Pode Vender) ↗
+            </a>
+          </div>
         </div>
+
+        </div>
+
 
 
 
