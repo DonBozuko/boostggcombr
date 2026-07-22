@@ -1,0 +1,2 @@
+UPDATE public.pedidos SET status = 'completed' WHERE status = 'Enviado';
+UPDATE public.pedidos SET status = 'completed', last_reconciled_at = now() WHERE status = 'paid' AND provider_order_id IS NOT NULL AND created_at < now() - interval '2 hours';
