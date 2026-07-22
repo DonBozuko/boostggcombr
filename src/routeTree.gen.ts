@@ -55,6 +55,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
+import { Route as AdminHealthCatalogRouteImport } from './routes/admin.health-catalog'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -88,12 +89,14 @@ import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/pub
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
+import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './routes/api/public/hooks/auto-resolve-service-ids'
 import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
+import { Route as ApiPublicAdminCatalogHealthRouteImport } from './routes/api/public/admin/catalog-health'
 
 const Char126beatDotjsRoute = Char126beatDotjsRouteImport.update({
   id: '/~beat.js',
@@ -333,6 +336,11 @@ const AdminScriptsRoute = AdminScriptsRouteImport.update({
   path: '/scripts',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
+  id: '/health-catalog',
+  path: '/health-catalog',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -516,6 +524,12 @@ const ApiPublicHooksPedidoReconcilerRoute =
     path: '/api/public/hooks/pedido-reconciler',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDryRunCatalogRoute =
+  ApiPublicHooksDryRunCatalogRouteImport.update({
+    id: '/api/public/hooks/dry-run-catalog',
+    path: '/api/public/hooks/dry-run-catalog',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBestsellerScanRoute =
   ApiPublicHooksBestsellerScanRouteImport.update({
     id: '/api/public/hooks/bestseller-scan',
@@ -550,6 +564,12 @@ const ApiPublicAdminPricingConfigRoute =
   ApiPublicAdminPricingConfigRouteImport.update({
     id: '/api/public/admin/pricing-config',
     path: '/api/public/admin/pricing-config',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicAdminCatalogHealthRoute =
+  ApiPublicAdminCatalogHealthRouteImport.update({
+    id: '/api/public/admin/catalog-health',
+    path: '/api/public/admin/catalog-health',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -593,6 +613,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/health-catalog': typeof AdminHealthCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
@@ -615,12 +636,14 @@ export interface FileRoutesByFullPath {
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
   '/api/public/track': typeof ApiPublicTrackRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/admin/catalog-health': typeof ApiPublicAdminCatalogHealthRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -680,6 +703,7 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/health-catalog': typeof AdminHealthCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
@@ -702,12 +726,14 @@ export interface FileRoutesByTo {
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
   '/api/public/track': typeof ApiPublicTrackRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/admin/catalog-health': typeof ApiPublicAdminCatalogHealthRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -768,6 +794,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
+  '/admin/health-catalog': typeof AdminHealthCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
@@ -790,12 +817,14 @@ export interface FileRoutesById {
   '/api/public/test-tiktok-event': typeof ApiPublicTestTiktokEventRoute
   '/api/public/track': typeof ApiPublicTrackRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/admin/catalog-health': typeof ApiPublicAdminCatalogHealthRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -857,6 +886,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
+    | '/admin/health-catalog'
     | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
@@ -879,12 +909,14 @@ export interface FileRouteTypes {
     | '/api/public/test-tiktok-event'
     | '/api/public/track'
     | '/lovable/email/suppression'
+    | '/api/public/admin/catalog-health'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -944,6 +976,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
+    | '/admin/health-catalog'
     | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
@@ -966,12 +999,14 @@ export interface FileRouteTypes {
     | '/api/public/test-tiktok-event'
     | '/api/public/track'
     | '/lovable/email/suppression'
+    | '/api/public/admin/catalog-health'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -1031,6 +1066,7 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
+    | '/admin/health-catalog'
     | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
@@ -1053,12 +1089,14 @@ export interface FileRouteTypes {
     | '/api/public/test-tiktok-event'
     | '/api/public/track'
     | '/lovable/email/suppression'
+    | '/api/public/admin/catalog-health'
     | '/api/public/admin/pricing-config'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -1139,12 +1177,14 @@ export interface RootRouteChildren {
   ApiPublicTestTiktokEventRoute: typeof ApiPublicTestTiktokEventRoute
   ApiPublicTrackRoute: typeof ApiPublicTrackRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicAdminCatalogHealthRoute: typeof ApiPublicAdminCatalogHealthRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksAutoResolveServiceIdsRoute: typeof ApiPublicHooksAutoResolveServiceIdsRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
+  ApiPublicHooksDryRunCatalogRoute: typeof ApiPublicHooksDryRunCatalogRoute
   ApiPublicHooksPedidoReconcilerRoute: typeof ApiPublicHooksPedidoReconcilerRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
@@ -1489,6 +1529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminScriptsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/health-catalog': {
+      id: '/admin/health-catalog'
+      path: '/health-catalog'
+      fullPath: '/admin/health-catalog'
+      preLoaderRoute: typeof AdminHealthCatalogRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/catalog': {
       id: '/admin/catalog'
       path: '/catalog'
@@ -1720,6 +1767,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksPedidoReconcilerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/dry-run-catalog': {
+      id: '/api/public/hooks/dry-run-catalog'
+      path: '/api/public/hooks/dry-run-catalog'
+      fullPath: '/api/public/hooks/dry-run-catalog'
+      preLoaderRoute: typeof ApiPublicHooksDryRunCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/bestseller-scan': {
       id: '/api/public/hooks/bestseller-scan'
       path: '/api/public/hooks/bestseller-scan'
@@ -1762,16 +1816,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminPricingConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/admin/catalog-health': {
+      id: '/api/public/admin/catalog-health'
+      path: '/api/public/admin/catalog-health'
+      fullPath: '/api/public/admin/catalog-health'
+      preLoaderRoute: typeof ApiPublicAdminCatalogHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
+  AdminHealthCatalogRoute: AdminHealthCatalogRoute,
   AdminScriptsRoute: AdminScriptsRoute,
 }
 
@@ -1840,6 +1903,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicTestTiktokEventRoute: ApiPublicTestTiktokEventRoute,
   ApiPublicTrackRoute: ApiPublicTrackRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicAdminCatalogHealthRoute: ApiPublicAdminCatalogHealthRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksAutoResolveServiceIdsRoute:
@@ -1847,6 +1911,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
+  ApiPublicHooksDryRunCatalogRoute: ApiPublicHooksDryRunCatalogRoute,
   ApiPublicHooksPedidoReconcilerRoute: ApiPublicHooksPedidoReconcilerRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,

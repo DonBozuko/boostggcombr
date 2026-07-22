@@ -794,10 +794,13 @@ export type Database = {
           auto_resolved_at: string | null
           category: string
           cost_brl: number
+          is_sellable: boolean
+          last_dry_run: string | null
           pacote: string
           price_brl: number
           provider_service_id: number | null
           quantidade: number
+          sellable_reason: string | null
           smmhype_auto_id: string | null
           smmhype_service_id: string | null
           smmpanel_auto_id: string | null
@@ -811,10 +814,13 @@ export type Database = {
           auto_resolved_at?: string | null
           category: string
           cost_brl?: number
+          is_sellable?: boolean
+          last_dry_run?: string | null
           pacote: string
           price_brl?: number
           provider_service_id?: number | null
           quantidade: number
+          sellable_reason?: string | null
           smmhype_auto_id?: string | null
           smmhype_service_id?: string | null
           smmpanel_auto_id?: string | null
@@ -828,10 +834,13 @@ export type Database = {
           auto_resolved_at?: string | null
           category?: string
           cost_brl?: number
+          is_sellable?: boolean
+          last_dry_run?: string | null
           pacote?: string
           price_brl?: number
           provider_service_id?: number | null
           quantidade?: number
+          sellable_reason?: string | null
           smmhype_auto_id?: string | null
           smmhype_service_id?: string | null
           smmpanel_auto_id?: string | null
