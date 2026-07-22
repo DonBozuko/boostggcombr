@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
-export const Route = createFileRoute("/admin/health-catalog")({
+export const Route = createFileRoute("/admin-health-catalog")({
   head: () => ({
     meta: [
       { title: "Saúde do Catálogo · Admin" },

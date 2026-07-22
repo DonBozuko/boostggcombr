@@ -43,6 +43,7 @@ import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-in
 import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
+import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
@@ -55,7 +56,6 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
-import { Route as AdminHealthCatalogRouteImport } from './routes/admin.health-catalog'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -273,6 +273,11 @@ const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
   path: '/audiencia-brasileira',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
+  id: '/admin-health-catalog',
+  path: '/admin-health-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -334,11 +339,6 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 const AdminScriptsRoute = AdminScriptsRouteImport.update({
   id: '/scripts',
   path: '/scripts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
-  id: '/health-catalog',
-  path: '/health-catalog',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
@@ -576,6 +576,7 @@ const ApiPublicAdminCatalogHealthRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
@@ -613,7 +614,6 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
-  '/admin/health-catalog': typeof AdminHealthCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
@@ -666,6 +666,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
@@ -703,7 +704,6 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
-  '/admin/health-catalog': typeof AdminHealthCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
@@ -757,6 +757,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
@@ -794,7 +795,6 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/catalog': typeof AdminCatalogRoute
-  '/admin/health-catalog': typeof AdminHealthCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/dashboard/seo': typeof DashboardSeoRoute
@@ -849,6 +849,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin-health-catalog'
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
@@ -886,7 +887,6 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
-    | '/admin/health-catalog'
     | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
@@ -939,6 +939,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/admin-health-catalog'
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
@@ -976,7 +977,6 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
-    | '/admin/health-catalog'
     | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
@@ -1029,6 +1029,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/admin-health-catalog'
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
@@ -1066,7 +1067,6 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/catalog'
-    | '/admin/health-catalog'
     | '/admin/scripts'
     | '/blog/$slug'
     | '/dashboard/seo'
@@ -1120,6 +1120,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
   AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
   AvaliacoesRoute: typeof AvaliacoesRoute
   ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
@@ -1445,6 +1446,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AudienciaBrasileiraRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-health-catalog': {
+      id: '/admin-health-catalog'
+      path: '/admin-health-catalog'
+      fullPath: '/admin-health-catalog'
+      preLoaderRoute: typeof AdminHealthCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -1527,13 +1535,6 @@ declare module '@tanstack/react-router' {
       path: '/scripts'
       fullPath: '/admin/scripts'
       preLoaderRoute: typeof AdminScriptsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/health-catalog': {
-      id: '/admin/health-catalog'
-      path: '/health-catalog'
-      fullPath: '/admin/health-catalog'
-      preLoaderRoute: typeof AdminHealthCatalogRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/catalog': {
@@ -1828,13 +1829,11 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminCatalogRoute: typeof AdminCatalogRoute
-  AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
   AdminScriptsRoute: typeof AdminScriptsRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminCatalogRoute: AdminCatalogRoute,
-  AdminHealthCatalogRoute: AdminHealthCatalogRoute,
   AdminScriptsRoute: AdminScriptsRoute,
 }
 
@@ -1843,6 +1842,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AdminHealthCatalogRoute: AdminHealthCatalogRoute,
   AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
   AvaliacoesRoute: AvaliacoesRoute,
   ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
