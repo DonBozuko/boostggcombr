@@ -103,7 +103,11 @@ export const criarPedido = createServerFn({ method: "POST" })
         return { ok: false as const, error: "GLOBAL_KILL" as const };
       }
     }
-    const pkg = data.pacote.toLowerCase();
+    const pacoteRaw = data.pacote.toLowerCase();
+    // v192 — pacotes com prefixo `br-` (variante brasileira) precisam ser normalizados
+    // para lookup de preço/categoria, mas o prefixo é preservado para dispatch (SMMhype BR).
+    const isBrVariant = pacoteRaw.startsWith("br-");
+    const pkg = isBrVariant ? pacoteRaw.slice(3) : pacoteRaw;
     const isTelegram = pkg.startsWith("tg");
     const isTrafego = !isTelegram && pkg.startsWith("w");
     const isTiktok = !isTelegram && !isTrafego && pkg.startsWith("t");
@@ -111,6 +115,7 @@ export const criarPedido = createServerFn({ method: "POST" })
     const isFacebook = pkg.startsWith("f");
     const isKwai = pkg.startsWith("k");
     const isInstagram = !isTelegram && !isTrafego && !isTiktok && !isYoutube && !isFacebook && !isKwai;
+
     const rede =
       data.rede_social ??
       (isTelegram ? "telegram"
@@ -156,7 +161,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
     }
     if (valorBase == null) {
-      const oficial = PRICE_TABLE[data.pacote];
+      const oficial = PRICE_TABLE[pkg];
       if (!oficial) {
         console.error("[criarPedido] pacote inválido:", data.pacote);
         return { ok: false as const, error: "INVALID_PACKAGE" as const };
@@ -168,6 +173,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
+
 
     // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
     // Only accept when client value is within 10% of server value (anti-tampering).
@@ -185,7 +191,7 @@ export const criarPedido = createServerFn({ method: "POST" })
 
     // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
     // Margem preservada (base já tem 5-12x multiplicador; -20% sai da margem, nunca do custo).
-    let pacoteEfetivo = data.pacote;
+    let pacoteEfetivo = isBrVariant ? `br-${pkg}` : data.pacote;
     let quantidadeEfetiva = qtdOficial;
     let bumpAplicado = false;
     let bumpOfertado = false;
@@ -199,11 +205,12 @@ export const criarPedido = createServerFn({ method: "POST" })
       // v190 — Telemetria: se existe tier válido, o dialog foi mostrado no front.
       bumpOfertado = !!next;
       if (data.bump_upgrade && next) {
-        pacoteEfetivo = next.id;
+        pacoteEfetivo = isBrVariant ? `br-${next.id}` : next.id;
         quantidadeEfetiva = next.quantidade;
         valorBase = Number((next.valor * 0.80).toFixed(2));
         bumpAplicado = true;
-        console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
+        console.log("[criarPedido] bump aplicado:", data.pacote, "→", pacoteEfetivo, `R$${valorBase}`);
+
       } else if (data.bump_upgrade) {
         console.log("[criarPedido] bump rejeitado (nenhum tier válido):", data.pacote);
       }
