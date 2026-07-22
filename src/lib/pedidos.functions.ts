@@ -156,26 +156,58 @@ export const criarPedido = createServerFn({ method: "POST" })
     let qtdOficial: number = data.quantidade;
     let gridRef: Awaited<ReturnType<typeof import("./pricing-engine.server").getPricingGridImpl>> | null = null;
     let catRef: string | null = null;
-    try {
-      const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
-      const cat = categoryFromPacote(pkg);
-      if (cat) {
-        catRef = cat;
-        const grid = await getPricingGridImpl(cat);
-        gridRef = grid;
-        const item = grid.items.find((i) => i.id === pkg);
-        if (item) {
-          valorBase = item.valor;
-          qtdOficial = item.quantidade;
+
+    // v211 — BR variants (`br-*`) live in a separate pricing_items subcategory
+    // (ex: `instagram:seguidores:br`) that categoryFromPacote() doesn't map.
+    // Query pricing_items directly by full pacote id to avoid INVALID_PACKAGE.
+    if (isBrVariant) {
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: row } = await supabaseAdmin
+          .from("pricing_items" as any)
+          .select("price_brl, quantidade")
+          .eq("pacote", pacoteRaw)
+          .maybeSingle();
+        const v = Number((row as any)?.price_brl);
+        const q = Number((row as any)?.quantidade);
+        if (Number.isFinite(v) && v > 0 && Number.isFinite(q) && q > 0) {
+          valorBase = v;
+          qtdOficial = q;
         }
+      } catch (err) {
+        console.error("[criarPedido] BR lookup falhou:", err);
       }
-    } catch (err) {
-      console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
+    }
+
+    if (valorBase == null) {
+      try {
+        const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
+        const cat = categoryFromPacote(pkg);
+        if (cat) {
+          catRef = cat;
+          const grid = await getPricingGridImpl(cat);
+          gridRef = grid;
+          const item = grid.items.find((i) => i.id === pkg);
+          if (item) {
+            valorBase = item.valor;
+            qtdOficial = item.quantidade;
+          }
+        }
+      } catch (err) {
+        console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
+      }
     }
     if (valorBase == null) {
       const oficial = PRICE_TABLE[pkg];
       if (!oficial) {
         console.error("[criarPedido] pacote inválido:", data.pacote);
+        // v211 — Alerta imediato: pacote inválido = venda perdida silenciosa.
+        try {
+          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+          await dispatchWhatsappAlert(
+            `⚠️ CLIENTE TENTOU PACOTE QUE NÃO EXISTE\n\nPROBLEMA: alguém clicou no pacote "${data.pacote}" (${data.quantidade} ${categoria} ${rede}) mas o backend não conhece esse ID. Checkout travou pro cliente.\n\nO QUE FAZER: verificar se esse pacote aparece no front mas sumiu do pricing_items. Rodar sync-pricing no admin.`,
+          ).catch(() => {});
+        } catch { /* noop */ }
         return { ok: false as const, error: "INVALID_PACKAGE" as const };
       }
       valorBase = oficial.valor;
