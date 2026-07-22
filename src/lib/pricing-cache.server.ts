@@ -64,7 +64,7 @@ export const RESERVE_PROVIDER_ENDPOINTS = {
   verified: "https://verifiedatacado.com/api/v2",
 } as const;
 
-async function fetchServiceCatalog(endpoint: string, apiKey: string): Promise<RemoteService[] | null> {
+export async function fetchServiceCatalog(endpoint: string, apiKey: string): Promise<RemoteService[] | null> {
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12000);
