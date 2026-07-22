@@ -205,11 +205,12 @@ export const criarPedido = createServerFn({ method: "POST" })
       // v190 — Telemetria: se existe tier válido, o dialog foi mostrado no front.
       bumpOfertado = !!next;
       if (data.bump_upgrade && next) {
-        pacoteEfetivo = next.id;
+        pacoteEfetivo = isBrVariant ? `br-${next.id}` : next.id;
         quantidadeEfetiva = next.quantidade;
         valorBase = Number((next.valor * 0.80).toFixed(2));
         bumpAplicado = true;
-        console.log("[criarPedido] bump aplicado:", data.pacote, "→", next.id, `R$${valorBase}`);
+        console.log("[criarPedido] bump aplicado:", data.pacote, "→", pacoteEfetivo, `R$${valorBase}`);
+
       } else if (data.bump_upgrade) {
         console.log("[criarPedido] bump rejeitado (nenhum tier válido):", data.pacote);
       }
