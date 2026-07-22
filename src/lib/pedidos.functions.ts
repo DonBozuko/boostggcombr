@@ -161,7 +161,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
     }
     if (valorBase == null) {
-      const oficial = PRICE_TABLE[data.pacote];
+      const oficial = PRICE_TABLE[pkg];
       if (!oficial) {
         console.error("[criarPedido] pacote inválido:", data.pacote);
         return { ok: false as const, error: "INVALID_PACKAGE" as const };
@@ -173,6 +173,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
+
 
     // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
     // Only accept when client value is within 10% of server value (anti-tampering).
