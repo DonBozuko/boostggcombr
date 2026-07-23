@@ -301,6 +301,51 @@ export const criarPedido = createServerFn({ method: "POST" })
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
+    // v218 — Checkout dedup: se cliente clica 2x em <90s, retorna o MESMO Pix.
+    // Sem isso, cada clique gera novo payment no MP e polui a fila de recuperação.
+    try {
+      const { supabaseAdmin: sbDedup } = await import("@/integrations/supabase/client.server");
+      const cutoff = new Date(Date.now() - 90_000).toISOString();
+      const { data: existing } = await sbDedup
+        .from("pedidos")
+        .select("id, mercado_pago_id, valor, pacote, quantidade")
+        .eq("instagram_user", clean(data.instagram_user))
+        .eq("pacote", clean(pacoteEfetivo))
+        .eq("status", "pending")
+        .gte("created_at", cutoff)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (existing?.mercado_pago_id && process.env.MERCADO_PAGO_ACCESS_TOKEN) {
+        const rr = await fetch(`https://api.mercadopago.com/v1/payments/${existing.mercado_pago_id}`, {
+          headers: { Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}` },
+          cache: "no-store",
+        });
+        if (rr.ok) {
+          const mpPrev: any = await rr.json().catch(() => ({}));
+          const qr = mpPrev?.point_of_interaction?.transaction_data?.qr_code;
+          const qr64 = mpPrev?.point_of_interaction?.transaction_data?.qr_code_base64;
+          if (qr && qr64 && mpPrev?.status === "pending") {
+            console.log("[criarPedido] v218 dedup HIT — reaproveitando Pix", existing.id);
+            return {
+              ok: true as const,
+              pedidoId: existing.id,
+              mercadoPagoId: String(existing.mercado_pago_id),
+              qrCode: qr,
+              qrCodeBase64: qr64,
+              valorCobrado: Number(existing.valor),
+              valorFormatado: `R$ ${Number(existing.valor).toFixed(2).replace(".", ",")}`,
+              cupomAplicado: null,
+              bumpAplicado: false,
+              pacoteFinal: existing.pacote,
+              quantidadeFinal: Number(existing.quantidade),
+            };
+          }
+        }
+      }
+    } catch (e) { console.warn("[criarPedido] v218 dedup check falhou:", e); }
+
+
 
 
     const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
