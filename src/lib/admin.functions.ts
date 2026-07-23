@@ -672,7 +672,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
       ensure(dayOf(v.created_at as string)).visits++;
     }
 
-    const paidStatuses = new Set(["approved", "paid", "provisioning", "provisioned", "completed", "concluido", "concluído"]);
+    const paidStatuses = new Set(["approved", "paid", "provisioning", "provisioned", "processing", "completed", "concluido", "concluído"]);
     for (const p of pedidosRes.data ?? []) {
       const d = dayOf(p.created_at as string);
       const row = ensure(d);
