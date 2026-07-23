@@ -239,6 +239,8 @@ export function MobileFrame({
         @media (min-height: 700px) and (min-width: 1024px) {
           .mf-shell { height: auto !important; min-height: 100vh !important; max-height: none !important; border-radius: 18px; }
         }
+      `}</style>
+
 
       <BodyCharacters data={data} chars={chars} />
       <Billboard side="left" data={data} />
