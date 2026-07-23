@@ -91,6 +91,7 @@ import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
 import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
+import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
@@ -536,6 +537,12 @@ const ApiPublicHooksDryRunCatalogRoute =
     path: '/api/public/hooks/dry-run-catalog',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDeliveryWatcherRoute =
+  ApiPublicHooksDeliveryWatcherRouteImport.update({
+    id: '/api/public/hooks/delivery-watcher',
+    path: '/api/public/hooks/delivery-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBestsellerScanRoute =
   ApiPublicHooksBestsellerScanRouteImport.update({
     id: '/api/public/hooks/bestseller-scan',
@@ -650,6 +657,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
@@ -741,6 +749,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
@@ -833,6 +842,7 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
@@ -926,6 +936,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
@@ -1017,6 +1028,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
@@ -1108,6 +1120,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
@@ -1198,6 +1211,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
+  ApiPublicHooksDeliveryWatcherRoute: typeof ApiPublicHooksDeliveryWatcherRoute
   ApiPublicHooksDryRunCatalogRoute: typeof ApiPublicHooksDryRunCatalogRoute
   ApiPublicHooksPedidoReconcilerRoute: typeof ApiPublicHooksPedidoReconcilerRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
@@ -1795,6 +1809,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDryRunCatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/delivery-watcher': {
+      id: '/api/public/hooks/delivery-watcher'
+      path: '/api/public/hooks/delivery-watcher'
+      fullPath: '/api/public/hooks/delivery-watcher'
+      preLoaderRoute: typeof ApiPublicHooksDeliveryWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/bestseller-scan': {
       id: '/api/public/hooks/bestseller-scan'
       path: '/api/public/hooks/bestseller-scan'
@@ -1932,6 +1953,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
+  ApiPublicHooksDeliveryWatcherRoute: ApiPublicHooksDeliveryWatcherRoute,
   ApiPublicHooksDryRunCatalogRoute: ApiPublicHooksDryRunCatalogRoute,
   ApiPublicHooksPedidoReconcilerRoute: ApiPublicHooksPedidoReconcilerRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
