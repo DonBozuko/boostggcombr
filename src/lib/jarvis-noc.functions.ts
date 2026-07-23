@@ -42,7 +42,7 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     const since = new Date(Date.now() - 24 * 3600_000).toISOString();
     const { data: pedidos24 } = await supabaseAdmin
       .from("pedidos").select("status").gte("created_at", since);
-    const pagos = (pedidos24 ?? []).filter((p: any) => ["paid","pago","completed"].includes(p.status)).length;
+    const pagos = (pedidos24 ?? []).filter((p: any) => ["paid","pago","completed","processing"].includes(p.status)).length;
     const pendentes = (pedidos24 ?? []).filter((p: any) => ["pending","pendente"].includes(p.status)).length;
 
     // v191 — Health probe: qualquer resposta HTTP < 500 conta como "API viva"
@@ -117,7 +117,7 @@ export const jarvisChat = createServerFn({ method: "POST" })
       supabaseAdmin.from("admin_treasury" as any).select("faturamento, lucro_liquido").gte("occurred_at", start30d),
     ]);
 
-    const pagosHoje = (hoje ?? []).filter((r: any) => ["paid","pago","completed"].includes(r.status));
+    const pagosHoje = (hoje ?? []).filter((r: any) => ["paid","pago","completed","processing"].includes(r.status));
     const receitaHoje = pagosHoje.reduce((s: number, r: any) => s + Number(r.valor || 0), 0);
     const custoHoje = pagosHoje.reduce((s: number, r: any) => s + Number(r.custo_real || 0), 0);
     const lucroHoje = receitaHoje - custoHoje;
