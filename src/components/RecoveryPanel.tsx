@@ -13,6 +13,7 @@ type Row = {
   pacote: string | null;
   whatsapp: string | null;
   instagram_user: string | null;
+  email: string | null;
   status: string;
   attempts: number;
   first_seen_at: string;
@@ -31,8 +32,36 @@ function timeAgo(iso: string) {
   return `${Math.floor(h / 24)}d`;
 }
 
+/** Extrai handle limpo de qualquer coisa colada pelo cliente (URL, @, etc). */
+function parseHandle(raw: string | null): { handle: string; platform: "instagram" | "tiktok" | "youtube" | "kwai" | "facebook" | null; rawUrl: string | null } {
+  const s = (raw ?? "").trim();
+  if (!s) return { handle: "", platform: null, rawUrl: null };
+  let platform: "instagram" | "tiktok" | "youtube" | "kwai" | "facebook" | null = null;
+  if (/tiktok\.com/i.test(s)) platform = "tiktok";
+  else if (/instagram\.com/i.test(s)) platform = "instagram";
+  else if (/youtube\.com|youtu\.be/i.test(s)) platform = "youtube";
+  else if (/kwai\.com/i.test(s)) platform = "kwai";
+  else if (/facebook\.com|fb\.com/i.test(s)) platform = "facebook";
+  const rawUrl = /^https?:\/\//i.test(s) ? s : null;
+  // pega último segmento com @handle ou path final
+  const m = s.match(/@([A-Za-z0-9._-]+)/) ?? s.match(/\/([A-Za-z0-9._-]+)\/?(?:\?|$)/);
+  const handle = (m?.[1] ?? s.replace(/^@/, "").split(/[/?#]/).pop() ?? "").trim();
+  return { handle, platform, rawUrl };
+}
+
+function networkToPlatform(rede: string | null): "instagram" | "tiktok" | "youtube" | "kwai" | "facebook" | null {
+  const r = (rede ?? "").toLowerCase();
+  if (r.includes("tiktok")) return "tiktok";
+  if (r.includes("insta")) return "instagram";
+  if (r.includes("youtube")) return "youtube";
+  if (r.includes("kwai")) return "kwai";
+  if (r.includes("face")) return "facebook";
+  return null;
+}
+
 function buildMessage(r: Row): string {
-  const nome = r.instagram_user ? `@${r.instagram_user.replace(/^@/, "")}` : "olá";
+  const { handle } = parseHandle(r.instagram_user);
+  const nome = handle ? `@${handle}` : "olá";
   return (
     `Oi ${nome}! 👋\n\n` +
     `Vi aqui que você começou um pedido na BoostGG (${r.pacote ?? "impulso"}) mas o Pix ficou pendente. ` +
@@ -42,14 +71,30 @@ function buildMessage(r: Row): string {
 
 function buildWhatsappUrl(r: Row): string | null {
   const digits = (r.whatsapp ?? "").replace(/\D/g, "");
-  if (!digits) return null;
+  if (!digits || digits.length < 8) return null;
   return `https://api.whatsapp.com/send?phone=${digits}&text=${encodeURIComponent(buildMessage(r))}`;
 }
 
-function buildInstagramUrl(r: Row): string | null {
-  const u = (r.instagram_user ?? "").replace(/^@/, "").trim();
-  if (!u) return null;
-  return `https://www.instagram.com/${u}/`;
+function buildProfileUrl(r: Row): string | null {
+  const parsed = parseHandle(r.instagram_user);
+  if (parsed.rawUrl) return parsed.rawUrl;
+  if (!parsed.handle) return null;
+  const platform = parsed.platform ?? networkToPlatform(r.rede_social) ?? "instagram";
+  const h = parsed.handle.replace(/^@/, "");
+  switch (platform) {
+    case "tiktok": return `https://www.tiktok.com/@${h}`;
+    case "youtube": return `https://www.youtube.com/@${h}`;
+    case "kwai": return `https://www.kwai.com/@${h}`;
+    case "facebook": return `https://www.facebook.com/${h}`;
+    default: return `https://www.instagram.com/${h}/`;
+  }
+}
+
+function buildEmailUrl(r: Row): string | null {
+  if (!r.email) return null;
+  const subject = `BoostGG — seu pedido ${r.pacote ?? ""} ficou pendente`;
+  const body = buildMessage(r);
+  return `mailto:${r.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 export function RecoveryPanel({ token }: { token: string }) {
