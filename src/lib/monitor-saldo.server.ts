@@ -9,12 +9,13 @@ export type AlertLevel = "verde" | "amarelo" | "laranja" | "vermelho" | "critico
 
 export function classifyBalance(saldoBrl: number | null | undefined): AlertLevel {
   if (saldoBrl == null) return "critico";
-  if (saldoBrl < 20) return "critico";
-  if (saldoBrl < 50) return "vermelho";
-  if (saldoBrl < 100) return "laranja";
-  if (saldoBrl < 200) return "amarelo";
+  if (saldoBrl < 50) return "critico";
+  if (saldoBrl < 100) return "vermelho";
+  if (saldoBrl < 200) return "laranja";
+  if (saldoBrl < 400) return "amarelo";
   return "verde";
 }
+
 
 export async function checkSmmhypeBalance() {
   const { data: fornecedor, error: fErr } = await supabaseAdmin
@@ -57,20 +58,24 @@ export async function checkSmmhypeBalance() {
     }
 
     if (saldoBrl != null) {
-      if (saldoBrl < 50) {
+      // Sugestão de recarga = 3 dias de consumo (previsao24h * 3), mínimo R$300.
+      const sugestaoRecarga = Math.max(300, Math.ceil((previsao24hBrl * 3) / 50) * 50);
+      const sugestaoTxt = `Sugestão: recarregar R$ ${sugestaoRecarga.toFixed(2)} (cobre ~3 dias de venda no ritmo atual).`;
+
+      if (saldoBrl < 100) {
         alertaCriado = {
           nivel: 2,
-          mensagem: `🚨 CRÍTICO: SMMhype com R$ ${saldoBrl.toFixed(2)} (abaixo de R$ 50). Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}. Deposite manualmente AGORA no painel do fornecedor.`,
+          mensagem: `🚨 CRÍTICO: SMMhype com R$ ${saldoBrl.toFixed(2)} (abaixo de R$ 100). Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.\n\n${sugestaoTxt}\n\nO QUE FAZER: deposite AGORA no painel do fornecedor antes que pedidos falhem.`,
         };
-      } else if (saldoBrl < 100) {
+      } else if (saldoBrl < 200) {
         alertaCriado = {
           nivel: 2,
-          mensagem: `🚨 URGENTE: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.`,
+          mensagem: `🚨 URGENTE: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.\n\n${sugestaoTxt}`,
         };
-      } else if (saldoBrl < 300) {
+      } else if (saldoBrl < 500) {
         alertaCriado = {
           nivel: 1,
-          mensagem: `⚠️ Atenção: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.`,
+          mensagem: `⚠️ Atenção: SMMhype com R$ ${saldoBrl.toFixed(2)}. Consumo 24h: R$ ${previsao24hBrl.toFixed(2)}.\n\n${sugestaoTxt}`,
         };
       }
     }
@@ -94,10 +99,11 @@ export async function checkSmmhypeBalance() {
           mensagem: alertaCriado.mensagem,
           status: "open",
         });
-        const { dispatchWhatsappAlert, buildSmmhypeAlertMessage } = await import("@/lib/whatsapp-alert.server");
-        await dispatchWhatsappAlert(buildSmmhypeAlertMessage(saldoBrl));
+        const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+        await dispatchWhatsappAlert(alertaCriado.mensagem);
       }
     }
+
   } catch (e) {
     console.error("[monitor-saldo] previsao/alerta error", e);
   }
