@@ -1,6 +1,4 @@
-// v214 — Teste seco pacote-a-pacote. Roda contra os catálogos vivos dos 3
-// fornecedores SEM consumir saldo nem cobrar Pix. Marca cada pacote como
-// sellable/não-sellable e grava o motivo em português no banco.
+// v214 + v217 — Teste seco pacote-a-pacote.
 //
 // Regras:
 //  1. cost_brl > 0        (senão: "Custo zerado")
@@ -9,6 +7,9 @@
 //  4. pelo menos 1 desses IDs aparece no catálogo vivo do fornecedor
 //     correspondente (senão: "Fornecedor não reconhece o ID")
 //  5. min ≤ quantidade ≤ max do fornecedor (senão: "Fora do range do fornecedor")
+//  6. v217 TRAVA DINÂMICA: menor custo vivo precisa manter margem mínima.
+//     Se custo dispara → pausa. Quando cai, próximo dry-run reativa sozinho.
+const MIN_MARGIN = 0.70;
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchServiceCatalog, RESERVE_PROVIDER_ENDPOINTS } from "./pricing-cache.server";
