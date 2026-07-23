@@ -80,6 +80,7 @@ import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$n
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
 import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public/queue/reprocess'
 import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
+import { Route as ApiPublicQueueApproveRefundRouteImport } from './routes/api/public/queue/approve-refund'
 import { Route as ApiPublicHooksWaitingWatcherRouteImport } from './routes/api/public/hooks/waiting-watcher'
 import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
 import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
@@ -472,6 +473,12 @@ const ApiPublicQueueConfirmRoute = ApiPublicQueueConfirmRouteImport.update({
   path: '/api/public/queue/confirm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicQueueApproveRefundRoute =
+  ApiPublicQueueApproveRefundRouteImport.update({
+    id: '/api/public/queue/approve-refund',
+    path: '/api/public/queue/approve-refund',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksWaitingWatcherRoute =
   ApiPublicHooksWaitingWatcherRouteImport.update({
     id: '/api/public/hooks/waiting-watcher',
@@ -669,6 +676,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/hooks/waiting-watcher': typeof ApiPublicHooksWaitingWatcherRoute
+  '/api/public/queue/approve-refund': typeof ApiPublicQueueApproveRefundRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
@@ -761,6 +769,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/hooks/waiting-watcher': typeof ApiPublicHooksWaitingWatcherRoute
+  '/api/public/queue/approve-refund': typeof ApiPublicQueueApproveRefundRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
@@ -854,6 +863,7 @@ export interface FileRoutesById {
   '/api/public/hooks/smoke-test': typeof ApiPublicHooksSmokeTestRoute
   '/api/public/hooks/sync-pricing': typeof ApiPublicHooksSyncPricingRoute
   '/api/public/hooks/waiting-watcher': typeof ApiPublicHooksWaitingWatcherRoute
+  '/api/public/queue/approve-refund': typeof ApiPublicQueueApproveRefundRoute
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
@@ -948,6 +958,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/hooks/waiting-watcher'
+    | '/api/public/queue/approve-refund'
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
@@ -1040,6 +1051,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/hooks/waiting-watcher'
+    | '/api/public/queue/approve-refund'
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
@@ -1132,6 +1144,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/smoke-test'
     | '/api/public/hooks/sync-pricing'
     | '/api/public/hooks/waiting-watcher'
+    | '/api/public/queue/approve-refund'
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
@@ -1223,6 +1236,7 @@ export interface RootRouteChildren {
   ApiPublicHooksSmokeTestRoute: typeof ApiPublicHooksSmokeTestRoute
   ApiPublicHooksSyncPricingRoute: typeof ApiPublicHooksSyncPricingRoute
   ApiPublicHooksWaitingWatcherRoute: typeof ApiPublicHooksWaitingWatcherRoute
+  ApiPublicQueueApproveRefundRoute: typeof ApiPublicQueueApproveRefundRoute
   ApiPublicQueueConfirmRoute: typeof ApiPublicQueueConfirmRoute
   ApiPublicQueueReprocessRoute: typeof ApiPublicQueueReprocessRoute
   ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
@@ -1732,6 +1746,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQueueConfirmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/queue/approve-refund': {
+      id: '/api/public/queue/approve-refund'
+      path: '/api/public/queue/approve-refund'
+      fullPath: '/api/public/queue/approve-refund'
+      preLoaderRoute: typeof ApiPublicQueueApproveRefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/waiting-watcher': {
       id: '/api/public/hooks/waiting-watcher'
       path: '/api/public/hooks/waiting-watcher'
@@ -1965,6 +1986,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksSmokeTestRoute: ApiPublicHooksSmokeTestRoute,
   ApiPublicHooksSyncPricingRoute: ApiPublicHooksSyncPricingRoute,
   ApiPublicHooksWaitingWatcherRoute: ApiPublicHooksWaitingWatcherRoute,
+  ApiPublicQueueApproveRefundRoute: ApiPublicQueueApproveRefundRoute,
   ApiPublicQueueConfirmRoute: ApiPublicQueueConfirmRoute,
   ApiPublicQueueReprocessRoute: ApiPublicQueueReprocessRoute,
   ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,

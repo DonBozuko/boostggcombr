@@ -70,13 +70,33 @@ export async function runSlaWatcher(): Promise<SlaReport> {
       continue;
     }
 
-    // Expirado — refund automático
+    // Expirado
     if (!p.mercado_pago_id) {
       await supabaseAdmin
         .from("pedidos")
         .update({ status: "SMM_FAILED", error_detail: "SLA expirado sem mercado_pago_id" } as any)
         .eq("id", p.id);
       report.refund_failed++;
+      continue;
+    }
+
+    // v220 — Política B: auto-refund apenas até R$ 50. Acima disso, aguarda aprovação humana.
+    const valor = Number(p.valor ?? 0);
+    const AUTO_REFUND_CAP = 50;
+    if (valor > AUTO_REFUND_CAP) {
+      await supabaseAdmin
+        .from("pedidos")
+        .update({
+          status: "AWAITING_REFUND_APPROVAL",
+          error_detail: `SLA 24h expirado · R$${valor.toFixed(2)} > R$${AUTO_REFUND_CAP} → aguardando aprovação humana no painel.`,
+        } as any)
+        .eq("id", p.id);
+      try {
+        const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+        await dispatchWhatsappAlert(
+          `🛑 REEMBOLSO PRECISA DE APROVAÇÃO\n\nPROBLEMA: pedido de R$${valor.toFixed(2)} passou de 24h sem entregar. Valor alto pra devolver sozinho.\n\nPedido ${p.id.slice(0, 8)} · ${p.pacote}\n\nO QUE FAZER: abre o admin, vai na Fila e clica em "Aprovar Refund" (ou "Reprocessar" se der pra tentar de novo).`,
+        ).catch(() => {});
+      } catch { /* */ }
       continue;
     }
 
@@ -92,12 +112,13 @@ export async function runSlaWatcher(): Promise<SlaReport> {
       .from("pedidos")
       .update({
         status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-        error_detail: `SLA 24h expirado. Refund ${refund.ok ? "OK" : "FALHOU"} (${refundAttempts.join(" | ")})`.slice(0, 500),
+        error_detail: `SLA 24h expirado (auto). Refund ${refund.ok ? "OK" : "FALHOU"} (${refundAttempts.join(" | ")})`.slice(0, 500),
       } as any)
       .eq("id", p.id);
 
     if (refund.ok) report.refunded++;
     else report.refund_failed++;
+
 
     // v215 — Aviso ao cliente por e-mail quando refund automático dá certo
     if (refund.ok) {

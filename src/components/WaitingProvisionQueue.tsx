@@ -150,7 +150,35 @@ export function WaitingProvisionQueue({ token }: { token: string }) {
               >
                 {busyId === it.pedido_id ? "processando..." : "✅ Confirmar envio"}
               </button>
+              {it.status === "AWAITING_REFUND_APPROVAL" && (
+                <button
+                  onClick={async () => {
+                    if (!token) { setFlash("❌ Sessão expirada — refaça login"); return; }
+                    if (!window.confirm(`Reembolsar R$${it.valor_cliente_brl.toFixed(2)} pro cliente do pedido ${it.pedido_id.slice(0,8)}? Ação irreversível.`)) return;
+                    setBusyId(it.pedido_id); setFlash(null);
+                    try {
+                      const res = await fetch("/api/public/queue/approve-refund", {
+                        method: "POST",
+                        headers: { "x-admin-token": token, "Content-Type": "application/json" },
+                        body: JSON.stringify({ pedido_id: it.pedido_id }),
+                      });
+                      const j = await res.json();
+                      setFlash(j.ok
+                        ? `💸 Refund OK · ${it.pedido_id.slice(0,8)}`
+                        : `❌ Refund falhou: ${j.error ?? j.detail ?? "erro"}`);
+                      await load();
+                    } catch (e) {
+                      setFlash(`❌ ${(e as Error).message}`);
+                    } finally { setBusyId(null); }
+                  }}
+                  disabled={busyId === it.pedido_id}
+                  className="text-[10px] uppercase tracking-wider text-red-200 border border-red-500/40 rounded px-2 py-1 hover:bg-red-500/10 disabled:opacity-50"
+                >
+                  {busyId === it.pedido_id ? "..." : "💸 Aprovar Refund"}
+                </button>
+              )}
             </div>
+
           </div>
         ))}
       </div>
