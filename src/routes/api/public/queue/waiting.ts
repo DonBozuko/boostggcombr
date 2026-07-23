@@ -17,7 +17,7 @@ export const Route = createFileRoute("/api/public/queue/waiting")({
         const { data, error } = await supabaseAdmin
           .from("pedidos")
           .select("id, pacote, quantidade, instagram_user, valor, custo_real, status, created_at")
-          .in("status", ["waiting_provision", "MARGIN_HOLD", "SMM_FAILED"])
+          .in("status", ["waiting_provision", "MARGIN_HOLD", "SMM_FAILED", "AWAITING_REFUND_APPROVAL"])
           .order("created_at", { ascending: true })
           .limit(200);
         if (error) {
