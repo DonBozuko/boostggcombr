@@ -403,6 +403,15 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
       return { ok: true, fornecedor: f.slug, orderId: r.orderId != null ? String(r.orderId) : null };
     }
     tentativas.push(`${f.slug}: ${r.error ?? "falha"}`);
+    // v218 — Circuit breaker no redispatch órfão: mesma regra do fallback.
+    try {
+      const errStr = String(r.error ?? "");
+      const structural = /timeout|rede|ECONN|ETIMEDOUT|fetch failed|HTTP 5\d\d/i.test(errStr);
+      if (structural) {
+        const { markProviderUnstable } = await import("@/lib/smart-routing.server");
+        await markProviderUnstable(f.slug, `verificações automáticas seguidas: ${errStr}`);
+      }
+    } catch { /* noop */ }
   }
   return { ok: false, error: "TODOS_FORNECEDORES_FALHARAM", tentativas };
 }
