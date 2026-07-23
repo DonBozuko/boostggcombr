@@ -118,10 +118,12 @@ export function RecoveryPanel({ token }: { token: string }) {
 
   useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [token]);
 
-  async function contact(r: Row, channel: "whatsapp" | "instagram") {
-    const url = channel === "whatsapp" ? buildWhatsappUrl(r) : buildInstagramUrl(r);
-    if (!url) { toast.error(`Sem ${channel === "whatsapp" ? "WhatsApp" : "Instagram"} cadastrado`); return; }
-    window.open(url, "_blank", "noopener");
+  async function contact(r: Row, channel: "whatsapp" | "profile" | "email") {
+    const url = channel === "whatsapp" ? buildWhatsappUrl(r) : channel === "email" ? buildEmailUrl(r) : buildProfileUrl(r);
+    const labelMap = { whatsapp: "WhatsApp", profile: "perfil", email: "email" } as const;
+    if (!url) { toast.error(`Sem ${labelMap[channel]} cadastrado`); return; }
+    if (channel === "email") window.location.href = url;
+    else window.open(url, "_blank", "noopener");
     const res = await markRecoveryContacted({ data: { token, id: r.id } });
     if (res.ok) { toast.success("Marcado como contatado"); load(); }
     else toast.error(res.error ?? "erro");
