@@ -125,14 +125,24 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
         }
       }
       if (matched) {
-        sellable = true;
-        reason = "OK";
+        // v217: trava dinâmica de margem. price/cost precisa manter margem
+        // mínima. Se custo do fornecedor subiu e comeu lucro, pausa. Assim
+        // que sync baixar o cost_brl de volta, próximo dry-run reativa.
+        const margem = price > 0 ? (price - cost) / price : 0;
+        if (margem < MIN_MARGIN) {
+          sellable = false;
+          reason = `Custo do fornecedor subiu (margem ${(margem * 100).toFixed(0)}%)`;
+        } else {
+          sellable = true;
+          reason = "OK";
+        }
       } else if (anyKnown) {
         reason = "Fora do range do fornecedor";
       } else {
         reason = "Fornecedor não reconhece o ID";
       }
     }
+
 
     summary.byReason[reason] = (summary.byReason[reason] ?? 0) + 1;
     if (sellable) summary.sellable++; else summary.paused++;
