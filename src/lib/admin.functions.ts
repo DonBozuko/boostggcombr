@@ -735,13 +735,17 @@ export const getRecoveryQueue = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pix_recovery_queue")
-      .select("*")
+      .select("*, pedidos:pedido_id ( email_contato )")
       .in("status", ["novo", "contatado"])
       .order("valor", { ascending: false })
       .limit(100);
     if (error) return { ok: false as const, error: error.message };
-    const totalValor = (rows ?? []).reduce((a, r) => a + Number((r as { valor?: number }).valor ?? 0), 0);
-    return { ok: true as const, rows: rows ?? [], totalValor };
+    const flat = (rows ?? []).map((r) => {
+      const rr = r as { pedidos?: { email_contato?: string | null } | null } & Record<string, unknown>;
+      return { ...rr, email: rr.pedidos?.email_contato ?? null };
+    });
+    const totalValor = flat.reduce((a, r) => a + Number((r as { valor?: number }).valor ?? 0), 0);
+    return { ok: true as const, rows: flat, totalValor };
   });
 
 export const markRecoveryContacted = createServerFn({ method: "POST" })
