@@ -1,6 +1,4 @@
-// v214 — Teste seco pacote-a-pacote. Roda contra os catálogos vivos dos 3
-// fornecedores SEM consumir saldo nem cobrar Pix. Marca cada pacote como
-// sellable/não-sellable e grava o motivo em português no banco.
+// v214 + v217 — Teste seco pacote-a-pacote.
 //
 // Regras:
 //  1. cost_brl > 0        (senão: "Custo zerado")
@@ -9,6 +7,9 @@
 //  4. pelo menos 1 desses IDs aparece no catálogo vivo do fornecedor
 //     correspondente (senão: "Fornecedor não reconhece o ID")
 //  5. min ≤ quantidade ≤ max do fornecedor (senão: "Fora do range do fornecedor")
+//  6. v217 TRAVA DINÂMICA: menor custo vivo precisa manter margem mínima.
+//     Se custo dispara → pausa. Quando cai, próximo dry-run reativa sozinho.
+const MIN_MARGIN = 0.70;
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchServiceCatalog, RESERVE_PROVIDER_ENDPOINTS } from "./pricing-cache.server";
@@ -124,14 +125,24 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
         }
       }
       if (matched) {
-        sellable = true;
-        reason = "OK";
+        // v217: trava dinâmica de margem. price/cost precisa manter margem
+        // mínima. Se custo do fornecedor subiu e comeu lucro, pausa. Assim
+        // que sync baixar o cost_brl de volta, próximo dry-run reativa.
+        const margem = price > 0 ? (price - cost) / price : 0;
+        if (margem < MIN_MARGIN) {
+          sellable = false;
+          reason = `Custo do fornecedor subiu (margem ${(margem * 100).toFixed(0)}%)`;
+        } else {
+          sellable = true;
+          reason = "OK";
+        }
       } else if (anyKnown) {
         reason = "Fora do range do fornecedor";
       } else {
         reason = "Fornecedor não reconhece o ID";
       }
     }
+
 
     summary.byReason[reason] = (summary.byReason[reason] ?? 0) + 1;
     if (sellable) summary.sellable++; else summary.paused++;
