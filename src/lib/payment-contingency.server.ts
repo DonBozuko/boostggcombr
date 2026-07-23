@@ -195,7 +195,16 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     rankedContingency.map((p: any) => [p.slug, p.provider_service_id ?? null]),
   );
 
+  const { respectsMinMargin } = await import("@/lib/margin-guardian");
   for (const f of cadeia) {
+    // v216 — trava anti-prejuízo: se custo do fallback quebra margem mínima,
+    // pula e vai pro próximo. Sem isso, SMMPainel (11x mais caro que SMMHype)
+    // consumia todo o lucro do pedido.
+    const custoFornecedor = costMap.get(f.slug) ?? null;
+    if (custoFornecedor != null && !respectsMinMargin(Number(pedido.valor), custoFornecedor)) {
+      tentativas.push(`${f.nome}: bloqueado (custo R$${custoFornecedor.toFixed(2)} > margem mínima)`);
+      continue;
+    }
     const r = await dispatchByFornecedor(f.slug, {
       pacote: pedido.pacote,
       quantidade: pedido.quantidade,

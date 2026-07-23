@@ -339,6 +339,16 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             } as any);
           } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
 
+          // v216 — Fecha entry na fila de recuperação. Sem isso, pedidos pagos
+          // continuam aparecendo como "carrinho abandonado" no painel admin.
+          try {
+            await supabaseAdmin
+              .from("pix_recovery_queue")
+              .update({ status: "recuperado", updated_at: new Date().toISOString() } as any)
+              .eq("pedido_id", pedido.id)
+              .neq("status", "recuperado");
+          } catch (e) { console.warn("[mp-webhook] v216 recovery close fail", e); }
+
           // v153 — Live Webhook Heartbeat: emite audit imediato pro monitor destravar [1].
           try {
             await supabaseAdmin.from("admin_audit_logs" as any).insert({

@@ -77,19 +77,27 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
             } catch { /* silencioso */ }
           }
 
-          // Auto-desqualifica: pedido já foi pago depois? marca como recuperado
-          const { data: pagos } = await supabaseAdmin
-            .from("pedidos")
-            .select("id, status")
-            .in("id", ids)
-            .in("status", ["approved", "paid", "provisioning", "provisioned", "completed"]);
-          const idsPagos = (pagos ?? []).map((p) => p.id as string);
-          if (idsPagos.length > 0) {
-            await supabaseAdmin
-              .from("pix_recovery_queue")
-              .update({ status: "recuperado" })
-              .in("pedido_id", idsPagos)
-              .neq("status", "recuperado");
+          // v216 — Sweep completo: qualquer entry ativa cujo pedido virou pago
+          // é marcada como recuperada. Antes só olhava IDs da janela atual.
+          const { data: ativos } = await supabaseAdmin
+            .from("pix_recovery_queue")
+            .select("pedido_id")
+            .in("status", ["novo", "contatado"]);
+          const ativosIds = (ativos ?? []).map((r) => r.pedido_id as string);
+          if (ativosIds.length > 0) {
+            const { data: pagos } = await supabaseAdmin
+              .from("pedidos")
+              .select("id")
+              .in("id", ativosIds)
+              .in("status", ["approved", "paid", "provisioning", "provisioned", "completed"]);
+            const idsPagos = (pagos ?? []).map((p) => p.id as string);
+            if (idsPagos.length > 0) {
+              await supabaseAdmin
+                .from("pix_recovery_queue")
+                .update({ status: "recuperado" })
+                .in("pedido_id", idsPagos)
+                .neq("status", "recuperado");
+            }
           }
 
           return Response.json({ ok: true, scanned: rows.length, enqueued, valor_em_risco: valorEmRisco });
