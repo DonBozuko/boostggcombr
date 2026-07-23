@@ -48,6 +48,8 @@ import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { LaboratorioPanel } from "@/components/LaboratorioPanel";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
 import { WaitingProvisionQueue } from "@/components/WaitingProvisionQueue";
+import { SloPanel } from "@/components/SloPanel";
+
 import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
 import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
