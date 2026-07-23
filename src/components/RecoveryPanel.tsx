@@ -164,7 +164,11 @@ export function RecoveryPanel({ token }: { token: string }) {
         <div className="space-y-2">
           {rows.map((r) => {
             const hasWpp = !!(r.whatsapp && r.whatsapp.replace(/\D/g, "").length >= 8);
-            const hasIg = !!(r.instagram_user && r.instagram_user.trim().length > 0);
+            const parsed = parseHandle(r.instagram_user);
+            const hasProfile = !!(parsed.handle || parsed.rawUrl);
+            const hasEmail = !!r.email;
+            const platform = parsed.platform ?? networkToPlatform(r.rede_social);
+            const profileLabel = platform ? platform.charAt(0).toUpperCase() + platform.slice(1) : "Perfil";
             return (
               <div key={r.id} className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-lg border border-white/10 bg-white/5">
                 <div className="min-w-0 flex-1">
@@ -172,9 +176,10 @@ export function RecoveryPanel({ token }: { token: string }) {
                     {brl(r.valor)} · <span className="text-neutral-300">{r.pacote ?? "—"}</span>
                     {r.rede_social && <span className="text-xs text-neutral-500 ml-2">({r.rede_social})</span>}
                   </div>
-                  <div className="text-xs text-neutral-400 mt-0.5">
-                    {hasIg && <span>@{r.instagram_user}</span>}
+                  <div className="text-xs text-neutral-400 mt-0.5 break-all">
+                    {parsed.handle && <span>@{parsed.handle}</span>}
                     {hasWpp && <span className="ml-2">📱 {r.whatsapp}</span>}
+                    {hasEmail && <span className="ml-2">✉️ {r.email}</span>}
                     <span className="ml-2 text-neutral-500">
                       há {timeAgo(r.first_seen_at)} · tentativas: {r.attempts}
                       {r.status === "contatado" && r.contacted_at && ` · contatado há ${timeAgo(r.contacted_at)}`}
@@ -187,17 +192,27 @@ export function RecoveryPanel({ token }: { token: string }) {
                     className="bg-green-600 hover:bg-green-500 text-white h-8"
                     onClick={() => contact(r, "whatsapp")}
                     disabled={!hasWpp}
-                    title={hasWpp ? "Abrir WhatsApp" : "Sem WhatsApp cadastrado"}
+                    title={hasWpp ? "Abrir WhatsApp com mensagem pronta" : "Sem WhatsApp cadastrado"}
                   >
                     WhatsApp
                   </Button>
                   <Button
                     size="sm"
                     className="bg-pink-600 hover:bg-pink-500 text-white h-8"
-                    onClick={() => contact(r, "instagram")}
-                    disabled={!hasIg}
+                    onClick={() => contact(r, "profile")}
+                    disabled={!hasProfile}
+                    title={hasProfile ? `Abrir perfil ${profileLabel}` : "Sem perfil"}
                   >
-                    Instagram
+                    {profileLabel}
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-sky-600 hover:bg-sky-500 text-white h-8"
+                    onClick={() => contact(r, "email")}
+                    disabled={!hasEmail}
+                    title={hasEmail ? "Abrir email com mensagem pronta" : "Sem email cadastrado"}
+                  >
+                    Email
                   </Button>
                   <Button size="sm" variant="ghost" className="h-8 text-neutral-400" onClick={() => dismiss(r)}>
                     Descartar
