@@ -207,6 +207,10 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     }
     const r = await dispatchByFornecedor(f.slug, {
       pacote: pedido.pacote,
+      quantidade: pedido.quantidade,
+      instagram_user: pedido.instagram_user,
+      serviceIdOverride: f.slug === "smmhype" ? undefined : serviceIdMap.get(f.slug) ?? null,
+    });
     if (r.ok) {
       sucesso = true;
       fornecedorOk = f.nome;
