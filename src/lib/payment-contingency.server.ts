@@ -219,7 +219,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       await supabaseAdmin
         .from("pedidos")
         .update({
-          status: "paid",
+          status: "completed",
           error_detail: `Contingência OK · ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
           provider_slug: f.slug,
