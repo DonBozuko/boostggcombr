@@ -4,8 +4,8 @@ export const Route = createFileRoute("/api/public/hooks/sla-watcher")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = request.headers.get("x-admin-token") ?? "";
-        if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
+        const { isCronAuthorized } = await import("@/lib/cron-auth.server");
+        if (!isCronAuthorized(request)) {
           return new Response("Unauthorized", { status: 401 });
         }
         const { runSlaWatcher } = await import("@/services/sla-watcher.server");
