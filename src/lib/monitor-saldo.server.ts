@@ -9,12 +9,13 @@ export type AlertLevel = "verde" | "amarelo" | "laranja" | "vermelho" | "critico
 
 export function classifyBalance(saldoBrl: number | null | undefined): AlertLevel {
   if (saldoBrl == null) return "critico";
-  if (saldoBrl < 20) return "critico";
-  if (saldoBrl < 50) return "vermelho";
-  if (saldoBrl < 100) return "laranja";
-  if (saldoBrl < 200) return "amarelo";
+  if (saldoBrl < 50) return "critico";
+  if (saldoBrl < 100) return "vermelho";
+  if (saldoBrl < 200) return "laranja";
+  if (saldoBrl < 400) return "amarelo";
   return "verde";
 }
+
 
 export async function checkSmmhypeBalance() {
   const { data: fornecedor, error: fErr } = await supabaseAdmin
