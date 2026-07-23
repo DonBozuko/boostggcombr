@@ -266,6 +266,17 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       break;
     }
     tentativas.push(`${f.nome}: ${r.error}${r.status ? ` HTTP ${r.status}` : ""}`);
+    // v218 — Circuit breaker: falha estrutural (rede/5xx/timeout) trip do fornecedor.
+    // Erros de negócio (saldo, service id, 4xx) NÃO trip — não são culpa do fornecedor.
+    try {
+      const errStr = String(r.error ?? "");
+      const structural = /timeout|rede|ECONN|ETIMEDOUT|fetch failed|HTTP 5\d\d/i.test(errStr)
+        || (typeof r.status === "number" && r.status >= 500);
+      if (structural) {
+        const { markProviderUnstable } = await import("@/lib/smart-routing.server");
+        await markProviderUnstable(f.slug, `verificações automáticas seguidas: ${errStr}`);
+      }
+    } catch { /* noop */ }
   }
 
   // 5) Log de auditoria — TI consome via jarvis_alerts
