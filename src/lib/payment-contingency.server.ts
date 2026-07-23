@@ -385,7 +385,7 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
       const { data: gravado } = await supabaseAdmin
         .from("pedidos")
         .update({
-          status: "completed",
+          status: "processing",
           provider_slug: f.slug,
           provider_order_id: r.orderId != null ? String(r.orderId) : null,
           dispatched_at: new Date().toISOString(),
