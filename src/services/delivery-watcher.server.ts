@@ -27,6 +27,8 @@ const ENDPOINTS: Record<string, { url: string; key: string | undefined }> = {
 };
 
 const STUCK_ALERT_HOURS = 24;
+// Só é "travado" se o contador de faltantes não se mexe há esse tempo.
+const STALLED_HOURS = 12;
 
 async function fetchStatus(slug: string, orderId: string): Promise<ProviderStatus | null> {
   const cfg = ENDPOINTS[slug];
@@ -46,11 +48,17 @@ async function fetchStatus(slug: string, orderId: string): Promise<ProviderStatu
   }
 }
 
-function isDelivered(s: ProviderStatus): boolean {
+// v234 — "Partial" com muita coisa faltando NÃO é entrega concluída.
+function isDelivered(s: ProviderStatus, quantidade: number): boolean {
   const status = String(s.status ?? "").toLowerCase();
   const remains = Number(s.remains ?? -1);
-  if (["completed", "partial", "concluído", "concluido"].includes(status)) return true;
   if (!isNaN(remains) && remains === 0) return true;
+  if (["completed", "concluído", "concluido"].includes(status)) return true;
+  if (["partial", "parcial"].includes(status)) {
+    // aceita como entregue só se faltou pouco (<=10% do pedido)
+    if (!isNaN(remains) && quantidade > 0 && remains <= quantidade * 0.1) return true;
+    return false;
+  }
   return false;
 }
 
@@ -80,7 +88,7 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
 
   const { data: pedidos, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, provider_slug, provider_order_id, dispatched_at, instagram_user, pacote, quantidade, valor, alerted_at")
+    .select("id, status, provider_slug, provider_order_id, dispatched_at, instagram_user, pacote, quantidade, valor, alerted_at, last_remains, last_remains_at")
     .eq("status", "processing")
     .not("provider_order_id", "is", null)
     .not("provider_slug", "is", null)
@@ -108,7 +116,7 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
       continue;
     }
 
-    if (isDelivered(s)) {
+    if (isDelivered(s, Number(p.quantidade ?? 0))) {
       await supabaseAdmin
         .from("pedidos")
         .update({
@@ -126,10 +134,26 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
     report.ainda_processando++;
     report.detalhes.push({ id: p.id, provider: slug, order: orderId, result: `IN_PROGRESS remains=${s.remains}` });
 
+    // v234 — progresso real: se o "faltam" caiu desde a última varredura, está andando.
+    const remainsNow = Number(s.remains ?? NaN);
+    const remainsBefore = p.last_remains == null ? null : Number(p.last_remains);
+    const progrediu = !isNaN(remainsNow) && remainsBefore != null && remainsNow < remainsBefore;
+    const paradoDesde = p.last_remains_at ? new Date(p.last_remains_at).getTime() : 0;
+    const horasParado = progrediu || !paradoDesde ? 0 : (Date.now() - paradoDesde) / 3_600_000;
+
+    if (!isNaN(remainsNow) && (remainsBefore == null || remainsNow !== remainsBefore)) {
+      await supabaseAdmin
+        .from("pedidos")
+        .update({ last_remains: remainsNow, last_remains_at: new Date().toISOString() } as any)
+        .eq("id", p.id);
+    }
+
     // Trava anti-spam: alerta uma vez só (alerted_at)
     const dispatchedAt = p.dispatched_at ? new Date(p.dispatched_at).getTime() : 0;
     const ageHours = dispatchedAt ? (Date.now() - dispatchedAt) / 3_600_000 : 0;
-    if (ageHours > STUCK_ALERT_HOURS && !p.alerted_at) {
+    // Só alerta se: passou do prazo E o contador não anda há 12h (entrega realmente parada).
+    const realmenteTravado = ageHours > STUCK_ALERT_HOURS && horasParado >= STALLED_HOURS;
+    if (realmenteTravado && !p.alerted_at) {
       await supabaseAdmin
         .from("pedidos")
         .update({ alerted_at: new Date().toISOString() } as any)
@@ -146,7 +170,7 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
       const { dispatchTelegramAlert } = await import("@/lib/messaging");
       await dispatchTelegramAlert(
         `⏰ ENTREGA DEMORANDO MAIS QUE O NORMAL\n\n` +
-        `PROBLEMA: ${stuckAlerts.length} pedido(s) despachado(s) há mais de ${STUCK_ALERT_HOURS}h ainda não terminaram de cair.\n\n` +
+        `PROBLEMA: ${stuckAlerts.length} pedido(s) parado(s): passou de ${STUCK_ALERT_HOURS}h e o número de seguidores faltando não muda há mais de ${STALLED_HOURS}h.\n\n` +
         stuckAlerts.join("\n") +
         `\n\nO QUE FAZER: abre o painel do fornecedor, confere se travou. Se sim, reprocessa ou reembolsa manual pelo Mercado Pago.`,
       );
@@ -156,7 +180,7 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
   try {
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
       admin_email: "system@delivery-watcher",
-      action: "delivery_watcher_v219",
+      action: "delivery_watcher_v234",
       detail: report as any,
       created_at: new Date().toISOString(),
     });
