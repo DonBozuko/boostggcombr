@@ -200,5 +200,5 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       blockDeploy,
       checks,
     };
-  },
-);
+  });
+
