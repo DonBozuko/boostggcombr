@@ -174,6 +174,10 @@ export async function dispatchByFornecedor(slug: string, args: {
     await new Promise((res) => setTimeout(res, 800));
     r = await doOne();
   }
+
+    await new Promise((res) => setTimeout(res, 800));
+    r = await doOne();
+  }
   await recordDispatchResult(slug, r.ok, r.ok ? undefined : r.error);
   return r;
 }
