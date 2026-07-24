@@ -3,7 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-const schema = z.object({ pedido_id: z.string().min(1), dry_run: z.boolean().optional() });
+const schema = z.object({ pedido_id: z.string().min(1), dry_run: z.boolean().optional(), force_refund: z.boolean().optional() });
 
 async function authorize(request: Request): Promise<{ ok: boolean; who: string }> {
   const authz = request.headers.get("authorization") ?? "";
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
 
         const { data: p, error: loadErr } = await supabaseAdmin
           .from("pedidos")
-          .select("id, status, mercado_pago_id, valor, pacote, email_contato")
+          .select("id, status, mercado_pago_id, valor, pacote, email_contato, provider_slug, provider_order_id")
           .eq("id", parsed.data.pedido_id)
           .maybeSingle();
 
@@ -64,6 +64,8 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
             pedido_found: !!p,
             pedido_status: (p as any)?.status ?? null,
             has_mp_id: !!(p as any)?.mercado_pago_id,
+            provider_slug: (p as any)?.provider_slug ?? null,
+            has_provider_order_id: !!(p as any)?.provider_order_id,
             valor: (p as any)?.valor ?? null,
           }), { status: 200, headers: { "Content-Type": "application/json" } });
         }
@@ -84,7 +86,30 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
           });
         }
 
-        const { refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+        const { refundMercadoPago, cancelAtProvider } = await import("@/lib/dispatcher-fallback.server");
+
+        // v230 — cancel-then-refund: recupera saldo no fornecedor ANTES de reembolsar cliente.
+        // Se cancel falhar (em andamento/entregue) → bloqueia refund por padrão (prejuízo).
+        // Admin pode forçar com force_refund: true (assumindo o prejuízo conscientemente).
+        let cancelResult: { ok: boolean; detail: string; recoverable: boolean } = {
+          ok: true, detail: "sem provider_slug (contingência sem dispatch)", recoverable: true,
+        };
+        const slug = String((p as any).provider_slug ?? "").toLowerCase().trim();
+        const pOrderId = String((p as any).provider_order_id ?? "").trim();
+        if (slug) {
+          cancelResult = await cancelAtProvider(slug, pOrderId);
+        }
+
+        if (!cancelResult.ok && !parsed.data.force_refund) {
+          return new Response(JSON.stringify({
+            ok: false,
+            error: "CANCEL_FALHOU_PREJUIZO_PROVAVEL",
+            provider: slug,
+            provider_order_id: pOrderId || null,
+            cancel_detail: cancelResult.detail,
+            hint: "Fornecedor não cancelou (pedido pode estar em andamento/entregue). Para reembolsar mesmo assim, reenvie com force_refund: true.",
+          }), { status: 409, headers: { "Content-Type": "application/json" } });
+        }
 
         let refund = await refundMercadoPago(String((p as any).mercado_pago_id));
         const attempts: string[] = [`t1: ${refund.ok ? "OK" : refund.detail}`];
@@ -94,11 +119,17 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
           attempts.push(`t${i}: ${refund.ok ? "OK" : refund.detail}`);
         }
 
+
+        const cancelTag = slug
+          ? `Cancel@${slug}: ${cancelResult.ok ? "OK" : "FALHOU"} (${cancelResult.detail})`
+          : "Cancel: N/A";
+        const forcedTag = parsed.data.force_refund && !cancelResult.ok ? " [FORCED — prejuízo assumido]" : "";
+
         await supabaseAdmin
           .from("pedidos")
           .update({
             status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-            error_detail: `Refund manual aprovado. ${refund.ok ? "OK" : "FALHOU"} (${attempts.join(" | ")})`.slice(0, 500),
+            error_detail: `Refund manual aprovado. ${cancelTag}${forcedTag}. Refund: ${refund.ok ? "OK" : "FALHOU"} (${attempts.join(" | ")})`.slice(0, 500),
           } as any)
           .eq("id", (p as any).id);
 
@@ -126,13 +157,28 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
         try {
           await supabaseAdmin.from("admin_audit_logs" as any).insert({
             admin_email: auth.who || "admin@manual-refund-approval",
-            action: "REFUND_APPROVED_v220",
-            detail: { pedido_id: (p as any).id, valor: (p as any).valor, refund_ok: refund.ok, attempts } as any,
+            action: "REFUND_APPROVED_v230",
+            detail: {
+              pedido_id: (p as any).id,
+              valor: (p as any).valor,
+              provider: slug || null,
+              provider_order_id: pOrderId || null,
+              cancel_ok: cancelResult.ok,
+              cancel_detail: cancelResult.detail,
+              forced: !!parsed.data.force_refund && !cancelResult.ok,
+              refund_ok: refund.ok,
+              attempts,
+            } as any,
             created_at: new Date().toISOString(),
           } as any);
         } catch { /* */ }
 
-        return new Response(JSON.stringify({ ok: refund.ok, detail: refund.detail, attempts }), {
+        return new Response(JSON.stringify({
+          ok: refund.ok,
+          cancel_at_provider: { ok: cancelResult.ok, detail: cancelResult.detail, forced: !!parsed.data.force_refund && !cancelResult.ok },
+          refund_detail: refund.detail,
+          attempts,
+        }), {
           status: refund.ok ? 200 : 502, headers: { "Content-Type": "application/json" },
         });
       },

@@ -204,6 +204,53 @@ export async function refundMercadoPago(paymentId: string): Promise<{ ok: boolea
   }
 }
 
+// v230 — Cancel no fornecedor ANTES de reembolsar. Recupera saldo se ainda não entregou.
+// Retorna ok=true se conseguiu cancelar OU se o fornecedor não tem esse pedido (nada a perder).
+// Retorna ok=false quando o pedido está em andamento/entregue → indica prejuízo se reembolsar.
+export async function cancelAtProvider(
+  slug: string,
+  providerOrderId: string,
+): Promise<{ ok: boolean; detail: string; recoverable: boolean }> {
+  const cfg: Record<string, { endpoint: string; key: string | undefined }> = {
+    smmhype:   { endpoint: "https://smmhype.com/api/v2",           key: process.env.SMMHYPE_API_KEY },
+    smmpainel: { endpoint: "https://smmpainel.com/api/v2",         key: process.env.SMMPAINEL_API_KEY },
+    verified:  { endpoint: "https://verifiedatacado.com/api/v2",   key: process.env.VERIFIED_API_KEY },
+  };
+  const c = cfg[slug];
+  if (!c) return { ok: false, detail: `fornecedor desconhecido: ${slug}`, recoverable: false };
+  if (!c.key) return { ok: false, detail: `${slug}: API key ausente`, recoverable: false };
+  if (!providerOrderId) return { ok: true, detail: "sem provider_order_id (nada a cancelar)", recoverable: true };
+
+  const body = new URLSearchParams({ key: c.key, action: "cancel", order: String(providerOrderId) });
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12_000);
+    try {
+      const res = await fetch(c.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+        signal: ctrl.signal,
+      });
+      const text = await res.text();
+      let json: any = null;
+      try { json = JSON.parse(text); } catch { /* */ }
+      const err = String(json?.error ?? "").toLowerCase();
+      // sucesso puro
+      if (res.ok && !err) return { ok: true, detail: text.slice(0, 200), recoverable: true };
+      // "incorrect order id" = fornecedor não conhece esse pedido → seguro reembolsar
+      if (/incorrect.*order|not.*found|invalid.*order/i.test(err)) {
+        return { ok: true, detail: `provider não tem o pedido: ${err}`, recoverable: true };
+      }
+      // outros erros: em andamento / já entregue / não cancelável → PREJUÍZO se reembolsar
+      return { ok: false, detail: `provider recusou cancel: ${err || text.slice(0, 120)}`, recoverable: false };
+    } finally { clearTimeout(timer); }
+  } catch (e) {
+    const msg = (e as Error).name === "AbortError" ? "timeout 12s" : (e as Error).message;
+    return { ok: false, detail: `rede: ${msg}`, recoverable: false };
+  }
+}
+
 // v225 — Anti dupla-entrega FAIL-SAFE: consulta MP se já existe refund registrado.
 // Em erro/timeout retorna TRUE (bloqueia reprocesso) — melhor atrasar 1 pedido do que entregar 2x um reembolsado.
 // Sem token → mantém false (dev/setup incompleto não trava produção que já roda).
