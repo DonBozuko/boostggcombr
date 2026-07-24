@@ -55,18 +55,31 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
       });
       if (!fOk) blockDeploy = true;
 
-      // 3. Alertas Jarvis abertos (últimas 6h) — SINTOMA REAL
+      // 3. Alertas Jarvis ABERTOS (últimas 2h) — SINTOMA REAL
+      // v239: antes contava qualquer linha das últimas 6h, inclusive as marcadas
+      // "✅ RESOLVIDO" e as já superadas por uma auditoria posterior limpa da mesma
+      // origem. Resultado: alerta antigo/corrigido mantinha o deploy bloqueado.
       const { data: alertas } = await supabaseAdmin
         .from("jarvis_alerts")
         .select("severidade, origem, mensagem, created_at")
-        .gte("created_at", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString())
+        .gte("created_at", new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString())
         .order("created_at", { ascending: false });
-      const errors = (alertas ?? []).filter((a) => a.severidade === "error" || a.severidade === "critical");
-      const warns = (alertas ?? []).filter((a) => a.severidade === "warning");
+      const abertos = (alertas ?? []).filter((a) => !String(a.mensagem ?? "").startsWith("✅ RESOLVIDO"));
+      // Só o alerta mais recente de cada origem vale: se a mesma rotina rodou depois
+      // e não repetiu o problema, o alerta anterior está superado.
+      const vistos = new Set<string>();
+      const vigentes = abertos.filter((a) => {
+        const key = String(a.origem ?? "desconhecida");
+        if (vistos.has(key)) return false;
+        vistos.add(key);
+        return true;
+      });
+      const errors = vigentes.filter((a) => a.severidade === "error" || a.severidade === "critical");
+      const warns = vigentes.filter((a) => a.severidade === "warning");
       const alertOk = errors.length === 0;
       checks.push({
         id: "jarvis_alerts",
-        label: `Alertas nas últimas 6h (${errors.length} erros, ${warns.length} avisos)`,
+        label: `Alertas abertos nas últimas 2h (${errors.length} erros, ${warns.length} avisos)`,
         ok: alertOk,
         detail: alertOk
           ? warns.length > 0
@@ -75,6 +88,7 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
           : `⚠️ ${errors[0]?.mensagem?.slice(0, 80)}`,
       });
       if (!alertOk) blockDeploy = true;
+
 
       // 4. Pedidos travados (paid há mais de 15min sem provider_order_id) — SINTOMA REAL
       const cutoff = new Date(Date.now() - 15 * 60 * 1000).toISOString();
