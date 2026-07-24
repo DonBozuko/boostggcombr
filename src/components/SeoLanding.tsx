@@ -3,6 +3,7 @@
 import { BrandHeader } from "@/components/BrandHeader";
 import { MobileFrame } from "@/components/MobileFrame";
 import { RelatedLinks } from "@/components/RelatedLinks";
+import { DeliveryTimes } from "@/components/DeliveryTimes";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
 
 export type SeoBenefit = { icon: "check" | "zap" | "shield" | "clock"; title: string; text: string };
@@ -116,6 +117,19 @@ export function SeoLanding(p: SeoLandingProps) {
             </a>
           </div>
         </section>
+
+        {/* v220 — Prazos reais de entrega (transparência anti-chargeback) */}
+        <DeliveryTimes
+          rede={
+            /tiktok/i.test(p.ctaHref) ? "tiktok"
+            : /youtube/i.test(p.ctaHref) ? "youtube"
+            : /kwai/i.test(p.ctaHref) ? "kwai"
+            : /twitter|x-/i.test(p.ctaHref) ? "twitter"
+            : /instagram/i.test(p.ctaHref) ? "instagram"
+            : "generic"
+          }
+          accent={p.accent}
+        />
 
         {/* Corpo (H2 + parágrafos) */}
         {p.bodySections.map((s, i) => (
