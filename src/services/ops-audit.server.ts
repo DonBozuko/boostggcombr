@@ -23,9 +23,10 @@ export type OpsAuditReport = {
 export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<OpsAuditReport> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+  // v238 — janela de 1h: erro antigo já corrigido não pode manter alerta vermelho.
   const [{ data: snap }, { data: http }] = await Promise.all([
     (supabaseAdmin as any).rpc("ops_forensics"),
-    (supabaseAdmin as any).rpc("ops_http_health", { _hours: 6 }),
+    (supabaseAdmin as any).rpc("ops_http_health", { _hours: 1 }),
   ]);
 
   const s = (snap ?? {}) as any;
@@ -40,7 +41,7 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       code: "ROBO_CHAMADA_RECUSADA",
       severity: "critical",
       titulo: "Robô automático rodando no vazio",
-      problema: `Nas últimas 6h houve ${naoEncontrado} chamada(s) para endereço inexistente e ${semPermissao} recusada(s) por senha inválida. O robô aparece como "OK" mas nada foi feito.`,
+      problema: `Na última hora houve ${naoEncontrado} chamada(s) para endereço inexistente e ${semPermissao} recusada(s) por senha inválida. O robô aparece como "OK" mas nada foi feito.`,
       o_que_fazer: "Me avise: preciso corrigir o endereço/senha do robô no agendador.",
       evidencia: h,
     });
@@ -52,11 +53,12 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       code: "ROBO_ERRO_SERVIDOR",
       severity: "critical",
       titulo: "Robô batendo em erro do servidor",
-      problema: `${erro5xx} chamadas retornaram erro de servidor nas últimas 6h.`,
+      problema: `${erro5xx} chamadas retornaram erro de servidor na última hora.`,
       o_que_fazer: "Me avise para investigar o log da rota que está quebrando.",
       evidencia: h,
     });
   }
+
 
   // 2) Cliente pagou e não recebeu
   const travados = Array.isArray(s.pedidos_pagos_sem_entrega) ? s.pedidos_pagos_sem_entrega : [];
