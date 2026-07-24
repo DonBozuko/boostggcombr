@@ -50,6 +50,9 @@ export const getJarvisTriage = createServerFn({ method: "GET" }).handler(
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const since6h = new Date(now - 6 * 60 * 60 * 1000).toISOString();
+      // v235 — crítico só conta se for recente (2h). Alerta velho já tratado
+      // não pode manter o semáforo vermelho o dia inteiro.
+      const since2h = now - 2 * 60 * 60 * 1000;
 
       // 1. Alertas abertos últimas 6h
       const { data: alertas } = await supabaseAdmin
@@ -58,7 +61,8 @@ export const getJarvisTriage = createServerFn({ method: "GET" }).handler(
         .gte("created_at", since6h);
       for (const a of alertas ?? []) {
         const s = String((a as { severidade?: string }).severidade ?? "").toLowerCase();
-        if (s === "critical" || s === "error") counters.criticalAlerts++;
+        const at = new Date(String((a as { created_at?: string }).created_at ?? 0)).getTime();
+        if ((s === "critical" || s === "error") && at >= since2h) counters.criticalAlerts++;
         else if (s === "warning") counters.warningAlerts++;
       }
 
