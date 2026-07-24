@@ -170,7 +170,7 @@ export const Route = createFileRoute("/api/public/hooks/backfill-smmhype-ids")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = request.headers.get("x-admin-token") ?? new URL(request.url).searchParams.get("token");
+        const token = request.headers.get("x-admin-token");
         if (!token || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
           return new Response(JSON.stringify({ ok: false, error: "unauthorized" }), {
             status: 401, headers: { "Content-Type": "application/json" },
