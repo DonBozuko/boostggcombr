@@ -4,6 +4,8 @@ import { BrandHeader } from "@/components/BrandHeader";
 import { MobileFrame } from "@/components/MobileFrame";
 import { RelatedLinks } from "@/components/RelatedLinks";
 import { DeliveryTimes } from "@/components/DeliveryTimes";
+import { TrustBadges } from "@/components/TrustBadges";
+import { LivePurchasesTicker } from "@/components/LivePurchasesTicker";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
 
 export type SeoBenefit = { icon: "check" | "zap" | "shield" | "clock"; title: string; text: string };
