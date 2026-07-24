@@ -12,6 +12,7 @@ import { Eye, EyeOff, Settings, Terminal, Search, Tag, Compass, BarChart3, Brief
 import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
+import { AdminHealthSemaphore } from "@/components/AdminHealthSemaphore";
 import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
