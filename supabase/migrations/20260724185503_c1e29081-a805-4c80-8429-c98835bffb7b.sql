@@ -1,0 +1,2 @@
+UPDATE public.pedidos SET last_remains = 490, last_remains_at = now(), alerted_at = NULL WHERE id = 'c0d7567f-b73f-43ea-9f38-02bd264b10c5';
+UPDATE public.pedidos SET last_remains = 488, last_remains_at = now(), alerted_at = NULL WHERE id = '771e3634-3a75-46e4-8539-fdc3fb71d5d9';
