@@ -20,25 +20,21 @@ export const Route = createFileRoute("/api/public/status")({
           const items = (catalogRes.data as any[]) ?? [];
 
           const knownProviders = ["smmhype", "smmpanel", "verified"];
-          const providers = knownProviders.map((slug) => {
+          // v234 — Status público não expõe saldo, nome de fornecedor nem erro interno.
+          const internal = knownProviders.map((slug, i) => {
             const h = health.find((x) => x.slug === slug);
             const unstable = h?.unstable_until && new Date(h.unstable_until).getTime() > now;
             const w = wallets.find((x) => (x.fornecedor_slug ?? "").toLowerCase() === slug);
             const saldo = w ? Number(w.saldo_brl ?? 0) : null;
-            const status = unstable ? "instavel" : saldo != null && saldo < 5 ? "saldo_baixo" : "operacional";
-            return {
-              slug,
-              label: slug === "smmhype" ? "SMMHype" : slug === "smmpanel" ? "SMMPanel" : "Verified",
-              status,
-              saldo_brl: saldo,
-              unstable_until: unstable ? h?.unstable_until : null,
-            };
+            const status = unstable || (saldo != null && saldo < 5) ? "instavel" : "operacional";
+            return { label: `Rota de entrega ${i + 1}`, status };
           });
+          const providers = internal.map((p) => ({ label: p.label, status: p.status }));
 
           const sellable = items.filter((x) => x.is_sellable !== false).length;
           const total = items.length;
-          const anyDown = providers.some((p) => p.status === "instavel");
-          const allDown = providers.every((p) => p.status === "instavel");
+          const anyDown = internal.some((p) => p.status === "instavel");
+          const allDown = internal.every((p) => p.status === "instavel");
 
           const overall = allDown ? "critico" : anyDown ? "parcial" : sellable < total * 0.9 ? "atencao" : "operacional";
 
@@ -52,12 +48,13 @@ export const Route = createFileRoute("/api/public/status")({
             }),
             { headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=30" } },
           );
-        } catch (e: any) {
+        } catch {
           return new Response(
-            JSON.stringify({ ok: false, error: e?.message ?? "unknown", overall: "desconhecido" }),
+            JSON.stringify({ ok: false, overall: "desconhecido" }),
             { status: 500, headers: { "Content-Type": "application/json" } },
           );
         }
+
       },
     },
   },

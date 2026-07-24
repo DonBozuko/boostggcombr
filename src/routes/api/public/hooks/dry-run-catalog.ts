@@ -6,7 +6,6 @@ function extractToken(request: Request) {
   return (
     request.headers.get("x-admin-token") ??
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-    new URL(request.url).searchParams.get("token") ??
     ""
   );
 }

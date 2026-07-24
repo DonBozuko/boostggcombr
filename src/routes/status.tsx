@@ -5,9 +5,9 @@ export const Route = createFileRoute("/status")({
   head: () => ({
     meta: [
       { title: "Status do Sistema | BoostGG" },
-      { name: "description", content: "Saúde em tempo real dos fornecedores, carteira e catálogo BoostGG." },
+      { name: "description", content: "Saúde em tempo real das rotas de entrega e do catálogo BoostGG." },
       { property: "og:title", content: "Status do Sistema | BoostGG" },
-      { property: "og:description", content: "Fornecedores, saldo e catálogo em tempo real." },
+      { property: "og:description", content: "Rotas de entrega e catálogo em tempo real." },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -15,11 +15,8 @@ export const Route = createFileRoute("/status")({
 });
 
 type Provider = {
-  slug: string;
   label: string;
   status: "operacional" | "instavel" | "saldo_baixo";
-  saldo_brl: number | null;
-  unstable_until: string | null;
 };
 
 type StatusPayload = {
@@ -107,21 +104,18 @@ function StatusPage() {
 
         <section style={{ marginBottom: 28 }}>
           <h2 style={{ fontSize: 16, textTransform: "uppercase", letterSpacing: "0.08em", opacity: 0.7, marginBottom: 12 }}>
-            Fornecedores
+            Rotas de entrega
           </h2>
           <div style={{ display: "grid", gap: 8 }}>
             {(data?.providers ?? []).map((p) => {
               const b = providerBadge(p);
               return (
-                <div key={p.slug} style={{
+                <div key={p.label} style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                   padding: "14px 18px", border: "1px solid #222", borderRadius: 10, background: "#111",
                 }}>
                   <div>
                     <div style={{ fontWeight: 600 }}>{p.label}</div>
-                    <div style={{ fontSize: 12, opacity: 0.6, marginTop: 2 }}>
-                      {p.saldo_brl != null ? `Saldo R$ ${p.saldo_brl.toFixed(2)}` : "Saldo indisponível"}
-                    </div>
                   </div>
                   <span style={{ fontSize: 13, color: b.color, fontWeight: 600 }}>{b.emoji} {b.text}</span>
                 </div>
