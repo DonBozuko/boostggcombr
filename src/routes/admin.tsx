@@ -19,6 +19,7 @@ import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
 
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
+import { ProbeCancelButton } from "@/components/ProbeCancelButton";
 
 import {
   Dialog,
