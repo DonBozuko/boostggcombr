@@ -194,6 +194,15 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
               continue
             }
 
+            // v233 — Falha permanente: e-mail transacional sem unsubscribe_token é
+            // rejeitado pelo provedor (400 missing_unsubscribe) em TODA tentativa.
+            // Vai direto pro DLQ em vez de queimar 5 ciclos.
+            if (payload.purpose === 'transactional' && !payload.unsubscribe_token) {
+              await moveToDlq(supabase, queue, msg, 'Payload inválido: unsubscribe_token ausente (não retentável)')
+              continue
+            }
+
+
             // Guard: skip if another worker already sent this message (VT expired race)
             if (payload.message_id) {
               const { data: alreadySent } = await supabase
@@ -232,9 +241,16 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                   text: payload.text,
                   purpose: payload.purpose,
                   label: payload.label,
-                  idempotency_key: payload.idempotency_key,
+                  // v233 — CAUSA RAIZ do loop de DLQ: o provedor invalida a chave de
+                  // idempotência assim que UMA tentativa falha (409 run_failed). Reenviar
+                  // com a mesma chave falha para sempre. Cada retentativa usa sufixo próprio.
+                  idempotency_key:
+                    failedAttempts > 0
+                      ? `${payload.idempotency_key}#r${failedAttempts}`
+                      : payload.idempotency_key,
                   unsubscribe_token: payload.unsubscribe_token,
                   message_id: payload.message_id,
+
                 },
                 { apiKey, sendUrl: process.env.LOVABLE_SEND_URL }
               )
