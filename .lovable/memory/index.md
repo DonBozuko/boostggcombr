@@ -13,5 +13,6 @@ Autonomia: quando a opção é claramente segura (não quebra receita, não apag
 ## Memories
 - [Evolução futura](mem://preferences/evolucao-futura) — Lembrar de evoluir módulos "honestos mas limitados" (ex: JarvisContentScheduler → publicação real) quando chip/warmup/API estiverem prontos. Usuário quer evoluir TUDO no futuro.
 - [Nunca responder de memória sobre operação](mem://preferences/nunca-responder-de-memoria) — Fornecedor ≠ rede. Fornecedores = SMMhype, SMMPainel, Verified (tabela `fornecedores`). Kwai/Instagram/TikTok = redes (rotas). Antes de afirmar, consultar banco/código.
+- [Pacote :br só serviço BR](mem://preferences/pacote-br-so-servico-br) — Pacote brasileiro nunca pode apontar pra serviço internacional nem pra serviço marcado como queda/"não compre". Validado no dry-run v240.
 
 
