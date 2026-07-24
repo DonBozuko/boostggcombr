@@ -127,15 +127,14 @@ export async function rankProvidersByCost(opts: {
   const refillMap: Record<string, boolean> = {};
   let brPackage = false;
   try {
+    // v243 — regras puras e testadas vivem em critical-guards.ts
+    const { isBrPackage, providerCanServe } = await import("./critical-guards");
     const { data: catRow } = await supabaseAdmin
       .from("pricing_items" as any)
       .select("category")
       .eq("pacote", opts.pacote)
       .maybeSingle();
-    const category = String((catRow as any)?.category ?? "");
-    const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
-    const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
-    brPackage = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
+    brPackage = isBrPackage(opts.pacote, (catRow as any)?.category);
     const cacheTable: Record<string, string> = {
       smmhype: "smmhype_services_cache",
       smmpainel: "smmpanel_services_cache",
@@ -150,9 +149,8 @@ export async function rankProvidersByCost(opts: {
         .eq("provider_service_id", String(pid))
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
-      const hay = `${(svcRow as any).name ?? ""} ${(svcRow as any).category ?? ""}`;
       refillMap[slug] = (svcRow as any).refill === true;
-      if (TOXIC_RE.test(hay) || (brPackage && !BR_RE.test(hay))) {
+      if (!providerCanServe({ brPackage, svc: svcRow as any })) {
         providerIdMap[slug] = null;
         console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
       }
