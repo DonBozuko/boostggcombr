@@ -173,5 +173,5 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
     }
 
     return { status, headline, summary, actions, counters, generatedAt: new Date().toISOString() };
-  },
-);
+  });
+
