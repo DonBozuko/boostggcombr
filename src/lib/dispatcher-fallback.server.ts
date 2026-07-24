@@ -204,8 +204,9 @@ export async function refundMercadoPago(paymentId: string): Promise<{ ok: boolea
   }
 }
 
-// v189 — Anti dupla-entrega: consulta MP se já existe refund registrado pro payment.
-// Retorna true SOMENTE se MP confirmou refund. Em erro/timeout retorna false (fail-open p/ não travar reprocesso legítimo).
+// v225 — Anti dupla-entrega FAIL-SAFE: consulta MP se já existe refund registrado.
+// Em erro/timeout retorna TRUE (bloqueia reprocesso) — melhor atrasar 1 pedido do que entregar 2x um reembolsado.
+// Sem token → mantém false (dev/setup incompleto não trava produção que já roda).
 export async function hasMpRefund(paymentId: string): Promise<boolean> {
   const token = process.env.MERCADO_PAGO_ACCESS_TOKEN;
   if (!token || !paymentId) return false;
@@ -217,13 +218,17 @@ export async function hasMpRefund(paymentId: string): Promise<boolean> {
         headers: { Authorization: `Bearer ${token}` },
         signal: ctrl.signal,
       });
-      if (!res.ok) return false;
+      if (!res.ok) {
+        console.warn("[hasMpRefund] MP HTTP", res.status, "→ fail-safe TRUE (bloqueia reprocesso)");
+        return true;
+      }
       const arr = JSON.parse(await res.text());
       return Array.isArray(arr) && arr.length > 0;
     } finally {
       clearTimeout(timer);
     }
-  } catch {
-    return false;
+  } catch (e) {
+    console.warn("[hasMpRefund] MP error → fail-safe TRUE:", (e as Error).message);
+    return true;
   }
 }
