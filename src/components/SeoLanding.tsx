@@ -118,6 +118,19 @@ export function SeoLanding(p: SeoLandingProps) {
           </div>
         </section>
 
+        {/* v220 — Prazos reais de entrega (transparência anti-chargeback) */}
+        <DeliveryTimes
+          rede={
+            /tiktok/i.test(p.ctaHref) ? "tiktok"
+            : /youtube/i.test(p.ctaHref) ? "youtube"
+            : /kwai/i.test(p.ctaHref) ? "kwai"
+            : /twitter|x-/i.test(p.ctaHref) ? "twitter"
+            : /instagram/i.test(p.ctaHref) ? "instagram"
+            : "generic"
+          }
+          accent={p.accent}
+        />
+
         {/* Corpo (H2 + parágrafos) */}
         {p.bodySections.map((s, i) => (
           <section key={i} className="mt-10">
