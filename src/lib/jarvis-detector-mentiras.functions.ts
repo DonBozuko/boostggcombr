@@ -1,13 +1,23 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 /**
  * JARVIS DETECTOR DE MENTIRAS v49
- * Não confia em check raso ("existe fornecedor? existe pricing?"). Bate o olho
- * nos SINTOMAS que o Telegram grita: alerta aberto, pedido travado, cron parado,
- * webhook MP instável, reconciliador em falha.
+ * v244: exige ADMIN_TOKEN (finding jarvis_ops_noauth).
  */
-export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
-  async () => {
+export const runJarvisLieDetector = createServerFn({ method: "POST" })
+  .inputValidator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
+  .handler(async ({ data }) => {
+    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+      return {
+        version: "v49",
+        timestamp: new Date().toISOString(),
+        passed: 0,
+        total: 0,
+        blockDeploy: true,
+        checks: [{ id: "auth", label: "Autenticação admin", ok: false, detail: "UNAUTHORIZED" }],
+      };
+    }
     const checks: Array<{ id: string; label: string; ok: boolean; detail: string }> = [];
     let blockDeploy = false;
 
@@ -190,5 +200,5 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
       blockDeploy,
       checks,
     };
-  },
-);
+  });
+

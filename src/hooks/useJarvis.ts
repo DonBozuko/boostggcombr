@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { logJarvisAlert } from "@/lib/jarvis.functions";
+// v244: logJarvisAlert exige ADMIN_TOKEN (finding jarvis_alerts_noauth).
+// Histórico local segue funcionando; a persistência server-side saiu do hook público.
 
 /**
  * Jarvis Sound System — native <audio> + cache v=18.
@@ -73,10 +74,10 @@ function pushHistory(evt: JarvisEvent, detail?: string) {
   });
   if (HISTORY.length > MAX) HISTORY.length = MAX;
   LISTENERS.forEach((l) => l());
-  void logJarvisAlert({
-    data: { severidade: SEVERITY[evt], origem: evt, mensagem: LABELS[evt], detalhe: detail },
-  }).catch(() => {});
+  // Persistência no jarvis_alerts foi movida para o admin autenticado.
 }
+
+
 
 export function useJarvisHistory(): JarvisHistoryEntry[] {
   const [, force] = useState(0);

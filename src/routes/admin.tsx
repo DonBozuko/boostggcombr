@@ -2226,8 +2226,10 @@ function JarvisHistoryPanel() {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
+      const token = typeof window !== "undefined" ? (window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "") : "";
+      if (!token) { setRows([]); return; }
       const { listJarvisAlerts } = await import("@/lib/jarvis.functions");
-      const res = await listJarvisAlerts({ data: { severidade: sev || undefined, origem: origem || undefined, limit: 50 } });
+      const res = await listJarvisAlerts({ data: { token, severidade: sev || undefined, origem: origem || undefined, limit: 50 } });
       setRows(res.rows);
     } finally { setLoading(false); }
   }, [sev, origem]);

@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 
 /**
  * v223 — Jarvis Triage Digest
@@ -32,8 +33,19 @@ export type TriageDigest = {
   generatedAt: string;
 };
 
-export const getJarvisTriage = createServerFn({ method: "GET" }).handler(
-  async (): Promise<TriageDigest> => {
+export const getJarvisTriage = createServerFn({ method: "POST" })
+  .inputValidator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
+  .handler(async ({ data }): Promise<TriageDigest> => {
+    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+      return {
+        status: "red",
+        headline: "Acesso negado",
+        summary: "UNAUTHORIZED",
+        actions: [],
+        counters: { criticalAlerts: 0, warningAlerts: 0, stuckOrders: 0, lowBalanceProviders: 0, pendingRecovery: 0 },
+        generatedAt: new Date().toISOString(),
+      };
+    }
     const now = Date.now();
     const counters = {
       criticalAlerts: 0,
@@ -161,5 +173,5 @@ export const getJarvisTriage = createServerFn({ method: "GET" }).handler(
     }
 
     return { status, headline, summary, actions, counters, generatedAt: new Date().toISOString() };
-  },
-);
+  });
+
