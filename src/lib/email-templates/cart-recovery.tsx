@@ -6,11 +6,14 @@ import {
   Head,
   Heading,
   Html,
+  Img,
+  Link,
   Preview,
   Section,
   Text,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
+import { brand, LOGO_URL, RAZAO, SITE_URL, SUPORTE_EMAIL } from './brand'
 
 interface Props {
   instagramUser?: string | null
@@ -33,28 +36,56 @@ const Email = ({ instagramUser, pacote, redeSocial, valor }: Props) => {
     <Html lang="pt-BR" dir="ltr">
       <Head />
       <Preview>Seu Pix ficou pendente — seu pedido ainda está reservado</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Heading style={h1}>BoostGG</Heading>
-          <Text style={text}>{greeting}</Text>
-          <Text style={text}>
-            Vi aqui que você começou o pedido de <strong>{item}</strong>
-            {valorFmt ? ` (${valorFmt})` : ''} mas o Pix não foi concluído. Nada foi cobrado.
-          </Text>
-          <Text style={text}>
-            Se ainda quiser, é só refazer em menos de 1 minuto — a entrega começa automaticamente
-            assim que o Pix cair, normalmente em poucos minutos.
-          </Text>
-          <Section style={{ textAlign: 'center', margin: '32px 0' }}>
-            <Button href="https://www.boostgg.com.br" style={button}>
-              Finalizar meu pedido
-            </Button>
+      <Body style={brand.main}>
+        <Container style={brand.container}>
+          <Section style={brand.headerBar}>
+            {LOGO_URL ? (
+              <Img src={LOGO_URL} alt="BoostGG" width="150" style={{ margin: '0 auto' }} />
+            ) : (
+              <Heading style={brand.wordmark}>BoostGG</Heading>
+            )}
+            <Text style={brand.tagline}>Seguidores e engajamento via Pix · desde 2024</Text>
           </Section>
-          <Text style={text}>
-            Ficou com dúvida sobre segurança, prazo ou o pacote certo? Responde esse e-mail que eu
-            te ajudo pessoalmente.
-          </Text>
-          <Text style={footer}>Elite Boost Prime · BoostGG — obrigado pela confiança. — Fabiano</Text>
+
+          <Section style={brand.body}>
+            <Text style={brand.text}>{greeting}</Text>
+            <Text style={brand.text}>
+              Vi aqui que você começou o pedido de <strong>{item}</strong>
+              {valorFmt ? ` (${valorFmt})` : ''} mas o Pix não foi concluído. Nada foi cobrado.
+            </Text>
+            <Text style={brand.text}>
+              Se ainda quiser, é só refazer em menos de 1 minuto — a entrega começa automaticamente
+              assim que o Pix cair, normalmente em poucos minutos.
+            </Text>
+
+            <Text style={brand.trust}>
+              ✅ Pagamento processado pelo Mercado Pago<br />
+              ✅ Entrega automática e acompanhada em tempo real<br />
+              ✅ Reembolso garantido se não entregarmos
+            </Text>
+
+            <Section style={{ textAlign: 'center', margin: '28px 0' }}>
+              <Button href={SITE_URL} style={brand.button}>
+                Finalizar meu pedido
+              </Button>
+            </Section>
+
+            <Text style={brand.text}>
+              Dúvida sobre segurança, prazo ou qual pacote escolher? Responde esse e-mail que eu te
+              ajudo pessoalmente.
+            </Text>
+
+            <Text style={brand.footer}>
+              — Fabiano Santiago, {RAZAO} (BoostGG)
+              <br />
+              <Link href={SITE_URL} style={brand.link}>
+                www.boostgg.com.br
+              </Link>{' '}
+              · {SUPORTE_EMAIL}
+              <br />
+              Você recebeu este e-mail porque iniciou um pedido no nosso site.
+            </Text>
+          </Section>
         </Container>
       </Body>
     </Html>
@@ -72,19 +103,3 @@ export const template = {
     valor: 29.9,
   },
 } satisfies TemplateEntry
-
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
-const container = { padding: '32px 28px', maxWidth: '560px' }
-const h1 = { color: '#14532d', fontSize: '24px', fontWeight: 700, margin: '0 0 16px' }
-const text = { color: '#111827', fontSize: '16px', lineHeight: '24px', margin: '0 0 16px' }
-const button = {
-  backgroundColor: '#16a34a',
-  color: '#ffffff',
-  padding: '14px 28px',
-  borderRadius: '10px',
-  fontSize: '16px',
-  fontWeight: 600,
-  textDecoration: 'none',
-  display: 'inline-block',
-}
-const footer = { color: '#6b7280', fontSize: '13px', marginTop: '24px' }
