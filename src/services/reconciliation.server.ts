@@ -44,13 +44,15 @@ export async function runReconciliation(hours = 24): Promise<ReconReport> {
     .gte("created_at", since);
 
   const RECEITA_STATUS = new Set(["paid", "waiting_provision", "Enviado", "processing", "completed"]);
-  const pedidosMap = new Map<string, { valor: number; custo: number }>();
+  const REFUND_STATUS = new Set(["mp_refunded", "refunded"]);
+  const pedidosMap = new Map<string, { valor: number; custo: number; refunded: boolean }>();
   for (const p of (pedidos as any[]) ?? []) {
+    const refunded = REFUND_STATUS.has(p.status);
     if (RECEITA_STATUS.has(p.status)) {
       report.receita_pedidos += Number(p.valor) || 0;
       report.custo_total += Number(p.custo_real) || 0;
     }
-    pedidosMap.set(p.id, { valor: Number(p.valor) || 0, custo: Number(p.custo_real) || 0 });
+    pedidosMap.set(p.id, { valor: Number(p.valor) || 0, custo: Number(p.custo_real) || 0, refunded });
   }
 
   const { data: ledger } = await supabaseAdmin
@@ -61,15 +63,19 @@ export async function runReconciliation(hours = 24): Promise<ReconReport> {
 
   const ledgerSet = new Set<string>();
   for (const l of (ledger as any[]) ?? []) {
+    const pid = l.pedido_id as string | null;
+    // Ignora ledger de pedidos reembolsados (dinheiro voltou ao cliente)
+    if (pid && pedidosMap.get(pid)?.refunded) continue;
     report.receita_ledger += Number(l.valor_brl) || 0;
-    if (l.pedido_id) ledgerSet.add(l.pedido_id);
+    if (pid) ledgerSet.add(pid);
   }
 
-  // Pedidos paid sem ledger (bug: dinheiro entrou, não foi contabilizado)
-  for (const [id] of pedidosMap) {
+  // Pedidos com receita ativa mas sem ledger (bug: dinheiro entrou, não foi contabilizado)
+  for (const [id, p] of pedidosMap) {
+    if (p.refunded) continue;
     if (!ledgerSet.has(id)) report.pedidos_paid_sem_ledger.push(id);
   }
-  // Ledger sem pedido paid (bug: ledger fantasma)
+  // Ledger sem pedido conhecido (bug: ledger fantasma)
   for (const id of ledgerSet) {
     if (!pedidosMap.has(id)) report.pedidos_ledger_sem_paid.push(id);
   }
