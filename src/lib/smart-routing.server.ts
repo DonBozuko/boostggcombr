@@ -200,20 +200,8 @@ export async function rankProvidersByCost(opts: {
   // (refill) ganha do mais barato sem reposição. Queda sem reposição = cliente
   // decepcionado + chargeback, que custa mais caro que a diferença de custo.
   const cascadeOrder: Record<string, number> = { smmhype: 0, smmpainel: 1, verified: 2 };
-  ranked.sort((a, b) => {
-    if (a.unstable !== b.unstable) return a.unstable ? 1 : -1;
-    if (brPackage) {
-      const ar = refillMap[a.slug] === true ? 0 : 1;
-      const br_ = refillMap[b.slug] === true ? 0 : 1;
-      if (ar !== br_) return ar - br_;
-    }
-    const ac = a.cost_brl ?? Number.POSITIVE_INFINITY;
-    const bc = b.cost_brl ?? Number.POSITIVE_INFINITY;
-    if (ac !== bc) return ac - bc;
-    const ao = cascadeOrder[a.slug] ?? 99;
-    const bo = cascadeOrder[b.slug] ?? 99;
-    return ao - bo;
-  });
+  const { compareProviders } = await import("./critical-guards");
+  ranked.sort((a, b) => compareProviders(a, b, { brPackage, refillMap, cascadeOrder }));
 
 
   return ranked;
