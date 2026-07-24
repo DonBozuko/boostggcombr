@@ -3,7 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-const schema = z.object({ pedido_id: z.string().min(1), dry_run: z.boolean().optional() });
+const schema = z.object({ pedido_id: z.string().min(1), dry_run: z.boolean().optional(), force_refund: z.boolean().optional() });
 
 async function authorize(request: Request): Promise<{ ok: boolean; who: string }> {
   const authz = request.headers.get("authorization") ?? "";
