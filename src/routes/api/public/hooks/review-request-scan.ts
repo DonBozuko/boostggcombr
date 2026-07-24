@@ -59,22 +59,21 @@ export const Route = createFileRoute('/api/public/hooks/review-request-scan')({
             continue
           }
 
-          const { error: enqErr } = await supabase.rpc('enqueue_email' as any, {
-            queue_name: 'transactional_emails',
-            payload: {
-              template_name: 'review-request',
-              recipient_email: email,
-              idempotency_key: `review-request-${p.id}`,
-              template_data: {
-                instagramUser: p.instagram_user && p.instagram_user !== '[anonimizado-lgpd]' ? p.instagram_user : null,
-                pacote: p.pacote ?? null,
-              },
+          const { enqueueTemplateEmail } = await import('@/lib/email-enqueue.server')
+          const res = await enqueueTemplateEmail(supabase, {
+            templateName: 'review-request',
+            recipientEmail: email,
+            idempotencyKey: `review-request-${p.id}`,
+            templateData: {
+              instagramUser: p.instagram_user && p.instagram_user !== '[anonimizado-lgpd]' ? p.instagram_user : null,
+              pacote: p.pacote ?? null,
             },
           })
-          if (enqErr) {
-            console.warn('[review-scan] enqueue fail', p.id, enqErr)
+          if (!res.ok) {
+            console.warn('[review-scan] enqueue fail', p.id, res.reason)
             continue
           }
+
           await supabase.from('pedidos').update({ review_email_sent_at: new Date().toISOString() }).eq('id', p.id)
           enqueued++
         }
