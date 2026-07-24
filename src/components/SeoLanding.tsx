@@ -142,42 +142,95 @@ export function SeoLanding(p: SeoLandingProps) {
           </div>
         </section>
 
-        {/* Ferramentas grátis — link juice interno pras ferramentas SEO */}
+        {/* Ferramentas grátis — apresentação clara pro cliente saber o que é */}
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-white mb-3">Ferramentas grátis pra analisar antes de comprar</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <a
-              href="/ferramentas/contador-seguidores"
-              className="rounded-xl p-4 block hover:opacity-90 transition-opacity"
-              style={{ background: "#111", border: `1px solid ${p.accent}55` }}
-            >
-              <div className="font-bold text-white text-sm mb-1">Contador de seguidores Instagram</div>
-              <div className="text-zinc-400 text-xs leading-relaxed">
-                Digite o @ e veja em tempo real quantos seguidores qualquer perfil público tem — grátis, sem login.
-              </div>
-            </a>
-            <a
-              href="/ferramentas/calculadora-engajamento-instagram"
-              className="rounded-xl p-4 block hover:opacity-90 transition-opacity"
-              style={{ background: "#111", border: `1px solid ${p.accent}55` }}
-            >
-              <div className="font-bold text-white text-sm mb-1">Calculadora de engajamento Instagram</div>
-              <div className="text-zinc-400 text-xs leading-relaxed">
-                Descubra se um perfil tem engajamento real ou seguidores inflados antes de investir.
-              </div>
-            </a>
-            <a
-              href="/ferramentas/gerador-legenda-instagram"
-              className="rounded-xl p-4 block hover:opacity-90 transition-opacity"
-              style={{ background: "#111", border: `1px solid ${p.accent}55` }}
-            >
-              <div className="font-bold text-white text-sm mb-1">Gerador de legenda com IA</div>
-              <div className="text-zinc-400 text-xs leading-relaxed">
-                Crie 3 legendas persuasivas com gancho, CTA e hashtags em segundos — grátis, sem login.
-              </div>
-            </a>
+          <div
+            className="rounded-2xl p-5 sm:p-6"
+            style={{
+              background: `linear-gradient(135deg, ${p.accent}11, #0a0a0a 60%)`,
+              border: `1px solid ${p.accent}55`,
+            }}
+          >
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider"
+                style={{ background: p.accent, color: "#000" }}
+              >
+                🎁 100% Grátis
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/90">
+                Sem login
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/90">
+                Sem cadastro
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider bg-white/10 text-white/90">
+                Uso ilimitado
+              </span>
+            </div>
+
+            <h2 className="text-xl sm:text-2xl font-black text-white mb-1">
+              Ferramentas grátis pra você usar antes de comprar
+            </h2>
+            <p className="text-zinc-300 text-sm mb-4 leading-relaxed">
+              A gente liberou 3 ferramentas de verdade pra você testar seu perfil,
+              medir engajamento e criar legendas — <span className="text-white font-semibold">sem pagar nada, sem pedir sua senha</span>.
+              Serve pra qualquer creator, mesmo quem nunca comprou aqui.
+            </p>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <a
+                href="/ferramentas/contador-seguidores"
+                className="group rounded-xl p-4 block hover:scale-[1.02] transition-transform"
+                style={{ background: "#111", border: `1px solid ${p.accent}55` }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">👥</span>
+                  <div className="font-bold text-white text-sm">Contador de seguidores</div>
+                </div>
+                <div className="text-zinc-400 text-xs leading-relaxed mb-2">
+                  Digite o @ e veja quantos seguidores qualquer perfil público tem, em tempo real.
+                </div>
+                <div className="text-[11px] font-bold" style={{ color: p.accent }}>
+                  Abrir grátis →
+                </div>
+              </a>
+              <a
+                href="/ferramentas/calculadora-engajamento-instagram"
+                className="group rounded-xl p-4 block hover:scale-[1.02] transition-transform"
+                style={{ background: "#111", border: `1px solid ${p.accent}55` }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">📊</span>
+                  <div className="font-bold text-white text-sm">Calculadora de engajamento</div>
+                </div>
+                <div className="text-zinc-400 text-xs leading-relaxed mb-2">
+                  Descubra se um perfil tem engajamento real ou seguidores inflados antes de investir.
+                </div>
+                <div className="text-[11px] font-bold" style={{ color: p.accent }}>
+                  Abrir grátis →
+                </div>
+              </a>
+              <a
+                href="/ferramentas/gerador-legenda-instagram"
+                className="group rounded-xl p-4 block hover:scale-[1.02] transition-transform"
+                style={{ background: "#111", border: `1px solid ${p.accent}55` }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">✨</span>
+                  <div className="font-bold text-white text-sm">Gerador de legenda com IA</div>
+                </div>
+                <div className="text-zinc-400 text-xs leading-relaxed mb-2">
+                  Crie 3 legendas persuasivas com gancho, CTA e hashtags em segundos.
+                </div>
+                <div className="text-[11px] font-bold" style={{ color: p.accent }}>
+                  Abrir grátis →
+                </div>
+              </a>
+            </div>
           </div>
         </section>
+
 
         <RelatedLinks accent={p.accent} />
 
