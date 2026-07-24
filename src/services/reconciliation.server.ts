@@ -35,16 +35,21 @@ export async function runReconciliation(hours = 24): Promise<ReconReport> {
     ts: new Date().toISOString(),
   };
 
+  // Busca ampla: qualquer pedido que teve dinheiro entrando (inclui refunded/completed/processing)
+  // para casar com ledger e não gerar falso "lançamento sem pedido".
   const { data: pedidos } = await supabaseAdmin
     .from("pedidos")
     .select("id, valor, custo_real, status, mercado_pago_id")
-    .in("status", ["paid", "waiting_provision", "Enviado"])
+    .in("status", ["paid", "waiting_provision", "Enviado", "processing", "completed", "mp_refunded", "refunded"])
     .gte("created_at", since);
 
+  const RECEITA_STATUS = new Set(["paid", "waiting_provision", "Enviado", "processing", "completed"]);
   const pedidosMap = new Map<string, { valor: number; custo: number }>();
   for (const p of (pedidos as any[]) ?? []) {
-    report.receita_pedidos += Number(p.valor) || 0;
-    report.custo_total += Number(p.custo_real) || 0;
+    if (RECEITA_STATUS.has(p.status)) {
+      report.receita_pedidos += Number(p.valor) || 0;
+      report.custo_total += Number(p.custo_real) || 0;
+    }
     pedidosMap.set(p.id, { valor: Number(p.valor) || 0, custo: Number(p.custo_real) || 0 });
   }
 
