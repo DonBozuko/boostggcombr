@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { isCronAuthorized } from "@/lib/cron-auth.server";
 
 // v227 — Token só via header (x-admin-token / Authorization Bearer).
 // Query string ?token=... foi removida para evitar vazamento via logs/Referer.
@@ -11,6 +12,8 @@ function extractToken(request: Request) {
 }
 
 async function authorized(request: Request) {
+  // v235 — aceita também Bearer service-role (padrão dos crons via vault)
+  if (isCronAuthorized(request)) return true;
   const token = extractToken(request);
   if (!token) return false;
   if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return true;
