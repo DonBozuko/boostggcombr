@@ -27,7 +27,7 @@ type Row = {
   verified_service_id: string | null;
 };
 
-type CatalogEntry = { rate: number | string; min?: number | string; max?: number | string };
+type CatalogEntry = { rate: number | string; min?: number | string; max?: number | string; name?: string; category?: string };
 
 function idx(list: Awaited<ReturnType<typeof fetchServiceCatalog>>) {
   const m = new Map<string, CatalogEntry>();
@@ -46,6 +46,20 @@ function inRange(qty: number, entry: CatalogEntry | undefined): boolean {
   if (!Number.isFinite(min) || !Number.isFinite(max)) return true;
   return qty >= min && qty <= max;
 }
+
+// v240 — trava de conteúdo do serviço.
+// 1) serviço que o próprio fornecedor marca como lixo (queda de 100%, "não compre") nunca vende;
+// 2) pacote :br só aceita serviço realmente brasileiro.
+const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
+const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
+
+function serviceContentIssue(entry: CatalogEntry, packageCategory: string): string | null {
+  const hay = `${entry.name ?? ""} ${entry.category ?? ""}`;
+  if (TOXIC_RE.test(hay)) return "Serviço marcado como queda pelo fornecedor";
+  if (packageCategory.endsWith(":br") && !BR_RE.test(hay)) return "Serviço não é brasileiro";
+  return null;
+}
+
 
 export type DryRunSummary = {
   total: number;
@@ -114,13 +128,17 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
       sellable = r.is_sellable;
       reason = r.sellable_reason ?? "Sem catálogo vivo pra revalidar";
     } else {
-      // Ao menos 1 provedor tem que reconhecer o ID + aceitar a quantidade.
+      // Ao menos 1 provedor tem que reconhecer o ID + aceitar a quantidade
+      // + o serviço tem que ser coerente com o pacote (BR de verdade, não-tóxico).
       let matched = false;
       let anyKnown = false;
+      let contentIssue: string | null = null;
       for (const [prov, id] of linkedProviders) {
         const entry = indices[prov].get(id!.trim());
         if (entry) {
           anyKnown = true;
+          const issue = serviceContentIssue(entry, String(r.category ?? ""));
+          if (issue) { contentIssue = issue; continue; }
           if (inRange(qty, entry)) { matched = true; break; }
         }
       }
@@ -136,6 +154,8 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
           sellable = true;
           reason = "OK";
         }
+      } else if (contentIssue) {
+        reason = contentIssue;
       } else if (anyKnown) {
         reason = "Fora do range do fornecedor";
       } else {
