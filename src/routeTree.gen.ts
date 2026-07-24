@@ -94,6 +94,7 @@ import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
 import { Route as ApiPublicHooksOpsAuditRouteImport } from './routes/api/public/hooks/ops-audit'
 import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
+import { Route as ApiPublicHooksDropWatcherRouteImport } from './routes/api/public/hooks/drop-watcher'
 import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
@@ -558,6 +559,12 @@ const ApiPublicHooksDryRunCatalogRoute =
     path: '/api/public/hooks/dry-run-catalog',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDropWatcherRoute =
+  ApiPublicHooksDropWatcherRouteImport.update({
+    id: '/api/public/hooks/drop-watcher',
+    path: '/api/public/hooks/drop-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDeliveryWatcherRoute =
   ApiPublicHooksDeliveryWatcherRouteImport.update({
     id: '/api/public/hooks/delivery-watcher',
@@ -686,6 +693,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
+  '/api/public/hooks/drop-watcher': typeof ApiPublicHooksDropWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/ops-audit': typeof ApiPublicHooksOpsAuditRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
@@ -782,6 +790,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
+  '/api/public/hooks/drop-watcher': typeof ApiPublicHooksDropWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/ops-audit': typeof ApiPublicHooksOpsAuditRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
@@ -879,6 +888,7 @@ export interface FileRoutesById {
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
+  '/api/public/hooks/drop-watcher': typeof ApiPublicHooksDropWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
   '/api/public/hooks/ops-audit': typeof ApiPublicHooksOpsAuditRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
@@ -977,6 +987,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/delivery-watcher'
+    | '/api/public/hooks/drop-watcher'
     | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/ops-audit'
     | '/api/public/hooks/pedido-reconciler'
@@ -1073,6 +1084,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/delivery-watcher'
+    | '/api/public/hooks/drop-watcher'
     | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/ops-audit'
     | '/api/public/hooks/pedido-reconciler'
@@ -1169,6 +1181,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/delivery-watcher'
+    | '/api/public/hooks/drop-watcher'
     | '/api/public/hooks/dry-run-catalog'
     | '/api/public/hooks/ops-audit'
     | '/api/public/hooks/pedido-reconciler'
@@ -1264,6 +1277,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
   ApiPublicHooksDeliveryWatcherRoute: typeof ApiPublicHooksDeliveryWatcherRoute
+  ApiPublicHooksDropWatcherRoute: typeof ApiPublicHooksDropWatcherRoute
   ApiPublicHooksDryRunCatalogRoute: typeof ApiPublicHooksDryRunCatalogRoute
   ApiPublicHooksOpsAuditRoute: typeof ApiPublicHooksOpsAuditRoute
   ApiPublicHooksPedidoReconcilerRoute: typeof ApiPublicHooksPedidoReconcilerRoute
@@ -1885,6 +1899,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDryRunCatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/drop-watcher': {
+      id: '/api/public/hooks/drop-watcher'
+      path: '/api/public/hooks/drop-watcher'
+      fullPath: '/api/public/hooks/drop-watcher'
+      preLoaderRoute: typeof ApiPublicHooksDropWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/delivery-watcher': {
       id: '/api/public/hooks/delivery-watcher'
       path: '/api/public/hooks/delivery-watcher'
@@ -2038,6 +2059,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
   ApiPublicHooksDeliveryWatcherRoute: ApiPublicHooksDeliveryWatcherRoute,
+  ApiPublicHooksDropWatcherRoute: ApiPublicHooksDropWatcherRoute,
   ApiPublicHooksDryRunCatalogRoute: ApiPublicHooksDryRunCatalogRoute,
   ApiPublicHooksOpsAuditRoute: ApiPublicHooksOpsAuditRoute,
   ApiPublicHooksPedidoReconcilerRoute: ApiPublicHooksPedidoReconcilerRoute,
