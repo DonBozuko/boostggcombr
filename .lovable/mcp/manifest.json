@@ -45,7 +45,7 @@
       {
         "name": "consultar_pedido",
         "title": "Consultar status de pedido",
-        "description": "Consulta o status de um pedido do BoostGG pelo ID público (retorna status, rede, quantidade e valor).",
+        "description": "Consulta o status genérico de um pedido do BoostGG pelo ID (retorna apenas: aguardando_pagamento, pago, em_processamento, entregue, cancelado, reembolsado ou recusado). Não expõe dados do comprador.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
