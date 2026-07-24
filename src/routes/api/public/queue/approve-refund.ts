@@ -120,11 +120,16 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
         }
 
 
+        const cancelTag = slug
+          ? `Cancel@${slug}: ${cancelResult.ok ? "OK" : "FALHOU"} (${cancelResult.detail})`
+          : "Cancel: N/A";
+        const forcedTag = parsed.data.force_refund && !cancelResult.ok ? " [FORCED — prejuízo assumido]" : "";
+
         await supabaseAdmin
           .from("pedidos")
           .update({
             status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-            error_detail: `Refund manual aprovado. ${refund.ok ? "OK" : "FALHOU"} (${attempts.join(" | ")})`.slice(0, 500),
+            error_detail: `Refund manual aprovado. ${cancelTag}${forcedTag}. Refund: ${refund.ok ? "OK" : "FALHOU"} (${attempts.join(" | ")})`.slice(0, 500),
           } as any)
           .eq("id", (p as any).id);
 
@@ -152,13 +157,28 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
         try {
           await supabaseAdmin.from("admin_audit_logs" as any).insert({
             admin_email: auth.who || "admin@manual-refund-approval",
-            action: "REFUND_APPROVED_v220",
-            detail: { pedido_id: (p as any).id, valor: (p as any).valor, refund_ok: refund.ok, attempts } as any,
+            action: "REFUND_APPROVED_v230",
+            detail: {
+              pedido_id: (p as any).id,
+              valor: (p as any).valor,
+              provider: slug || null,
+              provider_order_id: pOrderId || null,
+              cancel_ok: cancelResult.ok,
+              cancel_detail: cancelResult.detail,
+              forced: !!parsed.data.force_refund && !cancelResult.ok,
+              refund_ok: refund.ok,
+              attempts,
+            } as any,
             created_at: new Date().toISOString(),
           } as any);
         } catch { /* */ }
 
-        return new Response(JSON.stringify({ ok: refund.ok, detail: refund.detail, attempts }), {
+        return new Response(JSON.stringify({
+          ok: refund.ok,
+          cancel_at_provider: { ok: cancelResult.ok, detail: cancelResult.detail, forced: !!parsed.data.force_refund && !cancelResult.ok },
+          refund_detail: refund.detail,
+          attempts,
+        }), {
           status: refund.ok ? 200 : 502, headers: { "Content-Type": "application/json" },
         });
       },
