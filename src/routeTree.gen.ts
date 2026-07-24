@@ -9,259 +9,125 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as Char126beatDotjsRouteImport } from './routes/~beat[.]js'
-import { Route as YoutubeRouteImport } from './routes/youtube'
-import { Route as ViewsTiktokRouteImport } from './routes/views-tiktok'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
-import { Route as TurbinarTiktokRouteImport } from './routes/turbinar-tiktok'
-import { Route as TrafegoRouteImport } from './routes/trafego'
-import { Route as TiktokRouteImport } from './routes/tiktok'
-import { Route as TermosRouteImport } from './routes/termos'
-import { Route as TelegramRouteImport } from './routes/telegram'
-import { Route as StatusRouteImport } from './routes/status'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as ReembolsoRouteImport } from './routes/reembolso'
-import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
-import { Route as PrivacidadeRouteImport } from './routes/privacidade'
-import { Route as ObrigadoRouteImport } from './routes/obrigado'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as KwaiRouteImport } from './routes/kwai'
-import { Route as KitCreatorRouteImport } from './routes/kit-creator'
-import { Route as ImpulsionarInstagramRouteImport } from './routes/impulsionar-instagram'
-import { Route as FacebookRouteImport } from './routes/facebook'
-import { Route as EngajamentoInstagramRouteImport } from './routes/engajamento-instagram'
-import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
-import { Route as CrescerYoutubeRouteImport } from './routes/crescer-youtube'
-import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
-import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
-import { Route as ComprarSeguidoresKwaiRouteImport } from './routes/comprar-seguidores-kwai'
-import { Route as ComprarSeguidoresInstagramBaratoRouteImport } from './routes/comprar-seguidores-instagram-barato'
-import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
-import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
-import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
-import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
-import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
-import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
-import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
-import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
-import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
-import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
-import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
+import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
+import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
+import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
+import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
+import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
+import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
+import { Route as ComprarSeguidoresInstagramBaratoRouteImport } from './routes/comprar-seguidores-instagram-barato'
+import { Route as ComprarSeguidoresKwaiRouteImport } from './routes/comprar-seguidores-kwai'
+import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
+import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
+import { Route as CrescerYoutubeRouteImport } from './routes/crescer-youtube'
+import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
+import { Route as EngajamentoInstagramRouteImport } from './routes/engajamento-instagram'
+import { Route as FacebookRouteImport } from './routes/facebook'
+import { Route as ImpulsionarInstagramRouteImport } from './routes/impulsionar-instagram'
+import { Route as KitCreatorRouteImport } from './routes/kit-creator'
+import { Route as KwaiRouteImport } from './routes/kwai'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
+import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
+import { Route as ReembolsoRouteImport } from './routes/reembolso'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as StatusRouteImport } from './routes/status'
+import { Route as TelegramRouteImport } from './routes/telegram'
+import { Route as TermosRouteImport } from './routes/termos'
+import { Route as TiktokRouteImport } from './routes/tiktok'
+import { Route as TrafegoRouteImport } from './routes/trafego'
+import { Route as TurbinarTiktokRouteImport } from './routes/turbinar-tiktok'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as ViewsTiktokRouteImport } from './routes/views-tiktok'
+import { Route as YoutubeRouteImport } from './routes/youtube'
+import { Route as Char126beatDotjsRouteImport } from './routes/~beat[.]js'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
-import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
-import { Route as ApiPublicTestTiktokEventRouteImport } from './routes/api/public/test-tiktok-event'
-import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
-import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
-import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
-import { Route as ApiPublicStatusRouteImport } from './routes/api/public/status'
-import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
-import { Route as ApiPublicLgpdDeleteRouteImport } from './routes/api/public/lgpd-delete'
-import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
-import { Route as ApiPublicCheckoutAttemptRouteImport } from './routes/api/public/checkout-attempt'
-import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
+import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
+import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
+import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
+import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
+import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
-import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
-import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
-import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
-import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public/queue/reprocess'
-import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
-import { Route as ApiPublicQueueApproveRefundRouteImport } from './routes/api/public/queue/approve-refund'
-import { Route as ApiPublicHooksWaitingWatcherRouteImport } from './routes/api/public/hooks/waiting-watcher'
-import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
-import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
-import { Route as ApiPublicHooksSlaWatcherRouteImport } from './routes/api/public/hooks/sla-watcher'
-import { Route as ApiPublicHooksReviewRequestScanRouteImport } from './routes/api/public/hooks/review-request-scan'
-import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/public/hooks/reprocess-one'
-import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/public/hooks/recovery-scan'
-import { Route as ApiPublicHooksRecoveryEmailRouteImport } from './routes/api/public/hooks/recovery-email'
-import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
-import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
-import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
-import { Route as ApiPublicHooksOpsAuditRouteImport } from './routes/api/public/hooks/ops-audit'
-import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
-import { Route as ApiPublicHooksDropWatcherRouteImport } from './routes/api/public/hooks/drop-watcher'
-import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
-import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
-import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
-import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
-import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './routes/api/public/hooks/auto-resolve-service-ids'
-import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
-import { Route as ApiPublicDiagProbeCancelRouteImport } from './routes/api/public/diag/probe-cancel'
-import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
+import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
+import { Route as ApiPublicCheckoutAttemptRouteImport } from './routes/api/public/checkout-attempt'
+import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
+import { Route as ApiPublicLgpdDeleteRouteImport } from './routes/api/public/lgpd-delete'
+import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
+import { Route as ApiPublicStatusRouteImport } from './routes/api/public/status'
+import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
+import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
+import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
+import { Route as ApiPublicTestTiktokEventRouteImport } from './routes/api/public/test-tiktok-event'
+import { Route as ApiPublicTrackRouteImport } from './routes/api/public/track'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ApiPublicAdminCatalogHealthRouteImport } from './routes/api/public/admin/catalog-health'
+import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
+import { Route as ApiPublicDiagProbeCancelRouteImport } from './routes/api/public/diag/probe-cancel'
+import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
+import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './routes/api/public/hooks/auto-resolve-service-ids'
+import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
+import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
+import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
+import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
+import { Route as ApiPublicHooksDropWatcherRouteImport } from './routes/api/public/hooks/drop-watcher'
+import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
+import { Route as ApiPublicHooksOpsAuditRouteImport } from './routes/api/public/hooks/ops-audit'
+import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
+import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
+import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
+import { Route as ApiPublicHooksRecoveryEmailRouteImport } from './routes/api/public/hooks/recovery-email'
+import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/public/hooks/recovery-scan'
+import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/public/hooks/reprocess-one'
+import { Route as ApiPublicHooksReviewRequestScanRouteImport } from './routes/api/public/hooks/review-request-scan'
+import { Route as ApiPublicHooksSlaWatcherRouteImport } from './routes/api/public/hooks/sla-watcher'
+import { Route as ApiPublicHooksSmokeTestRouteImport } from './routes/api/public/hooks/smoke-test'
+import { Route as ApiPublicHooksSyncPricingRouteImport } from './routes/api/public/hooks/sync-pricing'
+import { Route as ApiPublicHooksWaitingWatcherRouteImport } from './routes/api/public/hooks/waiting-watcher'
+import { Route as ApiPublicQueueApproveRefundRouteImport } from './routes/api/public/queue/approve-refund'
+import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
+import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public/queue/reprocess'
+import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
+import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
+import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 
-const Char126beatDotjsRoute = Char126beatDotjsRouteImport.update({
-  id: '/~beat.js',
-  path: '/~beat.js',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const YoutubeRoute = YoutubeRouteImport.update({
-  id: '/youtube',
-  path: '/youtube',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ViewsTiktokRoute = ViewsTiktokRouteImport.update({
-  id: '/views-tiktok',
-  path: '/views-tiktok',
+const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
+  id: '/admin-health-catalog',
+  path: '/admin-health-catalog',
   getParentRoute: () => rootRouteImport,
 } as any)
-const UnsubscribeRoute = UnsubscribeRouteImport.update({
-  id: '/unsubscribe',
-  path: '/unsubscribe',
+const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
+  id: '/audiencia-brasileira',
+  path: '/audiencia-brasileira',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TurbinarTiktokRoute = TurbinarTiktokRouteImport.update({
-  id: '/turbinar-tiktok',
-  path: '/turbinar-tiktok',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TrafegoRoute = TrafegoRouteImport.update({
-  id: '/trafego',
-  path: '/trafego',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TiktokRoute = TiktokRouteImport.update({
-  id: '/tiktok',
-  path: '/tiktok',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TermosRoute = TermosRouteImport.update({
-  id: '/termos',
-  path: '/termos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TelegramRoute = TelegramRouteImport.update({
-  id: '/telegram',
-  path: '/telegram',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReembolsoRoute = ReembolsoRouteImport.update({
-  id: '/reembolso',
-  path: '/reembolso',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Promo5reaisRoute = Promo5reaisRouteImport.update({
-  id: '/promo-5reais',
-  path: '/promo-5reais',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacidadeRoute = PrivacidadeRouteImport.update({
-  id: '/privacidade',
-  path: '/privacidade',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ObrigadoRoute = ObrigadoRouteImport.update({
-  id: '/obrigado',
-  path: '/obrigado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KwaiRoute = KwaiRouteImport.update({
-  id: '/kwai',
-  path: '/kwai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KitCreatorRoute = KitCreatorRouteImport.update({
-  id: '/kit-creator',
-  path: '/kit-creator',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ImpulsionarInstagramRoute = ImpulsionarInstagramRouteImport.update({
-  id: '/impulsionar-instagram',
-  path: '/impulsionar-instagram',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FacebookRoute = FacebookRouteImport.update({
-  id: '/facebook',
-  path: '/facebook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EngajamentoInstagramRoute = EngajamentoInstagramRouteImport.update({
-  id: '/engajamento-instagram',
-  path: '/engajamento-instagram',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiagnosticoRoute = DiagnosticoRouteImport.update({
-  id: '/diagnostico',
-  path: '/diagnostico',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CrescerYoutubeRoute = CrescerYoutubeRouteImport.update({
-  id: '/crescer-youtube',
-  path: '/crescer-youtube',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComprarVisualizacoesTiktokRoute =
-  ComprarVisualizacoesTiktokRouteImport.update({
-    id: '/comprar-visualizacoes-tiktok',
-    path: '/comprar-visualizacoes-tiktok',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ComprarSeguidoresTiktokRoute = ComprarSeguidoresTiktokRouteImport.update({
-  id: '/comprar-seguidores-tiktok',
-  path: '/comprar-seguidores-tiktok',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComprarSeguidoresKwaiRoute = ComprarSeguidoresKwaiRouteImport.update({
-  id: '/comprar-seguidores-kwai',
-  path: '/comprar-seguidores-kwai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComprarSeguidoresInstagramBaratoRoute =
-  ComprarSeguidoresInstagramBaratoRouteImport.update({
-    id: '/comprar-seguidores-instagram-barato',
-    path: '/comprar-seguidores-instagram-barato',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ComprarSeguidoresInstagramRoute =
-  ComprarSeguidoresInstagramRouteImport.update({
-    id: '/comprar-seguidores-instagram',
-    path: '/comprar-seguidores-instagram',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ComprarSeguidoresBrasileirosRoute =
-  ComprarSeguidoresBrasileirosRouteImport.update({
-    id: '/comprar-seguidores-brasileiros',
-    path: '/comprar-seguidores-brasileiros',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ComprarInscritosYoutubeRoute = ComprarInscritosYoutubeRouteImport.update({
-  id: '/comprar-inscritos-youtube',
-  path: '/comprar-inscritos-youtube',
+const AvaliacoesRoute = AvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComprarCurtidasInstagramRoute =
@@ -270,29 +136,205 @@ const ComprarCurtidasInstagramRoute =
     path: '/comprar-curtidas-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AvaliacoesRoute = AvaliacoesRouteImport.update({
-  id: '/avaliacoes',
-  path: '/avaliacoes',
+const ComprarInscritosYoutubeRoute = ComprarInscritosYoutubeRouteImport.update({
+  id: '/comprar-inscritos-youtube',
+  path: '/comprar-inscritos-youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
-  id: '/audiencia-brasileira',
-  path: '/audiencia-brasileira',
+const ComprarSeguidoresBrasileirosRoute =
+  ComprarSeguidoresBrasileirosRouteImport.update({
+    id: '/comprar-seguidores-brasileiros',
+    path: '/comprar-seguidores-brasileiros',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComprarSeguidoresInstagramRoute =
+  ComprarSeguidoresInstagramRouteImport.update({
+    id: '/comprar-seguidores-instagram',
+    path: '/comprar-seguidores-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComprarSeguidoresInstagramBaratoRoute =
+  ComprarSeguidoresInstagramBaratoRouteImport.update({
+    id: '/comprar-seguidores-instagram-barato',
+    path: '/comprar-seguidores-instagram-barato',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ComprarSeguidoresKwaiRoute = ComprarSeguidoresKwaiRouteImport.update({
+  id: '/comprar-seguidores-kwai',
+  path: '/comprar-seguidores-kwai',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
-  id: '/admin-health-catalog',
-  path: '/admin-health-catalog',
+const ComprarSeguidoresTiktokRoute = ComprarSeguidoresTiktokRouteImport.update({
+  id: '/comprar-seguidores-tiktok',
+  path: '/comprar-seguidores-tiktok',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const ComprarVisualizacoesTiktokRoute =
+  ComprarVisualizacoesTiktokRouteImport.update({
+    id: '/comprar-visualizacoes-tiktok',
+    path: '/comprar-visualizacoes-tiktok',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CrescerYoutubeRoute = CrescerYoutubeRouteImport.update({
+  id: '/crescer-youtube',
+  path: '/crescer-youtube',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const DiagnosticoRoute = DiagnosticoRouteImport.update({
+  id: '/diagnostico',
+  path: '/diagnostico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EngajamentoInstagramRoute = EngajamentoInstagramRouteImport.update({
+  id: '/engajamento-instagram',
+  path: '/engajamento-instagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacebookRoute = FacebookRouteImport.update({
+  id: '/facebook',
+  path: '/facebook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpulsionarInstagramRoute = ImpulsionarInstagramRouteImport.update({
+  id: '/impulsionar-instagram',
+  path: '/impulsionar-instagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KitCreatorRoute = KitCreatorRouteImport.update({
+  id: '/kit-creator',
+  path: '/kit-creator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KwaiRoute = KwaiRouteImport.update({
+  id: '/kwai',
+  path: '/kwai',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ObrigadoRoute = ObrigadoRouteImport.update({
+  id: '/obrigado',
+  path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Promo5reaisRoute = Promo5reaisRouteImport.update({
+  id: '/promo-5reais',
+  path: '/promo-5reais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReembolsoRoute = ReembolsoRouteImport.update({
+  id: '/reembolso',
+  path: '/reembolso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TelegramRoute = TelegramRouteImport.update({
+  id: '/telegram',
+  path: '/telegram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TiktokRoute = TiktokRouteImport.update({
+  id: '/tiktok',
+  path: '/tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrafegoRoute = TrafegoRouteImport.update({
+  id: '/trafego',
+  path: '/trafego',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TurbinarTiktokRoute = TurbinarTiktokRouteImport.update({
+  id: '/turbinar-tiktok',
+  path: '/turbinar-tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ViewsTiktokRoute = ViewsTiktokRouteImport.update({
+  id: '/views-tiktok',
+  path: '/views-tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const YoutubeRoute = YoutubeRouteImport.update({
+  id: '/youtube',
+  path: '/youtube',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char126beatDotjsRoute = Char126beatDotjsRouteImport.update({
+  id: '/~beat.js',
+  path: '/~beat.js',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminCatalogRoute = AdminCatalogRouteImport.update({
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminScriptsRoute = AdminScriptsRouteImport.update({
+  id: '/scripts',
+  path: '/scripts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSeoRoute = DashboardSeoRouteImport.update({
+  id: '/dashboard/seo',
+  path: '/dashboard/seo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FerramentasIndexRoute = FerramentasIndexRouteImport.update({
@@ -300,20 +342,10 @@ const FerramentasIndexRoute = FerramentasIndexRouteImport.update({
   path: '/ferramentas/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
-  id: '/~api/beat',
-  path: '/~api/beat',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FerramentasGeradorLegendaInstagramRoute =
-  FerramentasGeradorLegendaInstagramRouteImport.update({
-    id: '/ferramentas/gerador-legenda-instagram',
-    path: '/ferramentas/gerador-legenda-instagram',
+const FerramentasCalculadoraEngajamentoInstagramRoute =
+  FerramentasCalculadoraEngajamentoInstagramRouteImport.update({
+    id: '/ferramentas/calculadora-engajamento-instagram',
+    path: '/ferramentas/calculadora-engajamento-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
 const FerramentasContadorSeguidoresRoute =
@@ -322,109 +354,15 @@ const FerramentasContadorSeguidoresRoute =
     path: '/ferramentas/contador-seguidores',
     getParentRoute: () => rootRouteImport,
   } as any)
-const FerramentasCalculadoraEngajamentoInstagramRoute =
-  FerramentasCalculadoraEngajamentoInstagramRouteImport.update({
-    id: '/ferramentas/calculadora-engajamento-instagram',
-    path: '/ferramentas/calculadora-engajamento-instagram',
+const FerramentasGeradorLegendaInstagramRoute =
+  FerramentasGeradorLegendaInstagramRouteImport.update({
+    id: '/ferramentas/gerador-legenda-instagram',
+    path: '/ferramentas/gerador-legenda-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardSeoRoute = DashboardSeoRouteImport.update({
-  id: '/dashboard/seo',
-  path: '/dashboard/seo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminScriptsRoute = AdminScriptsRouteImport.update({
-  id: '/scripts',
-  path: '/scripts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCatalogRoute = AdminCatalogRouteImport.update({
-  id: '/catalog',
-  path: '/catalog',
-  getParentRoute: () => AdminRoute,
-} as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTrackRoute = ApiPublicTrackRouteImport.update({
-  id: '/api/public/track',
-  path: '/api/public/track',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicTestTiktokEventRoute =
-  ApiPublicTestTiktokEventRouteImport.update({
-    id: '/api/public/test-tiktok-event',
-    path: '/api/public/test-tiktok-event',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicSyncVerifiedRoute = ApiPublicSyncVerifiedRouteImport.update({
-  id: '/api/public/sync-verified',
-  path: '/api/public/sync-verified',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicSyncSmmpanelRoute = ApiPublicSyncSmmpanelRouteImport.update({
-  id: '/api/public/sync-smmpanel',
-  path: '/api/public/sync-smmpanel',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
-  id: '/api/public/sync-services',
-  path: '/api/public/sync-services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicStatusRoute = ApiPublicStatusRouteImport.update({
-  id: '/api/public/status',
-  path: '/api/public/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
-  id: '/api/public/mp-webhook',
-  path: '/api/public/mp-webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicLgpdDeleteRoute = ApiPublicLgpdDeleteRouteImport.update({
-  id: '/api/public/lgpd-delete',
-  path: '/api/public/lgpd-delete',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicJarvisPipelineRoute = ApiPublicJarvisPipelineRouteImport.update({
-  id: '/api/public/jarvis-pipeline',
-  path: '/api/public/jarvis-pipeline',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicCheckoutAttemptRoute =
-  ApiPublicCheckoutAttemptRouteImport.update({
-    id: '/api/public/checkout-attempt',
-    path: '/api/public/checkout-attempt',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicCheckSaldoRoute = ApiPublicCheckSaldoRouteImport.update({
-  id: '/api/public/check-saldo',
-  path: '/api/public/check-saldo',
+const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
+  id: '/~api/beat',
+  path: '/~api/beat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
@@ -433,178 +371,72 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailTransactionalPreviewRoute =
-  LovableEmailTransactionalPreviewRouteImport.update({
-    id: '/lovable/email/transactional/preview',
-    path: '/lovable/email/transactional/preview',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicTelegramWebhookRoute =
-  ApiPublicTelegramWebhookRouteImport.update({
-    id: '/api/public/telegram/webhook',
-    path: '/api/public/telegram/webhook',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicSfxNameRoute = ApiPublicSfxNameRouteImport.update({
-  id: '/api/public/sfx/$name',
-  path: '/api/public/sfx/$name',
+const ApiPublicCheckSaldoRoute = ApiPublicCheckSaldoRouteImport.update({
+  id: '/api/public/check-saldo',
+  path: '/api/public/check-saldo',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicQueueWaitingRoute = ApiPublicQueueWaitingRouteImport.update({
-  id: '/api/public/queue/waiting',
-  path: '/api/public/queue/waiting',
+const ApiPublicCheckoutAttemptRoute =
+  ApiPublicCheckoutAttemptRouteImport.update({
+    id: '/api/public/checkout-attempt',
+    path: '/api/public/checkout-attempt',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicJarvisPipelineRoute = ApiPublicJarvisPipelineRouteImport.update({
+  id: '/api/public/jarvis-pipeline',
+  path: '/api/public/jarvis-pipeline',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicQueueReprocessRoute = ApiPublicQueueReprocessRouteImport.update({
-  id: '/api/public/queue/reprocess',
-  path: '/api/public/queue/reprocess',
+const ApiPublicLgpdDeleteRoute = ApiPublicLgpdDeleteRouteImport.update({
+  id: '/api/public/lgpd-delete',
+  path: '/api/public/lgpd-delete',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicQueueConfirmRoute = ApiPublicQueueConfirmRouteImport.update({
-  id: '/api/public/queue/confirm',
-  path: '/api/public/queue/confirm',
+const ApiPublicMpWebhookRoute = ApiPublicMpWebhookRouteImport.update({
+  id: '/api/public/mp-webhook',
+  path: '/api/public/mp-webhook',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicQueueApproveRefundRoute =
-  ApiPublicQueueApproveRefundRouteImport.update({
-    id: '/api/public/queue/approve-refund',
-    path: '/api/public/queue/approve-refund',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksWaitingWatcherRoute =
-  ApiPublicHooksWaitingWatcherRouteImport.update({
-    id: '/api/public/hooks/waiting-watcher',
-    path: '/api/public/hooks/waiting-watcher',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksSyncPricingRoute =
-  ApiPublicHooksSyncPricingRouteImport.update({
-    id: '/api/public/hooks/sync-pricing',
-    path: '/api/public/hooks/sync-pricing',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksSmokeTestRoute = ApiPublicHooksSmokeTestRouteImport.update({
-  id: '/api/public/hooks/smoke-test',
-  path: '/api/public/hooks/smoke-test',
+const ApiPublicStatusRoute = ApiPublicStatusRouteImport.update({
+  id: '/api/public/status',
+  path: '/api/public/status',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksSlaWatcherRoute =
-  ApiPublicHooksSlaWatcherRouteImport.update({
-    id: '/api/public/hooks/sla-watcher',
-    path: '/api/public/hooks/sla-watcher',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksReviewRequestScanRoute =
-  ApiPublicHooksReviewRequestScanRouteImport.update({
-    id: '/api/public/hooks/review-request-scan',
-    path: '/api/public/hooks/review-request-scan',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksReprocessOneRoute =
-  ApiPublicHooksReprocessOneRouteImport.update({
-    id: '/api/public/hooks/reprocess-one',
-    path: '/api/public/hooks/reprocess-one',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRecoveryScanRoute =
-  ApiPublicHooksRecoveryScanRouteImport.update({
-    id: '/api/public/hooks/recovery-scan',
-    path: '/api/public/hooks/recovery-scan',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRecoveryEmailRoute =
-  ApiPublicHooksRecoveryEmailRouteImport.update({
-    id: '/api/public/hooks/recovery-email',
-    path: '/api/public/hooks/recovery-email',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksRecoverAbandonedRoute =
-  ApiPublicHooksRecoverAbandonedRouteImport.update({
-    id: '/api/public/hooks/recover-abandoned',
-    path: '/api/public/hooks/recover-abandoned',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksReconciliationRoute =
-  ApiPublicHooksReconciliationRouteImport.update({
-    id: '/api/public/hooks/reconciliation',
-    path: '/api/public/hooks/reconciliation',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksPedidoReconcilerRoute =
-  ApiPublicHooksPedidoReconcilerRouteImport.update({
-    id: '/api/public/hooks/pedido-reconciler',
-    path: '/api/public/hooks/pedido-reconciler',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksOpsAuditRoute = ApiPublicHooksOpsAuditRouteImport.update({
-  id: '/api/public/hooks/ops-audit',
-  path: '/api/public/hooks/ops-audit',
+const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
+  id: '/api/public/sync-services',
+  path: '/api/public/sync-services',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHooksDryRunCatalogRoute =
-  ApiPublicHooksDryRunCatalogRouteImport.update({
-    id: '/api/public/hooks/dry-run-catalog',
-    path: '/api/public/hooks/dry-run-catalog',
+const ApiPublicSyncSmmpanelRoute = ApiPublicSyncSmmpanelRouteImport.update({
+  id: '/api/public/sync-smmpanel',
+  path: '/api/public/sync-smmpanel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSyncVerifiedRoute = ApiPublicSyncVerifiedRouteImport.update({
+  id: '/api/public/sync-verified',
+  path: '/api/public/sync-verified',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTestTiktokEventRoute =
+  ApiPublicTestTiktokEventRouteImport.update({
+    id: '/api/public/test-tiktok-event',
+    path: '/api/public/test-tiktok-event',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicHooksDropWatcherRoute =
-  ApiPublicHooksDropWatcherRouteImport.update({
-    id: '/api/public/hooks/drop-watcher',
-    path: '/api/public/hooks/drop-watcher',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksDeliveryWatcherRoute =
-  ApiPublicHooksDeliveryWatcherRouteImport.update({
-    id: '/api/public/hooks/delivery-watcher',
-    path: '/api/public/hooks/delivery-watcher',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksBestsellerScanRoute =
-  ApiPublicHooksBestsellerScanRouteImport.update({
-    id: '/api/public/hooks/bestseller-scan',
-    path: '/api/public/hooks/bestseller-scan',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksBackupDrillRoute =
-  ApiPublicHooksBackupDrillRouteImport.update({
-    id: '/api/public/hooks/backup-drill',
-    path: '/api/public/hooks/backup-drill',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksBackfillSmmhypeIdsRoute =
-  ApiPublicHooksBackfillSmmhypeIdsRouteImport.update({
-    id: '/api/public/hooks/backfill-smmhype-ids',
-    path: '/api/public/hooks/backfill-smmhype-ids',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksAutoResolveServiceIdsRoute =
-  ApiPublicHooksAutoResolveServiceIdsRouteImport.update({
-    id: '/api/public/hooks/auto-resolve-service-ids',
-    path: '/api/public/hooks/auto-resolve-service-ids',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicHooksAutoHealerRoute =
-  ApiPublicHooksAutoHealerRouteImport.update({
-    id: '/api/public/hooks/auto-healer',
-    path: '/api/public/hooks/auto-healer',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicDiagProbeCancelRoute =
-  ApiPublicDiagProbeCancelRouteImport.update({
-    id: '/api/public/diag/probe-cancel',
-    path: '/api/public/diag/probe-cancel',
+const ApiPublicTrackRoute = ApiPublicTrackRouteImport.update({
+  id: '/api/public/track',
+  path: '/api/public/track',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicAdminCatalogHealthRoute =
+  ApiPublicAdminCatalogHealthRouteImport.update({
+    id: '/api/public/admin/catalog-health',
+    path: '/api/public/admin/catalog-health',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicAdminPricingConfigRoute =
@@ -613,10 +445,178 @@ const ApiPublicAdminPricingConfigRoute =
     path: '/api/public/admin/pricing-config',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiPublicAdminCatalogHealthRoute =
-  ApiPublicAdminCatalogHealthRouteImport.update({
-    id: '/api/public/admin/catalog-health',
-    path: '/api/public/admin/catalog-health',
+const ApiPublicDiagProbeCancelRoute =
+  ApiPublicDiagProbeCancelRouteImport.update({
+    id: '/api/public/diag/probe-cancel',
+    path: '/api/public/diag/probe-cancel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksAutoHealerRoute =
+  ApiPublicHooksAutoHealerRouteImport.update({
+    id: '/api/public/hooks/auto-healer',
+    path: '/api/public/hooks/auto-healer',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksAutoResolveServiceIdsRoute =
+  ApiPublicHooksAutoResolveServiceIdsRouteImport.update({
+    id: '/api/public/hooks/auto-resolve-service-ids',
+    path: '/api/public/hooks/auto-resolve-service-ids',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksBackfillSmmhypeIdsRoute =
+  ApiPublicHooksBackfillSmmhypeIdsRouteImport.update({
+    id: '/api/public/hooks/backfill-smmhype-ids',
+    path: '/api/public/hooks/backfill-smmhype-ids',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksBackupDrillRoute =
+  ApiPublicHooksBackupDrillRouteImport.update({
+    id: '/api/public/hooks/backup-drill',
+    path: '/api/public/hooks/backup-drill',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksBestsellerScanRoute =
+  ApiPublicHooksBestsellerScanRouteImport.update({
+    id: '/api/public/hooks/bestseller-scan',
+    path: '/api/public/hooks/bestseller-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDeliveryWatcherRoute =
+  ApiPublicHooksDeliveryWatcherRouteImport.update({
+    id: '/api/public/hooks/delivery-watcher',
+    path: '/api/public/hooks/delivery-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDropWatcherRoute =
+  ApiPublicHooksDropWatcherRouteImport.update({
+    id: '/api/public/hooks/drop-watcher',
+    path: '/api/public/hooks/drop-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksDryRunCatalogRoute =
+  ApiPublicHooksDryRunCatalogRouteImport.update({
+    id: '/api/public/hooks/dry-run-catalog',
+    path: '/api/public/hooks/dry-run-catalog',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksOpsAuditRoute = ApiPublicHooksOpsAuditRouteImport.update({
+  id: '/api/public/hooks/ops-audit',
+  path: '/api/public/hooks/ops-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksPedidoReconcilerRoute =
+  ApiPublicHooksPedidoReconcilerRouteImport.update({
+    id: '/api/public/hooks/pedido-reconciler',
+    path: '/api/public/hooks/pedido-reconciler',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksReconciliationRoute =
+  ApiPublicHooksReconciliationRouteImport.update({
+    id: '/api/public/hooks/reconciliation',
+    path: '/api/public/hooks/reconciliation',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRecoverAbandonedRoute =
+  ApiPublicHooksRecoverAbandonedRouteImport.update({
+    id: '/api/public/hooks/recover-abandoned',
+    path: '/api/public/hooks/recover-abandoned',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRecoveryEmailRoute =
+  ApiPublicHooksRecoveryEmailRouteImport.update({
+    id: '/api/public/hooks/recovery-email',
+    path: '/api/public/hooks/recovery-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksRecoveryScanRoute =
+  ApiPublicHooksRecoveryScanRouteImport.update({
+    id: '/api/public/hooks/recovery-scan',
+    path: '/api/public/hooks/recovery-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksReprocessOneRoute =
+  ApiPublicHooksReprocessOneRouteImport.update({
+    id: '/api/public/hooks/reprocess-one',
+    path: '/api/public/hooks/reprocess-one',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksReviewRequestScanRoute =
+  ApiPublicHooksReviewRequestScanRouteImport.update({
+    id: '/api/public/hooks/review-request-scan',
+    path: '/api/public/hooks/review-request-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksSlaWatcherRoute =
+  ApiPublicHooksSlaWatcherRouteImport.update({
+    id: '/api/public/hooks/sla-watcher',
+    path: '/api/public/hooks/sla-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksSmokeTestRoute = ApiPublicHooksSmokeTestRouteImport.update({
+  id: '/api/public/hooks/smoke-test',
+  path: '/api/public/hooks/smoke-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksSyncPricingRoute =
+  ApiPublicHooksSyncPricingRouteImport.update({
+    id: '/api/public/hooks/sync-pricing',
+    path: '/api/public/hooks/sync-pricing',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksWaitingWatcherRoute =
+  ApiPublicHooksWaitingWatcherRouteImport.update({
+    id: '/api/public/hooks/waiting-watcher',
+    path: '/api/public/hooks/waiting-watcher',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicQueueApproveRefundRoute =
+  ApiPublicQueueApproveRefundRouteImport.update({
+    id: '/api/public/queue/approve-refund',
+    path: '/api/public/queue/approve-refund',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicQueueConfirmRoute = ApiPublicQueueConfirmRouteImport.update({
+  id: '/api/public/queue/confirm',
+  path: '/api/public/queue/confirm',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicQueueReprocessRoute = ApiPublicQueueReprocessRouteImport.update({
+  id: '/api/public/queue/reprocess',
+  path: '/api/public/queue/reprocess',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicQueueWaitingRoute = ApiPublicQueueWaitingRouteImport.update({
+  id: '/api/public/queue/waiting',
+  path: '/api/public/queue/waiting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSfxNameRoute = ApiPublicSfxNameRouteImport.update({
+  id: '/api/public/sfx/$name',
+  path: '/api/public/sfx/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicTelegramWebhookRoute =
+  ApiPublicTelegramWebhookRouteImport.update({
+    id: '/api/public/telegram/webhook',
+    path: '/api/public/telegram/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -1304,249 +1304,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/~beat.js': {
-      id: '/~beat.js'
-      path: '/~beat.js'
-      fullPath: '/~beat.js'
-      preLoaderRoute: typeof Char126beatDotjsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/youtube': {
-      id: '/youtube'
-      path: '/youtube'
-      fullPath: '/youtube'
-      preLoaderRoute: typeof YoutubeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/views-tiktok': {
-      id: '/views-tiktok'
-      path: '/views-tiktok'
-      fullPath: '/views-tiktok'
-      preLoaderRoute: typeof ViewsTiktokRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/unsubscribe': {
-      id: '/unsubscribe'
-      path: '/unsubscribe'
-      fullPath: '/unsubscribe'
-      preLoaderRoute: typeof UnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/turbinar-tiktok': {
-      id: '/turbinar-tiktok'
-      path: '/turbinar-tiktok'
-      fullPath: '/turbinar-tiktok'
-      preLoaderRoute: typeof TurbinarTiktokRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trafego': {
-      id: '/trafego'
-      path: '/trafego'
-      fullPath: '/trafego'
-      preLoaderRoute: typeof TrafegoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tiktok': {
-      id: '/tiktok'
-      path: '/tiktok'
-      fullPath: '/tiktok'
-      preLoaderRoute: typeof TiktokRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/termos': {
-      id: '/termos'
-      path: '/termos'
-      fullPath: '/termos'
-      preLoaderRoute: typeof TermosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/telegram': {
-      id: '/telegram'
-      path: '/telegram'
-      fullPath: '/telegram'
-      preLoaderRoute: typeof TelegramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reembolso': {
-      id: '/reembolso'
-      path: '/reembolso'
-      fullPath: '/reembolso'
-      preLoaderRoute: typeof ReembolsoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/promo-5reais': {
-      id: '/promo-5reais'
-      path: '/promo-5reais'
-      fullPath: '/promo-5reais'
-      preLoaderRoute: typeof Promo5reaisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacidade': {
-      id: '/privacidade'
-      path: '/privacidade'
-      fullPath: '/privacidade'
-      preLoaderRoute: typeof PrivacidadeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/obrigado': {
-      id: '/obrigado'
-      path: '/obrigado'
-      fullPath: '/obrigado'
-      preLoaderRoute: typeof ObrigadoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kwai': {
-      id: '/kwai'
-      path: '/kwai'
-      fullPath: '/kwai'
-      preLoaderRoute: typeof KwaiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/kit-creator': {
-      id: '/kit-creator'
-      path: '/kit-creator'
-      fullPath: '/kit-creator'
-      preLoaderRoute: typeof KitCreatorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/impulsionar-instagram': {
-      id: '/impulsionar-instagram'
-      path: '/impulsionar-instagram'
-      fullPath: '/impulsionar-instagram'
-      preLoaderRoute: typeof ImpulsionarInstagramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/facebook': {
-      id: '/facebook'
-      path: '/facebook'
-      fullPath: '/facebook'
-      preLoaderRoute: typeof FacebookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/engajamento-instagram': {
-      id: '/engajamento-instagram'
-      path: '/engajamento-instagram'
-      fullPath: '/engajamento-instagram'
-      preLoaderRoute: typeof EngajamentoInstagramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/diagnostico': {
-      id: '/diagnostico'
-      path: '/diagnostico'
-      fullPath: '/diagnostico'
-      preLoaderRoute: typeof DiagnosticoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crescer-youtube': {
-      id: '/crescer-youtube'
-      path: '/crescer-youtube'
-      fullPath: '/crescer-youtube'
-      preLoaderRoute: typeof CrescerYoutubeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-visualizacoes-tiktok': {
-      id: '/comprar-visualizacoes-tiktok'
-      path: '/comprar-visualizacoes-tiktok'
-      fullPath: '/comprar-visualizacoes-tiktok'
-      preLoaderRoute: typeof ComprarVisualizacoesTiktokRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-seguidores-tiktok': {
-      id: '/comprar-seguidores-tiktok'
-      path: '/comprar-seguidores-tiktok'
-      fullPath: '/comprar-seguidores-tiktok'
-      preLoaderRoute: typeof ComprarSeguidoresTiktokRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-seguidores-kwai': {
-      id: '/comprar-seguidores-kwai'
-      path: '/comprar-seguidores-kwai'
-      fullPath: '/comprar-seguidores-kwai'
-      preLoaderRoute: typeof ComprarSeguidoresKwaiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-seguidores-instagram-barato': {
-      id: '/comprar-seguidores-instagram-barato'
-      path: '/comprar-seguidores-instagram-barato'
-      fullPath: '/comprar-seguidores-instagram-barato'
-      preLoaderRoute: typeof ComprarSeguidoresInstagramBaratoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-seguidores-instagram': {
-      id: '/comprar-seguidores-instagram'
-      path: '/comprar-seguidores-instagram'
-      fullPath: '/comprar-seguidores-instagram'
-      preLoaderRoute: typeof ComprarSeguidoresInstagramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-seguidores-brasileiros': {
-      id: '/comprar-seguidores-brasileiros'
-      path: '/comprar-seguidores-brasileiros'
-      fullPath: '/comprar-seguidores-brasileiros'
-      preLoaderRoute: typeof ComprarSeguidoresBrasileirosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-inscritos-youtube': {
-      id: '/comprar-inscritos-youtube'
-      path: '/comprar-inscritos-youtube'
-      fullPath: '/comprar-inscritos-youtube'
-      preLoaderRoute: typeof ComprarInscritosYoutubeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/comprar-curtidas-instagram': {
-      id: '/comprar-curtidas-instagram'
-      path: '/comprar-curtidas-instagram'
-      fullPath: '/comprar-curtidas-instagram'
-      preLoaderRoute: typeof ComprarCurtidasInstagramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/avaliacoes': {
-      id: '/avaliacoes'
-      path: '/avaliacoes'
-      fullPath: '/avaliacoes'
-      preLoaderRoute: typeof AvaliacoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/audiencia-brasileira': {
-      id: '/audiencia-brasileira'
-      path: '/audiencia-brasileira'
-      fullPath: '/audiencia-brasileira'
-      preLoaderRoute: typeof AudienciaBrasileiraRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin-health-catalog': {
-      id: '/admin-health-catalog'
-      path: '/admin-health-catalog'
-      fullPath: '/admin-health-catalog'
-      preLoaderRoute: typeof AdminHealthCatalogRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -1556,95 +1318,249 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin-health-catalog': {
+      id: '/admin-health-catalog'
+      path: '/admin-health-catalog'
+      fullPath: '/admin-health-catalog'
+      preLoaderRoute: typeof AdminHealthCatalogRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ferramentas/': {
-      id: '/ferramentas/'
-      path: '/ferramentas'
-      fullPath: '/ferramentas/'
-      preLoaderRoute: typeof FerramentasIndexRouteImport
+    '/audiencia-brasileira': {
+      id: '/audiencia-brasileira'
+      path: '/audiencia-brasileira'
+      fullPath: '/audiencia-brasileira'
+      preLoaderRoute: typeof AudienciaBrasileiraRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
+    '/avaliacoes': {
+      id: '/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/avaliacoes'
+      preLoaderRoute: typeof AvaliacoesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/~api/beat': {
-      id: '/~api/beat'
-      path: '/~api/beat'
-      fullPath: '/~api/beat'
-      preLoaderRoute: typeof Char126apiBeatRouteImport
+    '/comprar-curtidas-instagram': {
+      id: '/comprar-curtidas-instagram'
+      path: '/comprar-curtidas-instagram'
+      fullPath: '/comprar-curtidas-instagram'
+      preLoaderRoute: typeof ComprarCurtidasInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ferramentas/gerador-legenda-instagram': {
-      id: '/ferramentas/gerador-legenda-instagram'
-      path: '/ferramentas/gerador-legenda-instagram'
-      fullPath: '/ferramentas/gerador-legenda-instagram'
-      preLoaderRoute: typeof FerramentasGeradorLegendaInstagramRouteImport
+    '/comprar-inscritos-youtube': {
+      id: '/comprar-inscritos-youtube'
+      path: '/comprar-inscritos-youtube'
+      fullPath: '/comprar-inscritos-youtube'
+      preLoaderRoute: typeof ComprarInscritosYoutubeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ferramentas/contador-seguidores': {
-      id: '/ferramentas/contador-seguidores'
-      path: '/ferramentas/contador-seguidores'
-      fullPath: '/ferramentas/contador-seguidores'
-      preLoaderRoute: typeof FerramentasContadorSeguidoresRouteImport
+    '/comprar-seguidores-brasileiros': {
+      id: '/comprar-seguidores-brasileiros'
+      path: '/comprar-seguidores-brasileiros'
+      fullPath: '/comprar-seguidores-brasileiros'
+      preLoaderRoute: typeof ComprarSeguidoresBrasileirosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ferramentas/calculadora-engajamento-instagram': {
-      id: '/ferramentas/calculadora-engajamento-instagram'
-      path: '/ferramentas/calculadora-engajamento-instagram'
-      fullPath: '/ferramentas/calculadora-engajamento-instagram'
-      preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
+    '/comprar-seguidores-instagram': {
+      id: '/comprar-seguidores-instagram'
+      path: '/comprar-seguidores-instagram'
+      fullPath: '/comprar-seguidores-instagram'
+      preLoaderRoute: typeof ComprarSeguidoresInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+    '/comprar-seguidores-instagram-barato': {
+      id: '/comprar-seguidores-instagram-barato'
+      path: '/comprar-seguidores-instagram-barato'
+      fullPath: '/comprar-seguidores-instagram-barato'
+      preLoaderRoute: typeof ComprarSeguidoresInstagramBaratoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/seo': {
-      id: '/dashboard/seo'
-      path: '/dashboard/seo'
-      fullPath: '/dashboard/seo'
-      preLoaderRoute: typeof DashboardSeoRouteImport
+    '/comprar-seguidores-kwai': {
+      id: '/comprar-seguidores-kwai'
+      path: '/comprar-seguidores-kwai'
+      fullPath: '/comprar-seguidores-kwai'
+      preLoaderRoute: typeof ComprarSeguidoresKwaiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
+    '/comprar-seguidores-tiktok': {
+      id: '/comprar-seguidores-tiktok'
+      path: '/comprar-seguidores-tiktok'
+      fullPath: '/comprar-seguidores-tiktok'
+      preLoaderRoute: typeof ComprarSeguidoresTiktokRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/scripts': {
-      id: '/admin/scripts'
-      path: '/scripts'
-      fullPath: '/admin/scripts'
-      preLoaderRoute: typeof AdminScriptsRouteImport
-      parentRoute: typeof AdminRoute
+    '/comprar-visualizacoes-tiktok': {
+      id: '/comprar-visualizacoes-tiktok'
+      path: '/comprar-visualizacoes-tiktok'
+      fullPath: '/comprar-visualizacoes-tiktok'
+      preLoaderRoute: typeof ComprarVisualizacoesTiktokRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/admin/catalog': {
-      id: '/admin/catalog'
-      path: '/catalog'
-      fullPath: '/admin/catalog'
-      preLoaderRoute: typeof AdminCatalogRouteImport
-      parentRoute: typeof AdminRoute
+    '/crescer-youtube': {
+      id: '/crescer-youtube'
+      path: '/crescer-youtube'
+      fullPath: '/crescer-youtube'
+      preLoaderRoute: typeof CrescerYoutubeRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/diagnostico': {
+      id: '/diagnostico'
+      path: '/diagnostico'
+      fullPath: '/diagnostico'
+      preLoaderRoute: typeof DiagnosticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/engajamento-instagram': {
+      id: '/engajamento-instagram'
+      path: '/engajamento-instagram'
+      fullPath: '/engajamento-instagram'
+      preLoaderRoute: typeof EngajamentoInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/facebook': {
+      id: '/facebook'
+      path: '/facebook'
+      fullPath: '/facebook'
+      preLoaderRoute: typeof FacebookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impulsionar-instagram': {
+      id: '/impulsionar-instagram'
+      path: '/impulsionar-instagram'
+      fullPath: '/impulsionar-instagram'
+      preLoaderRoute: typeof ImpulsionarInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kit-creator': {
+      id: '/kit-creator'
+      path: '/kit-creator'
+      fullPath: '/kit-creator'
+      preLoaderRoute: typeof KitCreatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kwai': {
+      id: '/kwai'
+      path: '/kwai'
+      fullPath: '/kwai'
+      preLoaderRoute: typeof KwaiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/obrigado': {
+      id: '/obrigado'
+      path: '/obrigado'
+      fullPath: '/obrigado'
+      preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/promo-5reais': {
+      id: '/promo-5reais'
+      path: '/promo-5reais'
+      fullPath: '/promo-5reais'
+      preLoaderRoute: typeof Promo5reaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reembolso': {
+      id: '/reembolso'
+      path: '/reembolso'
+      fullPath: '/reembolso'
+      preLoaderRoute: typeof ReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/telegram': {
+      id: '/telegram'
+      path: '/telegram'
+      fullPath: '/telegram'
+      preLoaderRoute: typeof TelegramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tiktok': {
+      id: '/tiktok'
+      path: '/tiktok'
+      fullPath: '/tiktok'
+      preLoaderRoute: typeof TiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trafego': {
+      id: '/trafego'
+      path: '/trafego'
+      fullPath: '/trafego'
+      preLoaderRoute: typeof TrafegoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/turbinar-tiktok': {
+      id: '/turbinar-tiktok'
+      path: '/turbinar-tiktok'
+      fullPath: '/turbinar-tiktok'
+      preLoaderRoute: typeof TurbinarTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/views-tiktok': {
+      id: '/views-tiktok'
+      path: '/views-tiktok'
+      fullPath: '/views-tiktok'
+      preLoaderRoute: typeof ViewsTiktokRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/youtube': {
+      id: '/youtube'
+      path: '/youtube'
+      fullPath: '/youtube'
+      preLoaderRoute: typeof YoutubeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/~beat.js': {
+      id: '/~beat.js'
+      path: '/~beat.js'
+      fullPath: '/~beat.js'
+      preLoaderRoute: typeof Char126beatDotjsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -1654,88 +1570,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/track': {
-      id: '/api/public/track'
-      path: '/api/public/track'
-      fullPath: '/api/public/track'
-      preLoaderRoute: typeof ApiPublicTrackRouteImport
+    '/admin/catalog': {
+      id: '/admin/catalog'
+      path: '/catalog'
+      fullPath: '/admin/catalog'
+      preLoaderRoute: typeof AdminCatalogRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/scripts': {
+      id: '/admin/scripts'
+      path: '/scripts'
+      fullPath: '/admin/scripts'
+      preLoaderRoute: typeof AdminScriptsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/test-tiktok-event': {
-      id: '/api/public/test-tiktok-event'
-      path: '/api/public/test-tiktok-event'
-      fullPath: '/api/public/test-tiktok-event'
-      preLoaderRoute: typeof ApiPublicTestTiktokEventRouteImport
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/sync-verified': {
-      id: '/api/public/sync-verified'
-      path: '/api/public/sync-verified'
-      fullPath: '/api/public/sync-verified'
-      preLoaderRoute: typeof ApiPublicSyncVerifiedRouteImport
+    '/dashboard/seo': {
+      id: '/dashboard/seo'
+      path: '/dashboard/seo'
+      fullPath: '/dashboard/seo'
+      preLoaderRoute: typeof DashboardSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/sync-smmpanel': {
-      id: '/api/public/sync-smmpanel'
-      path: '/api/public/sync-smmpanel'
-      fullPath: '/api/public/sync-smmpanel'
-      preLoaderRoute: typeof ApiPublicSyncSmmpanelRouteImport
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/sync-services': {
-      id: '/api/public/sync-services'
-      path: '/api/public/sync-services'
-      fullPath: '/api/public/sync-services'
-      preLoaderRoute: typeof ApiPublicSyncServicesRouteImport
+    '/ferramentas/': {
+      id: '/ferramentas/'
+      path: '/ferramentas'
+      fullPath: '/ferramentas/'
+      preLoaderRoute: typeof FerramentasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/status': {
-      id: '/api/public/status'
-      path: '/api/public/status'
-      fullPath: '/api/public/status'
-      preLoaderRoute: typeof ApiPublicStatusRouteImport
+    '/ferramentas/calculadora-engajamento-instagram': {
+      id: '/ferramentas/calculadora-engajamento-instagram'
+      path: '/ferramentas/calculadora-engajamento-instagram'
+      fullPath: '/ferramentas/calculadora-engajamento-instagram'
+      preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/mp-webhook': {
-      id: '/api/public/mp-webhook'
-      path: '/api/public/mp-webhook'
-      fullPath: '/api/public/mp-webhook'
-      preLoaderRoute: typeof ApiPublicMpWebhookRouteImport
+    '/ferramentas/contador-seguidores': {
+      id: '/ferramentas/contador-seguidores'
+      path: '/ferramentas/contador-seguidores'
+      fullPath: '/ferramentas/contador-seguidores'
+      preLoaderRoute: typeof FerramentasContadorSeguidoresRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/lgpd-delete': {
-      id: '/api/public/lgpd-delete'
-      path: '/api/public/lgpd-delete'
-      fullPath: '/api/public/lgpd-delete'
-      preLoaderRoute: typeof ApiPublicLgpdDeleteRouteImport
+    '/ferramentas/gerador-legenda-instagram': {
+      id: '/ferramentas/gerador-legenda-instagram'
+      path: '/ferramentas/gerador-legenda-instagram'
+      fullPath: '/ferramentas/gerador-legenda-instagram'
+      preLoaderRoute: typeof FerramentasGeradorLegendaInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/jarvis-pipeline': {
-      id: '/api/public/jarvis-pipeline'
-      path: '/api/public/jarvis-pipeline'
-      fullPath: '/api/public/jarvis-pipeline'
-      preLoaderRoute: typeof ApiPublicJarvisPipelineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/checkout-attempt': {
-      id: '/api/public/checkout-attempt'
-      path: '/api/public/checkout-attempt'
-      fullPath: '/api/public/checkout-attempt'
-      preLoaderRoute: typeof ApiPublicCheckoutAttemptRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/check-saldo': {
-      id: '/api/public/check-saldo'
-      path: '/api/public/check-saldo'
-      fullPath: '/api/public/check-saldo'
-      preLoaderRoute: typeof ApiPublicCheckSaldoRouteImport
+    '/~api/beat': {
+      id: '/~api/beat'
+      path: '/~api/beat'
+      fullPath: '/~api/beat'
+      preLoaderRoute: typeof Char126apiBeatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/invoke-tool/$tool': {
@@ -1745,214 +1661,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+    '/api/public/check-saldo': {
+      id: '/api/public/check-saldo'
+      path: '/api/public/check-saldo'
+      fullPath: '/api/public/check-saldo'
+      preLoaderRoute: typeof ApiPublicCheckSaldoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/preview': {
-      id: '/lovable/email/transactional/preview'
-      path: '/lovable/email/transactional/preview'
-      fullPath: '/lovable/email/transactional/preview'
-      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+    '/api/public/checkout-attempt': {
+      id: '/api/public/checkout-attempt'
+      path: '/api/public/checkout-attempt'
+      fullPath: '/api/public/checkout-attempt'
+      preLoaderRoute: typeof ApiPublicCheckoutAttemptRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/api/public/jarvis-pipeline': {
+      id: '/api/public/jarvis-pipeline'
+      path: '/api/public/jarvis-pipeline'
+      fullPath: '/api/public/jarvis-pipeline'
+      preLoaderRoute: typeof ApiPublicJarvisPipelineRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/telegram/webhook': {
-      id: '/api/public/telegram/webhook'
-      path: '/api/public/telegram/webhook'
-      fullPath: '/api/public/telegram/webhook'
-      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+    '/api/public/lgpd-delete': {
+      id: '/api/public/lgpd-delete'
+      path: '/api/public/lgpd-delete'
+      fullPath: '/api/public/lgpd-delete'
+      preLoaderRoute: typeof ApiPublicLgpdDeleteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/sfx/$name': {
-      id: '/api/public/sfx/$name'
-      path: '/api/public/sfx/$name'
-      fullPath: '/api/public/sfx/$name'
-      preLoaderRoute: typeof ApiPublicSfxNameRouteImport
+    '/api/public/mp-webhook': {
+      id: '/api/public/mp-webhook'
+      path: '/api/public/mp-webhook'
+      fullPath: '/api/public/mp-webhook'
+      preLoaderRoute: typeof ApiPublicMpWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/queue/waiting': {
-      id: '/api/public/queue/waiting'
-      path: '/api/public/queue/waiting'
-      fullPath: '/api/public/queue/waiting'
-      preLoaderRoute: typeof ApiPublicQueueWaitingRouteImport
+    '/api/public/status': {
+      id: '/api/public/status'
+      path: '/api/public/status'
+      fullPath: '/api/public/status'
+      preLoaderRoute: typeof ApiPublicStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/queue/reprocess': {
-      id: '/api/public/queue/reprocess'
-      path: '/api/public/queue/reprocess'
-      fullPath: '/api/public/queue/reprocess'
-      preLoaderRoute: typeof ApiPublicQueueReprocessRouteImport
+    '/api/public/sync-services': {
+      id: '/api/public/sync-services'
+      path: '/api/public/sync-services'
+      fullPath: '/api/public/sync-services'
+      preLoaderRoute: typeof ApiPublicSyncServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/queue/confirm': {
-      id: '/api/public/queue/confirm'
-      path: '/api/public/queue/confirm'
-      fullPath: '/api/public/queue/confirm'
-      preLoaderRoute: typeof ApiPublicQueueConfirmRouteImport
+    '/api/public/sync-smmpanel': {
+      id: '/api/public/sync-smmpanel'
+      path: '/api/public/sync-smmpanel'
+      fullPath: '/api/public/sync-smmpanel'
+      preLoaderRoute: typeof ApiPublicSyncSmmpanelRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/queue/approve-refund': {
-      id: '/api/public/queue/approve-refund'
-      path: '/api/public/queue/approve-refund'
-      fullPath: '/api/public/queue/approve-refund'
-      preLoaderRoute: typeof ApiPublicQueueApproveRefundRouteImport
+    '/api/public/sync-verified': {
+      id: '/api/public/sync-verified'
+      path: '/api/public/sync-verified'
+      fullPath: '/api/public/sync-verified'
+      preLoaderRoute: typeof ApiPublicSyncVerifiedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/waiting-watcher': {
-      id: '/api/public/hooks/waiting-watcher'
-      path: '/api/public/hooks/waiting-watcher'
-      fullPath: '/api/public/hooks/waiting-watcher'
-      preLoaderRoute: typeof ApiPublicHooksWaitingWatcherRouteImport
+    '/api/public/test-tiktok-event': {
+      id: '/api/public/test-tiktok-event'
+      path: '/api/public/test-tiktok-event'
+      fullPath: '/api/public/test-tiktok-event'
+      preLoaderRoute: typeof ApiPublicTestTiktokEventRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/sync-pricing': {
-      id: '/api/public/hooks/sync-pricing'
-      path: '/api/public/hooks/sync-pricing'
-      fullPath: '/api/public/hooks/sync-pricing'
-      preLoaderRoute: typeof ApiPublicHooksSyncPricingRouteImport
+    '/api/public/track': {
+      id: '/api/public/track'
+      path: '/api/public/track'
+      fullPath: '/api/public/track'
+      preLoaderRoute: typeof ApiPublicTrackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/smoke-test': {
-      id: '/api/public/hooks/smoke-test'
-      path: '/api/public/hooks/smoke-test'
-      fullPath: '/api/public/hooks/smoke-test'
-      preLoaderRoute: typeof ApiPublicHooksSmokeTestRouteImport
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/hooks/sla-watcher': {
-      id: '/api/public/hooks/sla-watcher'
-      path: '/api/public/hooks/sla-watcher'
-      fullPath: '/api/public/hooks/sla-watcher'
-      preLoaderRoute: typeof ApiPublicHooksSlaWatcherRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/review-request-scan': {
-      id: '/api/public/hooks/review-request-scan'
-      path: '/api/public/hooks/review-request-scan'
-      fullPath: '/api/public/hooks/review-request-scan'
-      preLoaderRoute: typeof ApiPublicHooksReviewRequestScanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/reprocess-one': {
-      id: '/api/public/hooks/reprocess-one'
-      path: '/api/public/hooks/reprocess-one'
-      fullPath: '/api/public/hooks/reprocess-one'
-      preLoaderRoute: typeof ApiPublicHooksReprocessOneRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/recovery-scan': {
-      id: '/api/public/hooks/recovery-scan'
-      path: '/api/public/hooks/recovery-scan'
-      fullPath: '/api/public/hooks/recovery-scan'
-      preLoaderRoute: typeof ApiPublicHooksRecoveryScanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/recovery-email': {
-      id: '/api/public/hooks/recovery-email'
-      path: '/api/public/hooks/recovery-email'
-      fullPath: '/api/public/hooks/recovery-email'
-      preLoaderRoute: typeof ApiPublicHooksRecoveryEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/recover-abandoned': {
-      id: '/api/public/hooks/recover-abandoned'
-      path: '/api/public/hooks/recover-abandoned'
-      fullPath: '/api/public/hooks/recover-abandoned'
-      preLoaderRoute: typeof ApiPublicHooksRecoverAbandonedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/reconciliation': {
-      id: '/api/public/hooks/reconciliation'
-      path: '/api/public/hooks/reconciliation'
-      fullPath: '/api/public/hooks/reconciliation'
-      preLoaderRoute: typeof ApiPublicHooksReconciliationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/pedido-reconciler': {
-      id: '/api/public/hooks/pedido-reconciler'
-      path: '/api/public/hooks/pedido-reconciler'
-      fullPath: '/api/public/hooks/pedido-reconciler'
-      preLoaderRoute: typeof ApiPublicHooksPedidoReconcilerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/ops-audit': {
-      id: '/api/public/hooks/ops-audit'
-      path: '/api/public/hooks/ops-audit'
-      fullPath: '/api/public/hooks/ops-audit'
-      preLoaderRoute: typeof ApiPublicHooksOpsAuditRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/dry-run-catalog': {
-      id: '/api/public/hooks/dry-run-catalog'
-      path: '/api/public/hooks/dry-run-catalog'
-      fullPath: '/api/public/hooks/dry-run-catalog'
-      preLoaderRoute: typeof ApiPublicHooksDryRunCatalogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/drop-watcher': {
-      id: '/api/public/hooks/drop-watcher'
-      path: '/api/public/hooks/drop-watcher'
-      fullPath: '/api/public/hooks/drop-watcher'
-      preLoaderRoute: typeof ApiPublicHooksDropWatcherRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/delivery-watcher': {
-      id: '/api/public/hooks/delivery-watcher'
-      path: '/api/public/hooks/delivery-watcher'
-      fullPath: '/api/public/hooks/delivery-watcher'
-      preLoaderRoute: typeof ApiPublicHooksDeliveryWatcherRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/bestseller-scan': {
-      id: '/api/public/hooks/bestseller-scan'
-      path: '/api/public/hooks/bestseller-scan'
-      fullPath: '/api/public/hooks/bestseller-scan'
-      preLoaderRoute: typeof ApiPublicHooksBestsellerScanRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/backup-drill': {
-      id: '/api/public/hooks/backup-drill'
-      path: '/api/public/hooks/backup-drill'
-      fullPath: '/api/public/hooks/backup-drill'
-      preLoaderRoute: typeof ApiPublicHooksBackupDrillRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/backfill-smmhype-ids': {
-      id: '/api/public/hooks/backfill-smmhype-ids'
-      path: '/api/public/hooks/backfill-smmhype-ids'
-      fullPath: '/api/public/hooks/backfill-smmhype-ids'
-      preLoaderRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/auto-resolve-service-ids': {
-      id: '/api/public/hooks/auto-resolve-service-ids'
-      path: '/api/public/hooks/auto-resolve-service-ids'
-      fullPath: '/api/public/hooks/auto-resolve-service-ids'
-      preLoaderRoute: typeof ApiPublicHooksAutoResolveServiceIdsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/hooks/auto-healer': {
-      id: '/api/public/hooks/auto-healer'
-      path: '/api/public/hooks/auto-healer'
-      fullPath: '/api/public/hooks/auto-healer'
-      preLoaderRoute: typeof ApiPublicHooksAutoHealerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/diag/probe-cancel': {
-      id: '/api/public/diag/probe-cancel'
-      path: '/api/public/diag/probe-cancel'
-      fullPath: '/api/public/diag/probe-cancel'
-      preLoaderRoute: typeof ApiPublicDiagProbeCancelRouteImport
+    '/api/public/admin/catalog-health': {
+      id: '/api/public/admin/catalog-health'
+      path: '/api/public/admin/catalog-health'
+      fullPath: '/api/public/admin/catalog-health'
+      preLoaderRoute: typeof ApiPublicAdminCatalogHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/admin/pricing-config': {
@@ -1962,11 +1759,214 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAdminPricingConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/admin/catalog-health': {
-      id: '/api/public/admin/catalog-health'
-      path: '/api/public/admin/catalog-health'
-      fullPath: '/api/public/admin/catalog-health'
-      preLoaderRoute: typeof ApiPublicAdminCatalogHealthRouteImport
+    '/api/public/diag/probe-cancel': {
+      id: '/api/public/diag/probe-cancel'
+      path: '/api/public/diag/probe-cancel'
+      fullPath: '/api/public/diag/probe-cancel'
+      preLoaderRoute: typeof ApiPublicDiagProbeCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/auto-healer': {
+      id: '/api/public/hooks/auto-healer'
+      path: '/api/public/hooks/auto-healer'
+      fullPath: '/api/public/hooks/auto-healer'
+      preLoaderRoute: typeof ApiPublicHooksAutoHealerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/auto-resolve-service-ids': {
+      id: '/api/public/hooks/auto-resolve-service-ids'
+      path: '/api/public/hooks/auto-resolve-service-ids'
+      fullPath: '/api/public/hooks/auto-resolve-service-ids'
+      preLoaderRoute: typeof ApiPublicHooksAutoResolveServiceIdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/backfill-smmhype-ids': {
+      id: '/api/public/hooks/backfill-smmhype-ids'
+      path: '/api/public/hooks/backfill-smmhype-ids'
+      fullPath: '/api/public/hooks/backfill-smmhype-ids'
+      preLoaderRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/backup-drill': {
+      id: '/api/public/hooks/backup-drill'
+      path: '/api/public/hooks/backup-drill'
+      fullPath: '/api/public/hooks/backup-drill'
+      preLoaderRoute: typeof ApiPublicHooksBackupDrillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/bestseller-scan': {
+      id: '/api/public/hooks/bestseller-scan'
+      path: '/api/public/hooks/bestseller-scan'
+      fullPath: '/api/public/hooks/bestseller-scan'
+      preLoaderRoute: typeof ApiPublicHooksBestsellerScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/delivery-watcher': {
+      id: '/api/public/hooks/delivery-watcher'
+      path: '/api/public/hooks/delivery-watcher'
+      fullPath: '/api/public/hooks/delivery-watcher'
+      preLoaderRoute: typeof ApiPublicHooksDeliveryWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/drop-watcher': {
+      id: '/api/public/hooks/drop-watcher'
+      path: '/api/public/hooks/drop-watcher'
+      fullPath: '/api/public/hooks/drop-watcher'
+      preLoaderRoute: typeof ApiPublicHooksDropWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/dry-run-catalog': {
+      id: '/api/public/hooks/dry-run-catalog'
+      path: '/api/public/hooks/dry-run-catalog'
+      fullPath: '/api/public/hooks/dry-run-catalog'
+      preLoaderRoute: typeof ApiPublicHooksDryRunCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/ops-audit': {
+      id: '/api/public/hooks/ops-audit'
+      path: '/api/public/hooks/ops-audit'
+      fullPath: '/api/public/hooks/ops-audit'
+      preLoaderRoute: typeof ApiPublicHooksOpsAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/pedido-reconciler': {
+      id: '/api/public/hooks/pedido-reconciler'
+      path: '/api/public/hooks/pedido-reconciler'
+      fullPath: '/api/public/hooks/pedido-reconciler'
+      preLoaderRoute: typeof ApiPublicHooksPedidoReconcilerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/reconciliation': {
+      id: '/api/public/hooks/reconciliation'
+      path: '/api/public/hooks/reconciliation'
+      fullPath: '/api/public/hooks/reconciliation'
+      preLoaderRoute: typeof ApiPublicHooksReconciliationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/recover-abandoned': {
+      id: '/api/public/hooks/recover-abandoned'
+      path: '/api/public/hooks/recover-abandoned'
+      fullPath: '/api/public/hooks/recover-abandoned'
+      preLoaderRoute: typeof ApiPublicHooksRecoverAbandonedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/recovery-email': {
+      id: '/api/public/hooks/recovery-email'
+      path: '/api/public/hooks/recovery-email'
+      fullPath: '/api/public/hooks/recovery-email'
+      preLoaderRoute: typeof ApiPublicHooksRecoveryEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/recovery-scan': {
+      id: '/api/public/hooks/recovery-scan'
+      path: '/api/public/hooks/recovery-scan'
+      fullPath: '/api/public/hooks/recovery-scan'
+      preLoaderRoute: typeof ApiPublicHooksRecoveryScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/reprocess-one': {
+      id: '/api/public/hooks/reprocess-one'
+      path: '/api/public/hooks/reprocess-one'
+      fullPath: '/api/public/hooks/reprocess-one'
+      preLoaderRoute: typeof ApiPublicHooksReprocessOneRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/review-request-scan': {
+      id: '/api/public/hooks/review-request-scan'
+      path: '/api/public/hooks/review-request-scan'
+      fullPath: '/api/public/hooks/review-request-scan'
+      preLoaderRoute: typeof ApiPublicHooksReviewRequestScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/sla-watcher': {
+      id: '/api/public/hooks/sla-watcher'
+      path: '/api/public/hooks/sla-watcher'
+      fullPath: '/api/public/hooks/sla-watcher'
+      preLoaderRoute: typeof ApiPublicHooksSlaWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/smoke-test': {
+      id: '/api/public/hooks/smoke-test'
+      path: '/api/public/hooks/smoke-test'
+      fullPath: '/api/public/hooks/smoke-test'
+      preLoaderRoute: typeof ApiPublicHooksSmokeTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/sync-pricing': {
+      id: '/api/public/hooks/sync-pricing'
+      path: '/api/public/hooks/sync-pricing'
+      fullPath: '/api/public/hooks/sync-pricing'
+      preLoaderRoute: typeof ApiPublicHooksSyncPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/waiting-watcher': {
+      id: '/api/public/hooks/waiting-watcher'
+      path: '/api/public/hooks/waiting-watcher'
+      fullPath: '/api/public/hooks/waiting-watcher'
+      preLoaderRoute: typeof ApiPublicHooksWaitingWatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/queue/approve-refund': {
+      id: '/api/public/queue/approve-refund'
+      path: '/api/public/queue/approve-refund'
+      fullPath: '/api/public/queue/approve-refund'
+      preLoaderRoute: typeof ApiPublicQueueApproveRefundRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/queue/confirm': {
+      id: '/api/public/queue/confirm'
+      path: '/api/public/queue/confirm'
+      fullPath: '/api/public/queue/confirm'
+      preLoaderRoute: typeof ApiPublicQueueConfirmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/queue/reprocess': {
+      id: '/api/public/queue/reprocess'
+      path: '/api/public/queue/reprocess'
+      fullPath: '/api/public/queue/reprocess'
+      preLoaderRoute: typeof ApiPublicQueueReprocessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/queue/waiting': {
+      id: '/api/public/queue/waiting'
+      path: '/api/public/queue/waiting'
+      fullPath: '/api/public/queue/waiting'
+      preLoaderRoute: typeof ApiPublicQueueWaitingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/sfx/$name': {
+      id: '/api/public/sfx/$name'
+      path: '/api/public/sfx/$name'
+      fullPath: '/api/public/sfx/$name'
+      preLoaderRoute: typeof ApiPublicSfxNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/telegram/webhook': {
+      id: '/api/public/telegram/webhook'
+      path: '/api/public/telegram/webhook'
+      fullPath: '/api/public/telegram/webhook'
+      preLoaderRoute: typeof ApiPublicTelegramWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
