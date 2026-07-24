@@ -98,6 +98,7 @@ import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/publ
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './routes/api/public/hooks/auto-resolve-service-ids'
 import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/public/hooks/auto-healer'
+import { Route as ApiPublicDiagProbeCancelRouteImport } from './routes/api/public/diag/probe-cancel'
 import { Route as ApiPublicAdminPricingConfigRouteImport } from './routes/api/public/admin/pricing-config'
 import { Route as ApiPublicAdminCatalogHealthRouteImport } from './routes/api/public/admin/catalog-health'
 
@@ -580,6 +581,12 @@ const ApiPublicHooksAutoHealerRoute =
     path: '/api/public/hooks/auto-healer',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicDiagProbeCancelRoute =
+  ApiPublicDiagProbeCancelRouteImport.update({
+    id: '/api/public/diag/probe-cancel',
+    path: '/api/public/diag/probe-cancel',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicAdminPricingConfigRoute =
   ApiPublicAdminPricingConfigRouteImport.update({
     id: '/api/public/admin/pricing-config',
@@ -659,6 +666,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/catalog-health': typeof ApiPublicAdminCatalogHealthRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
+  '/api/public/diag/probe-cancel': typeof ApiPublicDiagProbeCancelRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -752,6 +760,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/catalog-health': typeof ApiPublicAdminCatalogHealthRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
+  '/api/public/diag/probe-cancel': typeof ApiPublicDiagProbeCancelRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -846,6 +855,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/admin/catalog-health': typeof ApiPublicAdminCatalogHealthRoute
   '/api/public/admin/pricing-config': typeof ApiPublicAdminPricingConfigRoute
+  '/api/public/diag/probe-cancel': typeof ApiPublicDiagProbeCancelRoute
   '/api/public/hooks/auto-healer': typeof ApiPublicHooksAutoHealerRoute
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -941,6 +951,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/admin/catalog-health'
     | '/api/public/admin/pricing-config'
+    | '/api/public/diag/probe-cancel'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -1034,6 +1045,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/admin/catalog-health'
     | '/api/public/admin/pricing-config'
+    | '/api/public/diag/probe-cancel'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -1127,6 +1139,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/api/public/admin/catalog-health'
     | '/api/public/admin/pricing-config'
+    | '/api/public/diag/probe-cancel'
     | '/api/public/hooks/auto-healer'
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
@@ -1219,6 +1232,7 @@ export interface RootRouteChildren {
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicAdminCatalogHealthRoute: typeof ApiPublicAdminCatalogHealthRoute
   ApiPublicAdminPricingConfigRoute: typeof ApiPublicAdminPricingConfigRoute
+  ApiPublicDiagProbeCancelRoute: typeof ApiPublicDiagProbeCancelRoute
   ApiPublicHooksAutoHealerRoute: typeof ApiPublicHooksAutoHealerRoute
   ApiPublicHooksAutoResolveServiceIdsRoute: typeof ApiPublicHooksAutoResolveServiceIdsRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
@@ -1872,6 +1886,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksAutoHealerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/diag/probe-cancel': {
+      id: '/api/public/diag/probe-cancel'
+      path: '/api/public/diag/probe-cancel'
+      fullPath: '/api/public/diag/probe-cancel'
+      preLoaderRoute: typeof ApiPublicDiagProbeCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/admin/pricing-config': {
       id: '/api/public/admin/pricing-config'
       path: '/api/public/admin/pricing-config'
@@ -1968,6 +1989,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicAdminCatalogHealthRoute: ApiPublicAdminCatalogHealthRoute,
   ApiPublicAdminPricingConfigRoute: ApiPublicAdminPricingConfigRoute,
+  ApiPublicDiagProbeCancelRoute: ApiPublicDiagProbeCancelRoute,
   ApiPublicHooksAutoHealerRoute: ApiPublicHooksAutoHealerRoute,
   ApiPublicHooksAutoResolveServiceIdsRoute:
     ApiPublicHooksAutoResolveServiceIdsRoute,
