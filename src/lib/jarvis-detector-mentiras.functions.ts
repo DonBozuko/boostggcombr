@@ -99,7 +99,7 @@ export const runJarvisLieDetector = createServerFn({ method: "GET" }).handler(
       const { count: recRuns } = await supabaseAdmin
         .from("admin_audit_logs")
         .select("*", { count: "exact", head: true })
-        .eq("action", "pedido_reconciler_v179")
+        .like("action", "pedido_reconciler_%")
         .gte("created_at", runCutoff);
       const recOk = (recRuns ?? 0) >= 1;
       checks.push({
