@@ -14,7 +14,9 @@ export function AdminHealthSemaphore() {
 
   const load = useCallback(async () => {
     try {
-      const r = await fetchTriage();
+      const token = typeof window !== "undefined" ? (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "") : "";
+      if (!token) { setD(null); return; }
+      const r = await fetchTriage({ data: { token } });
       setD(r as TriageDigest);
     } catch { /* silencioso */ }
     finally { setLoading(false); }
