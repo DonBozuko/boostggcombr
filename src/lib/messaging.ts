@@ -83,10 +83,41 @@ async function sendViaDirectBot(message: string, options: { inlineKeyboard?: Inl
     : { ok: false, detail: `DIRECT HTTP ${res.status}: ${text.slice(0, 300)}` };
 }
 
+export type AlertSeverity = "critical" | "error" | "warning" | "info";
+
+// v223 — Severity Gate: só push Telegram em severity critical/error.
+// warning/info só ficam gravados em jarvis_alerts pro semáforo do admin ler.
+// Mata ~80% do ruído que chegava no celular sem ação obrigatória.
+async function logAlertToDb(severidade: AlertSeverity, message: string, origem: string) {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("jarvis_alerts").insert({
+      severidade,
+      origem,
+      mensagem: message.slice(0, 500),
+      detalhe: message.length > 500 ? message.slice(500, 2000) : null,
+    } as never);
+  } catch { /* best-effort */ }
+}
+
 export async function dispatchTelegramAlert(
   message: string,
-  options: { inlineKeyboard?: InlineKeyboardButton[][] } = {},
+  options: {
+    inlineKeyboard?: InlineKeyboardButton[][];
+    severity?: AlertSeverity;
+    origem?: string;
+    force?: boolean;
+  } = {},
 ): Promise<{ ok: boolean; detail?: string }> {
+  const severity: AlertSeverity = options.severity ?? "critical";
+  const origem = options.origem ?? "system";
+  await logAlertToDb(severity, message, origem);
+
+  // Gate: warning/info NÃO vão pro Telegram (a menos que force=true).
+  if (!options.force && (severity === "warning" || severity === "info")) {
+    return { ok: true, detail: "suppressed_by_severity_gate" };
+  }
+
   try {
     const viaConnector = await sendViaConnector(message, options);
     if (viaConnector.ok) return viaConnector;
