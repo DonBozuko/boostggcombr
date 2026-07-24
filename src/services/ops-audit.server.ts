@@ -23,9 +23,10 @@ export type OpsAuditReport = {
 export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<OpsAuditReport> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+  // v238 — janela de 1h: erro antigo já corrigido não pode manter alerta vermelho.
   const [{ data: snap }, { data: http }] = await Promise.all([
     (supabaseAdmin as any).rpc("ops_forensics"),
-    (supabaseAdmin as any).rpc("ops_http_health", { _hours: 6 }),
+    (supabaseAdmin as any).rpc("ops_http_health", { _hours: 1 }),
   ]);
 
   const s = (snap ?? {}) as any;
@@ -40,7 +41,7 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       code: "ROBO_CHAMADA_RECUSADA",
       severity: "critical",
       titulo: "Robô automático rodando no vazio",
-      problema: `Nas últimas 6h houve ${naoEncontrado} chamada(s) para endereço inexistente e ${semPermissao} recusada(s) por senha inválida. O robô aparece como "OK" mas nada foi feito.`,
+      problema: `Na última hora houve ${naoEncontrado} chamada(s) para endereço inexistente e ${semPermissao} recusada(s) por senha inválida. O robô aparece como "OK" mas nada foi feito.`,
       o_que_fazer: "Me avise: preciso corrigir o endereço/senha do robô no agendador.",
       evidencia: h,
     });
@@ -52,11 +53,12 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       code: "ROBO_ERRO_SERVIDOR",
       severity: "critical",
       titulo: "Robô batendo em erro do servidor",
-      problema: `${erro5xx} chamadas retornaram erro de servidor nas últimas 6h.`,
+      problema: `${erro5xx} chamadas retornaram erro de servidor na última hora.`,
       o_que_fazer: "Me avise para investigar o log da rota que está quebrando.",
       evidencia: h,
     });
   }
+
 
   // 2) Cliente pagou e não recebeu
   const travados = Array.isArray(s.pedidos_pagos_sem_entrega) ? s.pedidos_pagos_sem_entrega : [];
@@ -116,15 +118,31 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     });
   }
 
-  // 6) Robô parado (agendado mas sem execução no prazo)
+  // 6) Robô parado — v238: tolerância derivada do intervalo REAL do agendamento.
+  // Antes qualquer schedule com "*/" era tratado como "frequente" (90min), o que
+  // marcava "0 */6 * * *" (a cada 6h) como parado. Agora calcula o intervalo.
+  const intervaloMinutos = (sched: string): number | null => {
+    const [min, hora] = sched.trim().split(/\s+/);
+    if (!min || !hora) return null;
+    // minuto com passo: */5, 2-59/5  → intervalo em minutos
+    const stepMin = /\/(\d+)/.exec(min)?.[1];
+    if (stepMin && (hora === "*" || hora === "*/1")) return Number(stepMin);
+    // hora com passo: 0 */6 → intervalo em horas
+    const stepHora = /\/(\d+)/.exec(hora)?.[1];
+    if (stepHora) return Number(stepHora) * 60;
+    if (hora === "*") return 60; // roda em minuto fixo de toda hora
+    return null; // diário/mensal — fora do escopo
+  };
   const crons = Array.isArray(s.crons) ? s.crons : [];
   const parados = crons.filter((c: any) => {
     if (!c.active) return true;
-    const sched = String(c.schedule ?? "");
-    if (!sched.includes("*/") && !sched.includes("-")) return false; // diários/mensais fora do escopo
+    const intervalo = intervaloMinutos(String(c.schedule ?? ""));
+    if (intervalo === null) return false; // diários/mensais fora do escopo
+    const tolerancia = intervalo * 2 + 15;
     const stale = c.stale_minutes;
-    return stale === null || Number(stale) > 90;
+    return stale === null || Number(stale) > tolerancia;
   });
+
   if (parados.length > 0) {
     findings.push({
       code: "ROBO_PARADO",
