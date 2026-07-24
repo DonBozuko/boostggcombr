@@ -92,6 +92,7 @@ import { Route as ApiPublicHooksRecoveryEmailRouteImport } from './routes/api/pu
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
+import { Route as ApiPublicHooksOpsAuditRouteImport } from './routes/api/public/hooks/ops-audit'
 import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
 import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
@@ -546,6 +547,11 @@ const ApiPublicHooksPedidoReconcilerRoute =
     path: '/api/public/hooks/pedido-reconciler',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksOpsAuditRoute = ApiPublicHooksOpsAuditRouteImport.update({
+  id: '/api/public/hooks/ops-audit',
+  path: '/api/public/hooks/ops-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksDryRunCatalogRoute =
   ApiPublicHooksDryRunCatalogRouteImport.update({
     id: '/api/public/hooks/dry-run-catalog',
@@ -681,6 +687,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
+  '/api/public/hooks/ops-audit': typeof ApiPublicHooksOpsAuditRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -776,6 +783,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
+  '/api/public/hooks/ops-audit': typeof ApiPublicHooksOpsAuditRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -872,6 +880,7 @@ export interface FileRoutesById {
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
+  '/api/public/hooks/ops-audit': typeof ApiPublicHooksOpsAuditRoute
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
@@ -969,6 +978,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/dry-run-catalog'
+    | '/api/public/hooks/ops-audit'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -1064,6 +1074,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/dry-run-catalog'
+    | '/api/public/hooks/ops-audit'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -1159,6 +1170,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/dry-run-catalog'
+    | '/api/public/hooks/ops-audit'
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
@@ -1253,6 +1265,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
   ApiPublicHooksDeliveryWatcherRoute: typeof ApiPublicHooksDeliveryWatcherRoute
   ApiPublicHooksDryRunCatalogRoute: typeof ApiPublicHooksDryRunCatalogRoute
+  ApiPublicHooksOpsAuditRoute: typeof ApiPublicHooksOpsAuditRoute
   ApiPublicHooksPedidoReconcilerRoute: typeof ApiPublicHooksPedidoReconcilerRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
@@ -1858,6 +1871,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksPedidoReconcilerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/ops-audit': {
+      id: '/api/public/hooks/ops-audit'
+      path: '/api/public/hooks/ops-audit'
+      fullPath: '/api/public/hooks/ops-audit'
+      preLoaderRoute: typeof ApiPublicHooksOpsAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/dry-run-catalog': {
       id: '/api/public/hooks/dry-run-catalog'
       path: '/api/public/hooks/dry-run-catalog'
@@ -2019,6 +2039,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
   ApiPublicHooksDeliveryWatcherRoute: ApiPublicHooksDeliveryWatcherRoute,
   ApiPublicHooksDryRunCatalogRoute: ApiPublicHooksDryRunCatalogRoute,
+  ApiPublicHooksOpsAuditRoute: ApiPublicHooksOpsAuditRoute,
   ApiPublicHooksPedidoReconcilerRoute: ApiPublicHooksPedidoReconcilerRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
