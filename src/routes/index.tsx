@@ -792,6 +792,12 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       <p className="text-center text-sm sm:text-base text-zinc-300 mt-1 mb-3 px-4 max-w-2xl mx-auto">
         Crescimento real para Instagram, TikTok, YouTube, Facebook e Telegram. Não trabalhamos com boost de jogos — apenas engajamento social.
       </p>
+      {/* v224 — CRO: prova social + selos acima da dobra pra reduzir bounce */}
+      <div className="mx-auto w-full max-w-[720px] px-2 mb-2">
+        <LivePurchasesTicker accent="#00f2fe" />
+        <TrustBadges accent="#FFD700" />
+      </div>
+
       <ShowcaseShell>
 
       {/* v115 — Mystery Box Hook: bônus dinâmico 10–50 seguidores para compras acima de 200 */}
