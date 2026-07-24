@@ -157,9 +157,13 @@ export function WaitingProvisionQueue({ token }: { token: string }) {
                     if (!window.confirm(`Reembolsar R$${it.valor_cliente_brl.toFixed(2)} pro cliente do pedido ${it.pedido_id.slice(0,8)}? Ação irreversível.`)) return;
                     setBusyId(it.pedido_id); setFlash(null);
                     try {
+                      const { supabase } = await import("@/integrations/supabase/client");
+                      const { data: { session } } = await supabase.auth.getSession();
+                      const headers: Record<string,string> = { "Content-Type": "application/json", "x-admin-token": token };
+                      if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
                       const res = await fetch("/api/public/queue/approve-refund", {
                         method: "POST",
-                        headers: { "x-admin-token": token, "Content-Type": "application/json" },
+                        headers,
                         body: JSON.stringify({ pedido_id: it.pedido_id }),
                       });
                       const j = await res.json();
