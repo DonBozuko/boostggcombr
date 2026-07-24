@@ -19,6 +19,7 @@ import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
 
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
+import { ProbeCancelButton } from "@/components/ProbeCancelButton";
 
 import {
   Dialog,
@@ -1503,6 +1504,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisNocCenter token={token} refreshSignal={nocRefreshSignal} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"} mt-3`}><CatalogTelemetryPanel token={token} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><ClaudeCodeInspector /></div>
+        <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><ProbeCancelButton /></div>
         
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><AuditoriaJarvis token={token} onBalanceSynced={handleBalanceSynced} /></div>
         
