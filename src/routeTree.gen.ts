@@ -88,6 +88,7 @@ import { Route as ApiPublicHooksSlaWatcherRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksReviewRequestScanRouteImport } from './routes/api/public/hooks/review-request-scan'
 import { Route as ApiPublicHooksReprocessOneRouteImport } from './routes/api/public/hooks/reprocess-one'
 import { Route as ApiPublicHooksRecoveryScanRouteImport } from './routes/api/public/hooks/recovery-scan'
+import { Route as ApiPublicHooksRecoveryEmailRouteImport } from './routes/api/public/hooks/recovery-email'
 import { Route as ApiPublicHooksRecoverAbandonedRouteImport } from './routes/api/public/hooks/recover-abandoned'
 import { Route as ApiPublicHooksReconciliationRouteImport } from './routes/api/public/hooks/reconciliation'
 import { Route as ApiPublicHooksPedidoReconcilerRouteImport } from './routes/api/public/hooks/pedido-reconciler'
@@ -521,6 +522,12 @@ const ApiPublicHooksRecoveryScanRoute =
     path: '/api/public/hooks/recovery-scan',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRecoveryEmailRoute =
+  ApiPublicHooksRecoveryEmailRouteImport.update({
+    id: '/api/public/hooks/recovery-email',
+    path: '/api/public/hooks/recovery-email',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksRecoverAbandonedRoute =
   ApiPublicHooksRecoverAbandonedRouteImport.update({
     id: '/api/public/hooks/recover-abandoned',
@@ -677,6 +684,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/recovery-email': typeof ApiPublicHooksRecoveryEmailRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/review-request-scan': typeof ApiPublicHooksReviewRequestScanRoute
@@ -771,6 +779,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/recovery-email': typeof ApiPublicHooksRecoveryEmailRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/review-request-scan': typeof ApiPublicHooksReviewRequestScanRoute
@@ -866,6 +875,7 @@ export interface FileRoutesById {
   '/api/public/hooks/pedido-reconciler': typeof ApiPublicHooksPedidoReconcilerRoute
   '/api/public/hooks/reconciliation': typeof ApiPublicHooksReconciliationRoute
   '/api/public/hooks/recover-abandoned': typeof ApiPublicHooksRecoverAbandonedRoute
+  '/api/public/hooks/recovery-email': typeof ApiPublicHooksRecoveryEmailRoute
   '/api/public/hooks/recovery-scan': typeof ApiPublicHooksRecoveryScanRoute
   '/api/public/hooks/reprocess-one': typeof ApiPublicHooksReprocessOneRoute
   '/api/public/hooks/review-request-scan': typeof ApiPublicHooksReviewRequestScanRoute
@@ -962,6 +972,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/recovery-email'
     | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/review-request-scan'
@@ -1056,6 +1067,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/recovery-email'
     | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/review-request-scan'
@@ -1150,6 +1162,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/pedido-reconciler'
     | '/api/public/hooks/reconciliation'
     | '/api/public/hooks/recover-abandoned'
+    | '/api/public/hooks/recovery-email'
     | '/api/public/hooks/recovery-scan'
     | '/api/public/hooks/reprocess-one'
     | '/api/public/hooks/review-request-scan'
@@ -1243,6 +1256,7 @@ export interface RootRouteChildren {
   ApiPublicHooksPedidoReconcilerRoute: typeof ApiPublicHooksPedidoReconcilerRoute
   ApiPublicHooksReconciliationRoute: typeof ApiPublicHooksReconciliationRoute
   ApiPublicHooksRecoverAbandonedRoute: typeof ApiPublicHooksRecoverAbandonedRoute
+  ApiPublicHooksRecoveryEmailRoute: typeof ApiPublicHooksRecoveryEmailRoute
   ApiPublicHooksRecoveryScanRoute: typeof ApiPublicHooksRecoveryScanRoute
   ApiPublicHooksReprocessOneRoute: typeof ApiPublicHooksReprocessOneRoute
   ApiPublicHooksReviewRequestScanRoute: typeof ApiPublicHooksReviewRequestScanRoute
@@ -1816,6 +1830,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRecoveryScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/recovery-email': {
+      id: '/api/public/hooks/recovery-email'
+      path: '/api/public/hooks/recovery-email'
+      fullPath: '/api/public/hooks/recovery-email'
+      preLoaderRoute: typeof ApiPublicHooksRecoveryEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/recover-abandoned': {
       id: '/api/public/hooks/recover-abandoned'
       path: '/api/public/hooks/recover-abandoned'
@@ -2001,6 +2022,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksPedidoReconcilerRoute: ApiPublicHooksPedidoReconcilerRoute,
   ApiPublicHooksReconciliationRoute: ApiPublicHooksReconciliationRoute,
   ApiPublicHooksRecoverAbandonedRoute: ApiPublicHooksRecoverAbandonedRoute,
+  ApiPublicHooksRecoveryEmailRoute: ApiPublicHooksRecoveryEmailRoute,
   ApiPublicHooksRecoveryScanRoute: ApiPublicHooksRecoveryScanRoute,
   ApiPublicHooksReprocessOneRoute: ApiPublicHooksReprocessOneRoute,
   ApiPublicHooksReviewRequestScanRoute: ApiPublicHooksReviewRequestScanRoute,

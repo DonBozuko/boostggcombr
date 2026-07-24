@@ -609,6 +609,7 @@ export type Database = {
           provider_slug: string | null
           quantidade: number
           reconcile_attempts: number
+          recovery_email_sent_at: string | null
           rede_social: string
           review_email_sent_at: string | null
           sla_deadline: string | null
@@ -640,6 +641,7 @@ export type Database = {
           provider_slug?: string | null
           quantidade: number
           reconcile_attempts?: number
+          recovery_email_sent_at?: string | null
           rede_social?: string
           review_email_sent_at?: string | null
           sla_deadline?: string | null
@@ -671,6 +673,7 @@ export type Database = {
           provider_slug?: string | null
           quantidade?: number
           reconcile_attempts?: number
+          recovery_email_sent_at?: string | null
           rede_social?: string
           review_email_sent_at?: string | null
           sla_deadline?: string | null
