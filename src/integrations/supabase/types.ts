@@ -598,6 +598,7 @@ export type Database = {
           cupom: string | null
           custo_real: number | null
           dispatched_at: string | null
+          drop_checked_at: string | null
           email_contato: string | null
           error_detail: string | null
           id: string
@@ -613,6 +614,8 @@ export type Database = {
           reconcile_attempts: number
           recovery_email_sent_at: string | null
           rede_social: string
+          refill_requested_at: string | null
+          refill_result: string | null
           review_email_sent_at: string | null
           sla_deadline: string | null
           status: string
@@ -632,6 +635,7 @@ export type Database = {
           cupom?: string | null
           custo_real?: number | null
           dispatched_at?: string | null
+          drop_checked_at?: string | null
           email_contato?: string | null
           error_detail?: string | null
           id?: string
@@ -647,6 +651,8 @@ export type Database = {
           reconcile_attempts?: number
           recovery_email_sent_at?: string | null
           rede_social?: string
+          refill_requested_at?: string | null
+          refill_result?: string | null
           review_email_sent_at?: string | null
           sla_deadline?: string | null
           status?: string
@@ -666,6 +672,7 @@ export type Database = {
           cupom?: string | null
           custo_real?: number | null
           dispatched_at?: string | null
+          drop_checked_at?: string | null
           email_contato?: string | null
           error_detail?: string | null
           id?: string
@@ -681,6 +688,8 @@ export type Database = {
           reconcile_attempts?: number
           recovery_email_sent_at?: string | null
           rede_social?: string
+          refill_requested_at?: string | null
+          refill_result?: string | null
           review_email_sent_at?: string | null
           sla_deadline?: string | null
           status?: string

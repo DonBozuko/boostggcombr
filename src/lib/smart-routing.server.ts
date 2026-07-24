@@ -118,11 +118,14 @@ export async function rankProvidersByCost(opts: {
     verified: (pricingItem as any)?.verified_service_id ?? (autoIds as any)?.verified_auto_id ?? null,
   };
 
-  // v241 — TRAVA BR EM RUNTIME (caso Sybele).
+  // v241/v242 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
   // O dry-run valida o catálogo curado, mas o failover podia cair num
   // *_auto_id internacional/tóxico e entregar seguidor árabe num pacote :br.
   // Aqui, antes de rankear, derrubo qualquer fornecedor cujo serviço não seja
-  // brasileiro de verdade (ou esteja marcado como queda pelo próprio fornecedor).
+  // brasileiro de verdade (ou esteja marcado como queda pelo próprio fornecedor)
+  // e marco quem tem reposição (refill) para priorizar na ordenação.
+  const refillMap: Record<string, boolean> = {};
+  let brPackage = false;
   try {
     const { data: catRow } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -132,7 +135,7 @@ export async function rankProvidersByCost(opts: {
     const category = String((catRow as any)?.category ?? "");
     const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
     const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
-    const needsBr = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
+    brPackage = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
     const cacheTable: Record<string, string> = {
       smmhype: "smmhype_services_cache",
       smmpainel: "smmpanel_services_cache",
@@ -143,17 +146,19 @@ export async function rankProvidersByCost(opts: {
       if (!pid) continue;
       const { data: svcRow } = await supabaseAdmin
         .from(cacheTable[slug] as any)
-        .select("name, category")
+        .select("name, category, refill")
         .eq("provider_service_id", String(pid))
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
       const hay = `${(svcRow as any).name ?? ""} ${(svcRow as any).category ?? ""}`;
-      if (TOXIC_RE.test(hay) || (needsBr && !BR_RE.test(hay))) {
+      refillMap[slug] = (svcRow as any).refill === true;
+      if (TOXIC_RE.test(hay) || (brPackage && !BR_RE.test(hay))) {
         providerIdMap[slug] = null;
         console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
       }
     }
   } catch { /* noop — nunca derrubar o dispatch por causa da trava */ }
+
 
 
 
@@ -193,11 +198,17 @@ export async function rankProvidersByCost(opts: {
   }).filter((p) => !!p.provider_service_id);
 
   // v168 — Strict Margin Guard: ordena por MENOR custo real (Math.min sobre cost_brl).
-  // Cascata canônica (smmhype → smmpanel → verified) vira APENAS desempate quando
-  // cost_brl é matematicamente idêntico. Instáveis vão pro final.
+  // v242 — em pacote BR, GARANTIA vem antes de preço: fornecedor com reposição
+  // (refill) ganha do mais barato sem reposição. Queda sem reposição = cliente
+  // decepcionado + chargeback, que custa mais caro que a diferença de custo.
   const cascadeOrder: Record<string, number> = { smmhype: 0, smmpainel: 1, verified: 2 };
   ranked.sort((a, b) => {
     if (a.unstable !== b.unstable) return a.unstable ? 1 : -1;
+    if (brPackage) {
+      const ar = refillMap[a.slug] === true ? 0 : 1;
+      const br_ = refillMap[b.slug] === true ? 0 : 1;
+      if (ar !== br_) return ar - br_;
+    }
     const ac = a.cost_brl ?? Number.POSITIVE_INFINITY;
     const bc = b.cost_brl ?? Number.POSITIVE_INFINITY;
     if (ac !== bc) return ac - bc;
@@ -205,6 +216,7 @@ export async function rankProvidersByCost(opts: {
     const bo = cascadeOrder[b.slug] ?? 99;
     return ao - bo;
   });
+
 
   return ranked;
 }
@@ -220,6 +232,12 @@ export async function pickCheapestFornecedorSlug(pacote: string, quantidade: num
   const valid = ranked.filter(
     (p) => !p.unstable && p.saldo_atual > 0 && !!p.provider_service_id,
   );
+  // v242 — pacote BR respeita a ordem já rankeada (garantia > preço).
+  const brPackage = pacote.startsWith("br-") || pacote.startsWith("wbr");
+  if (brPackage) {
+    if (valid.length) return valid[0].slug;
+    return ranked[0].slug;
+  }
   const withCost = valid.filter((p) => typeof p.cost_brl === "number" && (p.cost_brl as number) > 0);
   if (withCost.length) {
     const min = Math.min(...withCost.map((p) => p.cost_brl as number));
@@ -228,6 +246,7 @@ export async function pickCheapestFornecedorSlug(pacote: string, quantidade: num
   if (valid.length) return valid[0].slug;
   return ranked[0].slug;
 }
+
 
 export async function markProviderUnstable(slug: string, errorMsg: string): Promise<void> {
   // v67 — Perpetual Balance Force: nunca marcar unstable se o fornecedor
