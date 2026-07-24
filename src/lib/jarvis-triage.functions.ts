@@ -79,15 +79,15 @@ export const getJarvisTriage = createServerFn({ method: "GET" }).handler(
         .eq("status", "novo");
       counters.pendingRecovery = pending ?? 0;
 
-      // 4. Saldos baixos — só se existir a tabela provider_health / fornecedores
+      // 4. Saldos baixos — colunas reais são saldo_atual + limite_alerta
       try {
         const { data: fh } = await supabaseAdmin
           .from("fornecedores")
-          .select("nome, saldo_brl, saldo_alerta_brl, ativo")
+          .select("nome, saldo_atual, limite_alerta, ativo")
           .eq("ativo", true);
-        for (const f of (fh ?? []) as Array<{ saldo_brl: number | null; saldo_alerta_brl: number | null }>) {
-          const bal = Number(f.saldo_brl ?? 0);
-          const thr = Number(f.saldo_alerta_brl ?? 30);
+        for (const f of (fh ?? []) as unknown as Array<{ saldo_atual: number | null; limite_alerta: number | null }>) {
+          const bal = Number(f.saldo_atual ?? 0);
+          const thr = Number(f.limite_alerta ?? 30);
           if (bal > 0 && bal < thr) counters.lowBalanceProviders++;
         }
       } catch { /* opcional */ }
