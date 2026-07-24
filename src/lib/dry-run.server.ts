@@ -27,7 +27,7 @@ type Row = {
   verified_service_id: string | null;
 };
 
-type CatalogEntry = { rate: number | string; min?: number | string; max?: number | string };
+type CatalogEntry = { rate: number | string; min?: number | string; max?: number | string; name?: string; category?: string };
 
 function idx(list: Awaited<ReturnType<typeof fetchServiceCatalog>>) {
   const m = new Map<string, CatalogEntry>();
@@ -46,6 +46,20 @@ function inRange(qty: number, entry: CatalogEntry | undefined): boolean {
   if (!Number.isFinite(min) || !Number.isFinite(max)) return true;
   return qty >= min && qty <= max;
 }
+
+// v240 — trava de conteúdo do serviço.
+// 1) serviço que o próprio fornecedor marca como lixo (queda de 100%, "não compre") nunca vende;
+// 2) pacote :br só aceita serviço realmente brasileiro.
+const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
+const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
+
+function serviceContentIssue(entry: CatalogEntry, packageCategory: string): string | null {
+  const hay = `${entry.name ?? ""} ${entry.category ?? ""}`;
+  if (TOXIC_RE.test(hay)) return "Serviço marcado como queda pelo fornecedor";
+  if (packageCategory.endsWith(":br") && !BR_RE.test(hay)) return "Serviço não é brasileiro";
+  return null;
+}
+
 
 export type DryRunSummary = {
   total: number;
