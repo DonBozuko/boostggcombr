@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+// v227 — Token só via header (x-admin-token / Authorization Bearer).
+// Query string ?token=... foi removida para evitar vazamento via logs/Referer.
 function extractToken(request: Request) {
   return (
     request.headers.get("x-admin-token") ??
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
-    new URL(request.url).searchParams.get("token")
+    null
   );
 }
 
