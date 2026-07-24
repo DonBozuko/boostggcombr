@@ -1292,6 +1292,7 @@ export type Database = {
     }
     Functions: {
       anonimizar_pedidos_antigos: { Args: never; Returns: number }
+      cancel_orphan_pending: { Args: never; Returns: number }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
