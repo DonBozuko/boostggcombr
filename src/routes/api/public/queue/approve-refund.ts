@@ -1,16 +1,39 @@
-// v220 — Aprovação manual de refund para pedidos AWAITING_REFUND_APPROVAL (>R$50).
-// Auth: header `x-admin-token: <ADMIN_TOKEN>`.
+// v227 — Aprovação manual de refund para AWAITING_REFUND_APPROVAL (>R$50).
+// Auth: Supabase JWT com role 'admin' em user_roles (preferido) OU x-admin-token (fallback).
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const schema = z.object({ pedido_id: z.string().min(1) });
 
+async function authorize(request: Request): Promise<{ ok: boolean; who: string }> {
+  const authz = request.headers.get("authorization") ?? "";
+  const bearer = authz.toLowerCase().startsWith("bearer ") ? authz.slice(7).trim() : "";
+  if (bearer) {
+    try {
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      const { data: u } = await sb.auth.getUser(bearer);
+      if (u?.user?.id) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: role } = await supabaseAdmin
+          .from("user_roles" as any).select("role").eq("user_id", u.user.id).eq("role", "admin").maybeSingle();
+        if (role) return { ok: true, who: u.user.email ?? u.user.id };
+      }
+    } catch { /* cai pro fallback */ }
+  }
+  const tok = request.headers.get("x-admin-token") ?? "";
+  if (process.env.ADMIN_TOKEN && tok === process.env.ADMIN_TOKEN) return { ok: true, who: "admin@token" };
+  return { ok: false, who: "" };
+}
+
 export const Route = createFileRoute("/api/public/queue/approve-refund")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = request.headers.get("x-admin-token") ?? "";
-        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+        const auth = await authorize(request);
+        if (!auth.ok) {
           return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), {
             status: 401, headers: { "Content-Type": "application/json" },
           });
@@ -87,7 +110,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
 
         try {
           await supabaseAdmin.from("admin_audit_logs" as any).insert({
-            admin_email: "admin@manual-refund-approval",
+            admin_email: auth.who || "admin@manual-refund-approval",
             action: "REFUND_APPROVED_v220",
             detail: { pedido_id: (p as any).id, valor: (p as any).valor, refund_ok: refund.ok, attempts } as any,
             created_at: new Date().toISOString(),
