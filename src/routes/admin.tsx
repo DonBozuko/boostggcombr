@@ -2115,17 +2115,21 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                             Última checagem: {ultima}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-sm font-bold ${saldoLow ? "text-red-400" : "text-emerald-300"}`}>
-                            {saldo !== null ? `R$ ${saldo.toFixed(2)}` : "—"}
+                        <div className="text-right flex items-center gap-3">
+                          <div>
+                            <div className={`text-sm font-bold ${saldoLow ? "text-red-400" : "text-emerald-300"}`}>
+                              {saldo !== null ? `R$ ${saldo.toFixed(2)}` : "—"}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">
+                              {f.ativo ? "ligado" : "desligado"}
+                            </div>
                           </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            {f.ativo ? "ligado" : "desligado"}
-                          </div>
+                          <RecargaFornecedor slug={f.slug} nome={f.nome} token={token} />
                         </div>
                       </div>
                     );
                   })}
+
                 </div>
               )}
             </div>
