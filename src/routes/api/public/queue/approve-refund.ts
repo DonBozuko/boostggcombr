@@ -3,7 +3,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-const schema = z.object({ pedido_id: z.string().min(1) });
+const schema = z.object({ pedido_id: z.string().min(1), dry_run: z.boolean().optional() });
 
 async function authorize(request: Request): Promise<{ ok: boolean; who: string }> {
   const authz = request.headers.get("authorization") ?? "";
@@ -48,13 +48,26 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
 
         const { data: p, error: loadErr } = await supabaseAdmin
           .from("pedidos")
           .select("id, status, mercado_pago_id, valor, pacote, email_contato")
           .eq("id", parsed.data.pedido_id)
           .maybeSingle();
+
+        // v228 — dry_run: valida auth + retorna info do pedido, SEM chamar MP, SEM mutação.
+        if (parsed.data.dry_run) {
+          return new Response(JSON.stringify({
+            ok: true,
+            dry_run: true,
+            auth_who: auth.who,
+            pedido_found: !!p,
+            pedido_status: (p as any)?.status ?? null,
+            has_mp_id: !!(p as any)?.mercado_pago_id,
+            valor: (p as any)?.valor ?? null,
+          }), { status: 200, headers: { "Content-Type": "application/json" } });
+        }
+
         if (loadErr || !p) {
           return new Response(JSON.stringify({ ok: false, error: "NOT_FOUND" }), {
             status: 404, headers: { "Content-Type": "application/json" },
@@ -70,6 +83,8 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
             status: 422, headers: { "Content-Type": "application/json" },
           });
         }
+
+        const { refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
 
         let refund = await refundMercadoPago(String((p as any).mercado_pago_id));
         const attempts: string[] = [`t1: ${refund.ok ? "OK" : refund.detail}`];

@@ -88,6 +88,33 @@ export function WaitingProvisionQueue({ token }: { token: string }) {
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-white/50 font-mono">{items.length} pedido(s)</span>
           <button
+            onClick={async () => {
+              if (!token) { setFlash("❌ Sessão expirada — refaça login"); return; }
+              setFlash("🧪 Testando autenticação de refund...");
+              try {
+                const { supabase } = await import("@/integrations/supabase/client");
+                const { data: { session } } = await supabase.auth.getSession();
+                const headers: Record<string,string> = { "Content-Type": "application/json", "x-admin-token": token };
+                if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+                const res = await fetch("/api/public/queue/approve-refund", {
+                  method: "POST",
+                  headers,
+                  body: JSON.stringify({ pedido_id: "00000000-0000-0000-0000-000000000000", dry_run: true }),
+                });
+                const j = await res.json();
+                setFlash(j.ok
+                  ? `✅ Auth OK — logado como: ${j.auth_who} (dry-run, nenhum MP chamado)`
+                  : `❌ Auth falhou: ${j.error ?? "erro"}`);
+              } catch (e) {
+                setFlash(`❌ ${(e as Error).message}`);
+              }
+            }}
+            className="text-[10px] uppercase tracking-wider text-amber-300 hover:text-amber-100 border border-amber-500/40 rounded px-2 py-1"
+            title="Testa auth do endpoint sem chamar Mercado Pago"
+          >
+            🧪 Testar auth
+          </button>
+          <button
             onClick={load}
             className="text-[10px] uppercase tracking-wider text-cyan-300 hover:text-cyan-100 border border-cyan-500/40 rounded px-2 py-1"
           >
