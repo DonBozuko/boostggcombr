@@ -1,33 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createHmac, timingSafeEqual } from "crypto";
+// v243 — verificação HMAC vive em src/lib/mp-signature.ts e é coberta por teste
+// automatizado (src/__tests__/mp-webhook-signature.test.ts).
+import { verifyMpSignature } from "@/lib/mp-signature";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
-
-// v190 — Valida HMAC do Mercado Pago conforme manifesto oficial:
-//   id:<data.id>;request-id:<x-request-id>;ts:<ts>;
-// Docs: https://www.mercadopago.com.br/developers/pt/docs/your-integrations/notifications/webhooks
-function verifyMpSignature(params: {
-  signatureHeader: string | null;
-  requestIdHeader: string | null;
-  dataId: string | null;
-  secret: string;
-}): boolean {
-  const { signatureHeader, requestIdHeader, dataId, secret } = params;
-  if (!signatureHeader || !dataId) return false;
-  const tsMatch = signatureHeader.match(/ts=([^,]+)/);
-  const v1Match = signatureHeader.match(/v1=([a-f0-9]+)/i);
-  if (!tsMatch || !v1Match) return false;
-  const ts = tsMatch[1].trim();
-  const provided = v1Match[1].trim().toLowerCase();
-  const manifest = `id:${dataId};request-id:${requestIdHeader ?? ""};ts:${ts};`;
-  const expected = createHmac("sha256", secret).update(manifest).digest("hex");
-  if (expected.length !== provided.length) return false;
-  try {
-    return timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(provided, "hex"));
-  } catch {
-    return false;
-  }
-}
 
 // v129 — Strict IP Rate Limiter (5 req/s por IP, in-memory sliding window)
 const RATE_LIMIT_MAX = 5;

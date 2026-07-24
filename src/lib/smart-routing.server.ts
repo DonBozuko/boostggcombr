@@ -127,15 +127,14 @@ export async function rankProvidersByCost(opts: {
   const refillMap: Record<string, boolean> = {};
   let brPackage = false;
   try {
+    // v243 — regras puras e testadas vivem em critical-guards.ts
+    const { isBrPackage, providerCanServe } = await import("./critical-guards");
     const { data: catRow } = await supabaseAdmin
       .from("pricing_items" as any)
       .select("category")
       .eq("pacote", opts.pacote)
       .maybeSingle();
-    const category = String((catRow as any)?.category ?? "");
-    const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
-    const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
-    brPackage = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
+    brPackage = isBrPackage(opts.pacote, (catRow as any)?.category);
     const cacheTable: Record<string, string> = {
       smmhype: "smmhype_services_cache",
       smmpainel: "smmpanel_services_cache",
@@ -150,9 +149,8 @@ export async function rankProvidersByCost(opts: {
         .eq("provider_service_id", String(pid))
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
-      const hay = `${(svcRow as any).name ?? ""} ${(svcRow as any).category ?? ""}`;
       refillMap[slug] = (svcRow as any).refill === true;
-      if (TOXIC_RE.test(hay) || (brPackage && !BR_RE.test(hay))) {
+      if (!providerCanServe({ brPackage, svc: svcRow as any })) {
         providerIdMap[slug] = null;
         console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
       }
@@ -202,20 +200,8 @@ export async function rankProvidersByCost(opts: {
   // (refill) ganha do mais barato sem reposição. Queda sem reposição = cliente
   // decepcionado + chargeback, que custa mais caro que a diferença de custo.
   const cascadeOrder: Record<string, number> = { smmhype: 0, smmpainel: 1, verified: 2 };
-  ranked.sort((a, b) => {
-    if (a.unstable !== b.unstable) return a.unstable ? 1 : -1;
-    if (brPackage) {
-      const ar = refillMap[a.slug] === true ? 0 : 1;
-      const br_ = refillMap[b.slug] === true ? 0 : 1;
-      if (ar !== br_) return ar - br_;
-    }
-    const ac = a.cost_brl ?? Number.POSITIVE_INFINITY;
-    const bc = b.cost_brl ?? Number.POSITIVE_INFINITY;
-    if (ac !== bc) return ac - bc;
-    const ao = cascadeOrder[a.slug] ?? 99;
-    const bo = cascadeOrder[b.slug] ?? 99;
-    return ao - bo;
-  });
+  const { compareProviders } = await import("./critical-guards");
+  ranked.sort((a, b) => compareProviders(a, b, { brPackage, refillMap, cascadeOrder }));
 
 
   return ranked;
