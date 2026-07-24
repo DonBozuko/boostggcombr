@@ -110,7 +110,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
 
         try {
           await supabaseAdmin.from("admin_audit_logs" as any).insert({
-            admin_email: "admin@manual-refund-approval",
+            admin_email: auth.who || "admin@manual-refund-approval",
             action: "REFUND_APPROVED_v220",
             detail: { pedido_id: (p as any).id, valor: (p as any).valor, refund_ok: refund.ok, attempts } as any,
             created_at: new Date().toISOString(),
