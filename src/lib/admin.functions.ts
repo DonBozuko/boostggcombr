@@ -735,18 +735,31 @@ export const getRecoveryQueue = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pix_recovery_queue")
-      .select("*, pedidos:pedido_id ( email_contato )")
+      .select("*")
       .in("status", ["novo", "contatado"])
       .order("valor", { ascending: false })
       .limit(100);
     if (error) return { ok: false as const, error: error.message };
+    const pedidoIds = Array.from(new Set((rows ?? []).map((r) => (r as { pedido_id?: string }).pedido_id).filter(Boolean))) as string[];
+    const emailMap = new Map<string, string | null>();
+    if (pedidoIds.length > 0) {
+      const { data: peds } = await supabaseAdmin
+        .from("pedidos")
+        .select("id, email_contato")
+        .in("id", pedidoIds);
+      for (const p of peds ?? []) {
+        const pp = p as { id: string; email_contato: string | null };
+        emailMap.set(pp.id, pp.email_contato ?? null);
+      }
+    }
     const flat = (rows ?? []).map((r) => {
-      const rr = r as { pedidos?: { email_contato?: string | null } | null } & Record<string, unknown>;
-      return { ...rr, email: rr.pedidos?.email_contato ?? null };
+      const rr = r as { pedido_id?: string } & Record<string, unknown>;
+      return { ...rr, email: rr.pedido_id ? emailMap.get(rr.pedido_id) ?? null : null };
     });
     const totalValor = flat.reduce((a, r) => a + Number((r as { valor?: number }).valor ?? 0), 0);
     return { ok: true as const, rows: flat, totalValor };
   });
+
 
 export const markRecoveryContacted = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({
