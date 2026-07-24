@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, pingAllProviders, sincronizarIdsApi, getGrowthCentral, smartApproveIds } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
-import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
+import { listarFornecedores, toggleFornecedorAtivo, getRecargaFornecedores } from "@/lib/fornecedores.functions";
 import { runBackupDrill, getBackupDrillStatus } from "@/lib/backup-drill.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -2115,17 +2115,21 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                             Última checagem: {ultima}
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className={`text-sm font-bold ${saldoLow ? "text-red-400" : "text-emerald-300"}`}>
-                            {saldo !== null ? `R$ ${saldo.toFixed(2)}` : "—"}
+                        <div className="text-right flex items-center gap-3">
+                          <div>
+                            <div className={`text-sm font-bold ${saldoLow ? "text-red-400" : "text-emerald-300"}`}>
+                              {saldo !== null ? `R$ ${saldo.toFixed(2)}` : "—"}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground">
+                              {f.ativo ? "ligado" : "desligado"}
+                            </div>
                           </div>
-                          <div className="text-[10px] text-muted-foreground">
-                            {f.ativo ? "ligado" : "desligado"}
-                          </div>
+                          <RecargaFornecedor slug={f.slug} nome={f.nome} token={token} />
                         </div>
                       </div>
                     );
                   })}
+
                 </div>
               )}
             </div>
@@ -2405,3 +2409,39 @@ function ServicesCacheCard({
 }
 
 
+
+// v236 — Recarga rápida: abre o painel do fornecedor e copia o Pix salvo nos secrets.
+function RecargaFornecedor({ slug, nome, token }: { slug: string; nome: string; token: string }) {
+  const getRecarga = useServerFn(getRecargaFornecedores);
+  const [busy, setBusy] = useState(false);
+
+  const abrir = async () => {
+    if (!token) return toast.error("Faça login no admin primeiro");
+    setBusy(true);
+    try {
+      const res = await getRecarga({ data: { token } });
+      if (!res.ok) return toast.error("Não autorizado");
+      const item = res.itens.find((i) => i.slug === (slug || "").toLowerCase());
+      if (!item) return toast.error(`${nome}: fornecedor não encontrado`);
+      if (item.pix) {
+        try {
+          await navigator.clipboard.writeText(item.pix);
+          toast.success(`${nome}: Pix copia-e-cola copiado. Cole no seu banco.`);
+        } catch {
+          toast.message(`${nome} · Pix copia-e-cola`, { description: item.pix });
+        }
+      } else {
+        toast.message(`${nome}: sem Pix salvo — recarregue pelo painel.`);
+      }
+      if (item.painelUrl) window.open(item.painelUrl, "_blank", "noopener,noreferrer");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Button size="sm" variant="outline" onClick={abrir} disabled={busy} className="shrink-0">
+      {busy ? "…" : "💳 Recarregar"}
+    </Button>
+  );
+}
