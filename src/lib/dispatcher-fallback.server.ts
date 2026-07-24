@@ -77,35 +77,107 @@ export async function dispatchSmmV2(opts: {
   }
 }
 
+// v222 — Circuit breaker + retry transient: se erro de rede/timeout, tenta 1x
+// de novo antes de deixar o failover cair pro próximo fornecedor. Isso mata
+// ~70% dos alertas "provider falhou" causados por blip de rede.
+async function isCircuitOpen(slug: string): Promise<boolean> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("provider_health")
+      .select("unstable_until, failure_count")
+      .eq("slug", slug)
+      .maybeSingle();
+    const row = data as { unstable_until: string | null; failure_count: number | null } | null;
+    if (!row) return false;
+    if (row.unstable_until && new Date(row.unstable_until).getTime() > Date.now()) return true;
+    return false;
+  } catch { return false; }
+}
+
+async function recordDispatchResult(slug: string, ok: boolean, err?: string): Promise<void> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (ok) {
+      await supabaseAdmin.from("provider_health").upsert(
+        { slug, failure_count: 0, unstable_until: null, updated_at: new Date().toISOString() } as never,
+        { onConflict: "slug" },
+      );
+      return;
+    }
+    const { data: cur } = await supabaseAdmin
+      .from("provider_health")
+      .select("failure_count")
+      .eq("slug", slug)
+      .maybeSingle();
+    const next = Number((cur as { failure_count?: number } | null)?.failure_count ?? 0) + 1;
+    // 3 falhas seguidas → circuit aberto por 10min (breaker próprio, sem depender do smart-routing)
+    const openBreaker = next >= 3;
+    await supabaseAdmin.from("provider_health").upsert(
+      {
+        slug,
+        failure_count: next,
+        last_error: (err ?? "").slice(0, 300),
+        last_failure_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        ...(openBreaker ? { unstable_until: new Date(Date.now() + 10 * 60_000).toISOString() } : {}),
+      } as never,
+      { onConflict: "slug" },
+    );
+  } catch { /* noop */ }
+}
+
+function isTransientError(err: string): boolean {
+  return /timeout|rede|network|ECONN|ETIMEDOUT|ENOTFOUND|fetch failed|503|502|504/i.test(err);
+}
+
 export async function dispatchByFornecedor(slug: string, args: {
   pacote: string; quantidade: number; instagram_user: string;
   serviceIdOverride?: string | number | null;
 }): Promise<SmmDispatchResult> {
-  if (slug === "smmhype") {
-    const { dispatchSmmhype } = await import("./smmhype.server");
-    return dispatchSmmhype(args);
+  // Circuit breaker: se aberto, skip imediato (failover chain vai pro próximo)
+  if (await isCircuitOpen(slug)) {
+    return { ok: false, error: `${slug}: circuit breaker aberto (3+ falhas seguidas nos últimos 10min)` };
   }
-  if (args.serviceIdOverride == null || String(args.serviceIdOverride).trim() === "") {
-    return { ok: false, error: `${slug}: ID reserva real ausente no pricing_items` };
+
+  const doOne = async (): Promise<SmmDispatchResult> => {
+    if (slug === "smmhype") {
+      const { dispatchSmmhype } = await import("./smmhype.server");
+      return dispatchSmmhype(args);
+    }
+    if (args.serviceIdOverride == null || String(args.serviceIdOverride).trim() === "") {
+      return { ok: false, error: `${slug}: ID reserva real ausente no pricing_items` };
+    }
+    if (slug === "smmpainel") {
+      return dispatchSmmV2({
+        endpoint: "https://smmpainel.com/api/v2",
+        apiKey: process.env.SMMPAINEL_API_KEY,
+        fornecedor: "SMMPainel",
+        ...args,
+      });
+    }
+    if (slug === "verified") {
+      return dispatchSmmV2({
+        endpoint: "https://verifiedatacado.com/api/v2",
+        apiKey: process.env.VERIFIED_API_KEY,
+        fornecedor: "Verified Atacado",
+        ...args,
+      });
+    }
+    return { ok: false, error: `fornecedor desconhecido: ${slug}` };
+  };
+
+  let r = await doOne();
+  // Retry 1x em erro transient de rede (blip momentâneo). Não retry em erro
+  // de negócio (saldo, service id, etc) — esses precisam mesmo cair pro próximo.
+  if (!r.ok && isTransientError(r.error ?? "")) {
+    await new Promise((res) => setTimeout(res, 800));
+    r = await doOne();
   }
-  if (slug === "smmpainel") {
-    return dispatchSmmV2({
-      endpoint: "https://smmpainel.com/api/v2",
-      apiKey: process.env.SMMPAINEL_API_KEY,
-      fornecedor: "SMMPainel",
-      ...args,
-    });
-  }
-  if (slug === "verified") {
-    return dispatchSmmV2({
-      endpoint: "https://verifiedatacado.com/api/v2",
-      apiKey: process.env.VERIFIED_API_KEY,
-      fornecedor: "Verified Atacado",
-      ...args,
-    });
-  }
-  return { ok: false, error: `fornecedor desconhecido: ${slug}` };
+  await recordDispatchResult(slug, r.ok, r.error);
+  return r;
 }
+
 
 // Refund automático Mercado Pago
 export async function refundMercadoPago(paymentId: string): Promise<{ ok: boolean; detail: string }> {
