@@ -14,7 +14,8 @@ export function JarvisDetectorMentiras() {
   const onRun = async () => {
     setLoading(true);
     try {
-      const r = await run();
+      const token = typeof window !== "undefined" ? (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "") : "";
+      const r = await run({ data: { token } });
       setReport(r);
     } catch (e) {
       console.error(e);
