@@ -77,6 +77,8 @@ function ObrigadoPage() {
             {value && <div className="text-zinc-400">Valor: <span className="text-white">R$ {value}</span></div>}
           </div>
         )}
+        <DeliveryTimes rede={/tiktok/i.test(tier) ? "tiktok" : /youtube/i.test(tier) ? "youtube" : /kwai/i.test(tier) ? "kwai" : /twitter|x-/i.test(tier) ? "twitter" : "instagram"} accent="#22c55e" />
+
         <div className="rounded-xl border-2 border-yellow-400/40 bg-gradient-to-br from-yellow-500/10 to-orange-500/5 p-5 text-left space-y-4">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-yellow-400" />
