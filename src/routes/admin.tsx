@@ -1447,36 +1447,50 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         {/* v66 · Strict Action-Triggered UI Isolation Matrix */}
         {(() => {
           const TABS = [
-            { id: "buscas" as const,     label: "🔍 BUSCA DE IDS",                grad: "from-cyan-500 to-blue-600",       glow: "shadow-[0_0_22px_rgba(0,242,254,0.55)]" },
-            { id: "tesouraria" as const, label: "📊 TESOURARIA & LIVRO CONTÁBIL", grad: "from-amber-400 to-orange-500",    glow: "shadow-[0_0_22px_rgba(245,158,11,0.55)]" },
-            { id: "auditoria" as const,  label: "🩺 NOC & AUDITORIA DE SALDOS",   grad: "from-red-500 to-fuchsia-600",     glow: "shadow-[0_0_22px_rgba(255,0,60,0.55)]" },
+            { id: "buscas" as const,     label: "🛒 CARRINHOS & PEDIDOS",   sub: "Recuperar Pix abandonado · buscar pedido",  grad: "from-emerald-500 to-cyan-600",  glow: "shadow-[0_0_22px_rgba(16,185,129,0.55)]" },
+            { id: "tesouraria" as const, label: "📊 TESOURARIA & CATÁLOGO", sub: "Saldos, faturamento, preços",               grad: "from-amber-400 to-orange-500",  glow: "shadow-[0_0_22px_rgba(245,158,11,0.55)]" },
+            { id: "auditoria" as const,  label: "🩺 DIAGNÓSTICO (só olhar)", sub: "Abra só quando chegar alerta no Telegram", grad: "from-red-500 to-fuchsia-600",   glow: "shadow-[0_0_22px_rgba(255,0,60,0.55)]" },
           ];
           const cur = folder;
           return (
-            <nav className="rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl p-2 flex flex-wrap gap-2 justify-center">
-              {TABS.map((t) => {
-                const active = cur === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => {
-                      setFolder(t.id);
-                      const primary: Record<string, AdminTab> = { buscas: "buscar", tesouraria: "tesouraria", auditoria: "noc" };
-                      setActiveTab(primary[t.id]);
-                      if (t.id === "buscas") setLoaded(true);
-                    }}
-                    className={`flex-1 min-w-[180px] rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all ${
-                      active
-                        ? `bg-gradient-to-r ${t.grad} text-white ${t.glow} scale-[1.02]`
-                        : "bg-black/40 text-white/70 hover:text-white border border-white/10"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                );
-              })}
-            </nav>
+            <>
+              <nav className="rounded-2xl border border-white/10 bg-black/50 backdrop-blur-xl p-2 flex flex-wrap gap-2 justify-center">
+                {TABS.map((t) => {
+                  const active = cur === t.id;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setFolder(t.id);
+                        const primary: Record<string, AdminTab> = { buscas: "buscar", tesouraria: "tesouraria", auditoria: "noc" };
+                        setActiveTab(primary[t.id]);
+                        if (t.id === "buscas") setLoaded(true);
+                      }}
+                      className={`flex-1 min-w-[200px] rounded-xl px-4 py-2.5 text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all text-left ${
+                        active
+                          ? `bg-gradient-to-r ${t.grad} text-white ${t.glow} scale-[1.02]`
+                          : "bg-black/40 text-white/70 hover:text-white border border-white/10"
+                      }`}
+                    >
+                      <div>{t.label}</div>
+                      <div className={`text-[10px] font-medium normal-case tracking-normal mt-0.5 ${active ? "text-white/90" : "text-white/50"}`}>{t.sub}</div>
+                    </button>
+                  );
+                })}
+              </nav>
+
+              <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 text-xs sm:text-sm text-emerald-100">
+                <div className="font-bold text-emerald-300 mb-1">👉 Só precisa olhar 2 coisas por dia:</div>
+                <ol className="list-decimal list-inside space-y-0.5 text-white/85">
+                  <li><b>🛒 Carrinhos &amp; Pedidos</b> → se tem Pix abandonado, mandar WhatsApp em 1 clique (Central de Recuperação de Pix).</li>
+                  <li><b>📊 Tesouraria</b> → conferir saldo dos 3 fornecedores no verde.</li>
+                </ol>
+                <div className="mt-1.5 text-white/60">
+                  A aba <b>Diagnóstico</b> é <b>só pra abrir quando chegar alerta no Telegram</b>. Ignorar as luzinhas se o Telegram estiver quieto — é normal ter algumas amarelas.
+                </div>
+              </div>
+            </>
           );
         })()}
         
