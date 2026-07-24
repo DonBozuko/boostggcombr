@@ -118,11 +118,14 @@ export async function rankProvidersByCost(opts: {
     verified: (pricingItem as any)?.verified_service_id ?? (autoIds as any)?.verified_auto_id ?? null,
   };
 
-  // v241 — TRAVA BR EM RUNTIME (caso Sybele).
+  // v241/v242 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
   // O dry-run valida o catálogo curado, mas o failover podia cair num
   // *_auto_id internacional/tóxico e entregar seguidor árabe num pacote :br.
   // Aqui, antes de rankear, derrubo qualquer fornecedor cujo serviço não seja
-  // brasileiro de verdade (ou esteja marcado como queda pelo próprio fornecedor).
+  // brasileiro de verdade (ou esteja marcado como queda pelo próprio fornecedor)
+  // e marco quem tem reposição (refill) para priorizar na ordenação.
+  const refillMap: Record<string, boolean> = {};
+  let brPackage = false;
   try {
     const { data: catRow } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -132,7 +135,7 @@ export async function rankProvidersByCost(opts: {
     const category = String((catRow as any)?.category ?? "");
     const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
     const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
-    const needsBr = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
+    brPackage = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
     const cacheTable: Record<string, string> = {
       smmhype: "smmhype_services_cache",
       smmpainel: "smmpanel_services_cache",
@@ -143,17 +146,19 @@ export async function rankProvidersByCost(opts: {
       if (!pid) continue;
       const { data: svcRow } = await supabaseAdmin
         .from(cacheTable[slug] as any)
-        .select("name, category")
+        .select("name, category, refill")
         .eq("provider_service_id", String(pid))
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
       const hay = `${(svcRow as any).name ?? ""} ${(svcRow as any).category ?? ""}`;
-      if (TOXIC_RE.test(hay) || (needsBr && !BR_RE.test(hay))) {
+      refillMap[slug] = (svcRow as any).refill === true;
+      if (TOXIC_RE.test(hay) || (brPackage && !BR_RE.test(hay))) {
         providerIdMap[slug] = null;
         console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
       }
     }
   } catch { /* noop — nunca derrubar o dispatch por causa da trava */ }
+
 
 
 
