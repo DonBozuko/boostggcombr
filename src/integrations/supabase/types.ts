@@ -603,6 +603,8 @@ export type Database = {
           id: string
           instagram_user: string
           last_reconciled_at: string | null
+          last_remains: number | null
+          last_remains_at: string | null
           mercado_pago_id: string | null
           pacote: string
           provider_order_id: string | null
@@ -635,6 +637,8 @@ export type Database = {
           id?: string
           instagram_user: string
           last_reconciled_at?: string | null
+          last_remains?: number | null
+          last_remains_at?: string | null
           mercado_pago_id?: string | null
           pacote: string
           provider_order_id?: string | null
@@ -667,6 +671,8 @@ export type Database = {
           id?: string
           instagram_user?: string
           last_reconciled_at?: string | null
+          last_remains?: number | null
+          last_remains_at?: string | null
           mercado_pago_id?: string | null
           pacote?: string
           provider_order_id?: string | null
