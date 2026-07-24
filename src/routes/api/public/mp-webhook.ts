@@ -419,6 +419,23 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 motivo: "Pagamento aprovado · aguardando robô externo confirmar envio",
               });
             } catch (e) { console.warn("[mp-webhook] v164 queue notify fail", e); }
+
+            // v226 — Kick auto-healer imediato (fire-and-forget). Não trava webhook.
+            // Reduz tempo médio de entrega de até 5min (próximo tick do cron) para segundos.
+            try {
+              const kickToken = process.env.CRON_ADMIN_TOKEN ?? process.env.ADMIN_TOKEN ?? "";
+              if (kickToken) {
+                const kickUrl = new URL("/api/public/hooks/auto-healer", requestUrl).toString();
+                scheduleWebhookBackground(
+                  fetch(kickUrl, {
+                    method: "POST",
+                    headers: { "x-admin-token": kickToken, "content-type": "application/json" },
+                    body: "{}",
+                  }).then(() => {}),
+                  context,
+                );
+              }
+            } catch (e) { console.warn("[mp-webhook] v226 auto-healer kick fail", e); }
             return;
           } catch (e) {
             console.warn("[mp-webhook] v164 queue fail", e);
