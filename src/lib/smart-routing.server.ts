@@ -190,7 +190,7 @@ export async function rankProvidersByCost(opts: {
       rate_usd: providerRate,
       unstable,
     };
-  }).filter((p) => p.slug === "smmhype" || !!p.provider_service_id);
+  }).filter((p) => !!p.provider_service_id);
 
   // v168 — Strict Margin Guard: ordena por MENOR custo real (Math.min sobre cost_brl).
   // Cascata canônica (smmhype → smmpanel → verified) vira APENAS desempate quando
