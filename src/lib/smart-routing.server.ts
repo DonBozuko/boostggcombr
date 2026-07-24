@@ -118,6 +118,45 @@ export async function rankProvidersByCost(opts: {
     verified: (pricingItem as any)?.verified_service_id ?? (autoIds as any)?.verified_auto_id ?? null,
   };
 
+  // v241 — TRAVA BR EM RUNTIME (caso Sybele).
+  // O dry-run valida o catálogo curado, mas o failover podia cair num
+  // *_auto_id internacional/tóxico e entregar seguidor árabe num pacote :br.
+  // Aqui, antes de rankear, derrubo qualquer fornecedor cujo serviço não seja
+  // brasileiro de verdade (ou esteja marcado como queda pelo próprio fornecedor).
+  try {
+    const { data: catRow } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("category")
+      .eq("pacote", opts.pacote)
+      .maybeSingle();
+    const category = String((catRow as any)?.category ?? "");
+    const TOXIC_RE = /n[aã]o\s*compre|queda\s*de\s*100|100%\s*de?\s*queda|drop\s*100/i;
+    const BR_RE = /brasil|brazil|brasileir|🇧🇷/i;
+    const needsBr = category.endsWith(":br") || opts.pacote.startsWith("br-") || opts.pacote.startsWith("wbr");
+    const cacheTable: Record<string, string> = {
+      smmhype: "smmhype_services_cache",
+      smmpainel: "smmpanel_services_cache",
+      verified: "verified_services_cache",
+    };
+    for (const slug of Object.keys(providerIdMap)) {
+      const pid = providerIdMap[slug];
+      if (!pid) continue;
+      const { data: svcRow } = await supabaseAdmin
+        .from(cacheTable[slug] as any)
+        .select("name, category")
+        .eq("provider_service_id", String(pid))
+        .maybeSingle();
+      if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
+      const hay = `${(svcRow as any).name ?? ""} ${(svcRow as any).category ?? ""}`;
+      if (TOXIC_RE.test(hay) || (needsBr && !BR_RE.test(hay))) {
+        providerIdMap[slug] = null;
+        console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
+      }
+    }
+  } catch { /* noop — nunca derrubar o dispatch por causa da trava */ }
+
+
+
   const smmhypeRate = Number((svc as any)?.rate);
   const [smmpainelRate, verifiedRate] = await Promise.all([
     fetchServiceRate("smmpainel", "https://smmpainel.com/api/v2", process.env.SMMPAINEL_API_KEY, providerIdMap.smmpainel),
