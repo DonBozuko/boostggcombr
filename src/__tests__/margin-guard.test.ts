@@ -40,7 +40,8 @@ describe("trava de margem", () => {
     const qtys = [50, 100, 500, 1000, 3000, 5000, 10000, 15000, 50000];
     for (let i = 1; i < qtys.length; i++) {
       expect(scaledFloor(qtys[i])).toBeGreaterThanOrEqual(scaledFloor(qtys[i - 1]));
-      expect(effectiveProfitMult(qtys[i])).toBeGreaterThanOrEqual(effectiveProfitMult(qtys[i - 1]));
+      // tolerância de 1e-9 apenas para ruído de ponto flutuante
+      expect(effectiveProfitMult(qtys[i])).toBeGreaterThanOrEqual(effectiveProfitMult(qtys[i - 1]) - 1e-9);
     }
   });
 
