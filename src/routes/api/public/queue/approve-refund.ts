@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
 
         const { data: p, error: loadErr } = await supabaseAdmin
           .from("pedidos")
-          .select("id, status, mercado_pago_id, valor, pacote, email_contato")
+          .select("id, status, mercado_pago_id, valor, pacote, email_contato, provider_slug, provider_order_id")
           .eq("id", parsed.data.pedido_id)
           .maybeSingle();
 
@@ -64,6 +64,8 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
             pedido_found: !!p,
             pedido_status: (p as any)?.status ?? null,
             has_mp_id: !!(p as any)?.mercado_pago_id,
+            provider_slug: (p as any)?.provider_slug ?? null,
+            has_provider_order_id: !!(p as any)?.provider_order_id,
             valor: (p as any)?.valor ?? null,
           }), { status: 200, headers: { "Content-Type": "application/json" } });
         }
@@ -84,7 +86,30 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
           });
         }
 
-        const { refundMercadoPago } = await import("@/lib/dispatcher-fallback.server");
+        const { refundMercadoPago, cancelAtProvider } = await import("@/lib/dispatcher-fallback.server");
+
+        // v230 — cancel-then-refund: recupera saldo no fornecedor ANTES de reembolsar cliente.
+        // Se cancel falhar (em andamento/entregue) → bloqueia refund por padrão (prejuízo).
+        // Admin pode forçar com force_refund: true (assumindo o prejuízo conscientemente).
+        let cancelResult: { ok: boolean; detail: string; recoverable: boolean } = {
+          ok: true, detail: "sem provider_slug (contingência sem dispatch)", recoverable: true,
+        };
+        const slug = String((p as any).provider_slug ?? "").toLowerCase().trim();
+        const pOrderId = String((p as any).provider_order_id ?? "").trim();
+        if (slug) {
+          cancelResult = await cancelAtProvider(slug, pOrderId);
+        }
+
+        if (!cancelResult.ok && !parsed.data.force_refund) {
+          return new Response(JSON.stringify({
+            ok: false,
+            error: "CANCEL_FALHOU_PREJUIZO_PROVAVEL",
+            provider: slug,
+            provider_order_id: pOrderId || null,
+            cancel_detail: cancelResult.detail,
+            hint: "Fornecedor não cancelou (pedido pode estar em andamento/entregue). Para reembolsar mesmo assim, reenvie com force_refund: true.",
+          }), { status: 409, headers: { "Content-Type": "application/json" } });
+        }
 
         let refund = await refundMercadoPago(String((p as any).mercado_pago_id));
         const attempts: string[] = [`t1: ${refund.ok ? "OK" : refund.detail}`];
@@ -93,6 +118,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
           refund = await refundMercadoPago(String((p as any).mercado_pago_id));
           attempts.push(`t${i}: ${refund.ok ? "OK" : refund.detail}`);
         }
+
 
         await supabaseAdmin
           .from("pedidos")
