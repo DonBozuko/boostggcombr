@@ -63,6 +63,12 @@ export function SeoLanding(p: SeoLandingProps) {
           </a>
         </div>
 
+        {/* v224 — Prova social acima da dobra */}
+        <div className="mt-6 space-y-3">
+          <LivePurchasesTicker accent={p.accent} />
+          <TrustBadges accent={p.accent} />
+        </div>
+
         {/* Benefícios */}
         <section className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {p.benefits.map((b, i) => {
