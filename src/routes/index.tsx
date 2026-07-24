@@ -761,13 +761,26 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           <div className="flex items-center gap-2">
             <BrandHeader subtitle="Seguidores Brasileiros no Instagram via Pix" />
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link
               to="/ferramentas"
-              className="text-sm text-zinc-300 hover:text-foreground transition-colors"
-              activeProps={{ className: "text-foreground font-medium" }}
+              className="group relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wide uppercase transition-all duration-300 hover:scale-105"
+              style={{
+                border: "1px solid #39ff14",
+                background: "linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(10,30,10,0.95) 100%)",
+                boxShadow: "0 0 0 1px #39ff1422, 0 4px 14px #39ff1422, inset 0 1px 0 #39ff1415",
+                color: "#39ff14",
+                textShadow: "0 0 8px #39ff1466",
+              }}
             >
-              Ferramentas
+              <Wrench className="w-3.5 h-3.5" />
+              <span>Ferramentas grátis</span>
+              <span
+                className="absolute -top-1.5 -right-2 px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider"
+                style={{ background: "#39ff14", color: "#000" }}
+              >
+                Grátis
+              </span>
             </Link>
             <ShowcaseTrigger />
           </div>
