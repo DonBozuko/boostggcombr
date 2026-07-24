@@ -74,10 +74,8 @@ function pushHistory(evt: JarvisEvent, detail?: string) {
   });
   if (HISTORY.length > MAX) HISTORY.length = MAX;
   LISTENERS.forEach((l) => l());
-  void logJarvisAlert({
-    data: { severidade: SEVERITY[evt], origem: evt, mensagem: LABELS[evt], detalhe: detail },
-  }).catch(() => {});
-}
+  // Persistência no jarvis_alerts foi movida para o admin autenticado.
+
 
 export function useJarvisHistory(): JarvisHistoryEntry[] {
   const [, force] = useState(0);
