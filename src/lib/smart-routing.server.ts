@@ -232,6 +232,12 @@ export async function pickCheapestFornecedorSlug(pacote: string, quantidade: num
   const valid = ranked.filter(
     (p) => !p.unstable && p.saldo_atual > 0 && !!p.provider_service_id,
   );
+  // v242 — pacote BR respeita a ordem já rankeada (garantia > preço).
+  const brPackage = pacote.startsWith("br-") || pacote.startsWith("wbr");
+  if (brPackage) {
+    if (valid.length) return valid[0].slug;
+    return ranked[0].slug;
+  }
   const withCost = valid.filter((p) => typeof p.cost_brl === "number" && (p.cost_brl as number) > 0);
   if (withCost.length) {
     const min = Math.min(...withCost.map((p) => p.cost_brl as number));
@@ -240,6 +246,7 @@ export async function pickCheapestFornecedorSlug(pacote: string, quantidade: num
   if (valid.length) return valid[0].slug;
   return ranked[0].slug;
 }
+
 
 export async function markProviderUnstable(slug: string, errorMsg: string): Promise<void> {
   // v67 — Perpetual Balance Force: nunca marcar unstable se o fornecedor
