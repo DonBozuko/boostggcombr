@@ -690,13 +690,14 @@ export const Route = createFileRoute("/blog/$slug")({
 
 function BlogPost() {
   const { post } = Route.useLoaderData();
+  const faq = post.faq ?? [];
   return (
     <BlogLayout title={post.title} subtitle={post.subtitle}>
       {post.body}
-      {post.faq?.length ? (
+      {faq.length ? (
         <>
           <h2>Perguntas frequentes</h2>
-          {post.faq.map((f) => (
+          {faq.map((f) => (
             <div key={f.q}>
               <h3>{f.q}</h3>
               <p>{f.a}</p>
