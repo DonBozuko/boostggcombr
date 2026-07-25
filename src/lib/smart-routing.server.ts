@@ -101,33 +101,43 @@ export async function rankProvidersByCost(opts: {
   const [{ data: forn }, { data: svc }, { data: health }, pricingItem, { data: autoIds }] = await Promise.all([
     supabaseAdmin
       .from("fornecedores")
-      .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade")
+      .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade, api_url, api_key_secret")
       .eq("ativo", true),
     serviceId != null
       ? supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", serviceId).maybeSingle()
       : Promise.resolve({ data: null } as any),
     supabaseAdmin.from("provider_health" as any).select("slug, unstable_until"),
     getPricingRow(opts.pacote),
-    supabaseAdmin.from("pricing_items" as any).select("smmhype_auto_id, smmpanel_auto_id, verified_auto_id").eq("pacote", opts.pacote).maybeSingle(),
+    supabaseAdmin.from("pricing_items" as any).select("smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id").eq("pacote", opts.pacote).maybeSingle(),
   ]);
 
-  // Failover triplo: ID manual (curado) tem prioridade, cai no auto-resolvido.
-  const providerIdMap: Record<string, string | null> = {
-    smmhype: (pricingItem as any)?.smmhype_service_id ?? (autoIds as any)?.smmhype_auto_id ?? (serviceId != null ? String(serviceId) : null),
-    smmpainel: (pricingItem as any)?.smmpanel_service_id ?? (autoIds as any)?.smmpanel_auto_id ?? null,
-    verified: (pricingItem as any)?.verified_service_id ?? (autoIds as any)?.verified_auto_id ?? null,
+  // v245 — Failover genérico: para cada fornecedor ativo, descobre o ID curado
+  // (coluna <slug>_service_id) ou auto-resolvido (<slug>_auto_id). SMMhype mantém
+  // fallback pelo service_id primário para compatibilidade histórica.
+  // Alias: banco usa slug 'smmpainel' mas coluna 'smmpanel_*'.
+  const slugToColumn: Record<string, string> = {
+    smmhype: "smmhype",
+    smmpainel: "smmpanel",
+    smmpanel: "smmpanel",
+    verified: "verified",
+    provider4: "provider4",
   };
+  const slugs = ((forn as any[]) ?? []).map((f) => f.slug as string);
+  const providerIdMap: Record<string, string | null> = {};
+  for (const slug of slugs) {
+    const prefix = slugToColumn[slug] ?? slug;
+    const manualCol = `${prefix}_service_id`;
+    const autoCol = `${prefix}_auto_id`;
+    const manualId = (pricingItem as any)?.[manualCol] ?? null;
+    const autoId = (autoIds as any)?.[autoCol] ?? null;
+    const fallbackId = slug === "smmhype" && serviceId != null ? String(serviceId) : null;
+    providerIdMap[slug] = manualId ?? autoId ?? fallbackId;
+  }
 
-  // v241/v242 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
-  // O dry-run valida o catálogo curado, mas o failover podia cair num
-  // *_auto_id internacional/tóxico e entregar seguidor árabe num pacote :br.
-  // Aqui, antes de rankear, derrubo qualquer fornecedor cujo serviço não seja
-  // brasileiro de verdade (ou esteja marcado como queda pelo próprio fornecedor)
-  // e marco quem tem reposição (refill) para priorizar na ordenação.
+  // v241/v242/v245 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
   const refillMap: Record<string, boolean> = {};
   let brPackage = false;
   try {
-    // v243 — regras puras e testadas vivem em critical-guards.ts
     const { isBrPackage, providerCanServe } = await import("./critical-guards");
     const { data: catRow } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -138,38 +148,50 @@ export async function rankProvidersByCost(opts: {
     const cacheTable: Record<string, string> = {
       smmhype: "smmhype_services_cache",
       smmpainel: "smmpanel_services_cache",
+      smmpanel: "smmpanel_services_cache",
       verified: "verified_services_cache",
+      provider4: "provider4_services_cache",
     };
     for (const slug of Object.keys(providerIdMap)) {
       const pid = providerIdMap[slug];
       if (!pid) continue;
+      const table = cacheTable[slug];
+      if (!table) continue;
       const { data: svcRow } = await supabaseAdmin
-        .from(cacheTable[slug] as any)
+        .from(table as any)
         .select("name, category, refill")
         .eq("provider_service_id", String(pid))
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
       refillMap[slug] = (svcRow as any).refill === true;
-      if (!providerCanServe({ brPackage, svc: svcRow as any })) {
+      if (!providerCanServe({ brPackage, svc: svcRow as any, requireRefill: brPackage })) {
         providerIdMap[slug] = null;
-        console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
+        const reason = brPackage && (svcRow as any).refill !== true ? "sem refill garantido" : "não é BR válido";
+        console.warn(`[v245] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} ${reason}`);
       }
+    }
+    if (brPackage && Object.values(providerIdMap).every((v) => !v)) {
+      console.error(`[v245] ${opts.pacote}: nenhum fornecedor BR com refill válido. Venda bloqueada.`);
+      return [];
     }
   } catch { /* noop — nunca derrubar o dispatch por causa da trava */ }
 
-
-
-
+  // Busca rates de todos os fornecedores ativos em paralelo.
+  const providerRateMap: Record<string, number | null> = {};
   const smmhypeRate = Number((svc as any)?.rate);
-  const [smmpainelRate, verifiedRate] = await Promise.all([
-    fetchServiceRate("smmpainel", "https://smmpainel.com/api/v2", process.env.SMMPAINEL_API_KEY, providerIdMap.smmpainel),
-    fetchServiceRate("verified", "https://verifiedatacado.com/api/v2", process.env.VERIFIED_API_KEY, providerIdMap.verified),
-  ]);
-  const providerRateMap: Record<string, number | null> = {
-    smmhype: Number.isFinite(smmhypeRate) && smmhypeRate > 0 ? smmhypeRate : null,
-    smmpainel: smmpainelRate,
-    verified: verifiedRate,
-  };
+  providerRateMap["smmhype"] = Number.isFinite(smmhypeRate) && smmhypeRate > 0 ? smmhypeRate : null;
+
+  await Promise.all(
+    slugs
+      .filter((slug) => slug !== "smmhype")
+      .map(async (slug) => {
+        const f = (forn as any[]).find((x) => x.slug === slug);
+        if (!f) return;
+        const apiKey = process.env[f.api_key_secret];
+        providerRateMap[slug] = await fetchServiceRate(slug, f.api_url, apiKey, providerIdMap[slug]);
+      }),
+  );
+
   const healthMap = new Map<string, string | null>();
   ((health as any[]) ?? []).forEach((h) => healthMap.set(h.slug, h.unstable_until));
 
@@ -195,14 +217,9 @@ export async function rankProvidersByCost(opts: {
     };
   }).filter((p) => !!p.provider_service_id);
 
-  // v168 — Strict Margin Guard: ordena por MENOR custo real (Math.min sobre cost_brl).
-  // v242 — em pacote BR, GARANTIA vem antes de preço: fornecedor com reposição
-  // (refill) ganha do mais barato sem reposição. Queda sem reposição = cliente
-  // decepcionado + chargeback, que custa mais caro que a diferença de custo.
-  const cascadeOrder: Record<string, number> = { smmhype: 0, smmpainel: 1, verified: 2 };
+  const cascadeOrder: Record<string, number> = Object.fromEntries(slugs.map((s, i) => [s, i]));
   const { compareProviders } = await import("./critical-guards");
   ranked.sort((a, b) => compareProviders(a, b, { brPackage, refillMap, cascadeOrder }));
-
 
   return ranked;
 }

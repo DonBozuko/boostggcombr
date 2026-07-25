@@ -124,13 +124,23 @@ ensureFallback().catch(() => { /* silencioso: chamado novamente no próximo sync
 export const syncSmmHype = syncSmmhypeServices;
 
 // ============================================================================
-// v164 — Sync isolado SMMPainel → smmpanel_services_cache
+// v164 / v245 — Sync genérico para qualquer fornecedor (endpoint API padrão SMM)
 // ============================================================================
+type ProviderSlug = string;
+
+const KNOWN_TABLES: Record<ProviderSlug, string> = {
+  smmhype: "smmhype_services_cache",
+  smmpanel: "smmpanel_services_cache",
+  smmpainel: "smmpanel_services_cache",
+  verified: "verified_services_cache",
+  provider4: "provider4_services_cache",
+};
+
 async function syncGenericProvider(opts: {
-  slug: "smmpanel" | "verified";
+  slug: ProviderSlug;
   endpoint: string;
   apiKey: string | undefined;
-  tableName: "smmpanel_services_cache" | "verified_services_cache";
+  tableName: string;
 }) {
   if (!opts.apiKey) throw new Error(`${opts.slug.toUpperCase()}_API_KEY ausente`);
   const body = new URLSearchParams({ key: opts.apiKey, action: "services" });
@@ -143,7 +153,7 @@ async function syncGenericProvider(opts: {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json,text/plain,*/*",
-        "User-Agent": "EliteBoostPrime-Sync/164",
+        "User-Agent": "EliteBoostPrime-Sync/245",
       },
       body: body.toString(),
       signal: ctrl.signal,
@@ -168,7 +178,6 @@ async function syncGenericProvider(opts: {
   }));
 
   if (rows.length > 0) {
-    // batches de 500 p/ evitar payloads gigantes
     for (let i = 0; i < rows.length; i += 500) {
       const chunk = rows.slice(i, i + 500);
       const { error } = await supabaseAdmin
@@ -185,20 +194,57 @@ async function syncGenericProvider(opts: {
   };
 }
 
-export async function syncSmmPanel() {
+export async function syncProviderBySlug(slug: ProviderSlug) {
+  const normalized = slug.toLowerCase();
+  const tableName = KNOWN_TABLES[normalized];
+  if (!tableName) throw new Error(`Fornecedor ${slug} não tem tabela de cache mapeada`);
+
+  // v245 — para fornecedores já conhecidos, mantém comportamento anterior
+  // (evita ler do banco e quebrar algo que está funcionando).
+  if (normalized === "smmhype") return syncSmmhypeServices();
+  if (normalized === "smmpanel" || normalized === "smmpainel") {
+    return syncGenericProvider({
+      slug: "smmpanel",
+      endpoint: "https://smmpainel.com/api/v2",
+      apiKey: process.env.SMMPAINEL_API_KEY,
+      tableName: "smmpanel_services_cache",
+    });
+  }
+  if (normalized === "verified") {
+    return syncGenericProvider({
+      slug: "verified",
+      endpoint: "https://verifiedatacado.com/api/v2",
+      apiKey: process.env.VERIFIED_API_KEY,
+      tableName: "verified_services_cache",
+    });
+  }
+
+  // v245 — provider4 (ou futuro): lê endpoint/chave da tabela fornecedores
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin
+    .from("fornecedores")
+    .select("api_url, api_key_secret")
+    .eq("slug", normalized)
+    .maybeSingle();
+  if (!data) throw new Error(`Fornecedor ${slug} não cadastrado na tabela fornecedores`);
+  const apiKey = process.env[(data as any).api_key_secret];
+  if (!apiKey) throw new Error(`Secret ${(data as any).api_key_secret} não configurado`);
   return syncGenericProvider({
-    slug: "smmpanel",
-    endpoint: "https://smmpainel.com/api/v2",
-    apiKey: process.env.SMMPAINEL_API_KEY,
-    tableName: "smmpanel_services_cache",
+    slug: normalized,
+    endpoint: (data as any).api_url,
+    apiKey,
+    tableName,
   });
 }
 
+export async function syncSmmPanel() {
+  return syncProviderBySlug("smmpanel");
+}
+
 export async function syncVerified() {
-  return syncGenericProvider({
-    slug: "verified",
-    endpoint: "https://verifiedatacado.com/api/v2",
-    apiKey: process.env.VERIFIED_API_KEY,
-    tableName: "verified_services_cache",
-  });
+  return syncProviderBySlug("verified");
+}
+
+export async function syncProvider4() {
+  return syncProviderBySlug("provider4");
 }

@@ -66,6 +66,7 @@ import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public
 import { Route as ApiPublicLgpdDeleteRouteImport } from './routes/api/public/lgpd-delete'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
 import { Route as ApiPublicStatusRouteImport } from './routes/api/public/status'
+import { Route as ApiPublicSyncProvider4RouteImport } from './routes/api/public/sync-provider4'
 import { Route as ApiPublicSyncServicesRouteImport } from './routes/api/public/sync-services'
 import { Route as ApiPublicSyncSmmpanelRouteImport } from './routes/api/public/sync-smmpanel'
 import { Route as ApiPublicSyncVerifiedRouteImport } from './routes/api/public/sync-verified'
@@ -402,6 +403,11 @@ const ApiPublicStatusRoute = ApiPublicStatusRouteImport.update({
   path: '/api/public/status',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicSyncProvider4Route = ApiPublicSyncProvider4RouteImport.update({
+  id: '/api/public/sync-provider4',
+  path: '/api/public/sync-provider4',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncServicesRoute = ApiPublicSyncServicesRouteImport.update({
   id: '/api/public/sync-services',
   path: '/api/public/sync-services',
@@ -678,6 +684,7 @@ export interface FileRoutesByFullPath {
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/status': typeof ApiPublicStatusRoute
+  '/api/public/sync-provider4': typeof ApiPublicSyncProvider4Route
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
@@ -775,6 +782,7 @@ export interface FileRoutesByTo {
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/status': typeof ApiPublicStatusRoute
+  '/api/public/sync-provider4': typeof ApiPublicSyncProvider4Route
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
@@ -873,6 +881,7 @@ export interface FileRoutesById {
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
   '/api/public/status': typeof ApiPublicStatusRoute
+  '/api/public/sync-provider4': typeof ApiPublicSyncProvider4Route
   '/api/public/sync-services': typeof ApiPublicSyncServicesRoute
   '/api/public/sync-smmpanel': typeof ApiPublicSyncSmmpanelRoute
   '/api/public/sync-verified': typeof ApiPublicSyncVerifiedRoute
@@ -972,6 +981,7 @@ export interface FileRouteTypes {
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
     | '/api/public/status'
+    | '/api/public/sync-provider4'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
@@ -1069,6 +1079,7 @@ export interface FileRouteTypes {
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
     | '/api/public/status'
+    | '/api/public/sync-provider4'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
@@ -1166,6 +1177,7 @@ export interface FileRouteTypes {
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
     | '/api/public/status'
+    | '/api/public/sync-provider4'
     | '/api/public/sync-services'
     | '/api/public/sync-smmpanel'
     | '/api/public/sync-verified'
@@ -1262,6 +1274,7 @@ export interface RootRouteChildren {
   ApiPublicLgpdDeleteRoute: typeof ApiPublicLgpdDeleteRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
   ApiPublicStatusRoute: typeof ApiPublicStatusRoute
+  ApiPublicSyncProvider4Route: typeof ApiPublicSyncProvider4Route
   ApiPublicSyncServicesRoute: typeof ApiPublicSyncServicesRoute
   ApiPublicSyncSmmpanelRoute: typeof ApiPublicSyncSmmpanelRoute
   ApiPublicSyncVerifiedRoute: typeof ApiPublicSyncVerifiedRoute
@@ -1703,6 +1716,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicStatusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/sync-provider4': {
+      id: '/api/public/sync-provider4'
+      path: '/api/public/sync-provider4'
+      fullPath: '/api/public/sync-provider4'
+      preLoaderRoute: typeof ApiPublicSyncProvider4RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync-services': {
       id: '/api/public/sync-services'
       path: '/api/public/sync-services'
@@ -2043,6 +2063,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicLgpdDeleteRoute: ApiPublicLgpdDeleteRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
   ApiPublicStatusRoute: ApiPublicStatusRoute,
+  ApiPublicSyncProvider4Route: ApiPublicSyncProvider4Route,
   ApiPublicSyncServicesRoute: ApiPublicSyncServicesRoute,
   ApiPublicSyncSmmpanelRoute: ApiPublicSyncSmmpanelRoute,
   ApiPublicSyncVerifiedRoute: ApiPublicSyncVerifiedRoute,
