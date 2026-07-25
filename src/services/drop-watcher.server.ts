@@ -90,6 +90,7 @@ export type DropWatcherSummary = {
   analisados: number;
   reposicoes_pedidas: number;
   sem_garantia: number;
+  br_sem_reposicao: string[];
   detalhes: Array<{ pedido: string; fornecedor: string; ok: boolean; detalhe: string }>;
 };
 
