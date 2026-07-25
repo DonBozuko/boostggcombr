@@ -3,6 +3,7 @@
 // "Aguardando pagamento..." infinite loop when handshakes are lost.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { dispatchByFornecedor, refundMercadoPago } from "./dispatcher-fallback.server";
+import type { RankedProvider } from "./smart-routing.server";
 
 const MP_PAYMENTS_ENDPOINT = "https://api.mercadopago.com/v1/payments";
 
