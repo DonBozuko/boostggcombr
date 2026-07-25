@@ -960,6 +960,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limit_hits: {
+        Row: {
+          bucket_key: string
+          created_at: string
+          id: number
+        }
+        Insert: {
+          bucket_key: string
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          bucket_key?: string
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       scheduled_posts: {
         Row: {
           approval_token: string | null
@@ -1426,6 +1444,14 @@ export type Database = {
       ops_forensics: { Args: never; Returns: Json }
       ops_http_health: { Args: { _hours?: number }; Returns: Json }
       ops_http_recent_failures: { Args: { _minutes?: number }; Returns: Json }
+      rate_limit_check: {
+        Args: { _key: string; _limit: number; _window_seconds: number }
+        Returns: {
+          allowed: boolean
+          hits: number
+          retry_after_seconds: number
+        }[]
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
