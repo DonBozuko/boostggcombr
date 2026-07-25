@@ -42,10 +42,19 @@ function fmtBRL(v: number): string {
 
 function tonePalette(id: string, fire?: boolean): { border: string; glow: string; chip: string; label: string } {
   if (fire) return { border: "#FFD60A", glow: "#FFD60Acc", chip: "#FFD60A", label: "RELÂMPAGO" };
-  // visualizações → roxo
   if (/^(v|tv|yv)\d/i.test(id)) return { border: "#A855F7", glow: "#A855F7cc", chip: "#A855F7", label: "VIEWS" };
-  // econômico (≤ 1k seguidores/curtidas) → azul
   return { border: "#38BDF8", glow: "#38BDF8aa", chip: "#38BDF8", label: "ECONÔMICO" };
+}
+
+// v245 — Selo de origem: transparência sobre nacionalidade do serviço.
+type Origin = "br" | "global" | "views";
+function detectOrigin(id: string): Origin {
+  if (/^(v|tv|yv)\d/i.test(id)) return "views";
+  if (/^(br-|wbr)/i.test(id)) return "br";
+  return "global";
+}
+function isSeguidoresBR(id: string): boolean {
+  return /^(br-tf|wbr)/i.test(id);
 }
 
 
@@ -117,14 +126,16 @@ export function PremiumPricingGrid({
       <div className={`grid ${gridCols} auto-rows-fr`}>
         {enriched.map((p) => {
           const tone = tonePalette(p.id, p.fire);
+          const origin = detectOrigin(p.id);
+          const recommendedBR = isSeguidoresBR(p.id);
           return (
             <div
               key={p.id}
-              className="relative rounded-xl p-3 pt-5 flex flex-col items-center text-center h-full min-h-[180px] justify-between backdrop-blur-md overflow-hidden"
+              className="relative rounded-xl p-3 pt-5 flex flex-col items-center text-center h-full min-h-[200px] justify-between backdrop-blur-md overflow-hidden"
               style={{
                 background: "rgba(12,12,14,0.62)",
-                border: `1.5px solid ${tone.border}`,
-                boxShadow: `0 0 10px ${tone.border}55, inset 0 0 18px ${tone.border}14`,
+                border: `1.5px solid ${recommendedBR ? "#16a34a" : tone.border}`,
+                boxShadow: `0 0 10px ${recommendedBR ? "#16a34a" : tone.border}55, inset 0 0 18px ${tone.border}14`,
               }}
             >
               <div
@@ -137,6 +148,12 @@ export function PremiumPricingGrid({
                 {p.fire ? `⚡ ${tone.label} ${countdown}` : tone.label}
               </div>
 
+              {recommendedBR && (
+                <div className="absolute -right-8 top-3 rotate-45 bg-emerald-500 text-black text-[9px] font-black tracking-wider px-8 py-0.5 shadow-md">
+                  RECOMENDADO
+                </div>
+              )}
+
               <div className="mt-4 flex items-baseline gap-1 justify-center">
                 <span className="text-xl md:text-2xl font-black text-white leading-none">{p.qty}</span>
                 {p.fire && <span className="text-sm leading-none">🔥</span>}
@@ -144,6 +161,24 @@ export function PremiumPricingGrid({
               {unit && (
                 <span className="text-[10px] uppercase tracking-[0.14em] text-zinc-400 leading-none">
                   {unit}
+                </span>
+              )}
+
+              {/* Selo de origem — transparência real p/ o cliente */}
+              {origin === "br" && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
+                  title="Perfis brasileiros reais com reposição garantida"
+                >
+                  🇧🇷 Brasileiro Real · c/ reposição
+                </span>
+              )}
+              {origin === "global" && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-500/50 bg-sky-500/10 text-sky-300"
+                  title="Perfis mundiais — padrão do mercado, melhor custo-benefício"
+                >
+                  🌎 Global · alto volume
                 </span>
               )}
 
@@ -158,6 +193,7 @@ export function PremiumPricingGrid({
               >
                 {p.price}
               </div>
+
 
               
 
