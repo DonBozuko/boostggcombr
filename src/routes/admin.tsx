@@ -855,12 +855,12 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       setPingBusy(false);
     }
   };
-  // v147 — Dry-Run em Cascata: varre os 3 fornecedores sequencialmente,
+  // v147 — Dry-Run em Cascata: varre todos os fornecedores sequencialmente,
   // valida integridade e aplicação server-side da Equação Fabiano.
   const handleCascadeDryRun = async () => {
     if (!token) return toast.error("Informe o token");
     setCascadeBusy(true);
-    const t = toast.loading("🔁 Dry-Run em Cascata · varrendo 3 fornecedores...");
+    const t = toast.loading("🔁 Dry-Run em Cascata · varrendo fornecedores...");
     try {
       const r = await pingAll({ data: { token } });
       if ((r as any).ok) {
@@ -1490,7 +1490,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                 <div className="font-bold text-emerald-300 mb-1">👉 Só precisa olhar 2 coisas por dia:</div>
                 <ol className="list-decimal list-inside space-y-0.5 text-white/85">
                   <li><b>🛒 Carrinhos &amp; Pedidos</b> → se tem Pix abandonado, mandar WhatsApp em 1 clique (Central de Recuperação de Pix).</li>
-                  <li><b>📊 Tesouraria</b> → conferir saldo dos 3 fornecedores no verde.</li>
+                  <li><b>📊 Tesouraria</b> → conferir saldo dos fornecedores no verde.</li>
                 </ol>
                 <div className="mt-1.5 text-white/60">
                   A aba <b>Diagnóstico</b> é <b>só pra abrir quando chegar alerta no Telegram</b>. Ignorar as luzinhas se o Telegram estiver quieto — é normal ter algumas amarelas.
