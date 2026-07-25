@@ -647,7 +647,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
 
     const [viewsRes, pedidosRes] = await Promise.all([
       supabaseAdmin.from("page_views")
-        .select("created_at, path, utm_source")
+        .select("created_at, path, utm_source, referrer")
         .gte("created_at", since)
         .limit(50000),
       supabaseAdmin.from("pedidos")
