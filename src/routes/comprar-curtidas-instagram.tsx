@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
 const TITLE = "Comprar Curtidas Instagram via Pix — Elite Boost Prime | BoostGG";
 const DESC =
-  "Curtidas no Instagram a partir de R$ 5,00 (50 curtidas), entrega em 1 a 5 minutos após o Pix. Sem senha, com reposição garantida por 30 dias. Cole o link do post.";
+  "Curtidas no Instagram a partir de R$ 5,00 (50 curtidas), entrega em 1 a 5 minutos após o Pix. Sem senha, com reposição de 30 dias nos pacotes brasileiros. Cole o link do post.";
 
 
 
@@ -68,7 +68,7 @@ function Page() {
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Primeiras curtidas em 1-5 min após Pix aprovado." },
         { icon: "shield", title: "100% seguro", text: "Não pedimos senha. Só o link do post ou Reel público." },
-        { icon: "check", title: "Reposição garantida", text: "Qualquer queda dentro de 30 dias nós recolocamos." },
+        { icon: "check", title: "Reposição 30 dias (BR)", text: "Pacotes 🇧🇷 Brasileiro Real têm reposição garantida; nos Global pedimos ao fornecedor." },
         { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela de preços — curtidas Instagram"

@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "BoostGG" },
-      { name: "description", content: "Comprar seguidores Instagram, TikTok e YouTube reais e brasileiros com entrega rápida via Pix. Reposição garantida e 100% seguro." },
+      { name: "description", content: "Comprar seguidores Instagram, TikTok e YouTube reais e brasileiros com entrega rápida via Pix. Reposição nos pacotes brasileiros e 100% seguro." },
       { name: "robots", content: "index, follow" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "BoostGG" },

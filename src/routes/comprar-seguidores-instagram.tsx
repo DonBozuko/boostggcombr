@@ -66,7 +66,7 @@ function Page() {
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Primeiros seguidores em 1-5 min após Pix aprovado." },
         { icon: "shield", title: "100% seguro", text: "Não pedimos sua senha. Só precisamos do @ público." },
-        { icon: "check", title: "Reposição garantida", text: "Qualquer queda dentro de 30 dias nós recolocamos." },
+        { icon: "check", title: "Reposição 30 dias (BR)", text: "Pacotes 🇧🇷 Brasileiro Real têm reposição garantida; nos Global pedimos ao fornecedor." },
         { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela de preços — seguidores Instagram"
