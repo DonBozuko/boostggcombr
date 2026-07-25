@@ -341,6 +341,8 @@ export const criarPedido = createServerFn({ method: "POST" })
           const qr64 = mpPrev?.point_of_interaction?.transaction_data?.qr_code_base64;
           if (qr && qr64 && mpPrev?.status === "pending") {
             console.log("[criarPedido] v218 dedup HIT — reaproveitando Pix", existing.id);
+            const { logGuard } = await import("@/lib/guard-events.server");
+            void logGuard("CHECKOUT_DEDUPE", { pedidoId: existing.id, pacote: existing.pacote });
             return {
               ok: true as const,
               pedidoId: existing.id,
