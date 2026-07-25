@@ -149,7 +149,7 @@ export async function runDropWatcher(): Promise<DropWatcherSummary> {
           summary.br_sem_reposicao.push(pacote);
           await supabaseAdmin.from("alerts").insert({
             tipo: "refill_br_recusado",
-            severidade: "critical",
+            nivel: "critical",
             mensagem:
               `Pacote brasileiro sem reposição: ${pacote}\n` +
               `PROBLEMA: a página promete reposição de 30 dias, mas o fornecedor ${slug} recusou (${r.detail}).\n` +
