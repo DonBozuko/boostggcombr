@@ -42,10 +42,19 @@ function fmtBRL(v: number): string {
 
 function tonePalette(id: string, fire?: boolean): { border: string; glow: string; chip: string; label: string } {
   if (fire) return { border: "#FFD60A", glow: "#FFD60Acc", chip: "#FFD60A", label: "RELÂMPAGO" };
-  // visualizações → roxo
   if (/^(v|tv|yv)\d/i.test(id)) return { border: "#A855F7", glow: "#A855F7cc", chip: "#A855F7", label: "VIEWS" };
-  // econômico (≤ 1k seguidores/curtidas) → azul
   return { border: "#38BDF8", glow: "#38BDF8aa", chip: "#38BDF8", label: "ECONÔMICO" };
+}
+
+// v245 — Selo de origem: transparência sobre nacionalidade do serviço.
+type Origin = "br" | "global" | "views";
+function detectOrigin(id: string): Origin {
+  if (/^(v|tv|yv)\d/i.test(id)) return "views";
+  if (/^(br-|wbr)/i.test(id)) return "br";
+  return "global";
+}
+function isSeguidoresBR(id: string): boolean {
+  return /^(br-tf|wbr)/i.test(id);
 }
 
 
