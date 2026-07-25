@@ -91,3 +91,16 @@ describe("ordem de despacho", () => {
     expect(sort(list, false, {})[0]).toBe("smmpainel");
   });
 });
+
+// FLUXO 3 — v246: moeda nativa do fornecedor no cálculo de custo.
+describe("moeda nativa do fornecedor", () => {
+  it("painéis BR não multiplicam pela cotação USD", async () => {
+    const { effectiveFx, isBrlNativeProvider } = await import("@/lib/critical-guards");
+    expect(isBrlNativeProvider("smmpainel")).toBe(true);
+    expect(isBrlNativeProvider("verified")).toBe(true);
+    expect(isBrlNativeProvider("provider4")).toBe(true);
+    expect(isBrlNativeProvider("smmhype")).toBe(false);
+    expect(effectiveFx("verified", 5.0781)).toBe(1);
+    expect(effectiveFx("smmhype", 5.0781)).toBe(5.0781);
+  });
+});
