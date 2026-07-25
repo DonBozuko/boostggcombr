@@ -25,7 +25,7 @@ export const Route = createFileRoute("/kit-creator")({
       { name: "description", content: KIT_DESC },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Kit Creator — 1.000 Seguidores Instagram" },
-      { property: "og:description", content: "Cresce de verdade com 1k seguidores no Pix. Reposição garantida." },
+      { property: "og:description", content: "Cresce de verdade com 1k seguidores no Pix. Reposição 30 dias nos pacotes brasileiros." },
       { property: "og:type", content: "product" },
       { property: "og:url", content: KIT_URL },
       { name: "twitter:card", content: "summary_large_image" },
