@@ -9,8 +9,11 @@ type Post = {
   description: string;
   subtitle: string;
   datePublished: string;
+  dateModified?: string;
+  faq?: { q: string; a: string }[];
   body: React.ReactNode;
 };
+
 
 const POSTS: Record<string, Post> = {
   "como-ganhar-seguidores-instagram": {
