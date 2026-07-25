@@ -160,20 +160,26 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
 
 
-  // 4) Dispatch failover A→B→C (somente fornecedores ativos com saldo > 0)
-  const { data: fornecedores } = await supabaseAdmin
-    .from("fornecedores")
-    .select("slug, nome, ativo, saldo_atual")
-    .eq("ativo", true)
-    .gt("saldo_atual", 0)
-    .order("prioridade", { ascending: true });
-
-  const cadeia = fornecedores ?? [];
+  // 4) Dispatch failover: usa a cadeia ranqueada pelo smart-routing (v245).
+  // Isso garante que a trava BR e a escolha por garantia/refill sejam respeitadas.
+  const cadeia = (rankedContingency ?? []).map((p) => ({
+    slug: p.slug,
+    nome: p.nome,
+    ativo: true,
+    saldo_atual: p.saldo_atual,
+  }));
   if (!cadeia.length) {
     await supabaseAdmin
       .from("pedidos")
-      .update({ status: "SMM_FAILED", error_detail: "Contingência: nenhum fornecedor com saldo." })
+      .update({ status: "SMM_FAILED", error_detail: "Contingência: nenhum fornecedor válido p/ este pacote (trava BR ou sem saldo)." })
       .eq("id", pedido.id);
+    // v245 — alerta admin imediato quando trava BR bloqueia venda
+    try {
+      const { dispatchTelegramAlert } = await import("@/lib/messaging");
+      await dispatchTelegramAlert(
+        `🚨 <b>VENDA BLOQUEADA — TRAVA BR</b>\n\nPROBLEMA: pacote ${pedido.pacote} não tem fornecedor BR com refill válido.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nO QUE FAZER: cadastrar serviço BR com refill no catálogo ou suspender este pacote.`,
+      );
+    } catch { /* */ }
     return { ok: true, status: "SMM_FAILED", recovered: false };
   }
 
