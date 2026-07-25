@@ -14,7 +14,7 @@ const FAQ = [
   { q: "É seguro?", a: "Sim, sem senha e sem risco à conta." },
   { q: "Vídeo antigo funciona?", a: "Funciona, mas o efeito no algoritmo é maior nas primeiras 24-48h de postagem." },
   { q: "Pagamento?", a: "Somente Pix, 24/7." },
-  { q: "Garantia?", a: "Sim, reposição por 30 dias." },
+  { q: "Garantia?", a: "Sim, nos pacotes 🇧🇷 Brasileiro Real a reposição é garantida por 30 dias. Nos pacotes 🌎 Global pedimos reposição ao fornecedor automaticamente." },
 ];
 
 export const Route = createFileRoute("/views-tiktok")({
@@ -42,13 +42,13 @@ function Page() {
       accent="#25F4EE"
       h1="Views TikTok — Amplifique Seu Alcance"
       subtitle="Boost profissional de visualizações para acelerar o For You"
-      intro="Ampliamos as views do seu vídeo para acelerar a distribuição pelo algoritmo. Entrega em minutos, sem senha, com garantia de 30 dias."
+      intro="Ampliamos as views do seu vídeo para acelerar a distribuição pelo algoritmo. Entrega em minutos, sem senha, com garantia de 30 dias nos pacotes brasileiros."
       ctaHref="/tiktok"
       ctaLabel="Amplificar views"
       benefits={[
         { icon: "zap", title: "Rápido", text: "Views começam em 1-3 min." },
         { icon: "shield", title: "Sem senha", text: "Só o link do vídeo." },
-        { icon: "check", title: "Garantia", text: "Reposição por 30 dias." },
+        { icon: "check", title: "Garantia", text: "Reposição de 30 dias nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente." },
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos de views — TikTok"
@@ -60,7 +60,7 @@ function Page() {
       ]}
       bodySections={[
         { h2: "Por que boost de views acelera o For You", body: "O algoritmo do TikTok testa vídeos novos em pequenos grupos. Se performar, distribui pra mais. Boost inicial de views manda sinal forte nas primeiras horas — a janela em que vídeo decide se vira viral ou morre." },
-        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o link do vídeo.\n3. Pague o Pix.\n4. Views em 1-3 min.\n5. Garantia 30 dias." },
+        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o link do vídeo.\n3. Pague o Pix.\n4. Views em 1-3 min.\n5. Garantia de 30 dias nos pacotes brasileiros." },
       ]}
       faq={FAQ}
     />

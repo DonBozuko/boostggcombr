@@ -62,7 +62,7 @@ function Page() {
     <SeoLanding
       accent="#39ff14"
       h1="Comprar Seguidores no Pix — Aprovação na Hora"
-      subtitle="Pix, entrega automática e reposição garantida"
+      subtitle="Pix, entrega automática e reposição nos pacotes brasileiros"
       intro="Você escolhe o pacote, paga no Pix e a entrega começa sozinha assim que o pagamento é confirmado. Sem cadastro, sem cartão, sem falar com ninguém."
       ctaHref="/"
       ctaLabel="Gerar meu Pix agora"

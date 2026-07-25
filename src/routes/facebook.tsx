@@ -45,7 +45,7 @@ export const Route = createFileRoute("/facebook")({
   head: () => {
     const title = "Impulsionar Facebook — Curtidas e Seguidores — Elite Boost Prime | BoostGG";
     const description =
-      "Impulsione seu Facebook com curtidas, seguidores e views via Pix. Engajamento orgânico, entrega rápida e reposição garantida.";
+      "Impulsione seu Facebook com curtidas, seguidores e views via Pix. Engajamento orgânico, entrega rápida e reposição nos pacotes brasileiros.";
     const url = "https://boostgg.com.br/facebook";
     const ogImage = `https://boostgg.com.br${ogFacebook}?v=48`;
     return {

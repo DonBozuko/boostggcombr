@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: "Se cair curtida, tem reposição?",
-    a: "Sim. Garantia de reposição por 30 dias. Se houver queda, abra um ticket e recompomos sem custo adicional.",
+    a: "Sim. Garantia de reposição de 30 dias nos pacotes brasileiros. Se houver queda, abra um ticket e recompomos sem custo adicional.",
   },
   {
     q: "Posso dividir as curtidas entre vários posts?",

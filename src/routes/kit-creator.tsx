@@ -16,7 +16,7 @@ import { buildProductJsonLd } from "@/lib/seo-jsonld";
 
 const KIT_URL = "https://boostgg.com.br/kit-creator";
 const KIT_DESC =
-  "Pacote Creator: 1.000 seguidores no Instagram via Pix. Entrega em minutos, reposição 30 dias, sem senha. Cupom PRIME15 aplicado.";
+  "Pacote Creator: 1.000 seguidores no Instagram via Pix. Entrega em minutos, reposição 30 dias (pacotes BR), sem senha. Cupom PRIME15 aplicado.";
 
 export const Route = createFileRoute("/kit-creator")({
   head: () => ({
@@ -178,7 +178,7 @@ function KitCreatorPage() {
             Instagram
           </span>
           <span className="block text-white/80 text-2xl sm:text-3xl mt-2">
-            Pix rápido · reposição 30 dias
+            Pix rápido · reposição 30 dias (pacotes BR)
           </span>
         </motion.h1>
 
@@ -205,7 +205,7 @@ function KitCreatorPage() {
           {[
             { icon: Zap, txt: "Entrega em minutos após confirmação Pix" },
             { icon: ShieldCheck, txt: "Perfil público · sem senha · 100% seguro" },
-            { icon: Check, txt: "Reposição grátis por 30 dias" },
+            { icon: Check, txt: "Reposição grátis 30 dias (pacotes BR)" },
             { icon: Crown, txt: "Suporte prioritário no WhatsApp" },
           ].map(({ icon: Icon, txt }, i) => (
             <motion.li

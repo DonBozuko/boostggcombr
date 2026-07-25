@@ -323,7 +323,7 @@ const allPlans: Plan[] = [...plans, ...likesPlans, ...viewsPlans];
 const trustBadges = [
   { icon: Zap, title: "Entrega Automática e Segura", desc: "Processamento automático em minutos após a aprovação do Pix." },
   { icon: ShieldCheck, title: "Sem Necessidade de Senha", desc: "Trabalhamos apenas com o @ público. Sua conta nunca é acessada." },
-  { icon: RefreshCw, title: "Reposição 30 dias nos pacotes BR", desc: "Pacotes 🇧🇷 Brasileiro Real têm reposição garantida. Nos Global, pedimos reposição ao fornecedor automaticamente." },
+  { icon: RefreshCw, title: "Reposição 30 dias nos pacotes BR", desc: "Pacotes 🇧🇷 Brasileiro Real têm reposição nos pacotes brasileiros. Nos Global, pedimos reposição ao fornecedor automaticamente." },
 ];
 
 const testimonials = [

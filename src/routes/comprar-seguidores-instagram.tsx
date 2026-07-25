@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://boostgg.com.br/comprar-seguidores-instagram";
 const TITLE = "Comprar Seguidores Instagram — Elite Boost Prime | BoostGG";
 const DESC =
-  "Compre seguidores para Instagram com entrega em minutos, pagamento via Pix e reposição garantida. Perfis brasileiros, sem senha, 100% seguro.";
+  "Compre seguidores para Instagram com entrega em minutos, pagamento via Pix e reposição nos pacotes brasileiros. Perfis brasileiros, sem senha, 100% seguro.";
 
 const FAQ = [
   {
@@ -23,7 +23,7 @@ const FAQ = [
   },
   {
     q: "Se cair seguidor, tem reposição?",
-    a: "Sim. Todos os pacotes acompanham garantia de reposição por 30 dias. Se cair, você abre um ticket e nós recompomos sem custo.",
+    a: "Nos pacotes 🇧🇷 Brasileiro Real, sim: reposição garantida por 30 dias sem custo. Nos pacotes 🌎 Global a reposição é solicitada ao fornecedor automaticamente; se o serviço não tiver garantia, avaliamos reenvio ou estorno no WhatsApp.",
   },
   {
     q: "Preciso deixar o perfil público?",
@@ -60,7 +60,7 @@ function Page() {
       accent="#e1306c"
       h1="Comprar Seguidores Instagram — Reais, Baratos e com Pix"
       subtitle="Seguidores Instagram entregues em minutos"
-      intro="Aumente sua audiência no Instagram sem enrolação: pague com Pix, receba em minutos e conte com reposição por 30 dias. Sem senha, sem risco, sem cadastro."
+      intro="Aumente sua audiência no Instagram sem enrolação: pague com Pix, receba em minutos e conte com reposição de 30 dias nos pacotes brasileiros. Sem senha, sem risco, sem cadastro."
       ctaHref="/"
       ctaLabel="Comprar seguidores agora"
       benefits={[

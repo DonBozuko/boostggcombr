@@ -10,14 +10,14 @@ const faq = [
   { q: "Seguidores do Kwai são brasileiros?", a: "Sim. Nosso plano padrão entrega perfis brasileiros pra prova social real — importante pra quem monetiza no Kwai Rewards e depende de audiência BR." },
   { q: "Preciso da senha da minha conta Kwai?", a: "Não. Trabalhamos só com dados públicos (@ ou link). Nunca peça senha para nenhum fornecedor de crescimento — é golpe." },
   { q: "Em quanto tempo entrega?", a: "Início em 5-30 minutos após o Pix confirmado. Pacotes pequenos concluem no mesmo dia; acima de 10 mil, distribuímos em 2-5 dias." },
-  { q: "E se cair seguidor?", a: "Reposição garantida por 30 dias em qualquer queda acima de 5%. Basta abrir chamado no WhatsApp com o link do perfil." },
+  { q: "E se cair seguidor?", a: "Nos pacotes 🇧🇷 Brasileiro Real, reposição garantida por 30 dias em queda acima de 5%. Nos pacotes Global, pedimos reposição ao fornecedor e, sem garantia, avaliamos reenvio ou estorno. Basta abrir chamado no WhatsApp com o link do perfil." },
 ];
 
 export const Route = createFileRoute("/comprar-seguidores-kwai")({
   head: () => {
     const title = "Comprar Seguidores no Kwai (BR) via Pix — Elite Boost Prime | BoostGG";
     const description =
-      "Compre seguidores brasileiros no Kwai via Pix. Entrega em minutos, sem senha e com reposição por 30 dias. A partir de R$ 5.";
+      "Compre seguidores brasileiros no Kwai via Pix. Entrega em minutos, sem senha e com reposição de 30 dias nos pacotes brasileiros. A partir de R$ 5.";
     return {
       meta: [
         { title },
@@ -41,14 +41,14 @@ export const Route = createFileRoute("/comprar-seguidores-kwai")({
     <SeoLanding
       accent="#ff6600"
       h1="Comprar Seguidores no Kwai via Pix"
-      subtitle="Entrega automática · perfis brasileiros · reposição por 30 dias"
+      subtitle="Entrega automática · perfis brasileiros · reposição de 30 dias nos pacotes brasileiros"
       ctaHref="/kwai"
       ctaLabel="Ver planos e comprar agora"
       intro="Quer crescer no Kwai sem ficar refém do algoritmo? Nossa entrega de seguidores brasileiros dá o empurrão inicial de prova social pra vídeos ganharem tração — em minutos, com Pix e sem pedir sua senha. Mais de 3 mil pedidos entregues no Instagram, TikTok e YouTube; agora também no Kwai."
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Início em 5-30 min após o Pix confirmado." },
         { icon: "shield", title: "Sem senha", text: "Só o @ ou link do perfil. 100% seguro." },
-        { icon: "check", title: "Reposição 30 dias", text: "Caiu, repomos. Sem letras miúdas." },
+        { icon: "check", title: "Reposição 30 dias", text: "Garantia nos pacotes brasileiros; nos Global pedimos ao fornecedor." },
         { icon: "clock", title: "Perfis brasileiros", text: "Audiência BR pra Kwai Rewards contar." },
       ]}
       pricingTitle="Preços (a partir de)"
