@@ -160,6 +160,13 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
 
 
+  // v174/v245 — obter cost_brl real por fornecedor e garantir que a trava BR respeitada
+  const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
+  const rankedContingency = await rankProvidersByCost({
+    pacote: pedido.pacote,
+    quantidade: Number(pedido.quantidade),
+  }).catch(() => [] as RankedProvider[]);
+
   // 4) Dispatch failover: usa a cadeia ranqueada pelo smart-routing (v245).
   // Isso garante que a trava BR e a escolha por garantia/refill sejam respeitadas.
   const cadeia = (rankedContingency ?? []).map((p) => ({
@@ -188,12 +195,6 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   let fornecedorOk: string | null = null;
   let orderIdOk: string | number | null = null;
 
-  // v174 — obter cost_brl real por fornecedor para gravar custo_real + ledger
-  const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
-  const rankedContingency = await rankProvidersByCost({
-    pacote: pedido.pacote,
-    quantidade: Number(pedido.quantidade),
-  }).catch(() => [] as Array<{ slug: string; cost_brl: number | null }>);
   const costMap = new Map<string, number | null>(
     rankedContingency.map((p) => [p.slug, p.cost_brl]),
   );
