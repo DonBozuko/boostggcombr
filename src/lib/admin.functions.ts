@@ -659,6 +659,39 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
     if (viewsRes.error) return { ok: false as const, error: viewsRes.error.message };
     if (pedidosRes.error) return { ok: false as const, error: pedidosRes.error.message };
 
+    // v249 — Origem de tráfego real:
+    // 1) descarta tráfego interno (editor Lovable, preview, navegação no próprio site)
+    // 2) classifica a origem pelo referrer quando não há utm_source
+    const hostOf = (ref: string | null | undefined): string => {
+      if (!ref) return "";
+      try { return new URL(ref).hostname.replace(/^www\./, "").toLowerCase(); } catch { return ""; }
+    };
+    const INTERNAL = /(^|\.)(lovable\.dev|lovableproject\.com|lovable\.app|boostgg\.com\.br)$/;
+    const AI_HOSTS: Record<string, string> = {
+      "chatgpt.com": "ChatGPT (IA)",
+      "chat.openai.com": "ChatGPT (IA)",
+      "perplexity.ai": "Perplexity (IA)",
+      "gemini.google.com": "Gemini (IA)",
+      "copilot.microsoft.com": "Copilot (IA)",
+      "claude.ai": "Claude (IA)",
+      "you.com": "You.com (IA)",
+    };
+    const SEARCH = /^(google\.|bing\.|duckduckgo\.|yahoo\.|ecosia\.)|^(google|bing|duckduckgo)\./;
+    const classify = (utm: string | null | undefined, ref: string | null | undefined): string => {
+      const u = (utm ?? "").trim().toLowerCase();
+      const h = hostOf(ref);
+      if (AI_HOSTS[h]) return AI_HOSTS[h];
+      if (AI_HOSTS[u]) return AI_HOSTS[u];
+      if (u) return u;
+      if (!h) return "direto";
+      if (SEARCH.test(h) || h.startsWith("google.") || h.startsWith("bing.")) return `busca: ${h}`;
+      return h;
+    };
+    const views = (viewsRes.data ?? []).filter((v) => {
+      const h = hostOf((v as { referrer?: string | null }).referrer);
+      return !(h && INTERNAL.test(h));
+    });
+
     type Row = { day: string; visits: number; pix_criados: number; pix_pagos: number; faturamento: number };
     const map = new Map<string, Row>();
     const dayOf = (iso: string) => iso.slice(0, 10);
@@ -668,9 +701,10 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
       return r;
     };
 
-    for (const v of viewsRes.data ?? []) {
+    for (const v of views) {
       ensure(dayOf(v.created_at as string)).visits++;
     }
+
 
     const paidStatuses = new Set(["approved", "paid", "provisioning", "provisioned", "processing", "completed", "concluido", "concluído"]);
     for (const p of pedidosRes.data ?? []) {
