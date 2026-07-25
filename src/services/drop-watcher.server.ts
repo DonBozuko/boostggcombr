@@ -109,7 +109,7 @@ export async function runDropWatcher(): Promise<DropWatcherSummary> {
     .lte("created_at", ate)
     .limit(40);
 
-  const summary: DropWatcherSummary = { analisados: 0, reposicoes_pedidas: 0, sem_garantia: 0, detalhes: [] };
+  const summary: DropWatcherSummary = { analisados: 0, reposicoes_pedidas: 0, sem_garantia: 0, br_sem_reposicao: [], detalhes: [] };
   const cfgs = await loadProviderConfigs();
 
   for (const p of ((pedidos as any[]) ?? [])) {
