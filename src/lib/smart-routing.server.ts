@@ -150,10 +150,18 @@ export async function rankProvidersByCost(opts: {
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
       refillMap[slug] = (svcRow as any).refill === true;
-      if (!providerCanServe({ brPackage, svc: svcRow as any })) {
+      // v245 — trava dura de refill em BR: sem reposição garantida, não entra.
+      if (!providerCanServe({ brPackage, svc: svcRow as any, requireRefill: brPackage })) {
         providerIdMap[slug] = null;
-        console.warn(`[v241] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não é BR válido`);
+        const reason = brPackage && (svcRow as any).refill !== true ? "sem refill garantido" : "não é BR válido";
+        console.warn(`[v245] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} ${reason}`);
       }
+    }
+    // v245 — se todos os fornecedores BR foram descartados, não vendemos.
+    // O caller deve colocar em contingência e alertar admin.
+    if (brPackage && Object.values(providerIdMap).every((v) => !v)) {
+      console.error(`[v245] ${opts.pacote}: nenhum fornecedor BR com refill válido. Venda bloqueada.`);
+      return [];
     }
   } catch { /* noop — nunca derrubar o dispatch por causa da trava */ }
 
