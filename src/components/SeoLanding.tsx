@@ -256,6 +256,33 @@ export function SeoLanding(p: SeoLandingProps) {
 
         <RelatedLinks accent={p.accent} />
 
+        {/* Guias do blog — link interno real pro cluster informativo */}
+        <section className="mt-10">
+          <h2 className="text-lg font-black text-white mb-1">Guias para decidir antes de comprar</h2>
+          <p className="text-zinc-400 text-xs mb-4">
+            Conteúdo direto, sem enrolação — escrito por quem entrega os pedidos todos os dias.
+          </p>
+          <div className="grid gap-2">
+            {[
+              { href: "/blog/como-ganhar-seguidores-instagram", t: "Como ganhar seguidores no Instagram em 2026", d: "O método na ordem certa e quanto tempo leva de verdade." },
+              { href: "/blog/e-seguro-comprar-seguidores", t: "É seguro comprar seguidores?", d: "O que o Instagram realmente detecta — e o que não detecta." },
+              { href: "/blog/melhor-site-comprar-seguidores", t: "Melhor site para comprar seguidores", d: "5 critérios objetivos para não perder dinheiro." },
+              { href: "/blog/como-tirar-instagram-privado", t: "Como tirar o Instagram do privado", d: "Passo a passo iOS e Android — obrigatório para receber entrega." },
+            ].map((g) => (
+              <a
+                key={g.href}
+                href={g.href}
+                className="rounded-xl p-3 block hover:scale-[1.01] transition-transform"
+                style={{ background: "#111", border: `1px solid ${p.accent}33` }}
+              >
+                <div className="font-bold text-white text-sm">{g.t}</div>
+                <div className="text-zinc-400 text-xs mt-0.5">{g.d}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+
+
 
 
 
