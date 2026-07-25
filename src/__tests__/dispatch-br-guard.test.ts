@@ -43,6 +43,16 @@ describe("trava BR no despacho", () => {
   it("pacote global aceita serviço internacional", () => {
     expect(providerCanServe({ brPackage: false, svc: { name: "Global Followers" } })).toBe(true);
   });
+
+  it("v245 — pacote BR exige refill quando requireRefill=true", () => {
+    const brSvc = { name: "Instagram Seguidores Brasileiros 🇧🇷", refill: false };
+    expect(providerCanServe({ brPackage: true, svc: brSvc, requireRefill: true })).toBe(false);
+    expect(providerCanServe({ brPackage: true, svc: { ...brSvc, refill: true }, requireRefill: true })).toBe(true);
+  });
+
+  it("v245 — trava dura não afeta pacotes globais", () => {
+    expect(providerCanServe({ brPackage: false, svc: { name: "Global Followers", refill: false }, requireRefill: true })).toBe(true);
+  });
 });
 
 // FLUXO 2 — Ordem de despacho: garantia antes de preço em pacote BR.
