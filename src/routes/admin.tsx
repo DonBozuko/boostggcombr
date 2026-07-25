@@ -855,12 +855,12 @@ function AdminPage({ initialToken }: { initialToken: string }) {
       setPingBusy(false);
     }
   };
-  // v147 — Dry-Run em Cascata: varre os 3 fornecedores sequencialmente,
+  // v147 — Dry-Run em Cascata: varre todos os fornecedores sequencialmente,
   // valida integridade e aplicação server-side da Equação Fabiano.
   const handleCascadeDryRun = async () => {
     if (!token) return toast.error("Informe o token");
     setCascadeBusy(true);
-    const t = toast.loading("🔁 Dry-Run em Cascata · varrendo 3 fornecedores...");
+    const t = toast.loading("🔁 Dry-Run em Cascata · varrendo fornecedores...");
     try {
       const r = await pingAll({ data: { token } });
       if ((r as any).ok) {
