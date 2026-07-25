@@ -23,6 +23,16 @@ export const Route = createFileRoute("/api/public/checkout-attempt")({
     handlers: {
       POST: async ({ request }) => {
         try {
+          // v252 — rate limit: 20 tentativas / 5 min por IP.
+          const { checkRateLimit, clientIpFrom } = await import("@/lib/rate-limit.server");
+          const ip = clientIpFrom(request.headers);
+          const rl = await checkRateLimit("checkout-attempt", ip, 20, 300);
+          if (!rl.allowed) {
+            return new Response("Too Many Requests", {
+              status: 429,
+              headers: { "retry-after": String(rl.retryAfterSeconds) },
+            });
+          }
           const raw = await request.json().catch(() => null);
           const parsed = schema.safeParse(raw);
           if (!parsed.success) {
