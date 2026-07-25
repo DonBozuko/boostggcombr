@@ -425,6 +425,11 @@ export const criarPedido = createServerFn({ method: "POST" })
           valor: valorCobrar,
           status: "pending",
           mercado_pago_id: mpId,
+          // v248: e-mail do pagador gravado JÁ no insert. Antes só era salvo pelo
+          // webhook do MP (ou seja, só quem pagava). Pix abandonado ficava sem contato
+          // e a recuperação por e-mail nunca disparava — dinheiro perdido em silêncio.
+          email_contato: data.email.trim().toLowerCase(),
+
           rede_social: rede,
           utm_source: utmClean(data.utm_source),
           utm_medium: utmClean(data.utm_medium),
