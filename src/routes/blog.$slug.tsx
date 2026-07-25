@@ -646,6 +646,7 @@ export const Route = createFileRoute("/blog/$slug")({
             headline: post.title,
             description: post.description,
             datePublished: post.datePublished,
+            dateModified: post.dateModified ?? post.datePublished,
             author: { "@type": "Organization", name: "BoostGG" },
             publisher: { "@type": "Organization", name: "BoostGG" },
             mainEntityOfPage: url,
@@ -663,7 +664,24 @@ export const Route = createFileRoute("/blog/$slug")({
             ],
           }),
         },
+        ...(post.faq?.length
+          ? [
+              {
+                type: "application/ld+json",
+                children: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  mainEntity: post.faq.map((f) => ({
+                    "@type": "Question",
+                    name: f.q,
+                    acceptedAnswer: { "@type": "Answer", text: f.a },
+                  })),
+                }),
+              },
+            ]
+          : []),
       ],
+
     };
   },
   component: BlogPost,
