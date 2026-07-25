@@ -109,11 +109,12 @@ export async function runDropWatcher(): Promise<DropWatcherSummary> {
     .limit(40);
 
   const summary: DropWatcherSummary = { analisados: 0, reposicoes_pedidas: 0, sem_garantia: 0, detalhes: [] };
+  const cfgs = await loadProviderConfigs();
 
   for (const p of ((pedidos as any[]) ?? [])) {
     summary.analisados++;
     const slug = String(p.provider_slug ?? "");
-    const r = await requestRefill(slug, String(p.provider_order_id));
+    const r = await requestRefill(cfgs, slug, String(p.provider_order_id));
     if (r.ok) summary.reposicoes_pedidas++; else summary.sem_garantia++;
     summary.detalhes.push({ pedido: String(p.id), fornecedor: slug, ok: r.ok, detalhe: r.detail });
 
