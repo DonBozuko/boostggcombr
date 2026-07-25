@@ -48,6 +48,39 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     const pagos = (pedidos24 ?? []).filter((p: any) => ["paid","pago","completed","processing"].includes(p.status)).length;
     const pendentes = (pedidos24 ?? []).filter((p: any) => ["pending","pendente"].includes(p.status)).length;
 
+    // v251 — Confiabilidade real por fornecedor (7 dias): entregues vs falhas
+    // de despacho + estado do circuit breaker. Dado vem do banco, sem estimativa.
+    const since7d = new Date(Date.now() - 7 * 86400_000).toISOString();
+    const [{ data: pedidos7d }, { data: healthRows }] = await Promise.all([
+      supabaseAdmin.from("pedidos").select("provider_slug, status").gte("created_at", since7d),
+      supabaseAdmin.from("provider_health").select("slug, failure_count, unstable_until, last_error"),
+    ]);
+    const relMap = new Map<string, { entregues: number; falhas: number }>();
+    for (const p of (pedidos7d ?? []) as any[]) {
+      const slug = p.provider_slug;
+      if (!slug) continue;
+      const cur = relMap.get(slug) ?? { entregues: 0, falhas: 0 };
+      if (["completed", "Enviado", "processing"].includes(p.status)) cur.entregues += 1;
+      else if (["SMM_FAILED", "refunded", "MARGIN_HOLD"].includes(p.status)) cur.falhas += 1;
+      relMap.set(slug, cur);
+    }
+    for (const h of (healthRows ?? []) as any[]) {
+      if (!relMap.has(h.slug)) relMap.set(h.slug, { entregues: 0, falhas: 0 });
+    }
+    const confiabilidade = Array.from(relMap.entries()).map(([slug, v]) => {
+      const h = ((healthRows ?? []) as any[]).find((x) => x.slug === slug);
+      const tot = v.entregues + v.falhas;
+      return {
+        slug,
+        entregues: v.entregues,
+        falhas: v.falhas,
+        taxaSucesso: tot > 0 ? Number(((v.entregues / tot) * 100).toFixed(1)) : null,
+        breakerAberto: !!(h?.unstable_until && new Date(h.unstable_until).getTime() > Date.now()),
+        ultimoErro: h?.last_error ?? null,
+      };
+    }).sort((a, b) => (b.entregues + b.falhas) - (a.entregues + a.falhas));
+
+
     // v191 — Health probe: qualquer resposta HTTP < 500 conta como "API viva"
     // (raiz de smmhype.com / api.mercadopago.com devolve 404/405 e não é falha).
     // Falha real = timeout, DNS, 5xx, ou latência > 3s.
