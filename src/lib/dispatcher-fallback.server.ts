@@ -172,17 +172,18 @@ export async function dispatchByFornecedor(slug: string, args: {
   };
 
   let r = await doOne();
-  // Retry 1x em erro transient de rede (blip momentâneo). Não retry em erro
-  // de negócio (saldo, service id, etc) — esses precisam mesmo cair pro próximo.
-  if (!r.ok && isTransientError(r.error ?? "")) {
-    await new Promise((res) => setTimeout(res, 800));
+  // v251 — Retry com backoff exponencial + jitter (1.5s → 5s) em erro transient
+  // de rede/5xx/429. Erro de negócio (saldo, service id) NÃO faz retry: cai
+  // direto pro próximo fornecedor no failover.
+  for (let attempt = 2; attempt <= MAX_DISPATCH_ATTEMPTS && !r.ok && isTransientError(r.error ?? ""); attempt++) {
+    await new Promise((res) => setTimeout(res, backoffDelayMs(attempt)));
     r = await doOne();
   }
-
 
   await recordDispatchResult(slug, r.ok, r.ok ? undefined : r.error);
   return r;
 }
+
 
 
 // Refund automático Mercado Pago
