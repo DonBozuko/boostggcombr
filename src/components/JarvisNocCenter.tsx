@@ -147,6 +147,40 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         </div>
       </div>
 
+      {snap.confiabilidade?.length ? (
+        <div>
+          <div className="text-[11px] uppercase tracking-wider text-red-200/80 font-bold mb-1">
+            Confiabilidade por Fornecedor (7 dias)
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {snap.confiabilidade.map((c) => {
+              const taxa = c.taxaSucesso;
+              const cor = c.breakerAberto || (taxa != null && taxa < 80)
+                ? "border-red-500/60 bg-red-950/30 text-red-100"
+                : taxa != null && taxa < 95
+                  ? "border-amber-500/60 bg-amber-950/30 text-amber-100"
+                  : "border-emerald-500/50 bg-emerald-950/20 text-emerald-100";
+              return (
+                <div key={c.slug} className={`rounded-lg border p-2 text-xs font-mono ${cor}`}>
+                  <div className="flex justify-between font-bold">
+                    <span>{c.slug}</span>
+                    <span>{taxa != null ? `${taxa}% entregou` : "sem pedidos"}</span>
+                  </div>
+                  <div>✅ {c.entregues} entregues · ❌ {c.falhas} falhas</div>
+                  {c.breakerAberto ? (
+                    <div className="text-red-300 font-bold">⛔ PAUSADO automaticamente (muitas falhas)</div>
+                  ) : null}
+                  {c.ultimoErro ? (
+                    <div className="opacity-70 truncate" title={c.ultimoErro}>último erro: {c.ultimoErro}</div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+
       <div className="rounded-lg border border-red-500/40 bg-black/70 p-3 space-y-2">
         <div className="text-[11px] uppercase tracking-wider text-red-300 font-bold">💬 Pergunte ao J.A.R.V.I.S.</div>
         <div className="max-h-40 overflow-y-auto space-y-1 text-xs">
