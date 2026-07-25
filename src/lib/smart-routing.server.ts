@@ -114,11 +114,20 @@ export async function rankProvidersByCost(opts: {
   // v245 — Failover genérico: para cada fornecedor ativo, descobre o ID curado
   // (coluna <slug>_service_id) ou auto-resolvido (<slug>_auto_id). SMMhype mantém
   // fallback pelo service_id primário para compatibilidade histórica.
+  // Alias: banco usa slug 'smmpainel' mas coluna 'smmpanel_*'.
+  const slugToColumn: Record<string, string> = {
+    smmhype: "smmhype",
+    smmpainel: "smmpanel",
+    smmpanel: "smmpanel",
+    verified: "verified",
+    provider4: "provider4",
+  };
   const slugs = ((forn as any[]) ?? []).map((f) => f.slug as string);
   const providerIdMap: Record<string, string | null> = {};
   for (const slug of slugs) {
-    const manualCol = `${slug}_service_id`;
-    const autoCol = `${slug}_auto_id`;
+    const prefix = slugToColumn[slug] ?? slug;
+    const manualCol = `${prefix}_service_id`;
+    const autoCol = `${prefix}_auto_id`;
     const manualId = (pricingItem as any)?.[manualCol] ?? null;
     const autoId = (autoIds as any)?.[autoCol] ?? null;
     const fallbackId = slug === "smmhype" && serviceId != null ? String(serviceId) : null;
