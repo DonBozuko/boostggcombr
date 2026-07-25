@@ -693,9 +693,21 @@ function BlogPost() {
   return (
     <BlogLayout title={post.title} subtitle={post.subtitle}>
       {post.body}
+      {post.faq?.length ? (
+        <>
+          <h2>Perguntas frequentes</h2>
+          {post.faq.map((f) => (
+            <div key={f.q}>
+              <h3>{f.q}</h3>
+              <p>{f.a}</p>
+            </div>
+          ))}
+        </>
+      ) : null}
     </BlogLayout>
   );
 }
+
 
 function PostNotFound() {
   return (
