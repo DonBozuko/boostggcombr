@@ -42,6 +42,7 @@ const buildSitemapXml = () => {
     { path: "/kit-creator", changefreq: "weekly", priority: "0.9" },
     { path: "/promo-5reais", changefreq: "weekly", priority: "0.8" },
     // v200 — SEO landings (keyword-alvo)
+    { path: "/seguidores-pix", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-instagram", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-instagram-barato", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-curtidas-instagram", changefreq: "weekly", priority: "0.9" },

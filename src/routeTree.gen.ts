@@ -35,6 +35,7 @@ import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
+import { Route as SeguidoresPixRouteImport } from './routes/seguidores-pix'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as TelegramRouteImport } from './routes/telegram'
@@ -239,6 +240,11 @@ const Promo5reaisRoute = Promo5reaisRouteImport.update({
 const ReembolsoRoute = ReembolsoRouteImport.update({
   id: '/reembolso',
   path: '/reembolso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SeguidoresPixRoute = SeguidoresPixRouteImport.update({
+  id: '/seguidores-pix',
+  path: '/seguidores-pix',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -653,6 +659,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/reembolso': typeof ReembolsoRoute
+  '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
@@ -751,6 +758,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/reembolso': typeof ReembolsoRoute
+  '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
@@ -850,6 +858,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/reembolso': typeof ReembolsoRoute
+  '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
@@ -950,6 +959,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/promo-5reais'
     | '/reembolso'
+    | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
@@ -1048,6 +1058,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/promo-5reais'
     | '/reembolso'
+    | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
@@ -1146,6 +1157,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/promo-5reais'
     | '/reembolso'
+    | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
@@ -1245,6 +1257,7 @@ export interface RootRouteChildren {
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
   ReembolsoRoute: typeof ReembolsoRoute
+  SeguidoresPixRoute: typeof SeguidoresPixRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   TelegramRoute: typeof TelegramRoute
@@ -1497,6 +1510,13 @@ declare module '@tanstack/react-router' {
       path: '/reembolso'
       fullPath: '/reembolso'
       preLoaderRoute: typeof ReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguidores-pix': {
+      id: '/seguidores-pix'
+      path: '/seguidores-pix'
+      fullPath: '/seguidores-pix'
+      preLoaderRoute: typeof SeguidoresPixRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2031,6 +2051,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
   ReembolsoRoute: ReembolsoRoute,
+  SeguidoresPixRoute: SeguidoresPixRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   TelegramRoute: TelegramRoute,
