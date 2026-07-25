@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { classifyTrafficSource, isInternalTraffic } from "@/lib/traffic-source";
 
 // Leitura pública e mínima de status do pedido (id é UUID, difícil de adivinhar).
 export const getPedidoStatus = createServerFn({ method: "GET" })
@@ -708,7 +709,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
     // Breakdown por origem real (utm_source + referrer classificado)
     const byUtm = new Map<string, { source: string; visits: number }>();
     for (const v of views) {
-      const s = classify(
+      const s = classifyTrafficSource(
         (v as { utm_source?: string | null }).utm_source,
         (v as { referrer?: string | null }).referrer,
       );
