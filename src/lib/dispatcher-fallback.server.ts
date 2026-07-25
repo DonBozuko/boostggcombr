@@ -127,9 +127,9 @@ async function recordDispatchResult(slug: string, ok: boolean, err?: string): Pr
   } catch { /* noop */ }
 }
 
-function isTransientError(err: string): boolean {
-  return /timeout|rede|network|ECONN|ETIMEDOUT|ENOTFOUND|fetch failed|503|502|504/i.test(err);
-}
+// v251 — política de retry centralizada e testada (backoff exponencial + jitter)
+import { backoffDelayMs, isTransientError, MAX_DISPATCH_ATTEMPTS } from "@/lib/retry-policy";
+
 
 export async function dispatchByFornecedor(slug: string, args: {
   pacote: string; quantidade: number; instagram_user: string;
