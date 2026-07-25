@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { classifyTrafficSource, isInternalTraffic } from "@/lib/traffic-source";
 
 // Leitura pública e mínima de status do pedido (id é UUID, difícil de adivinhar).
 export const getPedidoStatus = createServerFn({ method: "GET" })
@@ -659,38 +660,13 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
     if (viewsRes.error) return { ok: false as const, error: viewsRes.error.message };
     if (pedidosRes.error) return { ok: false as const, error: pedidosRes.error.message };
 
-    // v249 — Origem de tráfego real:
+    // v249 — Origem de tráfego real (lógica pura em @/lib/traffic-source, coberta por teste):
     // 1) descarta tráfego interno (editor Lovable, preview, navegação no próprio site)
     // 2) classifica a origem pelo referrer quando não há utm_source
-    const hostOf = (ref: string | null | undefined): string => {
-      if (!ref) return "";
-      try { return new URL(ref).hostname.replace(/^www\./, "").toLowerCase(); } catch { return ""; }
-    };
-    const INTERNAL = /(^|\.)(lovable\.dev|lovableproject\.com|lovable\.app|boostgg\.com\.br)$/;
-    const AI_HOSTS: Record<string, string> = {
-      "chatgpt.com": "ChatGPT (IA)",
-      "chat.openai.com": "ChatGPT (IA)",
-      "perplexity.ai": "Perplexity (IA)",
-      "gemini.google.com": "Gemini (IA)",
-      "copilot.microsoft.com": "Copilot (IA)",
-      "claude.ai": "Claude (IA)",
-      "you.com": "You.com (IA)",
-    };
-    const SEARCH = /^(google\.|bing\.|duckduckgo\.|yahoo\.|ecosia\.)|^(google|bing|duckduckgo)\./;
-    const classify = (utm: string | null | undefined, ref: string | null | undefined): string => {
-      const u = (utm ?? "").trim().toLowerCase();
-      const h = hostOf(ref);
-      if (AI_HOSTS[h]) return AI_HOSTS[h];
-      if (AI_HOSTS[u]) return AI_HOSTS[u];
-      if (u) return u;
-      if (!h) return "direto";
-      if (SEARCH.test(h) || h.startsWith("google.") || h.startsWith("bing.")) return `busca: ${h}`;
-      return h;
-    };
-    const views = (viewsRes.data ?? []).filter((v) => {
-      const h = hostOf((v as { referrer?: string | null }).referrer);
-      return !(h && INTERNAL.test(h));
-    });
+    const views = (viewsRes.data ?? []).filter(
+      (v) => !isInternalTraffic((v as { referrer?: string | null }).referrer),
+    );
+
 
     type Row = { day: string; visits: number; pix_criados: number; pix_pagos: number; faturamento: number };
     const map = new Map<string, Row>();
@@ -733,7 +709,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
     // Breakdown por origem real (utm_source + referrer classificado)
     const byUtm = new Map<string, { source: string; visits: number }>();
     for (const v of views) {
-      const s = classify(
+      const s = classifyTrafficSource(
         (v as { utm_source?: string | null }).utm_source,
         (v as { referrer?: string | null }).referrer,
       );
