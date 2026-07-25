@@ -20,17 +20,21 @@ export function isToxicService(name?: string | null, category?: string | null): 
 
 /**
  * Um fornecedor pode entregar este pacote?
- * Em pacote BR: só se o serviço for comprovadamente brasileiro e não-tóxico.
+ * Em pacote BR: só se o serviço for comprovadamente brasileiro, não-tóxico
+ * e, quando requireRefill=true, tiver reposição (refill) garantida.
  * Sem catálogo em cache (`svc === null`): não bloqueia — evita parar venda.
  */
 export function providerCanServe(opts: {
   brPackage: boolean;
-  svc: { name?: string | null; category?: string | null } | null;
+  svc: { name?: string | null; category?: string | null; refill?: boolean | null } | null;
+  requireRefill?: boolean;
 }): boolean {
   if (!opts.svc) return true;
   const hay = `${opts.svc.name ?? ""} ${opts.svc.category ?? ""}`;
   if (TOXIC_SERVICE_RE.test(hay)) return false;
   if (opts.brPackage && !BR_SERVICE_RE.test(hay)) return false;
+  // v245 — trava dura: em pacote BR, sem refill garantido = não despacha.
+  if (opts.brPackage && opts.requireRefill && opts.svc.refill !== true) return false;
   return true;
 }
 
