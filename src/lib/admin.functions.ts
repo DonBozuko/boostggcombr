@@ -730,14 +730,18 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
       }
     }
 
-    // Breakdown por UTM source (agregado no período)
+    // Breakdown por origem real (utm_source + referrer classificado)
     const byUtm = new Map<string, { source: string; visits: number }>();
-    for (const v of viewsRes.data ?? []) {
-      const s = String((v as { utm_source?: string | null }).utm_source ?? "direto").toLowerCase();
+    for (const v of views) {
+      const s = classify(
+        (v as { utm_source?: string | null }).utm_source,
+        (v as { referrer?: string | null }).referrer,
+      );
       let r = byUtm.get(s);
       if (!r) { r = { source: s, visits: 0 }; byUtm.set(s, r); }
       r.visits++;
     }
+
 
     const daily = [...map.values()].sort((a, b) => a.day.localeCompare(b.day));
     const totals = daily.reduce(
