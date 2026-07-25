@@ -1,0 +1,2 @@
+DROP POLICY IF EXISTS "Authenticated read provider4 cache" ON public.provider4_services_cache;
+CREATE POLICY "Director read provider4 cache" ON public.provider4_services_cache FOR SELECT TO authenticated USING (public.is_director());
