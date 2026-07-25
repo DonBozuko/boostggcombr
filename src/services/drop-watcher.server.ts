@@ -58,9 +58,10 @@ async function loadProviderConfigs(): Promise<Record<string, ProviderCfg>> {
 
 type RefillResp = { refill?: string | number; error?: string };
 
-async function requestRefill(slug: string, orderId: string): Promise<{ ok: boolean; detail: string }> {
-  const cfg = ENDPOINTS[slug];
-  if (!cfg?.key) return { ok: false, detail: `${slug}: API key ausente` };
+async function requestRefill(cfgs: Record<string, ProviderCfg>, slug: string, orderId: string): Promise<{ ok: boolean; detail: string }> {
+  const cfg = cfgs[slug];
+  if (!cfg?.url) return { ok: false, detail: `${slug}: fornecedor não cadastrado` };
+  if (!cfg.key) return { ok: false, detail: `${slug}: API key ausente` };
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 15000);
