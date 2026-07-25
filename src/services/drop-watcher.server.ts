@@ -90,6 +90,7 @@ export type DropWatcherSummary = {
   analisados: number;
   reposicoes_pedidas: number;
   sem_garantia: number;
+  br_sem_reposicao: string[];
   detalhes: Array<{ pedido: string; fornecedor: string; ok: boolean; detalhe: string }>;
 };
 
@@ -108,7 +109,7 @@ export async function runDropWatcher(): Promise<DropWatcherSummary> {
     .lte("created_at", ate)
     .limit(40);
 
-  const summary: DropWatcherSummary = { analisados: 0, reposicoes_pedidas: 0, sem_garantia: 0, detalhes: [] };
+  const summary: DropWatcherSummary = { analisados: 0, reposicoes_pedidas: 0, sem_garantia: 0, br_sem_reposicao: [], detalhes: [] };
   const cfgs = await loadProviderConfigs();
 
   for (const p of ((pedidos as any[]) ?? [])) {
@@ -126,6 +127,37 @@ export async function runDropWatcher(): Promise<DropWatcherSummary> {
         drop_checked_at: new Date().toISOString(),
       } as never)
       .eq("id", p.id);
+
+    // v255 — grava no catálogo se aquele pacote realmente tem reposição.
+    const pacote = String(p.pacote ?? "");
+    if (pacote) {
+      await supabaseAdmin
+        .from("pricing_items")
+        .update({ refill_supported: r.ok, refill_checked_at: new Date().toISOString() } as never)
+        .eq("pacote", pacote);
+
+      // Pacote BR promete 30 dias de reposição. Se o fornecedor recusou,
+      // a promessa da página está mentindo → alerta em português direto.
+      if (!r.ok) {
+        const { data: item } = await supabaseAdmin
+          .from("pricing_items")
+          .select("category")
+          .eq("pacote", pacote)
+          .maybeSingle();
+        const isBr = String((item as any)?.category ?? "").endsWith(":br");
+        if (isBr) {
+          summary.br_sem_reposicao.push(pacote);
+          await supabaseAdmin.from("alerts").insert({
+            tipo: "refill_br_recusado",
+            nivel: "critical",
+            mensagem:
+              `Pacote brasileiro sem reposição: ${pacote}\n` +
+              `PROBLEMA: a página promete reposição de 30 dias, mas o fornecedor ${slug} recusou (${r.detail}).\n` +
+              `O QUE FAZER: trocar o serviço desse pacote por um com reposição no painel do catálogo, ou pausar a venda dele.`,
+          } as never);
+        }
+      }
+    }
   }
 
   await supabaseAdmin.from("admin_audit_logs").insert({
