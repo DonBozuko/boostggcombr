@@ -10,11 +10,51 @@
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const ENDPOINTS: Record<string, { url: string; key: string | undefined }> = {
-  smmhype: { url: "https://smmhype.com/api/v2", key: process.env.SMMHYPE_API_KEY },
-  smmpainel: { url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
-  verified: { url: "https://verifiedatacado.com/api/v2", key: process.env.VERIFIED_API_KEY },
+// v254 — endpoints/chaves lidos da tabela `fornecedores` (nada de lista fixa).
+// Antes o robô só conhecia 3 slugs, então pedidos entregues pelo provider4
+// (SMMOficial) nunca pediam reposição automática.
+const FALLBACK_ENDPOINTS: Record<string, string> = {
+  smmhype: "https://smmhype.com/api/v2",
+  smmpainel: "https://smmpainel.com/api/v2",
+  verified: "https://verifiedatacado.com/api/v2",
 };
+
+const FALLBACK_SECRETS: Record<string, string> = {
+  smmhype: "SMMHYPE_API_KEY",
+  smmpainel: "SMMPAINEL_API_KEY",
+  verified: "VERIFIED_API_KEY",
+  provider4: "PROVIDER4_API_KEY",
+};
+
+function normalizeApiUrl(raw: string): string {
+  const u = raw.trim().replace(/\/+$/, "");
+  return /\/api\//i.test(u) ? u : `${u}/api/v2`;
+}
+
+type ProviderCfg = { url: string; key: string | undefined };
+
+async function loadProviderConfigs(): Promise<Record<string, ProviderCfg>> {
+  const cfgs: Record<string, ProviderCfg> = {};
+  for (const [slug, url] of Object.entries(FALLBACK_ENDPOINTS)) {
+    cfgs[slug] = { url, key: process.env[FALLBACK_SECRETS[slug]] };
+  }
+  try {
+    const { data } = await supabaseAdmin
+      .from("fornecedores")
+      .select("slug, api_url, api_key_secret, ativo");
+    for (const f of ((data as any[]) ?? [])) {
+      const slug = String(f.slug ?? "");
+      if (!slug) continue;
+      const secretName = String(f.api_key_secret ?? FALLBACK_SECRETS[slug] ?? "");
+      cfgs[slug] = {
+        url: f.api_url ? normalizeApiUrl(String(f.api_url)) : (cfgs[slug]?.url ?? ""),
+        key: (secretName ? process.env[secretName] : undefined) ?? cfgs[slug]?.key,
+      };
+    }
+  } catch { /* mantém fallback */ }
+  return cfgs;
+}
+
 
 type RefillResp = { refill?: string | number; error?: string };
 
