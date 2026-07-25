@@ -180,6 +180,42 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         </div>
       ) : null}
 
+      {snap.guardas?.length ? (
+        <div>
+          <div className="text-[11px] uppercase tracking-wider text-red-200/80 font-bold mb-1">
+            🛡️ Saldo de Guardas (24h) — as travas estão vivas?
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {snap.guardas.map((g) => {
+              const cor = g.alto
+                ? "border-amber-500/60 bg-amber-950/30 text-amber-100"
+                : g.count > 0
+                  ? "border-emerald-500/50 bg-emerald-950/20 text-emerald-100"
+                  : "border-white/10 bg-black/40 text-white/60";
+              return (
+                <div key={g.key} className={`rounded-lg border p-2 text-xs font-mono ${cor}`}>
+                  <div className="flex justify-between font-bold gap-2">
+                    <span className="truncate" title={g.label}>{g.label}</span>
+                    <span>{g.count}x</span>
+                  </div>
+                  <div className="opacity-70">
+                    {g.count === 0
+                      ? "não precisou agir nas últimas 24h"
+                      : `última vez: ${new Date(g.last!).toLocaleString("pt-BR")}`}
+                  </div>
+                  {g.alto ? <div className="text-amber-300 font-bold">⚠️ agindo muito — olhar de perto</div> : null}
+                </div>
+              );
+            })}
+          </div>
+          <div className="text-[10px] text-white/40 font-mono mt-1">
+            Vendas retidas por margem agora: {snap.guardasMarginHold24h} · contador em zero é normal quando não houve abuso.
+          </div>
+        </div>
+      ) : null}
+
+
+
 
       <div className="rounded-lg border border-red-500/40 bg-black/70 p-3 space-y-2">
         <div className="text-[11px] uppercase tracking-wider text-red-300 font-bold">💬 Pergunte ao J.A.R.V.I.S.</div>

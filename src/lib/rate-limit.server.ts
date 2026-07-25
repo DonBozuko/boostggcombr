@@ -43,6 +43,11 @@ export async function checkRateLimit(
     }
     const row = Array.isArray(data) ? (data[0] as any) : (data as any);
     if (!row) return { allowed: true, hits: 0, retryAfterSeconds: 0 };
+    if (row.allowed === false) {
+      // v253 — registra que a trava atuou (observabilidade do "Saldo de Guardas")
+      const { logGuard } = await import("@/lib/guard-events.server");
+      void logGuard("RATE_LIMIT", { scope, limit, windowSeconds, hits: Number(row.hits ?? 0) });
+    }
     return {
       allowed: row.allowed !== false,
       hits: Number(row.hits ?? 0),

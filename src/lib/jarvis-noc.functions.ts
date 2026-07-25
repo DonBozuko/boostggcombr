@@ -21,6 +21,9 @@ export type NocSnapshot = {
   confiabilidade: Array<{ slug: string; entregues: number; falhas: number; taxaSucesso: number | null; breakerAberto: boolean; ultimoErro: string | null }>;
   apiLatency: Array<{ name: string; ms: number; ok: boolean }>;
   pedidos: { total24h: number; pagos24h: number; pendentes24h: number };
+  // v253 — Saldo de Guardas: prova que cada blindagem continua viva (24h)
+  guardas: Array<{ key: string; label: string; count: number; last: string | null; alto: boolean }>;
+  guardasMarginHold24h: number;
 } | { ok: false; error: string };
 
 
@@ -81,6 +84,15 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
     }).sort((a, b) => (b.entregues + b.falhas) - (a.entregues + a.falhas));
 
 
+    // v253 — Saldo de Guardas (24h): quantas vezes cada trava atuou.
+    const { summarizeGuards } = await import("@/lib/guards-summary");
+    const [{ data: guardRows }, { count: marginHoldCount }] = await Promise.all([
+      supabaseAdmin.from("admin_audit_logs").select("action, created_at").gte("created_at", since).limit(2000),
+      supabaseAdmin.from("pedidos").select("id", { count: "exact", head: true })
+        .eq("status", "MARGIN_HOLD").gte("created_at", since),
+    ]);
+    const guardas = summarizeGuards((guardRows ?? []) as any[]);
+
     // v191 — Health probe: qualquer resposta HTTP < 500 conta como "API viva"
     // (raiz de smmhype.com / api.mercadopago.com devolve 404/405 e não é falha).
     // Falha real = timeout, DNS, 5xx, ou latência > 3s.
@@ -116,6 +128,8 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
       confiabilidade,
       apiLatency,
       pedidos: { total24h: pedidos24?.length ?? 0, pagos24h: pagos, pendentes24h: pendentes },
+      guardas,
+      guardasMarginHold24h: marginHoldCount ?? 0,
 
     };
   });

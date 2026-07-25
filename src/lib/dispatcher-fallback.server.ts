@@ -124,6 +124,11 @@ async function recordDispatchResult(slug: string, ok: boolean, err?: string): Pr
       } as never,
       { onConflict: "slug" },
     );
+    if (openBreaker) {
+      // v253 — registra o acionamento do breaker para o painel "Saldo de Guardas"
+      const { logGuard } = await import("@/lib/guard-events.server");
+      void logGuard("CIRCUIT_BREAKER", { slug, falhas: next, erro: (err ?? "").slice(0, 200) });
+    }
   } catch { /* noop */ }
 }
 
