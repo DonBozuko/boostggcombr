@@ -17,9 +17,12 @@ export type NocSnapshot = {
   ok: true;
   systemHealth: { total: number; ok: number; tables: Array<{ name: string; ok: boolean; ms: number }> };
   fornecedores: Array<{ id: string; nome: string; status: string | null; saldo: number | null; saldoUsd: number | null; cotacao: number | null; ativo: boolean; falhas: number | null; ultima: string | null }>;
+  // v251 — confiabilidade real por fornecedor (últimos 7 dias)
+  confiabilidade: Array<{ slug: string; entregues: number; falhas: number; taxaSucesso: number | null; breakerAberto: boolean; ultimoErro: string | null }>;
   apiLatency: Array<{ name: string; ms: number; ok: boolean }>;
   pedidos: { total24h: number; pagos24h: number; pendentes24h: number };
 } | { ok: false; error: string };
+
 
 export const jarvisNocSnapshot = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
