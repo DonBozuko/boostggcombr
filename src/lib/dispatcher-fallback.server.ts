@@ -215,22 +215,25 @@ export async function cancelAtProvider(
   slug: string,
   providerOrderId: string,
 ): Promise<{ ok: boolean; detail: string; recoverable: boolean }> {
-  const cfg: Record<string, { endpoint: string; key: string | undefined }> = {
-    smmhype:   { endpoint: "https://smmhype.com/api/v2",           key: process.env.SMMHYPE_API_KEY },
-    smmpainel: { endpoint: "https://smmpainel.com/api/v2",         key: process.env.SMMPAINEL_API_KEY },
-    verified:  { endpoint: "https://verifiedatacado.com/api/v2",   key: process.env.VERIFIED_API_KEY },
-  };
-  const c = cfg[slug];
-  if (!c) return { ok: false, detail: `fornecedor desconhecido: ${slug}`, recoverable: false };
-  if (!c.key) return { ok: false, detail: `${slug}: API key ausente`, recoverable: false };
+  // v245 — lê config do fornecedor do banco (genérico, funciona para provider4)
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: f } = await supabaseAdmin
+    .from("fornecedores")
+    .select("api_url, api_key_secret")
+    .eq("slug", slug)
+    .maybeSingle();
+  if (!f) return { ok: false, detail: `fornecedor desconhecido: ${slug}`, recoverable: false };
+  const endpoint = (f as any).api_url as string;
+  const apiKey = process.env[(f as any).api_key_secret];
+  if (!apiKey) return { ok: false, detail: `${slug}: API key ausente`, recoverable: false };
   if (!providerOrderId) return { ok: true, detail: "sem provider_order_id (nada a cancelar)", recoverable: true };
 
-  const body = new URLSearchParams({ key: c.key, action: "cancel", order: String(providerOrderId) });
+  const body = new URLSearchParams({ key: apiKey, action: "cancel", order: String(providerOrderId) });
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12_000);
     try {
-      const res = await fetch(c.endpoint, {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),
