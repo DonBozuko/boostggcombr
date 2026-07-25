@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://boostgg.com.br/comprar-seguidores-tiktok";
 const TITLE = "Comprar Seguidores TikTok — Elite Boost Prime | BoostGG";
 const DESC =
-  "Compre seguidores para TikTok com entrega imediata, pagamento via Pix e reposição por 30 dias. Sem senha, sem risco, a partir de R$ 4,90.";
+  "Compre seguidores para TikTok com entrega imediata, pagamento via Pix e reposição de 30 dias nos pacotes brasileiros. Sem senha, sem risco, a partir de R$ 4,90.";
 
 const FAQ = [
   {
@@ -23,7 +23,7 @@ const FAQ = [
   },
   {
     q: "Os seguidores caem depois?",
-    a: "Uma pequena taxa natural de queda existe em qualquer serviço. Por isso oferecemos reposição gratuita por 30 dias.",
+    a: "Uma taxa natural de queda existe em qualquer serviço. Nos pacotes 🇧🇷 Brasileiro Real a reposição é garantida por 30 dias; nos Global, pedimos reposição ao fornecedor automaticamente.",
   },
   {
     q: "O TikTok bane conta que compra seguidores?",
@@ -56,13 +56,13 @@ function Page() {
       accent="#00f2fe"
       h1="Comprar Seguidores TikTok — Baratos, Rápido, com Pix"
       subtitle="Seguidores TikTok em minutos"
-      intro="Cresça no TikTok sem esperar viralização por sorte. Base de seguidores ativa em minutos, pagamento via Pix, reposição por 30 dias e nenhum acesso à sua conta."
+      intro="Cresça no TikTok sem esperar viralização por sorte. Base de seguidores ativa em minutos, pagamento via Pix, reposição de 30 dias nos pacotes brasileiros e nenhum acesso à sua conta."
       ctaHref="/tiktok"
       ctaLabel="Comprar seguidores TikTok"
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Primeiros seguidores caem em 5-15 min." },
         { icon: "shield", title: "Sem senha, sem risco", text: "Só pedimos o @. Sua conta continua segura." },
-        { icon: "check", title: "Reposição por 30 dias", text: "Qualquer queda nós recompomos sem cobrar." },
+        { icon: "check", title: "Reposição por 30 dias", text: "Garantida nos pacotes brasileiros; nos Global, pedimos ao fornecedor." },
         { icon: "clock", title: "Pix 24/7", text: "Compra a hora que quiser, aprovação instantânea." },
       ]}
       pricingTitle="Tabela de preços — seguidores TikTok"
@@ -80,7 +80,7 @@ function Page() {
         },
         {
           h2: "Como comprar seguidores TikTok aqui",
-          body: "1. Escolha o pacote no /tiktok.\n2. Cole o @ do seu perfil.\n3. Pague o Pix.\n4. Em 5-15 min os primeiros entram.\n5. Reposição automática por 30 dias.",
+          body: "1. Escolha o pacote no /tiktok.\n2. Cole o @ do seu perfil.\n3. Pague o Pix.\n4. Em 5-15 min os primeiros entram.\n5. Reposição de 30 dias garantida nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente.",
         },
       ]}
       faq={FAQ}

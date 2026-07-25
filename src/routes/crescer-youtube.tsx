@@ -12,7 +12,7 @@ const FAQ = [
   { q: "Como funciona?", a: "Gestão profissional de audiência. Você informa a URL pública do canal, sem senha." },
   { q: "Tempo?", a: "Início em 15-60 min após o Pix. YouTube processa mais devagar que Instagram/TikTok." },
   { q: "Ajuda a monetizar?", a: "Ajuda a atingir o requisito de inscritos, mas horas de watch time precisam ser conquistadas com conteúdo real." },
-  { q: "Garantia?", a: "Reposição por 30 dias." },
+  { q: "Garantia?", a: "Reposição de 30 dias nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente." },
   { q: "Pagamento?", a: "Somente Pix." },
   { q: "É seguro?", a: "Sim, sem senha, entrega gradual." },
 ];
@@ -42,7 +42,7 @@ function Page() {
       accent="#FF0000"
       h1="Crescer no YouTube — Gestão de Audiência"
       subtitle="Amplie seu canal com estratégia profissional"
-      intro="Gestão de crescimento para canais YouTube. Sem senha, resultado em horas, garantia de 30 dias."
+      intro="Gestão de crescimento para canais YouTube. Sem senha, resultado em horas, garantia de 30 dias nos pacotes brasileiros."
       ctaHref="/youtube"
       ctaLabel="Crescer agora"
       benefits={[
@@ -60,7 +60,7 @@ function Page() {
       ]}
       bodySections={[
         { h2: "Por que investir em gestão de crescimento no YouTube", body: "Canal com 50 inscritos não vira recomendação. YouTube usa autoridade como sinal para recomendar. Empurrão inicial cria a base pro algoritmo começar a levar seus vídeos pra sugeridos e Home de mais gente." },
-        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole a URL do canal.\n3. Pague o Pix.\n4. Início em 15-60 min.\n5. Garantia 30 dias." },
+        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole a URL do canal.\n3. Pague o Pix.\n4. Início em 15-60 min.\n5. Garantia de 30 dias nos pacotes brasileiros." },
       ]}
       faq={FAQ}
     />

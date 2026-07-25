@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://boostgg.com.br/comprar-seguidores-instagram-barato";
 const TITLE = "Seguidores Instagram Barato — Elite Boost Prime | BoostGG";
 const DESC =
-  "Seguidores Instagram barato de verdade: pacote inicial a partir de R$5 no Pix, entrega em minutos e reposição por 30 dias. Sem senha, sem enrolação.";
+  "Seguidores Instagram barato de verdade: pacote inicial a partir de R$5 no Pix, entrega em minutos e reposição de 30 dias nos pacotes brasileiros. Sem senha, sem enrolação.";
 
 const FAQ = [
   {
@@ -15,7 +15,7 @@ const FAQ = [
   },
   {
     q: "R$5 é o mais barato mesmo?",
-    a: "Sim. R$5 são 100 seguidores mix internacional com reposição 30 dias. Se o objetivo é só quebrar a barreira do 'perfil vazio' pra parecer ativo, esse pacote resolve. Quer brasileiro real com foto e post? Aí sobe pra R$14,90 os 500.",
+    a: "Sim. R$5 são 100 seguidores mix internacional com reposição 30 dias (pacotes BR). Se o objetivo é só quebrar a barreira do 'perfil vazio' pra parecer ativo, esse pacote resolve. Quer brasileiro real com foto e post? Aí sobe pra R$14,90 os 500.",
   },
   {
     q: "Barato significa fake?",
@@ -60,13 +60,13 @@ function Page() {
       accent="#e1306c"
       h1="Comprar Seguidores Instagram Barato — a partir de R$5 no Pix"
       subtitle="Piso real de mercado, sem golpe de R$1"
-      intro="Quer seguidor no Instagram barato de verdade? Aqui o piso é R$5 pelos 100 primeiros — com Pix instantâneo, entrega em minutos e reposição por 30 dias. Nada de site que promete R$1 e some com seu dinheiro."
+      intro="Quer seguidor no Instagram barato de verdade? Aqui o piso é R$5 pelos 100 primeiros — com Pix instantâneo, entrega em minutos e reposição de 30 dias nos pacotes brasileiros. Nada de site que promete R$1 e some com seu dinheiro."
       ctaHref="/"
       ctaLabel="Comprar a partir de R$5"
       benefits={[
         { icon: "zap", title: "A partir de R$5", text: "100 seguidores no pacote de entrada. Piso real, sem pegadinha." },
         { icon: "shield", title: "Sem senha", text: "Só o @ público. Site que pede senha é golpe." },
-        { icon: "check", title: "Reposição 30 dias", text: "Vale até no pacote mais barato. Caiu, a gente recompõe." },
+        { icon: "check", title: "Reposição 30 dias", text: "Garantida nos pacotes brasileiros. No mix internacional, pedimos reposição ao fornecedor." },
         { icon: "clock", title: "Pix 24h", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela — seguidores Instagram baratos"
@@ -84,7 +84,7 @@ function Page() {
         },
         {
           h2: "Como funciona a compra barata na BoostGG",
-          body: "1. Escolhe o pacote de R$5 (ou maior).\n2. Cola o @ do Instagram (sem senha).\n3. Paga o Pix — QR Code ou copia-e-cola.\n4. 1-5 min depois os seguidores começam a cair.\n5. Reposição automática por 30 dias.",
+          body: "1. Escolhe o pacote de R$5 (ou maior).\n2. Cola o @ do Instagram (sem senha).\n3. Paga o Pix — QR Code ou copia-e-cola.\n4. 1-5 min depois os seguidores começam a cair.\n5. Reposição de 30 dias garantida nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente.",
         },
         {
           h2: "Barato ≠ ruim: quando o pacote de R$5 resolve",

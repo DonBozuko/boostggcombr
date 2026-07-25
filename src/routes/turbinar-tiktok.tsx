@@ -12,7 +12,7 @@ const FAQ = [
   { q: "Como funciona?", a: "Serviço de gestão de audiência qualificada. Você informa o @ público, sem senha." },
   { q: "Tempo de entrega?", a: "Início em 1-10 min após Pix. Planos grandes escalonados." },
   { q: "É seguro?", a: "Sim. Sem senha, entrega gradual, respeita limites da plataforma." },
-  { q: "Garantia?", a: "Reposição automática por 30 dias." },
+  { q: "Garantia?", a: "Reposição de 30 dias garantida nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente." },
   { q: "Perfil precisa estar público?", a: "Sim, apenas durante o processamento." },
   { q: "Pagamento?", a: "Somente Pix, 24/7." },
 ];
@@ -42,7 +42,7 @@ function Page() {
       accent="#25F4EE"
       h1="Turbinar TikTok — Gestão de Crescimento com Pix"
       subtitle="Amplie sua audiência e prova social em minutos"
-      intro="Gestão profissional de crescimento para TikTok. Sem senha, resultado em minutos, garantia de 30 dias."
+      intro="Gestão profissional de crescimento para TikTok. Sem senha, resultado em minutos, garantia de 30 dias nos pacotes brasileiros."
       ctaHref="/tiktok"
       ctaLabel="Turbinar agora"
       benefits={[
@@ -60,7 +60,7 @@ function Page() {
       ]}
       bodySections={[
         { h2: "Por que investir em gestão de crescimento no TikTok", body: "TikTok distribui via For You com base em sinais rápidos. Perfil pequeno tem menos chance de entrar na roda. Um empurrão profissional inicial cria a base pra o algoritmo levar seu conteúdo pra mais gente." },
-        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o @ do TikTok.\n3. Pague o Pix.\n4. Resultado em minutos.\n5. Garantia 30 dias." },
+        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o @ do TikTok.\n3. Pague o Pix.\n4. Resultado em minutos.\n5. Garantia de 30 dias nos pacotes brasileiros." },
       ]}
       faq={FAQ}
     />

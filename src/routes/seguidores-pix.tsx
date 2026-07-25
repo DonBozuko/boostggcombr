@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://boostgg.com.br/seguidores-pix";
 const TITLE = "Seguidores no Pix — Elite Boost Prime | BoostGG";
 const DESC =
-  "Comprar seguidores pagando no Pix: aprovação na hora, entrega automática e reposição de 30 dias. Sem cadastro, sem senha, sem cartão.";
+  "Comprar seguidores pagando no Pix: aprovação na hora, entrega automática e reposição nos pacotes brasileiros. Sem cadastro, sem senha, sem cartão.";
 
 const FAQ = [
   {
@@ -62,7 +62,7 @@ function Page() {
     <SeoLanding
       accent="#39ff14"
       h1="Comprar Seguidores no Pix — Aprovação na Hora"
-      subtitle="Pix, entrega automática e reposição garantida"
+      subtitle="Pix, entrega automática e reposição nos pacotes brasileiros"
       intro="Você escolhe o pacote, paga no Pix e a entrega começa sozinha assim que o pagamento é confirmado. Sem cadastro, sem cartão, sem falar com ninguém."
       ctaHref="/"
       ctaLabel="Gerar meu Pix agora"
@@ -70,7 +70,7 @@ function Page() {
         { icon: "zap", title: "Pix confirmado na hora", text: "Pagou, o robô já dispara o pedido — sem espera manual." },
         { icon: "shield", title: "Sem senha e sem cadastro", text: "Só o @ público do seu perfil." },
         { icon: "check", title: "Pacotes BR ou Global", text: "Escolha entre perfis brasileiros reais ou mix internacional mais barato." },
-        { icon: "clock", title: "Reposição 30 dias", text: "Caiu dentro do prazo? A gente repõe sem custo." },
+        { icon: "clock", title: "Reposição 30 dias (BR)", text: "Pacotes 🇧🇷 Brasileiro Real: caiu no prazo, repomos sem custo. Nos Global, pedimos reposição ao fornecedor." },
       ]}
       pricingTitle="Preços — pagamento via Pix"
       pricing={[

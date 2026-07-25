@@ -121,7 +121,7 @@ export const Route = createFileRoute("/")({
     const title = "BoostGG — Crescimento Social para Instagram, TikTok e YouTube";
     const ogTitle = "Elite Boost Prime — Seguidores no Instagram via Pix";
     const description =
-      "Comprar seguidores Instagram reais, brasileiros e com entrega rápida via Pix. Alta retenção, reposição garantida e 100% seguro. Comece em minutos.";
+      "Comprar seguidores Instagram reais, brasileiros e com entrega rápida via Pix. Alta retenção, reposição nos pacotes brasileiros e 100% seguro. Comece em minutos.";
     const url = "https://boostgg.com.br/";
     const ogImage = `https://boostgg.com.br${ogInstagram}?v=49`;
     return {
@@ -323,7 +323,7 @@ const allPlans: Plan[] = [...plans, ...likesPlans, ...viewsPlans];
 const trustBadges = [
   { icon: Zap, title: "Entrega Automática e Segura", desc: "Processamento automático em minutos após a aprovação do Pix." },
   { icon: ShieldCheck, title: "Sem Necessidade de Senha", desc: "Trabalhamos apenas com o @ público. Sua conta nunca é acessada." },
-  { icon: RefreshCw, title: "Garantia de Reposição de 30 dias", desc: "Caiu? A gente repõe. Sem letra miúda, sem burocracia." },
+  { icon: RefreshCw, title: "Reposição 30 dias nos pacotes BR", desc: "Pacotes 🇧🇷 Brasileiro Real têm reposição nos pacotes brasileiros. Nos Global, pedimos reposição ao fornecedor automaticamente." },
 ];
 
 const testimonials = [
@@ -1274,7 +1274,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             Comprar seguidores Instagram é uma estratégia usada por criadores, empresas e influenciadores para acelerar a credibilidade do perfil. Na <strong className="text-foreground">BoostGG</strong>, você compra seguidores brasileiros com entrega automática no Pix, sem precisar informar senha. O processo é seguro, discreto e começa em poucos minutos após a confirmação do pagamento.
           </p>
           <p>
-            Além de seguidores, você também pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link>, visualizações para Reels e seguidores brasileiros segmentados. Todos os pacotes incluem garantia de reposição de 30 dias e suporte no WhatsApp.
+            Além de seguidores, você também pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link>, visualizações para Reels e seguidores brasileiros segmentados. Os pacotes com selo 🇧🇷 Brasileiro Real incluem reposição garantida de 30 dias; nos pacotes Global a reposição é solicitada ao fornecedor automaticamente. Suporte no WhatsApp em qualquer caso.
           </p>
           <h3 className="text-lg font-semibold text-foreground pt-2">Como funciona</h3>
           <ol className="list-decimal pl-5 space-y-1">
@@ -1286,7 +1286,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Seguidores reais</strong> — perfis ativos, sem bots ou contas vazias.</li>
             <li><strong>Entrega via Pix</strong> — confirmação instantânea e início rápido.</li>
-            <li><strong>Reposição garantida</strong> — se cair, a gente repõe automaticamente.</li>
+            <li><strong>Reposição nos pacotes BR</strong> — pacotes 🇧🇷 Brasileiro Real têm garantia de 30 dias; nos Global pedimos reposição ao fornecedor automaticamente.</li>
             <li><strong>Sem senha</strong> — basta informar o @ do perfil público.</li>
             <li><strong>Suporte humano</strong> — atendimento no WhatsApp 24 horas.</li>
           </ul>

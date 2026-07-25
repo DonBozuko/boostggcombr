@@ -23,7 +23,7 @@ const FAQ = [
   },
   {
     q: "Existe garantia?",
-    a: "Sim. Todo plano inclui garantia de reposição por 30 dias corridos.",
+    a: "Nos pacotes 🇧🇷 Brasileiro Real sim: reposição garantida por 30 dias. Nos pacotes 🌎 Global pedimos reposição ao fornecedor automaticamente e, quando não há garantia, avaliamos reenvio ou estorno.",
   },
   {
     q: "Preciso deixar o perfil aberto?",
@@ -60,13 +60,13 @@ function Page() {
       accent="#e1306c"
       h1="Impulsionar Instagram — Gestão de Crescimento com Pix"
       subtitle="Amplie seu alcance e prova social em minutos"
-      intro="Serviço profissional de gestão de crescimento para Instagram. Sem senha, sem cadastro, com resultado em minutos e garantia de reposição por 30 dias."
+      intro="Serviço profissional de gestão de crescimento para Instagram. Sem senha, sem cadastro, com resultado em minutos e garantia de reposição de 30 dias nos pacotes brasileiros."
       ctaHref="/"
       ctaLabel="Impulsionar agora"
       benefits={[
         { icon: "zap", title: "Resultado em minutos", text: "Impulsionamento inicia em 1-5 min após Pix." },
         { icon: "shield", title: "Sem senha", text: "Só o @ público. Zero risco de acesso." },
-        { icon: "check", title: "Garantia 30 dias", text: "Reposição automática se houver queda." },
+        { icon: "check", title: "Garantia 30 dias", text: "Garantida nos pacotes brasileiros; nos Global pedimos ao fornecedor." },
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea, madrugada e feriado." },
       ]}
       pricingTitle="Planos de impulsionamento — Instagram"
@@ -84,7 +84,7 @@ function Page() {
         },
         {
           h2: "Como funciona",
-          body: "1. Escolha o plano ideal.\n2. Cole o @ do seu Instagram (sem senha).\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos o impulsionamento inicia.\n5. Garantia de reposição por 30 dias.",
+          body: "1. Escolha o plano ideal.\n2. Cole o @ do seu Instagram (sem senha).\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos o impulsionamento inicia.\n5. Garantia de reposição de 30 dias nos pacotes brasileiros.",
         },
         {
           h2: "Audiência nacional vs internacional",

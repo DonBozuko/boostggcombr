@@ -3,7 +3,7 @@ export type FaqItem = { q: string; a: string };
 
 export const FAQS: Record<string, FaqItem[]> = {
   instagram: [
-    { q: "Seguidores de Instagram caem depois de alguns dias?", a: "Nossos planos incluem reposição gratuita por 30 dias. Se houver queda, repomos sem custo. A entrega é gradual para minimizar drops." },
+    { q: "Seguidores de Instagram caem depois de alguns dias?", a: "Pode cair uma parte, sim. Nos pacotes marcados 🇧🇷 Brasileiro Real a reposição é garantida por 30 dias (só vendemos esses com garantia ativa do fornecedor). Nos pacotes 🌎 Global, pedimos reposição automaticamente 72h após a entrega — quando o serviço não tem garantia, avaliamos reenvio ou estorno pelo WhatsApp. A entrega é gradual para reduzir queda." },
     { q: "Em quanto tempo os seguidores começam a entrar?", a: "A entrega inicia em até 5 minutos após a confirmação do Pix. A velocidade é gradual (500-2000/dia) para simular crescimento orgânico e evitar bloqueios do Instagram." },
     { q: "Posso comprar seguidores para conta privada?", a: "Não. O perfil precisa estar público durante a entrega. Após concluída, você pode voltar para privado normalmente." },
     { q: "É seguro? Minha conta pode ser banida?", a: "Sim, é seguro. Não pedimos senha e usamos apenas o @ do perfil. Nunca tivemos relato de banimento em mais de 3.100 pedidos." },
@@ -26,7 +26,7 @@ export const FAQS: Record<string, FaqItem[]> = {
   facebook: [
     { q: "Curtidas em página de Facebook ainda importam em 2026?", a: "Menos que antes, mas ainda pesam em decisões de compra B2B e credibilidade local. Para negócio físico e prestador de serviço, uma página com 5k+ curtidas converte melhor." },
     { q: "Posso comprar seguidores para perfil pessoal (não página)?", a: "Sim, temos plano específico para perfil. Perfil pessoal usa o botão 'Seguir', diferente de curtidas em fanpage." },
-    { q: "Curtidas caem depois?", a: "Facebook faz limpezas menos agressivas que Instagram. Reposição garantida por 30 dias em qualquer queda acima de 5%." },
+    { q: "Curtidas caem depois?", a: "Facebook faz limpezas menos agressivas que Instagram. Nos pacotes com garantia (🇧🇷 Brasileiro Real) repomos por 30 dias em queda acima de 5%; nos pacotes Global, solicitamos reposição ao fornecedor e, se não houver garantia, tratamos caso a caso no WhatsApp." },
     { q: "Consigo alcance orgânico maior comprando curtidas?", a: "Curtidas não aumentam alcance direto (Facebook cobra por reach hoje), mas melhoram a prova social e a taxa de conversão do público que já chega na página." },
     { q: "Aceita pagamento via boleto ou cartão?", a: "Trabalhamos exclusivamente com Pix instantâneo — libera a entrega em segundos e evita chargeback." },
   ],
@@ -49,7 +49,7 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Em quanto tempo os seguidores caem no meu Kwai?", a: "A entrega inicia em 5-30 minutos após o Pix confirmado. Distribuímos gradualmente (300-1000/dia) pra parecer crescimento orgânico e evitar drop." },
     { q: "Views do Kwai contam pra Kwai Rewards / monetização?", a: "Contam pra contagem pública do vídeo. A monetização Kwai Rewards depende de tempo de retenção e origem — combine com conteúdo bom pra maximizar." },
     { q: "Consigo comprar curtidas pra um vídeo específico?", a: "Sim. No checkout, cole o link do vídeo Kwai (kwai.com/@user/vídeo). As curtidas caem só naquele post, sem espalhar." },
-    { q: "Seguidores caem depois?", a: "Reposição garantida por 30 dias em qualquer queda acima de 5%. Basta abrir chamado no WhatsApp/Jivo com o link do perfil." },
+    { q: "Seguidores caem depois?", a: "Nos pacotes com selo 🇧🇷 Brasileiro Real, reposição garantida por 30 dias em queda acima de 5%. Nos pacotes Global, pedimos reposição ao fornecedor automaticamente; sem garantia disponível, avaliamos reenvio ou estorno. Abra chamado no WhatsApp com o link do perfil." },
   ],
 };
 

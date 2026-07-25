@@ -19,7 +19,7 @@ const faqs = [
   {
     icon: RefreshCw,
     q: "E se cair seguidor depois?",
-    a: "Todos os planos incluem reposição garantida por 30 dias. Se houver queda, repomos sem custo adicional.",
+    a: "Nos pacotes com selo 🇧🇷 Brasileiro Real a reposição é garantida por 30 dias, sem custo. Nos pacotes 🌎 Global, pedimos reposição ao fornecedor automaticamente após a entrega e, quando o serviço não tem garantia, avaliamos reenvio ou estorno no WhatsApp.",
   },
   {
     icon: QrCode,

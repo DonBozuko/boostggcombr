@@ -12,7 +12,7 @@ const FAQ = [
   { q: "Diferença pra audiência internacional?", a: "Perfis brasileiros com foto, bio e postagens reais. Engajam de verdade, comentam em português. Ideal se seu negócio é local." },
   { q: "Tempo?", a: "Início em 5-15 min após o Pix. Entrega mais lenta que mix internacional por segurança." },
   { q: "Preço maior?", a: "Sim, audiência qualificada custa mais que mix internacional — mas converte muito mais para quem vende no Brasil." },
-  { q: "Garantia?", a: "Reposição por 30 dias." },
+  { q: "Garantia?", a: "Reposição de 30 dias nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente." },
   { q: "Serve pra Instagram e TikTok?", a: "Sim, ambos." },
   { q: "Pagamento?", a: "Somente Pix, 24/7." },
 ];
@@ -60,7 +60,7 @@ function Page() {
       ]}
       bodySections={[
         { h2: "Por que audiência brasileira converte mais", body: "Vender no Brasil com audiência de índia, indonésia e russa não fecha venda. Comentário em português, DM em português, seguidor que entende sua oferta. Custa mais, mas o ROI é outro." },
-        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o @ (IG ou TikTok).\n3. Pague o Pix.\n4. Entrega em 5-15 min.\n5. Garantia 30 dias." },
+        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o @ (IG ou TikTok).\n3. Pague o Pix.\n4. Entrega em 5-15 min.\n5. Garantia de 30 dias nos pacotes brasileiros." },
       ]}
       faq={FAQ}
     />

@@ -42,13 +42,13 @@ function Page() {
       accent="#e1306c"
       h1="Engajamento Instagram — Boost Profissional"
       subtitle="Mais curtidas, mais sinal para o algoritmo, mais alcance"
-      intro="Boost de engajamento em posts, Reels e carrosséis. Entrega em minutos, sem senha, com garantia de 30 dias."
+      intro="Boost de engajamento em posts, Reels e carrosséis. Entrega em minutos, sem senha, com garantia de 30 dias nos pacotes brasileiros."
       ctaHref="/"
       ctaLabel="Aumentar engajamento"
       benefits={[
         { icon: "zap", title: "Rápido", text: "Interações entram em 1-3 min após Pix." },
         { icon: "shield", title: "Sem senha", text: "Só o link do post público." },
-        { icon: "check", title: "Garantia", text: "Reposição por 30 dias." },
+        { icon: "check", title: "Garantia", text: "Reposição de 30 dias nos pacotes 🇧🇷 Brasileiro Real; nos Global, solicitada ao fornecedor automaticamente." },
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos de engajamento — Instagram"
@@ -60,7 +60,7 @@ function Page() {
       ]}
       bodySections={[
         { h2: "Por que engajamento importa mais que seguidor", body: "O algoritmo do Instagram distribui conteúdo com base em taxa de engajamento nas primeiras horas. Post que recebe interação rápida vira Explorar e Reels em destaque. Boost inicial acelera essa janela crítica." },
-        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o link do post.\n3. Pague o Pix.\n4. Interações em 1-3 min.\n5. Garantia 30 dias." },
+        { h2: "Como funciona", body: "1. Escolha o plano.\n2. Cole o link do post.\n3. Pague o Pix.\n4. Interações em 1-3 min.\n5. Garantia de 30 dias nos pacotes brasileiros." },
       ]}
       faq={FAQ}
     />
