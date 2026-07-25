@@ -4,9 +4,10 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Comprar Curtidas Instagram — Elite Boost Prime | BoostGG";
+const TITLE = "Comprar Curtidas Instagram via Pix — Elite Boost Prime | BoostGG";
 const DESC =
-  "Compre curtidas para Instagram com entrega rápida, pagamento via Pix e reposição garantida. Aumente o alcance dos seus Reels e posts sem senha.";
+  "Curtidas no Instagram a partir de R$ 3,90, entrega em 1 a 5 minutos após o Pix. Sem senha, com reposição garantida por 30 dias. Cole o link do post e pronto.";
+
 
 const FAQ = [
   {
