@@ -72,8 +72,8 @@ export function ExitRecoveryModal({ open, onClose, onContinue }: Props) {
           <li className="flex gap-3 items-start">
             <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
             <div>
-              <p className="text-white font-bold text-sm">Garantia de reposição 30 dias</p>
-              <p className="text-white/60 text-xs">Caiu seguidor? Repomos sem custo.</p>
+              <p className="text-white font-bold text-sm">Reposição 30 dias nos pacotes BR</p>
+              <p className="text-white/60 text-xs">Pacotes 🇧🇷 Brasileiro Real: caiu, repomos sem custo.</p>
             </div>
           </li>
         </ul>

@@ -22,7 +22,7 @@ export function BenefitsGrid({
     "Entrega Automática",
     "Pagamento via Pix",
     "Sem solicitar senha",
-    "Garantia de Reposição",
+    "Reposição nos pacotes BR",
     NETWORK_BENEFIT[route] ?? "Crescimento Real",
   ];
   return (
