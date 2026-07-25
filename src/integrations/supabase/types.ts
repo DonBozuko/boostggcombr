@@ -817,6 +817,8 @@ export type Database = {
           pacote: string
           price_brl: number
           provider_service_id: number | null
+          provider4_auto_id: string | null
+          provider4_service_id: string | null
           quantidade: number
           sellable_reason: string | null
           smmhype_auto_id: string | null
@@ -837,6 +839,8 @@ export type Database = {
           pacote: string
           price_brl?: number
           provider_service_id?: number | null
+          provider4_auto_id?: string | null
+          provider4_service_id?: string | null
           quantidade: number
           sellable_reason?: string | null
           smmhype_auto_id?: string | null
@@ -857,6 +861,8 @@ export type Database = {
           pacote?: string
           price_brl?: number
           provider_service_id?: number | null
+          provider4_auto_id?: string | null
+          provider4_service_id?: string | null
           quantidade?: number
           sellable_reason?: string | null
           smmhype_auto_id?: string | null
@@ -914,6 +920,39 @@ export type Database = {
           provider_service_id?: string
           provider_slug?: string
           rate_usd?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      provider4_services_cache: {
+        Row: {
+          category: string
+          max: number
+          min: number
+          name: string
+          provider_service_id: number
+          rate: number
+          refill: boolean
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          max?: number
+          min?: number
+          name: string
+          provider_service_id: number
+          rate?: number
+          refill?: boolean
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          max?: number
+          min?: number
+          name?: string
+          provider_service_id?: number
+          rate?: number
+          refill?: boolean
           updated_at?: string
         }
         Relationships: []
