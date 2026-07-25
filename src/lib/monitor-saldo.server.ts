@@ -285,11 +285,13 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
   const elapsed = Date.now() - t0;
   const cotacao = Number(fxRate) > 0 ? Number(fxRate) : await fetchUsdBrlRate();
 
-  // v83 — Strict Dual-Currency Mirror.
-  // SMMhype retorna USD nativo (multiplica × cotação para BRL).
-  // SMMPanel / Verified Atacado são contas BRL nativas (divide ÷ cotação para USD).
+  // v247 — Moeda vem do banco (fornecedores.moeda), não de regex de slug.
+  // Bug corrigido: provider4 (SMMOficial) é conta BRL nativa e o slug genérico
+  // não casava no regex antigo → saldo era multiplicado pela cotação (16,53 → 83,94).
   const slug = String(fornecedor.slug ?? fornecedor.nome ?? "").toLowerCase();
-  const isBrlNative = /smmpainel|smm[-_ ]?panel|verified/.test(slug);
+  const moeda = String((fornecedor as any).moeda ?? "").toUpperCase();
+  const isBrlNative = moeda === "BRL"
+    || (moeda !== "USD" && /smmpainel|smm[-_ ]?panel|verified|provider4|smmoficial/.test(slug));
   let saldoUsd: number | null = null;
   let saldoBrl: number | null = null;
   if (saldoRaw != null) {
@@ -301,6 +303,7 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
       saldoBrl = Number((saldoRaw * cotacao).toFixed(2));
     }
   }
+
 
 
   const saldoAtualPrevio = Number((fornecedor as any).saldo_atual ?? 0);

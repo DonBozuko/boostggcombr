@@ -406,6 +406,7 @@ export type Database = {
           created_at: string
           falhas_consecutivas: number
           id: string
+          moeda: string
           nome: string
           prioridade: number
           rede_social: string
@@ -424,6 +425,7 @@ export type Database = {
           created_at?: string
           falhas_consecutivas?: number
           id?: string
+          moeda?: string
           nome: string
           prioridade?: number
           rede_social?: string
@@ -442,6 +444,7 @@ export type Database = {
           created_at?: string
           falhas_consecutivas?: number
           id?: string
+          moeda?: string
           nome?: string
           prioridade?: number
           rede_social?: string

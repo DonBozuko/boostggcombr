@@ -65,6 +65,28 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       });
       if (!fOk) blockDeploy = true;
 
+      // 2b. v247 — Moeda do fornecedor declarada (anti saldo inflado por cotação).
+      // Bug real: provider4 era conta em BRL, o sistema tratou como USD e multiplicou
+      // o saldo pela cotação (R$16,53 virou R$83,94). Sem moeda declarada = saldo mentiroso.
+      const { data: moedas } = await supabaseAdmin
+        .from("fornecedores")
+        .select("nome, slug, moeda, ativo")
+        .eq("ativo", true);
+      const semMoeda = (moedas ?? []).filter(
+        (f: any) => !["BRL", "USD"].includes(String(f.moeda ?? "").toUpperCase()),
+      );
+      const moedaOk = semMoeda.length === 0;
+      checks.push({
+        id: "fornecedor_moeda",
+        label: `Moeda declarada em todos os fornecedores (${(moedas ?? []).length})`,
+        ok: moedaOk,
+        detail: moedaOk
+          ? "saldo lido na moeda certa, sem conversão errada"
+          : `sem moeda definida: ${semMoeda.map((f: any) => f.nome).join(", ")} — saldo pode estar inflado pela cotação`,
+      });
+      if (!moedaOk) blockDeploy = true;
+
+
       // 3. Alertas Jarvis ABERTOS (últimas 2h) — SINTOMA REAL
       // v239: antes contava qualquer linha das últimas 6h, inclusive as marcadas
       // "✅ RESOLVIDO" e as já superadas por uma auditoria posterior limpa da mesma
