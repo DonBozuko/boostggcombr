@@ -113,8 +113,10 @@ export const jarvisNocSnapshot = createServerFn({ method: "POST" })
           falhas: f.falhas_consecutivas, ultima: f.ultima_verificacao,
         };
       }),
+      confiabilidade,
       apiLatency,
       pedidos: { total24h: pedidos24?.length ?? 0, pagos24h: pagos, pendentes24h: pendentes },
+
     };
   });
 
