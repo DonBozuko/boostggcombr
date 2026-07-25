@@ -197,7 +197,7 @@ export async function rankProvidersByCost(opts: {
     const unstable = !!(until && new Date(until).getTime() > now);
     return {
       slug: f.slug,
-      nome: f.norte,
+      nome: f.nome,
       cotacao_brl: cot,
       saldo_atual: Number(f.saldo_atual),
       cost_brl: cost,
