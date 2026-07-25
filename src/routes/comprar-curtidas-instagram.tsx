@@ -6,7 +6,8 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
 const TITLE = "Comprar Curtidas Instagram via Pix — Elite Boost Prime | BoostGG";
 const DESC =
-  "Curtidas no Instagram a partir de R$ 3,90, entrega em 1 a 5 minutos após o Pix. Sem senha, com reposição garantida por 30 dias. Cole o link do post e pronto.";
+  "Curtidas no Instagram a partir de R$ 5,00 (50 curtidas), entrega em 1 a 5 minutos após o Pix. Sem senha, com reposição garantida por 30 dias. Cole o link do post.";
+
 
 
 const FAQ = [
