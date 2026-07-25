@@ -1425,6 +1425,7 @@ export type Database = {
       }
       ops_forensics: { Args: never; Returns: Json }
       ops_http_health: { Args: { _hours?: number }; Returns: Json }
+      ops_http_recent_failures: { Args: { _minutes?: number }; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {

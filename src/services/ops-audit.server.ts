@@ -24,28 +24,33 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   // v238 — janela de 1h: erro antigo já corrigido não pode manter alerta vermelho.
-  const [{ data: snap }, { data: http }] = await Promise.all([
+  // v250 — só alerta se AINDA está falhando agora (últimos 15min). Rajada isolada
+  // durante deploy que já se curou sozinha não vira alerta crítico.
+  const [{ data: snap }, { data: http }, { data: agora }] = await Promise.all([
     (supabaseAdmin as any).rpc("ops_forensics"),
     (supabaseAdmin as any).rpc("ops_http_health", { _hours: 1 }),
+    (supabaseAdmin as any).rpc("ops_http_recent_failures", { _minutes: 15 }),
   ]);
 
   const s = (snap ?? {}) as any;
   const h = (http ?? {}) as any;
+  const now15 = (agora ?? {}) as any;
   const findings: OpsFinding[] = [];
 
   // 1) Robôs que dispararam mas o destino recusou (404/401) — falso "verde"
-  const naoEncontrado = Number(h.nao_encontrado_404 ?? 0);
-  const semPermissao = Number(h.sem_permissao_401_403 ?? 0);
+  const naoEncontrado = Number(now15.nao_encontrado_404 ?? 0);
+  const semPermissao = Number(now15.sem_permissao_401_403 ?? 0);
   if (naoEncontrado > 0 || semPermissao > 0) {
     findings.push({
       code: "ROBO_CHAMADA_RECUSADA",
       severity: "critical",
       titulo: "Robô automático rodando no vazio",
-      problema: `Na última hora houve ${naoEncontrado} chamada(s) para endereço inexistente e ${semPermissao} recusada(s) por senha inválida. O robô aparece como "OK" mas nada foi feito.`,
+      problema: `Nos últimos 15 minutos houve ${naoEncontrado} chamada(s) para endereço inexistente e ${semPermissao} recusada(s) por senha inválida. O robô aparece como "OK" mas nada foi feito.`,
       o_que_fazer: "Me avise: preciso corrigir o endereço/senha do robô no agendador.",
-      evidencia: h,
+      evidencia: { agora: now15, ultima_hora: h },
     });
   }
+
 
   const erro5xx = Number(h.erro_servidor_5xx ?? 0);
   if (erro5xx >= 3) {
