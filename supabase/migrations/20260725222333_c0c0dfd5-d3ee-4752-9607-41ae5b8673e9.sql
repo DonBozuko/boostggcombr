@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.rate_limit_check(TEXT, INTEGER, INTEGER) FROM anon, authenticated, PUBLIC;
