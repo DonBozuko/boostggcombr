@@ -107,6 +107,20 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {
+    // v252 — Rate limit: 8 pedidos / 5 min por IP (anti-spam de Pix/robô).
+    {
+      const { getRequestHeaders } = await import("@tanstack/react-start/server");
+      const { checkRateLimit, clientIpFrom } = await import("./rate-limit.server");
+      let ip = "unknown";
+      try {
+        ip = clientIpFrom(new Headers(getRequestHeaders() as Record<string, string>));
+      } catch { /* fora de contexto HTTP: segue */ }
+      const rl = await checkRateLimit("criar-pedido", ip, 8, 300);
+      if (!rl.allowed) {
+        console.warn(`[criarPedido] RATE_LIMITED ip=${ip} hits=${rl.hits}`);
+        return { ok: false as const, error: "RATE_LIMITED" as const };
+      }
+    }
     // v182 — Kill Switch Global: para tudo em emergência.
     {
       const { isGloballyBlocked } = await import("./kill-switch.server");
