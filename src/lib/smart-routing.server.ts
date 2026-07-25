@@ -196,8 +196,11 @@ export async function rankProvidersByCost(opts: {
   ((health as any[]) ?? []).forEach((h) => healthMap.set(h.slug, h.unstable_until));
 
   const now = Date.now();
+  const { effectiveFx } = await import("./critical-guards");
   const ranked: RankedProvider[] = ((forn as any[]) ?? []).map((f) => {
-    const cot = Number(f.cotacao_brl ?? 7.0) || 7.0;
+    const cotRaw = Number(f.cotacao_brl ?? 7.0) || 7.0;
+    // v246 — painéis BR cobram em BRL: não multiplicar pela cotação USD.
+    const cot = effectiveFx(f.slug, cotRaw);
     const providerRate = providerRateMap[f.slug] ?? null;
     const cost = providerRate != null
       ? Number(((opts.quantidade / 1000) * providerRate * cot).toFixed(4))

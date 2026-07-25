@@ -19,6 +19,21 @@ export function isToxicService(name?: string | null, category?: string | null): 
 }
 
 /**
+ * v246 — Moeda nativa do fornecedor.
+ * SMMhype cobra em USD (rate × cotação = BRL). SMMPainel, Verified Atacado e
+ * demais painéis brasileiros já cobram em BRL — multiplicar pela cotação
+ * inflava o custo ~5x e podia travar venda por margem / escolher fornecedor errado.
+ */
+export function isBrlNativeProvider(slug?: string | null): boolean {
+  return /smmpainel|smm[-_ ]?panel|verified|provider4/i.test(String(slug ?? ""));
+}
+
+/** Cotação efetiva a aplicar sobre o rate do fornecedor. */
+export function effectiveFx(slug: string | null | undefined, cotacao: number): number {
+  return isBrlNativeProvider(slug) ? 1 : cotacao;
+}
+
+/**
  * Um fornecedor pode entregar este pacote?
  * Em pacote BR: só se o serviço for comprovadamente brasileiro, não-tóxico
  * e, quando requireRefill=true, tiver reposição (refill) garantida.
