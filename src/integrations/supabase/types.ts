@@ -823,6 +823,8 @@ export type Database = {
           provider4_auto_id: string | null
           provider4_service_id: string | null
           quantidade: number
+          refill_checked_at: string | null
+          refill_supported: boolean | null
           sellable_reason: string | null
           smmhype_auto_id: string | null
           smmhype_service_id: string | null
@@ -845,6 +847,8 @@ export type Database = {
           provider4_auto_id?: string | null
           provider4_service_id?: string | null
           quantidade: number
+          refill_checked_at?: string | null
+          refill_supported?: boolean | null
           sellable_reason?: string | null
           smmhype_auto_id?: string | null
           smmhype_service_id?: string | null
@@ -867,6 +871,8 @@ export type Database = {
           provider4_auto_id?: string | null
           provider4_service_id?: string | null
           quantidade?: number
+          refill_checked_at?: string | null
+          refill_supported?: boolean | null
           sellable_reason?: string | null
           smmhype_auto_id?: string | null
           smmhype_service_id?: string | null
