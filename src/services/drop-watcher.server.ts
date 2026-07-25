@@ -129,7 +129,7 @@ export async function runDropWatcher(): Promise<DropWatcherSummary> {
   }
 
   await supabaseAdmin.from("admin_audit_logs").insert({
-    action: "drop_watcher_v242",
+    action: "drop_watcher_v254",
     detail: summary as never,
   } as never);
 
