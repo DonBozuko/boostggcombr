@@ -275,6 +275,28 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
 
   // 3) Despacho pelo pipeline existente (mesmas travas BR/refill/fornecedor),
   //    com o piso de lucro próprio da revenda.
+  //
+  // v279 — Se o despacho não acontecer, o pedido ficava em waiting_provision SEM
+  // sla_deadline. O SLA watcher só olha pedidos com prazo definido, então o saldo
+  // do revendedor ficava debitado para sempre, sem entrega e sem devolução.
+  // Agora todo pedido de revenda não despachado ganha prazo de 24h: se ninguém
+  // resolver, o watcher devolve o saldo automaticamente.
+  async function armResellerSla(id: string, motivo: string) {
+    try {
+      await supabaseAdmin
+        .from("pedidos")
+        .update({
+          sla_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          error_detail: `v279 revenda · aguardando entrega (prazo 24h). ${motivo}`.slice(0, 500),
+        } as any)
+        .eq("id", id)
+        .eq("status", "waiting_provision")
+        .is("sla_deadline", null);
+    } catch (e) {
+      console.warn("[reseller-api] falha ao armar SLA", id, e);
+    }
+  }
+
   try {
     const { reprocessWaitingProvision } = await import("@/lib/reprocess-waiting.server");
     const r = await reprocessWaitingProvision(pedidoId, {
