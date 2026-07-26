@@ -390,8 +390,15 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
     quantidade: Number(pedido.quantidade),
   }).catch(() => [] as any[]);
 
+  // v278 — reivindica o envio antes de qualquer chamada ao fornecedor.
+  const { claimDispatch, releaseDispatch } = await import("@/lib/dispatch-claim.server");
+  if (!(await claimDispatch(supabaseAdmin as any, pedido.id))) {
+    return { ok: false, error: "ENVIO_EM_ANDAMENTO", tentativas: [] };
+  }
+
   const tentativas: string[] = [];
   for (const f of ranked as any[]) {
+
     if (f.unstable) { tentativas.push(`${f.slug}: instável`); continue; }
     if (Number(f.saldo_atual) <= 0) { tentativas.push(`${f.slug}: saldo zero`); continue; }
     if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) { tentativas.push(`${f.slug}: saldo<custo`); continue; }
