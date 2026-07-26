@@ -1,0 +1,157 @@
+// v281 — Painel do Pedido Canário.
+// Prova de entrega real: o sistema compra de verdade, no menor valor possível,
+// e acompanha até chegar. Se não chegar, alerta antes do cliente reclamar.
+import { useCallback, useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { getCanaryPanel, saveCanaryConfig, runCanaryNow } from "@/lib/canary.functions";
+import { Bird, RefreshCw, Play } from "lucide-react";
+import { toast } from "sonner";
+
+type Panel = Awaited<ReturnType<typeof getCanaryPanel>>;
+type Run = { id: string; created_at: string; pacote: string; quantidade: number; provider_slug: string | null; provider_order_id: string | null; status: string; remains: number | null; delivered_at: string | null; detail: string | null; cost_brl: number | null };
+
+const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
+  dispatched: { text: "enviado ao fornecedor", cls: "text-cyan-300" },
+  processing: { text: "entregando", cls: "text-amber-300" },
+  delivered: { text: "ENTREGUE", cls: "text-emerald-300" },
+  failed: { text: "FALHOU", cls: "text-red-300" },
+  stuck: { text: "ATRASADO", cls: "text-red-300" },
+};
+
+export function CanaryPanel({ token }: { token: string }) {
+  const load$ = useServerFn(getCanaryPanel);
+  const save$ = useServerFn(saveCanaryConfig);
+  const run$ = useServerFn(runCanaryNow);
+
+  const [panel, setPanel] = useState<Panel | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({ enabled: false, link: "", pacote: "", quantidade: 0, interval_hours: 12, sla_hours: 6 });
+
+  const load = useCallback(async () => {
+    if (!token) return;
+    try {
+      const r = await load$({ data: { token } });
+      setPanel(r);
+      if (r.ok) setForm(r.config);
+    } catch (e) { console.error(e); }
+  }, [load$, token]);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const save = async () => {
+    setBusy(true);
+    try {
+      const r = await save$({ data: { token, ...form, quantidade: Number(form.quantidade) || 0 } });
+      if (r.ok) { toast.success("Configuração salva"); void load(); }
+      else toast.error(r.error ?? "erro");
+    } finally { setBusy(false); }
+  };
+
+  const runNow = async () => {
+    setBusy(true);
+    try {
+      const r = await run$({ data: { token } });
+      if (!r.ok) { toast.error(r.error ?? "erro"); return; }
+      const rep = r.report;
+      if (!rep.ligado) toast.error(rep.motivo ?? "canário desligado");
+      else if (rep.novo_pedido) toast.success(`Compra real feita em ${rep.novo_pedido.fornecedor} (ordem ${rep.novo_pedido.ordem})`);
+      else toast.message("Nenhuma compra nova — apenas verificação dos testes abertos");
+      void load();
+    } finally { setBusy(false); }
+  };
+
+  const runs = (panel?.ok ? panel.runs : []) as Run[];
+
+  return (
+    <section className="rounded-xl border border-emerald-500/40 bg-black/60 backdrop-blur-xl p-4 shadow-[0_0_18px_rgba(16,185,129,0.2)]">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-emerald-300 flex items-center gap-2">
+          <Bird size={14} /> Pedido Canário · prova de entrega real
+        </h3>
+        <div className="flex gap-2">
+          <button onClick={load} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1 flex items-center gap-1">
+            <RefreshCw size={10} /> ↻
+          </button>
+          <button onClick={runNow} disabled={busy} className="text-[10px] uppercase tracking-wider text-black bg-emerald-400 rounded px-2 py-1 flex items-center gap-1 disabled:opacity-40">
+            <Play size={10} /> Testar agora
+          </button>
+        </div>
+      </div>
+
+      <p className="text-[11px] text-white/60 mb-3 leading-relaxed">
+        O sistema compra de verdade o menor pacote possível apontando para o seu perfil de teste e acompanha até entregar.
+        Se atrasar ou falhar, você recebe alerta no Telegram antes de qualquer cliente reclamar.
+      </p>
+
+      {panel && !panel.ok && <div className="text-[11px] text-red-300 font-mono">Token inválido — recarrega o admin.</div>}
+
+      {panel?.ok && (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] mb-3">
+            <label className="flex flex-col gap-1">
+              <span className="text-white/50">Perfil de teste (@ ou link)</span>
+              <input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })}
+                placeholder="@seu_perfil_de_teste"
+                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-white/50">Pacote do catálogo</span>
+              <input value={form.pacote} onChange={(e) => setForm({ ...form, pacote: e.target.value })}
+                placeholder="ex: seguidores-100"
+                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-white/50">Quantidade</span>
+              <input type="number" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: Number(e.target.value) })}
+                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-white/50">Intervalo entre testes (h)</span>
+              <input type="number" value={form.interval_hours} onChange={(e) => setForm({ ...form, interval_hours: Number(e.target.value) })}
+                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+            </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-white/50">Prazo máximo p/ entregar (h)</span>
+              <input type="number" value={form.sla_hours} onChange={(e) => setForm({ ...form, sla_hours: Number(e.target.value) })}
+                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+            </label>
+            <label className="flex items-end gap-2 pb-1">
+              <input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} />
+              <span className="text-white/70">Ligado (compra automática)</span>
+            </label>
+          </div>
+
+          <button onClick={save} disabled={busy}
+            className="text-[11px] uppercase tracking-wider border border-emerald-500/40 text-emerald-300 rounded px-3 py-1 mb-4 disabled:opacity-40">
+            Salvar configuração
+          </button>
+
+          {!form.enabled && (
+            <div className="text-[11px] text-amber-300 font-mono mb-3">
+              Canário desligado — nenhuma compra automática está sendo feita.
+            </div>
+          )}
+
+          <div className="space-y-1">
+            {runs.length === 0 && <div className="text-[11px] text-white/40 font-mono">Nenhum teste real registrado ainda.</div>}
+            {runs.map((r) => {
+              const s = STATUS_LABEL[r.status] ?? { text: r.status, cls: "text-white/60" };
+              return (
+                <div key={r.id} className="rounded-lg border border-white/10 bg-black/40 p-2 text-[11px] flex flex-wrap gap-x-3 gap-y-1">
+                  <span className="text-white/40 font-mono">{new Date(r.created_at).toLocaleString("pt-BR")}</span>
+                  <span className="text-white/80">{r.pacote} · {r.quantidade}</span>
+                  <span className="text-white/50">{r.provider_slug ?? "—"}{r.provider_order_id ? ` #${r.provider_order_id}` : ""}</span>
+                  <span className={s.cls}>{s.text}</span>
+                  {r.remains != null && r.status !== "delivered" && <span className="text-white/50">faltam {r.remains}</span>}
+                  {r.detail && <span className="text-white/40 w-full font-mono">{r.detail}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+export default CanaryPanel;
