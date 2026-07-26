@@ -504,30 +504,55 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     } catch { /* noop */ }
   }
 
-  // v271 — Alerta de reprecificação forte, com freio anti-spam.
-  // Se metade do catálogo "mudou de preço" de uma vez, isso não é o fornecedor
-  // reajustando: é leitura ruim (catálogo incompleto/câmbio). Nesse caso avisa
-  // UMA vez que a leitura está suspeita, em vez de despejar lista de preços.
-  const scannedTotal = ((rows as any[]) ?? []).length || 1;
-  const leituraSuspeita = repriced.length > scannedTotal * 0.3;
-  if (repriced.length > 0) {
+  // v275 — Alerta honesto: "mudariam" só quando realmente NÃO aplicou.
+  // Freio anti-spam: mesma leitura suspeita só alerta 1x a cada 6h.
+  const jaAlertouRecente =
+    emQuarentena &&
+    q?.signature === assinatura &&
+    q?.last_alert_at != null &&
+    Date.now() - Date.parse(q.last_alert_at) < ALERT_COOLDOWN_MS;
+
+  if ((repriced.length > 0 || emQuarentena) && !jaAlertouRecente) {
     try {
       const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      const base = emQuarentena ? movers : plans.filter((p) => p.movesPrice);
+      const amostraQ = base
+        .slice(0, 8)
+        .map((p) => `• ${p.pacote} → R$ ${Number(p.patch.price_brl ?? 0).toFixed(2)}`)
+        .join("\n");
       const amostra = repriced
         .slice(0, 8)
         .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
         .join("\n");
-      const msg = leituraSuspeita
-        ? `⚠️ LEITURA DE PREÇO SUSPEITA\n\nPROBLEMA: ${repriced.length} de ${scannedTotal} pacotes mudariam de preço de uma vez só. Isso quase sempre é falha de leitura do fornecedor, não reajuste real. Nada foi tirado da vitrine em massa.\n\n${amostra}\n\nO QUE FAZER: me avisa. Vou conferir se algum fornecedor devolveu catálogo incompleto ou cotação errada.`
+      const msg = emQuarentena
+        ? `⚠️ MUDANÇA DE PREÇO EM MASSA BLOQUEADA\n\nPROBLEMA: ${movers.length} de ${scannedTotal} pacotes mudariam de preço no mesmo ciclo. Isso quase sempre é leitura errada do fornecedor. NENHUM preço do site foi alterado e nada saiu da vitrine.\n\n${amostraQ}\n\nO QUE FAZER: nada urgente. Se a próxima leitura vier igual, o sistema aplica sozinho. Se quiser aplicar agora, aprovar no admin.`
         : `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`;
       await dispatchWhatsappAlert(msg).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
-        action: leituraSuspeita ? "leitura_preco_suspeita_v271" : "reprecificacao_forte_v266",
-        detail: { total: repriced.length, scanned: scannedTotal, itens: repriced.slice(0, 50) } as any,
+        action: emQuarentena ? "preco_massa_bloqueado_v275" : "reprecificacao_forte_v266",
+        detail: {
+          total: emQuarentena ? movers.length : repriced.length,
+          scanned: scannedTotal,
+          assinatura,
+          itens: repriced.slice(0, 50),
+        } as any,
       });
+      if (emQuarentena) {
+        await writeQuarantine(supabaseAdmin, {
+          signature: assinatura,
+          total: movers.length,
+          scanned: scannedTotal,
+          applied: false,
+          approved: false,
+          last_alert_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+        });
+      }
     } catch { /* noop */ }
   }
+
 
 
   const perProvider = Object.fromEntries(
