@@ -179,7 +179,11 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
 }
 
 /** Fase 2 — dispara um novo canário na rede que está há mais tempo sem teste.
- *  Cada rede tem seu próprio link/pacote: rotaciona um alvo por execução. */
+ *  Cada rede tem seu próprio link/pacote: rotaciona um alvo por execução.
+ *  v285 — agora exercita o MESMO failover de um pedido real: percorre a cadeia
+ *  inteira de fornecedores e só alerta se TODOS falharem. Antes o canário testava
+ *  só o mais barato, o que gerava alarme falso sempre que o primeiro recusava
+ *  (o cliente real failover e entrega normalmente). */
 async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<void> {
   const alvos = cfg.alvos.filter(alvoValido);
   if (alvos.length === 0) return;
@@ -207,8 +211,11 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
 
   const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
   const ranked = await rankProvidersByCost({ pacote: alvo.pacote, quantidade: alvo.quantidade });
-  const candidate = ranked.find((p) => !p.unstable && p.provider_service_id);
-  if (!candidate) {
+
+  // Cadeia apta: fornecedores ativos, não instáveis, com ID real (smmhype usa
+  // resolver interno, então dispensa provider_service_id).
+  const cadeia = ranked.filter((p) => !p.unstable && (p.slug === "smmhype" || p.provider_service_id));
+  if (cadeia.length === 0) {
     report.ok = false;
     const m = `🚨 NENHUM FORNECEDOR DISPONÍVEL\n\nPROBLEMA: o teste de compra real não achou fornecedor apto para o pacote ${alvo.pacote} (${rede}).\n\nO QUE FAZER: abrir /admin e conferir fornecedores e IDs do catálogo.`;
     report.alertas.push(m); await alert(m);
@@ -216,42 +223,60 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
   }
 
   const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
-  const r = await dispatchByFornecedor(candidate.slug, {
-    pacote: alvo.pacote,
-    quantidade: alvo.quantidade,
-    instagram_user: alvo.link,
-    serviceIdOverride: candidate.provider_service_id,
-  });
+  const tentativas: string[] = [];
 
+  for (const cand of cadeia) {
+    const r = await dispatchByFornecedor(cand.slug, {
+      pacote: alvo.pacote,
+      quantidade: alvo.quantidade,
+      instagram_user: alvo.link,
+      // smmhype resolve o serviceId internamente; demais usam o ID curado/auto.
+      serviceIdOverride: cand.slug === "smmhype" ? undefined : cand.provider_service_id,
+    });
+
+    if (!r.ok) {
+      tentativas.push(`${cand.slug}: ${r.error ?? "falha"}`);
+      // dispatchByFornecedor já acionou o circuit breaker interno; continua pro próximo.
+      continue;
+    }
+
+    const { data: ins } = await supabaseAdmin
+      .from("canary_runs")
+      .insert({
+        pacote: alvo.pacote,
+        quantidade: alvo.quantidade,
+        target_link: alvo.link,
+        provider_slug: cand.slug,
+        cost_brl: cand.cost_brl,
+        status: "dispatched",
+        provider_order_id: String(r.orderId),
+        detail: `[${rede}] enviado via ${cand.slug}${tentativas.length ? ` (após falha de ${tentativas.length} fornecedor[es])` : ""}`,
+      } as any)
+      .select("id")
+      .maybeSingle();
+
+    report.novo_pedido = {
+      id: String((ins as any)?.id ?? ""),
+      fornecedor: cand.slug,
+      ordem: String(r.orderId),
+      pacote: alvo.pacote,
+      quantidade: alvo.quantidade,
+    };
+    return; // sucesso — entrega em andamento
+  }
+
+  // Se chegou aqui: TODOS os fornecedores da cadeia falharam = entrega real quebrada.
   const base = {
     pacote: alvo.pacote,
     quantidade: alvo.quantidade,
     target_link: alvo.link,
-    provider_slug: candidate.slug,
-    cost_brl: candidate.cost_brl,
+    provider_slug: cadeia[0]?.slug ?? null,
+    cost_brl: cadeia[0]?.cost_brl ?? null,
   };
-
-  if (!r.ok) {
-    await supabaseAdmin.from("canary_runs").insert({ ...base, status: "failed", detail: `[${rede}] ${r.error ?? "falha desconhecida"}` } as any);
-    report.ok = false;
-    const m = `🚨 COMPRA DE TESTE FALHOU\n\nPROBLEMA: o sistema tentou comprar de verdade em ${candidate.slug} (${rede}) e o fornecedor recusou: ${r.error}\n\nO QUE FAZER: cliente real que comprar esse pacote agora provavelmente também falha. Conferir /admin.`;
-    report.alertas.push(m); await alert(m);
-    return;
-  }
-
-  const { data: ins } = await supabaseAdmin
-    .from("canary_runs")
-    .insert({ ...base, status: "dispatched", provider_order_id: String(r.orderId), detail: `[${rede}] enviado` } as any)
-    .select("id")
-    .maybeSingle();
-
-  report.novo_pedido = {
-    id: String((ins as any)?.id ?? ""),
-    fornecedor: candidate.slug,
-    ordem: String(r.orderId),
-    pacote: alvo.pacote,
-    quantidade: alvo.quantidade,
-  };
+  await supabaseAdmin.from("canary_runs").insert({ ...base, status: "failed", detail: `[${rede}] TODOS falharam: ${tentativas.join(" | ")}` } as any);
+  report.ok = false;
+  const m = `🚨 ENTREGA REAL QUEBRADA\n\nPROBLEMA: o teste de compra real (${rede} · ${alvo.pacote}) falhou em TODOS os ${cadeia.length} fornecedores:\n${tentativas.map((t) => `• ${t}`).join("\n")}\n\nO QUE FAZER: cliente que comprar esse pacote agora NÃO vai receber. Abrir /admin e conferir fornecedores antes de qualquer venda.`;
+  report.alertas.push(m); await alert(m);
 }
 
 export async function runCanary(force = false): Promise<CanaryReport> {

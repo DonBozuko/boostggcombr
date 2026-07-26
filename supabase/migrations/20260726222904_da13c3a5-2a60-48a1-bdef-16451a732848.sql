@@ -1,0 +1,1 @@
+UPDATE public.fornecedores SET api_url = slug || CASE WHEN slug = 'smmhype' THEN '.com/api/v2' WHEN slug = 'smmpainel' THEN '.com/api/v2' WHEN slug = 'verified' THEN '.com/api/v2' ELSE '' END WHERE slug IN ('smmhype','smmpainel','verified') AND api_url NOT LIKE '%/api/v2%';
