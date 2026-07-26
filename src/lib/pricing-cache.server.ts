@@ -261,13 +261,20 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       const best = costs.reduce((a, b) => (b.cost < a.cost ? b : a));
       const newCost = best.cost;
       const newPrice = computeGuardedPrice(newCost, qty); // Equação Fabiano Tiered v173
+      const oldPrice = Number(r.price_brl ?? 0);
       const costChanged = Math.abs(newCost - Number(r.cost_brl ?? 0)) > 0.0001;
-      const priceChanged = Math.abs(newPrice - Number(r.price_brl ?? 0)) > 0.009;
+      const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
         patch.price_brl = newPrice;
         patch.last_cost_source = best.slug;
         patch.synced_at = new Date().toISOString();
+        // v266 — Reprecificação forte: fornecedor mexeu muito no custo.
+        // Nunca vendemos abaixo da margem, mas o dono precisa saber para
+        // trocar de fornecedor ou aposentar o pacote.
+        if (oldPrice > 0 && (newPrice / oldPrice >= 1.5 || newPrice / oldPrice <= 0.6)) {
+          repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+        }
       }
     }
 
