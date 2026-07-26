@@ -657,10 +657,82 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     console.log("[pricing] v137 reserve live handshake", rep);
   } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
 
+  // v274 — Recusto pelo fornecedor de reserva.
+  // CAUSA RAIZ do p15k a R$2.509: quando o fornecedor primário (SMMhype) não
+  // tem o serviço, o motor caía na tabela FALLBACK (ex.: R$12/1k) mesmo com um
+  // fornecedor de reserva vendendo o mesmo pacote por R$1,91/1k. Resultado:
+  // custo fantasma inflado e preço de vitrine absurdo. Agora, todo item em
+  // 'fallback' que tenha ID de reserva com tarifa real usa a tarifa real.
+  try {
+    const rec = await recostFromReserves();
+    console.log("[pricing] v274 recost from reserves", rec);
+  } catch (e) { console.warn("[pricing] v274 recost fail", e); }
+
   purgePricingCacheMemory("syncPricingCacheAll:end");
 
   return { ok: !e1 && !e2, updated: itemRows.length, results: catSummary, mode: "api" };
 }
+
+/**
+ * v274 — Corrige itens precificados por fallback quando existe tarifa real de
+ * um fornecedor de reserva (SMMPainel / Verified, ambos em BRL).
+ * Só age para BAIXO ou quando o custo fantasma diverge >10% do real — nunca
+ * encarece o site por conta própria.
+ */
+export async function recostFromReserves(): Promise<{
+  checked: number;
+  fixed: number;
+  items: Array<{ pacote: string; de: number; para: number }>;
+}> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: items } = await supabaseAdmin
+    .from("pricing_items" as any)
+    .select("pacote, quantidade, cost_brl, price_brl, source, smmpanel_service_id, verified_service_id")
+    .eq("source", "fallback");
+
+  const rows = (items ?? []) as Array<Record<string, any>>;
+  if (!rows.length) return { checked: 0, fixed: 0, items: [] };
+
+  const [{ data: sp }, { data: vf }] = await Promise.all([
+    supabaseAdmin.from("smmpanel_services_cache" as any).select("provider_service_id, rate"),
+    supabaseAdmin.from("verified_services_cache" as any).select("provider_service_id, rate"),
+  ]);
+  const rateSp = new Map<string, number>();
+  for (const r of (sp ?? []) as any[]) rateSp.set(String(r.provider_service_id), Number(r.rate));
+  const rateVf = new Map<string, number>();
+  for (const r of (vf ?? []) as any[]) rateVf.set(String(r.provider_service_id), Number(r.rate));
+
+  const fixed: Array<{ pacote: string; de: number; para: number }> = [];
+  for (const row of rows) {
+    const qty = Number(row.quantidade) || 0;
+    if (qty <= 0) continue;
+    const rate =
+      rateSp.get(String(row.smmpanel_service_id ?? "")) ??
+      rateVf.get(String(row.verified_service_id ?? ""));
+    if (!Number.isFinite(rate) || !rate || rate <= 0) continue;
+
+    const realCost = (qty / 1000) * (rate as number);
+    const oldCost = Number(row.cost_brl) || 0;
+    // Ignora divergência pequena (ruído de câmbio/arredondamento).
+    if (oldCost > 0 && Math.abs(realCost - oldCost) / oldCost < 0.1) continue;
+    // Nunca encarece a vitrine sozinho: só corrige quando o custo real é menor.
+    if (oldCost > 0 && realCost > oldCost) continue;
+
+    const newPrice = Number(priceFromPackageCost(qty, realCost).toFixed(2));
+    const { error } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .update({
+        cost_brl: Number(realCost.toFixed(4)),
+        price_brl: newPrice,
+        last_cost_source: "reserve_recost_v274",
+      })
+      .eq("pacote", row.pacote);
+    if (!error) fixed.push({ pacote: String(row.pacote), de: Number(row.price_brl) || 0, para: newPrice });
+  }
+
+  return { checked: rows.length, fixed: fixed.length, items: fixed };
+}
+
 
 // v47 — preço final por pacote individual (checkout / webhook MP / bot Telegram).
 export async function getItemPriceBRL(pacote: string): Promise<number | null> {
