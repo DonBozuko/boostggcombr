@@ -126,10 +126,23 @@ export function CanaryPanel({ token }: { token: string }) {
 
       {panel?.ok && (
         <>
+          {quarentena.length > 0 && (
+            <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+              <div className="text-[10px] uppercase tracking-wider text-amber-300 mb-1">
+                Fornecedores em descanso (só neste pacote — o site continua vendendo pelos outros)
+              </div>
+              {quarentena.map((q, i) => (
+                <div key={i} className="text-[11px] text-white/70 font-mono">
+                  {q.pacote} · {q.provider_slug} · volta {new Date(q.until).toLocaleString("pt-BR")} · {q.reason ?? ""}
+                </div>
+              ))}
+            </div>
+          )}
           <div className="space-y-2 mb-3">
             <div className="text-[10px] uppercase tracking-wider text-white/50">
               Alvos por rede — cada rede precisa do próprio link de teste (Instagram não serve para YouTube/TikTok/Telegram)
             </div>
+
             {form.alvos.length === 0 && (
               <div className="text-[11px] text-amber-300 font-mono">Nenhuma rede configurada — o canário não roda.</div>
             )}
