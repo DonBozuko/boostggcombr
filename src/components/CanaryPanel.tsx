@@ -107,24 +107,43 @@ export function CanaryPanel({ token }: { token: string }) {
 
       {panel?.ok && (
         <>
+          <div className="space-y-2 mb-3">
+            <div className="text-[10px] uppercase tracking-wider text-white/50">
+              Alvos por rede — cada rede precisa do próprio link de teste (Instagram não serve para YouTube/TikTok/Telegram)
+            </div>
+            {form.alvos.length === 0 && (
+              <div className="text-[11px] text-amber-300 font-mono">Nenhuma rede configurada — o canário não roda.</div>
+            )}
+            {form.alvos.map((a, i) => (
+              <div key={i} className="grid grid-cols-2 md:grid-cols-6 gap-2 text-[11px] items-end rounded-lg border border-white/10 bg-black/40 p-2">
+                <input value={a.rede} onChange={(e) => setAlvo(i, { rede: e.target.value })}
+                  placeholder="rede (instagram)"
+                  className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+                <input value={a.link} onChange={(e) => setAlvo(i, { link: e.target.value })}
+                  placeholder="link/perfil de teste dessa rede"
+                  className="md:col-span-2 bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+                <input value={a.pacote} onChange={(e) => setAlvo(i, { pacote: e.target.value })}
+                  placeholder="pacote do catálogo"
+                  className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+                <input type="number" value={a.quantidade} onChange={(e) => setAlvo(i, { quantidade: Number(e.target.value) })}
+                  placeholder="qtd"
+                  className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1 text-white/70">
+                    <input type="checkbox" checked={a.ativo} onChange={(e) => setAlvo(i, { ativo: e.target.checked })} />
+                    ativo
+                  </label>
+                  <button onClick={() => removeAlvo(i)} className="text-red-300 border border-red-400/40 rounded px-2">×</button>
+                </div>
+              </div>
+            ))}
+            <button onClick={addAlvo} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1">
+              + adicionar rede
+            </button>
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] mb-3">
-            <label className="flex flex-col gap-1">
-              <span className="text-white/50">Perfil de teste (@ ou link)</span>
-              <input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })}
-                placeholder="@seu_perfil_de_teste"
-                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-white/50">Pacote do catálogo</span>
-              <input value={form.pacote} onChange={(e) => setForm({ ...form, pacote: e.target.value })}
-                placeholder="ex: seguidores-100"
-                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-white/50">Quantidade</span>
-              <input type="number" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: Number(e.target.value) })}
-                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
-            </label>
+
             <label className="flex flex-col gap-1">
               <span className="text-white/50">Intervalo entre testes (h)</span>
               <input type="number" value={form.interval_hours} onChange={(e) => setForm({ ...form, interval_hours: Number(e.target.value) })}
