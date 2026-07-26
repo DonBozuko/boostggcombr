@@ -196,6 +196,21 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
 
   const rede = redeFromCategory(String(item.category ?? ""), pacote);
 
+  // v279 — Idempotência real da API de revenda.
+  //
+  // Causa raiz: a rota aceitava qualquer POST. Um timeout de rede no lado do
+  // revendedor faz o cliente repetir a chamada — e o sistema criava um SEGUNDO
+  // pedido, debitava o saldo de novo e entregava duas vezes. O padrão de mercado
+  // é chave de idempotência; aqui ela é derivada de (revendedor, pacote, link,
+  // janela de 90s) OU do header/param enviado pelo cliente, e a unicidade é
+  // garantida pelo índice único no banco (não por leitura antes da escrita, que
+  // não protege contra requisições realmente simultâneas).
+  const clientKey = (p.idempotency_key ?? "").trim().slice(0, 80);
+  const bucket = Math.floor(Date.now() / 90_000);
+  const idemKey = clientKey
+    ? `rs:${reseller.id}:${clientKey}`
+    : `rs:${reseller.id}:${pacote}:${link.toLowerCase()}:${bucket}`;
+
   // 1) Pedido primeiro (rastreável mesmo se algo falhar depois).
   const { data: inserted, error: insErr } = await supabaseAdmin
     .from("pedidos")
@@ -206,6 +221,7 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
       valor: q.price,
       reseller_valor: q.price,
       reseller_id: reseller.id,
+      reseller_idem_key: idemKey,
       status: "waiting_provision",
       rede_social: rede,
       email_contato: reseller.email,
