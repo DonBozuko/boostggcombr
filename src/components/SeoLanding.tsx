@@ -308,7 +308,7 @@ export function SeoLanding(p: SeoLandingProps) {
           <a href="/promo-5reais" className="hover:text-white transition-colors">Promo R$ 5</a>
           <a href="/kit-creator" className="hover:text-white transition-colors">Kit Creator</a>
           <a href="/rastrear" className="hover:text-white transition-colors">Rastrear pedido</a>
-          <a href="/revenda" className="hover:text-white transition-colors">Seja revendedor</a>
+          <a href="/revenda" className="font-semibold text-amber-400 hover:text-amber-300 transition-colors">💼 Seja revendedor</a>
           <a href="/blog" className="hover:text-white transition-colors">Blog</a>
           <a href="/termos" className="hover:text-white transition-colors">Termos</a>
           <a href="/reembolso" className="hover:text-white transition-colors">Reembolso</a>
