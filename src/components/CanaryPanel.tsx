@@ -3,7 +3,7 @@
 // e acompanha até chegar. Se não chegar, alerta antes do cliente reclamar.
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getCanaryPanel, saveCanaryConfig, runCanaryNow } from "@/lib/canary.functions";
+import { getCanaryPanel, saveCanaryConfig, runCanaryNow, suggestCanaryTargets } from "@/lib/canary.functions";
 import { Bird, RefreshCw, Play } from "lucide-react";
 import { toast } from "sonner";
 
