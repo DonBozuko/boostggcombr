@@ -178,53 +178,70 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
   }
 }
 
-/** Fase 2 — dispara um novo canário se já passou o intervalo. */
+/** Fase 2 — dispara um novo canário na rede que está há mais tempo sem teste.
+ *  Cada rede tem seu próprio link/pacote: rotaciona um alvo por execução. */
 async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<void> {
-  const { data: last } = await supabaseAdmin
+  const alvos = cfg.alvos.filter(alvoValido);
+  if (alvos.length === 0) return;
+
+  const { data: recent } = await supabaseAdmin
     .from("canary_runs")
-    .select("created_at")
+    .select("pacote, created_at")
     .order("created_at", { ascending: false })
-    .limit(1);
-  const lastAt = (last as any[])?.[0]?.created_at ? new Date((last as any[])[0].created_at).getTime() : 0;
+    .limit(200);
+
+  const lastByPacote = new Map<string, number>();
+  for (const row of ((recent as any[]) ?? [])) {
+    if (!lastByPacote.has(row.pacote)) lastByPacote.set(row.pacote, new Date(row.created_at).getTime());
+  }
+
+  // O alvo mais "velho" (ou nunca testado) é o próximo da fila.
+  const alvo = [...alvos].sort(
+    (a, b) => (lastByPacote.get(a.pacote) ?? 0) - (lastByPacote.get(b.pacote) ?? 0),
+  )[0];
+
+  const lastAt = lastByPacote.get(alvo.pacote) ?? 0;
   if (Date.now() - lastAt < cfg.interval_hours * 3_600_000) return;
 
+  const rede = alvo.rede || alvo.pacote;
+
   const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
-  const ranked = await rankProvidersByCost({ pacote: cfg.pacote, quantidade: cfg.quantidade });
+  const ranked = await rankProvidersByCost({ pacote: alvo.pacote, quantidade: alvo.quantidade });
   const candidate = ranked.find((p) => !p.unstable && p.provider_service_id);
   if (!candidate) {
     report.ok = false;
-    const m = `🚨 NENHUM FORNECEDOR DISPONÍVEL\n\nPROBLEMA: o teste de compra real não achou fornecedor apto para o pacote ${cfg.pacote}.\n\nO QUE FAZER: abrir /admin e conferir fornecedores e IDs do catálogo.`;
+    const m = `🚨 NENHUM FORNECEDOR DISPONÍVEL\n\nPROBLEMA: o teste de compra real não achou fornecedor apto para o pacote ${alvo.pacote} (${rede}).\n\nO QUE FAZER: abrir /admin e conferir fornecedores e IDs do catálogo.`;
     report.alertas.push(m); await alert(m);
     return;
   }
 
   const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
   const r = await dispatchByFornecedor(candidate.slug, {
-    pacote: cfg.pacote,
-    quantidade: cfg.quantidade,
-    instagram_user: cfg.link,
+    pacote: alvo.pacote,
+    quantidade: alvo.quantidade,
+    instagram_user: alvo.link,
     serviceIdOverride: candidate.provider_service_id,
   });
 
   const base = {
-    pacote: cfg.pacote,
-    quantidade: cfg.quantidade,
-    target_link: cfg.link,
+    pacote: alvo.pacote,
+    quantidade: alvo.quantidade,
+    target_link: alvo.link,
     provider_slug: candidate.slug,
     cost_brl: candidate.cost_brl,
   };
 
   if (!r.ok) {
-    await supabaseAdmin.from("canary_runs").insert({ ...base, status: "failed", detail: r.error ?? "falha desconhecida" } as any);
+    await supabaseAdmin.from("canary_runs").insert({ ...base, status: "failed", detail: `[${rede}] ${r.error ?? "falha desconhecida"}` } as any);
     report.ok = false;
-    const m = `🚨 COMPRA DE TESTE FALHOU\n\nPROBLEMA: o sistema tentou comprar de verdade em ${candidate.slug} e o fornecedor recusou: ${r.error}\n\nO QUE FAZER: cliente real que comprar esse pacote agora provavelmente também falha. Conferir /admin.`;
+    const m = `🚨 COMPRA DE TESTE FALHOU\n\nPROBLEMA: o sistema tentou comprar de verdade em ${candidate.slug} (${rede}) e o fornecedor recusou: ${r.error}\n\nO QUE FAZER: cliente real que comprar esse pacote agora provavelmente também falha. Conferir /admin.`;
     report.alertas.push(m); await alert(m);
     return;
   }
 
   const { data: ins } = await supabaseAdmin
     .from("canary_runs")
-    .insert({ ...base, status: "dispatched", provider_order_id: String(r.orderId) } as any)
+    .insert({ ...base, status: "dispatched", provider_order_id: String(r.orderId), detail: `[${rede}] enviado` } as any)
     .select("id")
     .maybeSingle();
 
@@ -232,8 +249,8 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
     id: String((ins as any)?.id ?? ""),
     fornecedor: candidate.slug,
     ordem: String(r.orderId),
-    pacote: cfg.pacote,
-    quantidade: cfg.quantidade,
+    pacote: alvo.pacote,
+    quantidade: alvo.quantidade,
   };
 }
 
@@ -241,11 +258,12 @@ export async function runCanary(force = false): Promise<CanaryReport> {
   const report: CanaryReport = { ok: true, ligado: false, verificados: [], alertas: [], ts: new Date().toISOString() };
   const cfg = await getCanaryConfig();
 
-  if (!cfg.enabled || !cfg.link || !cfg.pacote || cfg.quantidade <= 0) {
-    report.motivo = "canário desligado: falta perfil de teste, pacote ou quantidade em admin_settings.canary_config";
+  if (!cfg.enabled || cfg.alvos.filter(alvoValido).length === 0) {
+    report.motivo = "canário desligado: nenhuma rede com perfil de teste, pacote e quantidade configurados";
     return report;
   }
   report.ligado = true;
+
 
   await checkOpenRuns(cfg, report);
   if (force) {
