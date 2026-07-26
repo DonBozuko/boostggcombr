@@ -7,7 +7,7 @@
 // Preserva HUD v57, largura +80px v101, grade 200 v107, cronômetro 3min v105,
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
-import { computeGuardedPrice } from "./margin-guardian";
+import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
 
 type PricingRow = {
   pacote: string;
@@ -206,7 +206,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
 
   const selectCols = [
     "pacote", "category", "quantidade", "cost_brl", "price_brl",
-    "id_miss_streak", "id_miss_since",
+    "id_miss_streak", "id_miss_since", "is_sellable", "sellable_reason",
     ...providers.flatMap((p) => [`${p.column}_service_id`, `${p.column}_auto_id`]),
   ];
   const { data: rows } = await supabaseAdmin
@@ -216,6 +216,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   const bound: Record<string, number> = {};
   const ghostList: Array<{ pacote: string; streak: number }> = [];
   const repriced: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
+  const restored: string[] = [];
   let updated_rows = 0;
 
   for (const r of ((rows as any[]) ?? [])) {
@@ -292,7 +293,25 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
           repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
         }
       }
+
+      // v267 — Auto-religamento. Sem isso o pacote pausado por custo ficava
+      // pausado PARA SEMPRE, mesmo depois de o preço já ter convergido para o
+      // valor justo. Só religa pausa criada por este próprio motor (prefixo
+      // "custo do fornecedor"/"custo real"), nunca pausa manual do dono,
+      // e só quando o preço vigente ainda respeita a margem mínima.
+      const autoPaused =
+        r.is_sellable === false &&
+        /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""));
+      if (autoPaused && patch.is_sellable !== false) {
+        const priceNow = Number(patch.price_brl ?? oldPrice);
+        if (priceNow > 0 && salto <= 1.5 && respectsMinMargin(priceNow, newCost)) {
+          patch.is_sellable = true;
+          patch.sellable_reason = null;
+          restored.push(r.pacote);
+        }
+      }
     }
+
 
     if (Object.keys(patch).length === 0) continue;
     const { error } = await supabaseAdmin
@@ -349,11 +368,12 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     }]),
   );
 
-  console.log("[pricing-cache] v266 canonical sync", {
+  console.log("[pricing-cache] v267 canonical sync", {
     providers: perProvider,
     scanned: ((rows as any[]) ?? []).length,
     updated_rows,
     ghosts: ghostList.length,
+    restored: restored.length,
   });
 
   lastReserveSyncAt = Date.now();
@@ -374,5 +394,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     ghosts: ghostList.length,
     scanned: ((rows as any[]) ?? []).length,
     updated_rows,
+    restored: restored.length,
+    restored_pacotes: restored.slice(0, 50),
   };
 }
