@@ -194,11 +194,21 @@ validateDispatcherConfig();
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
 function normalizeInstagramUser(raw: string): string {
-  const trimmed = raw.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  const handle = trimmed.replace(/^@+/, "").replace(/^instagram\.com\//i, "");
+  // v272 — O cliente cola o link do app com rastreadores (?igsh=...&utm_source=qr).
+  // Os fornecedores recusam esse formato ("Unable to verify your domain submission")
+  // e a venda inteira falha. Sempre reduzimos ao perfil canônico.
+  const handle = raw
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/^(m\.)?instagram\.com\//i, "")
+    .replace(/^@+/, "")
+    .replace(/[/?#].*$/, "")
+    .trim();
+  if (!handle) return raw.trim();
   return `https://instagram.com/${handle}`;
 }
+
 
 function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
   const trimmed = raw.trim();
