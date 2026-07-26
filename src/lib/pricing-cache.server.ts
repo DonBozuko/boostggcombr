@@ -263,8 +263,10 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     patch: Record<string, unknown>;
     priceKeys: string[];       // chaves que só existem por causa de preço/custo
     movesPrice: boolean;
+    restoredPacote: string | null;
   };
   const plans: Plan[] = [];
+
 
 
   for (const r of ((rows as any[]) ?? [])) {
