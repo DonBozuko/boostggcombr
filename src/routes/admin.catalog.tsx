@@ -1,8 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { PricingCatalogEditor } from "@/components/PricingCatalogEditor";
+import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 
 export const Route = createFileRoute("/admin/catalog")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Catálogo · Elite Boost Prime Admin" },
@@ -12,23 +15,23 @@ export const Route = createFileRoute("/admin/catalog")({
   component: AdminCatalogPage,
 });
 
-const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
-
 function AdminCatalogPage() {
   const [token, setToken] = useState<string>("");
-  const [input, setInput] = useState<string>("");
+  const [checked, setChecked] = useState(false);
+  const fetchAdminToken = useServerFn(getAdminTokenForSession);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const t = window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "";
-    setToken(t);
-    setInput(t);
-  }, []);
+    let alive = true;
+    void (async () => {
+      try {
+        const res = await fetchAdminToken({ data: {} as never });
+        if (alive && res.ok) setToken(res.token);
+      } catch { /* sem sessão admin */ }
+      if (alive) setChecked(true);
+    })();
+    return () => { alive = false; };
+  }, [fetchAdminToken]);
 
-  const save = () => {
-    window.localStorage.setItem(ADMIN_TOKEN_KEY, input);
-    setToken(input);
-  };
 
   return (
     <div className="min-h-screen bg-black text-amber-100 p-4 md:p-8">
