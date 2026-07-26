@@ -23,6 +23,7 @@ export const contarSeguidores = createServerFn({ method: "POST" })
               "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
             Accept: "*/*",
           },
+          signal: AbortSignal.timeout(10_000),
         },
       );
       if (!res.ok) return { ok: false as const, error: "NOT_FOUND" as const };
