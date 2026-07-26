@@ -193,7 +193,7 @@ validateDispatcherConfig();
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
-function stripTrackers(url: string): string {
+export function stripTrackers(url: string): string {
   // v272 — rastreadores do app (igsh, utm_*, is_from_webapp) fazem o fornecedor
   // recusar o pedido. Sempre limpamos antes de enviar.
   try {
@@ -208,7 +208,7 @@ function stripTrackers(url: string): string {
   }
 }
 
-function normalizeInstagramUser(raw: string): string {
+export function normalizeInstagramUser(raw: string): string {
   // v272 — O cliente cola o link do app com rastreadores (?igsh=...&utm_source=qr).
   // Os fornecedores recusam esse formato ("Unable to verify your domain submission")
   // e a venda inteira falha. Sempre reduzimos ao perfil canônico.
