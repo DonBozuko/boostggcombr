@@ -344,7 +344,22 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         error_detail: `Contingência falhou em todos fornecedores. ${tentativas.join(" | ")}`.slice(0, 500),
       })
       .eq("id", pedido.id);
+
+    // v273 — cliente é avisado por e-mail do estorno automático.
+    if (refund.ok) {
+      try {
+        const { sendRefundNoticeEmail } = await import("@/lib/refund-email.server");
+        await sendRefundNoticeEmail({
+          id: String(pedido.id),
+          email_contato: (pedido as any).email_contato,
+          pacote: pedido.pacote,
+          valor: pedido.valor,
+        });
+      } catch { /* nunca bloquear o estorno por causa de e-mail */ }
+    }
+
     return { ok: true, status: refund.ok ? "mp_refunded" : "SMM_FAILED", recovered: false };
+
   }
 
 
