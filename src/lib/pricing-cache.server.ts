@@ -206,7 +206,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
 
   const selectCols = [
     "pacote", "category", "quantidade", "cost_brl", "price_brl",
-    "id_miss_streak", "id_miss_since",
+    "id_miss_streak", "id_miss_since", "is_sellable", "sellable_reason",
     ...providers.flatMap((p) => [`${p.column}_service_id`, `${p.column}_auto_id`]),
   ];
   const { data: rows } = await supabaseAdmin
