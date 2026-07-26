@@ -1,9 +1,10 @@
 // Server-only helper para disparar pedido no SMMhype.
 // NÃO importar de código client-reachable em escopo de módulo.
 
-// Service IDs definitivos:
-// - Seguidores: 14325 (100–2000), 14225 (5000–100000)
+// Service IDs definitivos (revalidados contra o catálogo vivo em v272):
+// - Seguidores IG: 14325 (todas as faixas). 14225 MORREU no fornecedor.
 // - Curtidas: 18860 (todas quantidades)
+const IG_FOLLOWERS_SERVICE_ID = 14325;
 const LIKES_SERVICE_ID = 18860;
 const VIEWS_SERVICE_ID = 18855;
 // TikTok (SMMhype)
@@ -15,17 +16,20 @@ const YT_SUBSCRIBERS_SERVICE_ID = 19440;
 const YT_VIEWS_SERVICE_ID = 14321;
 // Facebook (SMMhype)
 const FB_FOLLOWERS_SERVICE_ID = 18870;
-const FB_LIKES_SERVICE_ID = 7593;
+// v272: 7593 saiu do catálogo → substituído por 14336 (Facebook Post Likes, refill 30d).
+const FB_LIKES_SERVICE_ID = 14336;
 // Tráfego Web (SMMhype)
 const WEB_TRAFFIC_BR_SERVICE_ID = 9313;
 const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
-// Telegram (SMMhype) — homologados
-const TG_CHANNEL_SERVICE_ID = 19106; // Membros para Canal
-const TG_GROUP_SERVICE_ID = 19107;   // Membros para Grupo
+// Telegram (SMMhype) — v272: 19106/19107 viraram "YouTube Live Views" no fornecedor
+// (entregaria produto ERRADO). Trocados pelos IDs reais de membros.
+const TG_CHANNEL_SERVICE_ID = 17200; // Membros MIX (min 500)
+const TG_GROUP_SERVICE_ID = 17200;   // mesmo serviço aceita grupo
 // Kwai (SMMhype) — v210
 const KW_FOLLOWERS_SERVICE_ID = 8330; // Seguidores BR (refill 30d)
 const KW_LIKES_SERVICE_ID = 8331;     // Curtidas BR (refill 30d)
 const KW_VIEWS_SERVICE_ID = 2758;     // Views HQ
+
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
@@ -52,8 +56,7 @@ export function resolveServiceId(pacote: string, quantidade: number): number | n
   if (p.startsWith("kv")) return KW_VIEWS_SERVICE_ID;
   if (p.startsWith("v")) return VIEWS_SERVICE_ID;
   if (p.startsWith("l")) return LIKES_SERVICE_ID;
-  if (quantidade >= 100 && quantidade <= 2000) return 14325;
-  if (quantidade >= 5000 && quantidade <= 100000) return 14225;
+  if (quantidade >= 20) return IG_FOLLOWERS_SERVICE_ID;
   return null;
 }
 
@@ -128,8 +131,8 @@ export async function resolveServiceIdAsync(pacote: string, quantidade: number):
 
 // Compat: map por pacote id (inclui curtidas e visualizações).
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  p100: 14325, p500: 14325, p1k: 14325, p2k: 14325,
-  p5k: 14225, p10k: 14225, p20k: 14225, p50k: 14225, p100k: 14225,
+  p100: IG_FOLLOWERS_SERVICE_ID, p500: IG_FOLLOWERS_SERVICE_ID, p1k: IG_FOLLOWERS_SERVICE_ID, p2k: IG_FOLLOWERS_SERVICE_ID,
+  p5k: IG_FOLLOWERS_SERVICE_ID, p10k: IG_FOLLOWERS_SERVICE_ID, p20k: IG_FOLLOWERS_SERVICE_ID, p50k: IG_FOLLOWERS_SERVICE_ID, p100k: IG_FOLLOWERS_SERVICE_ID,
   l100: LIKES_SERVICE_ID, l500: LIKES_SERVICE_ID, l1k: LIKES_SERVICE_ID,
   l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
   v1k: VIEWS_SERVICE_ID, v5k: VIEWS_SERVICE_ID, v10k: VIEWS_SERVICE_ID,
@@ -176,7 +179,7 @@ export function validateDispatcherConfig(): { ok: boolean; missing: string[]; as
     }
   }
   if (resolveServiceId("p500", 500) !== 14325) assertions.push("p500 deveria → 14325");
-  if (resolveServiceId("p10k", 10000) !== 14225) assertions.push("p10k deveria → 14225");
+  if (resolveServiceId("p10k", 10000) !== 14325) assertions.push("p10k deveria → 14325");
 
   if (missing.length) console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
   if (assertions.length) console.error("[smmhype] asserts falharam:", assertions);
@@ -190,15 +193,40 @@ validateDispatcherConfig();
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
-function normalizeInstagramUser(raw: string): string {
-  const trimmed = raw.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  const handle = trimmed.replace(/^@+/, "").replace(/^instagram\.com\//i, "");
+export function stripTrackers(url: string): string {
+  // v272 — rastreadores do app (igsh, utm_*, is_from_webapp) fazem o fornecedor
+  // recusar o pedido. Sempre limpamos antes de enviar.
+  try {
+    const u = new URL(url);
+    for (const k of [...u.searchParams.keys()]) {
+      if (/^(igsh|igshid|utm_[a-z_]+|is_from_webapp|sender_device|_r|_t)$/i.test(k)) u.searchParams.delete(k);
+    }
+    u.hash = "";
+    return u.toString().replace(/\?$/, "");
+  } catch {
+    return url;
+  }
+}
+
+export function normalizeInstagramUser(raw: string): string {
+  // v272 — O cliente cola o link do app com rastreadores (?igsh=...&utm_source=qr).
+  // Os fornecedores recusam esse formato ("Unable to verify your domain submission")
+  // e a venda inteira falha. Sempre reduzimos ao perfil canônico.
+  const handle = raw
+    .trim()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/^(m\.)?instagram\.com\//i, "")
+    .replace(/^@+/, "")
+    .replace(/[/?#].*$/, "")
+    .trim();
+  if (!handle) return raw.trim();
   return `https://instagram.com/${handle}`;
 }
 
+
 function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
-  const trimmed = raw.trim();
+  const trimmed = /^https?:\/\//i.test(raw.trim()) ? stripTrackers(raw.trim()) : raw.trim();
   if (isFollowers) {
     // Aceita: @user, user, tiktok.com/@user, https://(www.)tiktok.com/@user
     const handle = trimmed
@@ -218,7 +246,7 @@ function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
 }
 
 function normalizeYoutubeTarget(raw: string): string {
-  const trimmed = raw.trim();
+  const trimmed = /^https?:\/\//i.test(raw.trim()) ? stripTrackers(raw.trim()) : raw.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (/^(www\.)?(m\.|music\.)?youtube\.com\//i.test(trimmed) || /^youtu\.be\//i.test(trimmed)) {
     return `https://${trimmed.replace(/^www\./i, "")}`;
@@ -227,7 +255,7 @@ function normalizeYoutubeTarget(raw: string): string {
 }
 
 function normalizeFacebookTarget(raw: string): string {
-  const trimmed = raw.trim();
+  const trimmed = /^https?:\/\//i.test(raw.trim()) ? stripTrackers(raw.trim()) : raw.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (/^(www\.|m\.|web\.)?facebook\.com\//i.test(trimmed) || /^fb\.com\//i.test(trimmed) || /^fb\.watch\//i.test(trimmed)) {
     return `https://${trimmed.replace(/^www\./i, "")}`;
