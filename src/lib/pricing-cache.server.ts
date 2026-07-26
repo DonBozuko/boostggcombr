@@ -216,6 +216,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   const bound: Record<string, number> = {};
   const ghostList: Array<{ pacote: string; streak: number }> = [];
   const repriced: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
+  const restored: string[] = [];
   let updated_rows = 0;
 
   for (const r of ((rows as any[]) ?? [])) {
