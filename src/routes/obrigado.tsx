@@ -121,6 +121,12 @@ function ObrigadoPage() {
           </a>
         </div>
 
+        <Button asChild className="w-full">
+          <Link to="/rastrear" search={orderId ? { pedido: orderId } : undefined}>
+            <PackageSearch className="w-4 h-4 mr-2" />Acompanhar meu pedido
+          </Link>
+        </Button>
+
         <Button asChild variant="outline" className="w-full">
           <Link to="/"><Home className="w-4 h-4 mr-2" />Voltar ao início</Link>
         </Button>
