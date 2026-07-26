@@ -17,4 +17,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'review-request': reviewRequestTemplate,
   'refund-notice': refundNoticeTemplate,
   'cart-recovery': cartRecoveryTemplate,
+  'reseller-access': resellerAccessTemplate,
 }
