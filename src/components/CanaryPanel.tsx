@@ -25,7 +25,9 @@ export function CanaryPanel({ token }: { token: string }) {
 
   const [panel, setPanel] = useState<Panel | null>(null);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ enabled: false, link: "", pacote: "", quantidade: 0, interval_hours: 12, sla_hours: 6 });
+  const [form, setForm] = useState<{ enabled: boolean; alvos: Alvo[]; interval_hours: number; sla_hours: number }>(
+    { enabled: false, alvos: [], interval_hours: 12, sla_hours: 6 },
+  );
 
   const load = useCallback(async () => {
     if (!token) return;
@@ -38,14 +40,32 @@ export function CanaryPanel({ token }: { token: string }) {
 
   useEffect(() => { void load(); }, [load]);
 
+  const setAlvo = (i: number, patch: Partial<Alvo>) =>
+    setForm((f) => ({ ...f, alvos: f.alvos.map((a, idx) => (idx === i ? { ...a, ...patch } : a)) }));
+
+  const addAlvo = () =>
+    setForm((f) => ({ ...f, alvos: [...f.alvos, { rede: "", link: "", pacote: "", quantidade: 0, ativo: true }] }));
+
+  const removeAlvo = (i: number) =>
+    setForm((f) => ({ ...f, alvos: f.alvos.filter((_, idx) => idx !== i) }));
+
   const save = async () => {
     setBusy(true);
     try {
-      const r = await save$({ data: { token, ...form, quantidade: Number(form.quantidade) || 0 } });
+      const r = await save$({
+        data: {
+          token,
+          enabled: form.enabled,
+          interval_hours: Number(form.interval_hours) || 12,
+          sla_hours: Number(form.sla_hours) || 6,
+          alvos: form.alvos.map((a) => ({ ...a, quantidade: Number(a.quantidade) || 0 })),
+        },
+      });
       if (r.ok) { toast.success("Configuração salva"); void load(); }
       else toast.error(r.error ?? "erro");
     } finally { setBusy(false); }
   };
+
 
   const runNow = async () => {
     setBusy(true);
