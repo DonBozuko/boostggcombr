@@ -137,7 +137,13 @@ export async function confirmRobotDispatch(input: {
   return { ok: true, fornecedor, orderId, custoBrl };
 }
 
-export async function reprocessWaitingProvision(pedidoId: string): Promise<ReprocessResult> {
+export async function reprocessWaitingProvision(
+  pedidoId: string,
+  // v261 — opcional e aditivo: pedidos de revenda têm economia diferente
+  // (sem cupom, sem taxa fixa por pedido), então usam o próprio piso de lucro.
+  // Sem este parâmetro o comportamento é EXATAMENTE o de antes.
+  opts?: { marginCheck?: (valor: number, cost: number) => boolean; tag?: string },
+): Promise<ReprocessResult> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
@@ -181,7 +187,7 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
       await markProviderUnstable(f.slug, "saldo insuficiente");
       continue;
     }
-    if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
+    if (f.cost_brl != null && !(opts?.marginCheck ?? respectsMinMargin)(Number(pedido.valor), f.cost_brl)) {
       tentativas.push(`${f.nome}: margem <300%`);
       continue;
     }
@@ -197,7 +203,7 @@ export async function reprocessWaitingProvision(pedidoId: string): Promise<Repro
         .from("pedidos")
         .update({
           status: "Enviado",
-          error_detail: `v151 recarga manual · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+          error_detail: `${opts?.tag ?? "v151 recarga manual"} · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
           provider_slug: f.slug,
           provider_order_id: r.orderId != null ? String(r.orderId) : null,

@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.reseller_balance_move(UUID, NUMERIC, TEXT, UUID, TEXT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.reseller_balance_move(UUID, NUMERIC, TEXT, UUID, TEXT) TO service_role;

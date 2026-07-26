@@ -619,6 +619,8 @@ export type Database = {
           rede_social: string
           refill_requested_at: string | null
           refill_result: string | null
+          reseller_id: string | null
+          reseller_valor: number | null
           review_email_sent_at: string | null
           sla_deadline: string | null
           status: string
@@ -656,6 +658,8 @@ export type Database = {
           rede_social?: string
           refill_requested_at?: string | null
           refill_result?: string | null
+          reseller_id?: string | null
+          reseller_valor?: number | null
           review_email_sent_at?: string | null
           sla_deadline?: string | null
           status?: string
@@ -693,6 +697,8 @@ export type Database = {
           rede_social?: string
           refill_requested_at?: string | null
           refill_result?: string | null
+          reseller_id?: string | null
+          reseller_valor?: number | null
           review_email_sent_at?: string | null
           sla_deadline?: string | null
           status?: string
@@ -981,6 +987,89 @@ export type Database = {
           bucket_key?: string
           created_at?: string
           id?: number
+        }
+        Relationships: []
+      }
+      reseller_ledger: {
+        Row: {
+          created_at: string
+          detalhe: string | null
+          id: string
+          pedido_id: string | null
+          reseller_id: string
+          saldo_depois: number | null
+          tipo: string
+          valor_brl: number
+        }
+        Insert: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          pedido_id?: string | null
+          reseller_id: string
+          saldo_depois?: number | null
+          tipo: string
+          valor_brl: number
+        }
+        Update: {
+          created_at?: string
+          detalhe?: string | null
+          id?: string
+          pedido_id?: string | null
+          reseller_id?: string
+          saldo_depois?: number | null
+          tipo?: string
+          valor_brl?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_ledger_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resellers: {
+        Row: {
+          api_key_hash: string
+          api_key_prefix: string
+          ativo: boolean
+          created_at: string
+          desconto_pct: number
+          email: string
+          id: string
+          nome: string
+          notas: string | null
+          saldo_brl: number
+          updated_at: string
+        }
+        Insert: {
+          api_key_hash: string
+          api_key_prefix: string
+          ativo?: boolean
+          created_at?: string
+          desconto_pct?: number
+          email: string
+          id?: string
+          nome: string
+          notas?: string | null
+          saldo_brl?: number
+          updated_at?: string
+        }
+        Update: {
+          api_key_hash?: string
+          api_key_prefix?: string
+          ativo?: boolean
+          created_at?: string
+          desconto_pct?: number
+          email?: string
+          id?: string
+          nome?: string
+          notas?: string | null
+          saldo_brl?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1465,6 +1554,20 @@ export type Database = {
           message: Json
           msg_id: number
           read_ct: number
+        }[]
+      }
+      reseller_balance_move: {
+        Args: {
+          _amount: number
+          _detalhe?: string
+          _pedido_id?: string
+          _reseller_id: string
+          _tipo: string
+        }
+        Returns: {
+          motivo: string
+          ok: boolean
+          saldo: number
         }[]
       }
       solicitar_exclusao_pedido: {
