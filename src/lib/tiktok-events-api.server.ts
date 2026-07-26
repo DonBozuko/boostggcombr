@@ -73,6 +73,7 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<Se
         "Access-Token": token,
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(8_000),
     });
     const json = (await res.json().catch(() => ({}))) as { code?: number; message?: string };
     if (!res.ok || (json.code !== undefined && json.code !== 0)) {

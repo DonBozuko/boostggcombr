@@ -386,6 +386,8 @@ export const criarPedido = createServerFn({ method: "POST" })
           status: "pending",
           metodo_pagamento: "cartao",
           email_contato: data.email.trim().toLowerCase(),
+          // v276: WhatsApp era coletado no checkout e descartado (coluna inexistente).
+          whatsapp_contato: data.whatsapp_contato?.trim() || null,
           rede_social: rede,
           utm_source: utmClean(data.utm_source),
           utm_medium: utmClean(data.utm_medium),
@@ -412,6 +414,7 @@ export const criarPedido = createServerFn({ method: "POST" })
             Authorization: `Bearer ${mpTokenCard}`,
             "X-Idempotency-Key": `card-${pedidoCard.id}`,
           },
+          signal: AbortSignal.timeout(12_000),
           body: JSON.stringify({
             items: [{
               id: clean(pacoteEfetivo),
@@ -488,6 +491,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         const rr = await fetch(`https://api.mercadopago.com/v1/payments/${existing.mercado_pago_id}`, {
           headers: { Authorization: `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}` },
           cache: "no-store",
+          signal: AbortSignal.timeout(8_000),
         });
         if (rr.ok) {
           const mpPrev: any = await rr.json().catch(() => ({}));
@@ -556,6 +560,7 @@ export const criarPedido = createServerFn({ method: "POST" })
             "X-Idempotency-Key": idempotencyKey,
           },
           body: mpBody,
+          signal: AbortSignal.timeout(12_000),
         });
         const mpJson: unknown = await mpRes.json().catch(() => ({}));
         if (!mpRes.ok) {
@@ -612,6 +617,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           // webhook do MP (ou seja, só quem pagava). Pix abandonado ficava sem contato
           // e a recuperação por e-mail nunca disparava — dinheiro perdido em silêncio.
           email_contato: data.email.trim().toLowerCase(),
+          whatsapp_contato: data.whatsapp_contato?.trim() || null,
 
           rede_social: rede,
           utm_source: utmClean(data.utm_source),

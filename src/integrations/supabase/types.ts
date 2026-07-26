@@ -719,6 +719,7 @@ export type Database = {
           utm_source: string | null
           utm_term: string | null
           valor: number
+          whatsapp_contato: string | null
         }
         Insert: {
           abandono_notificado_at?: string | null
@@ -761,6 +762,7 @@ export type Database = {
           utm_source?: string | null
           utm_term?: string | null
           valor: number
+          whatsapp_contato?: string | null
         }
         Update: {
           abandono_notificado_at?: string | null
@@ -803,6 +805,7 @@ export type Database = {
           utm_source?: string | null
           utm_term?: string | null
           valor?: number
+          whatsapp_contato?: string | null
         }
         Relationships: []
       }

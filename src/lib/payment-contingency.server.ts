@@ -37,6 +37,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     const r = await fetch(`${MP_PAYMENTS_ENDPOINT}/${pedido.mercado_pago_id}`, {
       headers: { Authorization: `Bearer ${mpToken}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
     });
     if (!r.ok) return { ok: true, status: pedido.status, recovered: false };
     payment = await r.json();
