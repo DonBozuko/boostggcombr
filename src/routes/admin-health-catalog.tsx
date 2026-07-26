@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 
 export const Route = createFileRoute("/admin-health-catalog")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Saúde do Catálogo · Admin" },
@@ -11,7 +14,7 @@ export const Route = createFileRoute("/admin-health-catalog")({
   component: HealthCatalogPage,
 });
 
-const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
+
 
 type Row = {
   pacote: string;
