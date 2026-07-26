@@ -138,7 +138,14 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
     const remains = Number(s.remains ?? -1);
     const st = String(s.status ?? "").toLowerCase();
     const delivered = (Number.isFinite(remains) && remains === 0) || ["completed", "concluído", "concluido"].includes(st);
-    const canceled = ["canceled", "cancelled", "refunded", "partial"].includes(st) && remains > 0;
+    // v287 — "partial" NÃO é cancelamento: o fornecedor entregou parte e devolveu
+    // o resto. Antes caía no mesmo balde de "cancelado sem entregar" e disparava
+    // alarme falso de sistema quebrado. Também damos 30min de carência porque
+    // vários painéis marcam Partial no começo e depois completam.
+    const canceled = ["canceled", "cancelled", "refunded"].includes(st) && remains > 0;
+    const partial = st === "partial" && remains > 0;
+    const partialGraceH = 0.5;
+
 
     if (delivered) {
       await supabaseAdmin.from("canary_runs").update({
