@@ -893,7 +893,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           const plans = categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans;
           const chosen = plans.find((p) => p.id === id);
           if (chosen) trackAddToCart({ planId: id, value: chosen.valor, contentName: `${chosen.quantidade} ${categoria}` });
-          document.getElementById("pedido")?.scrollIntoView({ behavior: "smooth" });
+          (document.getElementById("form-pedido") ?? document.getElementById("pedido"))?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
         }}
       />
 
@@ -916,15 +919,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
           <LivePurchasesTicker accent="#00f2fe" />
           <TrustBadges accent="#FFD700" />
-          <CheckoutFaq />
-
-
-
-
 
           <form
+            id="form-pedido"
             onSubmit={onSubmit}
-            className="rounded-2xl border border-border bg-card p-3 sm:p-5 space-y-4 shadow-glow-blue"
+            className="scroll-mt-4 rounded-2xl border border-border bg-card p-3 sm:p-5 space-y-4 shadow-glow-blue"
           >
             <div className="space-y-2">
               <Label htmlFor="plan">Pacote escolhido</Label>
@@ -1043,6 +1042,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             </p>
 
           </form>
+
+          <div className="mt-5">
+            <CheckoutFaq />
+          </div>
         </div>
 
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
