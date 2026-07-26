@@ -23,6 +23,7 @@ export function CanaryPanel({ token }: { token: string }) {
   const load$ = useServerFn(getCanaryPanel);
   const save$ = useServerFn(saveCanaryConfig);
   const run$ = useServerFn(runCanaryNow);
+  const suggest$ = useServerFn(suggestCanaryTargets);
 
   const [panel, setPanel] = useState<Panel | null>(null);
   const [busy, setBusy] = useState(false);
