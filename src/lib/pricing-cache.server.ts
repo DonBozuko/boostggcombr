@@ -305,6 +305,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       missSince = null;
     }
 
+    let restoredPacote: string | null = null;
     const patch: Record<string, unknown> = {};
     if (nextStreak !== prevStreak) patch.id_miss_streak = nextStreak;
     if ((missSince ?? null) !== (r.id_miss_since ?? null)) patch.id_miss_since = missSince;
