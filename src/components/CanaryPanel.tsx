@@ -100,6 +100,10 @@ export function CanaryPanel({ token }: { token: string }) {
   };
 
   const runs = (panel?.ok ? panel.runs : []) as Run[];
+  const quarentena = (panel?.ok ? (panel as { quarentena?: unknown[] }).quarentena ?? [] : []) as Array<{
+    pacote: string; provider_slug: string; until: string; reason: string | null;
+  }>;
+
 
   return (
     <section className="rounded-xl border border-emerald-500/40 bg-black/60 backdrop-blur-xl p-4 shadow-[0_0_18px_rgba(16,185,129,0.2)]">
