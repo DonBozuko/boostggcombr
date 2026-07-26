@@ -600,6 +600,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           let sucesso = false;
           let margemBloqueada = 0;
 
+          // v278 — trava de envio ANTES de chamar o fornecedor. Sem isso, uma
+          // segunda notificação do MP (ou o reconciliador) poderia despachar o
+          // mesmo pedido em paralelo: saldo gasto em dobro e cliente recebendo 2x.
+          const { claimDispatch, releaseDispatch } = await import("@/lib/dispatch-claim.server");
+          if (!(await claimDispatch(supabaseAdmin as any, pedido.id))) {
+            console.warn("[mp-webhook] v278 envio já reivindicado por outro processo", { pedidoId: pedido.id });
+            return;
+          }
+
+
+
           for (const f of cadeia) {
             // v110 — Failover Injector Gateway: registra desvio quando não é o preferencial (smmhype)
             // ou quando já houve tentativa anterior nesta ordem.
