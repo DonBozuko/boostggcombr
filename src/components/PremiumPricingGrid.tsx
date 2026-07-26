@@ -41,14 +41,17 @@ function fmtBRL(v: number): string {
 }
 
 function tonePalette(id: string, fire?: boolean): { border: string; glow: string; chip: string; label: string } {
+  if (/^br-pro/i.test(id)) return { border: "#F5D061", glow: "#F5D061cc", chip: "#F5D061", label: "PREMIUM BR" };
   if (fire) return { border: "#FFD60A", glow: "#FFD60Acc", chip: "#FFD60A", label: "RELÂMPAGO" };
   if (/^(v|tv|yv)\d/i.test(id)) return { border: "#A855F7", glow: "#A855F7cc", chip: "#A855F7", label: "VIEWS" };
   return { border: "#38BDF8", glow: "#38BDF8aa", chip: "#38BDF8", label: "ECONÔMICO" };
 }
 
 // v245 — Selo de origem: transparência sobre nacionalidade do serviço.
-type Origin = "br" | "global" | "views";
+// v257 — Nível Premium BR: reposição de 90 dias declarada pelo fornecedor.
+type Origin = "br" | "brpro" | "global" | "views";
 function detectOrigin(id: string): Origin {
+  if (/^br-pro/i.test(id)) return "brpro";
   if (/^(v|tv|yv)\d/i.test(id)) return "views";
   if (/^(br-|wbr)/i.test(id)) return "br";
   return "global";
@@ -56,6 +59,7 @@ function detectOrigin(id: string): Origin {
 function isSeguidoresBR(id: string): boolean {
   return /^(br-tf|wbr)/i.test(id);
 }
+
 
 
 export function PremiumPricingGrid({
