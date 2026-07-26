@@ -149,7 +149,7 @@ function Revenda() {
               inputMode="tel"
               required
             />
-            <Input placeholder="E-mail (opcional)" value={form.email} onChange={set("email")} maxLength={160} type="email" />
+            <Input placeholder="E-mail (para receber seu acesso)" value={form.email} onChange={set("email")} maxLength={160} type="email" />
             <Input
               placeholder="Quanto pretende vender por mês? (ex: R$ 500)"
               value={form.volume_mes}
