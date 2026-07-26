@@ -33,6 +33,7 @@ import { Route as KwaiRouteImport } from './routes/kwai'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as RastrearRouteImport } from './routes/rastrear'
@@ -234,6 +235,11 @@ const McpRoute = McpRouteImport.update({
 const ObrigadoRoute = ObrigadoRouteImport.update({
   id: '/obrigado',
   path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRevendedorRoute = PainelRevendedorRouteImport.update({
+  id: '/painel-revendedor',
+  path: '/painel-revendedor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -681,6 +687,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-revendedor': typeof PainelRevendedorRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -784,6 +791,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-revendedor': typeof PainelRevendedorRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -888,6 +896,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-revendedor': typeof PainelRevendedorRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -993,6 +1002,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mcp'
     | '/obrigado'
+    | '/painel-revendedor'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1096,6 +1106,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mcp'
     | '/obrigado'
+    | '/painel-revendedor'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1199,6 +1210,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mcp'
     | '/obrigado'
+    | '/painel-revendedor'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1303,6 +1315,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
+  PainelRevendedorRoute: typeof PainelRevendedorRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
   RastrearRoute: typeof RastrearRoute
@@ -1548,6 +1561,13 @@ declare module '@tanstack/react-router' {
       path: '/obrigado'
       fullPath: '/obrigado'
       preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel-revendedor': {
+      id: '/painel-revendedor'
+      path: '/painel-revendedor'
+      fullPath: '/painel-revendedor'
+      preLoaderRoute: typeof PainelRevendedorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -2129,6 +2149,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
+  PainelRevendedorRoute: PainelRevendedorRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
   RastrearRoute: RastrearRoute,
