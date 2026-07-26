@@ -753,7 +753,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
 
           if (!sucesso) {
+            // v278 — nada foi enviado: devolve a trava para o reconciliador poder tentar.
+            await releaseDispatch(supabaseAdmin as any, pedido.id);
             const falhaResumo = tentativas.join(" | ").slice(0, 400);
+
             // v91 — se TODOS falharam por margem, retém em modo de segurança e gera Alerta Vermelho
             if (margemBloqueada > 0 && margemBloqueada === cadeia.length) {
               console.error("[mp-webhook] v91 HOLD margem", { pedidoId: pedido.id, tentativas });
