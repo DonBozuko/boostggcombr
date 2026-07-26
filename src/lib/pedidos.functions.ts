@@ -495,6 +495,13 @@ export const criarPedido = createServerFn({ method: "POST" })
       };
     } catch (err) {
       console.error("Erro inesperado no Supabase:", err);
+      // v259 — banco fora do ar / timeout depois do MP criar a cobrança:
+      // mesmo tratamento do erro de insert (estorno + alerta), nunca silêncio.
+      try {
+        const { refundOrphanCharge } = await import("./orphan-charge.server");
+        await refundOrphanCharge(mpId, valorCobrar, data.email, `exceção no banco: ${String((err as Error)?.message ?? err).slice(0, 120)}`);
+      } catch { /* noop */ }
       return { ok: false as const, error: "DB_FAILED" as const };
     }
+
   });
