@@ -137,3 +137,74 @@ export const deletePricingCatalog = createServerFn({ method: "POST" })
     if (error) return { ok: false, error: error.message };
     return { ok: true };
   });
+
+// ============================================================
+// v275 — Quarentena de mudança de preço em massa.
+// Mostra ao dono o que o motor bloqueou e permite liberar de propósito.
+// ============================================================
+export type QuarantineView =
+  | { ok: true; quarantine: null }
+  | {
+      ok: true;
+      quarantine: {
+        total: number;
+        scanned: number;
+        updated_at: string;
+        amostra: Array<{ pacote: string; para: number }>;
+      };
+    }
+  | { ok: false; error: string };
+
+export const getPriceQuarantine = createServerFn({ method: "POST" })
+  .inputValidator((i) => tokenOnly.parse(i))
+  .handler(async ({ data }): Promise<QuarantineView> => {
+    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+      return { ok: false, error: "UNAUTHORIZED" };
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("admin_settings" as any)
+      .select("value")
+      .eq("key", "price_quarantine")
+      .maybeSingle();
+    const v = (row as any)?.value;
+    if (!v?.signature || v.applied === true) return { ok: true, quarantine: null };
+    return {
+      ok: true,
+      quarantine: {
+        total: Number(v.total ?? 0),
+        scanned: Number(v.scanned ?? 0),
+        updated_at: String(v.updated_at ?? ""),
+        amostra: Array.isArray(v.amostra) ? v.amostra.slice(0, 20) : [],
+      },
+    };
+  });
+
+export const approvePriceQuarantine = createServerFn({ method: "POST" })
+  .inputValidator((i) => tokenOnly.parse(i))
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: string; applied?: number }> => {
+    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+      return { ok: false, error: "UNAUTHORIZED" };
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("admin_settings" as any)
+      .select("value")
+      .eq("key", "price_quarantine")
+      .maybeSingle();
+    const v = (row as any)?.value;
+    if (!v?.signature) return { ok: false, error: "Nada em quarentena." };
+    await supabaseAdmin.from("admin_settings" as any).upsert(
+      { key: "price_quarantine", value: { ...v, approved: true } as any },
+      { onConflict: "key" },
+    );
+    await supabaseAdmin.from("admin_audit_logs" as any).insert({
+      admin_email: "admin@painel",
+      action: "preco_massa_aprovado_v275",
+      detail: { assinatura: v.signature, total: v.total } as any,
+    });
+    // Reexecuta a sincronização: com approved=true a mesma leitura é aplicada.
+    const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
+    const rep: any = await syncReserveProviderIds().catch(() => null);
+    return { ok: true, applied: Number(rep?.updated_rows ?? 0) };
+  });
