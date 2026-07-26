@@ -255,6 +255,18 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   const restored: string[] = [];
   let updated_rows = 0;
 
+  // v275 — FASE 1: só PLANEJA. Nada vai para o banco antes de medir o
+  // tamanho do estrago. Antes, o preço já tinha sido gravado quando o
+  // alerta "leitura suspeita" saía — o aviso chegava tarde demais.
+  type Plan = {
+    pacote: string;
+    patch: Record<string, unknown>;
+    priceKeys: string[];       // chaves que só existem por causa de preço/custo
+    movesPrice: boolean;
+  };
+  const plans: Plan[] = [];
+
+
   for (const r of ((rows as any[]) ?? [])) {
     const qty = Number(r.quantidade);
     const costs: Array<{ slug: string; cost: number }> = [];
