@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
+import { Route as ApiRevendaRouteImport } from './routes/api-revenda'
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
@@ -122,6 +123,11 @@ const AdminRoute = AdminRouteImport.update({
 const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
   id: '/admin-health-catalog',
   path: '/admin-health-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRevendaRoute = ApiRevendaRouteImport.update({
+  id: '/api-revenda',
+  path: '/api-revenda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
@@ -648,6 +654,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
+  '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
@@ -749,6 +756,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
+  '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
@@ -851,6 +859,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
+  '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
@@ -954,6 +963,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-health-catalog'
+    | '/api-revenda'
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
@@ -1055,6 +1065,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-health-catalog'
+    | '/api-revenda'
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
@@ -1156,6 +1167,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-health-catalog'
+    | '/api-revenda'
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
@@ -1258,6 +1270,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
+  ApiRevendaRoute: typeof ApiRevendaRoute
   AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
   AvaliacoesRoute: typeof AvaliacoesRoute
   ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
@@ -1375,6 +1388,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-health-catalog'
       fullPath: '/admin-health-catalog'
       preLoaderRoute: typeof AdminHealthCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api-revenda': {
+      id: '/api-revenda'
+      path: '/api-revenda'
+      fullPath: '/api-revenda'
+      preLoaderRoute: typeof ApiRevendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/audiencia-brasileira': {
@@ -2068,6 +2088,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AdminHealthCatalogRoute: AdminHealthCatalogRoute,
+  ApiRevendaRoute: ApiRevendaRoute,
   AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
   AvaliacoesRoute: AvaliacoesRoute,
   ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
