@@ -383,7 +383,12 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     } catch { /* noop */ }
   }
 
-  // v266 — Alerta de reprecificação forte (custo do fornecedor mudou muito).
+  // v271 — Alerta de reprecificação forte, com freio anti-spam.
+  // Se metade do catálogo "mudou de preço" de uma vez, isso não é o fornecedor
+  // reajustando: é leitura ruim (catálogo incompleto/câmbio). Nesse caso avisa
+  // UMA vez que a leitura está suspeita, em vez de despejar lista de preços.
+  const scannedTotal = ((rows as any[]) ?? []).length || 1;
+  const leituraSuspeita = repriced.length > scannedTotal * 0.3;
   if (repriced.length > 0) {
     try {
       const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
@@ -391,16 +396,18 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         .slice(0, 8)
         .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
         .join("\n");
-      await dispatchWhatsappAlert(
-        `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`,
-      ).catch(() => {});
+      const msg = leituraSuspeita
+        ? `⚠️ LEITURA DE PREÇO SUSPEITA\n\nPROBLEMA: ${repriced.length} de ${scannedTotal} pacotes mudariam de preço de uma vez só. Isso quase sempre é falha de leitura do fornecedor, não reajuste real. Nada foi tirado da vitrine em massa.\n\n${amostra}\n\nO QUE FAZER: me avisa. Vou conferir se algum fornecedor devolveu catálogo incompleto ou cotação errada.`
+        : `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`;
+      await dispatchWhatsappAlert(msg).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
-        action: "reprecificacao_forte_v266",
-        detail: { total: repriced.length, itens: repriced.slice(0, 50) } as any,
+        action: leituraSuspeita ? "leitura_preco_suspeita_v271" : "reprecificacao_forte_v266",
+        detail: { total: repriced.length, scanned: scannedTotal, itens: repriced.slice(0, 50) } as any,
       });
     } catch { /* noop */ }
   }
+
 
   const perProvider = Object.fromEntries(
     providers.map((p) => [p.slug, {
