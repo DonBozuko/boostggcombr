@@ -279,6 +279,54 @@ export type Database = {
         }
         Relationships: []
       }
+      canary_alert_state: {
+        Row: {
+          alert_key: string
+          detail: string | null
+          last_sent_at: string
+          resolved_at: string | null
+        }
+        Insert: {
+          alert_key: string
+          detail?: string | null
+          last_sent_at?: string
+          resolved_at?: string | null
+        }
+        Update: {
+          alert_key?: string
+          detail?: string | null
+          last_sent_at?: string
+          resolved_at?: string | null
+        }
+        Relationships: []
+      }
+      canary_quarantine: {
+        Row: {
+          hits: number
+          pacote: string
+          provider_slug: string
+          reason: string | null
+          until: string
+          updated_at: string
+        }
+        Insert: {
+          hits?: number
+          pacote: string
+          provider_slug: string
+          reason?: string | null
+          until: string
+          updated_at?: string
+        }
+        Update: {
+          hits?: number
+          pacote?: string
+          provider_slug?: string
+          reason?: string | null
+          until?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       canary_runs: {
         Row: {
           cost_brl: number | null
