@@ -209,7 +209,7 @@ export async function dispatchByFornecedor(slug: string, args: {
       return { ok: false, error: `${slug}: API key ausente (secret ${(f as any).api_key_secret})` };
     }
     return dispatchSmmV2({
-      endpoint: (f as any).api_url,
+      endpoint: normalizeEndpoint((f as any).api_url),
       apiKey,
       fornecedor: (f as any).nome ?? slug,
       ...args,
