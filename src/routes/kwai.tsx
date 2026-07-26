@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { Send, Copy, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import CardPayOption from "@/components/CardPayOption";
 
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { FaqSection, FAQS } from "@/components/FaqSection";
