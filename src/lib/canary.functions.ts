@@ -57,6 +57,30 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
   });
 
 
+/** v284 — sugere o pacote real mais barato de cada rede para usar como canário.
+ *  Não cria pacote fake: usa o catálogo que o cliente compra de verdade. */
+export const suggestCanaryTargets = createServerFn({ method: "POST" })
+  .inputValidator((i) => tokenIn.parse(i))
+  .handler(async ({ data }) => {
+    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("pricing_items")
+      .select("pacote, category, quantidade, cost_brl, is_sellable");
+    const best = new Map<string, { rede: string; pacote: string; quantidade: number; cost_brl: number }>();
+    for (const r of ((rows as any[]) ?? [])) {
+      if (r.is_sellable === false) continue;
+      const rede = String(r.category ?? "").split(":")[0] || "outros";
+      const cur = best.get(String(r.category));
+      const cost = Number(r.cost_brl ?? 0);
+      if (!cur || cost < cur.cost_brl) {
+        best.set(String(r.category), { rede: String(r.category), pacote: r.pacote, quantidade: Number(r.quantidade), cost_brl: cost });
+      }
+      void rede;
+    }
+    return { ok: true as const, sugestoes: [...best.values()].sort((a, b) => a.rede.localeCompare(b.rede)) };
+  });
+
 export const runCanaryNow = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {

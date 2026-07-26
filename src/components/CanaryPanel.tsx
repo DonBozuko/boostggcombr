@@ -3,7 +3,7 @@
 // e acompanha até chegar. Se não chegar, alerta antes do cliente reclamar.
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getCanaryPanel, saveCanaryConfig, runCanaryNow } from "@/lib/canary.functions";
+import { getCanaryPanel, saveCanaryConfig, runCanaryNow, suggestCanaryTargets } from "@/lib/canary.functions";
 import { Bird, RefreshCw, Play } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,6 +23,7 @@ export function CanaryPanel({ token }: { token: string }) {
   const load$ = useServerFn(getCanaryPanel);
   const save$ = useServerFn(saveCanaryConfig);
   const run$ = useServerFn(runCanaryNow);
+  const suggest$ = useServerFn(suggestCanaryTargets);
 
   const [panel, setPanel] = useState<Panel | null>(null);
   const [busy, setBusy] = useState(false);
@@ -49,6 +50,23 @@ export function CanaryPanel({ token }: { token: string }) {
 
   const removeAlvo = (i: number) =>
     setForm((f) => ({ ...f, alvos: f.alvos.filter((_, idx) => idx !== i) }));
+  const preencherMaisBaratos = async () => {
+    setBusy(true);
+    try {
+      const r = await suggest$({ data: { token } });
+      if (!r.ok) { toast.error(r.error ?? "erro"); return; }
+      setForm((f) => {
+        const jaTem = new Map(f.alvos.map((a) => [a.pacote, a]));
+        const novos: Alvo[] = r.sugestoes.map((s) => {
+          const ex = jaTem.get(s.pacote);
+          return { rede: s.rede, link: ex?.link ?? "", pacote: s.pacote, quantidade: s.quantidade, ativo: Boolean(ex?.link) };
+        });
+        return { ...f, alvos: novos.slice(0, 12) };
+      });
+      toast.success("Pacotes mais baratos carregados — falta só colar o link de teste de cada rede");
+    } finally { setBusy(false); }
+  };
+
 
   const save = async () => {
     setBusy(true);
@@ -138,9 +156,14 @@ export function CanaryPanel({ token }: { token: string }) {
                 </div>
               </div>
             ))}
-            <button onClick={addAlvo} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1">
-              + adicionar rede
-            </button>
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={addAlvo} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1">
+                + adicionar rede
+              </button>
+              <button onClick={preencherMaisBaratos} disabled={busy} className="text-[10px] uppercase tracking-wider text-cyan-300 border border-cyan-500/40 rounded px-2 py-1 disabled:opacity-40">
+                usar pacotes mais baratos de cada rede
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] mb-3">
