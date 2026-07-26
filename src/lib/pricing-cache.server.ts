@@ -7,7 +7,7 @@
 // Preserva HUD v57, largura +80px v101, grade 200 v107, cronômetro 3min v105,
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
-import { computeGuardedPrice } from "./margin-guardian";
+import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
 
 type PricingRow = {
   pacote: string;
