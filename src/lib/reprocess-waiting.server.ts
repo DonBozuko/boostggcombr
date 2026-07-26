@@ -255,5 +255,7 @@ export async function reprocessWaitingProvision(
     await markProviderUnstable(f.slug, r.error ?? "dispatch fail");
   }
 
+  await releaseDispatch(supabaseAdmin as any, pedido.id);
   return { ok: false, error: "TODOS_FORNECEDORES_FALHARAM", tentativas };
 }
+
