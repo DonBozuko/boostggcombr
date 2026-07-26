@@ -919,15 +919,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
           <LivePurchasesTicker accent="#00f2fe" />
           <TrustBadges accent="#FFD700" />
-          <CheckoutFaq />
-
-
-
-
 
           <form
+            id="form-pedido"
             onSubmit={onSubmit}
-            className="rounded-2xl border border-border bg-card p-3 sm:p-5 space-y-4 shadow-glow-blue"
+            className="scroll-mt-4 rounded-2xl border border-border bg-card p-3 sm:p-5 space-y-4 shadow-glow-blue"
           >
             <div className="space-y-2">
               <Label htmlFor="plan">Pacote escolhido</Label>
