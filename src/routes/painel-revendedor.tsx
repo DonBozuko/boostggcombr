@@ -17,6 +17,7 @@ import {
   type PortalData,
   type PortalService,
 } from "@/lib/reseller-portal.functions";
+import { forgotResellerKey } from "@/lib/reseller-apply.functions";
 
 const STORAGE_KEY = "bgg_reseller_key";
 
@@ -47,7 +48,11 @@ function PainelRevendedor() {
   const fnCatalog = useServerFn(resellerCatalog);
   const fnOrder = useServerFn(resellerPlaceOrder);
 
+  const fnForgot = useServerFn(forgotResellerKey);
+
   const [apiKey, setApiKey] = useState("");
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
   const [keyInput, setKeyInput] = useState("");
   const [data, setData] = useState<PortalData | null>(null);
   const [busy, setBusy] = useState(false);
@@ -94,6 +99,18 @@ function PainelRevendedor() {
         setApiKey(keyInput.trim());
         window.sessionStorage.setItem(STORAGE_KEY, keyInput.trim());
       }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const recuperar = async () => {
+    if (!/^\S+@\S+\.\S+$/.test(forgotEmail.trim())) return toast.error("Informe seu e-mail de cadastro");
+    setBusy(true);
+    try {
+      const r = await fnForgot({ data: { email: forgotEmail.trim() } });
+      toast[r.ok ? "success" : "error"](r.message);
+      if (r.ok) { setForgotOpen(false); setForgotEmail(""); }
     } finally {
       setBusy(false);
     }
@@ -163,9 +180,43 @@ function PainelRevendedor() {
             {busy ? "Entrando..." : "Entrar"}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Sua chave fica só neste navegador, nesta aba. Nunca compartilhe com ninguém.
+            Não precisa saber programar: cole a chave, recarregue por Pix e peça. Sua chave fica só neste
+            navegador, nesta aba — nunca compartilhe com ninguém.
           </p>
         </form>
+
+        <div className="mt-4 rounded-xl border border-border/60 bg-card/20 p-4">
+          {!forgotOpen ? (
+            <button
+              type="button"
+              onClick={() => setForgotOpen(true)}
+              className="text-sm text-primary underline"
+            >
+              Esqueci minha chave
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm">
+                Informe o e-mail do seu cadastro. Enviamos uma chave nova e cancelamos a antiga na hora.
+              </p>
+              <Input
+                type="email"
+                placeholder="seu@email.com"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                maxLength={160}
+              />
+              <div className="flex gap-2">
+                <Button size="sm" onClick={recuperar} disabled={busy}>
+                  {busy ? "Enviando..." : "Enviar nova chave"}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setForgotOpen(false)}>
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </main>
     );
   }
