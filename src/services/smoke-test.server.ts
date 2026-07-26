@@ -135,8 +135,8 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   for (const it of (items as any[]) ?? []) {
     // v180 — auto_id (auto-resolver v171) é caminho válido de dispatch, conta como ID.
     const hasId =
-      it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id ||
-      it.smmhype_auto_id || it.smmpanel_auto_id || it.verified_auto_id;
+      it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id || it.provider4_service_id ||
+      it.smmhype_auto_id || it.smmpanel_auto_id || it.verified_auto_id || it.provider4_auto_id;
     if (!hasId) report.packages_without_valid_id.push(it.pacote);
 
     const cost = Number(it.cost_brl) || 0;
