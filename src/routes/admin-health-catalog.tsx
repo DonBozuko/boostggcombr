@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminTokenForSession } from "@/lib/admin-session.functions";
 
 export const Route = createFileRoute("/admin-health-catalog")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Saúde do Catálogo · Admin" },
@@ -11,7 +14,7 @@ export const Route = createFileRoute("/admin-health-catalog")({
   component: HealthCatalogPage,
 });
 
-const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
+
 
 type Row = {
   pacote: string;
@@ -37,10 +40,22 @@ function HealthCatalogPage() {
   const [filter, setFilter] = useState<"all" | "sellable" | "paused">("all");
   const [msg, setMsg] = useState<string | null>(null);
 
+  const fetchAdminToken = useServerFn(getAdminTokenForSession);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setToken(window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "");
-  }, []);
+    let alive = true;
+    void (async () => {
+      try {
+        const res = await fetchAdminToken({ data: {} as never });
+        if (alive && res.ok) setToken(res.token);
+        else if (alive) setMsg("Acesso restrito. Entre pelo painel /admin.");
+      } catch {
+        if (alive) setMsg("Acesso restrito. Entre pelo painel /admin.");
+      }
+    })();
+    return () => { alive = false; };
+  }, [fetchAdminToken]);
+
 
   const load = async () => {
     if (!token) { setMsg("Cole o admin token primeiro"); return; }
