@@ -7,7 +7,7 @@
 // Preserva HUD v57, largura +80px v101, grade 200 v107, cronômetro 3min v105,
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
-import { computeGuardedPrice } from "./margin-guardian";
+import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
 
 type PricingRow = {
   pacote: string;
@@ -271,7 +271,12 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       // gravado, o pacote sai da vitrine (is_sellable=false) e o dono decide
       // trocar de fornecedor ou reposicionar. Nunca vender abaixo da margem,
       // nunca dar susto de preço sem decisão humana.
-      const shock = oldPrice > 0 && newPrice / oldPrice > 1.5;
+      // Preço atual ainda respeita o piso de lucro (net ≥ 4x custo real)?
+      const precoAtualSeguro = oldPrice > 0 && respectsMinMargin(oldPrice, newCost);
+      // Só é "choque" quando o reajuste é violento E o preço de hoje já ficou
+      // abaixo do piso de lucro com o custo real. Reajuste grande em pacote que
+      // continua lucrativo NÃO tira nada da vitrine (evita esvaziar a loja).
+      const shock = oldPrice > 0 && newPrice / oldPrice > 1.5 && !precoAtualSeguro;
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
         patch.last_cost_source = best.slug;
@@ -279,6 +284,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         if (shock) {
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
+          repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+        } else if (oldPrice > 0 && newPrice / oldPrice > 1.5 && precoAtualSeguro) {
+          // Lucro segue saudável: mantém a etiqueta, só registra a oportunidade.
           repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
         } else {
           patch.price_brl = newPrice;
