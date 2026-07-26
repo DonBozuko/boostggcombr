@@ -37,6 +37,7 @@ import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as RastrearRouteImport } from './routes/rastrear'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
+import { Route as RevendaRouteImport } from './routes/revenda'
 import { Route as SeguidoresPixRouteImport } from './routes/seguidores-pix'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StatusRouteImport } from './routes/status'
@@ -253,6 +254,11 @@ const RastrearRoute = RastrearRouteImport.update({
 const ReembolsoRoute = ReembolsoRouteImport.update({
   id: '/reembolso',
   path: '/reembolso',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevendaRoute = RevendaRouteImport.update({
+  id: '/revenda',
+  path: '/revenda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SeguidoresPixRoute = SeguidoresPixRouteImport.update({
@@ -679,6 +685,7 @@ export interface FileRoutesByFullPath {
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
+  '/revenda': typeof RevendaRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -781,6 +788,7 @@ export interface FileRoutesByTo {
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
+  '/revenda': typeof RevendaRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -884,6 +892,7 @@ export interface FileRoutesById {
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
+  '/revenda': typeof RevendaRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -988,6 +997,7 @@ export interface FileRouteTypes {
     | '/promo-5reais'
     | '/rastrear'
     | '/reembolso'
+    | '/revenda'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1090,6 +1100,7 @@ export interface FileRouteTypes {
     | '/promo-5reais'
     | '/rastrear'
     | '/reembolso'
+    | '/revenda'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1192,6 +1203,7 @@ export interface FileRouteTypes {
     | '/promo-5reais'
     | '/rastrear'
     | '/reembolso'
+    | '/revenda'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1295,6 +1307,7 @@ export interface RootRouteChildren {
   Promo5reaisRoute: typeof Promo5reaisRoute
   RastrearRoute: typeof RastrearRoute
   ReembolsoRoute: typeof ReembolsoRoute
+  RevendaRoute: typeof RevendaRoute
   SeguidoresPixRoute: typeof SeguidoresPixRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -1563,6 +1576,13 @@ declare module '@tanstack/react-router' {
       path: '/reembolso'
       fullPath: '/reembolso'
       preLoaderRoute: typeof ReembolsoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revenda': {
+      id: '/revenda'
+      path: '/revenda'
+      fullPath: '/revenda'
+      preLoaderRoute: typeof RevendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seguidores-pix': {
@@ -2113,6 +2133,7 @@ const rootRouteChildren: RootRouteChildren = {
   Promo5reaisRoute: Promo5reaisRoute,
   RastrearRoute: RastrearRoute,
   ReembolsoRoute: ReembolsoRoute,
+  RevendaRoute: RevendaRoute,
   SeguidoresPixRoute: SeguidoresPixRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
