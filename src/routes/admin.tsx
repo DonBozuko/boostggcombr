@@ -1515,6 +1515,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}><SloPanel token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><TreasuryPanel token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><WaitingProvisionQueue token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><ResellerPanel token={token} /></div>
 
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}>
           <PricingCatalogEditor token={token} />
