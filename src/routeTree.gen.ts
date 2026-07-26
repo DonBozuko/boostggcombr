@@ -31,7 +31,6 @@ import { Route as FacebookRouteImport } from './routes/facebook'
 import { Route as ImpulsionarInstagramRouteImport } from './routes/impulsionar-instagram'
 import { Route as KitCreatorRouteImport } from './routes/kit-creator'
 import { Route as KwaiRouteImport } from './routes/kwai'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
@@ -227,11 +226,6 @@ const KitCreatorRoute = KitCreatorRouteImport.update({
 const KwaiRoute = KwaiRouteImport.update({
   id: '/kwai',
   path: '/kwai',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -697,7 +691,6 @@ export interface FileRoutesByFullPath {
   '/impulsionar-instagram': typeof ImpulsionarInstagramRoute
   '/kit-creator': typeof KitCreatorRoute
   '/kwai': typeof KwaiRoute
-  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
@@ -803,7 +796,6 @@ export interface FileRoutesByTo {
   '/impulsionar-instagram': typeof ImpulsionarInstagramRoute
   '/kit-creator': typeof KitCreatorRoute
   '/kwai': typeof KwaiRoute
-  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
@@ -910,7 +902,6 @@ export interface FileRoutesById {
   '/impulsionar-instagram': typeof ImpulsionarInstagramRoute
   '/kit-creator': typeof KitCreatorRoute
   '/kwai': typeof KwaiRoute
-  '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
@@ -1018,7 +1009,6 @@ export interface FileRouteTypes {
     | '/impulsionar-instagram'
     | '/kit-creator'
     | '/kwai'
-    | '/login'
     | '/mcp'
     | '/obrigado'
     | '/painel-afiliado'
@@ -1124,7 +1114,6 @@ export interface FileRouteTypes {
     | '/impulsionar-instagram'
     | '/kit-creator'
     | '/kwai'
-    | '/login'
     | '/mcp'
     | '/obrigado'
     | '/painel-afiliado'
@@ -1230,7 +1219,6 @@ export interface FileRouteTypes {
     | '/impulsionar-instagram'
     | '/kit-creator'
     | '/kwai'
-    | '/login'
     | '/mcp'
     | '/obrigado'
     | '/painel-afiliado'
@@ -1337,7 +1325,6 @@ export interface RootRouteChildren {
   ImpulsionarInstagramRoute: typeof ImpulsionarInstagramRoute
   KitCreatorRoute: typeof KitCreatorRoute
   KwaiRoute: typeof KwaiRoute
-  LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
   PainelAfiliadoRoute: typeof PainelAfiliadoRoute
@@ -1573,13 +1560,6 @@ declare module '@tanstack/react-router' {
       path: '/kwai'
       fullPath: '/kwai'
       preLoaderRoute: typeof KwaiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -2187,7 +2167,6 @@ const rootRouteChildren: RootRouteChildren = {
   ImpulsionarInstagramRoute: ImpulsionarInstagramRoute,
   KitCreatorRoute: KitCreatorRoute,
   KwaiRoute: KwaiRoute,
-  LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
   PainelAfiliadoRoute: PainelAfiliadoRoute,
