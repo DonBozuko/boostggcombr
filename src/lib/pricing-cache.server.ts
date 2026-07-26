@@ -309,6 +309,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
   const bound: Record<string, number> = {};
   const ghostList: Array<{ pacote: string; streak: number }> = [];
   const repriced: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
+  // v282 — reajustes aplicados sozinhos (dentro do teto de +40%) e aposentadorias.
+  const reajustados: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
+  const aposentados: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
   const restored: string[] = [];
   let updated_rows = 0;
 
