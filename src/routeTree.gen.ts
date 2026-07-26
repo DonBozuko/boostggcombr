@@ -102,6 +102,7 @@ import { Route as ApiPublicQueueApproveRefundRouteImport } from './routes/api/pu
 import { Route as ApiPublicQueueConfirmRouteImport } from './routes/api/public/queue/confirm'
 import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public/queue/reprocess'
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
+import { Route as ApiPublicResellerV1RouteImport } from './routes/api/public/reseller/v1'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -608,6 +609,11 @@ const ApiPublicQueueWaitingRoute = ApiPublicQueueWaitingRouteImport.update({
   path: '/api/public/queue/waiting',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicResellerV1Route = ApiPublicResellerV1RouteImport.update({
+  id: '/api/public/reseller/v1',
+  path: '/api/public/reseller/v1',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSfxNameRoute = ApiPublicSfxNameRouteImport.update({
   id: '/api/public/sfx/$name',
   path: '/api/public/sfx/$name',
@@ -732,6 +738,7 @@ export interface FileRoutesByFullPath {
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
+  '/api/public/reseller/v1': typeof ApiPublicResellerV1Route
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -832,6 +839,7 @@ export interface FileRoutesByTo {
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
+  '/api/public/reseller/v1': typeof ApiPublicResellerV1Route
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -933,6 +941,7 @@ export interface FileRoutesById {
   '/api/public/queue/confirm': typeof ApiPublicQueueConfirmRoute
   '/api/public/queue/reprocess': typeof ApiPublicQueueReprocessRoute
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
+  '/api/public/reseller/v1': typeof ApiPublicResellerV1Route
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1035,6 +1044,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
+    | '/api/public/reseller/v1'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
@@ -1135,6 +1145,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
+    | '/api/public/reseller/v1'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
@@ -1235,6 +1246,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/confirm'
     | '/api/public/queue/reprocess'
     | '/api/public/queue/waiting'
+    | '/api/public/reseller/v1'
     | '/api/public/sfx/$name'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
@@ -1334,6 +1346,7 @@ export interface RootRouteChildren {
   ApiPublicQueueConfirmRoute: typeof ApiPublicQueueConfirmRoute
   ApiPublicQueueReprocessRoute: typeof ApiPublicQueueReprocessRoute
   ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
+  ApiPublicResellerV1Route: typeof ApiPublicResellerV1Route
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1994,6 +2007,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicQueueWaitingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/reseller/v1': {
+      id: '/api/public/reseller/v1'
+      path: '/api/public/reseller/v1'
+      fullPath: '/api/public/reseller/v1'
+      preLoaderRoute: typeof ApiPublicResellerV1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sfx/$name': {
       id: '/api/public/sfx/$name'
       path: '/api/public/sfx/$name'
@@ -2140,6 +2160,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicQueueConfirmRoute: ApiPublicQueueConfirmRoute,
   ApiPublicQueueReprocessRoute: ApiPublicQueueReprocessRoute,
   ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,
+  ApiPublicResellerV1Route: ApiPublicResellerV1Route,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
