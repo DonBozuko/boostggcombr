@@ -37,7 +37,8 @@ export function maxAllowedDiscount(catalogPrice: number, costBrl: number): numbe
   const keep = ((1 + RESELLER_MIN_RATIO) * c) / (p * PIX_NET); // fração do preço a manter
   const allowed = 1 - keep;
   if (!Number.isFinite(allowed) || allowed <= 0) return 0;
-  return Math.min(RESELLER_MAX_DISCOUNT, Number(allowed.toFixed(4)));
+  // arredonda pra BAIXO: nunca conceder desconto maior do que a margem aguenta
+  return Math.min(RESELLER_MAX_DISCOUNT, Math.floor(allowed * 1e4) / 1e4);
 }
 
 export type ResellerQuote = {
@@ -64,7 +65,8 @@ export function quoteReseller(input: {
   const wanted = Math.max(0, Math.min(RESELLER_MAX_DISCOUNT, Number(input.descontoPct) || 0));
   const allowed = maxAllowedDiscount(retail, input.costBrl);
   const discount = Math.min(wanted, allowed);
-  const price = Number((retail * (1 - discount)).toFixed(2));
+  // centavos pra CIMA: preço nunca fica abaixo do piso por arredondamento
+  const price = Math.ceil(retail * (1 - discount) * 100) / 100;
   return {
     price,
     retail,
