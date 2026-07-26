@@ -333,27 +333,31 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
 
 
 /** Fase 2 — dispara um novo canário na rede que está há mais tempo sem teste.
- *  Cada rede tem seu próprio link/pacote: rotaciona um alvo por execução.
- *  v285 — agora exercita o MESMO failover de um pedido real: percorre a cadeia
- *  inteira de fornecedores e só alerta se TODOS falharem. Antes o canário testava
- *  só o mais barato, o que gerava alarme falso sempre que o primeiro recusava
- *  (o cliente real failover e entrega normalmente). */
+ *  v285 — exercita o MESMO failover de um pedido real.
+ *  v289 — rotaciona o POOL de links de teste da rede e respeita a quarentena
+ *  por pacote+fornecedor. Só alerta quando NÃO existe rota segura. */
 async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<void> {
   const alvos = cfg.alvos.filter(alvoValido);
   if (alvos.length === 0) return;
 
   const { data: recent } = await supabaseAdmin
     .from("canary_runs")
-    .select("pacote, created_at, status")
+    .select("pacote, target_link, created_at, status")
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(300);
 
   const lastByPacote = new Map<string, number>();
   const activeByPacote = new Set<string>();
+  const lastByLink = new Map<string, number>();
+  const activeLinks = new Set<string>();
   for (const row of ((recent as any[]) ?? [])) {
     if (!lastByPacote.has(row.pacote)) lastByPacote.set(row.pacote, new Date(row.created_at).getTime());
-    if ((row.status === "dispatched" || row.status === "processing") && !activeByPacote.has(row.pacote)) {
-      activeByPacote.add(row.pacote);
+    const aberto = row.status === "dispatched" || row.status === "processing";
+    if (aberto) activeByPacote.add(row.pacote);
+    const link = String(row.target_link ?? "").trim();
+    if (link) {
+      if (!lastByLink.has(link)) lastByLink.set(link, new Date(row.created_at).getTime());
+      if (aberto) activeLinks.add(link);
     }
   }
 
@@ -363,34 +367,35 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
   )[0];
 
   const lastAt = lastByPacote.get(alvo.pacote) ?? 0;
-  // v286 — piso anti-duplicado de link: fornecedores (SMMhype etc.) rejeitam
-  // "active order with this link" se um pedido recente ainda não liberou o link.
-  // Mesmo com force (interval_hours=0) mantemos 10 min de piso entre disparos do
-  // mesmo alvo, senão o canário dispara alarme falso de "entrega quebrada".
-  // v288 — 10 min era curto demais: o link ainda estava "ocupado" no fornecedor
-  // anterior e a recusa virava alarme falso. 90 min elimina isso sem reduzir a
-  // cobertura real (intervalo normal continua sendo interval_hours).
-  const minGapMs = 90 * 60_000;
-  if (lastAt > 0 && Date.now() - lastAt < Math.max(cfg.interval_hours * 3_600_000, minGapMs)) return;
-
-  // v286 — anti-alarme-falso: se já existe canário em andamento (dispatched/processing)
-  // para este alvo, NÃO dispara outro pedido pro mesmo link. Fornecedores como o
-  // SMMhype recusam duplicado ("active order with this link") e isso dispararia um
-  // alerta falso de "entrega quebrada". A Fase 1 (checkOpenRuns) cuida do acompanhamento.
+  if (lastAt > 0 && Date.now() - lastAt < cfg.interval_hours * 3_600_000) return;
   if (activeByPacote.has(alvo.pacote)) return;
+
+  // v289 — pool de links: o fornecedor recusa link com pedido ativo/recente.
+  // Com pool, o canário troca de perfil em vez de gerar alarme falso.
+  const LINK_COOLDOWN_MS = 90 * 60_000;
+  const pool = linksDoAlvo(alvo);
+  const disponiveis = pool
+    .filter((l) => !activeLinks.has(l))
+    .filter((l) => Date.now() - (lastByLink.get(l) ?? 0) >= LINK_COOLDOWN_MS)
+    .sort((a, b) => (lastByLink.get(a) ?? 0) - (lastByLink.get(b) ?? 0));
+  if (disponiveis.length === 0) return; // todos os perfis de teste em descanso
+  const link = disponiveis[0];
 
   const rede = alvo.rede || alvo.pacote;
 
   const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
   const ranked = await rankProvidersByCost({ pacote: alvo.pacote, quantidade: alvo.quantidade });
+  const quarentena = await getQuarentena(alvo.pacote);
 
-  // Cadeia apta: fornecedores ativos, não instáveis, com ID real (smmhype usa
-  // resolver interno, então dispensa provider_service_id).
-  const cadeia = ranked.filter((p) => !p.unstable && (p.slug === "smmhype" || p.provider_service_id));
+  // Cadeia apta: ativos, não instáveis, fora da quarentena e com ID real
+  // (smmhype usa resolver interno, então dispensa provider_service_id).
+  const cadeia = ranked.filter(
+    (p) => !p.unstable && !quarentena.has(p.slug) && (p.slug === "smmhype" || p.provider_service_id),
+  );
   if (cadeia.length === 0) {
     report.ok = false;
     const m = `🚨 NENHUM FORNECEDOR DISPONÍVEL\n\nPROBLEMA: o teste de compra real não achou fornecedor apto para o pacote ${alvo.pacote} (${rede}).\n\nO QUE FAZER: abrir /admin e conferir fornecedores e IDs do catálogo.`;
-    report.alertas.push(m); await alert(m);
+    if (await alert(`entrega:${alvo.pacote}`, m)) report.alertas.push(m);
     return;
   }
 
@@ -401,14 +406,18 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
     const r = await dispatchByFornecedor(cand.slug, {
       pacote: alvo.pacote,
       quantidade: alvo.quantidade,
-      instagram_user: alvo.link,
-      // smmhype resolve o serviceId internamente; demais usam o ID curado/auto.
+      instagram_user: link,
       serviceIdOverride: cand.slug === "smmhype" ? undefined : cand.provider_service_id,
     });
 
     if (!r.ok) {
-      tentativas.push(`${cand.slug}: ${r.error ?? "falha"}`);
-      // dispatchByFornecedor já acionou o circuit breaker interno; continua pro próximo.
+      const erro = r.error ?? "falha";
+      tentativas.push(`${cand.slug}: ${erro}`);
+      // v289 — recusa por link duplicado é problema do TESTE, não do fornecedor:
+      // não entra em quarentena (senão o canário se auto-sabota).
+      if (!/active order|duplicate|mesmo link/i.test(erro)) {
+        await quarentenar(alvo.pacote, cand.slug, `recusou o envio: ${erro}`);
+      }
       continue;
     }
 
@@ -417,7 +426,7 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
       .insert({
         pacote: alvo.pacote,
         quantidade: alvo.quantidade,
-        target_link: alvo.link,
+        target_link: link,
         provider_slug: cand.slug,
         cost_brl: cand.cost_brl,
         status: "dispatched",
@@ -437,19 +446,20 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
     return; // sucesso — entrega em andamento
   }
 
-  // Se chegou aqui: TODOS os fornecedores da cadeia falharam = entrega real quebrada.
+  // Se chegou aqui: TODOS os fornecedores aptos falharam = entrega real quebrada.
   const base = {
     pacote: alvo.pacote,
     quantidade: alvo.quantidade,
-    target_link: alvo.link,
+    target_link: link,
     provider_slug: cadeia[0]?.slug ?? null,
     cost_brl: cadeia[0]?.cost_brl ?? null,
   };
   await supabaseAdmin.from("canary_runs").insert({ ...base, status: "failed", detail: `[${rede}] TODOS falharam: ${tentativas.join(" | ")}` } as any);
   report.ok = false;
   const m = `🚨 ENTREGA REAL QUEBRADA\n\nPROBLEMA: o teste de compra real (${rede} · ${alvo.pacote}) falhou em TODOS os ${cadeia.length} fornecedores:\n${tentativas.map((t) => `• ${t}`).join("\n")}\n\nO QUE FAZER: cliente que comprar esse pacote agora NÃO vai receber. Abrir /admin e conferir fornecedores antes de qualquer venda.`;
-  report.alertas.push(m); await alert(m);
+  if (await alert(`entrega:${alvo.pacote}`, m)) report.alertas.push(m);
 }
+
 
 export async function runCanary(force = false): Promise<CanaryReport> {
   const report: CanaryReport = { ok: true, ligado: false, verificados: [], alertas: [], ts: new Date().toISOString() };
