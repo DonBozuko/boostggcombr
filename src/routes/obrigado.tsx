@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp, Star, ExternalLink } from "lucide-react";
+import { CheckCircle2, Home, Zap, Heart, Eye, TrendingUp, Star, ExternalLink, PackageSearch } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { DeliveryTimes } from "@/components/DeliveryTimes";
@@ -120,6 +120,12 @@ function ObrigadoPage() {
             <ExternalLink className="w-4 h-4" />
           </a>
         </div>
+
+        <Button asChild className="w-full">
+          <Link to="/rastrear" search={orderId ? { pedido: orderId } : undefined}>
+            <PackageSearch className="w-4 h-4 mr-2" />Acompanhar meu pedido
+          </Link>
+        </Button>
 
         <Button asChild variant="outline" className="w-full">
           <Link to="/"><Home className="w-4 h-4 mr-2" />Voltar ao início</Link>
