@@ -8,6 +8,7 @@ import { Bird, RefreshCw, Play } from "lucide-react";
 import { toast } from "sonner";
 
 type Panel = Awaited<ReturnType<typeof getCanaryPanel>>;
+type Alvo = { rede: string; link: string; pacote: string; quantidade: number; ativo: boolean };
 type Run = { id: string; created_at: string; pacote: string; quantidade: number; provider_slug: string | null; provider_order_id: string | null; status: string; remains: number | null; delivered_at: string | null; detail: string | null; cost_brl: number | null };
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
