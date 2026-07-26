@@ -190,13 +190,17 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
 
   const { data: recent } = await supabaseAdmin
     .from("canary_runs")
-    .select("pacote, created_at")
+    .select("pacote, created_at, status")
     .order("created_at", { ascending: false })
     .limit(200);
 
   const lastByPacote = new Map<string, number>();
+  const activeByPacote = new Set<string>();
   for (const row of ((recent as any[]) ?? [])) {
     if (!lastByPacote.has(row.pacote)) lastByPacote.set(row.pacote, new Date(row.created_at).getTime());
+    if ((row.status === "dispatched" || row.status === "processing") && !activeByPacote.has(row.pacote)) {
+      activeByPacote.add(row.pacote);
+    }
   }
 
   // O alvo mais "velho" (ou nunca testado) é o próximo da fila.
@@ -206,6 +210,12 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
 
   const lastAt = lastByPacote.get(alvo.pacote) ?? 0;
   if (Date.now() - lastAt < cfg.interval_hours * 3_600_000) return;
+
+  // v286 — anti-alarme-falso: se já existe canário em andamento (dispatched/processing)
+  // para este alvo, NÃO dispara outro pedido pro mesmo link. Fornecedores como o
+  // SMMhype recusam duplicado ("active order with this link") e isso dispararia um
+  // alerta falso de "entrega quebrada". A Fase 1 (checkOpenRuns) cuida do acompanhamento.
+  if (activeByPacote.has(alvo.pacote)) return;
 
   const rede = alvo.rede || alvo.pacote;
 
