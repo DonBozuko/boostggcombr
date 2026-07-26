@@ -10,23 +10,43 @@
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+/** Um alvo = uma rede. Link de Instagram não serve para YouTube/TikTok/Telegram,
+ *  por isso cada rede tem seu próprio perfil/link de teste. */
+export type CanaryAlvo = {
+  rede: string;          // rótulo livre: instagram, tiktok, youtube, telegram, kwai, facebook, trafego
+  link: string;          // perfil/URL de teste válido PARA ESSA REDE
+  pacote: string;        // pacote real do catálogo dessa rede
+  quantidade: number;    // menor quantidade possível
+  ativo: boolean;
+};
+
 export type CanaryConfig = {
   enabled: boolean;
-  link: string;          // perfil de teste do dono (@ ou URL)
-  pacote: string;        // pacote real do catálogo
-  quantidade: number;    // menor quantidade possível
+  alvos: CanaryAlvo[];
   interval_hours: number;
   sla_hours: number;     // prazo máximo para entregar antes de alertar
 };
 
 const DEFAULTS: CanaryConfig = {
   enabled: false,
-  link: "",
-  pacote: "",
-  quantidade: 0,
+  alvos: [],
   interval_hours: 12,
   sla_hours: 6,
 };
+
+function normAlvo(a: Partial<CanaryAlvo>): CanaryAlvo {
+  return {
+    rede: String(a.rede ?? "").trim(),
+    link: String(a.link ?? "").trim(),
+    pacote: String(a.pacote ?? "").trim(),
+    quantidade: Number(a.quantidade ?? 0) || 0,
+    ativo: a.ativo !== false,
+  };
+}
+
+export function alvoValido(a: CanaryAlvo): boolean {
+  return Boolean(a.ativo && a.link && a.pacote && a.quantidade > 0);
+}
 
 export async function getCanaryConfig(): Promise<CanaryConfig> {
   const { data } = await supabaseAdmin
@@ -34,15 +54,25 @@ export async function getCanaryConfig(): Promise<CanaryConfig> {
     .select("value")
     .eq("key", "canary_config")
     .maybeSingle();
-  const v = (data as { value?: Partial<CanaryConfig> } | null)?.value ?? {};
+  const v = (data as { value?: Record<string, unknown> } | null)?.value ?? {};
+
+  let alvos: CanaryAlvo[] = Array.isArray(v.alvos)
+    ? (v.alvos as Partial<CanaryAlvo>[]).map(normAlvo)
+    : [];
+
+  // Compatibilidade: configuração antiga tinha um único link/pacote/quantidade.
+  if (alvos.length === 0 && v.link && v.pacote) {
+    alvos = [normAlvo({ rede: "instagram", link: String(v.link), pacote: String(v.pacote), quantidade: Number(v.quantidade ?? 0), ativo: true })];
+  }
+
   return {
-    ...DEFAULTS,
-    ...v,
-    quantidade: Number(v.quantidade ?? 0) || 0,
+    enabled: Boolean(v.enabled),
+    alvos,
     interval_hours: Number(v.interval_hours ?? DEFAULTS.interval_hours) || DEFAULTS.interval_hours,
     sla_hours: Number(v.sla_hours ?? DEFAULTS.sla_hours) || DEFAULTS.sla_hours,
   };
 }
+
 
 type ProviderStatus = { status?: string; remains?: string | number; error?: string };
 
