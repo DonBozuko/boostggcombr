@@ -7,7 +7,7 @@
 // Preserva HUD v57, largura +80px v101, grade 200 v107, cronômetro 3min v105,
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
-import { computeGuardedPrice, estimateNetProfit } from "./margin-guardian";
+import { computeGuardedPrice } from "./margin-guardian";
 
 type PricingRow = {
   pacote: string;
@@ -267,11 +267,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
       // v266 — Convergência gradual (jeito dos painéis grandes):
       //  • reajuste até +50%: entra direto;
-      //  • reajuste violento em pacote AINDA lucrativo: sobe no máximo 50% por
-      //    sincronização até chegar no preço justo — sem susto para o cliente;
-      //  • pacote que virou prejuízo/lucro raso (< 1,5x o custo): sai da vitrine.
-      const lucroHoje = oldPrice > 0 ? estimateNetProfit(oldPrice, newCost) : 0;
-      const lucrativo = oldPrice > 0 && lucroHoje >= newCost * 1.5;
+      //  • reajuste violento (> +50%): preço justo é gravado, mas o pacote sai
+      //    da vitrine até o dono trocar de fornecedor ou reposicionar — o cliente
+      //    nunca vê um preço disparar do nada.
       const salto = oldPrice > 0 ? newPrice / oldPrice : 1;
 
       if (costChanged || priceChanged) {
@@ -284,11 +282,11 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
           if (oldPrice > 0 && salto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
-        } else if (lucrativo) {
-          const passo = Number((oldPrice * 1.5).toFixed(2));
-          patch.price_brl = passo;
-          repriced.push({ pacote: r.pacote, de: oldPrice, para: passo, fornecedor: best.slug });
         } else {
+          // Salto violento: o preço justo sai do mercado. A trava do banco
+          // garante que o preço nunca fique abaixo da margem, então a proteção
+          // do cliente é tirar o pacote da vitrine até decisão humana.
+          patch.price_brl = newPrice;
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
           repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
