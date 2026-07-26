@@ -148,6 +148,9 @@ const GHOST_ALERT_STREAK = 3;
 // quando a leitura idêntica se repetir (2ª confirmação) ou o dono aprovar.
 // ============================================================
 const MASS_CHANGE_RATIO = 0.3;
+// v282 — Faixas de reajuste de custo do fornecedor.
+const AUTO_UP_MAX = 1.40;   // até +40%: aplica sozinho
+const RETIRE_ABOVE = 1.80;  // acima de +80%: aposenta o pacote
 const QUARANTINE_KEY = "price_quarantine";
 const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 const PRICE_KEYS = new Set([
@@ -306,6 +309,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
   const bound: Record<string, number> = {};
   const ghostList: Array<{ pacote: string; streak: number }> = [];
   const repriced: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
+  // v282 — reajustes aplicados sozinhos (dentro do teto de +40%) e aposentadorias.
+  const reajustados: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
+  const aposentados: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
   const restored: string[] = [];
   let updated_rows = 0;
 
@@ -372,13 +378,16 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const oldCost = Number(r.cost_brl ?? 0);
       const costChanged = Math.abs(newCost - oldCost) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
-      // v271 — O gatilho de pausa agora olha CUSTO contra CUSTO.
-      // Antes comparava preço novo contra preço antigo, e isso pausava pacote
-      // saudável sempre que o piso escalar subia (ex.: l200 R$5,00 → R$7,67 com
-      // custo de R$0,05). Pausa só quando o fornecedor realmente encareceu.
+      // v271 — O gatilho olha CUSTO contra CUSTO (nunca preço contra preço).
+      // v282 — Faixas de reajuste automático em vez de trava binária:
+      //   até +40%  → aplica sozinho (margem continua protegida)
+      //   +40..+80% → pausa e espera decisão do dono
+      //   acima     → aposenta o pacote (fornecedor inviável)
       const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
       const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
-      const encareceuDeVerdade = saltoCusto > 1.5 && saltoPreco > 1.5;
+      const subiu = saltoCusto > AUTO_UP_MAX;
+      const disparou = saltoCusto > RETIRE_ABOVE;
+      const encareceuDeVerdade = subiu && saltoPreco > 1.05;
 
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
@@ -391,11 +400,26 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
           if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
+        } else if (!disparou && respectsMinMargin(newPrice, newCost)) {
+          // v282 — Reajuste dentro do teto: entra sozinho, mas com aviso em
+          // destaque para o dono (e o cliente vê o preço novo já correto).
+          patch.price_brl = newPrice;
+          if (r.is_sellable === false && /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""))) {
+            patch.is_sellable = true;
+            patch.sellable_reason = null;
+          }
+          reajustados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+        } else if (disparou) {
+          // v282 — Salto acima de +80%: fornecedor virou inviável. Aposenta.
+          patch.is_sellable = false;
+          patch.sellable_reason = `custo do fornecedor disparou (${Math.round((saltoCusto - 1) * 100)}%): pacote aposentado automaticamente — preço justo seria R$ ${newPrice.toFixed(2)}`;
+          if (r.is_sellable !== false) {
+            aposentados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          }
         } else {
-          // v271 — Salto violento: NÃO sobrescreve o preço da vitrine. O pacote
-          // sai de venda e o preço justo sugerido fica registrado no motivo.
-          // Sobrescrever o preço fazia o próximo ciclo comparar contra um valor
-          // inflado e disparar alerta de novo, em looping.
+          // v271 — Faixa de decisão (+40% a +80%): NÃO sobrescreve o preço da
+          // vitrine. O pacote sai de venda e o preço justo fica no motivo.
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
           if (r.is_sellable !== false) {
@@ -593,6 +617,45 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     } catch { /* noop */ }
   }
 
+  // v282 — Aviso em destaque: reajuste automático, aposentadoria e volta ao normal.
+  // Só faz sentido quando os preços realmente foram gravados (fora da quarentena).
+  if (!emQuarentena && (reajustados.length > 0 || aposentados.length > 0 || restored.length > 0)) {
+    try {
+      const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      const linhas = (arr: typeof reajustados) =>
+        arr.slice(0, 8).map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`).join("\n");
+
+      const partes: string[] = [];
+      if (reajustados.length > 0) {
+        partes.push(
+          `🔺 PREÇO SUBIU SOZINHO (dentro do limite de 40%)\n\nPROBLEMA: o fornecedor encareceu ${reajustados.length} pacote(s). O site já está com o preço novo e a margem segue protegida.\n\n${linhas(reajustados)}\n\nO QUE FAZER: nada agora. Se um cliente perguntar, a explicação é: "o custo do serviço subiu no fornecedor e reajustamos para manter a mesma qualidade de entrega".`,
+        );
+      }
+      if (aposentados.length > 0) {
+        partes.push(
+          `⛔ PACOTE APOSENTADO (custo disparou mais de 80%)\n\nPROBLEMA: ${aposentados.length} pacote(s) ficaram caros demais e saíram da vitrine em vez de subir o preço na cara do cliente.\n\n${linhas(aposentados)}\n\nO QUE FAZER: escolher outro fornecedor para esse pacote no admin, ou deixar aposentado.`,
+        );
+      }
+      if (restored.length > 0) {
+        partes.push(
+          `✅ PACOTE VOLTOU AO NORMAL\n\nPROBLEMA: nenhum. O custo caiu de novo e ${restored.length} pacote(s) voltaram para a vitrine com preço menor.\n\n${restored.slice(0, 8).map((p) => `• ${p}`).join("\n")}\n\nO QUE FAZER: nada. Só avisando para você saber que o preço baixou.`,
+        );
+      }
+
+      await dispatchWhatsappAlert(partes.join("\n\n———\n\n")).catch(() => {});
+      await supabaseAdmin.from("admin_audit_logs" as any).insert({
+        admin_email: "system@sync",
+        action: "reajuste_automatico_v282",
+        detail: {
+          teto_automatico: AUTO_UP_MAX,
+          teto_aposentadoria: RETIRE_ABOVE,
+          reajustados: reajustados.slice(0, 50),
+          aposentados: aposentados.slice(0, 50),
+          voltaram: restored.slice(0, 50),
+        } as any,
+      });
+    } catch { /* noop */ }
+  }
 
 
   const perProvider = Object.fromEntries(
