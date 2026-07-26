@@ -492,9 +492,32 @@ function TiktokLanding() {
             >
               {tipoBloqueado ? "⚠️ Indisponível Temporariamente (Manutenção do Servidor)" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
+            <CardPayOption
+              disabled={loading || !planId || tipoBloqueado}
+              valorPix={dynAllPlans.find((p) => p.id === planId)?.valor}
+              buildPayload={() => {
+                const sel = dynAllPlans.find((p) => p.id === planId);
+                if (!sel) { toast.error("Selecione um pacote."); return null; }
+                const sch = sel.id.startsWith("tf") ? followersSchema : videoSchema;
+                const parsed = sch.safeParse({ plan: sel.id, profile });
+                if (!parsed.success) { toast.error(parsed.error.issues[0].message); return null; }
+                if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido."); return null; }
+                return {
+                  instagram_user: parsed.data.profile,
+                  pacote: sel.id,
+                  quantidade: sel.quantidade,
+                  valor: sel.valor,
+                  email: resolveCheckoutEmail(email, "tiktok"),
+                  rede_social: "tiktok" as const,
+                  ...getUtmParams(),
+                  cupom: getAppliedCoupon(),
+                };
+              }}
+            />
             <p className="text-[11px] text-center text-zinc-500">
               Pagamento seguro via Pix · sem senha · entrega automática
             </p>
+
           </div>
         </div>
       </section>)}
