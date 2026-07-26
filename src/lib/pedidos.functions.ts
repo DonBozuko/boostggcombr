@@ -375,8 +375,13 @@ export const criarPedido = createServerFn({ method: "POST" })
     let mpId: string | null = null;
     let qrCode = "";
     let qrCodeBase64 = "";
-    const idempotencyKey =
-      (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`);
+    // v260 — chave determinística: cliques simultâneos = mesma chave = MP não cobra 2x.
+    const { buildCheckoutIdempotencyKey } = await import("@/lib/checkout-idempotency");
+    const idempotencyKey = buildCheckoutIdempotencyKey({
+      usuario: clean(data.instagram_user),
+      pacote: clean(pacoteEfetivo),
+      valor: valorCobrar,
+    });
     const mpBody = JSON.stringify({
       transaction_amount: Number(valorCobrar.toFixed(2)),
       description: `BoostGG - ${rede.toUpperCase()} pacote ${clean(pacoteEfetivo)} (${quantidadeEfetiva} ${categoria}) para ${clean(data.instagram_user)}${bumpAplicado ? " [UPGRADE]" : ""}`,

@@ -106,6 +106,7 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
   const pendingList = (pendings as any[]) ?? [];
   if (pendingList.length > 0) {
     const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
+    const { isStalePending } = await import("@/lib/checkout-idempotency");
     for (const p of pendingList) {
       try {
         const r = await confirmAndDispatchIfPaid(p.id);
@@ -114,11 +115,24 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
           created_at: p.created_at,
           result: `PENDING_SWEEP: ${r.ok ? (r.recovered ? "RECOVERED" : `status=${r.status}`) : `err=${r.error}`}`,
         });
+        // v260 — Pix vencido há >24h e ainda pendente: encerra como expirado.
+        // Sem isso o reconciliador batia no Mercado Pago a cada 5min, para
+        // sempre, por pedidos que nunca serão pagos. Só encerra quando a
+        // confirmação NÃO recuperou o pedido (nunca mexe em pedido pago).
+        if (!(r.ok && r.recovered) && isStalePending(p.created_at)) {
+          await supabaseAdmin
+            .from("pedidos")
+            .update({ status: "expired", error_detail: "Pix não pago em 24h (encerrado v260)" })
+            .eq("id", p.id)
+            .in("status", ["pending", "mp_pending", "mp_in_process"]);
+          report.detalhes.push({ id: p.id, created_at: p.created_at, result: "PENDING_EXPIRADO_24H" });
+        }
       } catch (e) {
         report.detalhes.push({ id: p.id, created_at: p.created_at, result: `PENDING_SWEEP_EX: ${(e as Error).message}` });
       }
     }
   }
+
 
   // Log de auditoria (mesmo quando 0 órfãos — prova que o cron rodou)
   try {
