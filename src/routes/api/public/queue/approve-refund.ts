@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
 
         const { data: p, error: loadErr } = await supabaseAdmin
           .from("pedidos")
-          .select("id, status, mercado_pago_id, valor, pacote, email_contato, provider_slug, provider_order_id")
+          .select("id, status, mercado_pago_id, valor, pacote, email_contato, provider_slug, provider_order_id, reseller_id, reseller_valor")
           .eq("id", parsed.data.pedido_id)
           .maybeSingle();
 
@@ -80,6 +80,22 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
             status: 409, headers: { "Content-Type": "application/json" },
           });
         }
+        // v279 — pedido de revenda não tem cobrança no Mercado Pago: devolve saldo na carteira.
+        const { isResellerPaid, refundResellerBalance } = await import("@/lib/reseller-refund.server");
+        if (isResellerPaid(p as any)) {
+          const back = await refundResellerBalance(String((p as any).id), `refund manual aprovado por ${auth.who}`);
+          await supabaseAdmin
+            .from("pedidos")
+            .update({
+              status: back.ok ? "refunded" : "SMM_FAILED",
+              error_detail: `Refund manual (revenda) por ${auth.who}. Devolução ${back.ok ? "OK" : "FALHOU"}: ${back.detail}`.slice(0, 500),
+            } as any)
+            .eq("id", (p as any).id);
+          return new Response(JSON.stringify({ ok: back.ok, kind: "reseller_balance", detail: back.detail }), {
+            status: back.ok ? 200 : 502, headers: { "Content-Type": "application/json" },
+          });
+        }
+
         if (!(p as any).mercado_pago_id) {
           return new Response(JSON.stringify({ ok: false, error: "SEM_MERCADO_PAGO_ID" }), {
             status: 422, headers: { "Content-Type": "application/json" },

@@ -7,7 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, X-Api-Key",
+  "Access-Control-Allow-Headers": "Content-Type, X-Api-Key, Idempotency-Key",
 };
 
 export const Route = createFileRoute("/api/public/reseller/v1")({

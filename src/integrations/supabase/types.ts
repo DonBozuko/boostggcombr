@@ -710,6 +710,7 @@ export type Database = {
           refill_requested_at: string | null
           refill_result: string | null
           reseller_id: string | null
+          reseller_idem_key: string | null
           reseller_valor: number | null
           review_email_sent_at: string | null
           sla_deadline: string | null
@@ -754,6 +755,7 @@ export type Database = {
           refill_requested_at?: string | null
           refill_result?: string | null
           reseller_id?: string | null
+          reseller_idem_key?: string | null
           reseller_valor?: number | null
           review_email_sent_at?: string | null
           sla_deadline?: string | null
@@ -798,6 +800,7 @@ export type Database = {
           refill_requested_at?: string | null
           refill_result?: string | null
           reseller_id?: string | null
+          reseller_idem_key?: string | null
           reseller_valor?: number | null
           review_email_sent_at?: string | null
           sla_deadline?: string | null
@@ -1773,6 +1776,14 @@ export type Database = {
           _reseller_id: string
           _tipo: string
         }
+        Returns: {
+          motivo: string
+          ok: boolean
+          saldo: number
+        }[]
+      }
+      reseller_refund_pedido: {
+        Args: { _motivo?: string; _pedido_id: string }
         Returns: {
           motivo: string
           ok: boolean

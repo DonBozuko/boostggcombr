@@ -196,6 +196,21 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
 
   const rede = redeFromCategory(String(item.category ?? ""), pacote);
 
+  // v279 — Idempotência real da API de revenda.
+  //
+  // Causa raiz: a rota aceitava qualquer POST. Um timeout de rede no lado do
+  // revendedor faz o cliente repetir a chamada — e o sistema criava um SEGUNDO
+  // pedido, debitava o saldo de novo e entregava duas vezes. O padrão de mercado
+  // é chave de idempotência; aqui ela é derivada de (revendedor, pacote, link,
+  // janela de 90s) OU do header/param enviado pelo cliente, e a unicidade é
+  // garantida pelo índice único no banco (não por leitura antes da escrita, que
+  // não protege contra requisições realmente simultâneas).
+  const clientKey = (p.idempotency_key ?? "").trim().slice(0, 80);
+  const bucket = Math.floor(Date.now() / 90_000);
+  const idemKey = clientKey
+    ? `rs:${reseller.id}:${clientKey}`
+    : `rs:${reseller.id}:${pacote}:${link.toLowerCase()}:${bucket}`;
+
   // 1) Pedido primeiro (rastreável mesmo se algo falhar depois).
   const { data: inserted, error: insErr } = await supabaseAdmin
     .from("pedidos")
@@ -206,6 +221,7 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
       valor: q.price,
       reseller_valor: q.price,
       reseller_id: reseller.id,
+      reseller_idem_key: idemKey,
       status: "waiting_provision",
       rede_social: rede,
       email_contato: reseller.email,
@@ -216,6 +232,25 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
     .select("id")
     .single();
   if (insErr || !inserted) {
+    // 23505 = índice único da chave de idempotência: requisição repetida.
+    // Devolve o pedido original em vez de cobrar/entregar duas vezes.
+    if (String((insErr as any)?.code ?? "") === "23505") {
+      const { data: prev } = await supabaseAdmin
+        .from("pedidos")
+        .select("id, status, reseller_valor")
+        .eq("reseller_idem_key", idemKey)
+        .maybeSingle();
+      if (prev) {
+        return json({
+          ok: true,
+          duplicate: true,
+          order: String((prev as any).id),
+          charge: Number((prev as any).reseller_valor ?? q.price).toFixed(2),
+          currency: "BRL",
+          balance: reseller.saldo_brl.toFixed(2),
+        });
+      }
+    }
     console.error("[reseller-api] insert falhou", insErr);
     return json({ error: "Internal error" }, 500);
   }
@@ -240,6 +275,28 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
 
   // 3) Despacho pelo pipeline existente (mesmas travas BR/refill/fornecedor),
   //    com o piso de lucro próprio da revenda.
+  //
+  // v279 — Se o despacho não acontecer, o pedido ficava em waiting_provision SEM
+  // sla_deadline. O SLA watcher só olha pedidos com prazo definido, então o saldo
+  // do revendedor ficava debitado para sempre, sem entrega e sem devolução.
+  // Agora todo pedido de revenda não despachado ganha prazo de 24h: se ninguém
+  // resolver, o watcher devolve o saldo automaticamente.
+  async function armResellerSla(id: string, motivo: string) {
+    try {
+      await supabaseAdmin
+        .from("pedidos")
+        .update({
+          sla_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          error_detail: `v279 revenda · aguardando entrega (prazo 24h). ${motivo}`.slice(0, 500),
+        } as any)
+        .eq("id", id)
+        .eq("status", "waiting_provision")
+        .is("sla_deadline", null);
+    } catch (e) {
+      console.warn("[reseller-api] falha ao armar SLA", id, e);
+    }
+  }
+
   try {
     const { reprocessWaitingProvision } = await import("@/lib/reprocess-waiting.server");
     const r = await reprocessWaitingProvision(pedidoId, {
@@ -248,10 +305,11 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
     });
     if (!r.ok) {
       console.warn("[reseller-api] dispatch pendente", pedidoId, r.error);
-      // fica em waiting_provision → watchers/reconciliador existentes cuidam
+      await armResellerSla(pedidoId, String(r.error ?? "dispatch falhou"));
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error("[reseller-api] dispatch exceção", e);
+    await armResellerSla(pedidoId, String(e?.message ?? "exceção no dispatch"));
   }
 
   return json({
@@ -278,6 +336,11 @@ export async function handleResellerApi(request: Request): Promise<Response> {
   const p = await parseParams(request);
   const key = (p.key ?? request.headers.get("x-api-key") ?? "").trim();
   const action = (p.action ?? "").trim().toLowerCase();
+  // v279 — chave de idempotência também aceita o header padrão de mercado.
+  if (!p.idempotency_key) {
+    const h = request.headers.get("idempotency-key") ?? request.headers.get("x-idempotency-key");
+    if (h) p.idempotency_key = h;
+  }
 
   // Rate limit por chave (fail-open, igual ao resto do sistema).
   try {

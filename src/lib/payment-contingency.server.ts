@@ -14,7 +14,7 @@ export type ContingencyResult =
 export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<ContingencyResult> {
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id, email_contato")
+    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id, email_contato, reseller_id, reseller_valor")
     .eq("id", pedidoId)
     .maybeSingle();
   if (error || !pedido) return { ok: false, status: null, error: "PEDIDO_NOT_FOUND" };
@@ -337,17 +337,22 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       return { ok: true, status: "waiting_provision", recovered: false, note: `SLA 24h até ${deadline}` };
     }
 
-    const refund = await refundMercadoPago(String(pedido.mercado_pago_id));
+    // v279 — estorno correto por origem do pagamento: revenda volta pra carteira,
+    // varejo volta pro Mercado Pago. Antes, revenda caía em refundMercadoPago("null").
+    const { refundPedido } = await import("@/lib/reseller-refund.server");
+    const refund = await refundPedido(pedido as any, "contingência falhou em todos fornecedores");
+    const refundedStatus = refund.kind === "reseller" ? "refunded" : "mp_refunded";
     await supabaseAdmin
       .from("pedidos")
       .update({
-        status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-        error_detail: `Contingência falhou em todos fornecedores. ${tentativas.join(" | ")}`.slice(0, 500),
+        status: refund.ok ? refundedStatus : "SMM_FAILED",
+        error_detail: `Contingência falhou em todos fornecedores. Estorno(${refund.kind}) ${refund.ok ? "OK" : "FALHOU"}: ${refund.detail}. ${tentativas.join(" | ")}`.slice(0, 500),
       })
       .eq("id", pedido.id);
 
     // v273 — cliente é avisado por e-mail do estorno automático.
-    if (refund.ok) {
+    // v279 — revenda recebe saldo de volta na carteira; não dispara e-mail de estorno bancário.
+    if (refund.ok && refund.kind === "mp") {
       try {
         const { sendRefundNoticeEmail } = await import("@/lib/refund-email.server");
         await sendRefundNoticeEmail({
@@ -359,7 +364,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       } catch { /* nunca bloquear o estorno por causa de e-mail */ }
     }
 
-    return { ok: true, status: refund.ok ? "mp_refunded" : "SMM_FAILED", recovered: false };
+    return { ok: true, status: refund.ok ? refundedStatus : "SMM_FAILED", recovered: false };
 
   }
 
