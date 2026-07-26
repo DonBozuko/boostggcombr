@@ -51,6 +51,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { LaboratorioPanel } from "@/components/LaboratorioPanel";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
+import ResellerPanel from "@/components/ResellerPanel";
 import { WaitingProvisionQueue } from "@/components/WaitingProvisionQueue";
 import { SloPanel } from "@/components/SloPanel";
 
