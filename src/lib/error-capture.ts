@@ -1,27 +1,42 @@
-// Captures the original Error out-of-band so server.ts can recover the stack
-// when h3 has already swallowed the throw into a generic 500 Response.
+/**
+ * Captura o último erro real lançado no runtime do servidor.
+ *
+ * O h3 engole o erro original do SSR e devolve só um corpo genérico, então
+ * interceptamos console.error e rejeições não tratadas para preservar a causa
+ * real e exibi-la nos logs (ver src/server.ts).
+ */
 
-let lastCapturedError: { error: unknown; at: number } | undefined;
-const TTL_MS = 5_000;
+let lastCapturedError: unknown;
 
-function record(error: unknown) {
-  lastCapturedError = { error, at: Date.now() };
-}
-
-if (typeof globalThis.addEventListener === "function") {
-  globalThis.addEventListener("error", (event) => record((event as ErrorEvent).error ?? event));
-  globalThis.addEventListener("unhandledrejection", (event) =>
-    record((event as PromiseRejectionEvent).reason),
-  );
+function record(err: unknown) {
+  if (err instanceof Error) lastCapturedError = err;
 }
 
 export function consumeLastCapturedError(): unknown {
-  if (!lastCapturedError) return undefined;
-  if (Date.now() - lastCapturedError.at > TTL_MS) {
-    lastCapturedError = undefined;
-    return undefined;
-  }
-  const { error } = lastCapturedError;
+  const err = lastCapturedError;
   lastCapturedError = undefined;
-  return error;
+  return err;
+}
+
+const globalScope = globalThis as typeof globalThis & {
+  __ebpErrorCaptureInstalled?: boolean;
+};
+
+if (!globalScope.__ebpErrorCaptureInstalled) {
+  globalScope.__ebpErrorCaptureInstalled = true;
+
+  const originalConsoleError = console.error.bind(console);
+  console.error = (...args: unknown[]) => {
+    for (const arg of args) record(arg);
+    originalConsoleError(...(args as []));
+  };
+
+  try {
+    globalThis.addEventListener?.("unhandledrejection", (event: unknown) => {
+      record((event as { reason?: unknown })?.reason);
+    });
+    globalThis.addEventListener?.("error", (event: unknown) => {
+      record((event as { error?: unknown })?.error);
+    });
+  } catch {}
 }

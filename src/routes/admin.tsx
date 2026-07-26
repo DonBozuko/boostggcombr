@@ -46,6 +46,7 @@ import { toast } from "sonner";
 import { useJarvis, useJarvisHistory, useJarvisSubtitle, SUBTITLES } from "@/hooks/useJarvis";
 
 import { getAdminTokenForSession } from "@/lib/admin-session.functions";
+import { useIdleLogout, markAdminActivity, clearAdminActivity, isAdminSessionExpired } from "@/hooks/useIdleLogout";
 import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
@@ -313,7 +314,21 @@ function AdminGate() {
   const [adminToken, setAdminToken] = useState("");
   const fetchAdminToken = useServerFn(getAdminTokenForSession);
 
+  const hardLogout = useCallback(async () => {
+    window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+    clearAdminActivity();
+    setAdminToken("");
+    setAuthed(false);
+    try { await supabase.auth.signOut(); } catch {}
+  }, []);
+
   const hydrate = useCallback(async (): Promise<boolean> => {
+    // Expiração por inatividade (30 min) vale também entre recargas de página.
+    if (isAdminSessionExpired()) {
+      await hardLogout();
+      toast.info("Sessão encerrada por inatividade");
+      return false;
+    }
     const { data } = await supabase.auth.getSession();
     const email = data.session?.user?.email?.toLowerCase() ?? null;
     if (!data.session || email !== ADMIN_EMAIL) {
@@ -324,6 +339,7 @@ function AdminGate() {
     }
     // Sessão Supabase ativa é a credencial mestre do shell; o token legado é só ponte para funções internas.
     setAuthed(true);
+    markAdminActivity();
     try {
       const res = await fetchAdminToken({ data: {} as never });
       if (res.ok) {
@@ -343,7 +359,13 @@ function AdminGate() {
       setAdminToken(cached);
       return true;
     }
-  }, [fetchAdminToken]);
+  }, [fetchAdminToken, hardLogout]);
+
+  const onIdleExpire = useCallback(() => {
+    void hardLogout().then(() => toast.info("Sessão encerrada por inatividade"));
+  }, [hardLogout]);
+
+  useIdleLogout(authed, onIdleExpire);
 
   useEffect(() => {
     setMounted(true);
@@ -351,6 +373,7 @@ function AdminGate() {
     const { data: sub } = supabase.auth.onAuthStateChange((evt) => {
       if (evt === "SIGNED_OUT") {
         window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+        clearAdminActivity();
         setAdminToken("");
         setAuthed(false);
       }
@@ -363,6 +386,7 @@ function AdminGate() {
   if (!authed) return <AdminLogin onSuccess={hydrate} />;
   return <AdminPage initialToken={adminToken} />;
 }
+
 
 const REMEMBER_KEY = "eliteboost_remember_me";
 
