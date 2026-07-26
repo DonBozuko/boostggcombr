@@ -341,16 +341,18 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     // varejo volta pro Mercado Pago. Antes, revenda caía em refundMercadoPago("null").
     const { refundPedido } = await import("@/lib/reseller-refund.server");
     const refund = await refundPedido(pedido as any, "contingência falhou em todos fornecedores");
+    const refundedStatus = refund.kind === "reseller" ? "refunded" : "mp_refunded";
     await supabaseAdmin
       .from("pedidos")
       .update({
-        status: refund.ok ? "mp_refunded" : "SMM_FAILED",
-        error_detail: `Contingência falhou em todos fornecedores. ${tentativas.join(" | ")}`.slice(0, 500),
+        status: refund.ok ? refundedStatus : "SMM_FAILED",
+        error_detail: `Contingência falhou em todos fornecedores. Estorno(${refund.kind}) ${refund.ok ? "OK" : "FALHOU"}: ${refund.detail}. ${tentativas.join(" | ")}`.slice(0, 500),
       })
       .eq("id", pedido.id);
 
     // v273 — cliente é avisado por e-mail do estorno automático.
-    if (refund.ok) {
+    // v279 — revenda recebe saldo de volta na carteira; não dispara e-mail de estorno bancário.
+    if (refund.ok && refund.kind === "mp") {
       try {
         const { sendRefundNoticeEmail } = await import("@/lib/refund-email.server");
         await sendRefundNoticeEmail({
@@ -362,7 +364,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       } catch { /* nunca bloquear o estorno por causa de e-mail */ }
     }
 
-    return { ok: true, status: refund.ok ? "mp_refunded" : "SMM_FAILED", recovered: false };
+    return { ok: true, status: refund.ok ? refundedStatus : "SMM_FAILED", recovered: false };
 
   }
 
