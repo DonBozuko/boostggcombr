@@ -910,7 +910,10 @@ export type Database = {
           auto_resolved_at: string | null
           category: string
           cost_brl: number
+          id_miss_since: string | null
+          id_miss_streak: number
           is_sellable: boolean
+          last_cost_source: string | null
           last_dry_run: string | null
           pacote: string
           price_brl: number
@@ -934,7 +937,10 @@ export type Database = {
           auto_resolved_at?: string | null
           category: string
           cost_brl?: number
+          id_miss_since?: string | null
+          id_miss_streak?: number
           is_sellable?: boolean
+          last_cost_source?: string | null
           last_dry_run?: string | null
           pacote: string
           price_brl?: number
@@ -958,7 +964,10 @@ export type Database = {
           auto_resolved_at?: string | null
           category?: string
           cost_brl?: number
+          id_miss_since?: string | null
+          id_miss_streak?: number
           is_sellable?: boolean
+          last_cost_source?: string | null
           last_dry_run?: string | null
           pacote?: string
           price_brl?: number
