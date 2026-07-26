@@ -19,11 +19,38 @@ type SmokeReport = {
 
 const PROVIDER_ALERT_THRESHOLD = 3;
 
-const PROVIDERS = [
-  { slug: "smmhype", endpoint: "https://smmhype.com/api/v2", envKey: "SMMHYPE_API_KEY" },
-  { slug: "smmpainel", endpoint: "https://smmpainel.com/api/v2", envKey: "SMMPAINEL_API_KEY" },
-  { slug: "verified", endpoint: "https://verifiedatacado.com/api/v2", envKey: "VERIFIED_API_KEY" },
-] as const;
+type ProviderProbe = { slug: string; endpoint: string; apiKey: string | undefined };
+
+const PROVIDERS: ProviderProbe[] = [
+  { slug: "smmhype", endpoint: "https://smmhype.com/api/v2", apiKey: process.env.SMMHYPE_API_KEY },
+  { slug: "smmpainel", endpoint: "https://smmpainel.com/api/v2", apiKey: process.env.SMMPAINEL_API_KEY },
+  { slug: "verified", endpoint: "https://verifiedatacado.com/api/v2", apiKey: process.env.VERIFIED_API_KEY },
+];
+
+// v281 — fornecedores cadastrados no banco (ex.: provider4/SMMOficial) também
+// precisam ser vigiados. Antes o smoke test só conhecia os 3 slugs fixos, então
+// uma chave vencida no 4º fornecedor passava batida até o cliente reclamar.
+async function extraProvidersFromDb(supabaseAdmin: any): Promise<ProviderProbe[]> {
+  try {
+    const known = new Set(PROVIDERS.map((p) => p.slug));
+    const { data } = await supabaseAdmin
+      .from("fornecedores")
+      .select("slug, api_url, api_key_secret")
+      .eq("ativo", true);
+    const out: ProviderProbe[] = [];
+    for (const f of (data as any[]) ?? []) {
+      const slug = String(f?.slug ?? "").toLowerCase();
+      if (!slug || known.has(slug) || slug === "smmpanel") continue;
+      const endpoint = String(f?.api_url ?? "");
+      if (!endpoint) continue;
+      const envName = String(f?.api_key_secret ?? "");
+      out.push({ slug, endpoint, apiKey: envName ? process.env[envName] : undefined });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
 
 async function pingProviderOnce(endpoint: string, apiKey: string): Promise<boolean> {
   try {
