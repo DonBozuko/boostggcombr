@@ -460,10 +460,12 @@ export const criarPedido = createServerFn({ method: "POST" })
         .single();
       if (error || !inserted) {
         console.error("Erro ao inserir pedido:", error);
-        // v205 — Anti-perda-de-dinheiro: MP já cobrou, banco falhou → refund automático + alerta.
+        // v205/v259 — Anti-perda-de-dinheiro: MP já criou a cobrança, banco falhou.
+        const { refundOrphanCharge } = await import("./orphan-charge.server");
         await refundOrphanCharge(mpId, valorCobrar, data.email, error?.message ?? "insert retornou vazio");
         return { ok: false as const, error: "DB_FAILED" as const };
       }
+
 
       try {
         const { sendTikTokServerEvent } = await import("@/lib/tiktok-events-api.server");
