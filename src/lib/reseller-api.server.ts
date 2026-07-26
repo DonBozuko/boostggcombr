@@ -336,6 +336,11 @@ export async function handleResellerApi(request: Request): Promise<Response> {
   const p = await parseParams(request);
   const key = (p.key ?? request.headers.get("x-api-key") ?? "").trim();
   const action = (p.action ?? "").trim().toLowerCase();
+  // v279 — chave de idempotência também aceita o header padrão de mercado.
+  if (!p.idempotency_key) {
+    const h = request.headers.get("idempotency-key") ?? request.headers.get("x-idempotency-key");
+    if (h) p.idempotency_key = h;
+  }
 
   // Rate limit por chave (fail-open, igual ao resto do sistema).
   try {
