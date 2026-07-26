@@ -1076,6 +1076,47 @@ export type Database = {
           },
         ]
       }
+      reseller_topups: {
+        Row: {
+          created_at: string
+          credited_at: string | null
+          id: string
+          mercado_pago_id: string | null
+          reseller_id: string
+          status: string
+          updated_at: string
+          valor_brl: number
+        }
+        Insert: {
+          created_at?: string
+          credited_at?: string | null
+          id?: string
+          mercado_pago_id?: string | null
+          reseller_id: string
+          status?: string
+          updated_at?: string
+          valor_brl: number
+        }
+        Update: {
+          created_at?: string
+          credited_at?: string | null
+          id?: string
+          mercado_pago_id?: string | null
+          reseller_id?: string
+          status?: string
+          updated_at?: string
+          valor_brl?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reseller_topups_reseller_id_fkey"
+            columns: ["reseller_id"]
+            isOneToOne: false
+            referencedRelation: "resellers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resellers: {
         Row: {
           api_key_hash: string
