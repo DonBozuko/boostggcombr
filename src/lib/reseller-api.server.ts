@@ -232,6 +232,25 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
     .select("id")
     .single();
   if (insErr || !inserted) {
+    // 23505 = índice único da chave de idempotência: requisição repetida.
+    // Devolve o pedido original em vez de cobrar/entregar duas vezes.
+    if (String((insErr as any)?.code ?? "") === "23505") {
+      const { data: prev } = await supabaseAdmin
+        .from("pedidos")
+        .select("id, status, reseller_valor")
+        .eq("reseller_idem_key", idemKey)
+        .maybeSingle();
+      if (prev) {
+        return json({
+          ok: true,
+          duplicate: true,
+          order: String((prev as any).id),
+          charge: Number((prev as any).reseller_valor ?? q.price).toFixed(2),
+          currency: "BRL",
+          balance: reseller.saldo_brl.toFixed(2),
+        });
+      }
+    }
     console.error("[reseller-api] insert falhou", insErr);
     return json({ error: "Internal error" }, 500);
   }
