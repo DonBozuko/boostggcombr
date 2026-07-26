@@ -292,7 +292,25 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
           repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
         }
       }
+
+      // v267 — Auto-religamento. Sem isso o pacote pausado por custo ficava
+      // pausado PARA SEMPRE, mesmo depois de o preço já ter convergido para o
+      // valor justo. Só religa pausa criada por este próprio motor (prefixo
+      // "custo do fornecedor"/"custo real"), nunca pausa manual do dono,
+      // e só quando o preço vigente ainda respeita a margem mínima.
+      const autoPaused =
+        r.is_sellable === false &&
+        /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""));
+      if (autoPaused && patch.is_sellable !== false) {
+        const priceNow = Number(patch.price_brl ?? oldPrice);
+        if (priceNow > 0 && salto <= 1.5 && respectsMinMargin(priceNow, newCost)) {
+          patch.is_sellable = true;
+          patch.sellable_reason = null;
+          restored.push(r.pacote);
+        }
+      }
     }
+
 
     if (Object.keys(patch).length === 0) continue;
     const { error } = await supabaseAdmin
