@@ -5,6 +5,8 @@ import {
   listPricingCatalog,
   upsertPricingCatalog,
   deletePricingCatalog,
+  getPriceQuarantine,
+  approvePriceQuarantine,
   type PricingCatalogRow,
 } from "@/lib/pricing-catalog.functions";
 import { computeGuardedPrice, respectsMinMargin } from "@/lib/margin-guardian";
@@ -64,6 +66,9 @@ export function PricingCatalogEditor({ token }: { token: string }) {
   const listFn = useServerFn(listPricingCatalog);
   const upsertFn = useServerFn(upsertPricingCatalog);
   const delFn = useServerFn(deletePricingCatalog);
+  const quarFn = useServerFn(getPriceQuarantine);
+  const approveFn = useServerFn(approvePriceQuarantine);
+  const [quar, setQuar] = useState<{ total: number; scanned: number; updated_at: string; amostra: Array<{ pacote: string; para: number }> } | null>(null);
   const [rows, setRows] = useState<PricingCatalogRow[]>([]);
   const [form, setForm] = useState<FormState>(empty);
   const [busy, setBusy] = useState(false);
@@ -83,7 +88,22 @@ export function PricingCatalogEditor({ token }: { token: string }) {
     else setMsg(r.error);
   };
 
-  useEffect(() => { if (token) void reload(); /* eslint-disable-next-line */ }, [token]);
+  const loadQuarantine = async () => {
+    const r = await quarFn({ data: { token } });
+    setQuar(r.ok ? r.quarantine : null);
+  };
+
+  useEffect(() => { if (token) { void reload(); void loadQuarantine(); } /* eslint-disable-next-line */ }, [token]);
+
+  const approveQuarantine = async () => {
+    setBusy(true);
+    try {
+      const r = await approveFn({ data: { token } });
+      setMsg(r.ok ? `✅ Preços liberados (${r.applied ?? 0} pacotes atualizados)` : `❌ ${r.error}`);
+      await loadQuarantine();
+      await reload();
+    } finally { setBusy(false); }
+  };
 
   const livePrices = useMemo(() => buildLivePrices(rows), [rows]);
 
@@ -165,6 +185,30 @@ export function PricingCatalogEditor({ token }: { token: string }) {
           ⚙️ Atualizar
         </button>
       </div>
+
+      {quar && (
+        <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3">
+          <p className="text-red-200 text-sm font-bold">
+            ⚠️ Mudança de preço em massa bloqueada
+          </p>
+          <p className="text-red-100/80 text-xs mt-1">
+            O fornecedor devolveu preço diferente para {quar.total} de {quar.scanned} pacotes de uma vez só.
+            Nenhum preço do site foi alterado. Se a próxima leitura vier igual, o sistema aplica sozinho.
+          </p>
+          <ul className="text-[11px] text-red-100/70 mt-2 space-y-0.5">
+            {quar.amostra.slice(0, 6).map((a) => (
+              <li key={a.pacote}>• {a.pacote} → R$ {a.para.toFixed(2)}</li>
+            ))}
+          </ul>
+          <button
+            onClick={approveQuarantine}
+            disabled={busy}
+            className="mt-3 text-[11px] px-3 py-1.5 rounded border border-red-400/60 text-red-100 bg-red-500/20 hover:bg-red-500/30 disabled:opacity-50"
+          >
+            {busy ? "Aplicando…" : "Aplicar esses preços agora"}
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
         <div className="col-span-2">
