@@ -990,6 +990,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reseller_applications: {
+        Row: {
+          canal: string | null
+          client_ip: string | null
+          created_at: string
+          email: string | null
+          id: string
+          mensagem: string | null
+          nome: string
+          nota_interna: string | null
+          status: string
+          updated_at: string
+          volume_mes: string | null
+          whatsapp: string
+        }
+        Insert: {
+          canal?: string | null
+          client_ip?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          mensagem?: string | null
+          nome: string
+          nota_interna?: string | null
+          status?: string
+          updated_at?: string
+          volume_mes?: string | null
+          whatsapp: string
+        }
+        Update: {
+          canal?: string | null
+          client_ip?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          mensagem?: string | null
+          nome?: string
+          nota_interna?: string | null
+          status?: string
+          updated_at?: string
+          volume_mes?: string | null
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       reseller_ledger: {
         Row: {
           created_at: string
