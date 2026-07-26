@@ -697,6 +697,8 @@ export type Database = {
           last_remains: number | null
           last_remains_at: string | null
           mercado_pago_id: string | null
+          metodo_pagamento: string
+          mp_preference_id: string | null
           pacote: string
           provider_order_id: string | null
           provider_slug: string | null
@@ -737,6 +739,8 @@ export type Database = {
           last_remains?: number | null
           last_remains_at?: string | null
           mercado_pago_id?: string | null
+          metodo_pagamento?: string
+          mp_preference_id?: string | null
           pacote: string
           provider_order_id?: string | null
           provider_slug?: string | null
@@ -777,6 +781,8 @@ export type Database = {
           last_remains?: number | null
           last_remains_at?: string | null
           mercado_pago_id?: string | null
+          metodo_pagamento?: string
+          mp_preference_id?: string | null
           pacote?: string
           provider_order_id?: string | null
           provider_slug?: string | null

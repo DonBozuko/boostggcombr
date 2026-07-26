@@ -232,7 +232,26 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return;
           }
 
+          // v270 — Cartão (Checkout Pro): a notificação traz o payment id novo,
+          // mas o pedido nasceu só com a preferência. Carimba o payment id no
+          // pedido para que TODO o fluxo abaixo (que busca por mercado_pago_id)
+          // continue funcionando sem nenhuma mudança.
+          if (extRef.startsWith("pedido:")) {
+            const pedidoRef = extRef.slice("pedido:".length);
+            try {
+              const { supabaseAdmin: admRef } = await import("@/integrations/supabase/client.server");
+              await admRef
+                .from("pedidos")
+                .update({ mercado_pago_id: String(paymentId) } as any)
+                .eq("id", pedidoRef)
+                .is("mercado_pago_id", null);
+            } catch (e) {
+              console.error("[mp-webhook] v270 falha ao carimbar payment id no pedido", pedidoRef, e);
+            }
+          }
+
           if (payment.status !== "approved") {
+
             console.warn("[mp-webhook] MP recusou", {
               paymentId, status: payment.status, status_detail: payment.status_detail,
             });
@@ -249,7 +268,19 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 error_detail: `MP ${payment.status}: ${payment.status_detail ?? "sem detalhe"}`,
               })
               .eq("mercado_pago_id", String(paymentId));
+
+            // v270 — Cartão contestado/estornado: dinheiro sai da conta. Isso não
+            // pode passar batido, então vira alerta imediato para o dono.
+            if (["charged_back", "refunded", "cancelled"].includes(String(payment.status))) {
+              try {
+                const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+                await dispatchWhatsappAlert(
+                  `💳 PAGAMENTO CONTESTADO NO CARTÃO\n\nPROBLEMA: o cliente pediu o dinheiro de volta no cartão (valor R$ ${Number(payment.transaction_amount ?? 0).toFixed(2)}). O valor sai da sua conta.\n\nO QUE FAZER: veja o pedido no painel e, se o serviço já foi entregue, envie o comprovante de entrega ao Mercado Pago para contestar.`,
+                );
+              } catch { /* alerta é best-effort */ }
+            }
             return;
+
           }
 
           // 2) Atualiza pedido para 'paid' (admin client p/ contornar RLS)

@@ -28,7 +28,7 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Posso comprar seguidores para perfil pessoal (não página)?", a: "Sim, temos plano específico para perfil. Perfil pessoal usa o botão 'Seguir', diferente de curtidas em fanpage." },
     { q: "Curtidas caem depois?", a: "Facebook faz limpezas menos agressivas que Instagram. Nos pacotes com garantia (🇧🇷 Brasileiro Real) repomos por 30 dias em queda acima de 5%; nos pacotes Global, solicitamos reposição ao fornecedor e, se não houver garantia, tratamos caso a caso no WhatsApp." },
     { q: "Consigo alcance orgânico maior comprando curtidas?", a: "Curtidas não aumentam alcance direto (Facebook cobra por reach hoje), mas melhoram a prova social e a taxa de conversão do público que já chega na página." },
-    { q: "Aceita pagamento via boleto ou cartão?", a: "Trabalhamos exclusivamente com Pix instantâneo — libera a entrega em segundos e evita chargeback." },
+    { q: "Aceita pagamento via boleto ou cartão?", a: "Cartão de crédito sim, com um acréscimo de 7% referente à taxa da operadora. Boleto não. O Pix continua sendo o melhor preço e libera a entrega em segundos." },
   ],
   telegram: [
     { q: "Membros de Telegram entram no meu canal ou grupo?", a: "Ambos. No checkout você cola o link (t.me/seucanal) ou o @username. Funciona para canais broadcast e grupos abertos." },
