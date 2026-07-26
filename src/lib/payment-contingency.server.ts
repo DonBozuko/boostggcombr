@@ -14,7 +14,7 @@ export type ContingencyResult =
 export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<ContingencyResult> {
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id")
+    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id, email_contato")
     .eq("id", pedidoId)
     .maybeSingle();
   if (error || !pedido) return { ok: false, status: null, error: "PEDIDO_NOT_FOUND" };
@@ -344,7 +344,22 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         error_detail: `Contingência falhou em todos fornecedores. ${tentativas.join(" | ")}`.slice(0, 500),
       })
       .eq("id", pedido.id);
+
+    // v273 — cliente é avisado por e-mail do estorno automático.
+    if (refund.ok) {
+      try {
+        const { sendRefundNoticeEmail } = await import("@/lib/refund-email.server");
+        await sendRefundNoticeEmail({
+          id: String(pedido.id),
+          email_contato: (pedido as any).email_contato,
+          pacote: pedido.pacote,
+          valor: pedido.valor,
+        });
+      } catch { /* nunca bloquear o estorno por causa de e-mail */ }
+    }
+
     return { ok: true, status: refund.ok ? "mp_refunded" : "SMM_FAILED", recovered: false };
+
   }
 
 
