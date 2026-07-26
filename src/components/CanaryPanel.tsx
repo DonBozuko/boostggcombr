@@ -100,6 +100,10 @@ export function CanaryPanel({ token }: { token: string }) {
   };
 
   const runs = (panel?.ok ? panel.runs : []) as Run[];
+  const quarentena = (panel?.ok ? (panel as { quarentena?: unknown[] }).quarentena ?? [] : []) as Array<{
+    pacote: string; provider_slug: string; until: string; reason: string | null;
+  }>;
+
 
   return (
     <section className="rounded-xl border border-emerald-500/40 bg-black/60 backdrop-blur-xl p-4 shadow-[0_0_18px_rgba(16,185,129,0.2)]">
@@ -126,10 +130,23 @@ export function CanaryPanel({ token }: { token: string }) {
 
       {panel?.ok && (
         <>
+          {quarentena.length > 0 && (
+            <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+              <div className="text-[10px] uppercase tracking-wider text-amber-300 mb-1">
+                Fornecedores em descanso (só neste pacote — o site continua vendendo pelos outros)
+              </div>
+              {quarentena.map((q, i) => (
+                <div key={i} className="text-[11px] text-white/70 font-mono">
+                  {q.pacote} · {q.provider_slug} · volta {new Date(q.until).toLocaleString("pt-BR")} · {q.reason ?? ""}
+                </div>
+              ))}
+            </div>
+          )}
           <div className="space-y-2 mb-3">
             <div className="text-[10px] uppercase tracking-wider text-white/50">
               Alvos por rede — cada rede precisa do próprio link de teste (Instagram não serve para YouTube/TikTok/Telegram)
             </div>
+
             {form.alvos.length === 0 && (
               <div className="text-[11px] text-amber-300 font-mono">Nenhuma rede configurada — o canário não roda.</div>
             )}
@@ -139,8 +156,9 @@ export function CanaryPanel({ token }: { token: string }) {
                   placeholder="rede (instagram)"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
                 <input value={a.link} onChange={(e) => setAlvo(i, { link: e.target.value })}
-                  placeholder="link/perfil de teste dessa rede"
+                  placeholder="links de teste (separe por vírgula p/ rodízio)"
                   className="md:col-span-2 bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+
                 <input value={a.pacote} onChange={(e) => setAlvo(i, { pacote: e.target.value })}
                   placeholder="pacote do catálogo"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />

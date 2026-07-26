@@ -15,13 +15,33 @@ export const getCanaryPanel = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { getCanaryConfig } = await import("@/services/canary.server");
     const cfg = await getCanaryConfig();
-    const { data: runs } = await supabaseAdmin
-      .from("canary_runs")
-      .select("id, created_at, pacote, quantidade, provider_slug, provider_order_id, status, remains, delivered_at, detail, cost_brl")
-      .order("created_at", { ascending: false })
-      .limit(15);
-    return { ok: true as const, config: cfg, runs: (runs as any[]) ?? [] };
+    const [{ data: runs }, { data: quarentena }, { data: alertas }] = await Promise.all([
+      supabaseAdmin
+        .from("canary_runs")
+        .select("id, created_at, pacote, quantidade, provider_slug, provider_order_id, status, remains, delivered_at, detail, cost_brl")
+        .order("created_at", { ascending: false })
+        .limit(15),
+      supabaseAdmin
+        .from("canary_quarantine" as never)
+        .select("pacote, provider_slug, until, reason, hits")
+        .order("until", { ascending: false })
+        .limit(20),
+      supabaseAdmin
+        .from("canary_alert_state" as never)
+        .select("alert_key, last_sent_at, resolved_at, detail")
+        .order("last_sent_at", { ascending: false })
+        .limit(10),
+    ]);
+    const agora = Date.now();
+    return {
+      ok: true as const,
+      config: cfg,
+      runs: (runs as any[]) ?? [],
+      quarentena: (((quarentena as any[]) ?? []).filter((q) => new Date(q.until).getTime() > agora)) as any[],
+      alertas_abertos: (((alertas as any[]) ?? []).filter((a) => !a.resolved_at)) as any[],
+    };
   });
+
 
 export const saveCanaryConfig = createServerFn({ method: "POST" })
   .inputValidator((i) =>
@@ -29,7 +49,7 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
       enabled: z.boolean(),
       alvos: z.array(z.object({
         rede: z.string().max(40),
-        link: z.string().max(300),
+        link: z.string().max(1200),
         pacote: z.string().max(120),
         quantidade: z.number().int().min(0).max(5000),
         ativo: z.boolean(),
