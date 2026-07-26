@@ -15,10 +15,12 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
           const url = new URL(request.url);
           const forceContingency = url.searchParams.get("force") === "contingency";
-          const [result, reserves] = await Promise.all([
-            syncPricingCacheAll({ forceContingency }),
-            syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) })),
-          ]);
+          // v272 — SEQUENCIAL, nunca em paralelo: o motor de fallback e o
+          // handshake canônico gravavam o mesmo pacote ao mesmo tempo e o
+          // preço da vitrine ficava oscilando (custo estimado x custo real).
+          const result = await syncPricingCacheAll({ forceContingency });
+          const reserves = await syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) }));
+
           (result as any).reserves = reserves;
           return new Response(JSON.stringify(result), {
             status: 200,
