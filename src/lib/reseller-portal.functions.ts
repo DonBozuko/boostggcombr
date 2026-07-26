@@ -163,6 +163,7 @@ export const resellerTopup = createServerFn({ method: "POST" })
           external_reference: `reseller-topup:${topupId}`,
           notification_url: "https://boostgg.com.br/api/public/mp-webhook",
         }),
+        signal: AbortSignal.timeout(20_000),
       });
       const mp = (await mpRes.json().catch(() => ({}))) as {
         id?: string | number;

@@ -505,6 +505,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                     method: "POST",
                     headers: { "x-admin-token": kickToken, "content-type": "application/json" },
                     body: "{}",
+                    signal: AbortSignal.timeout(20_000),
                   }).then(() => {}),
                   context,
                 );

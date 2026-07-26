@@ -176,6 +176,7 @@ export const pingSmmhype = createServerFn({ method: "POST" })
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),
+        signal: AbortSignal.timeout(15_000),
       });
       const text = await res.text();
       let json: any = null;
@@ -246,6 +247,7 @@ export const sincronizarIdsApi = createServerFn({ method: "POST" })
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: body.toString(),
+      signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) return { ok: false as const, error: `HTTP ${res.status}` };
     const list = (await res.json()) as Array<{

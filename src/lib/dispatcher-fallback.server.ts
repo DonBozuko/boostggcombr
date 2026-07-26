@@ -233,6 +233,8 @@ export async function refundMercadoPago(paymentId: string): Promise<{ ok: boolea
         "X-Idempotency-Key": idem,
       },
       body: "{}",
+      // v278: estorno sem prazo prendia o worker até o limite da plataforma.
+      signal: AbortSignal.timeout(20_000),
     });
     const text = await res.text();
     if (!res.ok) return { ok: false, detail: `HTTP ${res.status}: ${text.slice(0, 200)}` };
