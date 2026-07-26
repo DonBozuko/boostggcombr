@@ -51,7 +51,7 @@ export const Route = createFileRoute("/api/public/queue/approve-refund")({
 
         const { data: p, error: loadErr } = await supabaseAdmin
           .from("pedidos")
-          .select("id, status, mercado_pago_id, valor, pacote, email_contato, provider_slug, provider_order_id")
+          .select("id, status, mercado_pago_id, valor, pacote, email_contato, provider_slug, provider_order_id, reseller_id, reseller_valor")
           .eq("id", parsed.data.pedido_id)
           .maybeSingle();
 
