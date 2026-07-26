@@ -34,6 +34,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
+import { Route as RastrearRouteImport } from './routes/rastrear'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as SeguidoresPixRouteImport } from './routes/seguidores-pix'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -235,6 +236,11 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
 const Promo5reaisRoute = Promo5reaisRouteImport.update({
   id: '/promo-5reais',
   path: '/promo-5reais',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RastrearRoute = RastrearRouteImport.update({
+  id: '/rastrear',
+  path: '/rastrear',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReembolsoRoute = ReembolsoRouteImport.update({
@@ -658,6 +664,7 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
+  '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -757,6 +764,7 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
+  '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -857,6 +865,7 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
+  '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -958,6 +967,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/promo-5reais'
+    | '/rastrear'
     | '/reembolso'
     | '/seguidores-pix'
     | '/sitemap.xml'
@@ -1057,6 +1067,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/promo-5reais'
+    | '/rastrear'
     | '/reembolso'
     | '/seguidores-pix'
     | '/sitemap.xml'
@@ -1156,6 +1167,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/privacidade'
     | '/promo-5reais'
+    | '/rastrear'
     | '/reembolso'
     | '/seguidores-pix'
     | '/sitemap.xml'
@@ -1256,6 +1268,7 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
+  RastrearRoute: typeof RastrearRoute
   ReembolsoRoute: typeof ReembolsoRoute
   SeguidoresPixRoute: typeof SeguidoresPixRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1503,6 +1516,13 @@ declare module '@tanstack/react-router' {
       path: '/promo-5reais'
       fullPath: '/promo-5reais'
       preLoaderRoute: typeof Promo5reaisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rastrear': {
+      id: '/rastrear'
+      path: '/rastrear'
+      fullPath: '/rastrear'
+      preLoaderRoute: typeof RastrearRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reembolso': {
@@ -2050,6 +2070,7 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
+  RastrearRoute: RastrearRoute,
   ReembolsoRoute: ReembolsoRoute,
   SeguidoresPixRoute: SeguidoresPixRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
