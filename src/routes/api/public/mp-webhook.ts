@@ -187,18 +187,19 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
             const topupId = extRef.slice("reseller-topup:".length);
             const { supabaseAdmin: adm } = await import("@/integrations/supabase/client.server");
-            const { data: topup } = await adm
+            // v278 — CLAIM ATÔMICO. Antes era ler-status → creditar → gravar:
+            // duas notificações simultâneas do MP (retry + reenvio) liam
+            // 'pending' ao mesmo tempo e creditavam o saldo DUAS vezes.
+            // O UPDATE condicional trava a linha no Postgres: só um vence.
+            const { data: claimed } = await adm
               .from("reseller_topups" as any)
-              .select("id, reseller_id, valor_brl, status")
+              .update({ status: "crediting" } as any)
               .eq("id", topupId)
-              .maybeSingle();
-            const t = topup as any;
+              .eq("status", "pending")
+              .select("id, reseller_id, valor_brl");
+            const t = (Array.isArray(claimed) ? claimed[0] : null) as any;
             if (!t) {
-              console.error("[mp-webhook] v263 recarga não encontrada", topupId);
-              return;
-            }
-            if (String(t.status) !== "pending") {
-              console.log("[mp-webhook] v263 recarga já processada", topupId);
+              console.log("[mp-webhook] v278 recarga inexistente ou já processada", topupId);
               return;
             }
             const paid = Math.round(Number(payment.transaction_amount ?? 0) * 100);
@@ -217,13 +218,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             });
             const move = Array.isArray(mv) ? (mv as any[])[0] : (mv as any);
             if (mvErr || !move?.ok) {
-              console.error("[mp-webhook] v263 crédito falhou", mvErr, move);
-              return; // fica 'pending' → MP reenvia / admin credita manual
+              console.error("[mp-webhook] v278 crédito falhou — devolvendo para pending", mvErr, move);
+              // devolve o claim: sem isso a recarga ficava presa em 'crediting'
+              // e nem o retry do MP nem o admin conseguiriam creditar depois.
+              await adm.from("reseller_topups" as any).update({ status: "pending" } as any).eq("id", topupId);
+              return;
             }
             await adm
               .from("reseller_topups" as any)
               .update({ status: "credited", credited_at: new Date().toISOString() } as any)
               .eq("id", topupId);
+
             try {
               const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
               await dispatchWhatsappAlert(
