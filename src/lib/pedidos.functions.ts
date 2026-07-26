@@ -461,18 +461,10 @@ export const criarPedido = createServerFn({ method: "POST" })
       if (error || !inserted) {
         console.error("Erro ao inserir pedido:", error);
         // v205 — Anti-perda-de-dinheiro: MP já cobrou, banco falhou → refund automático + alerta.
-        try {
-          const { refundMercadoPago } = await import("./dispatcher-fallback.server");
-          const r = mpId ? await refundMercadoPago(mpId) : { ok: false, detail: "no mpId" };
-          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
-          await dispatchWhatsappAlert(
-            `🚨 COBRANÇA SEM PEDIDO NO BANCO\n\nPROBLEMA: MP cobrou R$${valorCobrar.toFixed(2)} do cliente ${data.email} mas o INSERT no banco falhou. Refund automático: ${r.ok ? "OK" : "FALHOU"}${r.ok ? "" : ` — ${r.detail}`}.\nMP payment id: ${mpId}\n\nO QUE FAZER: ${r.ok ? "só confirmar no MP se o estorno aparece." : "abrir o MP MANUALMENTE e estornar o payment " + mpId + " AGORA."}`,
-          ).catch(() => {});
-        } catch (e) {
-          console.error("[criarPedido] falha no refund automático:", e);
-        }
+        await refundOrphanCharge(mpId, valorCobrar, data.email, error?.message ?? "insert retornou vazio");
         return { ok: false as const, error: "DB_FAILED" as const };
       }
+
       try {
         const { sendTikTokServerEvent } = await import("@/lib/tiktok-events-api.server");
         await sendTikTokServerEvent({
