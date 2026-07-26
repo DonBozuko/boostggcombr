@@ -37,6 +37,7 @@ const buildSitemapXml = () => {
     { path: "/blog/como-tirar-instagram-privado", changefreq: "monthly", priority: "0.6" },
     { path: "/ferramentas", changefreq: "weekly", priority: "0.8" },
     { path: "/revenda", changefreq: "monthly", priority: "0.8" },
+    { path: "/afiliados", changefreq: "monthly", priority: "0.8" },
     { path: "/api-revenda", changefreq: "monthly", priority: "0.6" },
     { path: "/painel-revendedor", changefreq: "monthly", priority: "0.4" },
     { path: "/ferramentas/contador-seguidores", changefreq: "weekly", priority: "0.7" },

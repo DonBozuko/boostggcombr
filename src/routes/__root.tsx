@@ -178,6 +178,12 @@ function RootComponent() {
     }
   }, []);
 
+  // v265 — marca a indicação de afiliado (?ref=CODIGO) por 30 dias, first-touch.
+  useEffect(() => {
+    import("@/lib/affiliate").then((m) => m.captureAffiliateRef()).catch(() => {});
+  }, []);
+
+
   useEffect(() => {
     // Trava silenciadora de áudio concorrente: pausa Jarvis em qualquer troca de rota
     const unsub = router.subscribe("onBeforeNavigate", () => {

@@ -1331,6 +1331,12 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
               Entrar no painel
             </Link>
           </p>
+          <p className="mt-2 text-xs text-zinc-400">
+            Não quer comprar nada e prefere só indicar?{" "}
+            <Link to="/afiliados" className="font-semibold text-amber-300 underline">
+              Ganhe 10% no programa de afiliados
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -1344,6 +1350,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link to="/rastrear" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Rastrear pedido</Link>
             <Link to="/revenda" className="font-semibold text-amber-300 hover:text-amber-200" activeProps={{ className: "text-amber-200" }}>💼 Seja revendedor</Link>
+            <Link to="/afiliados" className="font-semibold text-amber-300 hover:text-amber-200" activeProps={{ className: "text-amber-200" }}>🤝 Ganhe indicando</Link>
             <Link to="/ferramentas" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Ferramentas</Link>
             <Link to="/privacidade" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Privacidade</Link>
             <Link to="/termos" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Termos</Link>

@@ -112,6 +112,92 @@ export type Database = {
           },
         ]
       }
+      afiliado_comissoes: {
+        Row: {
+          afiliado_id: string
+          comissao_brl: number
+          created_at: string
+          id: string
+          pedido_id: string
+          status: string
+          valor_pedido: number
+        }
+        Insert: {
+          afiliado_id: string
+          comissao_brl: number
+          created_at?: string
+          id?: string
+          pedido_id: string
+          status?: string
+          valor_pedido: number
+        }
+        Update: {
+          afiliado_id?: string
+          comissao_brl?: number
+          created_at?: string
+          id?: string
+          pedido_id?: string
+          status?: string
+          valor_pedido?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "afiliado_comissoes_afiliado_id_fkey"
+            columns: ["afiliado_id"]
+            isOneToOne: false
+            referencedRelation: "afiliados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      afiliados: {
+        Row: {
+          ativo: boolean
+          codigo: string
+          comissao_pct: number
+          created_at: string
+          email: string
+          id: string
+          nome: string
+          pago_brl: number
+          pix_chave: string | null
+          saldo_brl: number
+          total_ganho: number
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          codigo: string
+          comissao_pct?: number
+          created_at?: string
+          email: string
+          id?: string
+          nome: string
+          pago_brl?: number
+          pix_chave?: string | null
+          saldo_brl?: number
+          total_ganho?: number
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          codigo?: string
+          comissao_pct?: number
+          created_at?: string
+          email?: string
+          id?: string
+          nome?: string
+          pago_brl?: number
+          pix_chave?: string | null
+          saldo_brl?: number
+          total_ganho?: number
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       alerts: {
         Row: {
           created_at: string
@@ -594,6 +680,7 @@ export type Database = {
       pedidos: {
         Row: {
           abandono_notificado_at: string | null
+          affiliate_code: string | null
           alerted_at: string | null
           bump_accepted: boolean
           bump_offered: boolean
@@ -633,6 +720,7 @@ export type Database = {
         }
         Insert: {
           abandono_notificado_at?: string | null
+          affiliate_code?: string | null
           alerted_at?: string | null
           bump_accepted?: boolean
           bump_offered?: boolean
@@ -672,6 +760,7 @@ export type Database = {
         }
         Update: {
           abandono_notificado_at?: string | null
+          affiliate_code?: string | null
           alerted_at?: string | null
           bump_accepted?: boolean
           bump_offered?: boolean
@@ -1571,6 +1660,19 @@ export type Database = {
       }
     }
     Functions: {
+      afiliado_credit: {
+        Args: {
+          _afiliado_id: string
+          _comissao: number
+          _pedido_id: string
+          _valor_pedido: number
+        }
+        Returns: {
+          motivo: string
+          ok: boolean
+          saldo: number
+        }[]
+      }
       anonimizar_pedidos_antigos: { Args: never; Returns: number }
       cancel_orphan_pending: { Args: never; Returns: number }
       delete_email: {

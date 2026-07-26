@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
+import { Route as AfiliadosRouteImport } from './routes/afiliados'
 import { Route as ApiRevendaRouteImport } from './routes/api-revenda'
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
@@ -33,6 +34,7 @@ import { Route as KwaiRouteImport } from './routes/kwai'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
 import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
@@ -125,6 +127,11 @@ const AdminRoute = AdminRouteImport.update({
 const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
   id: '/admin-health-catalog',
   path: '/admin-health-catalog',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AfiliadosRoute = AfiliadosRouteImport.update({
+  id: '/afiliados',
+  path: '/afiliados',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiRevendaRoute = ApiRevendaRouteImport.update({
@@ -235,6 +242,11 @@ const McpRoute = McpRouteImport.update({
 const ObrigadoRoute = ObrigadoRouteImport.update({
   id: '/obrigado',
   path: '/obrigado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelAfiliadoRoute = PainelAfiliadoRouteImport.update({
+  id: '/painel-afiliado',
+  path: '/painel-afiliado',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PainelRevendedorRoute = PainelRevendedorRouteImport.update({
@@ -666,6 +678,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
+  '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
@@ -687,6 +700,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -770,6 +784,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
+  '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
@@ -791,6 +806,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -875,6 +891,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
+  '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
@@ -896,6 +913,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -981,6 +999,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-health-catalog'
+    | '/afiliados'
     | '/api-revenda'
     | '/audiencia-brasileira'
     | '/avaliacoes'
@@ -1002,6 +1021,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mcp'
     | '/obrigado'
+    | '/painel-afiliado'
     | '/painel-revendedor'
     | '/privacidade'
     | '/promo-5reais'
@@ -1085,6 +1105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-health-catalog'
+    | '/afiliados'
     | '/api-revenda'
     | '/audiencia-brasileira'
     | '/avaliacoes'
@@ -1106,6 +1127,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mcp'
     | '/obrigado'
+    | '/painel-afiliado'
     | '/painel-revendedor'
     | '/privacidade'
     | '/promo-5reais'
@@ -1189,6 +1211,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-health-catalog'
+    | '/afiliados'
     | '/api-revenda'
     | '/audiencia-brasileira'
     | '/avaliacoes'
@@ -1210,6 +1233,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/mcp'
     | '/obrigado'
+    | '/painel-afiliado'
     | '/painel-revendedor'
     | '/privacidade'
     | '/promo-5reais'
@@ -1294,6 +1318,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
+  AfiliadosRoute: typeof AfiliadosRoute
   ApiRevendaRoute: typeof ApiRevendaRoute
   AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
   AvaliacoesRoute: typeof AvaliacoesRoute
@@ -1315,6 +1340,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
+  PainelAfiliadoRoute: typeof PainelAfiliadoRoute
   PainelRevendedorRoute: typeof PainelRevendedorRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
@@ -1414,6 +1440,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-health-catalog'
       fullPath: '/admin-health-catalog'
       preLoaderRoute: typeof AdminHealthCatalogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/afiliados': {
+      id: '/afiliados'
+      path: '/afiliados'
+      fullPath: '/afiliados'
+      preLoaderRoute: typeof AfiliadosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api-revenda': {
@@ -1561,6 +1594,13 @@ declare module '@tanstack/react-router' {
       path: '/obrigado'
       fullPath: '/obrigado'
       preLoaderRoute: typeof ObrigadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel-afiliado': {
+      id: '/painel-afiliado'
+      path: '/painel-afiliado'
+      fullPath: '/painel-afiliado'
+      preLoaderRoute: typeof PainelAfiliadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/painel-revendedor': {
@@ -2128,6 +2168,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   AdminHealthCatalogRoute: AdminHealthCatalogRoute,
+  AfiliadosRoute: AfiliadosRoute,
   ApiRevendaRoute: ApiRevendaRoute,
   AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
   AvaliacoesRoute: AvaliacoesRoute,
@@ -2149,6 +2190,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
+  PainelAfiliadoRoute: PainelAfiliadoRoute,
   PainelRevendedorRoute: PainelRevendedorRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
