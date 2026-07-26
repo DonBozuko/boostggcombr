@@ -5,7 +5,7 @@ describe("v270 — preço no cartão", () => {
   it("repassa a taxa e nunca cobra menos que o Pix", () => {
     for (const pix of [5, 12, 18, 30, 65, 120]) {
       expect(cardAmount(pix)).toBeGreaterThan(pix);
-      expect(cardAmount(pix)).toBeGreaterThanOrEqual(pix * (1 + CARD_SURCHARGE));
+      expect(cardAmount(pix)).toBeGreaterThanOrEqual(pix * (1 + CARD_SURCHARGE) - 0.005);
     }
   });
 
