@@ -1,5 +1,11 @@
 // v160 — Realtime subscriber para tabelas críticas do painel admin.
 // Substitui polling de 60s por push instantâneo via Postgres Changes.
+//
+// SEGURANÇA: uso EXCLUSIVO em telas de admin (diretor autenticado). O canal só
+// serve como gatilho de "recarregar" — nenhum payload de linha é lido aqui, e as
+// políticas de RLS de `pedidos` só entregam linhas ao diretor. Nunca usar este
+// hook em rota pública/cliente (rastreio de pedido usa server function com
+// service_role e retorna apenas status, sem PII).
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
