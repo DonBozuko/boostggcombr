@@ -19,6 +19,18 @@ function stripTrackers(url: string): string {
   }
 }
 
+// v288 — endpoint do fornecedor vindo do banco pode chegar sem "https://" (ou
+// sem /api/v2) depois de uma edição manual/sincronização. Isso quebrava o envio
+// com "Failed to parse URL from verified.com/api/v2" e derrubava o fornecedor
+// inteiro por um erro de digitação. Normaliza antes de usar.
+export function normalizeEndpoint(raw: string): string {
+  let u = String(raw ?? "").trim().replace(/\/+$/, "");
+  if (!u) return u;
+  if (!/^https?:\/\//i.test(u)) u = `https://${u.replace(/^\/+/, "")}`;
+  if (!/\/api\//i.test(u)) u = `${u}/api/v2`;
+  return u;
+}
+
 function normalizeLink(pacote: string, raw: string): string {
   const p = pacote.toLowerCase().replace(/^br-/, "");
   const t = raw.trim();
@@ -197,7 +209,7 @@ export async function dispatchByFornecedor(slug: string, args: {
       return { ok: false, error: `${slug}: API key ausente (secret ${(f as any).api_key_secret})` };
     }
     return dispatchSmmV2({
-      endpoint: (f as any).api_url,
+      endpoint: normalizeEndpoint((f as any).api_url),
       apiKey,
       fornecedor: (f as any).nome ?? slug,
       ...args,
