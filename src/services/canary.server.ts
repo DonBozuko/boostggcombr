@@ -224,11 +224,25 @@ export type CanaryReport = {
 };
 
 
+/** v289 — quantos fornecedores AINDA conseguem atender esse pacote (fora da
+ *  quarentena e fora do circuit breaker). Se sobra rota, falha de um fornecedor
+ *  é ruído operacional: isola e segue. Se zera, aí sim é alarme de verdade. */
+async function rotasRestantes(pacote: string, quantidade: number): Promise<string[]> {
+  try {
+    const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
+    const ranked = await rankProvidersByCost({ pacote, quantidade });
+    const q = await getQuarentena(pacote);
+    return ranked
+      .filter((p) => !p.unstable && !q.has(p.slug) && (p.slug === "smmhype" || p.provider_service_id))
+      .map((p) => p.slug);
+  } catch { return []; }
+}
+
 /** Fase 1 — acompanha canários abertos e fecha/alerta. */
 async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<void> {
   const { data } = await supabaseAdmin
     .from("canary_runs")
-    .select("id, provider_slug, provider_order_id, quantidade, created_at, status")
+    .select("id, provider_slug, provider_order_id, pacote, quantidade, created_at, status")
     .in("status", ["dispatched", "processing"])
     .limit(20);
 
@@ -247,13 +261,11 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
     const st = String(s.status ?? "").toLowerCase();
     const delivered = (Number.isFinite(remains) && remains === 0) || ["completed", "concluído", "concluido"].includes(st);
     // v287 — "partial" NÃO é cancelamento: o fornecedor entregou parte e devolveu
-    // o resto. Antes caía no mesmo balde de "cancelado sem entregar" e disparava
-    // alarme falso de sistema quebrado. Também damos 30min de carência porque
-    // vários painéis marcam Partial no começo e depois completam.
+    // o resto. Também damos 30min de carência porque vários painéis marcam
+    // Partial no começo e depois completam.
     const canceled = ["canceled", "cancelled", "refunded"].includes(st) && remains > 0;
     const partial = st === "partial" && remains > 0;
     const partialGraceH = 0.5;
-
 
     if (delivered) {
       await supabaseAdmin.from("canary_runs").update({
@@ -261,68 +273,54 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
         last_checked_at: new Date().toISOString(), detail: `entregue em ${ageH.toFixed(1)}h`,
       }).eq("id", r.id);
       report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: `ENTREGUE (${ageH.toFixed(1)}h)` });
+      // v289 — entregou = fornecedor reabilitado nesse pacote + fecha alarme aberto.
+      await limparQuarentena(r.pacote, r.provider_slug);
+      await resolveAlert(
+        `entrega:${r.pacote}`,
+        `✅ ENTREGA VOLTOU AO NORMAL\n\nO teste de compra real do pacote ${r.pacote} foi entregue por ${r.provider_slug} em ${ageH.toFixed(1)}h. Nada a fazer.`,
+      );
       continue;
     }
 
-    if (canceled) {
+    // ── Falhas de UM fornecedor: isola o par pacote+fornecedor, não grita. ──
+    const falha =
+      canceled ? `cancelado pelo fornecedor (${st})`
+      : partial && ageH >= partialGraceH ? `entrega parcial: faltaram ${remains} de ${r.quantidade}`
+      : ageH > cfg.sla_hours ? `sem entregar há ${ageH.toFixed(1)}h`
+      : null;
+
+    if (partial && ageH < partialGraceH) {
       await supabaseAdmin.from("canary_runs").update({
-        status: "failed", remains: Number.isFinite(remains) ? remains : null,
-        last_checked_at: new Date().toISOString(), detail: `fornecedor devolveu status ${st}`,
+        status: "processing", remains, last_checked_at: new Date().toISOString(),
+        detail: `parcial (faltam ${remains}) — aguardando`,
       }).eq("id", r.id);
-      const m = `🚨 ENTREGA NÃO ESTÁ FUNCIONANDO\n\nPROBLEMA: o pedido de teste automático (${r.provider_slug}) foi cancelado pelo fornecedor sem entregar.\n\nO QUE FAZER: abrir /admin e conferir o fornecedor ${r.provider_slug} antes que um cliente real compre.`;
-      report.alertas.push(m); await alert(m);
-      report.ok = false;
+      report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: `parcial (faltam ${remains})` });
       continue;
     }
 
-    if (partial) {
-      // Dentro da carência: ainda pode completar. Só registra e volta depois.
-      if (ageH < partialGraceH) {
-        await supabaseAdmin.from("canary_runs").update({
-          status: "processing", remains, last_checked_at: new Date().toISOString(),
-          detail: `parcial (faltam ${remains}) — aguardando`,
-        }).eq("id", r.id);
-        report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: `parcial (faltam ${remains})` });
+    if (falha) {
+      const novoStatus = canceled ? "failed" : partial ? "partial" : "stuck";
+      await supabaseAdmin.from("canary_runs").update({
+        status: novoStatus, remains: Number.isFinite(remains) ? remains : null,
+        last_checked_at: new Date().toISOString(), detail: falha,
+      }).eq("id", r.id);
+      report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: falha });
+
+      const min = await quarentenar(r.pacote, r.provider_slug, falha);
+      const restantes = await rotasRestantes(r.pacote, Number(r.quantidade || 0));
+
+      if (restantes.length > 0) {
+        // Cliente real continua sendo atendido por outro fornecedor → sem alarme.
+        report.verificados.push({
+          id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id,
+          resultado: `isolado ${Math.round(min / 60)}h nesse pacote — ${restantes.length} fornecedor(es) ainda entregam`,
+        });
         continue;
       }
-      const entregue = Math.max(0, Number(r.quantidade || 0) - remains);
-      await supabaseAdmin.from("canary_runs").update({
-        status: "partial", remains, last_checked_at: new Date().toISOString(),
-        detail: `entrega parcial: ${entregue} de ${r.quantidade}`,
-      }).eq("id", r.id);
-      // v288 — parcial quase-zero (entregou <30%) é falha real do fornecedor:
-      // conta na saúde dele para o roteamento preferir os outros. Não pausa venda.
-      if (entregue < Number(r.quantidade || 0) * 0.3) {
-        try {
-          const { data: cur } = await supabaseAdmin
-            .from("provider_health").select("failure_count").eq("slug", r.provider_slug).maybeSingle();
-          const next = Number((cur as { failure_count?: number } | null)?.failure_count ?? 0) + 1;
-          await supabaseAdmin.from("provider_health").upsert({
-            slug: r.provider_slug,
-            failure_count: next,
-            last_error: `canário: entregou só ${entregue} de ${r.quantidade}`,
-            last_failure_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            ...(next >= 3 ? { unstable_until: new Date(Date.now() + 30 * 60_000).toISOString() } : {}),
-          } as never, { onConflict: "slug" });
-        } catch { /* noop */ }
-      }
-      const m = `⚠️ ENTREGA SAIU PELA METADE\n\nPROBLEMA: no teste de compra real o fornecedor ${r.provider_slug} entregou só ${entregue} de ${r.quantidade} e devolveu o resto.\n\nO QUE FAZER: o site continua vendendo (outros fornecedores estão OK), mas confira ${r.provider_slug} no /admin — se repetir, é melhor pausar esse fornecedor.`;
-      report.alertas.push(m); await alert(m);
+
       report.ok = false;
-      continue;
-    }
-
-
-
-    if (ageH > cfg.sla_hours) {
-      await supabaseAdmin.from("canary_runs").update({
-        status: "stuck", remains: Number.isFinite(remains) ? remains : null,
-        last_checked_at: new Date().toISOString(), detail: `sem entregar há ${ageH.toFixed(1)}h`,
-      }).eq("id", r.id);
-      const m = `🚨 ENTREGA ATRASADA NO FORNECEDOR\n\nPROBLEMA: o pedido de teste automático em ${r.provider_slug} está há ${ageH.toFixed(1)}h sem entregar (faltam ${Number.isFinite(remains) ? remains : "?"} de ${r.quantidade}).\n\nO QUE FAZER: se um cliente comprar agora, pode não receber. Conferir o fornecedor ${r.provider_slug} no /admin.`;
-      report.alertas.push(m); await alert(m);
-      report.ok = false;
+      const m = `🚨 ENTREGA PAROU NESSE PACOTE\n\nPROBLEMA: no teste de compra real, ${r.provider_slug} falhou (${falha}) e não sobrou nenhum outro fornecedor capaz de entregar o pacote ${r.pacote}.\n\nO QUE FAZER: quem comprar esse pacote agora pode não receber. Abrir /admin e conferir fornecedores desse pacote.`;
+      if (await alert(`entrega:${r.pacote}`, m)) report.alertas.push(m);
       continue;
     }
 
@@ -332,6 +330,7 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
     report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: `processando (faltam ${remains})` });
   }
 }
+
 
 /** Fase 2 — dispara um novo canário na rede que está há mais tempo sem teste.
  *  Cada rede tem seu próprio link/pacote: rotaciona um alvo por execução.
