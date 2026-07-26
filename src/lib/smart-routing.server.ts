@@ -159,16 +159,32 @@ export async function rankProvidersByCost(opts: {
       if (!table) continue;
       const { data: svcRow } = await supabaseAdmin
         .from(table as any)
-        .select("name, category, refill")
+        .select("name, category, refill, min, max")
         .eq("provider_service_id", String(pid))
         .maybeSingle();
       if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
       refillMap[slug] = (svcRow as any).refill === true;
+      // v286 — TRAVA DE FAIXA: fornecedor que não aceita a quantidade do pacote
+      // é descartado ANTES do dispatch. Antes disso o pedido só falhava no
+      // fornecedor ("min_quantity" / recusa genérica) e gerava alerta falso.
+      const fmin = Number((svcRow as any).min) || 0;
+      const fmax = Number((svcRow as any).max) || 0;
+      if ((fmin > 0 && opts.quantidade < fmin) || (fmax > 0 && opts.quantidade > fmax)) {
+        providerIdMap[slug] = null;
+        console.warn(`[v286] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} aceita ${fmin}-${fmax}, pedido ${opts.quantidade}`);
+        // ID auto fora de faixa está errado: zera para o auto-resolver escolher outro.
+        const prefix = slugToColumn[slug] ?? slug;
+        if (((autoIds as any)?.[`${prefix}_auto_id`] ?? null) != null && ((pricingItem as any)?.[`${prefix}_service_id`] ?? null) == null) {
+          void supabaseAdmin.from("pricing_items" as any).update({ [`${prefix}_auto_id`]: null } as any).eq("pacote", opts.pacote);
+        }
+        continue;
+      }
       if (!providerCanServe({ brPackage, svc: svcRow as any, requireRefill: brPackage })) {
         providerIdMap[slug] = null;
         const reason = brPackage && (svcRow as any).refill !== true ? "sem refill garantido" : "não é BR válido";
         console.warn(`[v245] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} ${reason}`);
       }
+
     }
     if (brPackage && Object.values(providerIdMap).every((v) => !v)) {
       console.error(`[v245] ${opts.pacote}: nenhum fornecedor BR com refill válido. Venda bloqueada.`);
