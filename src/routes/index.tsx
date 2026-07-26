@@ -179,14 +179,9 @@ export const Route = createFileRoute("/")({
                 areaServed: { "@type": "Country", name: "Brasil" },
                 name: "Compra de Seguidores no Instagram",
                 description,
-                aggregateRating: {
-                  "@type": "AggregateRating",
-                  ratingValue: "5",
-                  bestRating: "5",
-                  worstRating: "1",
-                  ratingCount: "3187",
-                  reviewCount: "2841",
-                },
+                // Google não aceita aggregateRating em Service (erro crítico no GSC).
+                // A nota agregada fica só no nó Product abaixo, que é o tipo suportado.
+
                 offers: {
                   "@type": "AggregateOffer",
                   priceCurrency: "BRL",
