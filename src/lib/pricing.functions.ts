@@ -63,12 +63,20 @@ export const getBrPricingGrid = createServerFn({ method: "GET" })
       .select("pacote, quantidade, price_brl")
       .eq("category", cat)
       .order("quantidade", { ascending: true });
-    const items = (rows ?? []).map((r: any) => ({
-      id: r.pacote as string,
-      quantidade: Number(r.quantidade),
-      valor: Number(r.price_brl),
-      price: `R$ ${Number(r.price_brl).toFixed(2).replace(".", ",")}`,
-    }));
+    const items = (rows ?? [])
+      .map((r: any) => ({
+        id: r.pacote as string,
+        quantidade: Number(r.quantidade),
+        valor: Number(r.price_brl),
+        price: `R$ ${Number(r.price_brl).toFixed(2).replace(".", ",")}`,
+      }))
+      // v257 — Econômico (30 dias) primeiro, Premium (90 dias) depois.
+      .sort((a, b) => {
+        const pa = /^br-pro/i.test(a.id) ? 1 : 0;
+        const pb = /^br-pro/i.test(b.id) ? 1 : 0;
+        return pa - pb || a.quantidade - b.quantidade;
+      });
+
     try {
       setResponseHeader("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
     } catch {}

@@ -41,14 +41,17 @@ function fmtBRL(v: number): string {
 }
 
 function tonePalette(id: string, fire?: boolean): { border: string; glow: string; chip: string; label: string } {
+  if (/^br-pro/i.test(id)) return { border: "#F5D061", glow: "#F5D061cc", chip: "#F5D061", label: "PREMIUM BR" };
   if (fire) return { border: "#FFD60A", glow: "#FFD60Acc", chip: "#FFD60A", label: "RELÂMPAGO" };
   if (/^(v|tv|yv)\d/i.test(id)) return { border: "#A855F7", glow: "#A855F7cc", chip: "#A855F7", label: "VIEWS" };
   return { border: "#38BDF8", glow: "#38BDF8aa", chip: "#38BDF8", label: "ECONÔMICO" };
 }
 
 // v245 — Selo de origem: transparência sobre nacionalidade do serviço.
-type Origin = "br" | "global" | "views";
+// v257 — Nível Premium BR: reposição de 90 dias declarada pelo fornecedor.
+type Origin = "br" | "brpro" | "global" | "views";
 function detectOrigin(id: string): Origin {
+  if (/^br-pro/i.test(id)) return "brpro";
   if (/^(v|tv|yv)\d/i.test(id)) return "views";
   if (/^(br-|wbr)/i.test(id)) return "br";
   return "global";
@@ -56,6 +59,7 @@ function detectOrigin(id: string): Origin {
 function isSeguidoresBR(id: string): boolean {
   return /^(br-tf|wbr)/i.test(id);
 }
+
 
 
 export function PremiumPricingGrid({
@@ -165,14 +169,23 @@ export function PremiumPricingGrid({
               )}
 
               {/* Selo de origem — transparência real p/ o cliente */}
+              {origin === "brpro" && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-400/70 bg-amber-400/10 text-amber-200"
+                  title="Perfis brasileiros premium com reposição de 90 dias garantida pelo fornecedor"
+                >
+                  💎 Premium BR · reposição 90 dias
+                </span>
+              )}
               {origin === "br" && (
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
-                  title="Perfis brasileiros reais com reposição garantida"
+                  title="Perfis brasileiros reais com reposição de 30 dias"
                 >
-                  🇧🇷 Brasileiro Real · c/ reposição
+                  🇧🇷 Brasileiro Real · reposição 30 dias
                 </span>
               )}
+
               {origin === "global" && (
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-500/50 bg-sky-500/10 text-sky-300"
