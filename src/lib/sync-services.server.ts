@@ -53,6 +53,7 @@ export async function syncSmmhypeServices() {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
+    signal: AbortSignal.timeout(20_000),
   });
   if (!resp.ok) throw new Error(`SMMhype HTTP ${resp.status}`);
   const json = (await resp.json()) as ProviderService[];

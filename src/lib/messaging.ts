@@ -60,6 +60,7 @@ async function sendViaConnector(message: string, options: { inlineKeyboard?: Inl
       "Content-Type": "application/json",
     },
     body: JSON.stringify(buildBody(message, options)),
+    signal: AbortSignal.timeout(8_000),
   });
   const text = await res.text();
   return res.ok
@@ -76,6 +77,7 @@ async function sendViaDirectBot(message: string, options: { inlineKeyboard?: Inl
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(buildBody(message, options)),
+    signal: AbortSignal.timeout(8_000),
   });
   const text = await res.text();
   return res.ok

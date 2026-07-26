@@ -162,6 +162,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           // 1) Busca o pagamento no MP para confirmar status
           const mpRes = await fetch(`${MP_PAYMENTS_ENDPOINT}/${paymentId}`, {
             headers: { Authorization: `Bearer ${mpToken}` },
+            signal: AbortSignal.timeout(10_000),
           });
           if (!mpRes.ok) {
             console.error("[mp-webhook] MP fetch falhou", mpRes.status, paymentId);
