@@ -153,9 +153,45 @@ export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<v
   });
 }
 
+/** v271 — trava global de execução única (vale entre isolates/servidores).
+ * Reaproveita rate_limit_check (já existe no banco, SECURITY DEFINER):
+ * 1 execução a cada 120s no projeto inteiro. Sem isso, cron + admin +
+ * dispatch rodavam a sincronização ao mesmo tempo, cada uma lia um preço
+ * antigo diferente e o alerta de reprecificação disparava em looping. */
+async function acquireSyncLock(supabaseAdmin: any, windowSeconds = 120): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseAdmin.rpc("rate_limit_check", {
+      _key: "pricing_sync_global",
+      _limit: 1,
+      _window_seconds: windowSeconds,
+    });
+    if (error) return true; // fail-open: nunca travar a sincronização por erro da trava
+    const row = Array.isArray(data) ? data[0] : data;
+    return row?.allowed !== false;
+  } catch {
+    return true;
+  }
+}
+
+const SKIPPED_REPORT = {
+  skipped: true,
+  smmhype_filled: 0, smmpanel_filled: 0, verified_filled: 0,
+  smmhype_catalog: 0, smmpanel_catalog: 0, verified_catalog: 0,
+  provider4_filled: 0, provider4_catalog: 0,
+  providers: {}, ghosts: 0, scanned: 0, updated_rows: 0,
+  restored: 0, restored_pacotes: [] as string[],
+};
+
 async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   purgePricingCacheMemory(_opts.force ? "v266-force-live-handshake" : "v266-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  if (!(await acquireSyncLock(supabaseAdmin))) {
+    console.log("[pricing-cache] v271 sync ignorado: outra execução em andamento");
+    lastReserveSyncAt = Date.now();
+    return SKIPPED_REPORT;
+  }
+
 
   const { data: fornRows } = await supabaseAdmin
     .from("fornecedores" as any)
@@ -264,33 +300,38 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       const newCost = best.cost;
       const newPrice = computeGuardedPrice(newCost, qty); // Equação Fabiano Tiered v173
       const oldPrice = Number(r.price_brl ?? 0);
-      const costChanged = Math.abs(newCost - Number(r.cost_brl ?? 0)) > 0.0001;
+      const oldCost = Number(r.cost_brl ?? 0);
+      const costChanged = Math.abs(newCost - oldCost) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
-      // v266 — Convergência gradual (jeito dos painéis grandes):
-      //  • reajuste até +50%: entra direto;
-      //  • reajuste violento (> +50%): preço justo é gravado, mas o pacote sai
-      //    da vitrine até o dono trocar de fornecedor ou reposicionar — o cliente
-      //    nunca vê um preço disparar do nada.
-      const salto = oldPrice > 0 ? newPrice / oldPrice : 1;
+      // v271 — O gatilho de pausa agora olha CUSTO contra CUSTO.
+      // Antes comparava preço novo contra preço antigo, e isso pausava pacote
+      // saudável sempre que o piso escalar subia (ex.: l200 R$5,00 → R$7,67 com
+      // custo de R$0,05). Pausa só quando o fornecedor realmente encareceu.
+      const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
+      const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
+      const encareceuDeVerdade = saltoCusto > 1.5 && saltoPreco > 1.5;
 
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
         patch.last_cost_source = best.slug;
         patch.synced_at = new Date().toISOString();
 
-        if (salto <= 1.5) {
+        if (!encareceuDeVerdade) {
           patch.price_brl = newPrice;
-          if (oldPrice > 0 && salto <= 0.6) {
+          // v271 — só avisa queda real de custo (≥40%), não oscilação de piso.
+          if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
         } else {
-          // Salto violento: o preço justo sai do mercado. A trava do banco
-          // garante que o preço nunca fique abaixo da margem, então a proteção
-          // do cliente é tirar o pacote da vitrine até decisão humana.
-          patch.price_brl = newPrice;
+          // v271 — Salto violento: NÃO sobrescreve o preço da vitrine. O pacote
+          // sai de venda e o preço justo sugerido fica registrado no motivo.
+          // Sobrescrever o preço fazia o próximo ciclo comparar contra um valor
+          // inflado e disparar alerta de novo, em looping.
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
-          repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          if (r.is_sellable !== false) {
+            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          }
         }
       }
 
@@ -304,13 +345,14 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""));
       if (autoPaused && patch.is_sellable !== false) {
         const priceNow = Number(patch.price_brl ?? oldPrice);
-        if (priceNow > 0 && salto <= 1.5 && respectsMinMargin(priceNow, newCost)) {
+        if (priceNow > 0 && !encareceuDeVerdade && respectsMinMargin(priceNow, newCost)) {
           patch.is_sellable = true;
           patch.sellable_reason = null;
           restored.push(r.pacote);
         }
       }
     }
+
 
 
     if (Object.keys(patch).length === 0) continue;
@@ -341,7 +383,12 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     } catch { /* noop */ }
   }
 
-  // v266 — Alerta de reprecificação forte (custo do fornecedor mudou muito).
+  // v271 — Alerta de reprecificação forte, com freio anti-spam.
+  // Se metade do catálogo "mudou de preço" de uma vez, isso não é o fornecedor
+  // reajustando: é leitura ruim (catálogo incompleto/câmbio). Nesse caso avisa
+  // UMA vez que a leitura está suspeita, em vez de despejar lista de preços.
+  const scannedTotal = ((rows as any[]) ?? []).length || 1;
+  const leituraSuspeita = repriced.length > scannedTotal * 0.3;
   if (repriced.length > 0) {
     try {
       const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
@@ -349,16 +396,18 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         .slice(0, 8)
         .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
         .join("\n");
-      await dispatchWhatsappAlert(
-        `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`,
-      ).catch(() => {});
+      const msg = leituraSuspeita
+        ? `⚠️ LEITURA DE PREÇO SUSPEITA\n\nPROBLEMA: ${repriced.length} de ${scannedTotal} pacotes mudariam de preço de uma vez só. Isso quase sempre é falha de leitura do fornecedor, não reajuste real. Nada foi tirado da vitrine em massa.\n\n${amostra}\n\nO QUE FAZER: me avisa. Vou conferir se algum fornecedor devolveu catálogo incompleto ou cotação errada.`
+        : `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`;
+      await dispatchWhatsappAlert(msg).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
-        action: "reprecificacao_forte_v266",
-        detail: { total: repriced.length, itens: repriced.slice(0, 50) } as any,
+        action: leituraSuspeita ? "leitura_preco_suspeita_v271" : "reprecificacao_forte_v266",
+        detail: { total: repriced.length, scanned: scannedTotal, itens: repriced.slice(0, 50) } as any,
       });
     } catch { /* noop */ }
   }
+
 
   const perProvider = Object.fromEntries(
     providers.map((p) => [p.slug, {
@@ -380,7 +429,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   purgePricingCacheMemory("syncReserveProviderIds:end");
 
   return {
+    skipped: false,
     // compat v137 (consumidores antigos)
+
     smmhype_filled: bound["smmhype"] ?? 0,
     smmpanel_filled: bound["smmpainel"] ?? bound["smmpanel"] ?? 0,
     verified_filled: bound["verified"] ?? 0,
