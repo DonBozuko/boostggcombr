@@ -40,10 +40,22 @@ function HealthCatalogPage() {
   const [filter, setFilter] = useState<"all" | "sellable" | "paused">("all");
   const [msg, setMsg] = useState<string | null>(null);
 
+  const fetchAdminToken = useServerFn(getAdminTokenForSession);
+
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    setToken(window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "");
-  }, []);
+    let alive = true;
+    void (async () => {
+      try {
+        const res = await fetchAdminToken({ data: {} as never });
+        if (alive && res.ok) setToken(res.token);
+        else if (alive) setMsg("Acesso restrito. Entre pelo painel /admin.");
+      } catch {
+        if (alive) setMsg("Acesso restrito. Entre pelo painel /admin.");
+      }
+    })();
+    return () => { alive = false; };
+  }, [fetchAdminToken]);
+
 
   const load = async () => {
     if (!token) { setMsg("Cole o admin token primeiro"); return; }
