@@ -617,6 +617,45 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     } catch { /* noop */ }
   }
 
+  // v282 — Aviso em destaque: reajuste automático, aposentadoria e volta ao normal.
+  // Só faz sentido quando os preços realmente foram gravados (fora da quarentena).
+  if (!emQuarentena && (reajustados.length > 0 || aposentados.length > 0 || restored.length > 0)) {
+    try {
+      const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      const linhas = (arr: typeof reajustados) =>
+        arr.slice(0, 8).map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`).join("\n");
+
+      const partes: string[] = [];
+      if (reajustados.length > 0) {
+        partes.push(
+          `🔺 PREÇO SUBIU SOZINHO (dentro do limite de 40%)\n\nPROBLEMA: o fornecedor encareceu ${reajustados.length} pacote(s). O site já está com o preço novo e a margem segue protegida.\n\n${linhas(reajustados)}\n\nO QUE FAZER: nada agora. Se um cliente perguntar, a explicação é: "o custo do serviço subiu no fornecedor e reajustamos para manter a mesma qualidade de entrega".`,
+        );
+      }
+      if (aposentados.length > 0) {
+        partes.push(
+          `⛔ PACOTE APOSENTADO (custo disparou mais de 80%)\n\nPROBLEMA: ${aposentados.length} pacote(s) ficaram caros demais e saíram da vitrine em vez de subir o preço na cara do cliente.\n\n${linhas(aposentados)}\n\nO QUE FAZER: escolher outro fornecedor para esse pacote no admin, ou deixar aposentado.`,
+        );
+      }
+      if (restored.length > 0) {
+        partes.push(
+          `✅ PACOTE VOLTOU AO NORMAL\n\nPROBLEMA: nenhum. O custo caiu de novo e ${restored.length} pacote(s) voltaram para a vitrine com preço menor.\n\n${restored.slice(0, 8).map((p) => `• ${p}`).join("\n")}\n\nO QUE FAZER: nada. Só avisando para você saber que o preço baixou.`,
+        );
+      }
+
+      await dispatchWhatsappAlert(partes.join("\n\n———\n\n")).catch(() => {});
+      await supabaseAdmin.from("admin_audit_logs" as any).insert({
+        admin_email: "system@sync",
+        action: "reajuste_automatico_v282",
+        detail: {
+          teto_automatico: AUTO_UP_MAX,
+          teto_aposentadoria: RETIRE_ABOVE,
+          reajustados: reajustados.slice(0, 50),
+          aposentados: aposentados.slice(0, 50),
+          voltaram: restored.slice(0, 50),
+        } as any,
+      });
+    } catch { /* noop */ }
+  }
 
 
   const perProvider = Object.fromEntries(
