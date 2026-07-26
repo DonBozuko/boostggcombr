@@ -184,6 +184,23 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
         status: "partial", remains, last_checked_at: new Date().toISOString(),
         detail: `entrega parcial: ${entregue} de ${r.quantidade}`,
       }).eq("id", r.id);
+      // v288 — parcial quase-zero (entregou <30%) é falha real do fornecedor:
+      // conta na saúde dele para o roteamento preferir os outros. Não pausa venda.
+      if (entregue < Number(r.quantidade || 0) * 0.3) {
+        try {
+          const { data: cur } = await supabaseAdmin
+            .from("provider_health").select("failure_count").eq("slug", r.provider_slug).maybeSingle();
+          const next = Number((cur as { failure_count?: number } | null)?.failure_count ?? 0) + 1;
+          await supabaseAdmin.from("provider_health").upsert({
+            slug: r.provider_slug,
+            failure_count: next,
+            last_error: `canário: entregou só ${entregue} de ${r.quantidade}`,
+            last_failure_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            ...(next >= 3 ? { unstable_until: new Date(Date.now() + 30 * 60_000).toISOString() } : {}),
+          } as never, { onConflict: "slug" });
+        } catch { /* noop */ }
+      }
       const m = `⚠️ ENTREGA SAIU PELA METADE\n\nPROBLEMA: no teste de compra real o fornecedor ${r.provider_slug} entregou só ${entregue} de ${r.quantidade} e devolveu o resto.\n\nO QUE FAZER: o site continua vendendo (outros fornecedores estão OK), mas confira ${r.provider_slug} no /admin — se repetir, é melhor pausar esse fornecedor.`;
       report.alertas.push(m); await alert(m);
       report.ok = false;
