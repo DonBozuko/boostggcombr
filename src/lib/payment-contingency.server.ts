@@ -337,7 +337,10 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       return { ok: true, status: "waiting_provision", recovered: false, note: `SLA 24h até ${deadline}` };
     }
 
-    const refund = await refundMercadoPago(String(pedido.mercado_pago_id));
+    // v279 — estorno correto por origem do pagamento: revenda volta pra carteira,
+    // varejo volta pro Mercado Pago. Antes, revenda caía em refundMercadoPago("null").
+    const { refundPedido } = await import("@/lib/reseller-refund.server");
+    const refund = await refundPedido(pedido as any, "contingência falhou em todos fornecedores");
     await supabaseAdmin
       .from("pedidos")
       .update({
