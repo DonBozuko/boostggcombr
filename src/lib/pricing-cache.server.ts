@@ -148,6 +148,9 @@ const GHOST_ALERT_STREAK = 3;
 // quando a leitura idêntica se repetir (2ª confirmação) ou o dono aprovar.
 // ============================================================
 const MASS_CHANGE_RATIO = 0.3;
+// v282 — Faixas de reajuste de custo do fornecedor.
+const AUTO_UP_MAX = 1.40;   // até +40%: aplica sozinho
+const RETIRE_ABOVE = 1.80;  // acima de +80%: aposenta o pacote
 const QUARANTINE_KEY = "price_quarantine";
 const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 const PRICE_KEYS = new Set([
