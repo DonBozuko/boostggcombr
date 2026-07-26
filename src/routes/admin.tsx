@@ -46,6 +46,7 @@ import { toast } from "sonner";
 import { useJarvis, useJarvisHistory, useJarvisSubtitle, SUBTITLES } from "@/hooks/useJarvis";
 
 import { getAdminTokenForSession } from "@/lib/admin-session.functions";
+import { useIdleLogout, markAdminActivity, clearAdminActivity, isAdminSessionExpired } from "@/hooks/useIdleLogout";
 import { unlockJarvis } from "@/hooks/useJarvis";
 import { supabase } from "@/integrations/supabase/client";
 import { AdminCostAlert } from "@/components/AdminCostAlert";
