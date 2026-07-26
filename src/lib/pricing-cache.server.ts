@@ -394,5 +394,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     ghosts: ghostList.length,
     scanned: ((rows as any[]) ?? []).length,
     updated_rows,
+    restored: restored.length,
+    restored_pacotes: restored.slice(0, 50),
   };
 }
