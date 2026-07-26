@@ -141,10 +141,64 @@ function normalizeEndpoint(apiUrl: string): string {
 
 const GHOST_ALERT_STREAK = 3;
 
-export async function syncReserveProviderIds() {
-  purgePricingCacheMemory("syncReserveProviderIds:start");
-  return syncReserveProviderIdsNow({ force: true });
+// ============================================================
+// v275 — Quarentena de preço em massa.
+// Regra dura: se mais de 30% do catálogo mudaria de preço no mesmo ciclo,
+// NADA de preço é gravado. A leitura fica guardada e só vira preço real
+// quando a leitura idêntica se repetir (2ª confirmação) ou o dono aprovar.
+// ============================================================
+const MASS_CHANGE_RATIO = 0.3;
+const QUARANTINE_KEY = "price_quarantine";
+const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const PRICE_KEYS = new Set([
+  "cost_brl", "price_brl", "last_cost_source", "synced_at", "is_sellable", "sellable_reason",
+]);
+
+export type PriceQuarantine = {
+  signature: string;
+  total: number;
+  scanned: number;
+  applied: boolean;
+  approved: boolean;
+  last_alert_at: string | null;
+  updated_at: string;
+  amostra: Array<{ pacote: string; para: number }>;
+};
+
+async function hashSignature(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).slice(0, 12).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+async function readQuarantine(supabaseAdmin: any): Promise<PriceQuarantine | null> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("admin_settings").select("value").eq("key", QUARANTINE_KEY).maybeSingle();
+    const v = data?.value;
+    return v && typeof v === "object" && v.signature ? (v as PriceQuarantine) : null;
+  } catch { return null; }
+}
+
+async function writeQuarantine(supabaseAdmin: any, value: PriceQuarantine): Promise<void> {
+  try {
+    await supabaseAdmin.from("admin_settings").upsert(
+      { key: QUARANTINE_KEY, value: value as any }, { onConflict: "key" },
+    );
+  } catch { /* noop */ }
+}
+
+async function clearQuarantine(supabaseAdmin: any): Promise<void> {
+  try {
+    await supabaseAdmin.from("admin_settings").delete().eq("key", QUARANTINE_KEY);
+  } catch { /* noop */ }
+}
+
+
+export async function syncReserveProviderIds(opts?: { bypassLock?: boolean }) {
+  purgePricingCacheMemory("syncReserveProviderIds:start");
+  return syncReserveProviderIdsNow({ force: true, bypassLock: opts?.bypassLock === true });
+}
+
 
 export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<void> {
   if (Date.now() - lastReserveSyncAt < staleMs) return;
@@ -182,11 +236,11 @@ const SKIPPED_REPORT = {
   restored: 0, restored_pacotes: [] as string[],
 };
 
-async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
+async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: boolean }) {
   purgePricingCacheMemory(_opts.force ? "v266-force-live-handshake" : "v266-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  if (!(await acquireSyncLock(supabaseAdmin))) {
+  if (!_opts.bypassLock && !(await acquireSyncLock(supabaseAdmin))) {
     console.log("[pricing-cache] v271 sync ignorado: outra execução em andamento");
     lastReserveSyncAt = Date.now();
     return SKIPPED_REPORT;
@@ -255,6 +309,20 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   const restored: string[] = [];
   let updated_rows = 0;
 
+  // v275 — FASE 1: só PLANEJA. Nada vai para o banco antes de medir o
+  // tamanho do estrago. Antes, o preço já tinha sido gravado quando o
+  // alerta "leitura suspeita" saía — o aviso chegava tarde demais.
+  type Plan = {
+    pacote: string;
+    patch: Record<string, unknown>;
+    priceKeys: string[];       // chaves que só existem por causa de preço/custo
+    movesPrice: boolean;
+    restoredPacote: string | null;
+  };
+  const plans: Plan[] = [];
+
+
+
   for (const r of ((rows as any[]) ?? [])) {
     const qty = Number(r.quantidade);
     const costs: Array<{ slug: string; cost: number }> = [];
@@ -291,6 +359,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       missSince = null;
     }
 
+    let restoredPacote: string | null = null;
     const patch: Record<string, unknown> = {};
     if (nextStreak !== prevStreak) patch.id_miss_streak = nextStreak;
     if ((missSince ?? null) !== (r.id_miss_since ?? null)) patch.id_miss_since = missSince;
@@ -348,24 +417,77 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         if (priceNow > 0 && !encareceuDeVerdade && respectsMinMargin(priceNow, newCost)) {
           patch.is_sellable = true;
           patch.sellable_reason = null;
-          restored.push(r.pacote);
+          restoredPacote = r.pacote;
         }
       }
     }
 
-
-
     if (Object.keys(patch).length === 0) continue;
+    const priceKeys = Object.keys(patch).filter((k) => PRICE_KEYS.has(k));
+    plans.push({
+      pacote: r.pacote,
+      patch,
+      priceKeys,
+      movesPrice: patch.price_brl !== undefined || patch.is_sellable !== undefined,
+      restoredPacote,
+    });
+  }
+
+  // v275 — FASE 2: mede o estrago ANTES de gravar.
+  // Se mais de 30% do catálogo mudaria de preço no mesmo ciclo, isso não é
+  // reajuste de fornecedor: é leitura ruim (catálogo incompleto/câmbio).
+  // Nesse caso a alteração vai para QUARENTENA: nada de preço é gravado.
+  // Só libera quando a MESMA leitura se repetir no ciclo seguinte
+  // (confirmação por segunda leitura) ou o dono aprovar no admin.
+  const scannedTotal = ((rows as any[]) ?? []).length || 1;
+  const movers = plans.filter((p) => p.movesPrice);
+  const leituraSuspeitaBruta = movers.length > scannedTotal * MASS_CHANGE_RATIO;
+
+  const assinatura = await hashSignature(
+    movers
+      .map((p) => `${p.pacote}:${Number(p.patch.price_brl ?? -1).toFixed(2)}:${p.patch.is_sellable === false ? "off" : "on"}`)
+      .sort()
+      .join("|"),
+  );
+  const q = await readQuarantine(supabaseAdmin);
+  const confirmadaPorSegundaLeitura = leituraSuspeitaBruta && q?.signature === assinatura;
+  const aprovadaManual = leituraSuspeitaBruta && q?.approved === true && q?.signature === assinatura;
+  const emQuarentena = leituraSuspeitaBruta && !confirmadaPorSegundaLeitura && !aprovadaManual;
+
+  if (leituraSuspeitaBruta) {
+    await writeQuarantine(supabaseAdmin, {
+      signature: assinatura,
+      total: movers.length,
+      scanned: scannedTotal,
+      applied: !emQuarentena,
+      approved: aprovadaManual ? false : (q?.signature === assinatura ? q?.approved === true : false),
+      last_alert_at: q?.signature === assinatura ? (q?.last_alert_at ?? null) : null,
+      updated_at: new Date().toISOString(),
+      amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+    });
+  } else if (q) {
+    await clearQuarantine(supabaseAdmin);
+  }
+
+  // v275 — FASE 3: grava. Em quarentena só os campos de ID fantasma passam.
+  for (const plan of plans) {
+    const patch = { ...plan.patch };
+    if (emQuarentena) {
+      for (const k of plan.priceKeys) delete patch[k];
+      if (Object.keys(patch).length === 0) continue;
+    }
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
       .update(patch)
-      .eq("pacote", r.pacote);
+      .eq("pacote", plan.pacote);
     if (error) {
-      console.error("[pricing-cache] v266 UPDATE falhou", { pacote: r.pacote, error: error.message });
-    } else if (patch.price_brl !== undefined || patch.cost_brl !== undefined) {
-      updated_rows++;
+      console.error("[pricing-cache] v275 UPDATE falhou", { pacote: plan.pacote, error: error.message });
+      continue;
     }
+    if (patch.price_brl !== undefined || patch.cost_brl !== undefined) updated_rows++;
+    if (plan.restoredPacote && patch.is_sellable === true) restored.push(plan.restoredPacote);
   }
+
 
   // Alerta único e em português sobre pacotes com ID sumido.
   if (ghostList.length > 0) {
@@ -383,30 +505,55 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     } catch { /* noop */ }
   }
 
-  // v271 — Alerta de reprecificação forte, com freio anti-spam.
-  // Se metade do catálogo "mudou de preço" de uma vez, isso não é o fornecedor
-  // reajustando: é leitura ruim (catálogo incompleto/câmbio). Nesse caso avisa
-  // UMA vez que a leitura está suspeita, em vez de despejar lista de preços.
-  const scannedTotal = ((rows as any[]) ?? []).length || 1;
-  const leituraSuspeita = repriced.length > scannedTotal * 0.3;
-  if (repriced.length > 0) {
+  // v275 — Alerta honesto: "mudariam" só quando realmente NÃO aplicou.
+  // Freio anti-spam: mesma leitura suspeita só alerta 1x a cada 6h.
+  const jaAlertouRecente =
+    emQuarentena &&
+    q?.signature === assinatura &&
+    q?.last_alert_at != null &&
+    Date.now() - Date.parse(q.last_alert_at) < ALERT_COOLDOWN_MS;
+
+  if ((repriced.length > 0 || emQuarentena) && !jaAlertouRecente) {
     try {
       const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      const base = emQuarentena ? movers : plans.filter((p) => p.movesPrice);
+      const amostraQ = base
+        .slice(0, 8)
+        .map((p) => `• ${p.pacote} → R$ ${Number(p.patch.price_brl ?? 0).toFixed(2)}`)
+        .join("\n");
       const amostra = repriced
         .slice(0, 8)
         .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
         .join("\n");
-      const msg = leituraSuspeita
-        ? `⚠️ LEITURA DE PREÇO SUSPEITA\n\nPROBLEMA: ${repriced.length} de ${scannedTotal} pacotes mudariam de preço de uma vez só. Isso quase sempre é falha de leitura do fornecedor, não reajuste real. Nada foi tirado da vitrine em massa.\n\n${amostra}\n\nO QUE FAZER: me avisa. Vou conferir se algum fornecedor devolveu catálogo incompleto ou cotação errada.`
+      const msg = emQuarentena
+        ? `⚠️ MUDANÇA DE PREÇO EM MASSA BLOQUEADA\n\nPROBLEMA: ${movers.length} de ${scannedTotal} pacotes mudariam de preço no mesmo ciclo. Isso quase sempre é leitura errada do fornecedor. NENHUM preço do site foi alterado e nada saiu da vitrine.\n\n${amostraQ}\n\nO QUE FAZER: nada urgente. Se a próxima leitura vier igual, o sistema aplica sozinho. Se quiser aplicar agora, aprovar no admin.`
         : `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`;
       await dispatchWhatsappAlert(msg).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
-        action: leituraSuspeita ? "leitura_preco_suspeita_v271" : "reprecificacao_forte_v266",
-        detail: { total: repriced.length, scanned: scannedTotal, itens: repriced.slice(0, 50) } as any,
+        action: emQuarentena ? "preco_massa_bloqueado_v275" : "reprecificacao_forte_v266",
+        detail: {
+          total: emQuarentena ? movers.length : repriced.length,
+          scanned: scannedTotal,
+          assinatura,
+          itens: repriced.slice(0, 50),
+        } as any,
       });
+      if (emQuarentena) {
+        await writeQuarantine(supabaseAdmin, {
+          signature: assinatura,
+          total: movers.length,
+          scanned: scannedTotal,
+          applied: false,
+          approved: false,
+          last_alert_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+        });
+      }
     } catch { /* noop */ }
   }
+
 
 
   const perProvider = Object.fromEntries(
