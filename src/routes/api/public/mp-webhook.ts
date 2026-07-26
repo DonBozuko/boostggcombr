@@ -256,7 +256,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { data: pedido, error: selErr } = await supabaseAdmin
             .from("pedidos")
-            .select("id, status, pacote, quantidade, instagram_user, valor, cupom")
+            .select("id, status, pacote, quantidade, instagram_user, valor, cupom, affiliate_code, email_contato")
             .eq("mercado_pago_id", String(paymentId))
             .maybeSingle();
 
@@ -360,7 +360,15 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             });
           } catch (e) { console.warn("[mp-webhook] tiktok eapi fail", e); }
 
+          // v265 — Comissão de afiliado. Idempotente por pedido, best-effort:
+          // falhar aqui nunca pode travar entrega nem o resto do webhook.
+          try {
+            const { creditAffiliateForOrder } = await import("@/lib/affiliate.server");
+            await creditAffiliateForOrder(pedido as any);
+          } catch (e) { console.warn("[mp-webhook] v265 comissão afiliado fail", e); }
+
           // v116 — Banco Interno Virtual: credita Carteira Geral + registra ledger imutável.
+
           try {
             await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
             await supabaseAdmin.from("financial_ledger" as any).insert({

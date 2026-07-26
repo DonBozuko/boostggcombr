@@ -437,9 +437,17 @@ export const criarPedido = createServerFn({ method: "POST" })
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const supabase = supabaseAdmin;
+      // v265 — indicação de afiliado vem do cookie (nenhum checkout precisou mudar).
+      let affiliateCode: string | null = null;
+      try {
+        const { getRequest } = await import("@tanstack/react-start/server");
+        const { refCodeFromHeaders } = await import("@/lib/affiliate.server");
+        affiliateCode = refCodeFromHeaders(getRequest()?.headers);
+      } catch { /* sem indicação */ }
       const { data: inserted, error } = await supabase
         .from("pedidos")
         .insert({
+
           instagram_user: clean(data.instagram_user),
           pacote: clean(pacoteEfetivo),
           quantidade: quantidadeEfetiva,
@@ -458,8 +466,10 @@ export const criarPedido = createServerFn({ method: "POST" })
           utm_content: utmClean(data.utm_content),
           utm_term: utmClean(data.utm_term),
           cupom: cupom || null,
+          affiliate_code: affiliateCode,
           bump_offered: bumpOfertado,
           bump_accepted: bumpAplicado,
+
         } as any)
         .select("id")
         .single();

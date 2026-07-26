@@ -1,0 +1,2 @@
+REVOKE ALL ON FUNCTION public.afiliado_credit(uuid, uuid, numeric, numeric) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.afiliado_credit(uuid, uuid, numeric, numeric) TO service_role;
