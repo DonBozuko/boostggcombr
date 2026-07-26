@@ -147,7 +147,7 @@ export const resellerLedger = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("reseller_ledger" as any)
-      .select("created_at, tipo, valor, saldo_depois, detalhe, pedido_id")
+      .select("created_at, tipo, valor_brl, saldo_depois, detalhe, pedido_id")
       .eq("reseller_id", data.id)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -156,7 +156,7 @@ export const resellerLedger = createServerFn({ method: "POST" })
       rows: ((rows ?? []) as any[]).map((r) => ({
         created_at: String(r.created_at),
         tipo: String(r.tipo),
-        valor: Number(r.valor),
+        valor: Number(r.valor_brl),
         saldo_depois: Number(r.saldo_depois),
         detalhe: String(r.detalhe ?? ""),
         pedido_id: r.pedido_id ? String(r.pedido_id) : null,
