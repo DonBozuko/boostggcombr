@@ -360,24 +360,77 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         if (priceNow > 0 && !encareceuDeVerdade && respectsMinMargin(priceNow, newCost)) {
           patch.is_sellable = true;
           patch.sellable_reason = null;
-          restored.push(r.pacote);
+          restoredPacote = r.pacote;
         }
       }
     }
 
-
-
     if (Object.keys(patch).length === 0) continue;
+    const priceKeys = Object.keys(patch).filter((k) => PRICE_KEYS.has(k));
+    plans.push({
+      pacote: r.pacote,
+      patch,
+      priceKeys,
+      movesPrice: patch.price_brl !== undefined || patch.is_sellable !== undefined,
+      restoredPacote,
+    });
+  }
+
+  // v275 — FASE 2: mede o estrago ANTES de gravar.
+  // Se mais de 30% do catálogo mudaria de preço no mesmo ciclo, isso não é
+  // reajuste de fornecedor: é leitura ruim (catálogo incompleto/câmbio).
+  // Nesse caso a alteração vai para QUARENTENA: nada de preço é gravado.
+  // Só libera quando a MESMA leitura se repetir no ciclo seguinte
+  // (confirmação por segunda leitura) ou o dono aprovar no admin.
+  const scannedTotal = ((rows as any[]) ?? []).length || 1;
+  const movers = plans.filter((p) => p.movesPrice);
+  const leituraSuspeitaBruta = movers.length > scannedTotal * MASS_CHANGE_RATIO;
+
+  const assinatura = await hashSignature(
+    movers
+      .map((p) => `${p.pacote}:${Number(p.patch.price_brl ?? -1).toFixed(2)}:${p.patch.is_sellable === false ? "off" : "on"}`)
+      .sort()
+      .join("|"),
+  );
+  const q = await readQuarantine(supabaseAdmin);
+  const confirmadaPorSegundaLeitura = leituraSuspeitaBruta && q?.signature === assinatura;
+  const aprovadaManual = leituraSuspeitaBruta && q?.approved === true && q?.signature === assinatura;
+  const emQuarentena = leituraSuspeitaBruta && !confirmadaPorSegundaLeitura && !aprovadaManual;
+
+  if (leituraSuspeitaBruta) {
+    await writeQuarantine(supabaseAdmin, {
+      signature: assinatura,
+      total: movers.length,
+      scanned: scannedTotal,
+      applied: !emQuarentena,
+      approved: aprovadaManual ? false : (q?.signature === assinatura ? q?.approved === true : false),
+      last_alert_at: q?.signature === assinatura ? (q?.last_alert_at ?? null) : null,
+      updated_at: new Date().toISOString(),
+      amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+    });
+  } else if (q) {
+    await clearQuarantine(supabaseAdmin);
+  }
+
+  // v275 — FASE 3: grava. Em quarentena só os campos de ID fantasma passam.
+  for (const plan of plans) {
+    const patch = { ...plan.patch };
+    if (emQuarentena) {
+      for (const k of plan.priceKeys) delete patch[k];
+      if (Object.keys(patch).length === 0) continue;
+    }
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
       .update(patch)
-      .eq("pacote", r.pacote);
+      .eq("pacote", plan.pacote);
     if (error) {
-      console.error("[pricing-cache] v266 UPDATE falhou", { pacote: r.pacote, error: error.message });
-    } else if (patch.price_brl !== undefined || patch.cost_brl !== undefined) {
-      updated_rows++;
+      console.error("[pricing-cache] v275 UPDATE falhou", { pacote: plan.pacote, error: error.message });
+      continue;
     }
+    if (patch.price_brl !== undefined || patch.cost_brl !== undefined) updated_rows++;
+    if (plan.restoredPacote && patch.is_sellable === true) restored.push(plan.restoredPacote);
   }
+
 
   // Alerta único e em português sobre pacotes com ID sumido.
   if (ghostList.length > 0) {
