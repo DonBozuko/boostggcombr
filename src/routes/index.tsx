@@ -1042,6 +1042,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             </p>
 
           </form>
+
+          <div className="mt-5">
+            <CheckoutFaq />
+          </div>
         </div>
 
         <Dialog open={modalOpen} onOpenChange={setModalOpen}>
