@@ -14,7 +14,7 @@ export type ContingencyResult =
 export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<ContingencyResult> {
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id")
+    .select("id, status, pacote, quantidade, instagram_user, valor, mercado_pago_id, email_contato")
     .eq("id", pedidoId)
     .maybeSingle();
   if (error || !pedido) return { ok: false, status: null, error: "PEDIDO_NOT_FOUND" };
