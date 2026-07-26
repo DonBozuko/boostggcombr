@@ -193,6 +193,21 @@ validateDispatcherConfig();
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
+function stripTrackers(url: string): string {
+  // v272 — rastreadores do app (igsh, utm_*, is_from_webapp) fazem o fornecedor
+  // recusar o pedido. Sempre limpamos antes de enviar.
+  try {
+    const u = new URL(url);
+    for (const k of [...u.searchParams.keys()]) {
+      if (/^(igsh|igshid|utm_[a-z_]+|is_from_webapp|sender_device|_r|_t)$/i.test(k)) u.searchParams.delete(k);
+    }
+    u.hash = "";
+    return u.toString().replace(/\?$/, "");
+  } catch {
+    return url;
+  }
+}
+
 function normalizeInstagramUser(raw: string): string {
   // v272 — O cliente cola o link do app com rastreadores (?igsh=...&utm_source=qr).
   // Os fornecedores recusam esse formato ("Unable to verify your domain submission")
@@ -211,7 +226,7 @@ function normalizeInstagramUser(raw: string): string {
 
 
 function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
-  const trimmed = raw.trim();
+  const trimmed = /^https?:\/\//i.test(raw.trim()) ? stripTrackers(raw.trim()) : raw.trim();
   if (isFollowers) {
     // Aceita: @user, user, tiktok.com/@user, https://(www.)tiktok.com/@user
     const handle = trimmed
@@ -231,7 +246,7 @@ function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
 }
 
 function normalizeYoutubeTarget(raw: string): string {
-  const trimmed = raw.trim();
+  const trimmed = /^https?:\/\//i.test(raw.trim()) ? stripTrackers(raw.trim()) : raw.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (/^(www\.)?(m\.|music\.)?youtube\.com\//i.test(trimmed) || /^youtu\.be\//i.test(trimmed)) {
     return `https://${trimmed.replace(/^www\./i, "")}`;
@@ -240,7 +255,7 @@ function normalizeYoutubeTarget(raw: string): string {
 }
 
 function normalizeFacebookTarget(raw: string): string {
-  const trimmed = raw.trim();
+  const trimmed = /^https?:\/\//i.test(raw.trim()) ? stripTrackers(raw.trim()) : raw.trim();
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (/^(www\.|m\.|web\.)?facebook\.com\//i.test(trimmed) || /^fb\.com\//i.test(trimmed) || /^fb\.watch\//i.test(trimmed)) {
     return `https://${trimmed.replace(/^www\./i, "")}`;
