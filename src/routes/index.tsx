@@ -1343,6 +1343,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link to="/rastrear" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Rastrear pedido</Link>
+            <Link to="/revenda" className="font-semibold text-amber-300 hover:text-amber-200" activeProps={{ className: "text-amber-200" }}>💼 Seja revendedor</Link>
             <Link to="/ferramentas" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Ferramentas</Link>
             <Link to="/privacidade" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Privacidade</Link>
             <Link to="/termos" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Termos</Link>
