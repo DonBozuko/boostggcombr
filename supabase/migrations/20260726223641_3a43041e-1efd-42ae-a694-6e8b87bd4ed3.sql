@@ -1,0 +1,1 @@
+UPDATE public.pricing_items SET smmpanel_auto_id = NULL WHERE pacote IN ('p50','ys75k','ys100k');
