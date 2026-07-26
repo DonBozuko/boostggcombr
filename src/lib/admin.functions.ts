@@ -594,7 +594,9 @@ export const smartApproveIds = createServerFn({ method: "POST" })
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
+          signal: AbortSignal.timeout(10_000),
         });
+
       }
     } catch (e) {
       console.warn("[smartApproveIds] telegram falhou:", e);
