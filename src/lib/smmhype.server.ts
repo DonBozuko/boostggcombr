@@ -1,9 +1,10 @@
 // Server-only helper para disparar pedido no SMMhype.
 // NÃO importar de código client-reachable em escopo de módulo.
 
-// Service IDs definitivos:
-// - Seguidores: 14325 (100–2000), 14225 (5000–100000)
+// Service IDs definitivos (revalidados contra o catálogo vivo em v272):
+// - Seguidores IG: 14325 (todas as faixas). 14225 MORREU no fornecedor.
 // - Curtidas: 18860 (todas quantidades)
+const IG_FOLLOWERS_SERVICE_ID = 14325;
 const LIKES_SERVICE_ID = 18860;
 const VIEWS_SERVICE_ID = 18855;
 // TikTok (SMMhype)
@@ -15,17 +16,20 @@ const YT_SUBSCRIBERS_SERVICE_ID = 19440;
 const YT_VIEWS_SERVICE_ID = 14321;
 // Facebook (SMMhype)
 const FB_FOLLOWERS_SERVICE_ID = 18870;
-const FB_LIKES_SERVICE_ID = 7593;
+// v272: 7593 saiu do catálogo → substituído por 14336 (Facebook Post Likes, refill 30d).
+const FB_LIKES_SERVICE_ID = 14336;
 // Tráfego Web (SMMhype)
 const WEB_TRAFFIC_BR_SERVICE_ID = 9313;
 const WEB_TRAFFIC_WORLD_SERVICE_ID = 10351;
-// Telegram (SMMhype) — homologados
-const TG_CHANNEL_SERVICE_ID = 19106; // Membros para Canal
-const TG_GROUP_SERVICE_ID = 19107;   // Membros para Grupo
+// Telegram (SMMhype) — v272: 19106/19107 viraram "YouTube Live Views" no fornecedor
+// (entregaria produto ERRADO). Trocados pelos IDs reais de membros.
+const TG_CHANNEL_SERVICE_ID = 17200; // Membros MIX (min 500)
+const TG_GROUP_SERVICE_ID = 17200;   // mesmo serviço aceita grupo
 // Kwai (SMMhype) — v210
 const KW_FOLLOWERS_SERVICE_ID = 8330; // Seguidores BR (refill 30d)
 const KW_LIKES_SERVICE_ID = 8331;     // Curtidas BR (refill 30d)
 const KW_VIEWS_SERVICE_ID = 2758;     // Views HQ
+
 
 export function resolveServiceId(pacote: string, quantidade: number): number | null {
   const p = String(pacote ?? "").trim().toLowerCase();
