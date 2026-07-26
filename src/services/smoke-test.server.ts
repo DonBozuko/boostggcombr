@@ -114,9 +114,10 @@ export async function runSmokeTest(): Promise<SmokeReport> {
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  // 1) Provedores respondem?
-  for (const p of PROVIDERS) {
-    const key = process.env[p.envKey];
+  // 1) Provedores respondem? (fixos + cadastrados no banco)
+  const probes = [...PROVIDERS, ...(await extraProvidersFromDb(supabaseAdmin))];
+  for (const p of probes) {
+    const key = p.apiKey;
     if (!key) { report.provider_reachability[p.slug] = false; continue; }
     report.provider_reachability[p.slug] = await pingProvider(p.endpoint, key);
     report.provider_consecutive_failures[p.slug] = await countConsecutiveProviderFailures(
@@ -129,7 +130,7 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   // 2) Todo pacote tem pelo menos 1 ID válido?
   const { data: items } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id");
+    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id");
 
   for (const it of (items as any[]) ?? []) {
     // v180 — auto_id (auto-resolver v171) é caminho válido de dispatch, conta como ID.
