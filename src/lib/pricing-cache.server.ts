@@ -265,12 +265,6 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       const oldPrice = Number(r.price_brl ?? 0);
       const costChanged = Math.abs(newCost - Number(r.cost_brl ?? 0)) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
-      // v266 — Reajuste automático COM freio de choque.
-      // Alta suave (até +50%) entra sozinha: é o preço se ajustando ao custo real.
-      // Alta violenta NÃO troca a etiqueta na cara do cliente: o custo real é
-      // gravado, o pacote sai da vitrine (is_sellable=false) e o dono decide
-      // trocar de fornecedor ou reposicionar. Nunca vender abaixo da margem,
-      // nunca dar susto de preço sem decisão humana.
       // v266 — Convergência gradual (jeito dos painéis grandes):
       //  • reajuste até +50%: entra direto;
       //  • reajuste violento em pacote AINDA lucrativo: sobe no máximo 50% por
