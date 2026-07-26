@@ -470,23 +470,62 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
   }
 
   // v275 — FASE 3: grava. Em quarentena só os campos de ID fantasma passam.
+  // v277 — Gravação em LOTE. Antes era 1 UPDATE por pacote (281 round-trips por
+  // ciclo → 362 mil UPDATEs acumulados). Agora agrupa os patches que mexem nas
+  // MESMAS colunas e manda um upsert só por grupo. Mesmo resultado, ~30x menos
+  // ida-e-volta no banco. Os pacotes vêm de um SELECT desta mesma tabela, então
+  // o upsert sempre cai no caminho de conflito (UPDATE), nunca insere linha nova.
+  const grupos = new Map<string, Array<Record<string, any>>>();
+  const planosPorPacote = new Map<string, (typeof plans)[number]>();
+
   for (const plan of plans) {
     const patch = { ...plan.patch };
     if (emQuarentena) {
       for (const k of plan.priceKeys) delete patch[k];
       if (Object.keys(patch).length === 0) continue;
     }
-    const { error } = await supabaseAdmin
-      .from("pricing_items" as any)
-      .update(patch)
-      .eq("pacote", plan.pacote);
-    if (error) {
-      console.error("[pricing-cache] v275 UPDATE falhou", { pacote: plan.pacote, error: error.message });
-      continue;
-    }
-    if (patch.price_brl !== undefined || patch.cost_brl !== undefined) updated_rows++;
-    if (plan.restoredPacote && patch.is_sellable === true) restored.push(plan.restoredPacote);
+    const chave = Object.keys(patch).sort().join(",");
+    const lote = grupos.get(chave) ?? [];
+    lote.push({ pacote: plan.pacote, ...patch });
+    grupos.set(chave, lote);
+    planosPorPacote.set(plan.pacote, plan);
   }
+
+  const CHUNK = 200;
+  for (const lote of grupos.values()) {
+    for (let i = 0; i < lote.length; i += CHUNK) {
+      const fatia = lote.slice(i, i + CHUNK);
+      const { error } = await supabaseAdmin
+        .from("pricing_items" as any)
+        .upsert(fatia, { onConflict: "pacote" });
+      if (error) {
+        // Falhou o lote inteiro: cai para linha-a-linha para não perder tudo
+        // por causa de um único pacote problemático.
+        console.error("[pricing-cache] v277 lote falhou, aplicando 1 a 1", error.message);
+        for (const row of fatia) {
+          const { pacote, ...patch } = row;
+          const { error: e1 } = await supabaseAdmin
+            .from("pricing_items" as any)
+            .update(patch)
+            .eq("pacote", pacote);
+          if (e1) {
+            console.error("[pricing-cache] v277 UPDATE falhou", { pacote, error: e1.message });
+            continue;
+          }
+          contabiliza(row);
+        }
+        continue;
+      }
+      for (const row of fatia) contabiliza(row);
+    }
+  }
+
+  function contabiliza(row: Record<string, any>) {
+    if (row.price_brl !== undefined || row.cost_brl !== undefined) updated_rows++;
+    const plan = planosPorPacote.get(String(row.pacote));
+    if (plan?.restoredPacote && row.is_sellable === true) restored.push(plan.restoredPacote);
+  }
+
 
 
   // Alerta único e em português sobre pacotes com ID sumido.
