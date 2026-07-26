@@ -16,7 +16,11 @@ async function serve(request: Request, name: string) {
     const range = request.headers.get("range");
     let res: Response;
     try {
-      res = await fetch(upstream.toString(), { headers: range ? { range } : {} });
+      // v280: timeout de 8s — sem isso, upstream travado prende o worker.
+      res = await fetch(upstream.toString(), {
+        headers: range ? { range } : {},
+        signal: AbortSignal.timeout(8000),
+      });
     } catch {
       return new Response(JSON.stringify({ error: "UPSTREAM_FAIL", fallback: true }), {
         status: 200,
