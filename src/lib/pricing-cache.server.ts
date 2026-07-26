@@ -265,16 +265,26 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       const oldPrice = Number(r.price_brl ?? 0);
       const costChanged = Math.abs(newCost - Number(r.cost_brl ?? 0)) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
+      // v266 — Reajuste automático COM freio de choque.
+      // Alta suave (até +50%) entra sozinha: é o preço se ajustando ao custo real.
+      // Alta violenta NÃO troca a etiqueta na cara do cliente: o custo real é
+      // gravado, o pacote sai da vitrine (is_sellable=false) e o dono decide
+      // trocar de fornecedor ou reposicionar. Nunca vender abaixo da margem,
+      // nunca dar susto de preço sem decisão humana.
+      const shock = oldPrice > 0 && newPrice / oldPrice > 1.5;
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
-        patch.price_brl = newPrice;
         patch.last_cost_source = best.slug;
         patch.synced_at = new Date().toISOString();
-        // v266 — Reprecificação forte: fornecedor mexeu muito no custo.
-        // Nunca vendemos abaixo da margem, mas o dono precisa saber para
-        // trocar de fornecedor ou aposentar o pacote.
-        if (oldPrice > 0 && (newPrice / oldPrice >= 1.5 || newPrice / oldPrice <= 0.6)) {
+        if (shock) {
+          patch.is_sellable = false;
+          patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
           repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+        } else {
+          patch.price_brl = newPrice;
+          if (oldPrice > 0 && newPrice / oldPrice <= 0.6) {
+            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          }
         }
       }
     }
@@ -316,7 +326,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
         .join("\n");
       await dispatchWhatsappAlert(
-        `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu no custo de ${repriced.length} pacote(s) e o site reajustou para manter seu lucro.\n\n${amostra}\n\nO QUE FAZER: se algum preço ficou fora do mercado, trocar o fornecedor desse pacote no admin ou tirar o pacote da vitrine.`,
+        `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`,
       ).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
