@@ -264,33 +264,38 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       const newCost = best.cost;
       const newPrice = computeGuardedPrice(newCost, qty); // Equação Fabiano Tiered v173
       const oldPrice = Number(r.price_brl ?? 0);
-      const costChanged = Math.abs(newCost - Number(r.cost_brl ?? 0)) > 0.0001;
+      const oldCost = Number(r.cost_brl ?? 0);
+      const costChanged = Math.abs(newCost - oldCost) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
-      // v266 — Convergência gradual (jeito dos painéis grandes):
-      //  • reajuste até +50%: entra direto;
-      //  • reajuste violento (> +50%): preço justo é gravado, mas o pacote sai
-      //    da vitrine até o dono trocar de fornecedor ou reposicionar — o cliente
-      //    nunca vê um preço disparar do nada.
-      const salto = oldPrice > 0 ? newPrice / oldPrice : 1;
+      // v271 — O gatilho de pausa agora olha CUSTO contra CUSTO.
+      // Antes comparava preço novo contra preço antigo, e isso pausava pacote
+      // saudável sempre que o piso escalar subia (ex.: l200 R$5,00 → R$7,67 com
+      // custo de R$0,05). Pausa só quando o fornecedor realmente encareceu.
+      const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
+      const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
+      const encareceuDeVerdade = saltoCusto > 1.5 && saltoPreco > 1.5;
 
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
         patch.last_cost_source = best.slug;
         patch.synced_at = new Date().toISOString();
 
-        if (salto <= 1.5) {
+        if (!encareceuDeVerdade) {
           patch.price_brl = newPrice;
-          if (oldPrice > 0 && salto <= 0.6) {
+          // v271 — só avisa queda real de custo (≥40%), não oscilação de piso.
+          if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
         } else {
-          // Salto violento: o preço justo sai do mercado. A trava do banco
-          // garante que o preço nunca fique abaixo da margem, então a proteção
-          // do cliente é tirar o pacote da vitrine até decisão humana.
-          patch.price_brl = newPrice;
+          // v271 — Salto violento: NÃO sobrescreve o preço da vitrine. O pacote
+          // sai de venda e o preço justo sugerido fica registrado no motivo.
+          // Sobrescrever o preço fazia o próximo ciclo comparar contra um valor
+          // inflado e disparar alerta de novo, em looping.
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
-          repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          if (r.is_sellable !== false) {
+            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          }
         }
       }
 
@@ -304,13 +309,14 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""));
       if (autoPaused && patch.is_sellable !== false) {
         const priceNow = Number(patch.price_brl ?? oldPrice);
-        if (priceNow > 0 && salto <= 1.5 && respectsMinMargin(priceNow, newCost)) {
+        if (priceNow > 0 && !encareceuDeVerdade && respectsMinMargin(priceNow, newCost)) {
           patch.is_sellable = true;
           patch.sellable_reason = null;
           restored.push(r.pacote);
         }
       }
     }
+
 
 
     if (Object.keys(patch).length === 0) continue;
