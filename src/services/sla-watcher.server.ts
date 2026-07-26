@@ -71,6 +71,23 @@ export async function runSlaWatcher(): Promise<SlaReport> {
     }
 
     // Expirado
+    // v279 — Pedido de revenda é pago com saldo pré-pago (sem mercado_pago_id):
+    // devolve o valor na carteira do revendedor em vez de queimar o dinheiro.
+    const { isResellerPaid, refundResellerBalance } = await import("@/lib/reseller-refund.server");
+    if (isResellerPaid(p)) {
+      const back = await refundResellerBalance(String(p.id), "SLA 24h expirado sem entrega");
+      await supabaseAdmin
+        .from("pedidos")
+        .update({
+          status: back.ok ? "refunded" : "SMM_FAILED",
+          error_detail: `SLA 24h expirado (revenda). Devolução ${back.ok ? "OK" : "FALHOU"}: ${back.detail}`.slice(0, 500),
+        } as any)
+        .eq("id", p.id);
+      if (back.ok) report.refunded++;
+      else report.refund_failed++;
+      continue;
+    }
+
     if (!p.mercado_pago_id) {
       await supabaseAdmin
         .from("pedidos")
