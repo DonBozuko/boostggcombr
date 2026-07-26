@@ -445,6 +445,8 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
       }
     } catch { /* noop */ }
   }
+  await releaseDispatch(supabaseAdmin as any, pedido.id);
   return { ok: false, error: "TODOS_FORNECEDORES_FALHARAM", tentativas };
 }
+
 
