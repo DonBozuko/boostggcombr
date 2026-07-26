@@ -236,11 +236,11 @@ const SKIPPED_REPORT = {
   restored: 0, restored_pacotes: [] as string[],
 };
 
-async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
+async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: boolean }) {
   purgePricingCacheMemory(_opts.force ? "v266-force-live-handshake" : "v266-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  if (!(await acquireSyncLock(supabaseAdmin))) {
+  if (!_opts.bypassLock && !(await acquireSyncLock(supabaseAdmin))) {
     console.log("[pricing-cache] v271 sync ignorado: outra execução em andamento");
     lastReserveSyncAt = Date.now();
     return SKIPPED_REPORT;
