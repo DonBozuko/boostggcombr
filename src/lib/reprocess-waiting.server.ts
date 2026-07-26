@@ -137,7 +137,13 @@ export async function confirmRobotDispatch(input: {
   return { ok: true, fornecedor, orderId, custoBrl };
 }
 
-export async function reprocessWaitingProvision(pedidoId: string): Promise<ReprocessResult> {
+export async function reprocessWaitingProvision(
+  pedidoId: string,
+  // v261 — opcional e aditivo: pedidos de revenda têm economia diferente
+  // (sem cupom, sem taxa fixa por pedido), então usam o próprio piso de lucro.
+  // Sem este parâmetro o comportamento é EXATAMENTE o de antes.
+  opts?: { marginCheck?: (valor: number, cost: number) => boolean; tag?: string },
+): Promise<ReprocessResult> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: pedido, error } = await supabaseAdmin
     .from("pedidos")
