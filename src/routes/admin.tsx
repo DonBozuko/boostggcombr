@@ -53,6 +53,7 @@ import { LaboratorioPanel } from "@/components/LaboratorioPanel";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
 import ResellerPanel from "@/components/ResellerPanel";
 import ResellerApplicationsPanel from "@/components/ResellerApplicationsPanel";
+import AffiliatesPanel from "@/components/AffiliatesPanel";
 import { WaitingProvisionQueue } from "@/components/WaitingProvisionQueue";
 import { SloPanel } from "@/components/SloPanel";
 
@@ -1519,6 +1520,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><WaitingProvisionQueue token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><ResellerPanel token={token} /></div>
         <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><ResellerApplicationsPanel token={token} /></div>
+        <div className={`${folder === "tesouraria" ? "block" : "hidden"} mt-3`}><AffiliatesPanel token={token} /></div>
 
         <div className={`${folder === "tesouraria" ? "block" : "hidden"}`}>
           <PricingCatalogEditor token={token} />
