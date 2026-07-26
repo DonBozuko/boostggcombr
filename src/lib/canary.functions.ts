@@ -49,7 +49,7 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
       enabled: z.boolean(),
       alvos: z.array(z.object({
         rede: z.string().max(40),
-        link: z.string().max(300),
+        link: z.string().max(1200),
         pacote: z.string().max(120),
         quantidade: z.number().int().min(0).max(5000),
         ativo: z.boolean(),
