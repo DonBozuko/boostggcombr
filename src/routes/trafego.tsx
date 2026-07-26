@@ -298,7 +298,28 @@ function TrafegoLanding() {
               style={{ background: NEON, color: "#fff", boxShadow: `0 0 35px ${NEON}` }}>
               {tipoBloqueado ? "Instabilidade Temporária - Reposição de Estoque" : loading ? "Gerando Pix..." : (<>💎 PAGAR COM PIX <Send className="size-5 ml-2" /></>)}
             </Button>
+            <CardPayOption
+              disabled={loading || !planId || tipoBloqueado}
+              valorPix={dynAllPlans.find((p) => p.id === planId)?.valor}
+              buildPayload={() => {
+                const sel = dynAllPlans.find((p) => p.id === planId);
+                if (!sel) { toast.error("Selecione um pacote."); return null; }
+                const parsed = urlSchema.safeParse({ plan: sel.id, profile });
+                if (!parsed.success) { toast.error(parsed.error.issues[0].message); return null; }
+                return {
+                  instagram_user: parsed.data.profile,
+                  pacote: sel.id,
+                  quantidade: sel.quantidade,
+                  valor: sel.valor,
+                  email: resolveCheckoutEmail(email, "trafego"),
+                  rede_social: "trafego" as const,
+                  ...getUtmParams(),
+                  cupom: getAppliedCoupon(),
+                };
+              }}
+            />
             <p className="text-[11px] text-center text-zinc-500">Pagamento seguro via Pix · entrega automática</p>
+
           </div>
         </div>
       </section>)}
