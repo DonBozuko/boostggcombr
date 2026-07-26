@@ -203,7 +203,7 @@ export async function reprocessWaitingProvision(
         .from("pedidos")
         .update({
           status: "Enviado",
-          error_detail: `v151 recarga manual · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+          error_detail: `${opts?.tag ?? "v151 recarga manual"} · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
           ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
           provider_slug: f.slug,
           provider_order_id: r.orderId != null ? String(r.orderId) : null,
