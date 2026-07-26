@@ -7,7 +7,7 @@
 // Preserva HUD v57, largura +80px v101, grade 200 v107, cronômetro 3min v105,
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
-import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
+import { computeGuardedPrice, estimateNetProfit } from "./margin-guardian";
 
 type PricingRow = {
   pacote: string;
@@ -271,28 +271,33 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
       // gravado, o pacote sai da vitrine (is_sellable=false) e o dono decide
       // trocar de fornecedor ou reposicionar. Nunca vender abaixo da margem,
       // nunca dar susto de preço sem decisão humana.
-      // Preço atual ainda respeita o piso de lucro (net ≥ 4x custo real)?
-      const precoAtualSeguro = oldPrice > 0 && respectsMinMargin(oldPrice, newCost);
-      // Só é "choque" quando o reajuste é violento E o preço de hoje já ficou
-      // abaixo do piso de lucro com o custo real. Reajuste grande em pacote que
-      // continua lucrativo NÃO tira nada da vitrine (evita esvaziar a loja).
-      const shock = oldPrice > 0 && newPrice / oldPrice > 1.5 && !precoAtualSeguro;
+      // v266 — Convergência gradual (jeito dos painéis grandes):
+      //  • reajuste até +50%: entra direto;
+      //  • reajuste violento em pacote AINDA lucrativo: sobe no máximo 50% por
+      //    sincronização até chegar no preço justo — sem susto para o cliente;
+      //  • pacote que virou prejuízo/lucro raso (< 1,5x o custo): sai da vitrine.
+      const lucroHoje = oldPrice > 0 ? estimateNetProfit(oldPrice, newCost) : 0;
+      const lucrativo = oldPrice > 0 && lucroHoje >= newCost * 1.5;
+      const salto = oldPrice > 0 ? newPrice / oldPrice : 1;
+
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
         patch.last_cost_source = best.slug;
         patch.synced_at = new Date().toISOString();
-        if (shock) {
+
+        if (salto <= 1.5) {
+          patch.price_brl = newPrice;
+          if (oldPrice > 0 && salto <= 0.6) {
+            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          }
+        } else if (lucrativo) {
+          const passo = Number((oldPrice * 1.5).toFixed(2));
+          patch.price_brl = passo;
+          repriced.push({ pacote: r.pacote, de: oldPrice, para: passo, fornecedor: best.slug });
+        } else {
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
           repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-        } else if (oldPrice > 0 && newPrice / oldPrice > 1.5 && precoAtualSeguro) {
-          // Lucro segue saudável: mantém a etiqueta, só registra a oportunidade.
-          repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-        } else {
-          patch.price_brl = newPrice;
-          if (oldPrice > 0 && newPrice / oldPrice <= 0.6) {
-            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-          }
         }
       }
     }
