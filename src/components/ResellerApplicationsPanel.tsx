@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import {
   listResellerApplications,
   setResellerApplicationStatus,
+  approveAndProvisionReseller,
   type ResellerApplication,
 } from "@/lib/reseller-apply.functions";
 
@@ -23,6 +24,7 @@ export default function ResellerApplicationsPanel({ token }: { token: string }) 
   const [loading, setLoading] = useState(false);
   const fnList = useServerFn(listResellerApplications);
   const fnStatus = useServerFn(setResellerApplicationStatus);
+  const fnApprove = useServerFn(approveAndProvisionReseller);
 
   const load = async () => {
     setLoading(true);
@@ -41,6 +43,22 @@ export default function ResellerApplicationsPanel({ token }: { token: string }) 
   const marcar = async (id: string, status: "em_contato" | "aprovado" | "recusado") => {
     const r = await fnStatus({ data: { token, id, status } });
     if (!r.ok) return toast.error(r.error ?? "Falhou");
+    void load();
+  };
+
+  const liberar = async (r: ResellerApplication) => {
+    if (!r.email) return toast.error("Sem e-mail nessa solicitação — peça o e-mail antes de liberar.");
+    const pct = window.prompt(`Desconto de revenda para ${r.nome} (%)`, "10");
+    if (pct == null) return;
+    const desconto = Number(pct.replace(",", ".")) / 100;
+    if (!(desconto >= 0 && desconto <= 0.3)) return toast.error("Desconto entre 0% e 30%");
+    const res = await fnApprove({ data: { token, id: r.id, desconto_pct: desconto } });
+    if (!res.ok) return toast.error(res.error ?? "Falhou");
+    toast.success(
+      res.emailed
+        ? `Acesso liberado. Chave enviada por e-mail para ${r.email}.`
+        : `Acesso criado, mas o e-mail não saiu. Chave: ${res.apiKey}`,
+    );
     void load();
   };
 
@@ -88,6 +106,9 @@ export default function ResellerApplicationsPanel({ token }: { token: string }) 
                 >
                   WhatsApp
                 </Button>
+                <Button size="sm" onClick={() => liberar(r)} disabled={!r.email}>
+                  Aprovar e liberar
+                </Button>
                 <Button size="sm" variant="ghost" onClick={() => marcar(r.id, "em_contato")}>
                   Em contato
                 </Button>
@@ -102,8 +123,8 @@ export default function ResellerApplicationsPanel({ token }: { token: string }) 
           </div>
         ))}
         <p className="text-xs text-muted-foreground">
-          Aprovar aqui é só triagem. Para liberar o acesso, crie o revendedor no painel acima e credite o
-          saldo depois que o Pix cair.
+          "Aprovar e liberar" faz tudo sozinho: cria o revendedor, gera a chave e envia por e-mail com o
+          link do painel. O saldo ele mesmo recarrega por Pix — você não precisa fazer nada depois.
         </p>
       </CardContent>
     </Card>

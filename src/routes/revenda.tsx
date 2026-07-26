@@ -58,12 +58,14 @@ function Revenda() {
     e.preventDefault();
     if (form.nome.trim().length < 2) return toast.error("Informe seu nome");
     if (form.whatsapp.replace(/\D/g, "").length < 10) return toast.error("Informe um WhatsApp válido com DDD");
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim()))
+      return toast.error("Informe um e-mail válido — é nele que chega seu acesso");
     setBusy(true);
     try {
       const r = await send({ data: form });
       if (!r.ok) return toast.error(r.error ?? "Não consegui enviar agora");
       setDone(true);
-      toast.success("Solicitação enviada! Vamos te chamar no WhatsApp.");
+      toast.success("Solicitação enviada! Seu acesso chega por e-mail assim que for aprovado.");
     } finally {
       setBusy(false);
     }
@@ -149,7 +151,7 @@ function Revenda() {
               inputMode="tel"
               required
             />
-            <Input placeholder="E-mail (opcional)" value={form.email} onChange={set("email")} maxLength={160} type="email" />
+            <Input placeholder="E-mail (para receber seu acesso)" value={form.email} onChange={set("email")} maxLength={160} type="email" />
             <Input
               placeholder="Quanto pretende vender por mês? (ex: R$ 500)"
               value={form.volume_mes}
