@@ -56,8 +56,7 @@ export function resolveServiceId(pacote: string, quantidade: number): number | n
   if (p.startsWith("kv")) return KW_VIEWS_SERVICE_ID;
   if (p.startsWith("v")) return VIEWS_SERVICE_ID;
   if (p.startsWith("l")) return LIKES_SERVICE_ID;
-  if (quantidade >= 100 && quantidade <= 2000) return 14325;
-  if (quantidade >= 5000 && quantidade <= 100000) return 14225;
+  if (quantidade >= 20) return IG_FOLLOWERS_SERVICE_ID;
   return null;
 }
 
@@ -132,8 +131,8 @@ export async function resolveServiceIdAsync(pacote: string, quantidade: number):
 
 // Compat: map por pacote id (inclui curtidas e visualizações).
 export const SMMHYPE_SERVICE_IDS: Record<string, number> = {
-  p100: 14325, p500: 14325, p1k: 14325, p2k: 14325,
-  p5k: 14225, p10k: 14225, p20k: 14225, p50k: 14225, p100k: 14225,
+  p100: IG_FOLLOWERS_SERVICE_ID, p500: IG_FOLLOWERS_SERVICE_ID, p1k: IG_FOLLOWERS_SERVICE_ID, p2k: IG_FOLLOWERS_SERVICE_ID,
+  p5k: IG_FOLLOWERS_SERVICE_ID, p10k: IG_FOLLOWERS_SERVICE_ID, p20k: IG_FOLLOWERS_SERVICE_ID, p50k: IG_FOLLOWERS_SERVICE_ID, p100k: IG_FOLLOWERS_SERVICE_ID,
   l100: LIKES_SERVICE_ID, l500: LIKES_SERVICE_ID, l1k: LIKES_SERVICE_ID,
   l2k: LIKES_SERVICE_ID, l5k: LIKES_SERVICE_ID,
   v1k: VIEWS_SERVICE_ID, v5k: VIEWS_SERVICE_ID, v10k: VIEWS_SERVICE_ID,
@@ -180,7 +179,7 @@ export function validateDispatcherConfig(): { ok: boolean; missing: string[]; as
     }
   }
   if (resolveServiceId("p500", 500) !== 14325) assertions.push("p500 deveria → 14325");
-  if (resolveServiceId("p10k", 10000) !== 14225) assertions.push("p10k deveria → 14225");
+  if (resolveServiceId("p10k", 10000) !== 14325) assertions.push("p10k deveria → 14325");
 
   if (missing.length) console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
   if (assertions.length) console.error("[smmhype] asserts falharam:", assertions);
