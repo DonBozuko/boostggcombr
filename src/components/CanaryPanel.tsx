@@ -139,8 +139,9 @@ export function CanaryPanel({ token }: { token: string }) {
                   placeholder="rede (instagram)"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
                 <input value={a.link} onChange={(e) => setAlvo(i, { link: e.target.value })}
-                  placeholder="link/perfil de teste dessa rede"
+                  placeholder="links de teste (separe por vírgula p/ rodízio)"
                   className="md:col-span-2 bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+
                 <input value={a.pacote} onChange={(e) => setAlvo(i, { pacote: e.target.value })}
                   placeholder="pacote do catálogo"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
