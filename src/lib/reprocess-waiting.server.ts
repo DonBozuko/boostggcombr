@@ -187,7 +187,7 @@ export async function reprocessWaitingProvision(
       await markProviderUnstable(f.slug, "saldo insuficiente");
       continue;
     }
-    if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
+    if (f.cost_brl != null && !(opts?.marginCheck ?? respectsMinMargin)(Number(pedido.valor), f.cost_brl)) {
       tentativas.push(`${f.nome}: margem <300%`);
       continue;
     }
