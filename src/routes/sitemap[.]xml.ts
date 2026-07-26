@@ -41,6 +41,7 @@ const buildSitemapXml = () => {
     { path: "/ferramentas/gerador-legenda-instagram", changefreq: "weekly", priority: "0.8" },
     { path: "/kit-creator", changefreq: "weekly", priority: "0.9" },
     { path: "/promo-5reais", changefreq: "weekly", priority: "0.8" },
+    { path: "/rastrear", changefreq: "monthly", priority: "0.5" },
     // v200 — SEO landings (keyword-alvo)
     { path: "/seguidores-pix", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-instagram", changefreq: "weekly", priority: "0.9" },
