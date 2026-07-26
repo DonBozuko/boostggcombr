@@ -101,11 +101,116 @@ async function fetchProviderStatus(slug: string, orderId: string): Promise<Provi
   }
 }
 
-async function alert(msg: string): Promise<void> {
+// ─────────────────────────────────────────────────────────────
+// v289 — ALERTA COM ESTADO (dedupe + resolução automática)
+// Antes: toda falha virava mensagem nova no Telegram → loop de alarme.
+// Agora: cada problema tem uma chave. Mesma chave só reenvia depois do
+// cooldown; quando volta a funcionar, manda 1 aviso de "resolvido" e limpa.
+// ─────────────────────────────────────────────────────────────
+async function send(msg: string): Promise<void> {
   try {
     const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
     await dispatchWhatsappAlert(msg).catch(() => {});
   } catch { /* noop */ }
+}
+
+async function alert(key: string, msg: string, cooldownH = 6): Promise<boolean> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("canary_alert_state" as never)
+      .select("last_sent_at, resolved_at")
+      .eq("alert_key", key)
+      .maybeSingle();
+    const row = data as { last_sent_at?: string; resolved_at?: string | null } | null;
+    const aberto = row && !row.resolved_at;
+    const recente = row?.last_sent_at
+      ? Date.now() - new Date(row.last_sent_at).getTime() < cooldownH * 3_600_000
+      : false;
+    if (aberto && recente) return false; // já avisado, não repete
+    await supabaseAdmin.from("canary_alert_state" as never).upsert(
+      { alert_key: key, last_sent_at: new Date().toISOString(), resolved_at: null, detail: msg.slice(0, 500) } as never,
+      { onConflict: "alert_key" },
+    );
+  } catch { /* se o estado falhar, prefere avisar a ficar mudo */ }
+  await send(msg);
+  return true;
+}
+
+async function resolveAlert(key: string, msg: string): Promise<void> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("canary_alert_state" as never)
+      .select("resolved_at")
+      .eq("alert_key", key)
+      .maybeSingle();
+    const row = data as { resolved_at?: string | null } | null;
+    if (!row || row.resolved_at) return; // não havia problema aberto
+    await supabaseAdmin
+      .from("canary_alert_state" as never)
+      .update({ resolved_at: new Date().toISOString() } as never)
+      .eq("alert_key", key);
+    await send(msg);
+  } catch { /* noop */ }
+}
+
+// ─────────────────────────────────────────────────────────────
+// v289 — QUARENTENA POR PACOTE + FORNECEDOR
+// Fornecedor que falha num pacote específico sai do roteamento DAQUELE pacote
+// por um tempo crescente (3h, 6h, 12h… teto 24h), em vez de derrubar o
+// fornecedor inteiro ou gritar a cada tentativa.
+// ─────────────────────────────────────────────────────────────
+const QUARENTENA_BASE_MIN = 180;
+const QUARENTENA_TETO_MIN = 1440;
+
+export async function getQuarentena(pacote: string): Promise<Set<string>> {
+  const out = new Set<string>();
+  try {
+    const { data } = await supabaseAdmin
+      .from("canary_quarantine" as never)
+      .select("provider_slug, until")
+      .eq("pacote", pacote);
+    for (const r of ((data as { provider_slug: string; until: string }[]) ?? [])) {
+      if (new Date(r.until).getTime() > Date.now()) out.add(r.provider_slug);
+    }
+  } catch { /* noop */ }
+  return out;
+}
+
+async function quarentenar(pacote: string, slug: string, reason: string): Promise<number> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("canary_quarantine" as never)
+      .select("hits")
+      .eq("pacote", pacote).eq("provider_slug", slug).maybeSingle();
+    const hits = Number((data as { hits?: number } | null)?.hits ?? 0) + 1;
+    const min = Math.min(QUARENTENA_BASE_MIN * hits, QUARENTENA_TETO_MIN);
+    await supabaseAdmin.from("canary_quarantine" as never).upsert(
+      {
+        pacote, provider_slug: slug, hits, reason: reason.slice(0, 300),
+        until: new Date(Date.now() + min * 60_000).toISOString(),
+        updated_at: new Date().toISOString(),
+      } as never,
+      { onConflict: "pacote,provider_slug" },
+    );
+    return min;
+  } catch { return 0; }
+}
+
+async function limparQuarentena(pacote: string, slug: string): Promise<void> {
+  try {
+    await supabaseAdmin.from("canary_quarantine" as never).delete().eq("pacote", pacote).eq("provider_slug", slug);
+  } catch { /* noop */ }
+}
+
+/** v289 — pool de links de teste por rede. O mesmo link repetido faz o
+ *  fornecedor recusar ("active order with this link"), o que virava alarme
+ *  falso. Aceita vários links separados por vírgula, ponto-e-vírgula ou quebra
+ *  de linha e rotaciona entre eles. */
+export function linksDoAlvo(a: CanaryAlvo): string[] {
+  return String(a.link ?? "")
+    .split(/[\n,;]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export type CanaryReport = {
@@ -117,6 +222,7 @@ export type CanaryReport = {
   alertas: string[];
   ts: string;
 };
+
 
 /** Fase 1 — acompanha canários abertos e fecha/alerta. */
 async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<void> {
