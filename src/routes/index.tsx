@@ -360,7 +360,7 @@ const faqs = [
   },
   {
     q: "Posso pagar de outra forma além do Pix?",
-    a: "Hoje trabalhamos exclusivamente com Pix por ser instantâneo e ter taxa zero — isso te garante o melhor preço do mercado.",
+    a: "Sim. Além do Pix, você pode pagar com cartão de crédito (acréscimo de 7% da taxa da operadora). O Pix é instantâneo e tem taxa zero, por isso continua sendo o melhor preço.",
   },
 ];
 
