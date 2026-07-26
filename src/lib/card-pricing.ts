@@ -21,7 +21,9 @@ export const CARD_MIN_BRL = 5;
 
 /** Preço no cartão = preço Pix + taxa repassada, arredondado para cima no centavo. */
 export function cardAmount(pixAmount: number): number {
-  return Math.ceil(pixAmount * (1 + CARD_SURCHARGE) * 100) / 100;
+  // Number(...toFixed(4)) mata o ruído de ponto flutuante antes do arredondamento.
+  const bruto = Number((pixAmount * (1 + CARD_SURCHARGE)).toFixed(4));
+  return Math.ceil(bruto * 100) / 100;
 }
 
 export function formatBRL(v: number): string {
