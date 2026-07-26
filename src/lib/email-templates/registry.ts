@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import { template as reviewRequestTemplate } from './review-request'
 import { template as refundNoticeTemplate } from './refund-notice'
 import { template as cartRecoveryTemplate } from './cart-recovery'
+import { template as resellerAccessTemplate } from './reseller-access'
 
 export interface TemplateEntry {
   component: ComponentType<any>
