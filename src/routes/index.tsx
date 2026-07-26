@@ -1298,7 +1298,41 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
       {/* FAQ movida para <FaqSection /> abaixo (evita duplicação) */}
 
-
+      {/* BANNER REVENDA — destaque para quem quer revender */}
+      <section className="container mx-auto px-6 my-12">
+        <div
+          className="relative overflow-hidden rounded-2xl border border-amber-300/30 px-6 py-8 sm:px-10 sm:py-10"
+          style={{ background: "linear-gradient(120deg, rgba(234,179,8,0.12), rgba(234,179,8,0.02))" }}
+        >
+          <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xl">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-300">
+                💼 Programa de Revenda
+              </span>
+              <h2 className="mt-3 text-xl font-bold text-foreground sm:text-2xl">
+                Quer revender seguidores e curtidas com sua marca?
+              </h2>
+              <p className="mt-2 text-sm text-zinc-300">
+                Preço de revenda com desconto real, saldo pré-pago via Pix, painel e API prontos. Você
+                vende pelo preço que quiser e fica com a diferença — sem mensalidade.
+              </p>
+            </div>
+            <Link
+              to="/revenda"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl px-7 py-4 text-base font-black text-black transition-transform hover:scale-[1.03]"
+              style={{ background: "linear-gradient(135deg, #facc15, #eab308)", boxShadow: "0 0 24px rgba(234,179,8,0.45)" }}
+            >
+              Seja revendedor →
+            </Link>
+          </div>
+          <p className="mt-5 text-xs text-zinc-400">
+            Acesso por aprovação. Já é revendedor?{" "}
+            <Link to="/painel-revendedor" className="text-amber-300 underline">
+              Entrar no painel
+            </Link>
+          </p>
+        </div>
+      </section>
 
       {/* FOOTER */}
       <footer className="border-t border-border py-10">
@@ -1309,6 +1343,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link to="/rastrear" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Rastrear pedido</Link>
+            <Link to="/revenda" className="font-semibold text-amber-300 hover:text-amber-200" activeProps={{ className: "text-amber-200" }}>💼 Seja revendedor</Link>
             <Link to="/ferramentas" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Ferramentas</Link>
             <Link to="/privacidade" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Privacidade</Link>
             <Link to="/termos" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Termos</Link>
