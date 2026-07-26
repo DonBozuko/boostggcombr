@@ -1450,6 +1450,7 @@ export type Database = {
       ops_forensics: { Args: never; Returns: Json }
       ops_http_health: { Args: { _hours?: number }; Returns: Json }
       ops_http_recent_failures: { Args: { _minutes?: number }; Returns: Json }
+      purge_telemetry_retention: { Args: never; Returns: Json }
       rate_limit_check: {
         Args: { _key: string; _limit: number; _window_seconds: number }
         Returns: {
