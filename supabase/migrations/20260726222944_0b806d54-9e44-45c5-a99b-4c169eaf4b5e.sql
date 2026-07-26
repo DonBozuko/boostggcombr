@@ -1,0 +1,1 @@
+UPDATE public.fornecedores SET api_url = CASE slug WHEN 'smmhype' THEN 'https://smmhype.com/api/v2' WHEN 'smmpainel' THEN 'https://smmpainel.com/api/v2' WHEN 'verified' THEN 'https://verifiedatacado.com/api/v2' ELSE api_url END WHERE slug IN ('smmhype','smmpainel','verified');

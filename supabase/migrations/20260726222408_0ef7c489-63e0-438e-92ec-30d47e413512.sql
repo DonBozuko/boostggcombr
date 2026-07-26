@@ -1,0 +1,1 @@
+insert into public.admin_settings (key, value, updated_at) values ('canary_config', '{"enabled": true, "alvos": [{"rede": "instagram", "link": "https://instagram.com/fabiano_santiago_oficial", "pacote": "p50", "quantidade": 50, "ativo": true}], "interval_hours": 12, "sla_hours": 6}'::jsonb, now()) on conflict (key) do update set value = excluded.value, updated_at = now();
