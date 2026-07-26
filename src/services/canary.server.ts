@@ -82,7 +82,9 @@ async function fetchProviderStatus(slug: string, orderId: string): Promise<Provi
     .select("api_url, api_key_secret")
     .eq("slug", slug)
     .maybeSingle();
-  const url = (f as { api_url?: string } | null)?.api_url;
+  const rawUrl = (f as { api_url?: string } | null)?.api_url;
+  const { normalizeEndpoint } = await import("@/lib/dispatcher-fallback.server");
+  const url = rawUrl ? normalizeEndpoint(rawUrl) : "";
   const key = f ? process.env[(f as { api_key_secret?: string }).api_key_secret ?? ""] : undefined;
   if (!url || !key) return { error: `config ausente para ${slug}` };
   try {
