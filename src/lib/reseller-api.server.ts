@@ -283,10 +283,11 @@ async function actionAdd(reseller: ResellerRow, p: Params) {
     });
     if (!r.ok) {
       console.warn("[reseller-api] dispatch pendente", pedidoId, r.error);
-      // fica em waiting_provision → watchers/reconciliador existentes cuidam
+      await armResellerSla(pedidoId, String(r.error ?? "dispatch falhou"));
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error("[reseller-api] dispatch exceção", e);
+    await armResellerSla(pedidoId, String(e?.message ?? "exceção no dispatch"));
   }
 
   return json({
