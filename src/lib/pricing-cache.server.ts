@@ -429,7 +429,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   purgePricingCacheMemory("syncReserveProviderIds:end");
 
   return {
+    skipped: false,
     // compat v137 (consumidores antigos)
+
     smmhype_filled: bound["smmhype"] ?? 0,
     smmpanel_filled: bound["smmpainel"] ?? bound["smmpanel"] ?? 0,
     verified_filled: bound["verified"] ?? 0,
