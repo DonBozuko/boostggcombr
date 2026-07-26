@@ -87,6 +87,7 @@ import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './route
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
+import { Route as ApiPublicHooksCanaryRouteImport } from './routes/api/public/hooks/canary'
 import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
 import { Route as ApiPublicHooksDropWatcherRouteImport } from './routes/api/public/hooks/drop-watcher'
 import { Route as ApiPublicHooksDryRunCatalogRouteImport } from './routes/api/public/hooks/dry-run-catalog'
@@ -524,6 +525,11 @@ const ApiPublicHooksBestsellerScanRoute =
     path: '/api/public/hooks/bestseller-scan',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksCanaryRoute = ApiPublicHooksCanaryRouteImport.update({
+  id: '/api/public/hooks/canary',
+  path: '/api/public/hooks/canary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicHooksDeliveryWatcherRoute =
   ApiPublicHooksDeliveryWatcherRouteImport.update({
     id: '/api/public/hooks/delivery-watcher',
@@ -747,6 +753,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/canary': typeof ApiPublicHooksCanaryRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/drop-watcher': typeof ApiPublicHooksDropWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
@@ -852,6 +859,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/canary': typeof ApiPublicHooksCanaryRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/drop-watcher': typeof ApiPublicHooksDropWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
@@ -958,6 +966,7 @@ export interface FileRoutesById {
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
+  '/api/public/hooks/canary': typeof ApiPublicHooksCanaryRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
   '/api/public/hooks/drop-watcher': typeof ApiPublicHooksDropWatcherRoute
   '/api/public/hooks/dry-run-catalog': typeof ApiPublicHooksDryRunCatalogRoute
@@ -1065,6 +1074,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/canary'
     | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/drop-watcher'
     | '/api/public/hooks/dry-run-catalog'
@@ -1170,6 +1180,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/canary'
     | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/drop-watcher'
     | '/api/public/hooks/dry-run-catalog'
@@ -1275,6 +1286,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
     | '/api/public/hooks/bestseller-scan'
+    | '/api/public/hooks/canary'
     | '/api/public/hooks/delivery-watcher'
     | '/api/public/hooks/drop-watcher'
     | '/api/public/hooks/dry-run-catalog'
@@ -1379,6 +1391,7 @@ export interface RootRouteChildren {
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
+  ApiPublicHooksCanaryRoute: typeof ApiPublicHooksCanaryRoute
   ApiPublicHooksDeliveryWatcherRoute: typeof ApiPublicHooksDeliveryWatcherRoute
   ApiPublicHooksDropWatcherRoute: typeof ApiPublicHooksDropWatcherRoute
   ApiPublicHooksDryRunCatalogRoute: typeof ApiPublicHooksDryRunCatalogRoute
@@ -1954,6 +1967,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBestsellerScanRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/canary': {
+      id: '/api/public/hooks/canary'
+      path: '/api/public/hooks/canary'
+      fullPath: '/api/public/hooks/canary'
+      preLoaderRoute: typeof ApiPublicHooksCanaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/delivery-watcher': {
       id: '/api/public/hooks/delivery-watcher'
       path: '/api/public/hooks/delivery-watcher'
@@ -2225,6 +2245,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
+  ApiPublicHooksCanaryRoute: ApiPublicHooksCanaryRoute,
   ApiPublicHooksDeliveryWatcherRoute: ApiPublicHooksDeliveryWatcherRoute,
   ApiPublicHooksDropWatcherRoute: ApiPublicHooksDropWatcherRoute,
   ApiPublicHooksDryRunCatalogRoute: ApiPublicHooksDryRunCatalogRoute,

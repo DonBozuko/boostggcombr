@@ -279,6 +279,54 @@ export type Database = {
         }
         Relationships: []
       }
+      canary_runs: {
+        Row: {
+          cost_brl: number | null
+          created_at: string
+          delivered_at: string | null
+          detail: string | null
+          id: string
+          last_checked_at: string | null
+          pacote: string
+          provider_order_id: string | null
+          provider_slug: string | null
+          quantidade: number
+          remains: number | null
+          status: string
+          target_link: string
+        }
+        Insert: {
+          cost_brl?: number | null
+          created_at?: string
+          delivered_at?: string | null
+          detail?: string | null
+          id?: string
+          last_checked_at?: string | null
+          pacote: string
+          provider_order_id?: string | null
+          provider_slug?: string | null
+          quantidade: number
+          remains?: number | null
+          status?: string
+          target_link: string
+        }
+        Update: {
+          cost_brl?: number | null
+          created_at?: string
+          delivered_at?: string | null
+          detail?: string | null
+          id?: string
+          last_checked_at?: string | null
+          pacote?: string
+          provider_order_id?: string | null
+          provider_slug?: string | null
+          quantidade?: number
+          remains?: number | null
+          status?: string
+          target_link?: string
+        }
+        Relationships: []
+      }
       checkout_attempts: {
         Row: {
           categoria: string | null
