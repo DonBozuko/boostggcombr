@@ -65,7 +65,7 @@ export function useIdleLogout(active: boolean, onExpire: () => void) {
       "touchstart",
       "scroll",
       "wheel",
-availability_placeholder
+"click",
     ];
     for (const evt of events) window.addEventListener(evt, bump, { passive: true });
     window.addEventListener("visibilitychange", check);
