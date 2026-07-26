@@ -138,7 +138,14 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
     const remains = Number(s.remains ?? -1);
     const st = String(s.status ?? "").toLowerCase();
     const delivered = (Number.isFinite(remains) && remains === 0) || ["completed", "concluído", "concluido"].includes(st);
-    const canceled = ["canceled", "cancelled", "refunded", "partial"].includes(st) && remains > 0;
+    // v287 — "partial" NÃO é cancelamento: o fornecedor entregou parte e devolveu
+    // o resto. Antes caía no mesmo balde de "cancelado sem entregar" e disparava
+    // alarme falso de sistema quebrado. Também damos 30min de carência porque
+    // vários painéis marcam Partial no começo e depois completam.
+    const canceled = ["canceled", "cancelled", "refunded"].includes(st) && remains > 0;
+    const partial = st === "partial" && remains > 0;
+    const partialGraceH = 0.5;
+
 
     if (delivered) {
       await supabaseAdmin.from("canary_runs").update({
@@ -159,6 +166,29 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
       report.ok = false;
       continue;
     }
+
+    if (partial) {
+      // Dentro da carência: ainda pode completar. Só registra e volta depois.
+      if (ageH < partialGraceH) {
+        await supabaseAdmin.from("canary_runs").update({
+          status: "processing", remains, last_checked_at: new Date().toISOString(),
+          detail: `parcial (faltam ${remains}) — aguardando`,
+        }).eq("id", r.id);
+        report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: `parcial (faltam ${remains})` });
+        continue;
+      }
+      const entregue = Math.max(0, Number(r.quantidade || 0) - remains);
+      await supabaseAdmin.from("canary_runs").update({
+        status: "partial", remains, last_checked_at: new Date().toISOString(),
+        detail: `entrega parcial: ${entregue} de ${r.quantidade}`,
+      }).eq("id", r.id);
+      const m = `⚠️ ENTREGA SAIU PELA METADE\n\nPROBLEMA: no teste de compra real o fornecedor ${r.provider_slug} entregou só ${entregue} de ${r.quantidade} e devolveu o resto.\n\nO QUE FAZER: o site continua vendendo (outros fornecedores estão OK), mas confira ${r.provider_slug} no /admin — se repetir, é melhor pausar esse fornecedor.`;
+      report.alertas.push(m); await alert(m);
+      report.ok = false;
+      continue;
+    }
+
+
 
     if (ageH > cfg.sla_hours) {
       await supabaseAdmin.from("canary_runs").update({
