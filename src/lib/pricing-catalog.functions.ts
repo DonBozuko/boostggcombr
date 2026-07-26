@@ -205,6 +205,6 @@ export const approvePriceQuarantine = createServerFn({ method: "POST" })
     });
     // Reexecuta a sincronização: com approved=true a mesma leitura é aplicada.
     const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
-    const rep: any = await syncReserveProviderIds().catch(() => null);
+    const rep: any = await syncReserveProviderIds({ bypassLock: true }).catch(() => null);
     return { ok: true, applied: Number(rep?.updated_rows ?? 0) };
   });
