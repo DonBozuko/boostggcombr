@@ -26,7 +26,7 @@ export async function runSlaWatcher(): Promise<SlaReport> {
 
   const { data: parqueados, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, sla_deadline, mercado_pago_id, valor, pacote, email_contato")
+    .select("id, status, sla_deadline, mercado_pago_id, valor, pacote, email_contato, reseller_id, reseller_valor")
     .eq("status", "waiting_provision")
     .not("sla_deadline", "is", null);
 
