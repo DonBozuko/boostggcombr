@@ -141,6 +141,59 @@ function normalizeEndpoint(apiUrl: string): string {
 
 const GHOST_ALERT_STREAK = 3;
 
+// ============================================================
+// v275 — Quarentena de preço em massa.
+// Regra dura: se mais de 30% do catálogo mudaria de preço no mesmo ciclo,
+// NADA de preço é gravado. A leitura fica guardada e só vira preço real
+// quando a leitura idêntica se repetir (2ª confirmação) ou o dono aprovar.
+// ============================================================
+const MASS_CHANGE_RATIO = 0.3;
+const QUARANTINE_KEY = "price_quarantine";
+const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
+const PRICE_KEYS = new Set([
+  "cost_brl", "price_brl", "last_cost_source", "synced_at", "is_sellable", "sellable_reason",
+]);
+
+export type PriceQuarantine = {
+  signature: string;
+  total: number;
+  scanned: number;
+  applied: boolean;
+  approved: boolean;
+  last_alert_at: string | null;
+  updated_at: string;
+  amostra: Array<{ pacote: string; para: number }>;
+};
+
+async function hashSignature(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).slice(0, 12).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function readQuarantine(supabaseAdmin: any): Promise<PriceQuarantine | null> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("admin_settings").select("value").eq("key", QUARANTINE_KEY).maybeSingle();
+    const v = data?.value;
+    return v && typeof v === "object" && v.signature ? (v as PriceQuarantine) : null;
+  } catch { return null; }
+}
+
+async function writeQuarantine(supabaseAdmin: any, value: PriceQuarantine): Promise<void> {
+  try {
+    await supabaseAdmin.from("admin_settings").upsert(
+      { key: QUARANTINE_KEY, value: value as any }, { onConflict: "key" },
+    );
+  } catch { /* noop */ }
+}
+
+async function clearQuarantine(supabaseAdmin: any): Promise<void> {
+  try {
+    await supabaseAdmin.from("admin_settings").delete().eq("key", QUARANTINE_KEY);
+  } catch { /* noop */ }
+}
+
+
 export async function syncReserveProviderIds() {
   purgePricingCacheMemory("syncReserveProviderIds:start");
   return syncReserveProviderIdsNow({ force: true });
