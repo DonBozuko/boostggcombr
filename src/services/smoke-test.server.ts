@@ -19,11 +19,38 @@ type SmokeReport = {
 
 const PROVIDER_ALERT_THRESHOLD = 3;
 
-const PROVIDERS = [
-  { slug: "smmhype", endpoint: "https://smmhype.com/api/v2", envKey: "SMMHYPE_API_KEY" },
-  { slug: "smmpainel", endpoint: "https://smmpainel.com/api/v2", envKey: "SMMPAINEL_API_KEY" },
-  { slug: "verified", endpoint: "https://verifiedatacado.com/api/v2", envKey: "VERIFIED_API_KEY" },
-] as const;
+type ProviderProbe = { slug: string; endpoint: string; apiKey: string | undefined };
+
+const PROVIDERS: ProviderProbe[] = [
+  { slug: "smmhype", endpoint: "https://smmhype.com/api/v2", apiKey: process.env.SMMHYPE_API_KEY },
+  { slug: "smmpainel", endpoint: "https://smmpainel.com/api/v2", apiKey: process.env.SMMPAINEL_API_KEY },
+  { slug: "verified", endpoint: "https://verifiedatacado.com/api/v2", apiKey: process.env.VERIFIED_API_KEY },
+];
+
+// v281 — fornecedores cadastrados no banco (ex.: provider4/SMMOficial) também
+// precisam ser vigiados. Antes o smoke test só conhecia os 3 slugs fixos, então
+// uma chave vencida no 4º fornecedor passava batida até o cliente reclamar.
+async function extraProvidersFromDb(supabaseAdmin: any): Promise<ProviderProbe[]> {
+  try {
+    const known = new Set(PROVIDERS.map((p) => p.slug));
+    const { data } = await supabaseAdmin
+      .from("fornecedores")
+      .select("slug, api_url, api_key_secret")
+      .eq("ativo", true);
+    const out: ProviderProbe[] = [];
+    for (const f of (data as any[]) ?? []) {
+      const slug = String(f?.slug ?? "").toLowerCase();
+      if (!slug || known.has(slug) || slug === "smmpanel") continue;
+      const endpoint = String(f?.api_url ?? "");
+      if (!endpoint) continue;
+      const envName = String(f?.api_key_secret ?? "");
+      out.push({ slug, endpoint, apiKey: envName ? process.env[envName] : undefined });
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
 
 async function pingProviderOnce(endpoint: string, apiKey: string): Promise<boolean> {
   try {
@@ -87,9 +114,10 @@ export async function runSmokeTest(): Promise<SmokeReport> {
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  // 1) Provedores respondem?
-  for (const p of PROVIDERS) {
-    const key = process.env[p.envKey];
+  // 1) Provedores respondem? (fixos + cadastrados no banco)
+  const probes = [...PROVIDERS, ...(await extraProvidersFromDb(supabaseAdmin))];
+  for (const p of probes) {
+    const key = p.apiKey;
     if (!key) { report.provider_reachability[p.slug] = false; continue; }
     report.provider_reachability[p.slug] = await pingProvider(p.endpoint, key);
     report.provider_consecutive_failures[p.slug] = await countConsecutiveProviderFailures(
@@ -102,13 +130,13 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   // 2) Todo pacote tem pelo menos 1 ID válido?
   const { data: items } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id");
+    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id");
 
   for (const it of (items as any[]) ?? []) {
     // v180 — auto_id (auto-resolver v171) é caminho válido de dispatch, conta como ID.
     const hasId =
-      it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id ||
-      it.smmhype_auto_id || it.smmpanel_auto_id || it.verified_auto_id;
+      it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id || it.provider4_service_id ||
+      it.smmhype_auto_id || it.smmpanel_auto_id || it.verified_auto_id || it.provider4_auto_id;
     if (!hasId) report.packages_without_valid_id.push(it.pacote);
 
     const cost = Number(it.cost_brl) || 0;
