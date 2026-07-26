@@ -194,10 +194,11 @@ async function clearQuarantine(supabaseAdmin: any): Promise<void> {
 }
 
 
-export async function syncReserveProviderIds() {
+export async function syncReserveProviderIds(opts?: { bypassLock?: boolean }) {
   purgePricingCacheMemory("syncReserveProviderIds:start");
-  return syncReserveProviderIdsNow({ force: true });
+  return syncReserveProviderIdsNow({ force: true, bypassLock: opts?.bypassLock === true });
 }
+
 
 export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<void> {
   if (Date.now() - lastReserveSyncAt < staleMs) return;
