@@ -2,10 +2,37 @@
 // Mesmo protocolo do SMMhype (key/action/service/link/quantity).
 import { resolveServiceId, SMMHYPE_SERVICE_IDS, type SmmDispatchResult } from "./smmhype.server";
 
+function stripTrackers(url: string): string {
+  // v272 — remove rastreadores (?igsh, utm_*, is_from_webapp) que fazem o
+  // fornecedor recusar o pedido com "Unable to verify your domain submission".
+  try {
+    const u = new URL(url);
+    for (const k of [...u.searchParams.keys()]) {
+      if (/^(igsh|igshid|utm_[a-z_]+|is_from_webapp|sender_device|si|feature|_r|_t)$/i.test(k)) {
+        u.searchParams.delete(k);
+      }
+    }
+    u.hash = "";
+    return u.toString().replace(/\?$/, "");
+  } catch {
+    return url;
+  }
+}
+
 function normalizeLink(pacote: string, raw: string): string {
-  const p = pacote.toLowerCase();
+  const p = pacote.toLowerCase().replace(/^br-/, "");
   const t = raw.trim();
-  if (/^https?:\/\//i.test(t)) return t;
+  const isProfileOnly = p.startsWith("p") || p.startsWith("tf") || p.startsWith("ff");
+  if (/^https?:\/\//i.test(t)) {
+    const clean = stripTrackers(t);
+    if (isProfileOnly) {
+      try {
+        const u = new URL(clean);
+        return `${u.protocol}//${u.host.replace(/^m\./i, "www.")}${u.pathname.replace(/\/+$/, "")}`;
+      } catch { return clean; }
+    }
+    return clean;
+  }
   if (p.startsWith("f")) {
     const h = t.replace(/^@+/, "").replace(/[/?#].*$/, "");
     return `https://www.facebook.com/${h}`;
@@ -15,9 +42,10 @@ function normalizeLink(pacote: string, raw: string): string {
     const h = t.replace(/^@+/, "").replace(/[/?#].*$/, "");
     return p.startsWith("tf") ? `https://www.tiktok.com/@${h}` : t;
   }
-  const h = t.replace(/^@+/, "").replace(/^instagram\.com\//i, "");
+  const h = t.replace(/^@+/, "").replace(/^instagram\.com\//i, "").replace(/[/?#].*$/, "");
   return `https://instagram.com/${h}`;
 }
+
 
 export async function dispatchSmmV2(opts: {
   endpoint: string;
