@@ -70,8 +70,13 @@ export function scaledFloor(qty: number): number {
 export function computeGuardedPrice(costBrl: number, qty = 0): number {
   const c = Number(costBrl);
   if (!Number.isFinite(c) || c <= 0) return 0;
-  const raw = (c * effectiveProfitMult(qty) * COUPON_BUFFER + PIX_FIXED) / PIX_NET;
-  return Number(Math.max(scaledFloor(qty), raw).toFixed(2));
+  // v267 — a taxa fixa do Pix também entra dentro do buffer do cupom. Antes ela
+  // ficava fora, e o preço resultante ficava ~0,6% abaixo do necessário para o
+  // lucro líquido de 4x — o que fazia a própria validação de margem reprovar o
+  // preço que este motor tinha acabado de calcular (pacote pausado eternamente).
+  const raw = ((c * effectiveProfitMult(qty) + PIX_FIXED) * COUPON_BUFFER) / PIX_NET;
+  const guarded = Math.max(scaledFloor(qty), raw);
+  return Number((Math.ceil(guarded * 100) / 100).toFixed(2));
 }
 
 
