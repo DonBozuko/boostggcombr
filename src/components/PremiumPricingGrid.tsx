@@ -169,14 +169,23 @@ export function PremiumPricingGrid({
               )}
 
               {/* Selo de origem — transparência real p/ o cliente */}
+              {origin === "brpro" && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-400/70 bg-amber-400/10 text-amber-200"
+                  title="Perfis brasileiros premium com reposição de 90 dias garantida pelo fornecedor"
+                >
+                  💎 Premium BR · reposição 90 dias
+                </span>
+              )}
               {origin === "br" && (
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
-                  title="Perfis brasileiros reais com reposição garantida"
+                  title="Perfis brasileiros reais com reposição de 30 dias"
                 >
-                  🇧🇷 Brasileiro Real · c/ reposição
+                  🇧🇷 Brasileiro Real · reposição 30 dias
                 </span>
               )}
+
               {origin === "global" && (
                 <span
                   className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-sky-500/50 bg-sky-500/10 text-sky-300"
