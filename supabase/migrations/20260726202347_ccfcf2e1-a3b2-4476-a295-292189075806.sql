@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS public.idx_admin_audit_logs_action;
