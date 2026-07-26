@@ -372,13 +372,16 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const oldCost = Number(r.cost_brl ?? 0);
       const costChanged = Math.abs(newCost - oldCost) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
-      // v271 — O gatilho de pausa agora olha CUSTO contra CUSTO.
-      // Antes comparava preço novo contra preço antigo, e isso pausava pacote
-      // saudável sempre que o piso escalar subia (ex.: l200 R$5,00 → R$7,67 com
-      // custo de R$0,05). Pausa só quando o fornecedor realmente encareceu.
+      // v271 — O gatilho olha CUSTO contra CUSTO (nunca preço contra preço).
+      // v282 — Faixas de reajuste automático em vez de trava binária:
+      //   até +40%  → aplica sozinho (margem continua protegida)
+      //   +40..+80% → pausa e espera decisão do dono
+      //   acima     → aposenta o pacote (fornecedor inviável)
       const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
       const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
-      const encareceuDeVerdade = saltoCusto > 1.5 && saltoPreco > 1.5;
+      const subiu = saltoCusto > AUTO_UP_MAX;
+      const disparou = saltoCusto > RETIRE_ABOVE;
+      const encareceuDeVerdade = subiu && saltoPreco > 1.05;
 
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
@@ -391,11 +394,26 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
           if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
+        } else if (!disparou && respectsMinMargin(newPrice, newCost)) {
+          // v282 — Reajuste dentro do teto: entra sozinho, mas com aviso em
+          // destaque para o dono (e o cliente vê o preço novo já correto).
+          patch.price_brl = newPrice;
+          if (r.is_sellable === false && /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""))) {
+            patch.is_sellable = true;
+            patch.sellable_reason = null;
+          }
+          reajustados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+        } else if (disparou) {
+          // v282 — Salto acima de +80%: fornecedor virou inviável. Aposenta.
+          patch.is_sellable = false;
+          patch.sellable_reason = `custo do fornecedor disparou (${Math.round((saltoCusto - 1) * 100)}%): pacote aposentado automaticamente — preço justo seria R$ ${newPrice.toFixed(2)}`;
+          if (r.is_sellable !== false) {
+            aposentados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
+          }
         } else {
-          // v271 — Salto violento: NÃO sobrescreve o preço da vitrine. O pacote
-          // sai de venda e o preço justo sugerido fica registrado no motivo.
-          // Sobrescrever o preço fazia o próximo ciclo comparar contra um valor
-          // inflado e disparar alerta de novo, em looping.
+          // v271 — Faixa de decisão (+40% a +80%): NÃO sobrescreve o preço da
+          // vitrine. O pacote sai de venda e o preço justo fica no motivo.
           patch.is_sellable = false;
           patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
           if (r.is_sellable !== false) {
