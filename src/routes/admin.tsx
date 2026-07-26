@@ -52,6 +52,7 @@ import { AdminCostAlert } from "@/components/AdminCostAlert";
 import { LaboratorioPanel } from "@/components/LaboratorioPanel";
 import { TreasuryPanel } from "@/components/TreasuryPanel";
 import ResellerPanel from "@/components/ResellerPanel";
+import ResellerApplicationsPanel from "@/components/ResellerApplicationsPanel";
 import { WaitingProvisionQueue } from "@/components/WaitingProvisionQueue";
 import { SloPanel } from "@/components/SloPanel";
 
