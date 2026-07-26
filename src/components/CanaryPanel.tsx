@@ -156,9 +156,14 @@ export function CanaryPanel({ token }: { token: string }) {
                 </div>
               </div>
             ))}
-            <button onClick={addAlvo} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1">
-              + adicionar rede
-            </button>
+            <div className="flex gap-2 flex-wrap">
+              <button onClick={addAlvo} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1">
+                + adicionar rede
+              </button>
+              <button onClick={preencherMaisBaratos} disabled={busy} className="text-[10px] uppercase tracking-wider text-cyan-300 border border-cyan-500/40 rounded px-2 py-1 disabled:opacity-40">
+                usar pacotes mais baratos de cada rede
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] mb-3">
