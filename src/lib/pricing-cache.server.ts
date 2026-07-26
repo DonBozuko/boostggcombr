@@ -368,11 +368,12 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
     }]),
   );
 
-  console.log("[pricing-cache] v266 canonical sync", {
+  console.log("[pricing-cache] v267 canonical sync", {
     providers: perProvider,
     scanned: ((rows as any[]) ?? []).length,
     updated_rows,
     ghosts: ghostList.length,
+    restored: restored.length,
   });
 
   lastReserveSyncAt = Date.now();
