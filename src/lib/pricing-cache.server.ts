@@ -153,9 +153,45 @@ export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<v
   });
 }
 
+/** v271 — trava global de execução única (vale entre isolates/servidores).
+ * Reaproveita rate_limit_check (já existe no banco, SECURITY DEFINER):
+ * 1 execução a cada 120s no projeto inteiro. Sem isso, cron + admin +
+ * dispatch rodavam a sincronização ao mesmo tempo, cada uma lia um preço
+ * antigo diferente e o alerta de reprecificação disparava em looping. */
+async function acquireSyncLock(supabaseAdmin: any, windowSeconds = 120): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseAdmin.rpc("rate_limit_check", {
+      _key: "pricing_sync_global",
+      _limit: 1,
+      _window_seconds: windowSeconds,
+    });
+    if (error) return true; // fail-open: nunca travar a sincronização por erro da trava
+    const row = Array.isArray(data) ? data[0] : data;
+    return row?.allowed !== false;
+  } catch {
+    return true;
+  }
+}
+
+const SKIPPED_REPORT = {
+  skipped: true,
+  smmhype_filled: 0, smmpanel_filled: 0, verified_filled: 0,
+  smmhype_catalog: 0, smmpanel_catalog: 0, verified_catalog: 0,
+  provider4_filled: 0, provider4_catalog: 0,
+  providers: {}, ghosts: 0, scanned: 0, updated_rows: 0,
+  restored: 0, restored_pacotes: [] as string[],
+};
+
 async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
   purgePricingCacheMemory(_opts.force ? "v266-force-live-handshake" : "v266-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+  if (!(await acquireSyncLock(supabaseAdmin))) {
+    console.log("[pricing-cache] v271 sync ignorado: outra execução em andamento");
+    lastReserveSyncAt = Date.now();
+    return SKIPPED_REPORT;
+  }
+
 
   const { data: fornRows } = await supabaseAdmin
     .from("fornecedores" as any)
