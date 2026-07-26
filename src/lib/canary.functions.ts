@@ -27,9 +27,13 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
   .inputValidator((i) =>
     tokenIn.extend({
       enabled: z.boolean(),
-      link: z.string().max(300),
-      pacote: z.string().max(120),
-      quantidade: z.number().int().min(0).max(1000),
+      alvos: z.array(z.object({
+        rede: z.string().max(40),
+        link: z.string().max(300),
+        pacote: z.string().max(120),
+        quantidade: z.number().int().min(0).max(5000),
+        ativo: z.boolean(),
+      })).max(12),
       interval_hours: z.number().int().min(1).max(168),
       sla_hours: z.number().int().min(1).max(72),
     }).parse(i),
@@ -39,9 +43,9 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const value = {
       enabled: data.enabled,
-      link: data.link.trim(),
-      pacote: data.pacote.trim(),
-      quantidade: data.quantidade,
+      alvos: data.alvos
+        .map((a) => ({ ...a, rede: a.rede.trim(), link: a.link.trim(), pacote: a.pacote.trim() }))
+        .filter((a) => a.link || a.pacote),
       interval_hours: data.interval_hours,
       sla_hours: data.sla_hours,
     };
@@ -51,6 +55,7 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: error.message };
     return { ok: true as const };
   });
+
 
 export const runCanaryNow = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenIn.parse(i))
