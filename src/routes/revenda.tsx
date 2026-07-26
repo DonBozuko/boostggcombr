@@ -77,6 +77,14 @@ function Revenda() {
         comissão: o cliente final é seu, a marca na frente é a sua. A entrega é automática pelo nosso
         sistema, com reposição nos pacotes brasileiros.
       </p>
+      <p className="mt-2 text-sm">
+        Já é revendedor?{" "}
+        <Link to="/painel-revendedor" className="text-primary underline">
+          Entrar no painel do revendedor
+        </Link>{" "}
+        (saldo, recarga por Pix e pedidos).
+      </p>
+
 
       <h2 className="mt-8 text-lg font-semibold">Como funciona</h2>
       <ol className="mt-3 space-y-3">

@@ -172,8 +172,66 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             status_detail?: string;
             id?: string | number;
             transaction_amount?: number;
+            external_reference?: string | null;
             payer?: { id?: string | number; email?: string | null };
           };
+
+          // v263 — Recarga de saldo de revendedor (não é pedido).
+          // Crédito idempotente: só credita se a recarga ainda estiver 'pending'.
+          const extRef = String(payment.external_reference ?? "");
+          if (extRef.startsWith("reseller-topup:")) {
+            if (payment.status !== "approved") {
+              console.log("[mp-webhook] v263 recarga revenda ainda não aprovada", { paymentId, status: payment.status });
+              return;
+            }
+            const topupId = extRef.slice("reseller-topup:".length);
+            const { supabaseAdmin: adm } = await import("@/integrations/supabase/client.server");
+            const { data: topup } = await adm
+              .from("reseller_topups" as any)
+              .select("id, reseller_id, valor_brl, status")
+              .eq("id", topupId)
+              .maybeSingle();
+            const t = topup as any;
+            if (!t) {
+              console.error("[mp-webhook] v263 recarga não encontrada", topupId);
+              return;
+            }
+            if (String(t.status) !== "pending") {
+              console.log("[mp-webhook] v263 recarga já processada", topupId);
+              return;
+            }
+            const paid = Math.round(Number(payment.transaction_amount ?? 0) * 100);
+            const expected = Math.round(Number(t.valor_brl) * 100);
+            if (paid !== expected) {
+              console.error("[mp-webhook] v263 valor de recarga divergente", { topupId, paid, expected });
+              await adm.from("reseller_topups" as any).update({ status: "amount_mismatch" } as any).eq("id", topupId);
+              return;
+            }
+            const { data: mv, error: mvErr } = await adm.rpc("reseller_balance_move" as any, {
+              _reseller_id: t.reseller_id,
+              _amount: Number(t.valor_brl),
+              _tipo: "deposit",
+              _pedido_id: null,
+              _detalhe: `recarga Pix ${paymentId}`,
+            });
+            const move = Array.isArray(mv) ? (mv as any[])[0] : (mv as any);
+            if (mvErr || !move?.ok) {
+              console.error("[mp-webhook] v263 crédito falhou", mvErr, move);
+              return; // fica 'pending' → MP reenvia / admin credita manual
+            }
+            await adm
+              .from("reseller_topups" as any)
+              .update({ status: "credited", credited_at: new Date().toISOString() } as any)
+              .eq("id", topupId);
+            try {
+              const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+              await dispatchWhatsappAlert(
+                `💰 RECARGA DE REVENDEDOR APROVADA\n\nPROBLEMA: nenhum — entrou dinheiro.\nValor: R$ ${Number(t.valor_brl).toFixed(2)}\nSaldo do revendedor agora: R$ ${Number(move.saldo).toFixed(2)}\n\nO QUE FAZER: nada. O saldo já foi creditado automaticamente.`,
+              );
+            } catch { /* alerta é best-effort */ }
+            return;
+          }
+
           if (payment.status !== "approved") {
             console.warn("[mp-webhook] MP recusou", {
               paymentId, status: payment.status, status_detail: payment.status_detail,
