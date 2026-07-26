@@ -209,7 +209,12 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
   )[0];
 
   const lastAt = lastByPacote.get(alvo.pacote) ?? 0;
-  if (Date.now() - lastAt < cfg.interval_hours * 3_600_000) return;
+  // v286 — piso anti-duplicado de link: fornecedores (SMMhype etc.) rejeitam
+  // "active order with this link" se um pedido recente ainda não liberou o link.
+  // Mesmo com force (interval_hours=0) mantemos 10 min de piso entre disparos do
+  // mesmo alvo, senão o canário dispara alarme falso de "entrega quebrada".
+  const minGapMs = 10 * 60_000;
+  if (lastAt > 0 && Date.now() - lastAt < Math.max(cfg.interval_hours * 3_600_000, minGapMs)) return;
 
   // v286 — anti-alarme-falso: se já existe canário em andamento (dispatched/processing)
   // para este alvo, NÃO dispara outro pedido pro mesmo link. Fornecedores como o
