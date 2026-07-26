@@ -60,6 +60,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
+import CardPayOption from "@/components/CardPayOption";
 import { z } from "zod";
 import { criarPedido } from "@/lib/pedidos.functions";
 import { trackInitiateCheckout, trackViewContent, trackAddToCart } from "@/lib/tiktok-pixel";
@@ -1017,9 +1018,30 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 </>
               )}
             </Button>
+            <CardPayOption
+              disabled={loading || tipoBloqueado}
+              valorPix={dynAllPlans.find((p) => p.id === form.plan)?.valor}
+              buildPayload={() => {
+                const r = orderSchema.safeParse(form);
+                if (!r.success) { toast.error(r.error.issues[0].message); return null; }
+                const sel = dynAllPlans.find((p) => p.id === r.data.plan);
+                if (!sel) { toast.error("Pacote inválido."); return null; }
+                return {
+                  instagram_user: r.data.profile,
+                  pacote: sel.id,
+                  quantidade: sel.quantidade,
+                  valor: sel.valor,
+                  email: r.data.email,
+                  whatsapp_contato: r.data.contact,
+                  ...getUtmParams(),
+                  cupom: getAppliedCoupon(),
+                };
+              }}
+            />
             <p className="text-xs text-center text-zinc-300">
               Pagamento seguro · Pedido processado em segundos após o Pix
             </p>
+
           </form>
         </div>
 

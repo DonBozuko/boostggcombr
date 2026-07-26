@@ -16,6 +16,8 @@ const pedidoSchema = z.object({
   utm_term: z.string().max(60).optional().nullable(),
   cupom: z.string().max(20).optional().nullable(),
   bump_upgrade: z.boolean().optional(),
+  // v270 — método de pagamento. Ausente = pix (mantém 100% do fluxo antigo).
+  metodo: z.enum(["pix", "cartao"]).optional(),
 });
 
 const utmClean = (v: string | null | undefined) =>
@@ -314,6 +316,158 @@ export const criarPedido = createServerFn({ method: "POST" })
     const hasPrime = cupom.split(/[,\s]+/).includes("PRIME15");
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
+
+    // ─────────────────────────────────────────────────────────────────────
+    // v270 — CARTÃO (Mercado Pago Checkout Pro).
+    // Caminho separado e aditivo: o fluxo Pix abaixo continua intocado.
+    // Aqui o pedido nasce ANTES da cobrança (não existe cobrança órfã: se a
+    // preferência falhar, o pedido é apagado e nada foi cobrado).
+    // ─────────────────────────────────────────────────────────────────────
+    if (data.metodo === "cartao") {
+      const { cardAmount, cardBlockedReason, CARD_MAX_BRL } = await import("./card-pricing");
+      const bloqueio = cardBlockedReason(valorCobrar);
+      if (bloqueio) {
+        console.warn("[criarPedido] v270 cartão bloqueado", { bloqueio, valorCobrar, teto: CARD_MAX_BRL });
+        return { ok: false as const, error: bloqueio };
+      }
+      const valorCartao = cardAmount(valorCobrar);
+
+      const mpTokenCard = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+      if (!mpTokenCard) {
+        console.error("MERCADO_PAGO_ACCESS_TOKEN ausente");
+        return { ok: false as const, error: "MP_TOKEN_MISSING" as const };
+      }
+
+      const { supabaseAdmin: sbCard } = await import("@/integrations/supabase/client.server");
+
+      // Dedup: clique repetido em <15min reaproveita o mesmo checkout.
+      try {
+        const cutoffCard = new Date(Date.now() - 900_000).toISOString();
+        const { data: prev } = await sbCard
+          .from("pedidos")
+          .select("id, mp_preference_id, valor, pacote, quantidade")
+          .eq("instagram_user", clean(data.instagram_user))
+          .eq("pacote", clean(pacoteEfetivo))
+          .eq("status", "pending")
+          .eq("metodo_pagamento", "cartao")
+          .gte("created_at", cutoffCard)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        const p = prev as any;
+        if (p?.mp_preference_id && Number(p.valor) === valorCartao) {
+          return {
+            ok: true as const,
+            metodo: "cartao" as const,
+            pedidoId: String(p.id),
+            checkoutUrl: `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${p.mp_preference_id}`,
+            valorCobrado: valorCartao,
+            valorFormatado: `R$ ${valorCartao.toFixed(2).replace(".", ",")}`,
+            pacoteFinal: String(p.pacote),
+            quantidadeFinal: Number(p.quantidade),
+          };
+        }
+      } catch (e) { console.warn("[criarPedido] v270 dedup cartão falhou:", e); }
+
+      let affiliateCodeCard: string | null = null;
+      try {
+        const { getRequest } = await import("@tanstack/react-start/server");
+        const { refCodeFromHeaders } = await import("@/lib/affiliate.server");
+        affiliateCodeCard = refCodeFromHeaders(getRequest()?.headers);
+      } catch { /* sem indicação */ }
+
+      const { data: pedidoCard, error: errCard } = await sbCard
+        .from("pedidos")
+        .insert({
+          instagram_user: clean(data.instagram_user),
+          pacote: clean(pacoteEfetivo),
+          quantidade: quantidadeEfetiva,
+          valor: valorCartao,
+          status: "pending",
+          metodo_pagamento: "cartao",
+          email_contato: data.email.trim().toLowerCase(),
+          rede_social: rede,
+          utm_source: utmClean(data.utm_source),
+          utm_medium: utmClean(data.utm_medium),
+          utm_campaign: utmClean(data.utm_campaign),
+          utm_content: utmClean(data.utm_content),
+          utm_term: utmClean(data.utm_term),
+          cupom: cupom || null,
+          affiliate_code: affiliateCodeCard,
+          bump_offered: bumpOfertado,
+          bump_accepted: bumpAplicado,
+        } as any)
+        .select("id")
+        .single();
+      if (errCard || !pedidoCard) {
+        console.error("[criarPedido] v270 insert cartão falhou:", errCard);
+        return { ok: false as const, error: "DB_FAILED" as const };
+      }
+
+      try {
+        const prefRes = await fetch("https://api.mercadopago.com/checkout/preferences", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${mpTokenCard}`,
+            "X-Idempotency-Key": `card-${pedidoCard.id}`,
+          },
+          body: JSON.stringify({
+            items: [{
+              id: clean(pacoteEfetivo),
+              title: `BoostGG · ${quantidadeEfetiva} ${categoria} ${rede}`,
+              description: `Entrega para ${clean(data.instagram_user)}`,
+              quantity: 1,
+              currency_id: "BRL",
+              unit_price: Number(valorCartao.toFixed(2)),
+            }],
+            payer: { email: data.email.trim().toLowerCase() },
+            external_reference: `pedido:${pedidoCard.id}`,
+            notification_url: "https://boostgg.com.br/api/public/mp-webhook",
+            statement_descriptor: "BOOSTGG",
+            binary_mode: true,
+            payment_methods: {
+              // Pix/boleto ficam fora: no cartão o preço já tem a taxa repassada.
+              excluded_payment_types: [{ id: "ticket" }, { id: "bank_transfer" }, { id: "atm" }],
+              installments: 1,
+            },
+            back_urls: {
+              success: `https://www.boostgg.com.br/obrigado?order=${pedidoCard.id}&value=${valorCartao}`,
+              pending: `https://www.boostgg.com.br/rastrear?pedido=${pedidoCard.id}`,
+              failure: `https://www.boostgg.com.br/rastrear?pedido=${pedidoCard.id}`,
+            },
+            auto_return: "approved",
+          }),
+        });
+        const prefJson: any = await prefRes.json().catch(() => ({}));
+        if (!prefRes.ok || !prefJson?.id || !prefJson?.init_point) {
+          console.error("[criarPedido] v270 preferência falhou", prefRes.status, prefJson);
+          await sbCard.from("pedidos").delete().eq("id", pedidoCard.id);
+          return { ok: false as const, error: "MP_FAILED" as const };
+        }
+        await sbCard
+          .from("pedidos")
+          .update({ mp_preference_id: String(prefJson.id) } as any)
+          .eq("id", pedidoCard.id);
+
+        return {
+          ok: true as const,
+          metodo: "cartao" as const,
+          pedidoId: String(pedidoCard.id),
+          checkoutUrl: String(prefJson.init_point),
+          valorCobrado: valorCartao,
+          valorFormatado: `R$ ${valorCartao.toFixed(2).replace(".", ",")}`,
+          pacoteFinal: pacoteEfetivo,
+          quantidadeFinal: quantidadeEfetiva,
+        };
+      } catch (err) {
+        console.error("[criarPedido] v270 exceção cartão:", err);
+        try { await sbCard.from("pedidos").delete().eq("id", pedidoCard.id); } catch { /* noop */ }
+        return { ok: false as const, error: "MP_FAILED" as const };
+      }
+    }
+
+
 
     // v218 — Checkout dedup: se cliente clica 2x em <90s, retorna o MESMO Pix.
     // Sem isso, cada clique gera novo payment no MP e polui a fila de recuperação.

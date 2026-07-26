@@ -232,7 +232,26 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             return;
           }
 
+          // v270 — Cartão (Checkout Pro): a notificação traz o payment id novo,
+          // mas o pedido nasceu só com a preferência. Carimba o payment id no
+          // pedido para que TODO o fluxo abaixo (que busca por mercado_pago_id)
+          // continue funcionando sem nenhuma mudança.
+          if (extRef.startsWith("pedido:")) {
+            const pedidoRef = extRef.slice("pedido:".length);
+            try {
+              const { supabaseAdmin: admRef } = await import("@/integrations/supabase/client.server");
+              await admRef
+                .from("pedidos")
+                .update({ mercado_pago_id: String(paymentId) } as any)
+                .eq("id", pedidoRef)
+                .is("mercado_pago_id", null);
+            } catch (e) {
+              console.error("[mp-webhook] v270 falha ao carimbar payment id no pedido", pedidoRef, e);
+            }
+          }
+
           if (payment.status !== "approved") {
+
             console.warn("[mp-webhook] MP recusou", {
               paymentId, status: payment.status, status_detail: payment.status_detail,
             });
