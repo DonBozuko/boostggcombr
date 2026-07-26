@@ -163,6 +163,7 @@ export const resellerTopup = createServerFn({ method: "POST" })
           external_reference: `reseller-topup:${topupId}`,
           notification_url: "https://boostgg.com.br/api/public/mp-webhook",
         }),
+        signal: AbortSignal.timeout(20_000),
       });
       const mp = (await mpRes.json().catch(() => ({}))) as {
         id?: string | number;
@@ -185,6 +186,13 @@ export const resellerTopup = createServerFn({ method: "POST" })
       return { ok: true, topupId, qrCode, qrCodeBase64, valor };
     } catch (e) {
       console.error("[reseller-topup] exceção", e);
+      // v278 — sem isto a linha ficava 'pending' pra sempre (recarga fantasma
+      // no painel do revendedor). Se o Pix não nasceu, a recarga morre aqui.
+      await supabaseAdmin
+        .from("reseller_topups" as any)
+        .update({ status: "failed" } as any)
+        .eq("id", topupId)
+        .eq("status", "pending");
       return { ok: false, error: "Falha de rede ao gerar o Pix. Tente de novo." };
     }
   });

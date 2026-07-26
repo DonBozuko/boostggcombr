@@ -112,6 +112,7 @@ export const testarCron = createServerFn({ method: "POST" })
           "x-admin-token": process.env.ADMIN_TOKEN ?? "",
         },
         body: "{}",
+        signal: AbortSignal.timeout(20_000),
       });
       const text = await resp.text();
       return {

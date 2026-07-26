@@ -175,8 +175,16 @@ export async function reprocessWaitingProvision(
   const cadeia = await rankProvidersByCost({ pacote: pedido.pacote, quantidade: Number(pedido.quantidade) });
   if (!cadeia.length) return { ok: false, error: "SEM_FORNECEDOR_DISPONIVEL" };
 
+  // v278 — trava de envio: operador clicando duas vezes (ou cron paralelo)
+  // não pode mandar o mesmo pedido duas vezes ao fornecedor.
+  const { claimDispatch, releaseDispatch } = await import("@/lib/dispatch-claim.server");
+  if (!(await claimDispatch(supabaseAdmin as any, pedido.id))) {
+    return { ok: false, error: "ENVIO_EM_ANDAMENTO" };
+  }
+
   const tentativas: string[] = [];
   for (const f of cadeia) {
+
     if (Number(f.saldo_atual) <= 0) {
       tentativas.push(`${f.nome}: saldo zerado`);
       await markProviderUnstable(f.slug, "saldo zerado");
@@ -247,5 +255,7 @@ export async function reprocessWaitingProvision(
     await markProviderUnstable(f.slug, r.error ?? "dispatch fail");
   }
 
+  await releaseDispatch(supabaseAdmin as any, pedido.id);
   return { ok: false, error: "TODOS_FORNECEDORES_FALHARAM", tentativas };
 }
+

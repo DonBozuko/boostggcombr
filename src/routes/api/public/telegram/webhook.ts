@@ -35,6 +35,7 @@ async function tg(method: string, body: unknown) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(10_000),
     });
     return await r.json();
   } catch (e) {

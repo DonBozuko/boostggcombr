@@ -187,18 +187,19 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             }
             const topupId = extRef.slice("reseller-topup:".length);
             const { supabaseAdmin: adm } = await import("@/integrations/supabase/client.server");
-            const { data: topup } = await adm
+            // v278 — CLAIM ATÔMICO. Antes era ler-status → creditar → gravar:
+            // duas notificações simultâneas do MP (retry + reenvio) liam
+            // 'pending' ao mesmo tempo e creditavam o saldo DUAS vezes.
+            // O UPDATE condicional trava a linha no Postgres: só um vence.
+            const { data: claimed } = await adm
               .from("reseller_topups" as any)
-              .select("id, reseller_id, valor_brl, status")
+              .update({ status: "crediting" } as any)
               .eq("id", topupId)
-              .maybeSingle();
-            const t = topup as any;
+              .eq("status", "pending")
+              .select("id, reseller_id, valor_brl");
+            const t = (Array.isArray(claimed) ? claimed[0] : null) as any;
             if (!t) {
-              console.error("[mp-webhook] v263 recarga não encontrada", topupId);
-              return;
-            }
-            if (String(t.status) !== "pending") {
-              console.log("[mp-webhook] v263 recarga já processada", topupId);
+              console.log("[mp-webhook] v278 recarga inexistente ou já processada", topupId);
               return;
             }
             const paid = Math.round(Number(payment.transaction_amount ?? 0) * 100);
@@ -217,13 +218,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             });
             const move = Array.isArray(mv) ? (mv as any[])[0] : (mv as any);
             if (mvErr || !move?.ok) {
-              console.error("[mp-webhook] v263 crédito falhou", mvErr, move);
-              return; // fica 'pending' → MP reenvia / admin credita manual
+              console.error("[mp-webhook] v278 crédito falhou — devolvendo para pending", mvErr, move);
+              // devolve o claim: sem isso a recarga ficava presa em 'crediting'
+              // e nem o retry do MP nem o admin conseguiriam creditar depois.
+              await adm.from("reseller_topups" as any).update({ status: "pending" } as any).eq("id", topupId);
+              return;
             }
             await adm
               .from("reseller_topups" as any)
               .update({ status: "credited", credited_at: new Date().toISOString() } as any)
               .eq("id", topupId);
+
             try {
               const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
               await dispatchWhatsappAlert(
@@ -505,6 +510,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                     method: "POST",
                     headers: { "x-admin-token": kickToken, "content-type": "application/json" },
                     body: "{}",
+                    signal: AbortSignal.timeout(20_000),
                   }).then(() => {}),
                   context,
                 );
@@ -593,6 +599,17 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           const tentativas: string[] = [];
           let sucesso = false;
           let margemBloqueada = 0;
+
+          // v278 — trava de envio ANTES de chamar o fornecedor. Sem isso, uma
+          // segunda notificação do MP (ou o reconciliador) poderia despachar o
+          // mesmo pedido em paralelo: saldo gasto em dobro e cliente recebendo 2x.
+          const { claimDispatch, releaseDispatch } = await import("@/lib/dispatch-claim.server");
+          if (!(await claimDispatch(supabaseAdmin as any, pedido.id))) {
+            console.warn("[mp-webhook] v278 envio já reivindicado por outro processo", { pedidoId: pedido.id });
+            return;
+          }
+
+
 
           for (const f of cadeia) {
             // v110 — Failover Injector Gateway: registra desvio quando não é o preferencial (smmhype)
@@ -736,7 +753,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
 
           if (!sucesso) {
+            // v278 — nada foi enviado: devolve a trava para o reconciliador poder tentar.
+            await releaseDispatch(supabaseAdmin as any, pedido.id);
             const falhaResumo = tentativas.join(" | ").slice(0, 400);
+
             // v91 — se TODOS falharam por margem, retém em modo de segurança e gera Alerta Vermelho
             if (margemBloqueada > 0 && margemBloqueada === cadeia.length) {
               console.error("[mp-webhook] v91 HOLD margem", { pedidoId: pedido.id, tentativas });

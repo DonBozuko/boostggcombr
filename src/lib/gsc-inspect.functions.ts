@@ -36,6 +36,7 @@ async function inspectOne(path: string): Promise<InspectRow> {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ inspectionUrl: url, siteUrl: SITE }),
+        signal: AbortSignal.timeout(20_000),
       },
     );
     if (!res.ok) {

@@ -687,6 +687,7 @@ export type Database = {
           created_at: string
           cupom: string | null
           custo_real: number | null
+          dispatch_claimed_at: string | null
           dispatched_at: string | null
           drop_checked_at: string | null
           email_contato: string | null
@@ -730,6 +731,7 @@ export type Database = {
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
+          dispatch_claimed_at?: string | null
           dispatched_at?: string | null
           drop_checked_at?: string | null
           email_contato?: string | null
@@ -773,6 +775,7 @@ export type Database = {
           created_at?: string
           cupom?: string | null
           custo_real?: number | null
+          dispatch_claimed_at?: string | null
           dispatched_at?: string | null
           drop_checked_at?: string | null
           email_contato?: string | null
