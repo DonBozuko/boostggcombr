@@ -50,6 +50,23 @@ export function CanaryPanel({ token }: { token: string }) {
 
   const removeAlvo = (i: number) =>
     setForm((f) => ({ ...f, alvos: f.alvos.filter((_, idx) => idx !== i) }));
+  const preencherMaisBaratos = async () => {
+    setBusy(true);
+    try {
+      const r = await suggest$({ data: { token } });
+      if (!r.ok) { toast.error(r.error ?? "erro"); return; }
+      setForm((f) => {
+        const jaTem = new Map(f.alvos.map((a) => [a.pacote, a]));
+        const novos: Alvo[] = r.sugestoes.map((s) => {
+          const ex = jaTem.get(s.pacote);
+          return { rede: s.rede, link: ex?.link ?? "", pacote: s.pacote, quantidade: s.quantidade, ativo: Boolean(ex?.link) };
+        });
+        return { ...f, alvos: novos.slice(0, 12) };
+      });
+      toast.success("Pacotes mais baratos carregados — falta só colar o link de teste de cada rede");
+    } finally { setBusy(false); }
+  };
+
 
   const save = async () => {
     setBusy(true);
