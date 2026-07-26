@@ -215,6 +215,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
 
   const bound: Record<string, number> = {};
   const ghostList: Array<{ pacote: string; streak: number }> = [];
+  const repriced: Array<{ pacote: string; de: number; para: number; fornecedor: string }> = [];
   let updated_rows = 0;
 
   for (const r of ((rows as any[]) ?? [])) {
@@ -302,6 +303,25 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean }) {
         admin_email: "system@sync",
         action: "ghost_service_ids_v266",
         detail: { total: ghostList.length, pacotes: ghostList.slice(0, 50) } as any,
+      });
+    } catch { /* noop */ }
+  }
+
+  // v266 — Alerta de reprecificação forte (custo do fornecedor mudou muito).
+  if (repriced.length > 0) {
+    try {
+      const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+      const amostra = repriced
+        .slice(0, 8)
+        .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
+        .join("\n");
+      await dispatchWhatsappAlert(
+        `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu no custo de ${repriced.length} pacote(s) e o site reajustou para manter seu lucro.\n\n${amostra}\n\nO QUE FAZER: se algum preço ficou fora do mercado, trocar o fornecedor desse pacote no admin ou tirar o pacote da vitrine.`,
+      ).catch(() => {});
+      await supabaseAdmin.from("admin_audit_logs" as any).insert({
+        admin_email: "system@sync",
+        action: "reprecificacao_forte_v266",
+        detail: { total: repriced.length, itens: repriced.slice(0, 50) } as any,
       });
     } catch { /* noop */ }
   }
