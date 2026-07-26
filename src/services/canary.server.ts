@@ -262,7 +262,10 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
   // "active order with this link" se um pedido recente ainda não liberou o link.
   // Mesmo com force (interval_hours=0) mantemos 10 min de piso entre disparos do
   // mesmo alvo, senão o canário dispara alarme falso de "entrega quebrada".
-  const minGapMs = 10 * 60_000;
+  // v288 — 10 min era curto demais: o link ainda estava "ocupado" no fornecedor
+  // anterior e a recusa virava alarme falso. 90 min elimina isso sem reduzir a
+  // cobertura real (intervalo normal continua sendo interval_hours).
+  const minGapMs = 90 * 60_000;
   if (lastAt > 0 && Date.now() - lastAt < Math.max(cfg.interval_hours * 3_600_000, minGapMs)) return;
 
   // v286 — anti-alarme-falso: se já existe canário em andamento (dispatched/processing)
