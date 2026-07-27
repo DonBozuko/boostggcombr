@@ -163,8 +163,8 @@ export function analyzeCatalogCoherence(
     const cat = String(r.category ?? "");
     const intent = intentOf(cat);
     if (!intent) continue;
-    for (const id of r.serviceIds) {
-      const name = serviceNames.get(id);
+    for (const ref of r.serviceIds) {
+      const name = serviceNames.get(serviceKey(ref));
       if (!name) continue;
       if (intent.proibe?.test(name)) {
         issues.push({
@@ -172,10 +172,11 @@ export function analyzeCatalogCoherence(
           severity: "critical",
           pacote: r.pacote,
           category: cat,
-          detalhe: `vinculado ao serviço "${name}" (id ${id}), incompatível com ${intent.label}`,
+          detalhe: `vinculado ao serviço "${name}" (${ref.provider} id ${ref.id}), incompatível com ${intent.label}`,
         });
       }
     }
+
   }
 
   // 5) Teste seco cego: sem revalidação recente o catálogo inteiro é palpite.
