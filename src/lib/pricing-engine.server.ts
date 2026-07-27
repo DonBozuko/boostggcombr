@@ -649,7 +649,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = preserveReserveIds(itemRows, existingReserveIds);
+  itemRows = applyLadderGuard(preserveReserveIds(itemRows, existingReserveIds), "live");
   const { error: e1 } = await supabaseAdmin
     .from("pricing_items" as any)
     .upsert(itemRows, { onConflict: "pacote" });
