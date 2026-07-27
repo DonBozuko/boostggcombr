@@ -10,6 +10,7 @@ const ROUTES: Record<string, { label: string; url: string }> = {
   fb: { label: '🔵 Facebook', url: 'https://boostgg.com.br/facebook' },
   tg: { label: '✈️ Telegram', url: 'https://boostgg.com.br/telegram' },
   tf: { label: '🌐 Tráfego', url: 'https://boostgg.com.br/trafego' },
+  kw: { label: '🧡 Kwai', url: 'https://boostgg.com.br/kwai' },
 };
 
 function deriveSecret(key: string) {
