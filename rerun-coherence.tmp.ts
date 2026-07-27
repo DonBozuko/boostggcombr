@@ -41,3 +41,4 @@ if (religar.length) {
   const { error } = await db.from("pricing_items" as any).update({ is_sellable: true, sellable_reason: null }).in("pacote", religar);
   console.log("update:", error?.message ?? "ok");
 }
+for (const i of issues.filter(x=>criticos.has(x.pacote)).slice(0,8)) console.log(i.code, i.pacote, "|", i.detalhe.slice(0,140));
