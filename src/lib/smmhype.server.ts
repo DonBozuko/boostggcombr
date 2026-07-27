@@ -195,7 +195,8 @@ const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
 // v303 — a limpeza mora em `@/lib/target-link` (ponto único de verdade).
 // Reexportado aqui só para não quebrar os imports existentes.
-export { stripTrackers, normalizeInstagramUser } from "./target-link";
+import { stripTrackers, normalizeInstagramUser } from "./target-link";
+export { stripTrackers, normalizeInstagramUser };
 
 
 function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
