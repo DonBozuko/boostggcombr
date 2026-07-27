@@ -13,22 +13,17 @@ export const getServicesCacheStatus = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { SERVICOS_MONITORADOS, FALLBACK_SERVICES } = await import("@/lib/sync-services.server");
+    const { SERVICOS_MONITORADOS } = await import("@/lib/sync-services.server");
 
-    // Garante fallback antes de medir (cache nunca fica vazio para IDs estáveis)
-    const fallbackRows = FALLBACK_SERVICES.map((s) => ({
-      ...s, refill: true, updated_at: new Date().toISOString(),
-    }));
-    await supabaseAdmin
-      .from("services_cache")
-      .upsert(fallbackRows, { onConflict: "provider_service_id", ignoreDuplicates: false });
-
+    // v296 — Nada de "garantir" serviço no cache: o cache espelha só o que o
+    // fornecedor devolve de verdade. Se um ID sumir, tem que aparecer aqui.
     const { data: rows, count } = await supabaseAdmin
       .from("services_cache")
       .select("provider_service_id, name, category, rate, updated_at", { count: "exact" });
 
     const ids = (rows ?? []).map((r: any) => r.provider_service_id as number);
     const missing = SERVICOS_MONITORADOS.filter((id) => !ids.includes(id));
+
     const lastSync = (rows ?? []).reduce<string | null>((acc, r: any) => {
       if (!acc || new Date(r.updated_at) > new Date(acc)) return r.updated_at;
       return acc;
