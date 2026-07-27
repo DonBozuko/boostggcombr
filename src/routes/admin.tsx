@@ -13,6 +13,7 @@ import jarvisHud from "@/assets/jarvis-hud.png";
 import { JarvisContentScheduler } from "@/components/JarvisContentScheduler";
 import { JarvisAlertCenter } from "@/components/JarvisAlertCenter";
 import { AdminHealthSemaphore } from "@/components/AdminHealthSemaphore";
+import { PendenciasManuaisPanel } from "@/components/PendenciasManuaisPanel";
 import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
@@ -1476,6 +1477,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         <ExecutiveHeader soundOn={soundOn} toggleSound={toggleSound} />
 
         <AdminHealthSemaphore />
+
+        <PendenciasManuaisPanel />
 
         <AdsHardwarePauseBanner />
 
