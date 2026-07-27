@@ -12,37 +12,13 @@ type ProviderService = {
   refill?: boolean;
 };
 
-// IDs curados manualmente. Mundiais: 14325/14225 (IG followers), 18860 (IG likes).
-// BR reais validados no catálogo SMMhype: 4100 (IG followers BR), 14441/9264 (IG likes BR), 4292 (TikTok followers BR).
+// IDs de referência para monitoramento (apenas leitura/diagnóstico).
+// v296 — NÃO protegem mais o cache da limpeza: o catálogo em cache tem que ser
+// 100% igual ao que o fornecedor devolve. IDs "garantidos na marra" faziam o
+// sistema acreditar que um serviço existia quando o fornecedor já o tinha
+// removido — foi a causa raiz do reembolso de R$283 (p15k → serviço 14225).
 export const SERVICOS_MONITORADOS = [14325, 14225, 18860, 4100, 14441, 9264, 4292];
 
-// Fallback fixo: IDs estáveis garantidos no cache mesmo se a API do fornecedor
-// não os retornar (evita falsos positivos de "serviço sumiu").
-export const FALLBACK_SERVICES: Array<{
-  provider_service_id: number;
-  category: string;
-  name: string;
-  rate: number;
-  min: number;
-  max: number;
-}> = [
-  { provider_service_id: 14325, category: "Instagram Followers", name: "Instagram Followers (Refill) — 14325", rate: 0, min: 10, max: 1000000 },
-  { provider_service_id: 14225, category: "Instagram Followers", name: "Instagram Followers (Refill) — 14225", rate: 0, min: 10, max: 1000000 },
-  { provider_service_id: 18860, category: "Instagram Likes",     name: "Instagram Likes (Refill) — 18860",     rate: 0, min: 10, max: 1000000 },
-];
-
-async function ensureFallback() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const rows = FALLBACK_SERVICES.map((s) => ({
-    ...s,
-    refill: true,
-    updated_at: new Date().toISOString(),
-  }));
-  const { error } = await supabaseAdmin
-    .from("services_cache")
-    .upsert(rows, { onConflict: "provider_service_id", ignoreDuplicates: false });
-  if (error) throw error;
-}
 
 export async function syncSmmhypeServices() {
   const apiKey = process.env.SMMHYPE_API_KEY;
