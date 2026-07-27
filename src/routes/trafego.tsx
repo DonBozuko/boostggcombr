@@ -1,7 +1,6 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
-import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE_CLEAN } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,15 +67,10 @@ export const Route = createFileRoute("/trafego")({
 type Categoria = "brasil" | "mundial";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
-const TRAFEGO_QTYS = [1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,10000000];
+// v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
+const brPlans: Plan[] = [];
+const glPlans: Plan[] = [];
 
-const brPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "wbr", unitLabel: "Visitas BR", costPer1k: 3, qtys: TRAFEGO_QTYS }),
-);
-const glPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "wgl", unitLabel: "Visitas Global", costPer1k: 1.5, qtys: TRAFEGO_QTYS }),
-);
-const allPlans = [...brPlans, ...glPlans];
 
 
 const urlSchema = z.object({

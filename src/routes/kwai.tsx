@@ -10,7 +10,6 @@ import CardPayOption from "@/components/CardPayOption";
 
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { FaqSection, FAQS } from "@/components/FaqSection";
-import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -67,19 +66,10 @@ export const Route = createFileRoute("/kwai")({
 type Categoria = "seguidores" | "curtidas" | "visualizacoes";
 type Plan = { id: string; tier: string; qty: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
-const FOLLOWER_QTYS = [100,250,500,1000,2000,3000,5000,10000,20000,50000,100000];
-const LIKE_QTYS = [100,500,1000,2500,5000,10000,25000,50000,100000];
-const VIEW_QTYS = [1000,5000,10000,25000,50000,100000,250000,500000,1000000];
-
-const followersPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "kf", unitLabel: "Seguidores", costPer1k: 5.5, qtys: FOLLOWER_QTYS }),
-);
-const likesPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "kl", unitLabel: "Curtidas", costPer1k: 3.0, qtys: LIKE_QTYS }),
-);
-const viewsPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "kv", unitLabel: "Views", costPer1k: 2.7, qtys: VIEW_QTYS }),
-);
+// v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
+const followersPlans: Plan[] = [];
+const likesPlans: Plan[] = [];
+const viewsPlans: Plan[] = [];
 
 const followersSchema = z.object({
   plan: z.string().min(1),

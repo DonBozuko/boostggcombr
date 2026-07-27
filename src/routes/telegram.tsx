@@ -2,7 +2,6 @@ import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
-import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -75,15 +74,10 @@ export const Route = createFileRoute("/telegram")({
 type Categoria = "canal" | "grupo";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
-const TG_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
+// v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
+const canalPlans: Plan[] = [];
+const grupoPlans: Plan[] = [];
 
-const canalPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "tgc", unitLabel: "Membros (Canal)", costPer1k: 15, qtys: TG_QTYS }),
-);
-const grupoPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "tgg", unitLabel: "Membros (Grupo)", costPer1k: 15, qtys: TG_QTYS }),
-);
-const allPlans = [...canalPlans, ...grupoPlans];
 
 
 const linkSchema = z.object({

@@ -7,7 +7,6 @@ import {
   effectiveProfitMult,
   FLOOR_BRL,
 } from "@/lib/margin-guardian";
-import { applyProfitFormula } from "@/lib/profit-markup";
 
 // FLUXO 5 — Margem. Se isto quebrar, vendemos no prejuízo sem ninguém notar.
 describe("trava de margem", () => {
@@ -45,16 +44,13 @@ describe("trava de margem", () => {
     }
   });
 
-  it("vitrine (cliente) nunca mostra preço abaixo da trava do servidor", () => {
-    const plans = [
-      { valor: 0.5, price: "", quantidade: 100 },
-      { valor: 3, price: "", quantidade: 1000 },
-      { valor: 12, price: "", quantidade: 10000 },
-    ];
-    for (const p of applyProfitFormula(plans)) {
-      const original = plans.find((x) => x.quantidade === p.quantidade)!;
-      expect(p.valor).toBeGreaterThanOrEqual(computeGuardedPrice(original.valor, p.quantidade) - 0.01);
-      expect(respectsMinMargin(p.valor, original.valor)).toBe(true);
+  // v307 — a vitrine deixou de calcular preço. O que ela mostra é o que a
+  // Autoridade gravou no banco; a trava de fórmula única vive em
+  // src/__tests__/price-single-math.test.ts.
+  it("preço da autoridade sempre respeita a margem mínima", () => {
+    for (const [cost, qty] of [[0.5, 100], [3, 1000], [12, 10000]] as const) {
+      const price = computeGuardedPrice(cost, qty);
+      expect(respectsMinMargin(price, cost)).toBe(true);
     }
   });
 });

@@ -6,7 +6,7 @@
 // CTR e a conversão que já foram conquistados.
 //
 // Economia do revendedor difere do varejo:
-//  - não usa cupom PRIME15 (sem COUPON_BUFFER a absorver)
+//  - não usa cupom PRIME15 (sem o buffer de cupom a absorver)
 //  - não paga taxa fixa Pix por pedido (o depósito é uma transação só)
 // Por isso o piso de lucro aqui é 2,5× o custo (varejo exige 4×) e ainda assim
 // o lucro absoluto por pedido continua positivo e auditável.

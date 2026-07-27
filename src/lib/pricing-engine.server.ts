@@ -3,7 +3,6 @@
 // NÃO importar de módulos client-reachable em escopo de módulo.
 
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
-import { enforceMonotonicLadder } from "./price-monotonic";
 
 export type Category =
   | "instagram:seguidores"
@@ -179,21 +178,18 @@ function floorFor(qty: number): number {
   return FLOOR_BASE + ((q - 500) / 1000) * 2.0;
 }
 
-function priceFromCost(qty: number, costPer1k: number): number {
-  const cost = parseFloat(String(costPer1k));
-  const baseCost = (qty / 1000) * cost;
-  const raw = (baseCost * FABIANO_PROFIT * tierFactor(qty) * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
-  return Math.max(floorFor(qty), ceilTo(raw, 0.5));
-}
-
 function packageCostFromRate(qty: number, costPer1k: number): number {
   return (qty / 1000) * costPer1k;
 }
 
-function priceFromPackageCost(qty: number, costBrl: number): number {
+// v307 — PREÇO-SEMENTE. Usado UMA vez, só quando o pacote ainda não existe no
+// banco, para a linha nascer válida. A Autoridade Única reprecifica no mesmo
+// ciclo. Nunca é aplicado sobre pacote existente (ver preserveAuthorityPrice).
+function seedPriceFromCost(qty: number, costBrl: number): number {
   const raw = (costBrl * FABIANO_PROFIT * tierFactor(qty) * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
   return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
+
 
 
 function formatBRL(v: number): string {
@@ -387,16 +383,25 @@ type PricingItemRow = {
 
 // v292 — Trava de escada: nenhum pacote maior pode sair mais barato que o
 // menor da mesma categoria. Só empurra preço PRA CIMA (nunca corta margem).
-function applyLadderGuard(rows: PricingItemRow[], modo: string): PricingItemRow[] {
-  const { rows: fixed, fixes } = enforceMonotonicLadder(rows);
-  if (fixes.length > 0) {
-    console.warn(
-      `[pricing] v292 trava de escada (${modo}) corrigiu ${fixes.length} pacote(s):`,
-      fixes.slice(0, 10).map((f) => `${f.pacote} R$${f.de}→R$${f.para}`).join(", "),
-    );
+// v307 — Faxina: este motor NÃO mexe mais em preço de pacote que já existe.
+// Ele grava custo e IDs; o preço de linha já existente é preservado exatamente
+// como está no banco e só a Autoridade Única (price-authority.server.ts) o
+// altera, no fim do ciclo. Pacote novo entra com o preço-semente e a Autoridade
+// o corrige no mesmo ciclo. Escada monotônica também é da Autoridade.
+function preserveAuthorityPrice(rows: PricingItemRow[], existing: Map<string, ExistingItem>): PricingItemRow[] {
+  let kept = 0;
+  const out = rows.map((r) => {
+    const old = existing.get(r.pacote);
+    if (!old || !(old.price_brl > 0)) return r;
+    if (Math.abs(old.price_brl - r.price_brl) > 0.009) kept += 1;
+    return { ...r, price_brl: old.price_brl };
+  });
+  if (kept > 0) {
+    console.log(`[pricing] v307 preço preservado (autoridade decide) em ${kept} pacote(s)`);
   }
-  return fixed;
+  return out;
 }
+
 
 function buildContingencyPricingRows(now = new Date().toISOString()): {
   itemRows: PricingItemRow[];
@@ -426,7 +431,7 @@ function buildContingencyPricingRows(now = new Date().toISOString()): {
         smmpanel_service_id: null,
         verified_service_id: null,
         cost_brl: Number(costBrl.toFixed(4)),
-        price_brl: Number(priceFromPackageCost(qty, costBrl).toFixed(2)),
+        price_brl: Number(seedPriceFromCost(qty, costBrl).toFixed(2)),
         source: CONTINGENCY_SOURCE,
         synced_at: now,
       });
@@ -443,20 +448,6 @@ function buildContingencyPricingRows(now = new Date().toISOString()): {
 }
 
 
-async function readCachedRate(category: Category): Promise<number | null> {
-  try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin
-      .from("pricing_cache" as any)
-      .select("cost_per_1k_brl")
-      .eq("category", category)
-      .maybeSingle();
-    const v = Number((data as any)?.cost_per_1k_brl);
-    return Number.isFinite(v) && v > 0 ? v : null;
-  } catch {
-    return null;
-  }
-}
 
 // v47 — lê itens já precificados 1:1 do pricing_items.
 async function readCachedItems(category: Category): Promise<Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean }>> {
@@ -554,29 +545,21 @@ function preserveCheaperRealCost(rows: PricingItemRow[], existing: Map<string, E
 
 
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
-  // Hermetic Engine v47: leitura 1:1 do pricing_items (preço final por card).
-  // Fallback: pricing_cache (per-1k) → tabela estática.
+  // v307 — Faxina: a vitrine é ESPELHO do banco, não uma calculadora.
+  // Quem decide preço é `price-authority.server.ts` (v305/v306). Aqui não se
+  // aplica piso, escada nem markup: se o pacote não tem preço real no banco,
+  // ele simplesmente não existe na vitrine (prateleira honesta v290).
   await primeConfig();
-  const [itemsMap, cachedRate] = await Promise.all([
-    readCachedItems(category),
-    readCachedRate(category),
-  ]);
-  const rateFallback = cachedRate ?? FALLBACK_RATES_PER_1K[category];
+  const itemsMap = await readCachedItems(category);
   let anyApi = false;
 
-  const rawItems: GridItem[] = CANONICAL_QTYS[category].map(({ id, qty }) => {
+  const rawItems: GridItem[] = [];
+  for (const { id, qty } of CANONICAL_QTYS[category]) {
     const hit = itemsMap.get(id);
-    if (hit && hit.price > 0) {
-      if (hit.source === "api") anyApi = true;
-      // v109 — reaplica piso escalonado sobre preços cacheados,
-      // evita R$3 duplicado em 50/100/200 quando o cache foi gravado
-      // antes da matriz incremental.
-      const guarded = Math.max(floorFor(qty), hit.price);
-      return { id, quantidade: qty, valor: guarded, price: formatBRL(guarded) };
-    }
-    const valor = priceFromCost(qty, rateFallback);
-    return { id, quantidade: qty, valor, price: formatBRL(valor) };
-  });
+    if (!hit || !(hit.price > 0)) continue;
+    if (hit.source === "api") anyApi = true;
+    rawItems.push({ id, quantidade: qty, valor: hit.price, price: formatBRL(hit.price) });
+  }
 
   // v290 — prateleira honesta: pacote que o teste seco marcou como não vendável
   // some da vitrine, em vez de aparecer e travar no checkout. Se TODOS sumiriam,
@@ -584,22 +567,10 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   const disponiveis = rawItems.filter((it) => itemsMap.get(it.id)?.sellable !== false);
   const visiveis = disponiveis.length > 0 ? disponiveis : rawItems;
 
-  // v109 — Monotonic Guard: cada pacote deve custar >= anterior + R$0,50.
-  const sorted = [...visiveis].sort((a, b) => a.quantidade - b.quantidade);
-  let prev = 0;
-  for (const it of sorted) {
-    const minAllowed = prev + 0.5;
-    if (it.valor < minAllowed) {
-      it.valor = ceilTo(minAllowed, 0.5);
-      it.price = formatBRL(it.valor);
-    }
-    prev = it.valor;
-  }
-  const items = sorted;
+  const items = [...visiveis].sort((a, b) => a.quantidade - b.quantidade);
 
+  const source: "api" | "fallback" = anyApi ? "api" : "fallback";
 
-
-  const source: "api" | "fallback" = anyApi || cachedRate != null ? "api" : "fallback";
 
   return {
     category,
@@ -640,7 +611,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = applyLadderGuard(preserveCheaperRealCost(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds), "contingency");
+    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
     const { error: e1 } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(itemRows, { onConflict: "pacote" });
@@ -687,7 +658,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
         source = "fallback";
       }
       // Markup v42 aplicado item-a-item sobre o custo real BRL
-      const price_brl = priceFromPackageCost(qty, cost_brl);
+      const price_brl = seedPriceFromCost(qty, cost_brl);
       const sidStr = serviceId != null ? String(serviceId) : null;
       itemRows.push({
         pacote: id, category: cat, quantidade: qty,
@@ -705,7 +676,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = applyLadderGuard(preserveCheaperRealCost(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds), "live");
+  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
   const { error: e1 } = await supabaseAdmin
     .from("pricing_items" as any)
     .upsert(itemRows, { onConflict: "pacote" });
@@ -794,7 +765,7 @@ export async function recostFromReserves(): Promise<{
     // Nunca encarece a vitrine sozinho: só corrige quando o custo real é menor.
     if (oldCost > 0 && realCost > oldCost) continue;
 
-    const newPrice = Number(priceFromPackageCost(qty, realCost).toFixed(2));
+    const newPrice = Number(row.price_brl) || 0; // v307: recost não move preço
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
       // v305 — recusto grava só CUSTO. Preço é da autoridade única.

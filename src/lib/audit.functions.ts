@@ -3,6 +3,7 @@
 // junta com serviços que usamos (resolveServiceId/overrides), converte custo
 // USD→BRL via cotacao_brl do fornecedor, e calcula lucro com a fórmula High-CAC.
 import { createServerFn } from "@tanstack/react-start";
+import { computeGuardedPrice } from "@/lib/margin-guardian";
 import { z } from "zod";
 
 const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
@@ -25,9 +26,10 @@ export type AuditResp =
   | { ok: true; fornecedor: string; cotacao: number; rows: AuditRow[]; scannedAt: string }
   | { ok: false; error: string };
 
-const COUPON_BUFFER = 0.85;
+// v307 — a auditoria de fornecedor NÃO tem fórmula própria. Ela simula o preço
+// exatamente como a Autoridade Única faria, senão o painel mostra margem que
+// não existe na vitrine.
 const PIX_RATE = 0.0099; // 0,99% MP PIX aprox.
-function tier(qty: number) { return qty <= 1000 ? 4.0 : qty <= 10000 ? 2.6 : 1.8; }
 
 async function buildContingencyAuditRows(): Promise<AuditRow[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -119,8 +121,7 @@ export const auditarFornecedor = createServerFn({ method: "POST" })
       const rateUsdPer1k = Number(s.rate ?? 0);
       const costBrl = rateUsdPer1k * cotacao;
       const qtyRef = 1000;
-      const raw = (costBrl * tier(qtyRef)) / COUPON_BUFFER;
-      const venda = Math.max(3, Math.ceil(raw / 0.5) * 0.5);
+      const venda = computeGuardedPrice(costBrl, qtyRef);
       const pix = venda * PIX_RATE;
       const lucro = venda - costBrl - pix;
       const margem = venda > 0 ? (lucro / venda) * 100 : 0;
