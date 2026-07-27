@@ -95,10 +95,21 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
       continue;
     }
 
+    // Preço novo (sem preço ainda): vai direto para o preço justo cheio.
+    if (price <= 0) {
+      r.price_brl = r2(justo);
+      motivos.set(r.pacote, "primeiro_preco");
+      continue;
+    }
 
-    // (d) salto grande demais não entra às cegas: pausa em vez de vender no
-    // prejuízo ou trocar o preço na cara do cliente.
-    if (price > 0 && justo > price * AUTHORITY_MAX_UP) {
+    // (d) v306 — RAMPA: o teto de +40% deixou de ser motivo de pausa e voltou a
+    // ser o que sempre devia ser: limite de reajuste por ciclo. Se subir até
+    // +40% já recoloca a margem mínima (4x líquido), sobe e segue vendendo —
+    // e nos ciclos seguintes continua subindo até o preço justo, ou para de
+    // subir sozinho quando o fornecedor baixar o custo (margem fica mais gorda).
+    const alvo = Math.min(justo, price * AUTHORITY_MAX_UP);
+    if (!respectsMinMargin(alvo, cost)) {
+      // Nem o teto de +40% cobre o custo: vender aqui é prejuízo real.
       blocked.push({
         pacote: r.pacote,
         atual: r2(price),
@@ -109,8 +120,9 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
       continue;
     }
 
-    r.price_brl = r2(justo);
-    motivos.set(r.pacote, price > 0 ? "margem" : "primeiro_preco");
+    r.price_brl = r2(alvo);
+    motivos.set(r.pacote, "margem");
+
   }
 
   // (c) escada é aplicada sobre o alvo final, não sobre o lote de um motor.
