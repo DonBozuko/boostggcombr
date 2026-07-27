@@ -5,6 +5,13 @@
 // detector. O teste seco só olha "dá pra vender?" — não olha "faz sentido?".
 // Aqui ficam as INVARIANTES do catálogo. Se uma quebra, vira achado.
 
+// v308 — IDs de serviço agora carregam o fornecedor junto.
+// Motivo real (auditoria 27/07): o id "143" existe em DOIS fornecedores com
+// produtos diferentes ("Curtidas na Live" no SMMPanel, "Visualizações de live
+// do FB" no Verified). O mapa de nomes era global por id, então a auditoria
+// lia o nome do fornecedor errado e pausava pacote saudável. Chave = provider:id.
+export type ServiceRef = { provider: string; id: string };
+
 export type CoherenceRow = {
   pacote: string;
   category: string | null;
@@ -12,7 +19,7 @@ export type CoherenceRow = {
   cost_brl: number | null;
   price_brl: number | null;
   last_dry_run: string | null;
-  serviceIds: string[];
+  serviceIds: ServiceRef[];
 };
 
 export type CoherenceIssue = {
@@ -42,6 +49,11 @@ function intentOf(category: string) {
   return null;
 }
 
+export function serviceKey(ref: ServiceRef): string {
+  return `${ref.provider}:${ref.id}`;
+}
+
+
 function median(nums: number[]): number {
   if (nums.length === 0) return 0;
   const s = [...nums].sort((a, b) => a - b);
@@ -57,12 +69,31 @@ export function analyzeCatalogCoherence(
   const issues: CoherenceIssue[] = [];
   const byCategory = new Map<string, CoherenceRow[]>();
 
+  // Serviço vinculado bate com o produto da categoria? Calculado antes porque a
+  // trava de custo usa isso: custo alto com serviço CERTO é tier premium legítimo,
+  // custo alto com serviço errado/desconhecido é risco de prejuízo.
+  const nameOk = new Map<string, boolean>();
+  for (const r of rows) {
+    const intent = intentOf(String(r.category ?? ""));
+    let known = false;
+    let bad = false;
+    for (const ref of r.serviceIds) {
+      const name = serviceNames.get(serviceKey(ref));
+      if (!name) continue;
+      known = true;
+      if (intent?.proibe?.test(name)) bad = true;
+    }
+    nameOk.set(r.pacote, known && !bad);
+  }
+
   for (const r of rows) {
     const cat = String(r.category ?? "");
     if (!cat) continue;
     if (!byCategory.has(cat)) byCategory.set(cat, []);
     byCategory.get(cat)!.push(r);
   }
+
+
 
   for (const [cat, list] of byCategory) {
     const sorted = list
@@ -109,14 +140,20 @@ export function analyzeCatalogCoherence(
         if (!(Number(r.cost_brl) > 0) || !(Number(r.quantidade) > 0)) continue;
         const u = Number(r.cost_brl) / Number(r.quantidade);
         if (u > med * 4) {
+          const servicoConfere = nameOk.get(r.pacote) === true;
           issues.push({
             code: "CUSTO_FORA_DA_CURVA",
-            severity: "critical",
+            // v308 — serviço confere = tier premium legítimo (ex.: seguidor BR
+            // premium 90 dias). Não tira da vitrine; só avisa.
+            severity: servicoConfere ? "warning" : "critical",
             pacote: r.pacote,
             category: cat,
-            detalhe: `custo unitário ${(u / med).toFixed(1)}× acima do normal da categoria — provável serviço errado vinculado`,
+            detalhe: servicoConfere
+              ? `custo unitário ${(u / med).toFixed(1)}× acima do normal da categoria — serviço confere, provável tier premium`
+              : `custo unitário ${(u / med).toFixed(1)}× acima do normal da categoria — provável serviço errado vinculado`,
           });
         }
+
       }
     }
   }
@@ -126,8 +163,8 @@ export function analyzeCatalogCoherence(
     const cat = String(r.category ?? "");
     const intent = intentOf(cat);
     if (!intent) continue;
-    for (const id of r.serviceIds) {
-      const name = serviceNames.get(id);
+    for (const ref of r.serviceIds) {
+      const name = serviceNames.get(serviceKey(ref));
       if (!name) continue;
       if (intent.proibe?.test(name)) {
         issues.push({
@@ -135,10 +172,11 @@ export function analyzeCatalogCoherence(
           severity: "critical",
           pacote: r.pacote,
           category: cat,
-          detalhe: `vinculado ao serviço "${name}" (id ${id}), incompatível com ${intent.label}`,
+          detalhe: `vinculado ao serviço "${name}" (${ref.provider} id ${ref.id}), incompatível com ${intent.label}`,
         });
       }
     }
+
   }
 
   // 5) Teste seco cego: sem revalidação recente o catálogo inteiro é palpite.

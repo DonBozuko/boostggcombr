@@ -33,14 +33,26 @@ type PricingItem = {
 
 // Categorias do pricing_items → palavras-chave que devem aparecer no name/category
 // do cache do fornecedor. Todas em minúsculas.
+// v308 — nenhum pacote nosso é de transmissão ao vivo. Serviço de live entregando
+// "curtida" ou "view" é a origem histórica de pacote errado vinculado.
+const GLOBAL_NOT = ["live", "ao vivo", "espectador", "transmiss", "stream", "drip", "comment"];
+
 const CATEGORY_MATCHERS: Record<string, { any: string[][]; must?: string[]; not?: string[] }> = {
   "instagram:seguidores": {
+    any: [["instagram", "follow"], ["instagram", "seguidor"]],
+    not: ["dislike", "unfollow"],
+  },
+  "instagram:seguidores:br": {
     any: [["instagram", "follow"], ["instagram", "seguidor"]],
     not: ["dislike", "unfollow"],
   },
   "instagram:curtidas": {
     any: [["instagram", "like"], ["instagram", "curtida"]],
     not: ["dislike"],
+  },
+  "instagram:visualizacoes": {
+    any: [["instagram", "view"], ["instagram", "visualiz"]],
+    not: ["story", "reel view bot"],
   },
   "facebook:seguidores": {
     any: [["facebook", "follow"], ["facebook", "seguidor"], ["facebook", "page like"]],
@@ -63,6 +75,13 @@ const CATEGORY_MATCHERS: Record<string, { any: string[][]; must?: string[]; not?
     any: [["tiktok", "follow"], ["tiktok", "seguidor"]],
     must: [],
   },
+  "tiktok:curtidas": {
+    any: [["tiktok", "like"], ["tiktok", "curtida"]],
+    not: ["dislike"],
+  },
+  "tiktok:visualizacoes": {
+    any: [["tiktok", "view"], ["tiktok", "visualiz"]],
+  },
   "kwai:seguidores": {
     any: [["kwai", "follow"], ["kwai", "seguidor"]],
   },
@@ -82,6 +101,7 @@ const CATEGORY_MATCHERS: Record<string, { any: string[][]; must?: string[]; not?
     not: ["channel", "canal"],
   },
 };
+
 
 function pacoteWantsBrazilian(pacote: string, category: string): boolean {
   if (category.endsWith(":br")) return true;
@@ -108,8 +128,9 @@ function scoreCandidate(row: CacheRow, opts: { qty: number; wantBr: boolean; wan
   const catOk = opts.matcher.any.some((words) => words.every((w) => hay.includes(w)));
   if (!catOk) return null;
 
-  // Palavras proibidas.
+  // Palavras proibidas (da categoria e as globais de "ao vivo").
   if (opts.matcher.not?.some((w) => hay.includes(w))) return null;
+  if (GLOBAL_NOT.some((w) => hay.includes(w))) return null;
 
   // Quantidade cabe?
   if (!(row.min <= opts.qty && opts.qty <= row.max)) return null;
@@ -142,10 +163,21 @@ function scoreCandidate(row: CacheRow, opts: { qty: number; wantBr: boolean; wan
 
 async function loadCache(supabaseAdmin: any, provider: Provider): Promise<CacheRow[]> {
   const table = provider === "smmhype" ? "services_cache" : provider === "smmpanel" ? "smmpanel_services_cache" : "verified_services_cache";
-  const { data } = await supabaseAdmin
-    .from(table)
-    .select("provider_service_id, name, category, rate, min, max, refill");
-  return ((data as any[]) ?? []).map((r) => ({
+  // v308 — paginado: o cache do fornecedor principal tem 6.000+ serviços e a API
+  // corta em 1.000. O religador só enxergava a primeira fatia e escolhia serviço
+  // pior (ou nenhum) mesmo existindo o certo.
+  const raw: any[] = [];
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data } = await supabaseAdmin
+      .from(table)
+      .select("provider_service_id, name, category, rate, min, max, refill")
+      .range(from, from + PAGE - 1);
+    const page = (data as any[]) ?? [];
+    raw.push(...page);
+    if (page.length < PAGE) break;
+  }
+  return raw.map((r) => ({
     provider_service_id: String(r.provider_service_id),
     name: String(r.name ?? ""),
     category: String(r.category ?? ""),
