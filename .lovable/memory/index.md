@@ -11,7 +11,10 @@ Toda integração com fornecedor (SMMhype, SMMPainel, Verified, MP, TikTok, etc)
 Autonomia: quando a opção é claramente segura (não quebra receita, não apaga dado, não expõe segredo, reversível), EXECUTA direto sem pedir confirmação. Só pergunta em decisões irreversíveis ou trade-off real de negócio.
 Build só passa com `vitest run` verde (gate v243). Fluxo crítico novo/corrigido nasce com teste em `src/__tests__/`, e regra de dinheiro/entrega vive em módulo puro testável. Nunca remover o gate pra destravar deploy.
 
+Modo Orquestrador (regra absoluta): antes de mexer, mapear impacto cruzado, definir ordem de execução, rollback e prova real. Causa raiz > remendo. Ver [Modo Orquestrador](mem://preferences/modo-orquestrador).
+
 ## Memories
+- [Modo Orquestrador](mem://preferences/modo-orquestrador) — Como planejar e executar qualquer mudança: mapa de impacto, ordem, ponto único de verdade, rollback, prova real, anti-loop de alarme.
 - [Evolução futura](mem://preferences/evolucao-futura) — Lembrar de evoluir módulos "honestos mas limitados" (ex: JarvisContentScheduler → publicação real) quando chip/warmup/API estiverem prontos. Usuário quer evoluir TUDO no futuro.
 - [Nunca responder de memória sobre operação](mem://preferences/nunca-responder-de-memoria) — Fornecedor ≠ rede. Fornecedores = SMMhype, SMMPainel, Verified (tabela `fornecedores`). Kwai/Instagram/TikTok = redes (rotas). Antes de afirmar, consultar banco/código.
 - [Pacote :br só serviço BR](mem://preferences/pacote-br-so-servico-br) — Pacote brasileiro nunca pode apontar pra serviço internacional nem pra serviço marcado como queda/"não compre". Validado no dry-run v240.
