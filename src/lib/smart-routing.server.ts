@@ -124,6 +124,8 @@ export async function rankProvidersByCost(opts: {
   };
   const slugs = ((forn as any[]) ?? []).map((f) => f.slug as string);
   const providerIdMap: Record<string, string | null> = {};
+  // v294 — precisamos saber se o ID veio curado (manual) ou auto-resolvido.
+  const providerIdIsAuto: Record<string, boolean> = {};
   for (const slug of slugs) {
     const prefix = slugToColumn[slug] ?? slug;
     const manualCol = `${prefix}_service_id`;
@@ -132,6 +134,7 @@ export async function rankProvidersByCost(opts: {
     const autoId = (autoIds as any)?.[autoCol] ?? null;
     const fallbackId = slug === "smmhype" && serviceId != null ? String(serviceId) : null;
     providerIdMap[slug] = manualId ?? autoId ?? fallbackId;
+    providerIdIsAuto[slug] = manualId == null && autoId != null;
   }
 
   // v241/v242/v245 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
