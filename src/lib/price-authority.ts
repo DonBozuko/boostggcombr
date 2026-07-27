@@ -85,11 +85,16 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
 
     const justo = computeGuardedPrice(cost, qty);
 
-    // (b) preço saudável não desce sozinho — fim da oscilação da vitrine.
-    if (price > 0 && price >= justo && respectsMinMargin(price, cost)) {
+    // (b) preço saudável não desce nem sobe sozinho — fim da oscilação da vitrine.
+    // v306: o critério de "saudável" é MARGEM REAL (≥4x líquido), não o piso
+    // comercial escalonado. O piso é sugestão de vitrine para preço NOVO; usá-lo
+    // como gatilho de reajuste tirava do ar pacote-isca com 9x de margem
+    // (v1k/tv1k a R$ 6,00) alegando "custo do fornecedor subiu" — o que era falso.
+    if (price >= FLOOR_BRL && respectsMinMargin(price, cost)) {
       r.price_brl = price;
       continue;
     }
+
 
     // (d) salto grande demais não entra às cegas: pausa em vez de vender no
     // prejuízo ou trocar o preço na cara do cliente.
