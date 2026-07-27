@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyTrafficSource, isInternalTraffic } from "@/lib/traffic-source";
+import { classifyTrafficSource, isInternalPath, isInternalTraffic } from "@/lib/traffic-source";
 
 describe("origem de tráfego — trava anti-inflação de visitas", () => {
   it("descarta editor/preview/próprio site", () => {
@@ -28,5 +28,18 @@ describe("origem de tráfego — trava anti-inflação de visitas", () => {
   it("sem referrer é direto, e utm tem prioridade sobre host genérico", () => {
     expect(classifyTrafficSource(null, null)).toBe("direto");
     expect(classifyTrafficSource("instagram_bio", "https://t.co/x")).toBe("instagram_bio");
+  });
+});
+
+describe("rotas internas — não contam como visita de cliente", () => {
+  it("descarta bastidor", () => {
+    for (const p of ["/admin", "/admin/catalog", "/dashboard/seo", "/diagnostico", "/painel-revendedor", "/painel-afiliado"]) {
+      expect(isInternalPath(p)).toBe(true);
+    }
+  });
+  it("mantém rotas de venda", () => {
+    for (const p of ["/", "/tiktok", "/comprar-seguidores-instagram"]) {
+      expect(isInternalPath(p)).toBe(false);
+    }
   });
 });

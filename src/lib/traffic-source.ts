@@ -45,3 +45,12 @@ export function classifyTrafficSource(
   if (SEARCH.test(h)) return `busca: ${h}`;
   return h;
 }
+
+// v309 — rotas internas nunca contam como visita de cliente.
+const INTERNAL_PATHS =
+  /^\/(admin|dashboard|diagnostico|painel-revendedor|painel-afiliado|lovable)(\/|$)/;
+
+/** true = caminho de bastidor (dono/operação), não conta visita. */
+export function isInternalPath(path: string | null | undefined): boolean {
+  return INTERNAL_PATHS.test((path ?? "").toLowerCase());
+}
