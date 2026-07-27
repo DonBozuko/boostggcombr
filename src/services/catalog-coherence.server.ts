@@ -89,7 +89,7 @@ const PAUSE_PREFIX = "auditoria de coerência";
 
 export async function remediateCoherence(
   issues: CoherenceIssue[],
-): Promise<{ paused: string[]; errors: number }> {
+): Promise<{ paused: string[]; restored: string[]; errors: number }> {
   const alvos = new Map<string, string>();
   for (const i of issues) {
     if (!AUTO_PAUSE_CODES.has(i.code)) continue;
@@ -99,7 +99,7 @@ export async function remediateCoherence(
 
     if (!alvos.has(i.pacote)) alvos.set(i.pacote, `${PAUSE_PREFIX}: ${i.detalhe}`);
   }
-  if (alvos.size === 0) return { paused: [], errors: 0 };
+
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const paused: string[] = [];
