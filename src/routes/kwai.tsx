@@ -1,5 +1,6 @@
 // v210 — Kwai checkout (Seguidores, Curtidas, Views) via SMMhype.
 import { createFileRoute } from "@tanstack/react-router";
+import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { z } from "zod";
@@ -171,7 +172,7 @@ function KwaiLanding() {
           cupom: getAppliedCoupon(),
         },
       });
-      if (!res?.ok) { toast.error("Não foi possível gerar o Pix. Tente novamente."); return; }
+      if (!res?.ok) { toast.error(checkoutErrorMessage(res?.error)); return; }
       trackInitiateCheckout({
         orderId: res.pedidoId ?? "", value: selected.valor,
         contentId: selected.id, contentName: `${selected.tier} ${categoria}`,
