@@ -588,7 +588,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = preserveReserveIds(contingency.itemRows, existingReserveIds);
+    itemRows = applyLadderGuard(preserveReserveIds(contingency.itemRows, existingReserveIds), "contingency");
     const { error: e1 } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(itemRows, { onConflict: "pacote" });
