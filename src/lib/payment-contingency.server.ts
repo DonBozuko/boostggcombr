@@ -341,8 +341,12 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         } as any)
         .eq("id", pedido.id);
 
+      // v296 — alerta só no PRIMEIRO parqueamento. Sem isso, cada retentativa
+      // do SLA watcher (15 em 15min) mandaria o mesmo aviso e viraria ruído.
       try {
+        if (prazoExistente) throw new Error("skip-alert");
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
+
         const msg = isSaldo
           ? `⏳ <b>PEDIDO EM ESPERA — RECARREGAR EM 24h</b>\n\nPROBLEMA: cliente pagou mas nenhum fornecedor tinha saldo pra entregar.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: recarregar qualquer fornecedor até ${prazoTxt} e apertar "Recarga Confirmada". Se passar do prazo, cliente é reembolsado automático.\n\nTentativas:\n${tentativas.join("\n")}`
           : `⏳ <b>PEDIDO EM ESPERA — FORNECEDOR RECUSOU AGORA</b>\n\nPROBLEMA: cliente pagou e os fornecedores recusaram o envio neste momento. O sistema vai tentar de novo sozinho a cada 15 minutos.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: nada agora. Se não entrar até ${prazoTxt}, o cliente é reembolsado automático e você é avisado.\n\nRecusas:\n${tentativas.join("\n")}`;
