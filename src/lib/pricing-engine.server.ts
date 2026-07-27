@@ -3,6 +3,7 @@
 // NÃO importar de módulos client-reachable em escopo de módulo.
 
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
+import { enforceMonotonicLadder } from "./price-monotonic";
 
 export type Category =
   | "instagram:seguidores"
@@ -384,6 +385,19 @@ type PricingItemRow = {
   synced_at: string;
 };
 
+// v292 — Trava de escada: nenhum pacote maior pode sair mais barato que o
+// menor da mesma categoria. Só empurra preço PRA CIMA (nunca corta margem).
+function applyLadderGuard(rows: PricingItemRow[], modo: string): PricingItemRow[] {
+  const { rows: fixed, fixes } = enforceMonotonicLadder(rows);
+  if (fixes.length > 0) {
+    console.warn(
+      `[pricing] v292 trava de escada (${modo}) corrigiu ${fixes.length} pacote(s):`,
+      fixes.slice(0, 10).map((f) => `${f.pacote} R$${f.de}→R$${f.para}`).join(", "),
+    );
+  }
+  return fixed;
+}
+
 function buildContingencyPricingRows(now = new Date().toISOString()): {
   itemRows: PricingItemRow[];
   summaryRows: Array<{ category: Category; cost_per_1k_brl: number; source: "fallback"; synced_at: string }>;
@@ -588,7 +602,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = preserveReserveIds(contingency.itemRows, existingReserveIds);
+    itemRows = applyLadderGuard(preserveReserveIds(contingency.itemRows, existingReserveIds), "contingency");
     const { error: e1 } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(itemRows, { onConflict: "pacote" });
@@ -649,7 +663,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = preserveReserveIds(itemRows, existingReserveIds);
+  itemRows = applyLadderGuard(preserveReserveIds(itemRows, existingReserveIds), "live");
   const { error: e1 } = await supabaseAdmin
     .from("pricing_items" as any)
     .upsert(itemRows, { onConflict: "pacote" });
