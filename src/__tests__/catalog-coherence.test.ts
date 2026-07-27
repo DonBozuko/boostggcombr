@@ -37,10 +37,43 @@ describe("coerência do catálogo", () => {
 
   it("pega serviço incompatível com a categoria", () => {
     const issues = analyzeCatalogCoherence(
-      [base({ pacote: "yv2m", category: "youtube:visualizacoes", serviceIds: ["195"] })],
-      new Map([["195", "YouTube Espectadores ao Vivo"]]),
+      [base({ pacote: "yv2m", category: "youtube:visualizacoes", serviceIds: [{ provider: "verified", id: "195" }] })],
+      new Map([["verified:195", "YouTube Espectadores ao Vivo"]]),
     );
     expect(issues.some((i) => i.code === "SERVICO_INCOERENTE")).toBe(true);
+  });
+
+  // v308 — regressão real: o id 143 existe em dois fornecedores com produtos
+  // diferentes. Sem chave por fornecedor, o pacote certo era pausado por engano.
+  it("não confunde mesmo id em fornecedores diferentes", () => {
+    const issues = analyzeCatalogCoherence(
+      [base({ pacote: "tl100", category: "tiktok:curtidas", serviceIds: [{ provider: "smmpanel", id: "143" }] })],
+      new Map([
+        ["smmpanel:143", "TikTok Curtidas Brasil"],
+        ["verified:143", "Visualizações de transmissão ao vivo do FB"],
+      ]),
+    );
+    expect(issues.some((i) => i.code === "SERVICO_INCOERENTE")).toBe(false);
+  });
+
+  it("custo alto com serviço correto vira aviso, não pausa", () => {
+    const names = new Map([["smmhype:8431", "Instagram Brazilian Followers Premium"]]);
+    const issues = analyzeCatalogCoherence(
+      [
+        base({ pacote: "a", quantidade: 1000, cost_brl: 1, price_brl: 10 }),
+        base({ pacote: "b", quantidade: 2000, cost_brl: 2, price_brl: 20 }),
+        base({
+          pacote: "brpro",
+          quantidade: 1000,
+          cost_brl: 7.35,
+          price_brl: 60,
+          serviceIds: [{ provider: "smmhype", id: "8431" }],
+        }),
+      ],
+      names,
+    );
+    const achado = issues.find((i) => i.code === "CUSTO_FORA_DA_CURVA" && i.pacote === "brpro");
+    expect(achado?.severity).toBe("warning");
   });
 
   it("pega custo fora da curva", () => {
