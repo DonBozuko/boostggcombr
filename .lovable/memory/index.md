@@ -14,6 +14,8 @@ Build só passa com `vitest run` verde (gate v243). Fluxo crítico novo/corrigid
 Modo Orquestrador (regra absoluta): antes de mexer, mapear impacto cruzado, definir ordem de execução, rollback e prova real. Causa raiz > remendo. Ver [Modo Orquestrador](mem://preferences/modo-orquestrador).
 Documento nunca manda no código: `ARQUITETURA.md` e os arquivos em `.lovable/*.md` são índice, não verdade. Se divergirem do código, o CÓDIGO vence e eu corrijo o documento no mesmo turno. Proibido cravar service ID, preço ou número que o sync muda sozinho dentro de documento.
 Toda tarefa começa com rótulo: RÁPIDO (executo direto) · MÉDIO (mostro mapa de impacto e executo) · PESADO (dinheiro/dispatch/auth/migração — aviso que preciso do turno inteiro pra analisar antes de codar). Ver [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho).
+Problema achado por acaso = falha de instrumentação. Todo bug vira invariante automatizada + teste + achado na auditoria forense. Ver [Bug vira invariante](mem://preferences/bug-vira-invariante).
+
 
 ## Memories
 - [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho) — Como a dupla conduz tarefas: rótulo de complexidade, quando pedir sinal verde, código > documento, fechamento de ciclo, auditoria de coerência.
