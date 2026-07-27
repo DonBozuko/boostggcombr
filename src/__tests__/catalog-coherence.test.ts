@@ -94,3 +94,23 @@ describe("coerência do catálogo", () => {
     expect(issues.some((i) => i.code === "TESTE_SECO_CEGO")).toBe(true);
   });
 });
+
+// v309 — regressão real: "Instagram Likes" não batia em \blike\b (plural),
+// e 16 pacotes de visualizações ficaram vinculados a curtidas sem alerta.
+describe("v309 — plural não escapa da coerência", () => {
+  it("pega 'Instagram Likes' em pacote de visualizações", () => {
+    const issues = analyzeCatalogCoherence(
+      [base({ pacote: "v2k", category: "instagram:visualizacoes", serviceIds: [{ provider: "smmhype", id: "18855" }] })],
+      new Map([["smmhype:18855", "⚪ Instagram Likes ➜ [Economy] [ Speed : 150K+/Day ]"]]),
+    );
+    expect(issues.some((i) => i.code === "SERVICO_INCOERENTE")).toBe(true);
+  });
+
+  it("não acusa o serviço correto de visualizações", () => {
+    const issues = analyzeCatalogCoherence(
+      [base({ pacote: "v2k", category: "instagram:visualizacoes", serviceIds: [{ provider: "smmhype", id: "13471" }] })],
+      new Map([["smmhype:13471", "🟢 Instagram Views ➜ [Standard] [ +1M/Day | No Drop ]"]]),
+    );
+    expect(issues.some((i) => i.code === "SERVICO_INCOERENTE")).toBe(false);
+  });
+});

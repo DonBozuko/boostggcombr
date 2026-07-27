@@ -36,12 +36,16 @@ export type CoherenceIssue = {
 };
 
 // Nome do serviço do fornecedor → precisa bater com a intenção da categoria.
+// v309 — o \b final deixava passar PLURAL: "Instagram Likes" não batia em \blike\b.
+// Caso real: pacotes de visualizações do Instagram vinculados a "Instagram Likes".
+// Agora aceita sufixo (likes/followers/views/seguidores).
 const INTENT: Record<string, { requer?: RegExp; proibe?: RegExp; label: string }> = {
-  seguidores: { proibe: /\b(like|curtid|view|visualiz|inscrit|subscrib|ao\s*vivo|live)\b/i, label: "seguidores" },
-  curtidas: { proibe: /\b(follow|seguidor|view|visualiz|inscrit|subscrib|ao\s*vivo|live)\b/i, label: "curtidas" },
-  visualizacoes: { proibe: /\b(follow|seguidor|like|curtid|ao\s*vivo|live|short)\b/i, label: "visualizações" },
-  inscritos: { proibe: /\b(like|curtid|view|visualiz|ao\s*vivo|live)\b/i, label: "inscritos" },
+  seguidores: { proibe: /\b(like|curtid|view|visualiz|inscrit|subscrib|ao\s*vivo|live)\w*/i, label: "seguidores" },
+  curtidas: { proibe: /\b(follow|seguidor|view|visualiz|inscrit|subscrib|ao\s*vivo|live)\w*/i, label: "curtidas" },
+  visualizacoes: { proibe: /\b(follow|seguidor|like|curtid|ao\s*vivo|live|short)\w*/i, label: "visualizações" },
+  inscritos: { proibe: /\b(like|curtid|view|visualiz|ao\s*vivo|live)\w*/i, label: "inscritos" },
 };
+
 
 function intentOf(category: string) {
   const parts = category.split(":");
