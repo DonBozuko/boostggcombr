@@ -8,6 +8,7 @@
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
 import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
+import { enforceMonotonicLadder } from "./price-monotonic";
 
 type PricingRow = {
   pacote: string;
