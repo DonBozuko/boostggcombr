@@ -23,7 +23,7 @@
 //      abaixo da margem só porque o reajuste era grande)
 //   e) idempotente — rodar duas vezes seguidas não muda nada
 
-import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
+import { computeGuardedPrice, respectsMinMargin, FLOOR_BRL } from "./margin-guardian";
 import { enforceMonotonicLadder } from "./price-monotonic";
 
 /** Teto de reajuste automático para cima num único ciclo. */
