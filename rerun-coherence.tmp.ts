@@ -29,8 +29,12 @@ const rows: CoherenceRow[] = (items as any[]).map((r) => ({
 }));
 const names = new Map<string,string>();
 for (const { table, provider } of CACHES) {
-  const { data } = await db.from(table as any).select("provider_service_id, name");
-  for (const s of ((data as any[]) ?? [])) names.set(serviceKey({provider,id:String(s.provider_service_id).trim()}), String(s.name));
+  for (let from=0;;from+=1000) {
+    const { data } = await db.from(table as any).select("provider_service_id, name").range(from, from+999);
+    const page = (data as any[]) ?? [];
+    for (const s of page) names.set(serviceKey({provider,id:String(s.provider_service_id).trim()}), String(s.name));
+    if (page.length < 1000) break;
+  }
 }
 const issues = analyzeCatalogCoherence(rows, names);
 const criticos = new Set(issues.filter(i => i.severity==="critical" && (i.code==="SERVICO_INCOERENTE"||i.code==="CUSTO_FORA_DA_CURVA")).map(i=>i.pacote));
