@@ -193,36 +193,9 @@ validateDispatcherConfig();
 
 const SMMHYPE_ENDPOINT = "https://smmhype.com/api/v2";
 
-export function stripTrackers(url: string): string {
-  // v272 — rastreadores do app (igsh, utm_*, is_from_webapp) fazem o fornecedor
-  // recusar o pedido. Sempre limpamos antes de enviar.
-  try {
-    const u = new URL(url);
-    for (const k of [...u.searchParams.keys()]) {
-      if (/^(igsh|igshid|utm_[a-z_]+|is_from_webapp|sender_device|_r|_t)$/i.test(k)) u.searchParams.delete(k);
-    }
-    u.hash = "";
-    return u.toString().replace(/\?$/, "");
-  } catch {
-    return url;
-  }
-}
-
-export function normalizeInstagramUser(raw: string): string {
-  // v272 — O cliente cola o link do app com rastreadores (?igsh=...&utm_source=qr).
-  // Os fornecedores recusam esse formato ("Unable to verify your domain submission")
-  // e a venda inteira falha. Sempre reduzimos ao perfil canônico.
-  const handle = raw
-    .trim()
-    .replace(/^https?:\/\//i, "")
-    .replace(/^www\./i, "")
-    .replace(/^(m\.)?instagram\.com\//i, "")
-    .replace(/^@+/, "")
-    .replace(/[/?#].*$/, "")
-    .trim();
-  if (!handle) return raw.trim();
-  return `https://instagram.com/${handle}`;
-}
+// v303 — a limpeza mora em `@/lib/target-link` (ponto único de verdade).
+// Reexportado aqui só para não quebrar os imports existentes.
+export { stripTrackers, normalizeInstagramUser } from "./target-link";
 
 
 function normalizeTiktokTarget(raw: string, isFollowers: boolean): string {
