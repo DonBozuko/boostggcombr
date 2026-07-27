@@ -26,11 +26,13 @@ describe("v305 — autoridade única de preço", () => {
     expect(changes).toHaveLength(0);
   });
 
-  it("sobe preço quando o custo estoura a margem mínima (dentro do teto)", () => {
-    const [r] = planAuthorityPrices([row("p1k", 1000, 3.2, 25)]).changes;
-    expect(r.para).toBeGreaterThan(25);
+  it("sobe preço quando o custo estoura a margem mínima (dentro do teto de +40%)", () => {
+    const [r] = planAuthorityPrices([row("p1k", 1000, 3.2, 16)]).changes;
+    expect(r.para).toBeGreaterThan(16);
+    expect(r.para).toBeLessThanOrEqual(16 * AUTHORITY_MAX_UP + 0.01);
     expect(respectsMinMargin(r.para, 3.2)).toBe(true);
   });
+
 
   it("não aplica salto acima do teto: vira decisão do dono", () => {
     const { changes, blocked } = planAuthorityPrices([row("p1k", 1000, 500, 30)]);
