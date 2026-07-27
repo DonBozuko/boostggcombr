@@ -46,6 +46,8 @@ export function extractInstagramHandle(raw: string): string | null {
     .trim()
     .toLowerCase();
   if (!h || !/^[a-z0-9._]{1,30}$/.test(h)) return null;
+  // Colou link de outra rede: não é @ de Instagram, não opinamos.
+  if (/\.(com|br|net|me|tv|app|io)$/.test(h)) return null;
   return h;
 }
 
