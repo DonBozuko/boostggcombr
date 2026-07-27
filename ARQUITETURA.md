@@ -78,6 +78,19 @@ lê todos, aplica a fórmula e upserta `pricing_items`. Vitrine re-hidrata via
 hooks em `src/routes/api/public/hooks/*`, autenticados por
 `src/lib/cron-auth.server.ts`.
 
+Regras de cron (v293, obrigatórias em qualquer job novo):
+- Token SEMPRE via `vault.decrypted_secrets` (`CRON_ADMIN_TOKEN`). Nunca
+  literal no `command` — `cron.job` é legível por quem lê o banco.
+- SEMPRE `timeout_milliseconds := 55000`. O padrão do `pg_net` é 5s e
+  descarta a resposta de qualquer hook mais lento.
+- URL SEMPRE a estável do projeto (`project--<id>.lovable.app`), nunca o
+  domínio custom — DNS/SSL do domínio não pode ser ponto único de falha.
+- `net.http_post` é fire-and-forget: `cron.job_run_details` marca
+  "succeeded" mesmo com hook em 500. A verdade está em
+  `net._http_response`, lida pelo job `vigia-robos` (`public.vigia_robos()`,
+  a cada 30 min) que abre alerta em português com dedupe de 2h e fecha
+  sozinho quando normaliza.
+
 ## Modo Shadow (teste sem gastar)
 
 ```js

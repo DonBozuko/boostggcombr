@@ -1893,6 +1893,7 @@ export type Database = {
           ok: boolean
         }[]
       }
+      vigia_robos: { Args: never; Returns: Json }
       wallet_credit: {
         Args: { _amount: number; _wallet_key: string }
         Returns: number
