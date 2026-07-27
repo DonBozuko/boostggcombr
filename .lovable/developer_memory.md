@@ -35,6 +35,10 @@
 10. **Mudança aditiva > refactor arriscado.** Se houver risco de regressão,
     avisar ANTES. Se quebrou, avisar IMEDIATAMENTE no turno seguinte.
 
+11. **Preço tem dono único.** Só `src/lib/price-authority.server.ts` grava
+    `price_brl`. Qualquer outro motor grava apenas custo/IDs. Teste
+    `price-single-writer` barra o deploy se surgir um segundo escritor.
+
 ## Como aplicar em cada turno
 
 - Antes de editar: reler este arquivo + `.lovable/finance_rules.md` +
