@@ -3,6 +3,7 @@
 // NÃO importar de módulos client-reachable em escopo de módulo.
 
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
+import { enforceMonotonicLadder } from "./price-monotonic";
 
 export type Category =
   | "instagram:seguidores"
