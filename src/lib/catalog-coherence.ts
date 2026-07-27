@@ -140,14 +140,20 @@ export function analyzeCatalogCoherence(
         if (!(Number(r.cost_brl) > 0) || !(Number(r.quantidade) > 0)) continue;
         const u = Number(r.cost_brl) / Number(r.quantidade);
         if (u > med * 4) {
+          const servicoConfere = nameOk.get(r.pacote) === true;
           issues.push({
             code: "CUSTO_FORA_DA_CURVA",
-            severity: "critical",
+            // v308 — serviço confere = tier premium legítimo (ex.: seguidor BR
+            // premium 90 dias). Não tira da vitrine; só avisa.
+            severity: servicoConfere ? "warning" : "critical",
             pacote: r.pacote,
             category: cat,
-            detalhe: `custo unitário ${(u / med).toFixed(1)}× acima do normal da categoria — provável serviço errado vinculado`,
+            detalhe: servicoConfere
+              ? `custo unitário ${(u / med).toFixed(1)}× acima do normal da categoria — serviço confere, provável tier premium`
+              : `custo unitário ${(u / med).toFixed(1)}× acima do normal da categoria — provável serviço errado vinculado`,
           });
         }
+
       }
     }
   }
