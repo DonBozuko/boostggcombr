@@ -33,14 +33,26 @@ type PricingItem = {
 
 // Categorias do pricing_items → palavras-chave que devem aparecer no name/category
 // do cache do fornecedor. Todas em minúsculas.
+// v308 — nenhum pacote nosso é de transmissão ao vivo. Serviço de live entregando
+// "curtida" ou "view" é a origem histórica de pacote errado vinculado.
+const GLOBAL_NOT = ["live", "ao vivo", "espectador", "transmiss", "stream", "drip", "comment"];
+
 const CATEGORY_MATCHERS: Record<string, { any: string[][]; must?: string[]; not?: string[] }> = {
   "instagram:seguidores": {
+    any: [["instagram", "follow"], ["instagram", "seguidor"]],
+    not: ["dislike", "unfollow"],
+  },
+  "instagram:seguidores:br": {
     any: [["instagram", "follow"], ["instagram", "seguidor"]],
     not: ["dislike", "unfollow"],
   },
   "instagram:curtidas": {
     any: [["instagram", "like"], ["instagram", "curtida"]],
     not: ["dislike"],
+  },
+  "instagram:visualizacoes": {
+    any: [["instagram", "view"], ["instagram", "visualiz"]],
+    not: ["story", "reel view bot"],
   },
   "facebook:seguidores": {
     any: [["facebook", "follow"], ["facebook", "seguidor"], ["facebook", "page like"]],
@@ -63,6 +75,13 @@ const CATEGORY_MATCHERS: Record<string, { any: string[][]; must?: string[]; not?
     any: [["tiktok", "follow"], ["tiktok", "seguidor"]],
     must: [],
   },
+  "tiktok:curtidas": {
+    any: [["tiktok", "like"], ["tiktok", "curtida"]],
+    not: ["dislike"],
+  },
+  "tiktok:visualizacoes": {
+    any: [["tiktok", "view"], ["tiktok", "visualiz"]],
+  },
   "kwai:seguidores": {
     any: [["kwai", "follow"], ["kwai", "seguidor"]],
   },
@@ -82,6 +101,7 @@ const CATEGORY_MATCHERS: Record<string, { any: string[][]; must?: string[]; not?
     not: ["channel", "canal"],
   },
 };
+
 
 function pacoteWantsBrazilian(pacote: string, category: string): boolean {
   if (category.endsWith(":br")) return true;
