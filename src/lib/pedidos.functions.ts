@@ -344,6 +344,22 @@ export const criarPedido = createServerFn({ method: "POST" })
       console.warn("[criarPedido] v297 preflight falhou (venda liberada):", err);
     }
 
+    // v301 — PREFLIGHT DE ALVO. A v297 prova que existe ROTA; esta prova que o
+    // ALVO é aceitável. Perfil inexistente/privado é recusado por todo painel
+    // SMM ("Unable to verify your domain submission") — foi a causa real do
+    // estorno de R$ 283,44 (p15k, 26/07). Fail-open em instabilidade.
+    try {
+      const { preflightTargetOrBlock } = await import("./target-preflight.server");
+      const alvo = await preflightTargetOrBlock({
+        rede: data.rede_social ?? "instagram",
+        pacote: pacoteEfetivo,
+        alvo: data.instagram_user,
+      });
+      if (!alvo.ok) return { ok: false as const, error: alvo.code };
+    } catch (err) {
+      console.warn("[criarPedido] v301 preflight de alvo falhou (venda liberada):", err);
+    }
+
 
 
     // ─────────────────────────────────────────────────────────────────────

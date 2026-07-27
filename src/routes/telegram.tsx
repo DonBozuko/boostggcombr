@@ -1,4 +1,5 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
@@ -181,7 +182,7 @@ function TelegramLanding() {
         },
       });
       if (!res?.ok) {
-        toast.error("Não foi possível gerar o Pix. Tente novamente.");
+        toast.error(checkoutErrorMessage(res?.error));
         return;
       }
       trackInitiateCheckout({

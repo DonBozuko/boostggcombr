@@ -1,4 +1,5 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
+import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { FaqSection, FAQS } from "@/components/FaqSection";
 import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
@@ -248,7 +249,7 @@ function TiktokLanding() {
         },
       });
       if (!res?.ok) {
-        toast.error("Não foi possível gerar o Pix. Tente novamente.");
+        toast.error(checkoutErrorMessage(res?.error));
         return;
       }
       trackInitiateCheckout({
