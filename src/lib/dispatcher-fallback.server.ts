@@ -21,6 +21,12 @@ function normalizeLink(pacote: string, raw: string): string {
   const p = pacote.toLowerCase().replace(/^br-/, "");
   const t = raw.trim();
   const isProfileOnly = p.startsWith("p") || p.startsWith("tf") || p.startsWith("ff");
+  // v303 — perfil de Instagram sai SEMPRE no formato canônico, igual ao
+  // SMMhype. Antes este dispatcher mandava `https://www.instagram.com/user`
+  // e o SMMhype `https://instagram.com/user` para o mesmo pedido.
+  if (p.startsWith("p") && /instagram\.com|^@|^[a-z0-9._]+$/i.test(t)) {
+    return normalizeInstagramUser(t);
+  }
   if (/^https?:\/\//i.test(t)) {
     const clean = stripTrackers(t);
     if (isProfileOnly) {
