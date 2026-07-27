@@ -10,6 +10,7 @@ NADA fake/dormindo em NENHUMA rota (`/`, `/admin`, checkout de redes, blog, stat
 Toda integração com fornecedor (SMMhype, SMMPainel, Verified, MP, TikTok, etc) deve ser SEMPRE: (1) catálogo/dados COMPLETOS sincronizados do provedor, nunca amostra hardcoded; (2) tabela atualizável em banco, não constante em código; (3) job automático (pg_cron diário mínimo) que mantém tudo fresco; (4) detector automático de variantes (BR/mundial, refill/sem, tiers de qty) que popula `service_id_matrix` sem intervenção manual. Se precisar preencher ID à mão, o sync está incompleto — arruma o sync, não o valor.
 Autonomia: quando a opção é claramente segura (não quebra receita, não apaga dado, não expõe segredo, reversível), EXECUTA direto sem pedir confirmação. Só pergunta em decisões irreversíveis ou trade-off real de negócio.
 Build só passa com `vitest run` verde (gate v243). Fluxo crítico novo/corrigido nasce com teste em `src/__tests__/`, e regra de dinheiro/entrega vive em módulo puro testável. Nunca remover o gate pra destravar deploy.
+Ordem sagrada do dinheiro: preflight de rota ao vivo → cobrança → despacho. Nunca cobrar sem provar que dá pra entregar agora. Ver [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight).
 
 Modo Orquestrador (regra absoluta): antes de mexer, mapear impacto cruzado, definir ordem de execução, rollback e prova real. Causa raiz > remendo. Ver [Modo Orquestrador](mem://preferences/modo-orquestrador).
 Documento nunca manda no código: `ARQUITETURA.md` e os arquivos em `.lovable/*.md` são índice, não verdade. Se divergirem do código, o CÓDIGO vence e eu corrijo o documento no mesmo turno. Proibido cravar service ID, preço ou número que o sync muda sozinho dentro de documento.
@@ -23,5 +24,6 @@ Problema achado por acaso = falha de instrumentação. Todo bug vira invariante 
 - [Evolução futura](mem://preferences/evolucao-futura) — Lembrar de evoluir módulos "honestos mas limitados" (ex: JarvisContentScheduler → publicação real) quando chip/warmup/API estiverem prontos. Usuário quer evoluir TUDO no futuro.
 - [Nunca responder de memória sobre operação](mem://preferences/nunca-responder-de-memoria) — Fornecedor ≠ rede. Fornecedores = smmhype, smmpainel, verified, provider4 (tabela `fornecedores`). Kwai/Instagram/TikTok = redes (rotas). Antes de afirmar, consultar banco/código.
 - [Pacote :br só serviço BR](mem://preferences/pacote-br-so-servico-br) — Pacote brasileiro nunca pode apontar pra serviço internacional nem pra serviço marcado como queda/"não compre". Validado no dry-run v240.
+- [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight) — v297: checagem ao vivo de rota antes de gerar Pix/cartão, fail-open em timeout, fail-closed com veredito, auto-cura da prateleira.
 
 
