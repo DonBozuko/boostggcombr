@@ -19,6 +19,7 @@ Problema achado por acaso = falha de instrumentação. Todo bug vira invariante 
 
 
 Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste barra qualquer segundo escritor. Ver [Preço dono único](mem://preferences/preco-dono-unico).
+Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/deletar. Arquivo pequeno, lógica em hook, feature em `src/features/`. Pedido vago ou grande = parar e fazer as 4 perguntas. Fechar ciclo perguntando sobre limpeza de lixo. Ver [Modo Torre](mem://preferences/modo-torre-clean-code).
 
 ## Memories
 - [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho) — Como a dupla conduz tarefas: rótulo de complexidade, quando pedir sinal verde, código > documento, fechamento de ciclo, auditoria de coerência.
@@ -28,5 +29,6 @@ Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste
 - [Pacote :br só serviço BR](mem://preferences/pacote-br-so-servico-br) — Pacote brasileiro nunca pode apontar pra serviço internacional nem pra serviço marcado como queda/"não compre". Validado no dry-run v240.
 - [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight) — v297: checagem ao vivo de rota antes de gerar Pix/cartão, fail-open em timeout, fail-closed com veredito, auto-cura da prateleira.
 - [Nunca cobrar sem validar o alvo](mem://preferences/nunca-cobrar-sem-validar-alvo) — v301: perfil do Instagram precisa existir e estar público antes da cobrança; fail-open em instabilidade; mensagem clara no checkout.
+- [Modo Torre (Clean Code)](mem://preferences/modo-torre-clean-code) — Contrato de ciclo fechado: anti-arquivo-gigante, modular por feature, deletar lixo na hora, listar arquivos antes de codar, 4 perguntas de direcionamento.
 
 
