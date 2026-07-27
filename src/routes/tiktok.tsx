@@ -1,7 +1,6 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { FaqSection, FAQS } from "@/components/FaqSection";
-import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -77,20 +76,11 @@ export const Route = createFileRoute("/tiktok")({
 type Categoria = "seguidores" | "curtidas" | "visualizacoes";
 type Plan = { id: string; tier: string; qty: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
-const FOLLOWER_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
-const LIKE_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000];
-const VIEW_QTYS = [1000,2000,5000,10000,15000,25000,50000,75000,100000,200000,300000,500000,750000,1000000];
+// v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
+const followersPlans: Plan[] = [];
+const likesPlans: Plan[] = [];
+const viewsPlans: Plan[] = [];
 
-const followersPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "tf", unitLabel: "Seguidores", costPer1k: 9, qtys: FOLLOWER_QTYS }),
-);
-const likesPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "tl", unitLabel: "Curtidas", costPer1k: 3, qtys: LIKE_QTYS }),
-);
-const viewsPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "tv", unitLabel: "Views", costPer1k: 0.4, qtys: VIEW_QTYS }),
-);
-const allPlans = [...followersPlans, ...likesPlans, ...viewsPlans];
 
 
 const followersSchema = z.object({

@@ -1,7 +1,6 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { FaqSection, FAQS } from "@/components/FaqSection";
-import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -76,16 +75,12 @@ export const Route = createFileRoute("/youtube")({
 type Categoria = "inscritos" | "visualizacoes";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
-const SUB_QTYS = [100,200,300,500,750,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000,75000,100000,200000,500000];
-const YT_VIEW_QTYS = [1000,2000,3000,5000,7500,10000,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000,300000,500000,750000,1000000,1500000,2000000,3000000,5000000,7500000,10000000,15000000,20000000,30000000,50000000];
+// v307 — Faxina: preço vem SÓ do banco (Autoridade Única). Sem fallback
+// estático: se o banco não responder, a vitrine mostra carregamento, nunca
+// preço inventado.
+const subsPlans: Plan[] = [];
+const viewsPlans: Plan[] = [];
 
-const subsPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "ys", unitLabel: "Inscritos", costPer1k: 25, qtys: SUB_QTYS }),
-);
-const viewsPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "yv", unitLabel: "Views", costPer1k: 1, qtys: YT_VIEW_QTYS }),
-);
-const allPlans = [...subsPlans, ...viewsPlans];
 
 
 const channelSchema = z.object({

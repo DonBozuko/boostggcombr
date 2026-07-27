@@ -2,7 +2,6 @@ import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
-import { applyProfitFormula, buildPlans } from "@/lib/profit-markup";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -76,16 +75,10 @@ export const Route = createFileRoute("/facebook")({
 type Categoria = "seguidores" | "curtidas";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
-const FB_FOLLOWER_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
-const FB_LIKE_QTYS = [100,200,300,500,750,1000,1500,2000,2500,3000,4000,5000,7500,10000,12500,15000,20000,25000,30000,40000,50000,75000,100000,150000,200000];
+// v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
+const followersPlans: Plan[] = [];
+const likesPlans: Plan[] = [];
 
-const followersPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "ff", unitLabel: "Seguidores", costPer1k: 10, qtys: FB_FOLLOWER_QTYS }),
-);
-const likesPlans: Plan[] = applyProfitFormula(
-  buildPlans({ prefix: "fl", unitLabel: "Curtidas", costPer1k: 5, qtys: FB_LIKE_QTYS }),
-);
-const allPlans = [...followersPlans, ...likesPlans];
 
 
 const profileSchema = z.object({
