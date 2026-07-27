@@ -148,6 +148,17 @@ export async function runAutoHealer(): Promise<HealReport> {
     // Ele corrigia margem item-a-item ignorando a escada e o teto de reajuste,
     // reintroduzindo exatamente as inversões que o ciclo anterior tinha
     // consertado. Preço agora tem dono único: a autoridade roda no fim.
+  }
+
+  // v305 — fecha o ciclo do auto-reparo pela autoridade única de preço.
+  try {
+    const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+    const auth = await enforcePriceAuthority("auto-healer");
+    report.price_fixed += auth.applied;
+  } catch (e) {
+    report.errors.push(`autoridade de preço falhou: ${String((e as any)?.message ?? e)}`);
+  }
+
 
 
   // 4) Alerta proativo — saldo pulmão crítico (< R$10 em qualquer fornecedor ativo)
