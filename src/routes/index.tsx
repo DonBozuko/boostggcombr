@@ -624,7 +624,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       });
       if (!res?.ok) {
         console.error("criarPedido falhou:", res);
-        toast.error("Não foi possível gerar o Pix. Tente novamente em instantes.");
+        toast.error(checkoutErrorMessage(res?.error));
         return;
       }
       trackInitiateCheckout({
