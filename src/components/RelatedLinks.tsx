@@ -54,21 +54,48 @@ const RELATED: Record<string, Link[]> = {
   ],
   "/crescer-youtube": [
     { href: "/comprar-inscritos-youtube", title: "Comprar Inscritos YouTube", desc: "Base inicial pra monetização." },
+    { href: "/youtube", title: "Pacotes YouTube", desc: "Inscritos, views e likes com Pix." },
+    { href: "/blog/como-ganhar-seguidores-instagram", title: "Guia de crescimento", desc: "O que funciona de verdade em rede social." },
   ],
   // Topo de funil
   "/audiencia-brasileira": [
     { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Compre agora com Pix." },
     { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Pacotes maiores mix internacional." },
+    { href: "/ferramentas/contador-seguidores", title: "Contador de seguidores", desc: "Confira seu número antes e depois, grátis." },
   ],
   "/engajamento-instagram": [
     { href: "/comprar-curtidas-instagram", title: "Comprar Curtidas Instagram", desc: "Empurre posts específicos." },
     { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Base pra sustentar o engajamento." },
+    { href: "/ferramentas/calculadora-engajamento-instagram", title: "Calculadora de engajamento", desc: "Veja se sua taxa está acima da média." },
   ],
   "/impulsionar-instagram": [
     { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Impulsione com base sólida." },
     { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Sinal forte pro algoritmo." },
+    { href: "/ferramentas/gerador-legenda-instagram", title: "Gerador de legenda", desc: "Legenda pronta com hashtag que alcança." },
+  ],
+  // v300 — páginas que estavam sem nenhum link de saída (órfãs de link juice)
+  "/seguidores-pix": [
+    { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Perfis BR reais com reposição." },
+    { href: "/comprar-seguidores-instagram-barato", title: "Seguidores baratos", desc: "Menor preço por seguidor com Pix." },
+    { href: "/blog/comprar-seguidores-pix", title: "Como funciona o Pix", desc: "Passo a passo do pagamento e da entrega." },
+  ],
+  "/comprar-seguidores-kwai": [
+    { href: "/kwai", title: "Pacotes Kwai", desc: "Seguidores, curtidas e views no Kwai." },
+    { href: "/comprar-seguidores-tiktok", title: "Seguidores TikTok", desc: "Mesma estratégia na rede vizinha." },
+    { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Público BR real pra vender." },
+  ],
+  "/kit-creator": [
+    { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Item mais pedido do kit, avulso." },
+    { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Reforço em posts do lançamento." },
+    { href: "/ferramentas", title: "Ferramentas grátis", desc: "Contador, calculadora e gerador de legenda." },
+  ],
+  "/promo-5reais": [
+    { href: "/comprar-seguidores-instagram-barato", title: "Seguidores baratos", desc: "Depois do teste, escale por pouco." },
+    { href: "/seguidores-pix", title: "Seguidores no Pix", desc: "Pagou, entregou. Sem cadastro." },
+    { href: "/avaliacoes", title: "Avaliações reais", desc: "Veja quem já comprou e recebeu." },
   ],
 };
+
 
 export function RelatedLinks({ accent = "#FFD700" }: { accent?: string }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
