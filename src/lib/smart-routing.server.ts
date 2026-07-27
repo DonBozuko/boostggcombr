@@ -1,8 +1,10 @@
 // Smart Cost Routing + Provider Health (Turno B v58)
 // Calcula custo BRL real por fornecedor ativo e ordena ascendente.
 // Sentinela: marca fornecedor instável por 30min após falha em runtime.
+import { costIsSane } from "./cost-sanity";
 
 const UNSTABLE_TTL_MS = 30 * 60 * 1000;
+
 
 export type RankedProvider = {
   slug: string;
@@ -124,6 +126,8 @@ export async function rankProvidersByCost(opts: {
   };
   const slugs = ((forn as any[]) ?? []).map((f) => f.slug as string);
   const providerIdMap: Record<string, string | null> = {};
+  // v294 — precisamos saber se o ID veio curado (manual) ou auto-resolvido.
+  const providerIdIsAuto: Record<string, boolean> = {};
   for (const slug of slugs) {
     const prefix = slugToColumn[slug] ?? slug;
     const manualCol = `${prefix}_service_id`;
@@ -132,6 +136,7 @@ export async function rankProvidersByCost(opts: {
     const autoId = (autoIds as any)?.[autoCol] ?? null;
     const fallbackId = slug === "smmhype" && serviceId != null ? String(serviceId) : null;
     providerIdMap[slug] = manualId ?? autoId ?? fallbackId;
+    providerIdIsAuto[slug] = manualId == null && autoId != null;
   }
 
   // v241/v242/v245 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
@@ -234,7 +239,25 @@ export async function rankProvidersByCost(opts: {
       rate_usd: providerRate,
       unstable,
     };
-  }).filter((p) => !!p.provider_service_id);
+  }).filter((p) => !!p.provider_service_id)
+    // v294 — descarta ID AUTO cujo custo destoa do custo de referência do pacote:
+    // sinal quase certo de que o ID aponta para outro produto (yv1k a R$0,20).
+    .filter((p) => {
+      if (!providerIdIsAuto[p.slug]) return true;
+      const ref = Number((pricingItem as any)?.cost_brl);
+      if (costIsSane(p.cost_brl, ref)) return true;
+      console.error(
+        `[v294] ${p.slug} descartado p/ ${opts.pacote}: ID auto ${p.provider_service_id} custa R$${p.cost_brl} vs referência R$${ref}`,
+      );
+      const prefix = slugToColumn[p.slug] ?? p.slug;
+      // Zera o ID auto errado para o auto-resolver procurar outro na próxima volta.
+      void supabaseAdmin
+        .from("pricing_items" as any)
+        .update({ [`${prefix}_auto_id`]: null } as any)
+        .eq("pacote", opts.pacote);
+      return false;
+    });
+
 
   const cascadeOrder: Record<string, number> = Object.fromEntries(slugs.map((s, i) => [s, i]));
   const { compareProviders } = await import("./critical-guards");
