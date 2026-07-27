@@ -70,13 +70,12 @@ const buildSitemapXml = () => {
   ];
 
 
-  // v172 — lastmod dinâmico (data de resposta) sinaliza frescor ao Google e acelera re-crawl.
-  const lastmod = new Date().toISOString().slice(0, 10);
+  // v308 — lastmod removido: data de build em todas as URLs é sinal falso de frescor
+  // e faz o Google desconfiar do sitemap inteiro. Só volta com timestamp real por página.
   const urls = entries.map((e) =>
     [
       `  <url>`,
       `    <loc>${BASE_URL}${e.path}</loc>`,
-      `    <lastmod>${lastmod}</lastmod>`,
       e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
       e.priority ? `    <priority>${e.priority}</priority>` : null,
       `  </url>`,
