@@ -28,3 +28,13 @@ export function classifyDispatchFailure(tentativas: string[]): FailureKind {
 // Janela de retentativa antes do estorno automático.
 export const TRANSIENT_SLA_MS = 2 * 60 * 60 * 1000; // 2h
 export const BALANCE_SLA_MS = 24 * 60 * 60 * 1000; // 24h
+
+// v296 — Prazo do parqueamento. O primeiro prazo manda: se o pedido já tem
+// sla_deadline, retentativa NÃO empurra o vencimento (senão nunca estorna).
+export function resolveSlaDeadline(existing: string | null | undefined, kind: FailureKind, now = Date.now()): string {
+  if (existing) {
+    const t = new Date(existing).getTime();
+    if (Number.isFinite(t)) return new Date(t).toISOString();
+  }
+  return new Date(now + (kind === "balance" ? BALANCE_SLA_MS : TRANSIENT_SLA_MS)).toISOString();
+}

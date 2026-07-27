@@ -310,13 +310,25 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
   if (!sucesso) {
     // v180/v296 — parqueia em vez de estornar quando a falha não é definitiva.
-    const { classifyDispatchFailure, TRANSIENT_SLA_MS, BALANCE_SLA_MS } = await import("./failure-classifier");
+    const { classifyDispatchFailure, resolveSlaDeadline } = await import("./failure-classifier");
     const kind = classifyDispatchFailure(tentativas);
 
     if (kind === "balance" || kind === "transient") {
       const isSaldo = kind === "balance";
-      const deadline = new Date(Date.now() + (isSaldo ? BALANCE_SLA_MS : TRANSIENT_SLA_MS)).toISOString();
+      // v296 — TRAVA DE PRAZO ETERNO. O SLA watcher retenta virando o pedido
+      // pra "pending" e chamando esta função de novo. Se recalculássemos o
+      // prazo aqui, cada retentativa empurraria o vencimento pra frente e o
+      // pedido NUNCA seria entregue nem estornado. O primeiro prazo manda.
+      const { data: atual } = await supabaseAdmin
+        .from("pedidos")
+        .select("sla_deadline")
+        .eq("id", pedido.id)
+        .maybeSingle();
+      const prazoExistente = (atual as any)?.sla_deadline as string | null | undefined;
+      const deadline = resolveSlaDeadline(prazoExistente, kind);
       const prazoTxt = new Date(deadline).toLocaleString("pt-BR");
+
+
       await supabaseAdmin
         .from("pedidos")
         .update({
@@ -328,8 +340,12 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         } as any)
         .eq("id", pedido.id);
 
+      // v296 — alerta só no PRIMEIRO parqueamento. Sem isso, cada retentativa
+      // do SLA watcher (15 em 15min) mandaria o mesmo aviso e viraria ruído.
       try {
+        if (prazoExistente) throw new Error("skip-alert");
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
+
         const msg = isSaldo
           ? `⏳ <b>PEDIDO EM ESPERA — RECARREGAR EM 24h</b>\n\nPROBLEMA: cliente pagou mas nenhum fornecedor tinha saldo pra entregar.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: recarregar qualquer fornecedor até ${prazoTxt} e apertar "Recarga Confirmada". Se passar do prazo, cliente é reembolsado automático.\n\nTentativas:\n${tentativas.join("\n")}`
           : `⏳ <b>PEDIDO EM ESPERA — FORNECEDOR RECUSOU AGORA</b>\n\nPROBLEMA: cliente pagou e os fornecedores recusaram o envio neste momento. O sistema vai tentar de novo sozinho a cada 15 minutos.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: nada agora. Se não entrar até ${prazoTxt}, o cliente é reembolsado automático e você é avisado.\n\nRecusas:\n${tentativas.join("\n")}`;
