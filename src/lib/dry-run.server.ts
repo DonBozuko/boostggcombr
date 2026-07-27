@@ -182,7 +182,7 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
       let anyKnown = false;
       let contentIssue: string | null = null;
       for (const [prov, id] of linkedProviders) {
-        const entry = indices[prov].get(id!.trim());
+        const entry = indices[prov]?.get(id!.trim());
         if (entry) {
           anyKnown = true;
           const issue = serviceContentIssue(entry, String(r.category ?? ""));
