@@ -1477,6 +1477,8 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
         <AdminHealthSemaphore />
 
+        <PendenciasManuaisPanel />
+
         <AdsHardwarePauseBanner />
 
         {/* v66 · Strict Action-Triggered UI Isolation Matrix */}
