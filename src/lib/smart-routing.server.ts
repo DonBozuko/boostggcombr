@@ -167,7 +167,25 @@ export async function rankProvidersByCost(opts: {
         .select("name, category, refill, min, max")
         .eq("provider_service_id", String(pid))
         .maybeSingle();
-      if (!svcRow) continue; // sem catálogo em cache: não bloqueio (evita parar venda)
+      if (!svcRow) {
+        // v296 — TRAVA DE ID FANTASMA. Se o catálogo do fornecedor está
+        // carregado e o ID do pacote não está lá, esse ID não existe mais.
+        // Mandar mesmo assim = pedido recusado + reembolso (caso p15k/14225).
+        // Só ignoramos quando o cache daquele fornecedor está vazio (sem dado).
+        const { count: catalogoSize } = await supabaseAdmin
+          .from(table as any)
+          .select("provider_service_id", { count: "exact", head: true });
+        if ((catalogoSize ?? 0) === 0) continue; // sem catálogo: não bloqueia
+        providerIdMap[slug] = null;
+        console.error(`[v296] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} não existe mais no catálogo do fornecedor`);
+        const prefix = slugToColumn[slug] ?? slug;
+        // ID auto inexistente: zera para o auto-resolver procurar outro.
+        if (((autoIds as any)?.[`${prefix}_auto_id`] ?? null) != null && ((pricingItem as any)?.[`${prefix}_service_id`] ?? null) == null) {
+          void supabaseAdmin.from("pricing_items" as any).update({ [`${prefix}_auto_id`]: null } as any).eq("pacote", opts.pacote);
+        }
+        continue;
+      }
+
       refillMap[slug] = (svcRow as any).refill === true;
       // v286 — TRAVA DE FAIXA: fornecedor que não aceita a quantidade do pacote
       // é descartado ANTES do dispatch. Antes disso o pedido só falhava no

@@ -309,33 +309,38 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   }
 
   if (!sucesso) {
-    // v180 — SLA 24h: se falha for saldo insuficiente em fornecedor, parqueia em waiting_provision.
-    // Só refunda se, após 24h, ainda não houver saldo (executado pelo SLA watcher).
-    const isSaldoInsuficiente = tentativas.some((t) =>
-      /insufficient|saldo|balance|not enough|no funds/i.test(t),
-    );
+    // v180/v296 — parqueia em vez de estornar quando a falha não é definitiva.
+    const { classifyDispatchFailure, TRANSIENT_SLA_MS, BALANCE_SLA_MS } = await import("./failure-classifier");
+    const kind = classifyDispatchFailure(tentativas);
 
-    if (isSaldoInsuficiente) {
-      const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    if (kind === "balance" || kind === "transient") {
+      const isSaldo = kind === "balance";
+      const deadline = new Date(Date.now() + (isSaldo ? BALANCE_SLA_MS : TRANSIENT_SLA_MS)).toISOString();
+      const prazoTxt = new Date(deadline).toLocaleString("pt-BR");
       await supabaseAdmin
         .from("pedidos")
         .update({
           status: "waiting_provision",
           sla_deadline: deadline,
-          error_detail: `Saldo insuficiente em fornecedores. Recarga até ${deadline}. ${tentativas.join(" | ")}`.slice(0, 500),
+          error_detail: (isSaldo
+            ? `Saldo insuficiente em fornecedores. Recarga até ${deadline}. `
+            : `v296: falha temporária no fornecedor. Retentando até ${deadline}. `) + tentativas.join(" | "),
         } as any)
         .eq("id", pedido.id);
 
       try {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
-        await dispatchTelegramAlert(
-          `⏳ <b>PEDIDO EM ESPERA — RECARREGAR EM 24h</b>\n\nPROBLEMA: cliente pagou mas nenhum fornecedor tinha saldo pra entregar.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: recarregar qualquer fornecedor até ${new Date(deadline).toLocaleString("pt-BR")} e apertar "Recarga Confirmada". Se passar do prazo, cliente é reembolsado automático.\n\nTentativas:\n${tentativas.join("\n")}`,
-          { inlineKeyboard: [[{ text: "✅ Recarga Confirmada", callback_data: `recharge:${pedido.id}` }]] },
-        ).catch(() => {});
+        const msg = isSaldo
+          ? `⏳ <b>PEDIDO EM ESPERA — RECARREGAR EM 24h</b>\n\nPROBLEMA: cliente pagou mas nenhum fornecedor tinha saldo pra entregar.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: recarregar qualquer fornecedor até ${prazoTxt} e apertar "Recarga Confirmada". Se passar do prazo, cliente é reembolsado automático.\n\nTentativas:\n${tentativas.join("\n")}`
+          : `⏳ <b>PEDIDO EM ESPERA — FORNECEDOR RECUSOU AGORA</b>\n\nPROBLEMA: cliente pagou e os fornecedores recusaram o envio neste momento. O sistema vai tentar de novo sozinho a cada 15 minutos.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nPacote: ${pedido.pacote} × ${pedido.quantidade}\n\nO QUE FAZER: nada agora. Se não entrar até ${prazoTxt}, o cliente é reembolsado automático e você é avisado.\n\nRecusas:\n${tentativas.join("\n")}`;
+        await dispatchTelegramAlert(msg, {
+          inlineKeyboard: [[{ text: "✅ Recarga Confirmada", callback_data: `recharge:${pedido.id}` }]],
+        }).catch(() => {});
       } catch { /* */ }
 
-      return { ok: true, status: "waiting_provision", recovered: false, note: `SLA 24h até ${deadline}` };
+      return { ok: true, status: "waiting_provision", recovered: false, note: `SLA até ${deadline}` };
     }
+
 
     // v279 — estorno correto por origem do pagamento: revenda volta pra carteira,
     // varejo volta pro Mercado Pago. Antes, revenda caía em refundMercadoPago("null").
