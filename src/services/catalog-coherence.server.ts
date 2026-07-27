@@ -93,6 +93,10 @@ export async function remediateCoherence(
   const alvos = new Map<string, string>();
   for (const i of issues) {
     if (!AUTO_PAUSE_CODES.has(i.code)) continue;
+    // v308 — só tira da vitrine achado crítico. Custo alto com serviço correto
+    // vira aviso, não pausa: tier premium é produto, não defeito.
+    if (i.severity !== "critical") continue;
+
     if (!alvos.has(i.pacote)) alvos.set(i.pacote, `${PAUSE_PREFIX}: ${i.detalhe}`);
   }
   if (alvos.size === 0) return { paused: [], errors: 0 };
