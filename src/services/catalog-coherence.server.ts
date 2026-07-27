@@ -60,20 +60,30 @@ export async function runCatalogCoherence(): Promise<CoherenceIssue[]> {
     };
   });
 
+  // v308 — leitura paginada. O cache do fornecedor principal tem 6.000+ serviços
+  // e a API corta em 1.000 por padrão: a auditoria ficava cega para o resto e
+  // tratava serviço válido como "desconhecido", pausando pacote saudável.
   const serviceNames = new Map<string, string>();
+  const PAGE = 1000;
   await Promise.all(
     CACHE_TABLES.map(async ({ table, provider }) => {
       try {
-        const { data } = await supabaseAdmin
-          .from(table as any)
-          .select("provider_service_id, name");
-        for (const s of ((data as any[]) ?? [])) {
-          const id = String(s.provider_service_id ?? "").trim();
-          if (id && s.name) serviceNames.set(serviceKey({ provider, id }), String(s.name));
+        for (let from = 0; ; from += PAGE) {
+          const { data } = await supabaseAdmin
+            .from(table as any)
+            .select("provider_service_id, name")
+            .range(from, from + PAGE - 1);
+          const page = (data as any[]) ?? [];
+          for (const s of page) {
+            const id = String(s.provider_service_id ?? "").trim();
+            if (id && s.name) serviceNames.set(serviceKey({ provider, id }), String(s.name));
+          }
+          if (page.length < PAGE) break;
         }
       } catch { /* cache ausente não invalida a auditoria */ }
     }),
   );
+
 
   return analyzeCatalogCoherence(rows, serviceNames);
 }
