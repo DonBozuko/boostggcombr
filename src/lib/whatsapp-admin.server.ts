@@ -92,9 +92,9 @@ export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?
     a.fornecedor ? `Fornecedor: <b>${a.fornecedor}</b>` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
     `Taxa Pix MP: ${fmtBrl(Number((a.vendaBrl * 0.0099 + 0.49).toFixed(2)))}`,
-    `Custo fornecedor: <b>${fmtBrl(custo)}</b>`,
-    `Lucro líq. (ROI ${roi}%): ${fmtBrl(lucroLiquido)}`,
-    showPix ? `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)` : null,
+    custo > 0 ? `Custo fornecedor: <b>${fmtBrl(custo)}</b>` : "Custo fornecedor: sem custo registrado para este pacote",
+    custo > 0 ? `Lucro líq. (ROI ${roi}%): ${fmtBrl(lucroLiquido)}` : null,
+    showPix && custo > 0 ? `💡 <b>Recarga sugerida: ${fmtBrl(sug.valor)}</b> (cobre ~${sug.cobre} pedidos deste custo)` : null,
     a.motivo ? `Motivo: ${a.motivo}` : null,
   ].filter(Boolean);
   const base = linhas.join("\n");
@@ -161,7 +161,11 @@ export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise
     }
   } catch { saldoCritical = !!alert.criticalCaixaZero; }
 
-  const text = buildProvisioningMessage({ ...alert, saldoCritical });
+  const custoBrl =
+    alert.custoBrl && alert.custoBrl > 0
+      ? alert.custoBrl
+      : await realCostBrl(alert.pacote, alert.quantidade);
+  const text = buildProvisioningMessage({ ...alert, custoBrl, saldoCritical });
   const opts = saldoCritical || alert.criticalCaixaZero
     ? { inlineKeyboard: rechargeKeyboard(alert.pedidoId) }
     : undefined;
