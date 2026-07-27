@@ -120,9 +120,37 @@ export async function remediateCoherence(
     if ((data as any[])?.length) paused.push(pacote);
   }
 
+  // v308 — religamento do que esta trava pausou e não é mais problema.
+  // Só volta à vitrine quem: foi pausado por ESTA trava, não tem mais achado
+  // crítico, e passou por teste seco nas últimas 48h. Sem teste recente, fica fora.
+  const restored: string[] = [];
+  const limite = new Date(Date.now() - 48 * 3600_000).toISOString();
+  const { data: pausados } = await supabaseAdmin
+    .from("pricing_items" as any)
+    .select("pacote, sellable_reason, last_dry_run")
+    .eq("is_sellable", false)
+    .like("sellable_reason", `${PAUSE_PREFIX}%`);
+
+  for (const p of ((pausados as any[]) ?? [])) {
+    const pacote = String(p.pacote);
+    if (alvos.has(pacote)) continue;
+    if (!p.last_dry_run || String(p.last_dry_run) < limite) continue;
+    const { error } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .update({ is_sellable: true, sellable_reason: null })
+      .eq("pacote", pacote)
+      .eq("is_sellable", false);
+    if (error) { errors += 1; continue; }
+    restored.push(pacote);
+  }
+
   if (paused.length > 0) {
     console.warn(`[coerencia] v304 pausou ${paused.length} pacote(s) incoerente(s):`, paused.join(", "));
   }
-  return { paused, errors };
+  if (restored.length > 0) {
+    console.info(`[coerencia] v308 religou ${restored.length} pacote(s):`, restored.join(", "));
+  }
+  return { paused, restored, errors };
 }
+
 
