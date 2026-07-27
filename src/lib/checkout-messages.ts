@@ -17,3 +17,18 @@ export function getCheckoutSuccessMessage(quantidade: number | null | undefined)
 
 // Alias legado (default = versão completa) para não quebrar imports antigos.
 export const CHECKOUT_SUCCESS_MESSAGE = CHECKOUT_SUCCESS_MESSAGE_FULL;
+
+// v301 — Mensagem única de erro de checkout. Bloqueio precisa explicar o que o
+// cliente faz agora, senão ele abandona achando que o site quebrou.
+export function checkoutErrorMessage(code?: string | null): string {
+  switch (code) {
+    case "PROFILE_NOT_FOUND":
+      return "Não encontramos esse perfil no Instagram. Confira o @ e tente de novo.";
+    case "PROFILE_PRIVATE":
+      return "Seu perfil está privado. Deixe público, aguarde 1 minuto e tente de novo — a entrega não funciona em perfil privado.";
+    case "INVALID_PACKAGE":
+      return "Este pacote está indisponível neste momento. Escolha outra quantidade — não vamos cobrar por algo que não conseguimos entregar agora.";
+    default:
+      return "Não foi possível gerar o Pix. Tente novamente.";
+  }
+}
