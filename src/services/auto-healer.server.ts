@@ -77,11 +77,18 @@ export async function runAutoHealer(): Promise<HealReport> {
   // 2) Snapshot fornecedores + catálogos externos ao vivo
   const { data: forn } = await supabaseAdmin
     .from("fornecedores")
-    .select("slug, ativo, saldo_atual, cotacao_brl");
-  const fornMap = new Map<string, { ativo: boolean; saldo: number; cot: number }>();
+    .select("nome, slug, ativo, saldo_atual, cotacao_brl, api_url");
+  const fornMap = new Map<string, { ativo: boolean; saldo: number; cot: number; nome: string; api_url: string | null }>();
   ((forn as any[]) ?? []).forEach((f) =>
-    fornMap.set(f.slug, { ativo: !!f.ativo, saldo: Number(f.saldo_atual) || 0, cot: Number(f.cotacao_brl) || 7 }),
+    fornMap.set(f.slug, {
+      ativo: !!f.ativo,
+      saldo: Number(f.saldo_atual) || 0,
+      cot: Number(f.cotacao_brl) || 7,
+      nome: f.nome ?? f.slug,
+      api_url: f.api_url ?? null,
+    }),
   );
+
 
   const catalogs: Record<string, Map<string, ProviderService> | null> = {};
   for (const p of PROVIDERS) {
