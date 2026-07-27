@@ -24,5 +24,6 @@ Problema achado por acaso = falha de instrumentação. Todo bug vira invariante 
 - [Evolução futura](mem://preferences/evolucao-futura) — Lembrar de evoluir módulos "honestos mas limitados" (ex: JarvisContentScheduler → publicação real) quando chip/warmup/API estiverem prontos. Usuário quer evoluir TUDO no futuro.
 - [Nunca responder de memória sobre operação](mem://preferences/nunca-responder-de-memoria) — Fornecedor ≠ rede. Fornecedores = smmhype, smmpainel, verified, provider4 (tabela `fornecedores`). Kwai/Instagram/TikTok = redes (rotas). Antes de afirmar, consultar banco/código.
 - [Pacote :br só serviço BR](mem://preferences/pacote-br-so-servico-br) — Pacote brasileiro nunca pode apontar pra serviço internacional nem pra serviço marcado como queda/"não compre". Validado no dry-run v240.
+- [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight) — v297: checagem ao vivo de rota antes de gerar Pix/cartão, fail-open em timeout, fail-closed com veredito, auto-cura da prateleira.
 
 
