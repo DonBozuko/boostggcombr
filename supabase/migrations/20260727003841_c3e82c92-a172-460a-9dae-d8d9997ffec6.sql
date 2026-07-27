@@ -1,0 +1,1 @@
+UPDATE admin_settings SET value = jsonb_set(value, '{alvos,10}', '{"ativo":true,"link":"https://t.me/vcsabiacatolico","pacote":"tgc100","quantidade":100,"rede":"telegram:canal"}'::jsonb, false), updated_at = now() WHERE key = 'canary_config';
