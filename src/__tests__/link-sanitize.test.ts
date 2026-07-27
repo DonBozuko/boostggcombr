@@ -20,4 +20,23 @@ describe("v272 — saneamento de link do cliente", () => {
       "https://www.youtube.com/watch?v=abc123",
     );
   });
+
+  // v303 — o botão Compartilhar do YouTube cola `?si=` e `?feature=`.
+  // Antes só o dispatcher de fallback removia isso; o SMMhype mandava sujo
+  // e o fornecedor recusava com "Unable to verify your domain submission".
+  it("remove os rastreadores do compartilhar do YouTube", () => {
+    expect(stripTrackers("https://youtu.be/abc123?si=Xy9&feature=shared")).toBe(
+      "https://youtu.be/abc123",
+    );
+    expect(
+      stripTrackers("https://www.tiktok.com/@user/video/123?is_from_webapp=1&sender_device=pc"),
+    ).toBe("https://www.tiktok.com/@user/video/123");
+  });
+
+  it("remove rastreadores de anúncio (fbclid/gclid/mibextid)", () => {
+    expect(stripTrackers("https://www.facebook.com/pagina?mibextid=abc&fbclid=xyz")).toBe(
+      "https://www.facebook.com/pagina",
+    );
+  });
 });
+

@@ -1,23 +1,9 @@
 // Server-only: dispatcher genérico SMM Panel v2 (SMMPainel, Verified Atacado).
 // Mesmo protocolo do SMMhype (key/action/service/link/quantity).
 import { resolveServiceId, SMMHYPE_SERVICE_IDS, type SmmDispatchResult } from "./smmhype.server";
-
-function stripTrackers(url: string): string {
-  // v272 — remove rastreadores (?igsh, utm_*, is_from_webapp) que fazem o
-  // fornecedor recusar o pedido com "Unable to verify your domain submission".
-  try {
-    const u = new URL(url);
-    for (const k of [...u.searchParams.keys()]) {
-      if (/^(igsh|igshid|utm_[a-z_]+|is_from_webapp|sender_device|si|feature|_r|_t)$/i.test(k)) {
-        u.searchParams.delete(k);
-      }
-    }
-    u.hash = "";
-    return u.toString().replace(/\?$/, "");
-  } catch {
-    return url;
-  }
-}
+// v303 — mesma limpeza de link usada pelo SMMhype (ponto único de verdade).
+// Antes cada dispatcher tinha a sua lista de rastreadores e divergia.
+import { stripTrackers, normalizeInstagramUser } from "./target-link";
 
 // v288 — endpoint do fornecedor vindo do banco pode chegar sem "https://" (ou
 // sem /api/v2) depois de uma edição manual/sincronização. Isso quebrava o envio
@@ -35,6 +21,12 @@ function normalizeLink(pacote: string, raw: string): string {
   const p = pacote.toLowerCase().replace(/^br-/, "");
   const t = raw.trim();
   const isProfileOnly = p.startsWith("p") || p.startsWith("tf") || p.startsWith("ff");
+  // v303 — perfil de Instagram sai SEMPRE no formato canônico, igual ao
+  // SMMhype. Antes este dispatcher mandava `https://www.instagram.com/user`
+  // e o SMMhype `https://instagram.com/user` para o mesmo pedido.
+  if (p.startsWith("p") && /instagram\.com|^@|^[a-z0-9._]+$/i.test(t)) {
+    return normalizeInstagramUser(t);
+  }
   if (/^https?:\/\//i.test(t)) {
     const clean = stripTrackers(t);
     if (isProfileOnly) {
