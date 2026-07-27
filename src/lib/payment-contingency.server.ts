@@ -315,8 +315,21 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
     if (kind === "balance" || kind === "transient") {
       const isSaldo = kind === "balance";
-      const deadline = new Date(Date.now() + (isSaldo ? BALANCE_SLA_MS : TRANSIENT_SLA_MS)).toISOString();
+      // v296 — TRAVA DE PRAZO ETERNO. O SLA watcher retenta virando o pedido
+      // pra "pending" e chamando esta função de novo. Se recalculássemos o
+      // prazo aqui, cada retentativa empurraria o vencimento pra frente e o
+      // pedido NUNCA seria entregue nem estornado. O primeiro prazo manda.
+      const { data: atual } = await supabaseAdmin
+        .from("pedidos")
+        .select("sla_deadline")
+        .eq("id", pedido.id)
+        .maybeSingle();
+      const prazoExistente = (atual as any)?.sla_deadline as string | null | undefined;
+      const deadline = prazoExistente
+        ? new Date(prazoExistente).toISOString()
+        : new Date(Date.now() + (isSaldo ? BALANCE_SLA_MS : TRANSIENT_SLA_MS)).toISOString();
       const prazoTxt = new Date(deadline).toLocaleString("pt-BR");
+
       await supabaseAdmin
         .from("pedidos")
         .update({
