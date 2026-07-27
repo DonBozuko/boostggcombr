@@ -14,7 +14,7 @@ const MIN_MARGIN = 0.70;
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchServiceCatalog, RESERVE_PROVIDER_ENDPOINTS } from "./pricing-cache.server";
 
-type ProviderKey = "smmhype" | "smmpanel" | "verified";
+type ProviderKey = string;
 
 type Row = {
   pacote: string;
@@ -22,10 +22,7 @@ type Row = {
   quantidade: number;
   cost_brl: number | null;
   price_brl: number | null;
-  smmhype_service_id: string | null;
-  smmpanel_service_id: string | null;
-  verified_service_id: string | null;
-};
+} & Record<string, unknown>;
 
 type CatalogEntry = { rate: number | string; min?: number | string; max?: number | string; name?: string; category?: string };
 
