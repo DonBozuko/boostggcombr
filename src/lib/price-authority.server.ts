@@ -70,5 +70,19 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
       .neq("is_sellable", false);
   }
 
+  // Contrapartida obrigatória: pacote que a AUTORIDADE pausou e que já teve o
+  // preço corrigido volta sozinho para a vitrine. Sem isso, a pausa vira lixo
+  // permanente e o pacote some do site sem motivo real.
+  const bloqueados = new Set(plan.blocked.map((b) => b.pacote));
+  const voltar = plan.rows.filter((r) => !bloqueados.has(r.pacote)).map((r) => r.pacote);
+  if (voltar.length > 0) {
+    await supabaseAdmin
+      .from("pricing_items" as any)
+      .update({ is_sellable: true, sellable_reason: null })
+      .in("pacote", voltar)
+      .like("sellable_reason", "custo do fornecedor subiu%");
+  }
+
+
   return { checked: plan.checked, applied, errors, changes: plan.changes, blocked: plan.blocked };
 }
