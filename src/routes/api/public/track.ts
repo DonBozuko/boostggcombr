@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { isInternalPath, isInternalTraffic } from "@/lib/traffic-source";
 import { z } from "zod";
 
 const schema = z.object({
