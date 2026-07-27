@@ -1,3 +1,4 @@
+import { isInternalPath } from "@/lib/traffic-source";
 // Beacon client-side de page views. Silencioso, não bloqueia navegação.
 // Nunca falha visível. Usa navigator.sendBeacon quando disponível.
 
