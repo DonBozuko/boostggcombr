@@ -1,9 +1,10 @@
 // Smart Cost Routing + Provider Health (Turno B v58)
 // Calcula custo BRL real por fornecedor ativo e ordena ascendente.
 // Sentinela: marca fornecedor instável por 30min após falha em runtime.
+import { costIsSane } from "./cost-sanity";
 
 const UNSTABLE_TTL_MS = 30 * 60 * 1000;
-import { costIsSane } from "./cost-sanity";
+
 
 export type RankedProvider = {
   slug: string;
