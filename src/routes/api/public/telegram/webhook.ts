@@ -10,6 +10,7 @@ const ROUTES: Record<string, { label: string; url: string }> = {
   fb: { label: '🔵 Facebook', url: 'https://boostgg.com.br/facebook' },
   tg: { label: '✈️ Telegram', url: 'https://boostgg.com.br/telegram' },
   tf: { label: '🌐 Tráfego', url: 'https://boostgg.com.br/trafego' },
+  kw: { label: '🧡 Kwai', url: 'https://boostgg.com.br/kwai' },
 };
 
 function deriveSecret(key: string) {
@@ -66,7 +67,8 @@ function networkKeyboard() {
       inline_keyboard: [
         [{ text: '📸 Instagram', callback_data: 'pick:ig' }, { text: '🎵 TikTok', callback_data: 'pick:tk' }],
         [{ text: '▶️ YouTube', callback_data: 'pick:yt' }, { text: '🔵 Facebook', callback_data: 'pick:fb' }],
-        [{ text: '✈️ Telegram', callback_data: 'pick:tg' }, { text: '🌐 Tráfego Web', callback_data: 'pick:tf' }],
+        [{ text: '🧡 Kwai', callback_data: 'pick:kw' }, { text: '✈️ Telegram', callback_data: 'pick:tg' }],
+        [{ text: '🌐 Tráfego Web', callback_data: 'pick:tf' }],
       ],
     },
   };
