@@ -1887,7 +1887,7 @@ export type Database = {
         }[]
       }
       solicitar_exclusao_pedido: {
-        Args: { _client_ip?: string; _mp_id: string }
+        Args: { _client_ip: string; _confirm?: string; _mp_id: string }
         Returns: {
           message: string
           ok: boolean

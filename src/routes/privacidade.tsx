@@ -134,6 +134,7 @@ function TrustPage() {
 
 function LgpdDeleteForm() {
   const [mpId, setMpId] = useState("");
+  const [confirmacao, setConfirmacao] = useState("");
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
   const submit = async (e: React.FormEvent) => {
@@ -145,11 +146,14 @@ function LgpdDeleteForm() {
       const res = await fetch("/api/public/lgpd-delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mercado_pago_id: mpId.trim() }),
+        body: JSON.stringify({ mercado_pago_id: mpId.trim(), confirmacao: confirmacao.trim() }),
       });
       const json = (await res.json()) as { ok: boolean; message: string };
       setResult(json);
-      if (json.ok) setMpId("");
+      if (json.ok) {
+        setMpId("");
+        setConfirmacao("");
+      }
     } catch {
       setResult({ ok: false, message: "Falha de rede. Tente novamente." });
     } finally {
@@ -157,31 +161,44 @@ function LgpdDeleteForm() {
     }
   };
   return (
-    <form onSubmit={submit} className="mt-4 flex flex-col sm:flex-row gap-2">
-      <input
-        type="text"
-        value={mpId}
-        onChange={(e) => setMpId(e.target.value)}
-        placeholder="ID do pagamento Mercado Pago"
-        className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
-        maxLength={60}
-        required
-      />
-      <button
-        type="submit"
-        disabled={busy || mpId.trim().length < 4}
-        className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
-      >
-        {busy ? "Enviando…" : "Excluir meus dados"}
-      </button>
+    <form onSubmit={submit} className="mt-4 flex flex-col gap-2">
+      <p className="text-xs text-muted-foreground">
+        Por segurança, pedimos dois dados: assim ninguém apaga o pedido de outra pessoa.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-2">
+        <input
+          type="text"
+          value={mpId}
+          onChange={(e) => setMpId(e.target.value)}
+          placeholder="ID do pagamento Mercado Pago"
+          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+          maxLength={60}
+          required
+        />
+        <input
+          type="text"
+          value={confirmacao}
+          onChange={(e) => setConfirmacao(e.target.value)}
+          placeholder="@ do perfil, e-mail ou WhatsApp do pedido"
+          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground"
+          maxLength={160}
+          required
+        />
+        <button
+          type="submit"
+          disabled={busy || mpId.trim().length < 4 || confirmacao.trim().length < 3}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:opacity-60"
+        >
+          {busy ? "Enviando…" : "Excluir meus dados"}
+        </button>
+      </div>
       {result && (
-        <p className={`sm:w-full text-xs mt-1 ${result.ok ? "text-emerald-400" : "text-red-400"}`}>
-          {result.message}
-        </p>
+        <p className={`text-xs ${result.ok ? "text-emerald-400" : "text-red-400"}`}>{result.message}</p>
       )}
     </form>
   );
 }
+
 
 function Section({
   icon: Icon,
