@@ -18,6 +18,8 @@
    isolamento por rede.
 5. **[.lovable/memory/index.md](.lovable/memory/index.md)** — Memória viva
    (preferências, regras de negócio, protocolo de trabalho).
+6. **[.lovable/seo_assets.md](.lovable/seo_assets.md)** — Inventário SEO/AEO:
+   URLs indexáveis, malha de links internos, llms.txt e plano de autoridade.
 
 ## Constantes Cravadas
 
