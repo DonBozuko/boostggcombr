@@ -85,8 +85,17 @@ async function runBackfill() {
   await syncSmmhypeServices().catch(() => null);
 
   // 2. Carrega catálogo SMMhype (services_cache) + linhas NULL
-  const [{ data: cache }, { data: nulos }] = await Promise.all([
-    supabaseAdmin.from("services_cache").select("provider_service_id, name, category, min, max, refill"),
+  // v308 — cache lido paginado (6.000+ serviços; a API corta em 1.000).
+  const cache: any[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data: page } = await supabaseAdmin
+      .from("services_cache")
+      .select("provider_service_id, name, category, min, max, refill")
+      .range(from, from + 999);
+    cache.push(...((page as any[]) ?? []));
+    if (((page as any[]) ?? []).length < 1000) break;
+  }
+  const [{ data: nulos }] = await Promise.all([
     supabaseAdmin
       .from("pricing_items")
       .select("pacote, quantidade")

@@ -64,12 +64,21 @@ export async function syncSmmhypeServices() {
 
   // v296 — Apaga TODOS os que sumiram do fornecedor, sem exceção.
   const ids = rows.map((r) => r.provider_service_id);
-  const { data: existentes } = await supabaseAdmin
-    .from("services_cache")
-    .select("provider_service_id");
+  // v308 — paginado: sem isso só as 1.000 primeiras linhas eram comparadas e
+  // serviço morto continuava no cache virando ID fantasma.
+  const existentes: any[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data: page } = await supabaseAdmin
+      .from("services_cache")
+      .select("provider_service_id")
+      .range(from, from + 999);
+    existentes.push(...((page as any[]) ?? []));
+    if (((page as any[]) ?? []).length < 1000) break;
+  }
+  const idSet = new Set(ids);
   const aRemover = (existentes ?? [])
     .map((r: any) => r.provider_service_id as number)
-    .filter((id: number) => !ids.includes(id));
+    .filter((id: number) => !idSet.has(id));
   if (aRemover.length > 0) {
     await supabaseAdmin
       .from("services_cache")
