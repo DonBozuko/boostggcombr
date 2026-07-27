@@ -2,27 +2,31 @@
 // Zero HTTP externo: só banco. Seguro para rodar junto da auditoria forense.
 import {
   analyzeCatalogCoherence,
+  serviceKey,
   type CoherenceIssue,
   type CoherenceRow,
 } from "@/lib/catalog-coherence";
 
-const ID_COLUMNS = [
-  "smmhype_service_id",
-  "smmhype_auto_id",
-  "smmpanel_service_id",
-  "smmpanel_auto_id",
-  "verified_service_id",
-  "verified_auto_id",
-  "provider4_service_id",
-  "provider4_auto_id",
-  "provider_service_id",
+// v308 — cada coluna de ID sabe de qual fornecedor ela é. Antes o nome era
+// buscado por id "solto" e o mesmo número existia em fornecedores diferentes
+// com produtos diferentes — a auditoria lia o nome errado e pausava pacote bom.
+const ID_COLUMNS: Array<{ col: string; provider: string }> = [
+  { col: "smmhype_service_id", provider: "smmhype" },
+  { col: "smmhype_auto_id", provider: "smmhype" },
+  { col: "provider_service_id", provider: "smmhype" },
+  { col: "smmpanel_service_id", provider: "smmpanel" },
+  { col: "smmpanel_auto_id", provider: "smmpanel" },
+  { col: "verified_service_id", provider: "verified" },
+  { col: "verified_auto_id", provider: "verified" },
+  { col: "provider4_service_id", provider: "provider4" },
+  { col: "provider4_auto_id", provider: "provider4" },
 ];
 
-const CACHE_TABLES = [
-  "services_cache",
-  "smmpanel_services_cache",
-  "verified_services_cache",
-  "provider4_services_cache",
+const CACHE_TABLES: Array<{ table: string; provider: string }> = [
+  { table: "services_cache", provider: "smmhype" },
+  { table: "smmpanel_services_cache", provider: "smmpanel" },
+  { table: "verified_services_cache", provider: "verified" },
+  { table: "provider4_services_cache", provider: "provider4" },
 ];
 
 export async function runCatalogCoherence(): Promise<CoherenceIssue[]> {
@@ -30,34 +34,42 @@ export async function runCatalogCoherence(): Promise<CoherenceIssue[]> {
 
   const { data: items } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select(["pacote", "category", "quantidade", "cost_brl", "price_brl", "last_dry_run", ...ID_COLUMNS].join(", "));
+    .select(
+      ["pacote", "category", "quantidade", "cost_brl", "price_brl", "last_dry_run", ...ID_COLUMNS.map((c) => c.col)].join(", "),
+    );
 
-  const rows: CoherenceRow[] = ((items as any[]) ?? []).map((r) => ({
-    pacote: String(r.pacote),
-    category: r.category ?? null,
-    quantidade: r.quantidade ?? null,
-    cost_brl: r.cost_brl ?? null,
-    price_brl: r.price_brl ?? null,
-    last_dry_run: r.last_dry_run ?? null,
-    serviceIds: [
-      ...new Set(
-        ID_COLUMNS.map((c) => r[c])
-          .filter((v) => v !== null && v !== undefined && String(v).trim() !== "")
-          .map((v) => String(v).trim()),
-      ),
-    ],
-  }));
+  const rows: CoherenceRow[] = ((items as any[]) ?? []).map((r) => {
+    const seen = new Set<string>();
+    const serviceIds = ID_COLUMNS.flatMap(({ col, provider }) => {
+      const v = r[col];
+      if (v === null || v === undefined || String(v).trim() === "") return [];
+      const ref = { provider, id: String(v).trim() };
+      const k = serviceKey(ref);
+      if (seen.has(k)) return [];
+      seen.add(k);
+      return [ref];
+    });
+    return {
+      pacote: String(r.pacote),
+      category: r.category ?? null,
+      quantidade: r.quantidade ?? null,
+      cost_brl: r.cost_brl ?? null,
+      price_brl: r.price_brl ?? null,
+      last_dry_run: r.last_dry_run ?? null,
+      serviceIds,
+    };
+  });
 
   const serviceNames = new Map<string, string>();
   await Promise.all(
-    CACHE_TABLES.map(async (t) => {
+    CACHE_TABLES.map(async ({ table, provider }) => {
       try {
         const { data } = await supabaseAdmin
-          .from(t as any)
+          .from(table as any)
           .select("provider_service_id, name");
         for (const s of ((data as any[]) ?? [])) {
           const id = String(s.provider_service_id ?? "").trim();
-          if (id && s.name && !serviceNames.has(id)) serviceNames.set(id, String(s.name));
+          if (id && s.name) serviceNames.set(serviceKey({ provider, id }), String(s.name));
         }
       } catch { /* cache ausente não invalida a auditoria */ }
     }),
@@ -65,6 +77,7 @@ export async function runCatalogCoherence(): Promise<CoherenceIssue[]> {
 
   return analyzeCatalogCoherence(rows, serviceNames);
 }
+
 
 // v304 — A auditoria de coerência deixou de ser só relatório.
 // Serviço errado vinculado (SERVICO_INCOERENTE) e custo absurdo
