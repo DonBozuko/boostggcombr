@@ -159,7 +159,55 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     });
   }
 
+  // 7) v291 — Coerência do catálogo (serviço errado, escada invertida, custo fora
+  // da curva). Aditivo: se falhar, a auditoria antiga continua valendo.
+  try {
+    const { runCatalogCoherence } = await import("@/services/catalog-coherence.server");
+    const issues = await runCatalogCoherence();
+    const grupos = new Map<string, typeof issues>();
+    for (const i of issues) {
+      if (!grupos.has(i.code)) grupos.set(i.code, []);
+      grupos.get(i.code)!.push(i);
+    }
+    const TITULOS: Record<string, { titulo: string; o_que_fazer: string }> = {
+      ESCADA_QUEBRADA: {
+        titulo: "Pacote maior está mais barato que o menor",
+        o_que_fazer: "Painel > Saúde do Catálogo: revise esses pacotes, o cliente paga mais por menos.",
+      },
+      PRECO_UNITARIO_INVERTIDO: {
+        titulo: "Preço por unidade sobe conforme o pacote cresce",
+        o_que_fazer: "Sem urgência: revise a escada dessa categoria.",
+      },
+      CUSTO_FORA_DA_CURVA: {
+        titulo: "Custo de fornecedor muito acima do normal",
+        o_que_fazer: "Provável serviço errado vinculado. Confira o ID desse pacote.",
+      },
+      SERVICO_INCOERENTE: {
+        titulo: "Pacote vinculado ao produto errado do fornecedor",
+        o_que_fazer: "Troque o ID do fornecedor desse pacote antes que alguém compre.",
+      },
+      TESTE_SECO_CEGO: {
+        titulo: "Catálogo sem revalidação recente",
+        o_que_fazer: "O robô de teste seco parou. Me avise para religar.",
+      },
+    };
+    for (const [code, lista] of grupos) {
+      const meta = TITULOS[code] ?? { titulo: code, o_que_fazer: "Revisar no painel." };
+      findings.push({
+        code,
+        severity: lista[0].severity,
+        titulo: meta.titulo,
+        problema: `${lista.length} pacote(s) com problema: ${lista.slice(0, 5).map((i) => `${i.pacote} (${i.detalhe})`).join("; ")}${lista.length > 5 ? "…" : ""}`,
+        o_que_fazer: meta.o_que_fazer,
+        evidencia: lista.slice(0, 30),
+      });
+    }
+  } catch (e) {
+    console.warn("[ops-audit] coerência falhou", e);
+  }
+
   const critical = findings.filter((f) => f.severity === "critical");
+
   let telegramEnviado = false;
 
   if (options.notify && critical.length > 0) {
