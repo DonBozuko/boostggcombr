@@ -2,11 +2,10 @@
 // Varredura clínica silenciosa dos 289 pacotes de pricing_items contra as 3 APIs
 // (smmhype, smmpanel, verified). Detecta e conserta em runtime:
 //   (a) ID inválido/defasado    → UPDATE direto na coluna *_service_id
-//   (b) Preço com margem furada → recomputa via computeGuardedPrice (piso R$5, Pix R$0,49)
+//   (b) Preço com margem furada → delegado à autoridade única (v305)
 //   (c) Provedor offline/zerado → seta provider_health.unstable_until
 // Descarrega tudo em admin_audit_logs.
 
-import { computeGuardedPrice, respectsMinMargin } from "@/lib/margin-guardian";
 
 const PROVIDERS = [
   { slug: "smmhype",  endpoint: "https://smmhype.com/api/v2",         envKey: "SMMHYPE_API_KEY",   idCol: "smmhype_service_id" },
