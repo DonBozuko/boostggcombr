@@ -123,8 +123,11 @@ export const Route = createFileRoute("/")({
     const ogTitle = "Elite Boost Prime — Seguidores no Instagram via Pix";
     const description =
       "Comprar seguidores Instagram reais, brasileiros e com entrega rápida via Pix. Alta retenção, reposição nos pacotes brasileiros e 100% seguro. Comece em minutos.";
-    const url = "https://boostgg.com.br/";
-    const ogImage = `https://boostgg.com.br${ogInstagram}?v=49`;
+    // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
+    // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
+    // marcação e usar a dele. Agora as duas batem.
+    const url = "https://www.boostgg.com.br/";
+    const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
     return {
       meta: [
         { title },
@@ -172,25 +175,15 @@ export const Route = createFileRoute("/")({
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://boostgg.com.br/#organization" },
               },
-              {
-                "@type": "Service",
-                serviceType: "Marketing de Instagram e Engajamento Social",
-                provider: { "@id": "https://boostgg.com.br/#organization" },
-                areaServed: { "@type": "Country", name: "Brasil" },
-                name: "Compra de Seguidores no Instagram",
-                description,
-                // Google não aceita aggregateRating em Service (erro crítico no GSC).
-                // A nota agregada fica só no nó Product abaixo, que é o tipo suportado.
+              // v302 — O nó Service foi REMOVIDO de propósito.
+              // O Google reportou "Review snippets: tipo de objeto do campo
+              // <parent_node> não é válido" apontando para o item
+              // "Compra de Seguidores no Instagram". Causa: Service não é um
+              // tipo que aceita nota/avaliação; como Service e Product
+              // descreviam a MESMA página, o Google colava a nota do Product
+              // no Service e invalidava o rich snippet inteiro.
+              // Ponto único de verdade: só o Product carrega oferta + nota.
 
-                offers: {
-                  "@type": "AggregateOffer",
-                  priceCurrency: "BRL",
-                  lowPrice: "5.00",
-                  highPrice: "499.00",
-                  offerCount: "9",
-                  availability: "https://schema.org/InStock",
-                },
-              },
               {
                 "@type": "FAQPage",
                 mainEntity: [
@@ -227,6 +220,17 @@ export const Route = createFileRoute("/")({
                 description,
                 brand: { "@type": "Brand", name: "BoostGG" },
                 image: ogImage,
+                // Oferta herdada do antigo nó Service (v302): rich snippet de
+                // preço + nota agora vivem no mesmo item suportado.
+                offers: {
+                  "@type": "AggregateOffer",
+                  priceCurrency: "BRL",
+                  lowPrice: "5.00",
+                  highPrice: "499.00",
+                  offerCount: "9",
+                  availability: "https://schema.org/InStock",
+                  url: "https://www.boostgg.com.br/",
+                },
                 aggregateRating: {
                   "@type": "AggregateRating",
                   ratingValue: "4.9",
