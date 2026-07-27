@@ -457,6 +457,50 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     });
   }
 
+  // v292 — Trava de escada. Depois de planejar preço item-a-item, garante que
+  // dentro da mesma categoria pacote maior nunca fique mais barato que o menor.
+  // Só empurra PRA CIMA — nunca reduz preço, então não come margem.
+  {
+    const planByPacote = new Map(plans.map((p) => [p.pacote, p]));
+    const ladderInput = ((rows as any[]) ?? [])
+      .map((r) => {
+        const plan = planByPacote.get(String(r.pacote));
+        const price = Number(plan?.patch.price_brl ?? r.price_brl ?? 0);
+        return {
+          pacote: String(r.pacote),
+          category: String(r.category ?? ""),
+          quantidade: Number(r.quantidade ?? 0),
+          price_brl: price,
+        };
+      })
+      .filter((r) => r.category && r.quantidade > 0 && r.price_brl > 0);
+
+    const { fixes } = enforceMonotonicLadder(ladderInput);
+    for (const f of fixes) {
+      const plan = planByPacote.get(f.pacote);
+      if (plan) {
+        plan.patch.price_brl = f.para;
+        if (!plan.priceKeys.includes("price_brl")) plan.priceKeys.push("price_brl");
+        plan.movesPrice = true;
+      } else {
+        plans.push({
+          pacote: f.pacote,
+          patch: { price_brl: f.para },
+          priceKeys: ["price_brl"],
+          movesPrice: true,
+          restoredPacote: null,
+        });
+      }
+    }
+    if (fixes.length > 0) {
+      console.warn(
+        `[pricing] v292 trava de escada corrigiu ${fixes.length} pacote(s):`,
+        fixes.slice(0, 10).map((f) => `${f.pacote} R$${f.de}→R$${f.para}`).join(", "),
+      );
+    }
+  }
+
+
   // v275 — FASE 2: mede o estrago ANTES de gravar.
   // Se mais de 30% do catálogo mudaria de preço no mesmo ciclo, isso não é
   // reajuste de fornecedor: é leitura ruim (catálogo incompleto/câmbio).
