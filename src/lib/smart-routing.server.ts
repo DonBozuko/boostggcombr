@@ -3,6 +3,7 @@
 // Sentinela: marca fornecedor instável por 30min após falha em runtime.
 
 const UNSTABLE_TTL_MS = 30 * 60 * 1000;
+import { costIsSane } from "./cost-sanity";
 
 export type RankedProvider = {
   slug: string;
