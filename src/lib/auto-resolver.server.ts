@@ -163,10 +163,21 @@ function scoreCandidate(row: CacheRow, opts: { qty: number; wantBr: boolean; wan
 
 async function loadCache(supabaseAdmin: any, provider: Provider): Promise<CacheRow[]> {
   const table = provider === "smmhype" ? "services_cache" : provider === "smmpanel" ? "smmpanel_services_cache" : "verified_services_cache";
-  const { data } = await supabaseAdmin
-    .from(table)
-    .select("provider_service_id, name, category, rate, min, max, refill");
-  return ((data as any[]) ?? []).map((r) => ({
+  // v308 — paginado: o cache do fornecedor principal tem 6.000+ serviços e a API
+  // corta em 1.000. O religador só enxergava a primeira fatia e escolhia serviço
+  // pior (ou nenhum) mesmo existindo o certo.
+  const raw: any[] = [];
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data } = await supabaseAdmin
+      .from(table)
+      .select("provider_service_id, name, category, rate, min, max, refill")
+      .range(from, from + PAGE - 1);
+    const page = (data as any[]) ?? [];
+    raw.push(...page);
+    if (page.length < PAGE) break;
+  }
+  return raw.map((r) => ({
     provider_service_id: String(r.provider_service_id),
     name: String(r.name ?? ""),
     category: String(r.category ?? ""),
