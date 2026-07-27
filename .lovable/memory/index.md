@@ -19,6 +19,7 @@ Problema achado por acaso = falha de instrumentação. Todo bug vira invariante 
 
 
 Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste barra qualquer segundo escritor. Ver [Preço dono único](mem://preferences/preco-dono-unico).
+Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/deletar. Arquivo pequeno, lógica em hook, feature em `src/features/`. Pedido vago ou grande = parar e fazer as 4 perguntas. Fechar ciclo perguntando sobre limpeza de lixo. Ver [Modo Torre](mem://preferences/modo-torre-clean-code).
 
 ## Memories
 - [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho) — Como a dupla conduz tarefas: rótulo de complexidade, quando pedir sinal verde, código > documento, fechamento de ciclo, auditoria de coerência.
