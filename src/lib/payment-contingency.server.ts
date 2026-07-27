@@ -310,7 +310,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
   if (!sucesso) {
     // v180/v296 — parqueia em vez de estornar quando a falha não é definitiva.
-    const { classifyDispatchFailure, TRANSIENT_SLA_MS, BALANCE_SLA_MS } = await import("./failure-classifier");
+    const { classifyDispatchFailure, resolveSlaDeadline } = await import("./failure-classifier");
     const kind = classifyDispatchFailure(tentativas);
 
     if (kind === "balance" || kind === "transient") {
@@ -325,10 +325,9 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         .eq("id", pedido.id)
         .maybeSingle();
       const prazoExistente = (atual as any)?.sla_deadline as string | null | undefined;
-      const deadline = prazoExistente
-        ? new Date(prazoExistente).toISOString()
-        : new Date(Date.now() + (isSaldo ? BALANCE_SLA_MS : TRANSIENT_SLA_MS)).toISOString();
+      const deadline = resolveSlaDeadline(prazoExistente, kind);
       const prazoTxt = new Date(deadline).toLocaleString("pt-BR");
+
 
       await supabaseAdmin
         .from("pedidos")
