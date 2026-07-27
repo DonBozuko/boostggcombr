@@ -307,7 +307,11 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
       report.verificados.push({ id: r.id, fornecedor: r.provider_slug, ordem: r.provider_order_id, resultado: falha });
 
       const min = await quarentenar(r.pacote, r.provider_slug, falha);
+      // v294 — se o ID usado era AUTO-resolvido, o cancelamento indica ID errado.
+      // Zera para o auto-resolver buscar outro em vez de repetir o mesmo erro.
+      if (canceled) await limparAutoIdSeAuto(r.pacote, r.provider_slug);
       const restantes = await rotasRestantes(r.pacote, Number(r.quantidade || 0));
+
 
       if (restantes.length > 0) {
         // Cliente real continua sendo atendido por outro fornecedor → sem alarme.
