@@ -165,10 +165,14 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     const { runCatalogCoherence, remediateCoherence } = await import("@/services/catalog-coherence.server");
     const issues = await runCatalogCoherence();
     // v304 — pacote com serviço errado ou custo absurdo sai da vitrine na hora.
-    const remediado = await remediateCoherence(issues).catch(() => ({ paused: [], errors: 1 }));
+    const remediado = await remediateCoherence(issues).catch(() => ({ paused: [], restored: [], errors: 1 }));
     if (remediado.paused.length > 0) {
       console.warn("[ops-audit] v304 pacotes pausados pela coerência", remediado.paused);
     }
+    if (remediado.restored.length > 0) {
+      console.info("[ops-audit] v308 pacotes religados pela coerência", remediado.restored);
+    }
+
     const grupos = new Map<string, typeof issues>();
     for (const i of issues) {
       if (!grupos.has(i.code)) grupos.set(i.code, []);
