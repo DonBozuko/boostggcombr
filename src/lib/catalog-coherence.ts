@@ -5,6 +5,13 @@
 // detector. O teste seco só olha "dá pra vender?" — não olha "faz sentido?".
 // Aqui ficam as INVARIANTES do catálogo. Se uma quebra, vira achado.
 
+// v308 — IDs de serviço agora carregam o fornecedor junto.
+// Motivo real (auditoria 27/07): o id "143" existe em DOIS fornecedores com
+// produtos diferentes ("Curtidas na Live" no SMMPanel, "Visualizações de live
+// do FB" no Verified). O mapa de nomes era global por id, então a auditoria
+// lia o nome do fornecedor errado e pausava pacote saudável. Chave = provider:id.
+export type ServiceRef = { provider: string; id: string };
+
 export type CoherenceRow = {
   pacote: string;
   category: string | null;
@@ -12,7 +19,7 @@ export type CoherenceRow = {
   cost_brl: number | null;
   price_brl: number | null;
   last_dry_run: string | null;
-  serviceIds: string[];
+  serviceIds: ServiceRef[];
 };
 
 export type CoherenceIssue = {
@@ -41,6 +48,11 @@ function intentOf(category: string) {
   for (const p of parts) if (INTENT[p]) return INTENT[p];
   return null;
 }
+
+export function serviceKey(ref: ServiceRef): string {
+  return `${ref.provider}:${ref.id}`;
+}
+
 
 function median(nums: number[]): number {
   if (nums.length === 0) return 0;
