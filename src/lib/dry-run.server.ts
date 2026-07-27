@@ -67,23 +67,71 @@ export type DryRunSummary = {
   catalogsAlive: number;
 };
 
+// v290 — fornecedores vêm da tabela `fornecedores` (inclui provider4/SMMOficial),
+// e conferimos tanto o ID curado quanto o auto-resolvido. Antes só 3 fornecedores
+// e só a coluna curada eram checados: pacote atendido pelo 4º fornecedor (ou só
+// com auto_id) era pausado sem motivo — sumia mercadoria da prateleira.
+const SLUG_TO_COLUMN: Record<string, string> = {
+  smmhype: "smmhype",
+  smmpainel: "smmpanel",
+  smmpanel: "smmpanel",
+  verified: "verified",
+  provider4: "provider4",
+};
+
+function normalizeEndpoint(apiUrl: string): string {
+  const base = String(apiUrl ?? "").trim().replace(/\/+$/, "");
+  if (!base) return "";
+  return /\/api\/v2$/.test(base) ? base : `${base}/api/v2`;
+}
+
+type ProviderCfg = { slug: string; column: string; endpoint: string; apiKey: string | null };
+
+async function loadProviders(): Promise<ProviderCfg[]> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("fornecedores" as any)
+      .select("slug, ativo, api_url, api_key_secret")
+      .eq("ativo", true);
+    const list = ((data as any[]) ?? [])
+      .map((f) => ({
+        slug: String(f.slug),
+        column: SLUG_TO_COLUMN[String(f.slug)] ?? String(f.slug),
+        endpoint: normalizeEndpoint(f.api_url),
+        apiKey: process.env[String(f.api_key_secret ?? "")] ?? null,
+      }))
+      .filter((p) => p.endpoint);
+    if (list.length > 0) return list;
+  } catch { /* cai no fallback abaixo */ }
+  // Fallback: os 3 fornecedores históricos, para o dry-run nunca ficar cego.
+  return [
+    { slug: "smmhype", column: "smmhype", endpoint: RESERVE_PROVIDER_ENDPOINTS.smmhype, apiKey: process.env.SMMHYPE_API_KEY ?? null },
+    { slug: "smmpanel", column: "smmpanel", endpoint: RESERVE_PROVIDER_ENDPOINTS.smmpanel, apiKey: process.env.SMMPAINEL_API_KEY ?? null },
+    { slug: "verified", column: "verified", endpoint: RESERVE_PROVIDER_ENDPOINTS.verified, apiKey: process.env.VERIFIED_API_KEY ?? null },
+  ];
+}
+
 export async function runDryRunAllPackages(): Promise<DryRunSummary> {
-  const [hype, panel, verified] = await Promise.all([
-    process.env.SMMHYPE_API_KEY ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmhype, process.env.SMMHYPE_API_KEY) : Promise.resolve(null),
-    process.env.SMMPAINEL_API_KEY ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.smmpanel, process.env.SMMPAINEL_API_KEY) : Promise.resolve(null),
-    process.env.VERIFIED_API_KEY ? fetchServiceCatalog(RESERVE_PROVIDER_ENDPOINTS.verified, process.env.VERIFIED_API_KEY) : Promise.resolve(null),
-  ]);
+  const providersCfg = await loadProviders();
+  const catalogs = await Promise.all(
+    providersCfg.map(async (p) => ({
+      p,
+      list: p.apiKey ? await fetchServiceCatalog(p.endpoint, p.apiKey) : null,
+    })),
+  );
 
-  const catalogsAlive = [hype, panel, verified].filter((l) => Array.isArray(l) && l.length > 0).length;
-  const indices: Record<ProviderKey, Map<string, CatalogEntry>> = {
-    smmhype: idx(hype),
-    smmpanel: idx(panel),
-    verified: idx(verified),
-  };
+  const catalogsAlive = catalogs.filter((c) => Array.isArray(c.list) && c.list!.length > 0).length;
+  const indices: Record<ProviderKey, Map<string, CatalogEntry>> = {};
+  for (const c of catalogs) indices[c.p.column] = idx(c.list);
 
+  const columns = [...new Set(providersCfg.map((p) => p.column))];
+  const selectCols = [
+    "pacote", "category", "quantidade", "cost_brl", "price_brl", "is_sellable", "sellable_reason",
+    ...columns.flatMap((c) => [`${c}_service_id`, `${c}_auto_id`]),
+  ];
   const { data: rows } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, category, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, is_sellable, sellable_reason");
+    .select([...new Set(selectCols)].join(", "));
 
   const summary: DryRunSummary = {
     total: 0,
@@ -107,12 +155,15 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
     let sellable = false;
     let reason = "OK";
 
-    const providers: Array<[ProviderKey, string | null]> = [
-      ["smmhype", r.smmhype_service_id],
-      ["smmpanel", r.smmpanel_service_id],
-      ["verified", r.verified_service_id],
-    ];
+    const providers: Array<[ProviderKey, string | null]> = [];
+    for (const col of columns) {
+      for (const suffix of ["_service_id", "_auto_id"]) {
+        const v = r[`${col}${suffix}`];
+        if (typeof v === "string" || typeof v === "number") providers.push([col, String(v)]);
+      }
+    }
     const linkedProviders = providers.filter(([, id]) => !!id && id.trim().length > 0);
+
 
     if (!(cost > 0)) {
       reason = "Custo zerado";
