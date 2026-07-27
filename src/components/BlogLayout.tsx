@@ -34,7 +34,33 @@ export function BlogLayout({
           {children}
         </article>
 
+        {/* v300 — malha de links internos: todo artigo distribui autoridade
+            pras páginas que vendem e pras ferramentas que mais ranqueiam. */}
+        <nav className="mt-14" aria-label="Conteúdo relacionado">
+          <h2 className="font-display font-bold text-xl mb-4 text-foreground">Continue por aqui</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { to: "/comprar-seguidores-brasileiros", t: "Seguidores brasileiros reais", d: "Perfis BR com reposição garantida." },
+              { to: "/seguidores-pix", t: "Seguidores no Pix", d: "Pagou, entregou — sem cadastro." },
+              { to: "/ferramentas/contador-seguidores", t: "Contador de seguidores grátis", d: "Meça antes e depois do pedido." },
+              { to: "/ferramentas/calculadora-engajamento-instagram", t: "Calculadora de engajamento", d: "Sua taxa está boa? Descubra em 10s." },
+              { to: "/comprar-curtidas-instagram", t: "Comprar curtidas Instagram", d: "Empurrão em posts específicos." },
+              { to: "/avaliacoes", t: "Avaliações de clientes", d: "Quem comprou, recebeu — veja os relatos." },
+            ].map((l) => (
+              <a
+                key={l.to}
+                href={l.to}
+                className="rounded-xl border border-border bg-card/60 p-4 block hover:border-primary/60 transition-colors no-underline"
+              >
+                <div className="font-semibold text-foreground text-sm mb-1">{l.t}</div>
+                <div className="text-muted-foreground text-xs leading-relaxed">{l.d}</div>
+              </a>
+            ))}
+          </div>
+        </nav>
+
         <div className="mt-16 rounded-2xl border border-border bg-card/60 p-8 text-center">
+
           <h2 className="font-display font-bold text-2xl mb-2">Pronto para crescer?</h2>
           <p className="text-muted-foreground mb-6">
             Escolha o pacote ideal e receba seguidores brasileiros em minutos.
