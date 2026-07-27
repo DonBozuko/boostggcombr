@@ -202,6 +202,32 @@ async function limparQuarentena(pacote: string, slug: string): Promise<void> {
   } catch { /* noop */ }
 }
 
+/** v294 — cancelamento com ID auto-resolvido = ID provavelmente errado.
+ *  Zera só o auto (nunca o curado à mão) para o resolver escolher outro. */
+const SLUG_TO_COL: Record<string, string> = {
+  smmhype: "smmhype", smmpainel: "smmpanel", smmpanel: "smmpanel", verified: "verified", provider4: "provider4",
+};
+async function limparAutoIdSeAuto(pacote: string, slug: string): Promise<void> {
+  const prefix = SLUG_TO_COL[slug];
+  if (!prefix) return;
+  try {
+    const { data } = await supabaseAdmin
+      .from("pricing_items" as never)
+      .select(`${prefix}_service_id, ${prefix}_auto_id`)
+      .eq("pacote", pacote)
+      .maybeSingle();
+    const row = data as Record<string, unknown> | null;
+    if (!row) return;
+    if (row[`${prefix}_service_id`] != null) return;   // ID curado: não mexe
+    if (row[`${prefix}_auto_id`] == null) return;
+    await supabaseAdmin
+      .from("pricing_items" as never)
+      .update({ [`${prefix}_auto_id`]: null } as never)
+      .eq("pacote", pacote);
+  } catch { /* noop */ }
+}
+
+
 /** v289 — pool de links de teste por rede. O mesmo link repetido faz o
  *  fornecedor recusar ("active order with this link"), o que virava alarme
  *  falso. Aceita vários links separados por vírgula, ponto-e-vírgula ou quebra
