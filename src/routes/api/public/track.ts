@@ -22,11 +22,17 @@ export const Route = createFileRoute("/api/public/track")({
             return new Response("bad_request", { status: 400 });
           }
 
+          // Bastidor nunca vira visita, mesmo se o beacon for adulterado
+          if (isInternalPath(parsed.data.path) || isInternalTraffic(parsed.data.referrer)) {
+            return new Response(null, { status: 204 });
+          }
+
           // Bot filter simples
           const ua = request.headers.get("user-agent") ?? "";
           if (/bot|crawler|spider|preview|monitor|curl|wget/i.test(ua)) {
             return new Response(null, { status: 204 });
           }
+
 
           const country = request.headers.get("cf-ipcountry") ?? null;
 
