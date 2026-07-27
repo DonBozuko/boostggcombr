@@ -128,8 +128,9 @@ function scoreCandidate(row: CacheRow, opts: { qty: number; wantBr: boolean; wan
   const catOk = opts.matcher.any.some((words) => words.every((w) => hay.includes(w)));
   if (!catOk) return null;
 
-  // Palavras proibidas.
+  // Palavras proibidas (da categoria e as globais de "ao vivo").
   if (opts.matcher.not?.some((w) => hay.includes(w))) return null;
+  if (GLOBAL_NOT.some((w) => hay.includes(w))) return null;
 
   // Quantidade cabe?
   if (!(row.min <= opts.qty && opts.qty <= row.max)) return null;
