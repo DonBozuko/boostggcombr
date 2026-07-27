@@ -69,12 +69,31 @@ export function analyzeCatalogCoherence(
   const issues: CoherenceIssue[] = [];
   const byCategory = new Map<string, CoherenceRow[]>();
 
+  // Serviço vinculado bate com o produto da categoria? Calculado antes porque a
+  // trava de custo usa isso: custo alto com serviço CERTO é tier premium legítimo,
+  // custo alto com serviço errado/desconhecido é risco de prejuízo.
+  const nameOk = new Map<string, boolean>();
+  for (const r of rows) {
+    const intent = intentOf(String(r.category ?? ""));
+    let known = false;
+    let bad = false;
+    for (const ref of r.serviceIds) {
+      const name = serviceNames.get(serviceKey(ref));
+      if (!name) continue;
+      known = true;
+      if (intent?.proibe?.test(name)) bad = true;
+    }
+    nameOk.set(r.pacote, known && !bad);
+  }
+
   for (const r of rows) {
     const cat = String(r.category ?? "");
     if (!cat) continue;
     if (!byCategory.has(cat)) byCategory.set(cat, []);
     byCategory.get(cat)!.push(r);
   }
+
+
 
   for (const [cat, list] of byCategory) {
     const sorted = list
