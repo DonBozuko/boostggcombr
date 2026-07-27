@@ -661,8 +661,8 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       console.log("[pricing] v137 reserve live handshake", rep);
     } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
     try {
-      const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
-      await enforceLadderInDb("pos-sync-contingencia");
+      const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+      await enforcePriceAuthority("pos-sync-contingencia");
     } catch (e) { console.warn("[pricing] v304 escada final fail", e); }
     purgePricingCacheMemory("syncPricingCacheAll:contingency:end");
     return { ok: !e1 && !e2, updated: itemRows.length, results: contingency.results, mode: "contingency" };
@@ -740,8 +740,8 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   // v304 — última palavra: escada monotônica sobre o estado REAL do banco,
   // depois de todos os motores gravarem.
   try {
-    const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
-    await enforceLadderInDb("pos-sync-live");
+    const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+    await enforcePriceAuthority("pos-sync-live");
   } catch (e) { console.warn("[pricing] v304 escada final fail", e); }
 
   purgePricingCacheMemory("syncPricingCacheAll:end");
@@ -797,9 +797,9 @@ export async function recostFromReserves(): Promise<{
     const newPrice = Number(priceFromPackageCost(qty, realCost).toFixed(2));
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
+      // v305 — recusto grava só CUSTO. Preço é da autoridade única.
       .update({
         cost_brl: Number(realCost.toFixed(4)),
-        price_brl: newPrice,
         last_cost_source: "reserve_recost_v274",
       })
       .eq("pacote", row.pacote);
