@@ -1,94 +1,55 @@
 # System Architecture — EliteBoost Prime
 
-Árvore genealógica do ecossistema. **Isolamento estrito por rota.** Não misturar identidades visuais, ícones, textos ou IDs de serviço entre as vitrines públicas.
+Isolamento por rota. **Nenhum service ID de fornecedor é fixado neste
+documento** — IDs mudam sozinhos e são resolvidos em runtime a partir de
+`pricing_items` / `*_services_cache` / `service_id_matrix`. Se algum
+documento citar um ID cravado, ele está errado.
 
----
+## Admin — `/admin`
 
-## 1. 👴 O AVÔ — `/admin`
-**Arquivo:** `src/routes/admin.tsx`
+Painel único (`src/routes/admin.tsx`). Saldo de todos os fornecedores,
+crons, dispatcher, pedidos, canário, Jarvis, tesouraria, revenda, afiliados.
 
-Painel administrativo único e centralizado.
+**Proibido:** vender pacote, expor checkout público, exibir branding de rede
+social no header.
 
-**Responsabilidades:**
-- Saldo global do fornecedor SMMhype.
-- Cron jobs e dispatcher de pedidos.
-- Listagem de pedidos com filtros por `rede_social` (`instagram` | `tiktok`).
-- Toggle de fornecedores ativos (apenas um ativo por vez).
+## Vitrines públicas (uma rota por rede)
 
-**Proibido:** vender pacotes, expor checkout público, exibir branding de rede social no header.
+| Rota | Rede | `rede_social` | prefixo de pacote |
+|---|---|---|---|
+| `/` | Instagram | `instagram` | `i*` |
+| `/tiktok` | TikTok | `tiktok` | `t*` |
+| `/youtube` | YouTube | `youtube` | `y*` |
+| `/kwai` | Kwai | `kwai` | `k*` |
+| `/facebook` | Facebook | `facebook` | `f*` |
+| `/telegram` | Telegram | `telegram` | `tg*` |
 
----
+Cada rota mantém identidade visual própria e **não** referencia outra rede
+(texto, ícone, cor ou pacote). Catálogo de cada rota vem do banco via
+`useDynamicPlans` — nunca lista hardcoded.
 
-## 2. 📸 O NETO DO INSTAGRAM — `/`
-**Arquivo:** `src/routes/index.tsx`
+## Landings de SEO
 
-Landing page pública **exclusivamente Instagram**.
+Rotas de conteúdo (`/comprar-*`, `/seguidores-pix`, `/blog/*`, `/ferramentas/*`)
+usam `SeoLanding` + JSON-LD e apontam CTA para a vitrine da rede
+correspondente. Cada rota tem `head()` próprio com título e descrição únicos.
 
-**Identidade visual:**
-- Fundo Dark.
-- Acentos Dourado / Verde Canarinho.
-- Logo oficial do Instagram (lucide `Instagram` ou SVG oficial).
+## Fluxo do dinheiro (canônico)
 
-**Catálogo (SMMhype service IDs):**
-- Seguidores → `14325`
-- Curtidas → `18860`
-- Visualizações → `18855`
+```
+Gerar Pix → criarPedido() valida preço contra pricing_items (RLS)
+  → snapshot valor_brl no pedido (imutável)
+  → MP cria preference → cliente paga
+  → webhook mp-webhook (idempotente, assinatura verificada)
+  → smart-routing: pickCheapestFornecedorSlug (cost_brl ASC)
+  → dispatch ao fornecedor (claim distribuído, anti dupla-entrega)
+  → financial_ledger: +pix, -taxa MP, -custo fornecedor
+  → divergência > R$ 0,01 → contingency_hold
+```
 
-**Prefixo de pedido:** `i*` (ex.: `i100`, `i500`, `i1k`).
-**Coluna `rede_social`:** `instagram`.
+## Vigilância automática
 
-**Proibido:** qualquer referência visual ou textual a TikTok, ciano neon, rosa neon, ícone de música, palavra "TikTok".
-
----
-
-## 3. 🎵 O NETO DO TIKTOK — `/tiktok`
-**Arquivo:** `src/routes/tiktok.tsx`
-
-Landing page pública **exclusivamente TikTok**, totalmente isolada da rota `/`.
-
-**Identidade visual:**
-- Fundo Grafite Ultra Escuro `#0a0a0a`.
-- Acentos elétricos Ciano Neon `#00f2fe` + Rosa Neon `#fe0979` com glow.
-- Logo oficial do TikTok (SVG inline `TikTokIcon`).
-
-**Catálogo (SMMhype service IDs):**
-- Seguidores → `14330`
-- Curtidas → `19191`
-- Visualizações → `14907`
-
-**Prefixos de pedido:** `tf*` (followers), `tl*` (likes), `tv*` (views).
-**Coluna `rede_social`:** `tiktok`.
-
-**Proibido:** qualquer referência visual ou textual a Instagram, gradiente fuchsia/pink/orange clássico do IG, ícone `Instagram` do lucide, palavra "Instagram".
-
----
-
-## 4. 📺 O NETO DO YOUTUBE — `/youtube`
-**Arquivo:** `src/routes/youtube.tsx`
-
-Landing page pública **exclusivamente YouTube**, totalmente isolada das demais rotas.
-
-**Identidade visual:**
-- Fundo Grafite Ultra Escuro `#0a0a0a`.
-- Acentos Vermelho Puro Neon `#FF0000` com glow.
-- Logo oficial do YouTube (SVG inline `YouTubeIcon`).
-
-**Catálogo (SMMhype service IDs):**
-- Inscritos → `14343`
-- Visualizações → `997`
-
-**Prefixos de pedido:** `ys*` (subscribers), `yv*` (views).
-**Coluna `rede_social`:** `youtube`.
-
-**Proibido:** qualquer referência visual ou textual a Instagram ou TikTok, ícones de outras redes, dourado/verde canarinho, ciano/rosa neon.
-
----
-
-## Regras de isolamento (checklist antes de qualquer PR)
-
-1. Editou `src/routes/index.tsx`? Não introduza ciano/rosa/vermelho neon nem ícones de TikTok/YouTube.
-2. Editou `src/routes/tiktok.tsx`? Não introduza dourado/verde canarinho, vermelho YouTube ou ícones de Instagram/YouTube.
-3. Editou `src/routes/youtube.tsx`? Não introduza identidades de Instagram ou TikTok.
-4. Editou `src/routes/admin.tsx`? Não exiba branding de rede social no header — use ícones apenas como filtro/etiqueta de linha.
-5. Novo pacote? Adicione em `src/lib/pedidos.functions.ts` (PRICE_TABLE) **e** mapeie o prefixo em `src/lib/smmhype.server.ts`.
-6. Build deve passar com `bun run build` antes de publicar.
+`delivery-watcher`, `sla-watcher`, `drop-watcher`, `pedido-reconciler`,
+`reconciliation`, `auto-healer`, `ops-audit`, `smoke-test` e `canary` rodam
+como hooks em `src/routes/api/public/hooks/*`, todos autenticados por
+`src/lib/cron-auth.server.ts`.
