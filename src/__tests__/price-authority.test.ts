@@ -60,3 +60,17 @@ describe("v305 — autoridade única de preço", () => {
     expect(bloqueados.size + plano.changes.length).toBe(2);
   });
 });
+
+describe("v306 — piso comercial não pausa pacote com margem real", () => {
+  it("pacote-isca barato com margem >4x continua na vitrine e sem reajuste", () => {
+    // caso real: v1k / tv1k — custo R$0,455, preço R$6,00, ~9x líquido.
+    const plano = planAuthorityPrices([row("v1k", 1000, 0.455, 6, "instagram:visualizacoes")]);
+    expect(plano.blocked).toHaveLength(0);
+    expect(plano.changes).toHaveLength(0);
+  });
+
+  it("mas preço sem margem real continua sendo tratado", () => {
+    const plano = planAuthorityPrices([row("x1k", 1000, 3.0, 6, "instagram:visualizacoes")]);
+    expect(plano.blocked.length + plano.changes.length).toBe(1);
+  });
+});
