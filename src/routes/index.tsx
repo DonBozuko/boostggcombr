@@ -123,8 +123,11 @@ export const Route = createFileRoute("/")({
     const ogTitle = "Elite Boost Prime — Seguidores no Instagram via Pix";
     const description =
       "Comprar seguidores Instagram reais, brasileiros e com entrega rápida via Pix. Alta retenção, reposição nos pacotes brasileiros e 100% seguro. Comece em minutos.";
-    const url = "https://boostgg.com.br/";
-    const ogImage = `https://boostgg.com.br${ogInstagram}?v=49`;
+    // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
+    // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
+    // marcação e usar a dele. Agora as duas batem.
+    const url = "https://www.boostgg.com.br/";
+    const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
     return {
       meta: [
         { title },
