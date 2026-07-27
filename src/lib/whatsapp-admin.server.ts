@@ -22,19 +22,29 @@ function fmtBrl(v: number): string {
   return `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
 }
 
-/** v181 — Estima custo bruto usando o mesmo tier multiplier de profit-markup.ts.
- *  Fórmula inversa: preço = (custo × tier × 1.15 + 0.49) / 0.9901 → custo = (venda×0.9901 − 0.49) / (tier×1.15). */
-function tierMult(qty: number): number {
-  const q = Number(qty) || 0;
-  if (q <= 500) return 5.0;
-  if (q <= 5_000) return 8.0;
-  if (q <= 15_000) return 8.0 + ((q - 5000) / 10000) * 4.0;
-  return 12.0;
+// v307 — FAXINA. Aqui existia `estimateCost`: uma fórmula INVERSA que adivinhava
+// o custo do fornecedor a partir do preço de venda, usando o multiplicador por
+// faixa que já morreu (5x/8x/12x). Resultado: o alerta de Pix aprovado informava
+// custo e lucro fictícios em TODO pedido pago. Agora o custo vem do banco
+// (`pricing_items.cost_brl`, gravado pelos motores de sincronismo). Se não houver
+// custo real, o alerta diz que não sabe — nunca inventa número.
+async function realCostBrl(pacote?: string | null, quantidade?: number | null): Promise<number> {
+  if (!pacote) return 0;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("cost_brl")
+      .eq("pacote", pacote)
+      .maybeSingle();
+    const c = Number((data as any)?.cost_brl ?? 0);
+    void quantidade;
+    return Number.isFinite(c) && c > 0 ? Number(c.toFixed(2)) : 0;
+  } catch {
+    return 0;
+  }
 }
-function estimateCost(vendaBrl: number, quantidade?: number | null): number {
-  const tier = tierMult(Number(quantidade ?? 0));
-  return Number((Math.max(0, vendaBrl * 0.9901 - 0.49) / (tier * 1.15)).toFixed(2));
-}
+
 function roiPct(venda: number, custo: number): number {
   const liquido = venda * 0.9901 - 0.49 - custo * 1.15;
   if (custo <= 0) return 0;
@@ -63,7 +73,7 @@ function suggestRecharge(custoUnitBrl: number): { valor: number; cobre: number }
 }
 
 export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?: boolean }): string {
-  const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : estimateCost(a.vendaBrl, a.quantidade);
+  const custo = a.custoBrl && a.custoBrl > 0 ? a.custoBrl : 0;
   const lucroLiquido = Number((a.vendaBrl * 0.9901 - 0.49 - custo * 1.15).toFixed(2));
   const roi = roiPct(a.vendaBrl, custo);
   const showPix = !!(a.saldoCritical || a.criticalCaixaZero);
@@ -99,6 +109,7 @@ export function buildProvisioningMessage(a: ProvisioningAlert & { saldoCritical?
 export type UniversalPaidAlert = {
   pedidoId: string;
   vendaBrl: number;
+  custoBrl?: number | null;
   compradorHandle: string | null;
   pacote: string | null;
   quantidade: number | null;
@@ -109,10 +120,11 @@ export function buildUniversalPaidMessage(a: UniversalPaidAlert): string {
   // v156 — Modelo saldo pré-carregado: cliente paga → sistema debita saldo local
   // e entrega imediato. NÃO enviamos PIX por pedido. PIX de recarga só chega
   // no alerta de provisão (saldo baixo/zerado) via buildProvisioningMessage.
-  const custoEstimado = estimateCost(a.vendaBrl, a.quantidade);
+  const custo = Number(a.custoBrl ?? 0);
+  const temCusto = custo > 0;
   const taxaPix = Number((a.vendaBrl * 0.0099 + 0.49).toFixed(2));
-  const lucroLiquido = Number((a.vendaBrl - taxaPix - custoEstimado * 1.15).toFixed(2));
-  const roi = roiPct(a.vendaBrl, custoEstimado);
+  const lucroLiquido = Number((a.vendaBrl - taxaPix - custo * 1.15).toFixed(2));
+  const roi = roiPct(a.vendaBrl, custo);
   const linhas = [
     "🟢 <b>PIX APROVADO · Entrega automática</b>",
     `Pedido: <code>${a.pedidoId}</code>`,
@@ -120,8 +132,8 @@ export function buildUniversalPaidMessage(a: UniversalPaidAlert): string {
     a.pacote ? `Pacote: <b>${a.pacote}</b>${a.quantidade ? ` × ${a.quantidade}` : ""}` : null,
     `Venda: ${fmtBrl(a.vendaBrl)}`,
     `Taxa Pix MP: ${fmtBrl(taxaPix)}`,
-    `Custo fornecedor: ${fmtBrl(custoEstimado)}`,
-    `Lucro líq. (ROI ${roi}%): <b>${fmtBrl(lucroLiquido)}</b>`,
+    temCusto ? `Custo fornecedor: ${fmtBrl(custo)}` : "Custo fornecedor: sem custo registrado para este pacote",
+    temCusto ? `Lucro líq. (ROI ${roi}%): <b>${fmtBrl(lucroLiquido)}</b>` : null,
     a.fornecedor ? `Debitado de: <b>${a.fornecedor}</b>` : null,
   ].filter(Boolean);
   return linhas.join("\n");
@@ -174,7 +186,11 @@ export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise
 /** Alerta universal em TODO pedido pago (sem PIX, sem botão). Não lança. */
 export async function notifyAdminUniversalPaid(alert: UniversalPaidAlert): Promise<void> {
   try {
-    const res = await dispatchTelegram(buildUniversalPaidMessage(alert));
+    const custoBrl =
+      alert.custoBrl && alert.custoBrl > 0
+        ? alert.custoBrl
+        : await realCostBrl(alert.pacote, alert.quantidade);
+    const res = await dispatchTelegram(buildUniversalPaidMessage({ ...alert, custoBrl }));
     if (!res.ok) console.error("[admin-notify] universal Telegram falhou", res.detail);
   } catch (e) {
     console.warn("[admin-notify] notifyAdminUniversalPaid falhou", e);
