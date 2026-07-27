@@ -100,7 +100,13 @@ export async function checkSmmhypeBalance() {
           status: "open",
         });
         const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
-        await dispatchWhatsappAlert(alertaCriado.mensagem);
+        // v298 — botão de recarga direto no alerta (link derivado do api_url real).
+        const { buildTopupKeyboard } = await import("@/lib/provider-topup");
+        const inlineKeyboard = buildTopupKeyboard([
+          { nome: fornecedor.nome, slug: fornecedor.slug, api_url: fornecedor.api_url, saldoBrl },
+        ]);
+        await dispatchWhatsappAlert(alertaCriado.mensagem, inlineKeyboard.length ? { inlineKeyboard } : {});
+
       }
     }
 
