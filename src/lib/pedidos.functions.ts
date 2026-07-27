@@ -323,6 +323,29 @@ export const criarPedido = createServerFn({ method: "POST" })
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
+    // v297 — PREFLIGHT DE ROTA AO VIVO. Última porta antes de cobrar.
+    // Roda os MESMOS filtros do despacho (ID fantasma, faixa, BR/refill,
+    // sanidade de custo, saldo e margem). Se nenhum fornecedor consegue
+    // entregar agora, não geramos cobrança — cobrar e estornar depois destrói
+    // confiança (casos p15k R$283,44 e kf2k R$18,00).
+    // Fail-open: erro/timeout do próprio preflight libera a venda.
+    try {
+      const { preflightRouteOrBlock } = await import("./route-preflight.server");
+      const pre = await preflightRouteOrBlock({
+        pacote: pacoteEfetivo,
+        quantidade: quantidadeEfetiva,
+        valorBrl: valorCobrar,
+      });
+      if (!pre.ok) {
+        console.error("[criarPedido] v297 cobrança bloqueada:", pacoteEfetivo, pre.reason);
+        return { ok: false as const, error: "INVALID_PACKAGE" as const };
+      }
+    } catch (err) {
+      console.warn("[criarPedido] v297 preflight falhou (venda liberada):", err);
+    }
+
+
+
     // ─────────────────────────────────────────────────────────────────────
     // v270 — CARTÃO (Mercado Pago Checkout Pro).
     // Caminho separado e aditivo: o fluxo Pix abaixo continua intocado.
