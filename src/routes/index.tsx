@@ -217,6 +217,17 @@ export const Route = createFileRoute("/")({
                 description,
                 brand: { "@type": "Brand", name: "BoostGG" },
                 image: ogImage,
+                // Oferta herdada do antigo nó Service (v302): rich snippet de
+                // preço + nota agora vivem no mesmo item suportado.
+                offers: {
+                  "@type": "AggregateOffer",
+                  priceCurrency: "BRL",
+                  lowPrice: "5.00",
+                  highPrice: "499.00",
+                  offerCount: "9",
+                  availability: "https://schema.org/InStock",
+                  url: "https://www.boostgg.com.br/",
+                },
                 aggregateRating: {
                   "@type": "AggregateRating",
                   ratingValue: "4.9",
