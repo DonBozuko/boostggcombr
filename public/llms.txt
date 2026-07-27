@@ -34,23 +34,48 @@ Não. É compra avulsa: escolhe o pacote, paga o Pix uma vez, recebe.
 Sim. Garantia de reposição gratuita por 30 dias em todos os pacotes.
 
 ### Vocês aceitam cartão ou boleto?
-Não. Apenas Pix — é o que garante aprovação instantânea e menor custo repassado ao cliente.
+Pix é o método principal (aprovação em segundos e menor custo). Cartão de crédito também é aceito em pedidos de até R$ 300, com acréscimo de 7% referente à taxa da operadora, sem parcelamento. Boleto não é aceito. Promoções e cupons valem apenas para Pix.
+
+### Como acompanho meu pedido?
+Pela página de rastreio (/rastrear), informando o @ do perfil ou o ID do pagamento. Não é preciso criar conta.
+
+### Vocês têm programa de afiliados ou revenda?
+Sim. Afiliados ganham comissão por indicação (/afiliados) e revendedores têm painel e API própria (/revenda, /api-revenda).
 
 ## Produtos principais
 
 - [Comprar Seguidores Instagram](/comprar-seguidores-instagram): pacotes de 100 a 100.000 seguidores brasileiros a partir de R$ 5,00.
 - [Comprar Seguidores Instagram Barato](/comprar-seguidores-instagram-barato): opções econômicas de audiência mundial.
 - [Comprar Seguidores Brasileiros](/comprar-seguidores-brasileiros): 100% audiência do Brasil com foto e bio.
+- [Seguidores no Pix](/seguidores-pix): compra direta pagando com Pix, sem cadastro.
 - [Comprar Curtidas Instagram](/comprar-curtidas-instagram): curtidas em posts e Reels, entrega em minutos.
 - [Comprar Seguidores TikTok](/comprar-seguidores-tiktok): crescimento de perfil no TikTok BR.
 - [Comprar Visualizações TikTok](/comprar-visualizacoes-tiktok): views para viralizar vídeos.
 - [Comprar Inscritos YouTube](/comprar-inscritos-youtube): inscritos para monetizar o canal.
+- [Comprar Seguidores Kwai](/comprar-seguidores-kwai): seguidores e views no Kwai.
 - [Kit Creator](/kit-creator): combo seguidores + curtidas + views com desconto.
 - [Promo R$ 5](/promo-5reais): pacote de entrada mais barato do site.
+
+## Catálogo por rede
+
+- [Instagram (home)](/)
+- [TikTok](/tiktok)
+- [YouTube](/youtube)
+- [Kwai](/kwai)
+- [Facebook](/facebook)
+- [Telegram](/telegram)
 
 ## Conteúdo educacional (blog)
 
 - [Blog BoostGG](/blog): guias sobre crescimento no Instagram, TikTok e YouTube.
+- [Como ganhar seguidores no Instagram](/blog/como-ganhar-seguidores-instagram)
+- [É seguro comprar seguidores?](/blog/e-seguro-comprar-seguidores)
+- [Melhor site para comprar seguidores](/blog/melhor-site-comprar-seguidores)
+- [Comprar seguidores com Pix](/blog/comprar-seguidores-pix)
+- [Por que seguidor comprado cai](/blog/comprar-seguidores-cai)
+- [BoostGG não é boost de jogos](/blog/boostgg-nao-e-boost-de-jogos)
+- [Seguidores de Instagram baratos](/blog/seguidores-instagram-baratos)
+- [Como tirar o Instagram do privado](/blog/como-tirar-instagram-privado)
 
 ## Ferramentas gratuitas
 
@@ -66,6 +91,17 @@ Não. Apenas Pix — é o que garante aprovação instantânea e menor custo rep
 - [Impulsionar Instagram](/impulsionar-instagram)
 - [Turbinar TikTok](/turbinar-tiktok)
 - [Views TikTok](/views-tiktok)
+
+## Prova social e transparência
+
+- [Avaliações de clientes](/avaliacoes): mais de 3.000 avaliações reais.
+- [Rastrear pedido](/rastrear): acompanhamento sem login.
+- [Status do sistema](/status): disponibilidade de entrega em tempo real.
+
+## Parcerias
+
+- [Programa de Afiliados](/afiliados)
+- [Revenda](/revenda) e [API para revendedores](/api-revenda)
 
 ## Institucional
 
