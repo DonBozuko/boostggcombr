@@ -1,81 +1,73 @@
-# EliteBoost Prime — Manager Agent (v171, imutável)
+# EliteBoost Prime — Manager Agent
 
 > Gerente Geral de Operações e Orquestrador de Infraestrutura.
 > Complementa `.lovable/developer_memory.md` e `.lovable/finance_rules.md`.
-> Em conflito: developer_memory > finance_rules > manager_agent.
+> Em conflito: **código real > developer_memory > finance_rules > manager_agent**.
 
 ## Missão
 
-Governar autonomamente a harmonia entre os 3 fornecedores (smmhype,
-smmpainel, verified), a integridade contábil da Equação Fabiano e a
-blindagem visual do HUD v57. Nenhuma decisão financeira, de roteamento
-ou de UI pode contradizer este documento.
+Governar a harmonia entre os fornecedores ativos, a integridade contábil
+e a blindagem visual do HUD. Nenhuma decisão financeira, de roteamento ou
+de UI pode contradizer este documento sem correção explícita dele.
 
-## Regras de Gerência Executiva
+## 1. Fornecedores (4 slugs)
 
-### 1. Patrulha de Catálogos (Background Crons)
+| slug | coluna de ID | cron de sync |
+|---|---|---|
+| `smmhype`  | `smmhype_auto_id`  | `/api/public/sync-services` |
+| `smmpainel` (colunas `smmpanel_*`) | `smmpanel_auto_id` | `/api/public/sync-smmpanel` |
+| `verified` | `verified_auto_id` | `/api/public/sync-verified` |
+| `provider4` | `provider4_auto_id` | `/api/public/sync-provider4` |
 
-- Os catálogos por fornecedor e suas colunas de IDs devem estar sempre
-  factuais e frescos:
-  - `pricing_catalog.smmhype_service_id`
-  - `pricing_catalog.smmpanel_service_id`
-  - `pricing_catalog.verified_service_id`
-  - `services_cache.provider_service_id`
-  - `provider_rates_cache` (TTL 60s por SKU)
-- Sincronização é 100% automatizada via crons de background
-  (`/api/public/hooks/sync-pricing`, `/api/public/sync-services`,
-  `/api/public/sync-smmpanel`, `/api/public/sync-verified`,
-  `/api/public/hooks/backfill-smmhype-ids`). Zero intervenção humana.
-- Qualquer PR/commit que remova coluna de ID de fornecedor ou desligue
-  cron de sync deve ser recusado.
+Master `sync-pricing` lê os caches, aplica a fórmula e upserta `pricing_items`.
 
-### 2. Desvio de Fluxo em B.O. de Runtime (Empréstimo Síncrono)
+**Regra de sync (absoluta):** catálogo do fornecedor é sempre sincronizado
+COMPLETO para tabela em banco, com job automático e detector de variantes
+que popula `service_id_matrix`. Se precisar preencher ID à mão, o sync está
+incompleto — arruma o sync, não o valor.
 
-- Timeout de rede, HTTP != 2xx, resposta sem `order`, ou API offline
-  são B.O. de runtime — nunca reembolso automático.
-- Ação obrigatória: acionar `smart-routing.server.ts`
-  → `pickCheapestFornecedorSlug(pacote, quantidade)`
-  → `Math.min(cost_brl)` sobre fornecedores válidos (ativo, saldo>0,
-  `provider_service_id` presente, não-`unstable`).
-- Fornecedor que falhou vai para `provider_health.unstable_until = now+30min`
-  via `markProviderUnstable`, EXCETO se `saldo_atual > 0 AND ativo`
-  (v67 Perpetual Balance Force — mantém botão ativo, failover é runtime).
-- Ordem canônica (smmhype→smmpainel→verified) só desempata `cost_brl`
-  matematicamente idêntico.
-- Pedido nunca é marcado `mp_refunded` por B.O. de fornecedor:
-  vai para `contingency_hold` + `waiting_provision_queue`.
+Qualquer mudança que remova coluna de ID de fornecedor ou desligue cron de
+sync deve ser recusada.
 
-### 3. Blindagem da Equação Fabiano (Margem Real +236% pós-Pix)
+## 2. Desvio de fluxo em B.O. de runtime
 
-Constantes travadas (idênticas a `src/lib/margin-guardian.ts`):
+- Timeout, HTTP != 2xx, resposta sem `order`, API offline = B.O. de runtime.
+  **Nunca reembolso automático.**
+- Ação: `smart-routing.server.ts` → `pickCheapestFornecedorSlug(pacote, qty)`
+  → `Math.min(cost_brl)` entre fornecedores válidos.
+- Fornecedor que falha entra em `provider_health.unstable_until` e, no
+  canário, em `canary_quarantine` (exponencial, por pacote+fornecedor).
+  Quarentena de um pacote **não** derruba a venda pelos outros.
+- Pedido nunca vira `mp_refunded` por B.O. de fornecedor: vai para
+  `contingency_hold` + `waiting_provision_queue`.
+- Retry com backoff exponencial vive em `src/lib/retry-policy.ts`.
 
-```
-PIX_NET       = 0.9901
-PIX_FIXED     = 0.49
-PROFIT_MULT   = 4.0
-COUPON_BUFFER = 1.15
-FLOOR_BRL     = 5.00
-```
+## 3. Vendabilidade e origem
 
-Fórmula de venda:
-`price = max(5.00, (cost × 4.0 × 1.15 + 0.49) / 0.9901)`
+- Pacote só é vendável se tiver service_id resolvido, fornecedor com saldo
+  e passar no dry-run. Sem isso, some da vitrine — nunca fica fantasma.
+- Pacote `:br` nunca aponta para serviço internacional nem para serviço
+  marcado como queda.
+- Selo de origem (🇧🇷 Brasileiro Real / 🌎 Global) é derivado do serviço
+  real, nunca hardcoded.
 
-Fail-Closed: se `abs(saldo_esperado − saldo_real) > 0.01`
-→ `pedido.status = 'contingency_hold'`, enfileirar em
-`waiting_provision_queue` com `motivo='ledger_mismatch'`,
-abortar despacho, alertar admin. Sem exceções.
+## 4. Blindagem de margem
 
-## HUD v57 READ-ONLY (Terminantemente Proibido Alterar)
+Constantes e fórmula: ver `.lovable/finance_rules.md` (ponto único de verdade).
+Camadas defensivas: cliente (`margin-guardian.ts`, `profit-markup.ts`),
+server (`pricing-engine.server.ts`, `pricing-config.server.ts`) e banco
+(trigger `enforce_pricing_markup`). Reajuste automático até +40%; acima
+disso, trava manual.
 
-- `BrandHeader` — fonte Cinzel dourada (v165)
-- `max-w-md` das 6 rotas públicas: `index`, `tiktok`, `youtube`,
-  `facebook`, `telegram`, `trafego` (v150)
-- `PixCountdown` — cronômetro visual de 3 min
-- Trava de quantidade ≤ 200 no seletor de planos
-- Meta tags agnósticas v167
-- Piso R$ 5,00, taxa Pix R$ 0,49, `cost_brl ASC` picker (v168)
+## 5. Alertas
+
+Todo alerta nasce com dedupe + cooldown + resolução automática + quarentena.
+Alerta repetido sem novidade é defeito nosso. Texto sempre em português
+direto: título + "PROBLEMA:" + "O QUE FAZER:".
+
+## HUD READ-ONLY (proibido alterar sem pedido explícito)
+
+- `BrandHeader` (fonte Cinzel dourada)
+- `max-w-md` do container das rotas públicas de checkout
+- `PixCountdown` — cronômetro de 3 min
 - `financial_ledger` imutável — DELETE bloqueado por trigger
-
-## Certificado de Governança
-
-`ELITEBOOST PRIME SYSTEM - OVERSEEN BY MANAGER AGENT v171`
