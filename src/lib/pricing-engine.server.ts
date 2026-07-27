@@ -445,19 +445,24 @@ async function readCachedRate(category: Category): Promise<number | null> {
 }
 
 // v47 — lê itens já precificados 1:1 do pricing_items.
-async function readCachedItems(category: Category): Promise<Map<string, { cost: number; price: number; source: "api" | "fallback" }>> {
-  const out = new Map<string, { cost: number; price: number; source: "api" | "fallback" }>();
+async function readCachedItems(category: Category): Promise<Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean }>> {
+  const out = new Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean }>();
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, cost_brl, price_brl, source")
+      .select("pacote, cost_brl, price_brl, source, is_sellable, last_dry_run")
       .eq("category", category);
     for (const row of (data ?? []) as Array<any>) {
+      // v290 — só confia na pausa se o teste seco rodou nas últimas 48h.
+      // Teste velho não tira produto da prateleira (evita vitrine vazia por cron parado).
+      const dr = row.last_dry_run ? Date.parse(row.last_dry_run) : 0;
+      const recente = dr > 0 && Date.now() - dr < 48 * 60 * 60 * 1000;
       out.set(String(row.pacote), {
         cost: Number(row.cost_brl) || 0,
         price: Number(row.price_brl) || 0,
         source: row.source === "api" ? "api" : "fallback",
+        sellable: recente ? row.is_sellable !== false : true,
       });
     }
   } catch {
@@ -465,6 +470,7 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
   }
   return out;
 }
+
 
 async function readExistingReserveIds(): Promise<Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>> {
   const out = new Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>();
@@ -520,8 +526,14 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
     return { id, quantidade: qty, valor, price: formatBRL(valor) };
   });
 
+  // v290 — prateleira honesta: pacote que o teste seco marcou como não vendável
+  // some da vitrine, em vez de aparecer e travar no checkout. Se TODOS sumiriam,
+  // mantém a lista (provável falso positivo) — o checkout ainda barra e alerta.
+  const disponiveis = rawItems.filter((it) => itemsMap.get(it.id)?.sellable !== false);
+  const visiveis = disponiveis.length > 0 ? disponiveis : rawItems;
+
   // v109 — Monotonic Guard: cada pacote deve custar >= anterior + R$0,50.
-  const sorted = [...rawItems].sort((a, b) => a.quantidade - b.quantidade);
+  const sorted = [...visiveis].sort((a, b) => a.quantidade - b.quantidade);
   let prev = 0;
   for (const it of sorted) {
     const minAllowed = prev + 0.5;
@@ -532,6 +544,7 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
     prev = it.valor;
   }
   const items = sorted;
+
 
 
   const source: "api" | "fallback" = anyApi || cachedRate != null ? "api" : "fallback";

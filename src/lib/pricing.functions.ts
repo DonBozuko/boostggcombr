@@ -60,16 +60,25 @@ export const getBrPricingGrid = createServerFn({ method: "GET" })
     const cat = `${data.network}:${data.kind}:br`;
     const { data: rows } = await supabaseAdmin
       .from("pricing_items")
-      .select("pacote, quantidade, price_brl")
+      .select("pacote, quantidade, price_brl, is_sellable, last_dry_run")
       .eq("category", cat)
       .order("quantidade", { ascending: true });
-    const items = (rows ?? [])
-      .map((r: any) => ({
-        id: r.pacote as string,
-        quantidade: Number(r.quantidade),
-        valor: Number(r.price_brl),
-        price: `R$ ${Number(r.price_brl).toFixed(2).replace(".", ",")}`,
-      }))
+    const all = (rows ?? []).map((r: any) => ({
+      id: r.pacote as string,
+      quantidade: Number(r.quantidade),
+      valor: Number(r.price_brl),
+      price: `R$ ${Number(r.price_brl).toFixed(2).replace(".", ",")}`,
+      // v290 — pausa só vale com teste seco recente (48h).
+      sellable: (() => {
+        const dr = r.last_dry_run ? Date.parse(r.last_dry_run) : 0;
+        const recente = dr > 0 && Date.now() - dr < 48 * 60 * 60 * 1000;
+        return recente ? r.is_sellable !== false : true;
+      })(),
+    }));
+    const disponiveis = all.filter((r) => r.sellable);
+    const items = (disponiveis.length > 0 ? disponiveis : all)
+      .map(({ sellable: _s, ...rest }) => rest)
+
       // v257 — Econômico (30 dias) primeiro, Premium (90 dias) depois.
       .sort((a, b) => {
         const pa = /^br-pro/i.test(a.id) ? 1 : 0;

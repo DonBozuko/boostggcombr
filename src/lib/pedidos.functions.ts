@@ -242,12 +242,18 @@ export const criarPedido = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: sellRow } = await supabaseAdmin
         .from("pricing_items" as any)
-        .select("cost_brl, is_sellable, sellable_reason, smmhype_service_id, smmpanel_service_id, verified_service_id")
+        .select("cost_brl, is_sellable, sellable_reason, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id")
         .eq("pacote", pacoteRaw)
         .maybeSingle();
       if (sellRow) {
         const row = sellRow as any;
-        const hasProvider = !!row.smmhype_service_id || !!row.smmpanel_service_id || !!row.verified_service_id;
+        // v290 — conta o 4º fornecedor e os IDs auto-resolvidos. Antes, pacote
+        // atendido só por eles era barrado como "sem fornecedor" e o cliente
+        // levava erro em um produto que o sistema entregaria normalmente.
+        const hasProvider = !!(
+          row.smmhype_service_id || row.smmpanel_service_id || row.verified_service_id || row.provider4_service_id ||
+          row.smmhype_auto_id || row.smmpanel_auto_id || row.verified_auto_id || row.provider4_auto_id
+        );
         const hasCost = Number(row.cost_brl) > 0;
         const blocked = row.is_sellable === false || !hasProvider || !hasCost;
         if (blocked) {
