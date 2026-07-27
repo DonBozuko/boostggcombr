@@ -23,7 +23,7 @@
 //      abaixo da margem só porque o reajuste era grande)
 //   e) idempotente — rodar duas vezes seguidas não muda nada
 
-import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
+import { computeGuardedPrice, respectsMinMargin, FLOOR_BRL } from "./margin-guardian";
 import { enforceMonotonicLadder } from "./price-monotonic";
 
 /** Teto de reajuste automático para cima num único ciclo. */
@@ -85,15 +85,31 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
 
     const justo = computeGuardedPrice(cost, qty);
 
-    // (b) preço saudável não desce sozinho — fim da oscilação da vitrine.
-    if (price > 0 && price >= justo && respectsMinMargin(price, cost)) {
+    // (b) preço saudável não desce nem sobe sozinho — fim da oscilação da vitrine.
+    // v306: o critério de "saudável" é MARGEM REAL (≥4x líquido), não o piso
+    // comercial escalonado. O piso é sugestão de vitrine para preço NOVO; usá-lo
+    // como gatilho de reajuste tirava do ar pacote-isca com 9x de margem
+    // (v1k/tv1k a R$ 6,00) alegando "custo do fornecedor subiu" — o que era falso.
+    if (price >= FLOOR_BRL && respectsMinMargin(price, cost)) {
       r.price_brl = price;
       continue;
     }
 
-    // (d) salto grande demais não entra às cegas: pausa em vez de vender no
-    // prejuízo ou trocar o preço na cara do cliente.
-    if (price > 0 && justo > price * AUTHORITY_MAX_UP) {
+    // Preço novo (sem preço ainda): vai direto para o preço justo cheio.
+    if (price <= 0) {
+      r.price_brl = r2(justo);
+      motivos.set(r.pacote, "primeiro_preco");
+      continue;
+    }
+
+    // (d) v306 — RAMPA: o teto de +40% deixou de ser motivo de pausa e voltou a
+    // ser o que sempre devia ser: limite de reajuste por ciclo. Se subir até
+    // +40% já recoloca a margem mínima (4x líquido), sobe e segue vendendo —
+    // e nos ciclos seguintes continua subindo até o preço justo, ou para de
+    // subir sozinho quando o fornecedor baixar o custo (margem fica mais gorda).
+    const alvo = Math.min(justo, price * AUTHORITY_MAX_UP);
+    if (!respectsMinMargin(alvo, cost)) {
+      // Nem o teto de +40% cobre o custo: vender aqui é prejuízo real.
       blocked.push({
         pacote: r.pacote,
         atual: r2(price),
@@ -104,8 +120,9 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
       continue;
     }
 
-    r.price_brl = r2(justo);
-    motivos.set(r.pacote, price > 0 ? "margem" : "primeiro_preco");
+    r.price_brl = r2(alvo);
+    motivos.set(r.pacote, "margem");
+
   }
 
   // (c) escada é aplicada sobre o alvo final, não sobre o lote de um motor.

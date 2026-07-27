@@ -1,0 +1,1 @@
+UPDATE public.pricing_items SET is_sellable = true, sellable_reason = NULL WHERE pacote IN ('v1k','tv1k') AND sellable_reason LIKE 'custo do fornecedor subiu%';

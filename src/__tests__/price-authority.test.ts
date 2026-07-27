@@ -26,11 +26,13 @@ describe("v305 — autoridade única de preço", () => {
     expect(changes).toHaveLength(0);
   });
 
-  it("sobe preço quando o custo estoura a margem mínima (dentro do teto)", () => {
-    const [r] = planAuthorityPrices([row("p1k", 1000, 3.2, 25)]).changes;
-    expect(r.para).toBeGreaterThan(25);
+  it("sobe preço quando o custo estoura a margem mínima (dentro do teto de +40%)", () => {
+    const [r] = planAuthorityPrices([row("p1k", 1000, 3.2, 16)]).changes;
+    expect(r.para).toBeGreaterThan(16);
+    expect(r.para).toBeLessThanOrEqual(16 * AUTHORITY_MAX_UP + 0.01);
     expect(respectsMinMargin(r.para, 3.2)).toBe(true);
   });
+
 
   it("não aplica salto acima do teto: vira decisão do dono", () => {
     const { changes, blocked } = planAuthorityPrices([row("p1k", 1000, 500, 30)]);
@@ -58,5 +60,19 @@ describe("v305 — autoridade única de preço", () => {
     }
     // nenhum dos dois pode simplesmente ficar como estava vendendo no prejuízo
     expect(bloqueados.size + plano.changes.length).toBe(2);
+  });
+});
+
+describe("v306 — piso comercial não pausa pacote com margem real", () => {
+  it("pacote-isca barato com margem >4x continua na vitrine e sem reajuste", () => {
+    // caso real: v1k / tv1k — custo R$0,455, preço R$6,00, ~9x líquido.
+    const plano = planAuthorityPrices([row("v1k", 1000, 0.455, 6, "instagram:visualizacoes")]);
+    expect(plano.blocked).toHaveLength(0);
+    expect(plano.changes).toHaveLength(0);
+  });
+
+  it("mas preço sem margem real continua sendo tratado", () => {
+    const plano = planAuthorityPrices([row("x1k", 1000, 3.0, 6, "instagram:visualizacoes")]);
+    expect(plano.blocked.length + plano.changes.length).toBe(1);
   });
 });
