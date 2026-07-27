@@ -62,14 +62,14 @@ export async function syncSmmhypeServices() {
     if (error) throw error;
   }
 
-  // Apaga os que sumiram — mas NUNCA remove IDs monitorados/fallback
+  // v296 — Apaga TODOS os que sumiram do fornecedor, sem exceção.
   const ids = rows.map((r) => r.provider_service_id);
   const { data: existentes } = await supabaseAdmin
     .from("services_cache")
     .select("provider_service_id");
   const aRemover = (existentes ?? [])
     .map((r: any) => r.provider_service_id as number)
-    .filter((id: number) => !ids.includes(id) && !SERVICOS_MONITORADOS.includes(id));
+    .filter((id: number) => !ids.includes(id));
   if (aRemover.length > 0) {
     await supabaseAdmin
       .from("services_cache")
@@ -77,10 +77,8 @@ export async function syncSmmhypeServices() {
       .in("provider_service_id", aRemover);
   }
 
-  // Garante presença dos IDs estáveis (fallback) mesmo se o fornecedor não os retornar
-  await ensureFallback();
-
-  const monitoradosFaltando: number[] = []; // garantidos via fallback
+  // Diagnóstico honesto: quais IDs de referência o fornecedor não lista mais.
+  const monitoradosFaltando = SERVICOS_MONITORADOS.filter((id) => !ids.includes(id));
 
   return {
     ok: true as const,
@@ -94,8 +92,6 @@ export async function syncSmmhypeServices() {
 // v172 — auto-populador removido: gerava IDs falsos (Channel Member como follower_br etc).
 // service_id_matrix é 100% curadoria manual via migration (SEEDs) + smoke-test antes de publicar SKU.
 
-// Executa fallback imediatamente em runtime (popula cache em cold start se vazio)
-ensureFallback().catch(() => { /* silencioso: chamado novamente no próximo sync */ });
 
 // v164 — Alias explícito para paridade tri-provider (SMMhype = services_cache)
 export const syncSmmHype = syncSmmhypeServices;
