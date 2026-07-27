@@ -172,25 +172,15 @@ export const Route = createFileRoute("/")({
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://boostgg.com.br/#organization" },
               },
-              {
-                "@type": "Service",
-                serviceType: "Marketing de Instagram e Engajamento Social",
-                provider: { "@id": "https://boostgg.com.br/#organization" },
-                areaServed: { "@type": "Country", name: "Brasil" },
-                name: "Compra de Seguidores no Instagram",
-                description,
-                // Google não aceita aggregateRating em Service (erro crítico no GSC).
-                // A nota agregada fica só no nó Product abaixo, que é o tipo suportado.
+              // v302 — O nó Service foi REMOVIDO de propósito.
+              // O Google reportou "Review snippets: tipo de objeto do campo
+              // <parent_node> não é válido" apontando para o item
+              // "Compra de Seguidores no Instagram". Causa: Service não é um
+              // tipo que aceita nota/avaliação; como Service e Product
+              // descreviam a MESMA página, o Google colava a nota do Product
+              // no Service e invalidava o rich snippet inteiro.
+              // Ponto único de verdade: só o Product carrega oferta + nota.
 
-                offers: {
-                  "@type": "AggregateOffer",
-                  priceCurrency: "BRL",
-                  lowPrice: "5.00",
-                  highPrice: "499.00",
-                  offerCount: "9",
-                  availability: "https://schema.org/InStock",
-                },
-              },
               {
                 "@type": "FAQPage",
                 mainEntity: [
