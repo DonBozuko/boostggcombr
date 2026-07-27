@@ -21,8 +21,8 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           const result = await syncPricingCacheAll({ forceContingency });
           const reserves = await syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) }));
           // v304 — escada monotônica é a última palavra do ciclo.
-          const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
-          const escada = await enforceLadderInDb("hook-post").catch((e) => ({ error: String(e?.message ?? e) }));
+          const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+          const escada = await enforcePriceAuthority("hook-post").catch((e) => ({ error: String(e?.message ?? e) }));
 
           (result as any).reserves = reserves;
           (result as any).escada = escada;
@@ -56,8 +56,8 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           // v272: os dois motores gravavam o mesmo pacote ao mesmo tempo).
           const result = await syncPricingCacheAll({ forceContingency });
           const reserves = await syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) }));
-          const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
-          const escada = await enforceLadderInDb("hook-get").catch((e) => ({ error: String(e?.message ?? e) }));
+          const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+          const escada = await enforcePriceAuthority("hook-get").catch((e) => ({ error: String(e?.message ?? e) }));
           (result as any).reserves = reserves;
           (result as any).escada = escada;
           return new Response(JSON.stringify(result), {

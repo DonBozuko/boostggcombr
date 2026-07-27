@@ -8,7 +8,6 @@
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
 import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
-import { enforceMonotonicLadder } from "./price-monotonic";
 
 type PricingRow = {
   pacote: string;
@@ -324,9 +323,6 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     patch: Record<string, unknown>;
     priceKeys: string[];       // chaves que só existem por causa de preço/custo
     movesPrice: boolean;
-    /** v304 — preço vindo só da trava de escada (imune à quarentena). */
-    ladderPrice?: number;
-    ladderOnly?: boolean;
     restoredPacote: string | null;
   };
   const plans: Plan[] = [];
@@ -399,15 +395,15 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
         patch.synced_at = new Date().toISOString();
 
         if (!encareceuDeVerdade) {
-          patch.price_brl = newPrice;
+          // v305 — grava só o CUSTO. O preço é decidido pela autoridade única
+          // no fim do ciclo (margem + escada juntas, sem ping-pong).
           // v271 — só avisa queda real de custo (≥40%), não oscilação de piso.
           if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
         } else if (!disparou && respectsMinMargin(newPrice, newCost)) {
-          // v282 — Reajuste dentro do teto: entra sozinho, mas com aviso em
-          // destaque para o dono (e o cliente vê o preço novo já correto).
-          patch.price_brl = newPrice;
+          // v282 — Reajuste dentro do teto: religa o pacote; o preço novo sai
+          // da autoridade única logo em seguida.
           if (r.is_sellable === false && /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""))) {
             patch.is_sellable = true;
             patch.sellable_reason = null;
@@ -456,60 +452,15 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       pacote: r.pacote,
       patch,
       priceKeys,
-      movesPrice: patch.price_brl !== undefined || patch.is_sellable !== undefined,
+      movesPrice: patch.cost_brl !== undefined || patch.is_sellable !== undefined,
       restoredPacote,
     });
   }
 
-  // v292 — Trava de escada. Depois de planejar preço item-a-item, garante que
-  // dentro da mesma categoria pacote maior nunca fique mais barato que o menor.
-  // Só empurra PRA CIMA — nunca reduz preço, então não come margem.
-  {
-    const planByPacote = new Map(plans.map((p) => [p.pacote, p]));
-    const ladderInput = ((rows as any[]) ?? [])
-      .map((r) => {
-        const plan = planByPacote.get(String(r.pacote));
-        const price = Number(plan?.patch.price_brl ?? r.price_brl ?? 0);
-        return {
-          pacote: String(r.pacote),
-          category: String(r.category ?? ""),
-          quantidade: Number(r.quantidade ?? 0),
-          price_brl: price,
-        };
-      })
-      .filter((r) => r.category && r.quantidade > 0 && r.price_brl > 0);
-
-    const { fixes } = enforceMonotonicLadder(ladderInput);
-    for (const f of fixes) {
-      const plan = planByPacote.get(f.pacote);
-      if (plan) {
-        plan.patch.price_brl = f.para;
-        if (!plan.priceKeys.includes("price_brl")) plan.priceKeys.push("price_brl");
-        // v304 — correção de escada NÃO conta como "movimento suspeito" nem é
-        // apagada pela quarentena: ela só empurra preço pra cima, então nunca
-        // pode causar prejuízo. Antes o freio de massa (v275) apagava a
-        // correção e a escada invertida voltava no ciclo seguinte, para sempre.
-        plan.ladderPrice = f.para;
-        if (!plan.movesPrice) plan.ladderOnly = true;
-      } else {
-        plans.push({
-          pacote: f.pacote,
-          patch: { price_brl: f.para },
-          priceKeys: ["price_brl"],
-          movesPrice: false,
-          ladderOnly: true,
-          ladderPrice: f.para,
-          restoredPacote: null,
-        });
-      }
-    }
-    if (fixes.length > 0) {
-      console.warn(
-        `[pricing] v292 trava de escada corrigiu ${fixes.length} pacote(s):`,
-        fixes.slice(0, 10).map((f) => `${f.pacote} R$${f.de}→R$${f.para}`).join(", "),
-      );
-    }
-  }
+  // v305 — A trava de escada saiu daqui de propósito. Este motor não decide
+  // mais preço: quem fecha o ciclo é a autoridade única
+  // (`price-authority.server.ts`), que lê o banco depois de todos gravarem
+  // custo e aplica margem + escada juntas, uma vez só.
 
 
   // v275 — FASE 2: mede o estrago ANTES de gravar.
@@ -561,9 +512,6 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     const patch = { ...plan.patch };
     if (emQuarentena) {
       for (const k of plan.priceKeys) delete patch[k];
-      // v304 — a escada sobrevive à quarentena: é a única correção que só
-      // pode subir preço, então nunca vende no prejuízo.
-      if (plan.ladderPrice !== undefined) patch.price_brl = plan.ladderPrice;
       if (Object.keys(patch).length === 0) continue;
     }
     const chave = Object.keys(patch).sort().join(",");

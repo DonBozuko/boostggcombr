@@ -18,6 +18,8 @@ Toda tarefa começa com rótulo: RÁPIDO (executo direto) · MÉDIO (mostro mapa
 Problema achado por acaso = falha de instrumentação. Todo bug vira invariante automatizada + teste + achado na auditoria forense. Ver [Bug vira invariante](mem://preferences/bug-vira-invariante).
 
 
+Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste barra qualquer segundo escritor. Ver [Preço dono único](mem://preferences/preco-dono-unico).
+
 ## Memories
 - [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho) — Como a dupla conduz tarefas: rótulo de complexidade, quando pedir sinal verde, código > documento, fechamento de ciclo, auditoria de coerência.
 - [Modo Orquestrador](mem://preferences/modo-orquestrador) — Como planejar e executar qualquer mudança: mapa de impacto, ordem, ponto único de verdade, rollback, prova real, anti-loop de alarme.

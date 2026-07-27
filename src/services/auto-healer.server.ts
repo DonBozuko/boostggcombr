@@ -2,11 +2,10 @@
 // Varredura clínica silenciosa dos 289 pacotes de pricing_items contra as 3 APIs
 // (smmhype, smmpanel, verified). Detecta e conserta em runtime:
 //   (a) ID inválido/defasado    → UPDATE direto na coluna *_service_id
-//   (b) Preço com margem furada → recomputa via computeGuardedPrice (piso R$5, Pix R$0,49)
+//   (b) Preço com margem furada → delegado à autoridade única (v305)
 //   (c) Provedor offline/zerado → seta provider_health.unstable_until
 // Descarrega tudo em admin_audit_logs.
 
-import { computeGuardedPrice, respectsMinMargin } from "@/lib/margin-guardian";
 
 const PROVIDERS = [
   { slug: "smmhype",  endpoint: "https://smmhype.com/api/v2",         envKey: "SMMHYPE_API_KEY",   idCol: "smmhype_service_id" },
@@ -144,22 +143,22 @@ export async function runAutoHealer(): Promise<HealReport> {
       }
     }
 
-    // 3b) Auditar margem — se cost_brl atual furou a margem, recomputa price_brl
-    const cost = Number(it.cost_brl);
-    const price = Number(it.price_brl);
-    if (Number.isFinite(cost) && cost > 0) {
-      if (!respectsMinMargin(price, cost)) {
-        const fixed = computeGuardedPrice(cost, Number(it.quantidade));
-        if (fixed > 0 && Math.abs(fixed - price) > 0.01) {
-          await supabaseAdmin
-            .from("pricing_items" as any)
-            .update({ price_brl: fixed, synced_at: new Date().toISOString() } as any)
-            .eq("pacote", it.pacote);
-          report.price_fixed++;
-        }
-      }
-    }
+    // 3b) v305 — o auto-reparador NÃO grava mais preço.
+    // Ele corrigia margem item-a-item ignorando a escada e o teto de reajuste,
+    // reintroduzindo exatamente as inversões que o ciclo anterior tinha
+    // consertado. Preço agora tem dono único: a autoridade roda no fim.
   }
+
+  // v305 — fecha o ciclo do auto-reparo pela autoridade única de preço.
+  try {
+    const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+    const auth = await enforcePriceAuthority("auto-healer");
+    report.price_fixed += auth.applied;
+  } catch (e) {
+    report.errors.push(`autoridade de preço falhou: ${String((e as any)?.message ?? e)}`);
+  }
+
+
 
   // 4) Alerta proativo — saldo pulmão crítico (< R$10 em qualquer fornecedor ativo)
   try {
