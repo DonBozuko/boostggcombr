@@ -164,15 +164,24 @@ export async function runAutoHealer(): Promise<HealReport> {
   // 4) Alerta proativo — saldo pulmão crítico (< R$10 em qualquer fornecedor ativo)
   try {
     const criticos: string[] = [];
+    const baixos: { nome: string; api_url: string | null; saldoBrl: number }[] = [];
     fornMap.forEach((f, slug) => {
-      if (f.ativo && f.saldo > 0 && f.saldo < 10) criticos.push(`${slug}: R$${f.saldo.toFixed(2)}`);
+      if (f.ativo && f.saldo > 0 && f.saldo < 10) {
+        criticos.push(`${slug}: R$${f.saldo.toFixed(2)}`);
+        baixos.push({ nome: f.nome, api_url: f.api_url, saldoBrl: f.saldo });
+      }
     });
     if (criticos.length > 0) {
       const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
+      // v298 — um botão de recarga por fornecedor afetado (só os que faltam saldo).
+      const { buildTopupKeyboard } = await import("@/lib/provider-topup");
+      const inlineKeyboard = buildTopupKeyboard(baixos);
       await dispatchWhatsappAlert(
-        `⚠️ SALDO BAIXO NO FORNECEDOR\n\nPROBLEMA: fornecedor(es) quase sem dinheiro (menos de R$10).\n\n${criticos.join("\n")}\n\nO QUE FAZER: recarregar agora, antes que novos pedidos comecem a falhar.`,
+        `⚠️ SALDO BAIXO NO FORNECEDOR\n\nPROBLEMA: fornecedor(es) quase sem dinheiro (menos de R$10).\n\n${criticos.join("\n")}\n\nO QUE FAZER: tocar no botão abaixo e recarregar agora, antes que novos pedidos comecem a falhar.`,
+        inlineKeyboard.length ? { inlineKeyboard } : {},
       ).catch(() => {});
     }
+
   } catch (e: any) {
     report.errors.push(`alert failed: ${e?.message ?? "unknown"}`);
   }
