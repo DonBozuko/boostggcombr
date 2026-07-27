@@ -1,5 +1,5 @@
 import ogInstagram from "@/assets/og-instagram.jpg";
-import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
+import { CHECKOUT_SUCCESS_TITLE, checkoutErrorMessage, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { JarvisBadge } from "@/components/JarvisBadge";
 import { FabianoBadge } from "@/components/FabianoBadge";
