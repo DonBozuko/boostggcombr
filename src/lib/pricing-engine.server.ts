@@ -486,24 +486,35 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
 }
 
 
-async function readExistingReserveIds(): Promise<Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>> {
-  const out = new Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>();
+type ExistingItem = {
+  smmpanel_service_id: string | null;
+  verified_service_id: string | null;
+  cost_brl: number;
+  price_brl: number;
+  last_cost_source: string | null;
+};
+
+async function readExistingReserveIds(): Promise<Map<string, ExistingItem>> {
+  const out = new Map<string, ExistingItem>();
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, smmpanel_service_id, verified_service_id");
+      .select("pacote, smmpanel_service_id, verified_service_id, cost_brl, price_brl, last_cost_source");
     for (const row of (data ?? []) as Array<any>) {
       out.set(String(row.pacote), {
         smmpanel_service_id: row.smmpanel_service_id ? String(row.smmpanel_service_id) : null,
         verified_service_id: row.verified_service_id ? String(row.verified_service_id) : null,
+        cost_brl: Number(row.cost_brl ?? 0),
+        price_brl: Number(row.price_brl ?? 0),
+        last_cost_source: row.last_cost_source ? String(row.last_cost_source) : null,
       });
     }
   } catch { /* noop */ }
   return out;
 }
 
-function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Pick<PricingItemRow, "smmpanel_service_id" | "verified_service_id">>): PricingItemRow[] {
+function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, ExistingItem>): PricingItemRow[] {
   return rows.map((r) => {
     const old = existing.get(r.pacote);
     if (!old) return r;
@@ -514,6 +525,33 @@ function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Pick<P
     };
   });
 }
+
+// v304 — PONTO ÚNICO DE VERDADE DO PREÇO.
+//
+// Dois motores gravavam price_brl no mesmo ciclo com bases de custo diferentes:
+// este (custo do fornecedor canônico por categoria) e o reserve sync
+// (menor custo real entre os 4 fornecedores, gravado em last_cost_source).
+// O resultado era ping-pong: 235 de 281 pacotes mudavam de preço por ciclo,
+// estourando o freio de massa e desfazendo as correções de escada.
+//
+// Regra: quando o reserve sync já achou um custo REAL igual ou mais barato,
+// esse custo manda. Este motor não sobrescreve. Nunca aumenta o preço para o
+// cliente — só evita reescrever por cima de uma leitura melhor.
+function preserveCheaperRealCost(rows: PricingItemRow[], existing: Map<string, ExistingItem>): PricingItemRow[] {
+  let kept = 0;
+  const out = rows.map((r) => {
+    const old = existing.get(r.pacote);
+    if (!old || !old.last_cost_source) return r;
+    if (!(old.cost_brl > 0) || !(old.price_brl > 0)) return r;
+    if (old.cost_brl > r.cost_brl) return r; // nosso custo é melhor: pode gravar
+    kept += 1;
+    return { ...r, cost_brl: old.cost_brl, price_brl: old.price_brl };
+  });
+  if (kept > 0) console.log(`[pricing] v304 manteve custo real do fornecedor em ${kept} pacote(s)`);
+  return out;
+}
+
+
 
 export async function getPricingGridImpl(category: Category): Promise<PricingGridResult> {
   // Hermetic Engine v47: leitura 1:1 do pricing_items (preço final por card).
@@ -602,7 +640,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = applyLadderGuard(preserveReserveIds(contingency.itemRows, existingReserveIds), "contingency");
+    itemRows = applyLadderGuard(preserveCheaperRealCost(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds), "contingency");
     const { error: e1 } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(itemRows, { onConflict: "pacote" });
@@ -622,6 +660,10 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       const rep = await syncReserveProviderIds();
       console.log("[pricing] v137 reserve live handshake", rep);
     } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
+    try {
+      const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
+      await enforceLadderInDb("pos-sync-contingencia");
+    } catch (e) { console.warn("[pricing] v304 escada final fail", e); }
     purgePricingCacheMemory("syncPricingCacheAll:contingency:end");
     return { ok: !e1 && !e2, updated: itemRows.length, results: contingency.results, mode: "contingency" };
   }
@@ -663,7 +705,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = applyLadderGuard(preserveReserveIds(itemRows, existingReserveIds), "live");
+  itemRows = applyLadderGuard(preserveCheaperRealCost(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds), "live");
   const { error: e1 } = await supabaseAdmin
     .from("pricing_items" as any)
     .upsert(itemRows, { onConflict: "pacote" });
@@ -694,6 +736,13 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     const rec = await recostFromReserves();
     console.log("[pricing] v274 recost from reserves", rec);
   } catch (e) { console.warn("[pricing] v274 recost fail", e); }
+
+  // v304 — última palavra: escada monotônica sobre o estado REAL do banco,
+  // depois de todos os motores gravarem.
+  try {
+    const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
+    await enforceLadderInDb("pos-sync-live");
+  } catch (e) { console.warn("[pricing] v304 escada final fail", e); }
 
   purgePricingCacheMemory("syncPricingCacheAll:end");
 

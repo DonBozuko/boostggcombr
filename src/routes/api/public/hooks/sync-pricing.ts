@@ -20,8 +20,12 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           // preço da vitrine ficava oscilando (custo estimado x custo real).
           const result = await syncPricingCacheAll({ forceContingency });
           const reserves = await syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) }));
+          // v304 — escada monotônica é a última palavra do ciclo.
+          const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
+          const escada = await enforceLadderInDb("hook-post").catch((e) => ({ error: String(e?.message ?? e) }));
 
           (result as any).reserves = reserves;
+          (result as any).escada = escada;
           return new Response(JSON.stringify(result), {
             status: 200,
             headers: {
@@ -48,11 +52,14 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           const { syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
           const url = new URL(request.url);
           const forceContingency = url.searchParams.get("force") === "contingency";
-          const [result, reserves] = await Promise.all([
-            syncPricingCacheAll({ forceContingency }),
-            syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) })),
-          ]);
+          // v304 — SEQUENCIAL (o GET ainda rodava em paralelo, contrariando a
+          // v272: os dois motores gravavam o mesmo pacote ao mesmo tempo).
+          const result = await syncPricingCacheAll({ forceContingency });
+          const reserves = await syncReserveProviderIds().catch((e) => ({ error: String(e?.message ?? e) }));
+          const { enforceLadderInDb } = await import("@/lib/ladder-enforce.server");
+          const escada = await enforceLadderInDb("hook-get").catch((e) => ({ error: String(e?.message ?? e) }));
           (result as any).reserves = reserves;
+          (result as any).escada = escada;
           return new Response(JSON.stringify(result), {
             status: 200,
             headers: {

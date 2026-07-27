@@ -162,8 +162,13 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   // 7) v291 — Coerência do catálogo (serviço errado, escada invertida, custo fora
   // da curva). Aditivo: se falhar, a auditoria antiga continua valendo.
   try {
-    const { runCatalogCoherence } = await import("@/services/catalog-coherence.server");
+    const { runCatalogCoherence, remediateCoherence } = await import("@/services/catalog-coherence.server");
     const issues = await runCatalogCoherence();
+    // v304 — pacote com serviço errado ou custo absurdo sai da vitrine na hora.
+    const remediado = await remediateCoherence(issues).catch(() => ({ paused: [], errors: 1 }));
+    if (remediado.paused.length > 0) {
+      console.warn("[ops-audit] v304 pacotes pausados pela coerência", remediado.paused);
+    }
     const grupos = new Map<string, typeof issues>();
     for (const i of issues) {
       if (!grupos.has(i.code)) grupos.set(i.code, []);

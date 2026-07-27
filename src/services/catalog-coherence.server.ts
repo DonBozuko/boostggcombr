@@ -65,3 +65,47 @@ export async function runCatalogCoherence(): Promise<CoherenceIssue[]> {
 
   return analyzeCatalogCoherence(rows, serviceNames);
 }
+
+// v304 — A auditoria de coerência deixou de ser só relatório.
+// Serviço errado vinculado (SERVICO_INCOERENTE) e custo absurdo
+// (CUSTO_FORA_DA_CURVA) são falhas que só terminam em estorno: o pacote sai da
+// vitrine na hora e o dono decide depois. Não religa sozinho — o motivo usa
+// prefixo próprio, então o auto-religamento por custo (v267) não toca nele.
+const AUTO_PAUSE_CODES = new Set(["SERVICO_INCOERENTE", "CUSTO_FORA_DA_CURVA"]);
+const PAUSE_PREFIX = "auditoria de coerência";
+
+export async function remediateCoherence(
+  issues: CoherenceIssue[],
+): Promise<{ paused: string[]; errors: number }> {
+  const alvos = new Map<string, string>();
+  for (const i of issues) {
+    if (!AUTO_PAUSE_CODES.has(i.code)) continue;
+    if (!alvos.has(i.pacote)) alvos.set(i.pacote, `${PAUSE_PREFIX}: ${i.detalhe}`);
+  }
+  if (alvos.size === 0) return { paused: [], errors: 0 };
+
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const paused: string[] = [];
+  let errors = 0;
+
+  for (const [pacote, motivo] of alvos) {
+    const { error, data } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .update({ is_sellable: false, sellable_reason: motivo.slice(0, 400) })
+      .eq("pacote", pacote)
+      .neq("is_sellable", false)
+      .select("pacote");
+    if (error) {
+      errors += 1;
+      console.error("[coerencia] v304 auto-pausa falhou", { pacote, error: error.message });
+      continue;
+    }
+    if ((data as any[])?.length) paused.push(pacote);
+  }
+
+  if (paused.length > 0) {
+    console.warn(`[coerencia] v304 pausou ${paused.length} pacote(s) incoerente(s):`, paused.join(", "));
+  }
+  return { paused, errors };
+}
+

@@ -324,6 +324,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     patch: Record<string, unknown>;
     priceKeys: string[];       // chaves que só existem por causa de preço/custo
     movesPrice: boolean;
+    /** v304 — preço vindo só da trava de escada (imune à quarentena). */
+    ladderPrice?: number;
+    ladderOnly?: boolean;
     restoredPacote: string | null;
   };
   const plans: Plan[] = [];
@@ -482,13 +485,20 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       if (plan) {
         plan.patch.price_brl = f.para;
         if (!plan.priceKeys.includes("price_brl")) plan.priceKeys.push("price_brl");
-        plan.movesPrice = true;
+        // v304 — correção de escada NÃO conta como "movimento suspeito" nem é
+        // apagada pela quarentena: ela só empurra preço pra cima, então nunca
+        // pode causar prejuízo. Antes o freio de massa (v275) apagava a
+        // correção e a escada invertida voltava no ciclo seguinte, para sempre.
+        plan.ladderPrice = f.para;
+        if (!plan.movesPrice) plan.ladderOnly = true;
       } else {
         plans.push({
           pacote: f.pacote,
           patch: { price_brl: f.para },
           priceKeys: ["price_brl"],
-          movesPrice: true,
+          movesPrice: false,
+          ladderOnly: true,
+          ladderPrice: f.para,
           restoredPacote: null,
         });
       }
@@ -551,6 +561,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     const patch = { ...plan.patch };
     if (emQuarentena) {
       for (const k of plan.priceKeys) delete patch[k];
+      // v304 — a escada sobrevive à quarentena: é a única correção que só
+      // pode subir preço, então nunca vende no prejuízo.
+      if (plan.ladderPrice !== undefined) patch.price_brl = plan.ladderPrice;
       if (Object.keys(patch).length === 0) continue;
     }
     const chave = Object.keys(patch).sort().join(",");
