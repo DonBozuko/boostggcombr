@@ -36,14 +36,37 @@ function readUTM() {
   }
 }
 
+const OPTOUT_KEY = "ebp_optout";
+
+/** Marca este aparelho como interno (dono/operação) — nunca mais conta visita. */
+function markInternalDevice() {
+  try { localStorage.setItem(OPTOUT_KEY, "1"); } catch { /* ignore */ }
+}
+
+function isOptedOut(): boolean {
+  try {
+    if (localStorage.getItem(OPTOUT_KEY) === "1") return true;
+    if (new URL(window.location.href).searchParams.get("naocontar") === "1") {
+      markInternalDevice();
+      return true;
+    }
+  } catch { /* ignore */ }
+  return false;
+}
+
 export function trackPageView(path: string) {
   if (typeof window === "undefined") return;
   try {
+    const p = path || window.location.pathname;
+    // Bastidor: marca o aparelho como interno e nunca envia.
+    if (isInternalPath(p)) { markInternalDevice(); return; }
+    if (isOptedOut()) return;
     const device_id = getOrCreate(localStorage, DEVICE_KEY);
     const session_id = getOrCreate(sessionStorage, SESSION_KEY);
     const utm = readUTM();
     const payload = JSON.stringify({
-      path: path || window.location.pathname,
+      path: p,
+
       referrer: document.referrer || null,
       device_id,
       session_id,
