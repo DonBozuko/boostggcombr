@@ -66,12 +66,12 @@ function Page() {
         { icon: "clock", title: "Pix 24/7", text: "Compra a hora que quiser, aprovação instantânea." },
       ]}
       pricingTitle="Tabela de preços — seguidores TikTok"
+      pricingCategories={["tiktok:seguidores"]}
       pricing={[
-        { qty: "100 seguidores", price: "R$ 4,90" },
-        { qty: "500 seguidores", price: "R$ 17,90", note: "Mais vendido" },
-        { qty: "1.000 seguidores", price: "R$ 29,90" },
-        { qty: "5.000 seguidores", price: "R$ 109,90" },
-        { qty: "10.000 seguidores", price: "R$ 199,90" },
+        { id: "tf100", qty: "100 seguidores", price: "R$ 9,87" },
+        { id: "tf500", qty: "500 seguidores", price: "R$ 45,70", note: "Mais vendido" },
+        { id: "tf1k", qty: "1.000 seguidores", price: "R$ 81,49" },
+        { id: "tf5k", qty: "5.000 seguidores", price: "R$ 245,88" },
       ]}
       bodySections={[
         {

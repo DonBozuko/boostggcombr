@@ -70,12 +70,13 @@ function Page() {
         { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela de preços — seguidores Instagram"
+      pricingCategories={["instagram:seguidores"]}
       pricing={[
-        { qty: "100 seguidores", price: "R$ 4,90" },
-        { qty: "500 seguidores", price: "R$ 14,90", note: "Mais vendido" },
-        { qty: "1.000 seguidores", price: "R$ 24,90" },
-        { qty: "5.000 seguidores", price: "R$ 89,90" },
-        { qty: "10.000 seguidores", price: "R$ 169,90" },
+        { id: "p100", qty: "100 seguidores", price: "R$ 5,50" },
+        { id: "p500", qty: "500 seguidores", price: "R$ 19,00", note: "Mais vendido" },
+        { id: "p1k", qty: "1.000 seguidores", price: "R$ 23,47" },
+        { id: "p5k", qty: "5.000 seguidores", price: "R$ 81,46" },
+        { id: "p10k", qty: "10.000 seguidores", price: "R$ 130,94" },
       ]}
       bodySections={[
         {

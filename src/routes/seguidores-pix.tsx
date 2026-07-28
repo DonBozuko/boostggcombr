@@ -73,11 +73,12 @@ function Page() {
         { icon: "clock", title: "Reposição 30 dias (BR)", text: "Pacotes 🇧🇷 Brasileiro Real: caiu no prazo, repomos sem custo. Nos Global, pedimos reposição ao fornecedor." },
       ]}
       pricingTitle="Preços — pagamento via Pix"
+      pricingCategories={["instagram:seguidores"]}
       pricing={[
-        { qty: "100 seguidores", price: "R$ 12,90" },
-        { qty: "500 seguidores", price: "R$ 49,90", note: "Mais vendido" },
-        { qty: "1.000 seguidores", price: "R$ 89,90" },
-        { qty: "5.000 seguidores", price: "R$ 349,90" },
+        { id: "p100", qty: "100 seguidores", price: "R$ 5,50" },
+        { id: "p500", qty: "500 seguidores", price: "R$ 19,00", note: "Mais vendido" },
+        { id: "p1k", qty: "1.000 seguidores", price: "R$ 23,47" },
+        { id: "p5k", qty: "5.000 seguidores", price: "R$ 81,46" },
       ]}
       bodySections={[
         {

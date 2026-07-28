@@ -66,12 +66,12 @@ function Page() {
         { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, qualquer horário." },
       ]}
       pricingTitle="Tabela de preços — visualizações TikTok"
+      pricingCategories={["tiktok:visualizacoes"]}
       pricing={[
-        { qty: "1.000 views", price: "R$ 3,90" },
-        { qty: "5.000 views", price: "R$ 14,90" },
-        { qty: "10.000 views", price: "R$ 24,90", note: "Mais vendido" },
-        { qty: "50.000 views", price: "R$ 99,90" },
-        { qty: "100.000 views", price: "R$ 179,90" },
+        { id: "tv1k", qty: "1.000 views", price: "R$ 6,00" },
+        { id: "tv2k", qty: "2.000 views", price: "R$ 18,00" },
+        { id: "tv5k", qty: "5.000 views", price: "R$ 27,00", note: "Mais vendido" },
+        { id: "tv10k", qty: "10.000 views", price: "R$ 54,40" },
       ]}
       bodySections={[
         {

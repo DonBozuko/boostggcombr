@@ -52,11 +52,12 @@ function Page() {
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos de turbinamento — TikTok"
+      pricingCategories={["tiktok:seguidores"]}
       pricing={[
-        { qty: "Starter", price: "R$ 4,90" },
-        { qty: "Essencial", price: "R$ 14,90", note: "Mais escolhido" },
-        { qty: "Pro", price: "R$ 24,90" },
-        { qty: "Elite", price: "R$ 89,90" },
+        { id: "tf100", qty: "100 seguidores", price: "R$ 9,87" },
+        { id: "tf500", qty: "500 seguidores", price: "R$ 45,70", note: "Mais escolhido" },
+        { id: "tf1k", qty: "1.000 seguidores", price: "R$ 81,49" },
+        { id: "tf5k", qty: "5.000 seguidores", price: "R$ 245,88" },
       ]}
       bodySections={[
         { h2: "Por que investir em gestão de crescimento no TikTok", body: "TikTok distribui via For You com base em sinais rápidos. Perfil pequeno tem menos chance de entrar na roda. Um empurrão profissional inicial cria a base pra o algoritmo levar seu conteúdo pra mais gente." },

@@ -66,11 +66,12 @@ function Page() {
         { icon: "zap", title: "Pix instantâneo", text: "Aprovação 24/7, sem taxa, sem cartão." },
       ]}
       pricingTitle="Tabela de preços — inscritos YouTube"
+      pricingCategories={["youtube:inscritos"]}
       pricing={[
-        { qty: "100 inscritos", price: "R$ 19,90" },
-        { qty: "500 inscritos", price: "R$ 79,90", note: "Mais vendido" },
-        { qty: "1.000 inscritos", price: "R$ 149,90" },
-        { qty: "5.000 inscritos", price: "R$ 599,90" },
+        { id: "ys100", qty: "100 inscritos", price: "R$ 39,90" },
+        { id: "ys500", qty: "500 inscritos", price: "R$ 138,80", note: "Mais vendido" },
+        { id: "ys1k", qty: "1.000 inscritos", price: "R$ 223,54" },
+        { id: "ys2k", qty: "2.000 inscritos", price: "R$ 358,65" },
       ]}
       bodySections={[
         {

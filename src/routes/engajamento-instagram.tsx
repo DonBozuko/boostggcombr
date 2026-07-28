@@ -52,11 +52,12 @@ function Page() {
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos de engajamento — Instagram"
+      pricingCategories={["instagram:curtidas"]}
       pricing={[
-        { qty: "Starter", price: "R$ 3,90" },
-        { qty: "Essencial", price: "R$ 9,90", note: "Mais escolhido" },
-        { qty: "Pro", price: "R$ 19,90" },
-        { qty: "Elite", price: "R$ 49,90" },
+        { id: "l100", qty: "100 curtidas", price: "R$ 5,50" },
+        { id: "l500", qty: "500 curtidas", price: "R$ 7,00", note: "Mais escolhido" },
+        { id: "l1k", qty: "1.000 curtidas", price: "R$ 9,00" },
+        { id: "l5k", qty: "5.000 curtidas", price: "R$ 38,40" },
       ]}
       bodySections={[
         { h2: "Por que engajamento importa mais que seguidor", body: "O algoritmo do Instagram distribui conteúdo com base em taxa de engajamento nas primeiras horas. Post que recebe interação rápida vira Explorar e Reels em destaque. Boost inicial acelera essa janela crítica." },
