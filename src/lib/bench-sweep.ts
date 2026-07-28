@@ -86,40 +86,70 @@ export function classifyBench(
     };
   }
 
-  // Falta de saldo: existe ID válido e custo conhecido, só falta dinheiro lá.
-  const candidatos = ranked
-    .filter((p) => p.provider_service_id && p.cost_brl != null && Number(p.cost_brl) > 0)
-    .map((p) => ({
-      slug: p.slug,
-      custo: Number(p.cost_brl),
-      falta: Number(p.cost_brl) - Number(p.saldo_atual ?? 0),
-    }))
-    .filter((c) => c.falta > 0)
-    .sort((a, b) => a.falta - b.falta);
+  // v335 — DIAGNÓSTICO PELO FORNECEDOR QUE ENTREGARIA.
+  //
+  // Antes: bastava QUALQUER fornecedor reprovar por margem para o pacote ser
+  // rotulado "vendendo no prejuízo" — mesmo quando o real bloqueio era falta de
+  // saldo no fornecedor mais barato. Isso inflou "margem" de 10 → 51 num ciclo
+  // e mandou o dono recarregar/consertar a coisa errada.
+  // Agora o veredito é o motivo do fornecedor MAIS BARATO com ID válido — que é
+  // exatamente quem entregaria o pedido.
+  const comId = ranked.filter(
+    (p) => p.provider_service_id && p.cost_brl != null && Number(p.cost_brl) > 0,
+  );
 
-  const bloqueioMargem = res.rejections.some((r) => /margem/i.test(r));
+  const escolhido = [...comId].sort((a, b) => Number(a.cost_brl) - Number(b.cost_brl))[0];
 
-  if (candidatos.length > 0 && !bloqueioMargem) {
-    const alvo = candidatos[0];
-    return {
-      verdict: "saldo",
-      motivo: `Falta ${fmt(alvo.falta)} de saldo em ${alvo.slug} pra este pacote sair`,
-      fornecedor: alvo.slug,
-      custoBrl: alvo.custo,
-      faltaRecarregar: Number(alvo.falta.toFixed(2)),
-      faltaEm: alvo.slug,
-    };
-  }
+  if (escolhido) {
+    const custo = Number(escolhido.cost_brl);
+    const reprovaMargem = res.rejections.some(
+      (r) => r.startsWith(`${escolhido.slug}:`) && /margem/i.test(r),
+    );
+    if (reprovaMargem) {
+      return {
+        verdict: "margem",
+        motivo: `O custo em ${escolhido.slug} (${fmt(custo)}) subiu e comeu a margem — venderia no prejuízo`,
+        fornecedor: escolhido.slug,
+        custoBrl: custo,
+        faltaRecarregar: null,
+        faltaEm: null,
+      };
+    }
 
-  if (bloqueioMargem) {
-    return {
-      verdict: "margem",
-      motivo: "O custo do fornecedor subiu e comeu a margem — venderia no prejuízo",
-      fornecedor: null,
-      custoBrl: null,
-      faltaRecarregar: null,
-      faltaEm: null,
-    };
+    // Falta de saldo: existe ID válido e custo conhecido, só falta dinheiro lá.
+    const candidatos = comId
+      .map((p) => ({
+        slug: p.slug,
+        custo: Number(p.cost_brl),
+        falta: Number(p.cost_brl) - Number(p.saldo_atual ?? 0),
+      }))
+      .filter(
+        (c) => c.falta > 0 && !res.rejections.some((r) => r.startsWith(`${c.slug}:`) && /margem/i.test(r)),
+      )
+      .sort((a, b) => a.falta - b.falta);
+
+    if (candidatos.length > 0) {
+      const alvo = candidatos[0];
+      return {
+        verdict: "saldo",
+        motivo: `Falta ${fmt(alvo.falta)} de saldo em ${alvo.slug} pra este pacote sair`,
+        fornecedor: alvo.slug,
+        custoBrl: alvo.custo,
+        faltaRecarregar: Number(alvo.falta.toFixed(2)),
+        faltaEm: alvo.slug,
+      };
+    }
+
+    if (res.rejections.some((r) => /margem/i.test(r))) {
+      return {
+        verdict: "margem",
+        motivo: "O custo do fornecedor subiu e comeu a margem — venderia no prejuízo",
+        fornecedor: escolhido.slug,
+        custoBrl: custo,
+        faltaRecarregar: null,
+        faltaEm: null,
+      };
+    }
   }
 
   return {
@@ -136,13 +166,25 @@ export type BenchSummary = {
   total: number;
   entregavel: number;
   porVeredito: Record<BenchVerdict, number>;
-  /** Quanto recarregar em cada fornecedor pra destravar TODOS os pacotes travados por saldo. */
+  /** Recarga necessária para destravar o que o cliente REALMENTE compra. */
   recargaPorFornecedor: Record<string, number>;
+  /** Recarga de pacote gigante sem venda: só sob encomenda, não é urgência. */
+  recargaSobDemanda: Record<string, number>;
   /** Rotas (categorias) com pelo menos 1 pacote travado. */
   rotasComProblema: string[];
 };
 
-export function summarizeBench(rows: BenchRow[]): BenchSummary {
+/**
+ * v335 — a recarga pedida tem que caber na realidade.
+ * O pedido de R$ 91.910 num fornecedor veio de um pacote gigante que ninguém
+ * comprou na vida. Somar isso no mesmo balde do que vende todo dia faz o dono
+ * ignorar o alerta inteiro. Agora separa: o que vende vira urgência; o resto
+ * fica listado como "sob encomenda".
+ */
+export function summarizeBench(
+  rows: BenchRow[],
+  opts: { demanda?: Set<string> } = {},
+): BenchSummary {
   const porVeredito: Record<BenchVerdict, number> = {
     entregavel: 0,
     sem_fornecedor: 0,
@@ -151,18 +193,21 @@ export function summarizeBench(rows: BenchRow[]): BenchSummary {
     margem: 0,
   };
   const recargaPorFornecedor: Record<string, number> = {};
+  const recargaSobDemanda: Record<string, number> = {};
   const rotas = new Set<string>();
+  const demanda = opts.demanda;
 
   for (const r of rows) {
     porVeredito[r.verdict] += 1;
     if (r.verdict !== "entregavel") rotas.add(r.category ?? "sem-rota");
     if (r.verdict === "saldo" && r.faltaEm && r.faltaRecarregar != null) {
+      // Sem histórico de demanda informado, tudo conta como demanda (não
+      // esconder problema por falta de dado).
+      const vende = !demanda || demanda.has(r.pacote);
+      const balde = vende ? recargaPorFornecedor : recargaSobDemanda;
       // O maior buraco cobre os menores no mesmo fornecedor — recarregar o
       // maior destrava todos os pacotes abaixo dele.
-      recargaPorFornecedor[r.faltaEm] = Math.max(
-        recargaPorFornecedor[r.faltaEm] ?? 0,
-        r.faltaRecarregar,
-      );
+      balde[r.faltaEm] = Math.max(balde[r.faltaEm] ?? 0, r.faltaRecarregar);
     }
   }
 
@@ -171,6 +216,8 @@ export function summarizeBench(rows: BenchRow[]): BenchSummary {
     entregavel: porVeredito.entregavel,
     porVeredito,
     recargaPorFornecedor,
+    recargaSobDemanda,
     rotasComProblema: [...rotas].sort(),
   };
 }
+
