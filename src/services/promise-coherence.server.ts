@@ -22,7 +22,10 @@ const ROTA_POR_REDE: Record<string, keyof typeof REVIEWS_BY_ROUTE> = {
   kwai: "/kwai",
 };
 
-export async function runPromiseCoherence(): Promise<PromiseViolation[]> {
+/** Fatos reais do catálogo por rede (fonte da verdade das promessas). */
+export async function loadCatalogFacts(): Promise<
+  Map<string, { hasBr: boolean; hasRefill: boolean }>
+> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const facts = new Map<string, { hasBr: boolean; hasRefill: boolean }>();
@@ -44,6 +47,12 @@ export async function runPromiseCoherence(): Promise<PromiseViolation[]> {
     }
     if (rows.length < PAGE) break;
   }
+  return facts;
+}
+
+export async function runPromiseCoherence(): Promise<PromiseViolation[]> {
+  const facts = await loadCatalogFacts();
+
 
   const out: PromiseViolation[] = [];
   for (const [rede, f] of facts) {
