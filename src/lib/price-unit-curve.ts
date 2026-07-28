@@ -122,7 +122,7 @@ export function enforceCategoryCurve<T extends CurveRow>(
     for (const r of list) {
       const justo = Number(fairFor(r));
       const price = Number(r.price_brl);
-      const teto = justo * CATEGORY_MAX_MULT;
+      const teto = justo * showcaseCap(justo);
       if (price <= teto + 0.009) continue;
       const alvo = r2(Math.max(teto, justo, pisoDoCiclo(r)));
       if (alvo < price - 0.009) {
