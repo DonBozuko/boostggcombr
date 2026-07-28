@@ -149,6 +149,18 @@ export async function runBenchAutonomo(
 
     const avaliados = rows.filter((r) => (r.verdict as string) !== "nao_avaliado");
 
+    // v340 — O ALERTA MEDE A VITRINE, NÃO O ARQUIVO MORTO.
+    // Causa raiz do "recarregar R$ 91.910": a varredura contava também os
+    // pacotes gigantes que ELA MESMA já tinha tirado da vitrine. Item fora da
+    // vitrine não vende, logo não pode gerar pedido de recarga nem entrar na
+    // conta de "não teriam entrega garantida" — senão o alerta nasce vermelho
+    // para sempre e o dono aprende a ignorar. Eles continuam sendo avaliados
+    // (para religar sozinhos) e continuam gravados no painel de Auditoria.
+    const naVitrine = new Set(
+      items.filter((it) => it.is_sellable !== false).map((it) => String(it.pacote)),
+    );
+    const avaliadosVitrine = avaliados.filter((r) => naVitrine.has(r.pacote));
+
     // v335 — o que o cliente REALMENTE compra (90 dias). Recarga urgente só
     // para esses; pacote gigante sem venda vira "sob encomenda".
     const demanda = new Set<string>();
@@ -165,6 +177,11 @@ export async function runBenchAutonomo(
     }
 
     const s = summarizeBench(avaliados, { demanda: demanda.size > 0 ? demanda : undefined });
+    // Base do aviso humano: só vitrine.
+    const sVitrine = summarizeBench(avaliadosVitrine, {
+      demanda: demanda.size > 0 ? demanda : undefined,
+    });
+
 
     // ---- Correção automática -------------------------------------------
     // Estrutural sai na hora (v297). Saldo/margem é transitório e NÃO derruba
