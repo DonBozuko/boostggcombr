@@ -33,5 +33,6 @@ Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/d
 - [Nunca cobrar sem validar o alvo](mem://preferences/nunca-cobrar-sem-validar-alvo) — v301: perfil do Instagram precisa existir e estar público antes da cobrança; fail-open em instabilidade; mensagem clara no checkout.
 - [Modo Torre (Clean Code)](mem://preferences/modo-torre-clean-code) — Contrato de ciclo fechado: anti-arquivo-gigante, modular por feature, deletar lixo na hora, listar arquivos antes de codar, 4 perguntas de direcionamento.
 - [Regra 2x — causa raiz](mem://preferences/regra-2x-causa-raiz) — Problema repetido 2x proíbe patch: mapear rota do dinheiro, atacar o que o fornecedor muda sem o sistema perceber, trava antes da cobrança + teste de regressão.
+- [Medidor antes do remédio](mem://preferences/medidor-antes-do-remedio) — v316/v317: severidade de alerta derivada em módulo único, no-op não conta como mudança, histerese de fornecedor (5%), livro-razão `catalog_changes` como fonte de verdade de oscilação.
 
 
