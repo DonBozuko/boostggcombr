@@ -60,11 +60,13 @@ export function decideQueueAction(item: QueueItem, now: number = Date.now()): Qu
     return { action: "wait", reason: `pedido novo (${Math.round(idadeMin)}min) — dispatch inline ainda pode resolver` };
   }
 
-  if (item.attempts >= QUEUE_MAX_ATTEMPTS) {
+  const { backoff, max } = tabela(item.status);
+
+  if (item.attempts >= max) {
     return { action: "escalate", reason: `${item.attempts} tentativas automáticas sem sucesso` };
   }
 
-  const esperaMin = QUEUE_BACKOFF_MIN[Math.min(item.attempts, QUEUE_BACKOFF_MIN.length - 1)];
+  const esperaMin = backoff[Math.min(item.attempts, backoff.length - 1)];
   const desdeUltima = item.last_attempt_at
     ? (now - new Date(item.last_attempt_at).getTime()) / 60_000
     : Infinity;
@@ -76,5 +78,5 @@ export function decideQueueAction(item: QueueItem, now: number = Date.now()): Qu
     };
   }
 
-  return { action: "retry", reason: `tentativa ${item.attempts + 1} de ${QUEUE_MAX_ATTEMPTS}` };
+  return { action: "retry", reason: `tentativa ${item.attempts + 1} de ${max}` };
 }
