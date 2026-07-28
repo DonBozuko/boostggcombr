@@ -128,6 +128,8 @@ export async function rankProvidersByCost(opts: {
   const providerIdMap: Record<string, string | null> = {};
   // v294 — precisamos saber se o ID veio curado (manual) ou auto-resolvido.
   const providerIdIsAuto: Record<string, boolean> = {};
+  // v313 — de qual coluna veio o ID (chave da impressão digital do serviço).
+  const providerIdCol: Record<string, string> = {};
   for (const slug of slugs) {
     const prefix = slugToColumn[slug] ?? slug;
     const manualCol = `${prefix}_service_id`;
