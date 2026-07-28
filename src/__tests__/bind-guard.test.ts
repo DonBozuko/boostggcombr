@@ -30,7 +30,7 @@ describe("v320 portão de vínculo", () => {
     expect(rejected).toHaveLength(0);
   });
 
-  it("não apaga vínculo quando o cache ainda não conhece o serviço", () => {
+  it("não apaga vínculo quando o catálogo do fornecedor veio incompleto", () => {
     const { rows, rejected } = sanitizeBindings(
       [{ pacote: "v10k", category: "instagram:visualizacoes", smmhype_service_id: "99999" }],
       nomes,
@@ -38,6 +38,17 @@ describe("v320 portão de vínculo", () => {
     expect(rows[0].smmhype_service_id).toBe("99999");
     expect(rejected).toHaveLength(0);
   });
+
+  it("corta ID fantasma quando o catálogo do fornecedor veio inteiro", () => {
+    const { rows, rejected } = sanitizeBindings(
+      [{ pacote: "p350k", category: "instagram:seguidores", smmhype_service_id: "14225" }],
+      nomes,
+      new Set(["smmhype"]),
+    );
+    expect(rows[0].smmhype_service_id).toBeNull();
+    expect(rejected[0].motivo).toBe("fantasma");
+  });
+
 
   it("separa fornecedores: mesmo número, produtos diferentes", () => {
     const { rows } = sanitizeBindings(
