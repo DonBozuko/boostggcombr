@@ -148,6 +148,9 @@ const GHOST_ALERT_STREAK = 3;
 // quando a leitura idêntica se repetir (2ª confirmação) ou o dono aprovar.
 // ============================================================
 const MASS_CHANGE_RATIO = 0.3;
+// v311 — variação de custo abaixo de 5% é ruído de câmbio/arredondamento do
+// fornecedor. Não conta como "pacote mudou de preço" para o freio de massa.
+const MOVE_THRESHOLD = 0.05;
 // v282 — Faixas de reajuste de custo do fornecedor.
 const AUTO_UP_MAX = 1.40;   // até +40%: aplica sozinho
 const RETIRE_ABOVE = 1.80;  // acima de +80%: aposenta o pacote
