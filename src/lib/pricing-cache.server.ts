@@ -508,7 +508,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       approved: aprovadaManual ? false : (q?.signature === assinatura ? q?.approved === true : false),
       last_alert_at: q?.signature === assinatura ? (q?.last_alert_at ?? null) : null,
       updated_at: new Date().toISOString(),
-      amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+      amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, custo: Number(p.patch.cost_brl ?? 0) })),
     });
   } else if (q) {
     await clearQuarantine(supabaseAdmin);
@@ -603,7 +603,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const base = emQuarentena ? movers : plans.filter((p) => p.movesPrice);
       const amostraQ = base
         .slice(0, 8)
-        .map((p) => `• ${p.pacote} → R$ ${Number(p.patch.price_brl ?? 0).toFixed(2)}`)
+        .map((p) => `• ${p.pacote} → custo R$ ${Number(p.patch.cost_brl ?? 0).toFixed(2)}`)
         .join("\n");
       const amostra = repriced
         .slice(0, 8)
@@ -632,7 +632,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
           approved: false,
           last_alert_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+          amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, custo: Number(p.patch.cost_brl ?? 0) })),
         });
       }
     } catch { /* noop */ }
