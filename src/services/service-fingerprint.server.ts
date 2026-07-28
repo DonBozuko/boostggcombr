@@ -8,7 +8,7 @@ import {
   type FingerprintLink,
   type FingerprintRecord,
 } from "@/lib/service-fingerprint";
-import { serviceKey } from "@/lib/catalog-coherence";
+import { serviceKey, serviceMatchesIntent } from "@/lib/catalog-coherence";
 
 const ID_COLUMNS: Array<{ col: string; provider: string }> = [
   { col: "smmhype_service_id", provider: "smmhype" },
@@ -36,6 +36,8 @@ export type FingerprintRunResult = {
   checked: number;
   baselined: number;
   drift: Array<{ pacote: string; col: string; provider: string; id: string; de: string; para: string }>;
+  /** v314 — vínculos novos recusados por não baterem com a intenção do pacote. */
+  suspects: number;
   unlinked: string[];
   paused: string[];
   errors: number;
@@ -62,6 +64,7 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
     checked: 0,
     baselined: 0,
     drift: [],
+    suspects: 0,
     unlinked: [],
     paused: [],
     errors: 0,
@@ -69,7 +72,7 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
 
   const items = await readAllPages<any>(
     "pricing_items",
-    ["pacote", "is_sellable", ...ID_COLUMNS.map((c) => c.col)].join(", "),
+    ["pacote", "category", "is_sellable", ...ID_COLUMNS.map((c) => c.col)].join(", "),
   );
 
   // Nomes atuais por fornecedor:id (paginado — cache tem 6k+ linhas).
@@ -106,6 +109,7 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
         provider,
         service_id: id,
         current_name: serviceNames.get(serviceKey({ provider, id })) ?? null,
+        category: item.category ?? null,
       };
       links.push(link);
       const lista = linksByPacote.get(link.pacote) ?? [];
@@ -115,7 +119,7 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
   }
 
   result.checked = links.length;
-  const decisions = decideFingerprints(links, stored);
+  const decisions = decideFingerprints(links, stored, serviceMatchesIntent);
 
   const upserts: any[] = [];
   const now = new Date().toISOString();
@@ -144,14 +148,26 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
         name_sig: stored.get(fingerprintKey(d.link.pacote, d.link.col))!.name_sig,
         checked_at: now,
       });
-    } else if (d.action === "drift") {
+    } else if (d.action === "rename") {
+      // v314 — mesmo produto, nome novo: atualiza a assinatura e mantém a rota.
+      upserts.push({
+        pacote: d.link.pacote,
+        col: d.link.col,
+        provider: d.link.provider,
+        service_id: d.link.service_id,
+        service_name: d.link.current_name,
+        name_sig: d.sig,
+        checked_at: now,
+      });
+    } else if (d.action === "suspect" || d.action === "drift") {
+      if (d.action === "suspect") result.suspects += 1;
       result.drift.push({
         pacote: d.link.pacote,
         col: d.link.col,
         provider: d.link.provider,
         id: d.link.service_id,
-        de: d.from,
-        para: d.to,
+        de: d.action === "drift" ? d.from : "(vínculo novo)",
+        para: d.action === "drift" ? d.to : `${d.link.current_name} — ${d.motivo}`,
       });
       const lista = driftPorPacote.get(d.link.pacote) ?? [];
       lista.push(d.link);
