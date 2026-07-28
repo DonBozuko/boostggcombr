@@ -17,7 +17,7 @@ export const Route = createFileRoute("/api/public/hooks/ops-audit")({
           criticos: report.findings.filter((f) => f.severity === "critical").length,
           total: report.findings.length,
           telegram_enviado: report.telegram_enviado,
-          findings: report.findings.map((f) => ({ code: f.code, severity: f.severity, titulo: f.titulo })),
+          findings: report.findings.map((f) => ({ code: f.code, severity: f.severity, titulo: f.titulo, problema: f.problema })),
         });
       },
     },
