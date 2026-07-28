@@ -248,16 +248,34 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
 
   if (options.notify && critical.length > 0) {
     const { dispatchTelegramAlert } = await import("@/lib/messaging");
-    const texto = [
-      "🔎 AUDITORIA FORENSE — problemas que afetam dinheiro ou cliente",
-      "",
-      ...critical.map(
-        (f) => `⚠️ ${f.titulo}\nPROBLEMA: ${f.problema}\nO QUE FAZER: ${f.o_que_fazer}`,
-      ),
-    ].join("\n\n");
-    const r = await dispatchTelegramAlert(texto, { severity: "critical", origem: "ops-audit" });
-    telegramEnviado = r.ok;
+    const corpo = critical
+      .map((f) => `⚠️ ${f.titulo}\nPROBLEMA: ${f.problema}\nO QUE FAZER: ${f.o_que_fazer}`)
+      .join("\n\n");
+
+    // v319 — SILÊNCIO INTELIGENTE. A auditoria roda de hora em hora e reenviava
+    // exatamente o mesmo texto enquanto o problema existisse: o celular do dono
+    // virou um loop de notificação e alerta repetido deixa de ser lido. Agora a
+    // mesma lista de problemas só volta a tocar a cada 12h, com contador de
+    // insistência. Problema NOVO (assinatura diferente) toca na hora, sempre.
+    const assinatura = await hashAlerta(
+      critical.map((f) => `${f.code}|${(f.evidencia ?? []).map((e: any) => e.pacote).sort().join(",")}`).sort().join("||"),
+    );
+    const { pode, vez } = await podeAlertar(assinatura);
+
+    if (pode) {
+      const texto = [
+        "🔎 AUDITORIA FORENSE — problemas que afetam dinheiro ou cliente",
+        vez > 1 ? `(${vez}ª vez que aviso disso — segue sem resolver)` : "",
+        "",
+        corpo,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      const r = await dispatchTelegramAlert(texto, { severity: "critical", origem: "ops-audit" });
+      telegramEnviado = r.ok;
+    }
   }
+
 
   try {
     await (supabaseAdmin as any).from("admin_audit_logs").insert({
