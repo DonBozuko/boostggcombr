@@ -627,10 +627,18 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     try {
       const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
       const base = emQuarentena ? movers : plans.filter((p) => p.movesPrice);
+      // v319 — o alerta mostrava "R$ 0.00" para todo pacote cuja mudança não foi
+      // de custo (só disponibilidade). Zero não era o custo novo: era campo vazio
+      // formatado. Alerta que mente vira alerta ignorado.
       const amostraQ = base
         .slice(0, 8)
-        .map((p) => `• ${p.pacote} → custo R$ ${Number(p.patch.cost_brl ?? 0).toFixed(2)}`)
+        .map((p) =>
+          p.patch.cost_brl !== undefined && Number(p.patch.cost_brl) > 0
+            ? `• ${p.pacote} → custo R$ ${Number(p.patch.cost_brl).toFixed(2)}`
+            : `• ${p.pacote} → mudou disponibilidade (custo igual)`,
+        )
         .join("\n");
+
       const amostra = repriced
         .slice(0, 8)
         .map((x) => `• ${x.pacote}: R$ ${x.de.toFixed(2)} → R$ ${x.para.toFixed(2)} (${x.fornecedor})`)
