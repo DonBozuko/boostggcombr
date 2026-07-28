@@ -17,7 +17,7 @@ export const CLAIM_BR_RE =
 
 /** Promessa de reposição/garantia contra queda. */
 export const CLAIM_REFILL_RE =
-  /reposi[çc][ãa]o\s+(garantida|por\s+\d+|de\s+\d+|nos?\s+)|garantia\s+de\s+reposi[çc][ãa]o|refill\s+garantid|sem\s+drop|sem\s+queda|n[ãa]o\s+cai(?:em)?\b/i;
+  /reposi[çc][ãa]o\s+(?:[ée]\s+)?(?:garantid|por\s+\d+|de\s+\d+|nos?\s+)|garantia\s+de\s+reposi[çc][ãa]o|refill\s+garantid|sem\s+drop|sem\s+queda|n[ãa]o\s+cai(?:em)?\b/i;
 
 /** Negativas explícitas ("hoje não", "não há reposição garantida") não são promessa. */
 const NEGATION_RE =
