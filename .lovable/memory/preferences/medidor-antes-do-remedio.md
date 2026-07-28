@@ -21,3 +21,6 @@ Regra nascida da v316/v317, depois de dias tratando sintoma:
 
 **Por quê:** 51 alertas "críticos" em 48h eram todos a mesma mensagem, e nenhum deles era
 risco real. O sistema não estava quebrado — o medidor estava.
+
+## v318 — dinheiro entrando nunca passa pelo filtro
+Alerta de venda paga / recarga aprovada é classificado como sucesso (info) e o portão de severidade suprimia o Telegram. Regra: todo alerta de DINHEIRO (pedido pago, provisão, recarga de revendedor) envia com `force: true`. Filtro de ruído vale para robô, nunca para caixa.
