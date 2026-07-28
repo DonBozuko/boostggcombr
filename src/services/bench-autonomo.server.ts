@@ -21,6 +21,9 @@ import { classifyBench, summarizeBench, type BenchRow } from "@/lib/bench-sweep"
 const PAUSE_PREFIX = "BANCADA";
 const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 const CONCURRENCY = 4;
+/** v335 — travado em 3 varreduras seguidas (6h) não é transitório: sai da vitrine. */
+const CICLOS_PARA_PAUSAR = 3;
+
 
 export type BenchRunResult = {
   ok: boolean;
