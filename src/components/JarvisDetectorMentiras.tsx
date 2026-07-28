@@ -1,3 +1,4 @@
+import { getAdminToken } from "@/lib/admin-token-store";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { runJarvisLieDetector } from "@/lib/jarvis-detector-mentiras.functions";
@@ -14,7 +15,7 @@ export function JarvisDetectorMentiras() {
   const onRun = async () => {
     setLoading(true);
     try {
-      const token = typeof window !== "undefined" ? (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "") : "";
+      const token = getAdminToken();
       const r = await run({ data: { token } });
       setReport(r);
     } catch (e) {

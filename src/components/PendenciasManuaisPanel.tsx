@@ -1,3 +1,4 @@
+import { getAdminToken } from "@/lib/admin-token-store";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getPendenciasManuais, type PendenciasDigest } from "@/lib/pendencias.functions";
@@ -14,7 +15,7 @@ export function PendenciasManuaisPanel() {
 
   const load = useCallback(async () => {
     try {
-      const token = typeof window !== "undefined" ? (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "") : "";
+      const token = getAdminToken();
       if (!token) { setD(null); return; }
       setD((await fetchPendencias({ data: { token } })) as PendenciasDigest);
     } catch { /* silencioso */ }
