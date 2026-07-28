@@ -341,10 +341,9 @@ export async function runBenchAutonomo(
       if (precisaRecarga.length > 0) {
         linhas.push("");
         linhas.push(
-          saldoVencido.size > 0
-            ? "Saldo pendente há MAIS DE 24h (agora atrasa entrega de verdade):"
-            : "Falta saldo (dentro do prazo de entrega — pode repor hoje, nada foi tirado da vitrine por isso):",
+          "Falta saldo em fornecedor (dentro do prazo de entrega — nada foi tirado da vitrine por isso):",
         );
+
         for (const [forn, falta] of precisaRecarga) {
           linhas.push(`• ${forn}: recarregar ${brl(falta)}`);
         }
