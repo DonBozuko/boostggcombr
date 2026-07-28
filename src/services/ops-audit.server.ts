@@ -159,6 +159,32 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     });
   }
 
+  // 6.5) v312 — Impressão digital do serviço: fornecedor manteve o ID mas trocou
+  // o produto por trás. Roda ANTES da coerência para que o vínculo podre já
+  // esteja desligado quando a coerência avaliar o pacote.
+  try {
+    const { runServiceFingerprints } = await import("@/services/service-fingerprint.server");
+    const fp = await runServiceFingerprints();
+    if (fp.drift.length > 0) {
+      findings.push({
+        code: "FORNECEDOR_TROCOU_PRODUTO",
+        severity: fp.paused.length > 0 ? "critical" : "warning",
+        titulo: "Fornecedor trocou o produto sem avisar",
+        problema: `${fp.drift.length} vínculo(s) mudaram de produto no fornecedor (ex.: ${fp.drift
+          .slice(0, 3)
+          .map((d) => `${d.pacote}: "${d.de}" virou "${d.para}"`)
+          .join("; ")}). O sistema já desligou essas rotas${fp.paused.length > 0 ? ` e tirou ${fp.paused.length} pacote(s) da vitrine` : ""}.`,
+        o_que_fazer:
+          fp.paused.length > 0
+            ? "Painel > Saúde do Catálogo: esses pacotes ficaram sem fornecedor. Escolha outro serviço para eles."
+            : "Nada urgente: o pacote continua vendendo por outro fornecedor.",
+        evidencia: fp.drift.slice(0, 20),
+      });
+    }
+  } catch (e) {
+    console.warn("[ops-audit] v312 impressão digital falhou", e);
+  }
+
   // 7) v291 — Coerência do catálogo (serviço errado, escada invertida, custo fora
   // da curva). Aditivo: se falhar, a auditoria antiga continua valendo.
   try {
@@ -166,6 +192,7 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     const issues = await runCatalogCoherence();
     // v304 — pacote com serviço errado ou custo absurdo sai da vitrine na hora.
     const remediado = await remediateCoherence(issues).catch(() => ({ paused: [], restored: [], errors: 1 }));
+
     if (remediado.paused.length > 0) {
       console.warn("[ops-audit] v304 pacotes pausados pela coerência", remediado.paused);
     }

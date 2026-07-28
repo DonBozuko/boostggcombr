@@ -1,0 +1,105 @@
+// v312 — IMPRESSÃO DIGITAL DO SERVIÇO (função pura, testável).
+//
+// Problema real: o fornecedor mantém o mesmo ID mas TROCA o produto por trás
+// ("Instagram Followers BR" vira "Instagram Likes"). Nenhuma trava por ID pega
+// isso — o ID continua existindo e o teste seco continua passando. O cliente
+// paga seguidor e recebe curtida; o dinheiro vira estorno.
+//
+// Solução: no momento do vínculo gravamos a "assinatura" do nome do serviço.
+// A cada auditoria comparamos com o nome atual do fornecedor. Se a assinatura
+// mudou, o vínculo é considerado podre e é desligado antes de vender.
+
+// Tokens que definem O QUE o serviço entrega. Mudança de qualquer um deles é
+// troca de produto. Palavra de marketing ("fast", "cheap", "new", "2024") não
+// entra: fornecedor renomeia isso toda semana e não é motivo para desvincular.
+const CORE_TOKENS: Array<{ token: string; re: RegExp }> = [
+  { token: "seguidores", re: /\b(follow\w*|seguidor\w*|subs?criber\w*|inscrit\w*|member\w*|membro\w*)/i },
+  { token: "curtidas", re: /\b(like\w*|curtid\w*|reaction\w*|rea[cç][aã]o\w*)/i },
+  { token: "visualizacoes", re: /\b(view\w*|visualiza\w*|watch\s*time|impress\w*)/i },
+  { token: "comentarios", re: /\b(comment\w*|coment[aá]ri\w*)/i },
+  { token: "compartilhamentos", re: /\b(share\w*|compartilh\w*|save\w*|salvament\w*)/i },
+  { token: "live", re: /\b(live|ao\s*vivo)\b/i },
+  { token: "short", re: /\b(short\w*|reel\w*)\b/i },
+  { token: "story", re: /\b(stor(y|ies)|st[oó]ri\w*)\b/i },
+  { token: "br", re: /\b(brazil\w*|brasil\w*|\bbr\b|portugu\w*)/i },
+  { token: "instagram", re: /\binstagram|\big\b/i },
+  { token: "tiktok", re: /\btik\s*tok\b/i },
+  { token: "youtube", re: /\byou\s*tube|\byt\b/i },
+  { token: "facebook", re: /\bfacebook|\bfb\b/i },
+  { token: "twitter", re: /\btwitter|\bx\.com\b/i },
+  { token: "kwai", re: /\bkwai\b/i },
+  { token: "telegram", re: /\btelegram\b/i },
+];
+
+/** Assinatura estável do nome do serviço: só o que define o produto. */
+export function serviceSignature(name: string): string {
+  const n = String(name ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  const hits = CORE_TOKENS.filter(({ re }) => re.test(n)).map(({ token }) => token);
+  if (hits.length === 0) {
+    // Sem token conhecido: cai para o nome cru normalizado. Melhor comparar algo
+    // do que declarar "igual" e deixar troca silenciosa passar.
+    return n.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  }
+  return [...new Set(hits)].sort().join("+");
+}
+
+export type FingerprintRecord = {
+  pacote: string;
+  col: string;
+  provider: string;
+  service_id: string;
+  service_name: string;
+  name_sig: string;
+};
+
+export type FingerprintLink = {
+  pacote: string;
+  col: string;
+  provider: string;
+  service_id: string;
+  /** Nome atual do serviço no cache do fornecedor. null = não encontrado. */
+  current_name: string | null;
+};
+
+export type FingerprintDecision =
+  | { action: "baseline"; link: FingerprintLink; sig: string }
+  | { action: "ok"; link: FingerprintLink }
+  | { action: "unknown"; link: FingerprintLink }
+  | { action: "drift"; link: FingerprintLink; from: string; to: string; sig: string };
+
+/**
+ * Compara os vínculos atuais com as impressões digitais gravadas.
+ * - sem registro e nome conhecido → grava baseline (não desvincula na 1ª vez);
+ * - nome sumiu do cache → "unknown" (outra trava já cuida de ID fantasma);
+ * - assinatura diferente → "drift": o fornecedor trocou o produto por trás.
+ */
+export function decideFingerprints(
+  links: FingerprintLink[],
+  stored: Map<string, FingerprintRecord>,
+): FingerprintDecision[] {
+  const out: FingerprintDecision[] = [];
+  for (const link of links) {
+    if (!link.current_name) {
+      out.push({ action: "unknown", link });
+      continue;
+    }
+    const sig = serviceSignature(link.current_name);
+    const prev = stored.get(fingerprintKey(link.pacote, link.col));
+    if (!prev || prev.service_id !== link.service_id || prev.provider !== link.provider) {
+      out.push({ action: "baseline", link, sig });
+      continue;
+    }
+    if (prev.name_sig === sig) {
+      out.push({ action: "ok", link });
+      continue;
+    }
+    out.push({ action: "drift", link, from: prev.service_name, to: link.current_name, sig });
+  }
+  return out;
+}
+
+export function fingerprintKey(pacote: string, col: string): string {
+  return `${pacote}|${col}`;
+}
