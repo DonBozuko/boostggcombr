@@ -266,7 +266,10 @@ export async function runBenchAutonomo(
 
 
     // Religa SÓ o que esta trava pausou e que agora tem rota provada agora.
+    // v350 — pausa antiga por saldo é liberada de imediato: saldo deixou de ser
+    // motivo de tirar pacote do ar.
     const entregaveis = new Set(avaliados.filter((r) => r.verdict === "entregavel").map((r) => r.pacote));
+    const soFaltaSaldo = new Set(avaliados.filter((r) => r.verdict === "saldo").map((r) => r.pacote));
     const religados: string[] = [];
     const { data: pausadosDb } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -275,7 +278,10 @@ export async function runBenchAutonomo(
       .like("sellable_reason", `${PAUSE_PREFIX}%`);
     for (const p of ((pausadosDb as any[]) ?? [])) {
       const pacote = String(p.pacote);
-      if (!entregaveis.has(pacote)) continue;
+      const motivoAntigo = String(p.sellable_reason ?? "");
+      const eraSaldo = /saldo/i.test(motivoAntigo);
+      if (!entregaveis.has(pacote) && !(eraSaldo || soFaltaSaldo.has(pacote))) continue;
+
       const { data } = await supabaseAdmin
         .from("pricing_items" as any)
         .update({ is_sellable: true, sellable_reason: null })
