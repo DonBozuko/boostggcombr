@@ -18,8 +18,25 @@ export const QUEUE_MIN_AGE_MIN = 15;
 /** Backoff entre retentativas (minutos), por número de tentativas já feitas. */
 export const QUEUE_BACKOFF_MIN = [15, 30, 60, 120, 240];
 
+/**
+ * v353 — pedido parado só por falta de saldo no fornecedor não pode desistir em
+ * ~8h. O dono recarrega rápido, mas pode acontecer movimento grande e demorar.
+ * Regra declarada: a fila insiste sozinha por ~24h antes de chamar humano.
+ */
+export const QUEUE_BACKOFF_WAITING_MIN = [15, 30, 60, 120, 240, 240, 240, 240, 240, 240];
+
 /** Depois disso, para de tentar sozinho e chama humano. */
 export const QUEUE_MAX_ATTEMPTS = QUEUE_BACKOFF_MIN.length;
+
+/** Teto de tentativas para pedido aguardando recarga (~24h de insistência). */
+export const QUEUE_MAX_ATTEMPTS_WAITING = QUEUE_BACKOFF_WAITING_MIN.length;
+
+function tabela(status: string) {
+  return status === "waiting_provision"
+    ? { backoff: QUEUE_BACKOFF_WAITING_MIN, max: QUEUE_MAX_ATTEMPTS_WAITING }
+    : { backoff: QUEUE_BACKOFF_MIN, max: QUEUE_MAX_ATTEMPTS };
+}
+
 
 export type QueueItem = {
   id: string;
@@ -43,11 +60,13 @@ export function decideQueueAction(item: QueueItem, now: number = Date.now()): Qu
     return { action: "wait", reason: `pedido novo (${Math.round(idadeMin)}min) — dispatch inline ainda pode resolver` };
   }
 
-  if (item.attempts >= QUEUE_MAX_ATTEMPTS) {
+  const { backoff, max } = tabela(item.status);
+
+  if (item.attempts >= max) {
     return { action: "escalate", reason: `${item.attempts} tentativas automáticas sem sucesso` };
   }
 
-  const esperaMin = QUEUE_BACKOFF_MIN[Math.min(item.attempts, QUEUE_BACKOFF_MIN.length - 1)];
+  const esperaMin = backoff[Math.min(item.attempts, backoff.length - 1)];
   const desdeUltima = item.last_attempt_at
     ? (now - new Date(item.last_attempt_at).getTime()) / 60_000
     : Infinity;
@@ -59,5 +78,5 @@ export function decideQueueAction(item: QueueItem, now: number = Date.now()): Qu
     };
   }
 
-  return { action: "retry", reason: `tentativa ${item.attempts + 1} de ${QUEUE_MAX_ATTEMPTS}` };
+  return { action: "retry", reason: `tentativa ${item.attempts + 1} de ${max}` };
 }

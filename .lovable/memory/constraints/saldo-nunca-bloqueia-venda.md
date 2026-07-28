@@ -14,8 +14,10 @@ dentro do preflight de rota.
    ("💳 RECARREGUE O FORNECEDOR AGORA"), cooldown de 30min por pacote.
    O dono repõe na hora — é o modelo de operação declarado.
 3. **Pedido espera, não estorna.** Sem saldo no despacho, o pedido parqueia em
-   `waiting_provision` e sai sozinho quando a recarga entra. Estorno automático
-   continua reservado a falha `permanent` (v296).
+   `waiting_provision` e sai sozinho quando a recarga entra. A fila insiste
+   sozinha por ~24h (v353, `QUEUE_BACKOFF_WAITING_MIN`) antes de chamar humano —
+   os 30min do alerta são só cooldown de notificação, não prazo de entrega.
+   Estorno automático continua reservado a falha `permanent` (v296).
 4. **Bancada continua diagnosticando saldo.** `classifyBench` devolve veredito
    `saldo` mesmo com `res.ok = true`, para o painel/celular mostrarem quanto
    falta recarregar e onde.
