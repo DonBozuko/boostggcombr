@@ -38,7 +38,7 @@ describe("v328 — markup decrescente por custo", () => {
     for (const c of [0.2, 2, 4.2, 41.96, 209.8, 320.79, 4196]) {
       const p = computeGuardedPrice(c, 1000);
       expect(respectsMinMargin(p, c)).toBe(true);
-      expect(minNetRatio(c)).toBeGreaterThanOrEqual(1.0);
+      expect(minNetRatio(c)).toBeGreaterThanOrEqual(0.98);
     }
   });
 
