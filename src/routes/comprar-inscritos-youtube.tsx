@@ -27,7 +27,7 @@ const FAQ = [
   },
   {
     q: "Vem com reposição?",
-    a: "Sim, 30 dias de reposição em caso de queda.",
+    a: "A linha de YouTube é Global e hoje não tem reposição garantida. Em caso de queda, solicitamos reposição ao fornecedor, sem prometer prazo.",
   },
 ];
 
