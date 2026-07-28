@@ -48,6 +48,22 @@ export const CURVE_TOLERANCE = 2.0;
 /** Aterrissagem: o outlier desce até 1,5x a curva — preserva prêmio de vitrine. */
 export const CURVE_LANDING = 1.5;
 
+// v327 — TETO DE VITRINE POR CATEGORIA.
+//
+// CAUSA RAIZ que a v326 não pegava: a regra da mediana só acha OUTLIER DENTRO
+// da categoria. Quando a categoria INTEIRA está inflada, a mediana É a inflação
+// e nada é corrigido. Medido no banco real: instagram/facebook vivem em ~1,0x
+// do preço justo, mas tiktok:seguidores em 3,1x, youtube:inscritos em 4,1x e
+// telegram:grupo em 10x — daí "1.000 seguidores TikTok por R$ 278,50" enquanto
+// 1.000 do Instagram custa R$ 47,60. Preço que ninguém paga não é margem, é
+// prateleira morta (0 vendas acima de 1.000 un em 120 dias).
+//
+// Invariante nova: nenhum pacote pode ficar acima de CATEGORY_MAX_MULT do seu
+// preço justo. O justo já embute margem líquida de 4x + cupom + taxa Pix, então
+// o teto NUNCA come a margem mínima. Desce no máximo 20% por ciclo.
+export const CATEGORY_MAX_MULT = 1.6;
+
+
 const r2 = (v: number) => Number(v.toFixed(2));
 
 function median(values: number[]): number {
@@ -78,7 +94,25 @@ export function enforceCategoryCurve<T extends CurveRow>(
     byCategory.set(r.category, list);
   }
 
+  // Preço no começo do ciclo: o limite de -20% vale para o ciclo INTEIRO
+  // (teto + mediana somados), nunca por passe.
+  const inicial = new Map(out.map((r) => [r.pacote, Number(r.price_brl)]));
+  const pisoDoCiclo = (r: CurveRow) => (inicial.get(r.pacote) ?? Number(r.price_brl)) * CURVE_MAX_DOWN;
+
   for (const [category, list] of byCategory) {
+    // v327 — teto absoluto: vale mesmo em categoria pequena (não depende de mediana).
+    for (const r of list) {
+      const justo = Number(fairFor(r));
+      const price = Number(r.price_brl);
+      const teto = justo * CATEGORY_MAX_MULT;
+      if (price <= teto + 0.009) continue;
+      const alvo = r2(Math.max(teto, justo, pisoDoCiclo(r)));
+      if (alvo < price - 0.009) {
+        fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
+        r.price_brl = alvo;
+      }
+    }
+
     // Categoria pequena não tem mediana confiável: não mexe.
     if (list.length < 4) continue;
 
@@ -91,13 +125,17 @@ export function enforceCategoryCurve<T extends CurveRow>(
       const naCurva = justo * mult;
       if (price <= naCurva * CURVE_TOLERANCE + 0.009) continue;
 
-      const alvo = r2(Math.max(naCurva * CURVE_LANDING, justo, price * CURVE_MAX_DOWN));
+      const alvo = r2(Math.max(naCurva * CURVE_LANDING, justo, pisoDoCiclo(r)));
       if (alvo < price - 0.009) {
-        fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
+        const antes = fixes.findIndex((f) => f.pacote === r.pacote);
+        if (antes >= 0) fixes[antes].para = alvo;
+        else fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
         r.price_brl = alvo;
       }
     }
+
   }
+
 
   return { rows: out, fixes };
 }
