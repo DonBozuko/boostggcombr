@@ -24,6 +24,7 @@ Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste
 Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/deletar. Arquivo pequeno, lógica em hook, feature em `src/features/`. Pedido vago ou grande = parar e fazer as 4 perguntas. Fechar ciclo perguntando sobre limpeza de lixo. Ver [Modo Torre](mem://preferences/modo-torre-clean-code).
 
 ## Memories
+- [Fonte única de ID de fornecedor](mem://constraints/fonte-unica-id-fornecedor) — Proibido ID chumbado no código; catálogo vivo manda e toda escrita passa pelo portão bind-guard. Consultar antes de mexer em vínculo/roteamento.
 - [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho) — Como a dupla conduz tarefas: rótulo de complexidade, quando pedir sinal verde, código > documento, fechamento de ciclo, auditoria de coerência.
 - [Modo Orquestrador](mem://preferences/modo-orquestrador) — Como planejar e executar qualquer mudança: mapa de impacto, ordem, ponto único de verdade, rollback, prova real, anti-loop de alarme.
 - [Evolução futura](mem://preferences/evolucao-futura) — Lembrar de evoluir módulos "honestos mas limitados" (ex: JarvisContentScheduler → publicação real) quando chip/warmup/API estiverem prontos. Usuário quer evoluir TUDO no futuro.
