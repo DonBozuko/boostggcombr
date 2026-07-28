@@ -1,0 +1,1 @@
+update public.pricing_items set is_sellable = true, sellable_reason = null where is_sellable = false and sellable_reason like 'Custo do fornecedor subiu%';
