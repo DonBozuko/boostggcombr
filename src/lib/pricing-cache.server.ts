@@ -486,7 +486,11 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
 
   const assinatura = await hashSignature(
     movers
-      .map((p) => `${p.pacote}:${Number(p.patch.price_brl ?? -1).toFixed(2)}:${p.patch.is_sellable === false ? "off" : "on"}`)
+      // v311 — a assinatura precisa refletir o que ESTE motor grava: custo.
+      // Antes usava price_brl, que a v305 parou de gravar aqui: toda leitura
+      // virava "-1.00", a confirmação por segunda leitura nunca fechava e a
+      // quarentena nunca liberava. Custo arredondado em centavo estabiliza.
+      .map((p) => `${p.pacote}:${Number(p.patch.cost_brl ?? -1).toFixed(2)}:${p.patch.is_sellable === false ? "off" : "on"}`)
       .sort()
       .join("|"),
   );
