@@ -104,7 +104,7 @@ describe("v314 baseline desconfiado e renome cosmético", () => {
       ],
     ]);
     const [d] = decideFingerprints(
-      [{ ...link, current_name: "Instagram Views Brasil Premium ⚡ HQ" }],
+      [{ ...link, current_name: "Instagram Story Views Brasil Premium" }],
       stored,
       matches,
     );
