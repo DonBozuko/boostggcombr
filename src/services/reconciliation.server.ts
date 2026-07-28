@@ -22,6 +22,16 @@ export async function runReconciliation(hours = 24): Promise<ReconReport> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const since = new Date(Date.now() - hours * 3600_000).toISOString();
 
+  // v339 — antes de comparar, fecha qualquer venda entregue que ficou fora do
+  // caixa (idempotente). Assim o relatório mede a realidade, não um buraco de
+  // gravação de um caminho de despacho específico.
+  try {
+    const { backfillTreasury } = await import("@/services/treasury-backfill.server");
+    await backfillTreasury(30);
+  } catch { /* nunca derruba a reconciliação */ }
+
+
+
   const report: ReconReport = {
     ok: true,
     periodo_horas: hours,

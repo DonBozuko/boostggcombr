@@ -263,6 +263,18 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
                 status: 'sent',
               })
 
+              // v339 — fecha a linha "pending" criada no enfileiramento.
+              // Sem isso ela ficava pendente para sempre e a auditoria acusava
+              // "e-mail não entregue" mesmo com o e-mail já entregue.
+              if (payload.message_id) {
+                await supabase
+                  .from('email_send_log')
+                  .update({ status: 'sent' })
+                  .eq('message_id', payload.message_id as string)
+                  .eq('status', 'pending')
+              }
+
+
               // Delete from queue
               const { error: delError } = await supabase.rpc('delete_email', {
                 queue_name: queue,
