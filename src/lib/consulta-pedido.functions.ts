@@ -28,11 +28,13 @@ export const consultarPedidoPublico = createServerFn({ method: "POST" })
       return { ok: false as const, message: "Não localizei esse pedido, senhor. Confirme o ID." };
     }
     const r = rows[0]!;
-    const base = STATUS_MSG[r.status] ?? `Status atual: ${r.status}.`;
+    const base = statusLabelPt(r.status);
     return {
       ok: true as const,
       message: `${base} (${r.rede_social ?? "rede"} · ${r.pacote} · ${r.quantidade}).`,
-      status: r.status,
+      // v325 — o cliente vê o estado público; o interno fica só no admin.
+      status: toCanonicalStatus(r.status),
     };
+
 
   });
