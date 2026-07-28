@@ -9,8 +9,18 @@
 //  5. min ≤ quantidade ≤ max do fornecedor (senão: "Fora do range do fornecedor")
 //  6. v217 TRAVA DINÂMICA: menor custo vivo precisa manter margem mínima.
 //     Se custo dispara → pausa. Quando cai, próximo dry-run reativa sozinho.
-const MIN_MARGIN = 0.70;
+//
+// v334 — PONTO ÚNICO DE VERDADE DE MARGEM.
+// Aqui existia `MIN_MARGIN = 0.70` (margem percentual fixa ≈ 3,33x) escrito à
+// mão em 2 lugares do projeto. A v328 passou a exigir markup MENOR conforme o
+// custo absoluto sobe (pacote de custo R$ 963 é saudável a ~2,0x). O limiar
+// velho não foi atualizado: a Autoridade de Preço dizia "preço correto, não
+// mexer" e este teste dizia "prejuízo, pausar" — no mesmo pacote, para sempre.
+// Resultado: p500k, tf100k, yv1m, yv750k, kv250k e tl500k pausados e alarme a
+// cada ciclo, sem prejuízo nenhum (p500k lucra ~R$ 1.076 por venda).
+// Regra: quem decide margem é `margin-guardian`. Ninguém mais.
 
+import { respectsMinMargin } from "./margin-guardian";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { fetchServiceCatalog, RESERVE_PROVIDER_ENDPOINTS } from "./pricing-cache.server";
 
