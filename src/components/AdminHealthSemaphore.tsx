@@ -1,3 +1,4 @@
+import { getAdminToken } from "@/lib/admin-token-store";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getJarvisTriage, type TriageDigest } from "@/lib/jarvis-triage.functions";
@@ -14,7 +15,7 @@ export function AdminHealthSemaphore() {
 
   const load = useCallback(async () => {
     try {
-      const token = typeof window !== "undefined" ? (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "") : "";
+      const token = getAdminToken();
       if (!token) { setD(null); return; }
       const r = await fetchTriage({ data: { token } });
       setD(r as TriageDigest);

@@ -72,7 +72,7 @@ import { RecoveryPanel } from "@/components/RecoveryPanel";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
 
-const ADMIN_TOKEN_KEY = "eliteboost_prime_admin_token";
+import { getAdminToken, setAdminToken, clearAdminToken } from "@/lib/admin-token-store";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 
 function AdminSettingsButton() {
@@ -159,7 +159,7 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
           size="sm"
           onClick={async () => {
             await supabase.auth.signOut();
-            window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+            clearAdminToken();
             toast.success("Sessão encerrada");
             window.location.href = "/admin";
           }}
@@ -291,7 +291,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
       <button
         onClick={async () => {
           await supabase.auth.signOut();
-          window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+          clearAdminToken();
           toast.success("Sessão encerrada");
           window.location.href = "/admin";
         }}
@@ -320,7 +320,7 @@ function AdminGate() {
   const fetchAdminToken = useServerFn(getAdminTokenForSession);
 
   const hardLogout = useCallback(async () => {
-    window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+    clearAdminToken();
     clearAdminActivity();
     setAdminToken("");
     setAuthed(false);
@@ -337,7 +337,7 @@ function AdminGate() {
     const { data } = await supabase.auth.getSession();
     const email = data.session?.user?.email?.toLowerCase() ?? null;
     if (!data.session || email !== ADMIN_EMAIL) {
-      window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+      clearAdminToken();
       setAdminToken("");
       setAuthed(false);
       return false;
@@ -348,19 +348,19 @@ function AdminGate() {
     try {
       const res = await fetchAdminToken({ data: {} as never });
       if (res.ok) {
-        window.localStorage.setItem(ADMIN_TOKEN_KEY, res.token);
+        setAdminToken(res.token);
         setAdminToken(res.token);
         setAuthed(true);
         return true;
       } else {
         await supabase.auth.signOut();
-        window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+        clearAdminToken();
         setAdminToken("");
         setAuthed(false);
         return false;
       }
     } catch {
-      const cached = window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "";
+      const cached = getAdminToken();
       setAdminToken(cached);
       return true;
     }
@@ -377,7 +377,7 @@ function AdminGate() {
     void hydrate();
     const { data: sub } = supabase.auth.onAuthStateChange((evt) => {
       if (evt === "SIGNED_OUT") {
-        window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+        clearAdminToken();
         clearAdminActivity();
         setAdminToken("");
         setAuthed(false);
@@ -946,7 +946,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
   const [token, setToken] = useState<string>(() => {
     if (typeof window === "undefined") return "";
-    return initialToken || (window.localStorage.getItem("eliteboost_prime_admin_token") ?? "");
+    return initialToken || getAdminToken();
   });
   useEffect(() => {
     if (initialToken) setToken(initialToken);
@@ -2265,7 +2265,7 @@ function JarvisHistoryPanel() {
   const reload = useCallback(async () => {
     setLoading(true);
     try {
-      const token = typeof window !== "undefined" ? (window.localStorage.getItem(ADMIN_TOKEN_KEY) ?? "") : "";
+      const token = getAdminToken();
       if (!token) { setRows([]); return; }
       const { listJarvisAlerts } = await import("@/lib/jarvis.functions");
       const res = await listJarvisAlerts({ data: { token, severidade: sev || undefined, origem: origem || undefined, limit: 50 } });
