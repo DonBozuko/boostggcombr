@@ -16,7 +16,39 @@ export const COUPON_BUFFER = 1.15;
 export const PIX_NET = 0.9901;
 export const PIX_FIXED = 0.49;
 export const FLOOR_BRL = 5.0;
-export const MIN_NET_PROFIT_RATIO = 4.0; // validação: net ≥ 4× custo
+export const MIN_NET_PROFIT_RATIO = 4.0; // validação: net ≥ 4× custo (custo baixo)
+
+// v328 — MARKUP DECRESCENTE POR CUSTO (causa raiz do YouTube/Telegram mortos).
+//
+// O múltiplo fixo por QUANTIDADE (5x→12x) só funciona quando o custo é
+// centavos. Medido no banco: 1.000 seguidores Instagram custam R$ 1,93 (5x =
+// R$ 11, competitivo), mas 1.000 inscritos YouTube custam R$ 41,96 — 12x daria
+// R$ 624 num mercado que cobra ~R$ 120. Múltiplo alto sobre custo alto não é
+// margem: é prateleira morta (0 venda em 120 dias acima de 1.000 un).
+//
+// Regra nova: o múltiplo cai conforme o CUSTO ABSOLUTO sobe. Interpolação
+// logarítmica (nunca em degraus) para que o preço total continue crescendo com
+// a quantidade — degrau criaria pacote maior mais barato e brigaria com a
+// escada monotônica (v292).
+//   custo ≤ R$ 5    → 5,0x   (ticket pequeno: Instagram/Facebook intactos)
+//   R$ 50           → 3,5x
+//   R$ 300          → 2,6x
+//   custo ≥ R$ 1000 → 2,0x   (piso — lucro absoluto continua alto)
+const COST_TIER_FLOOR_MULT = 2.0;
+
+function lerpLog(c: number, a: number, b: number, ma: number, mb: number): number {
+  return ma * Math.pow(mb / ma, Math.log(c / a) / Math.log(b / a));
+}
+
+/** Múltiplo máximo de markup permitido para um custo absoluto. */
+export function costTierMult(costBrl: number): number {
+  const c = Number(costBrl);
+  if (!Number.isFinite(c) || c <= 5) return PROFIT_MULT;
+  if (c <= 50) return lerpLog(c, 5, 50, 5.0, 3.5);
+  if (c <= 300) return lerpLog(c, 50, 300, 3.5, 2.6);
+  if (c <= 1000) return lerpLog(c, 300, 1000, 2.6, COST_TIER_FLOOR_MULT);
+  return COST_TIER_FLOOR_MULT;
+}
 
 /** v174 — Fator escalar com rampa linear entre 5k e 15k (elimina degrau abrupto). */
 export function tierFactor(qty: number): number {
@@ -30,10 +62,18 @@ export function tierFactor(qty: number): number {
   return 2.4;                                         // 12.0x — premium
 }
 
-/** v174 — Multiplicador efetivo de lucro para uma quantidade. */
-export function effectiveProfitMult(qty: number): number {
-  return PROFIT_MULT * tierFactor(qty);
+/**
+ * v174/v328 — Multiplicador efetivo de lucro.
+ * O escalonamento por quantidade continua valendo, mas nunca ultrapassa o teto
+ * de markup do custo absoluto (o que estava matando categorias caras).
+ */
+export function effectiveProfitMult(qty: number, costBrl = 0): number {
+  const porQuantidade = PROFIT_MULT * tierFactor(qty);
+  const c = Number(costBrl);
+  if (!Number.isFinite(c) || c <= 0) return porQuantidade;
+  return Math.min(porQuantidade, costTierMult(c));
 }
+
 
 /**
  * v175 — Piso escalar contínuo desde qty=50 (elimina achatamento visual
@@ -74,7 +114,7 @@ export function computeGuardedPrice(costBrl: number, qty = 0): number {
   // ficava fora, e o preço resultante ficava ~0,6% abaixo do necessário para o
   // lucro líquido de 4x — o que fazia a própria validação de margem reprovar o
   // preço que este motor tinha acabado de calcular (pacote pausado eternamente).
-  const raw = ((c * effectiveProfitMult(qty) + PIX_FIXED) * COUPON_BUFFER) / PIX_NET;
+  const raw = ((c * effectiveProfitMult(qty, c) + PIX_FIXED) * COUPON_BUFFER) / PIX_NET;
   const guarded = Math.max(scaledFloor(qty), raw);
   return Number((Math.ceil(guarded * 100) / 100).toFixed(2));
 }
@@ -87,8 +127,22 @@ export function estimateNetProfit(priceBrl: number, costBrl: number): number {
   return Number((afterPix - costBrl).toFixed(4));
 }
 
+/**
+ * v328 — lucro líquido mínimo exigido, em múltiplos do custo.
+ * Acompanha o markup por faixa de custo: exigir 4x líquido num pacote de custo
+ * R$ 4.196 é o que mantinha o preço em R$ 24 mil e o pacote invendável.
+ * O preço guardado entrega exatamente (mult − 1) de lucro; 2% de folga cobre
+ * arredondamento de centavos.
+ */
+export function minNetRatio(costBrl: number): number {
+  const c = Number(costBrl);
+  if (!Number.isFinite(c) || c <= 5) return MIN_NET_PROFIT_RATIO;
+  return (costTierMult(c) - 1) * 0.98;
+}
+
 export function respectsMinMargin(priceBrl: number, costBrl: number): boolean {
   if (!(costBrl > 0)) return false;
   const net = estimateNetProfit(priceBrl, costBrl);
-  return net / costBrl >= MIN_NET_PROFIT_RATIO;
+  return net / costBrl >= minNetRatio(costBrl);
 }
+

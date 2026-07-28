@@ -11,11 +11,24 @@
 // Por isso o piso de lucro aqui é 2,5× o custo (varejo exige 4×) e ainda assim
 // o lucro absoluto por pedido continua positivo e auditável.
 
+import { minNetRatio, MIN_NET_PROFIT_RATIO } from "./margin-guardian";
+
 export const PIX_NET = 0.9901;
 /** Teto duro de desconto por revendedor. Nada acima disso é aceito. */
 export const RESELLER_MAX_DISCOUNT = 0.30;
 /** Piso de lucro na revenda: líquido ≥ 2,5× o custo do fornecedor. */
 export const RESELLER_MIN_RATIO = 2.5;
+
+// v328 — o piso de revenda acompanha o piso de varejo. Com markup decrescente
+// por custo, exigir 2,5× líquido num pacote caro (varejo agora pede ~1,4×)
+// zeraria o desconto e tiraria o produto caro da revenda. Mantém a mesma
+// proporção histórica: revenda = 62,5% do piso de varejo (2,5 ÷ 4).
+const RESELLER_RATIO_SHARE = RESELLER_MIN_RATIO / MIN_NET_PROFIT_RATIO;
+
+/** Piso de lucro de revenda para um custo específico. */
+export function resellerMinRatio(costBrl: number): number {
+  return Math.min(RESELLER_MIN_RATIO, minNetRatio(costBrl) * RESELLER_RATIO_SHARE);
+}
 
 /** Lucro líquido estimado de um pedido de revenda. */
 export function resellerNetProfit(priceBrl: number, costBrl: number): number {
@@ -25,7 +38,7 @@ export function resellerNetProfit(priceBrl: number, costBrl: number): number {
 export function resellerRespectsMinMargin(priceBrl: number, costBrl: number): boolean {
   const c = Number(costBrl);
   if (!(c > 0)) return false;
-  return resellerNetProfit(priceBrl, c) / c >= RESELLER_MIN_RATIO;
+  return resellerNetProfit(priceBrl, c) / c >= resellerMinRatio(c);
 }
 
 /** Maior desconto possível sobre o preço de varejo sem furar o piso de lucro. */
@@ -34,12 +47,13 @@ export function maxAllowedDiscount(catalogPrice: number, costBrl: number): numbe
   const c = Number(costBrl);
   if (!(p > 0)) return 0;
   if (!(c > 0)) return 0; // custo desconhecido → nenhum desconto (fail-closed)
-  const keep = ((1 + RESELLER_MIN_RATIO) * c) / (p * PIX_NET); // fração do preço a manter
+  const keep = ((1 + resellerMinRatio(c)) * c) / (p * PIX_NET); // fração do preço a manter
   const allowed = 1 - keep;
   if (!Number.isFinite(allowed) || allowed <= 0) return 0;
   // arredonda pra BAIXO: nunca conceder desconto maior do que a margem aguenta
   return Math.min(RESELLER_MAX_DISCOUNT, Math.floor(allowed * 1e4) / 1e4);
 }
+
 
 export type ResellerQuote = {
   /** Preço final que o revendedor paga (debitado do saldo). */

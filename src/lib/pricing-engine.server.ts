@@ -4,6 +4,8 @@
 
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
 import { guardBindings } from "./bind-guard.server";
+import { costTierMult } from "./margin-guardian";
+
 
 
 export type Category =
@@ -188,9 +190,13 @@ function packageCostFromRate(qty: number, costPer1k: number): number {
 // banco, para a linha nascer válida. A Autoridade Única reprecifica no mesmo
 // ciclo. Nunca é aplicado sobre pacote existente (ver preserveAuthorityPrice).
 function seedPriceFromCost(qty: number, costBrl: number): number {
-  const raw = (costBrl * FABIANO_PROFIT * tierFactor(qty) * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
+  // v328 — o teto de markup por custo também vale na semente, senão o pacote
+  // nasce com preço de vitrine morta e só normaliza ciclos depois.
+  const mult = Math.min(FABIANO_PROFIT * tierFactor(qty), costTierMult(costBrl));
+  const raw = (costBrl * mult * FABIANO_COUPON + FABIANO_PIX_FIXED) / FABIANO_PIX_NET;
   return Math.max(floorFor(qty), ceilTo(raw, 0.5));
 }
+
 
 
 
