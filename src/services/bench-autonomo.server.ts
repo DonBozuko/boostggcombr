@@ -23,6 +23,10 @@ const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 const CONCURRENCY = 4;
 /** v335 — travado em 3 varreduras seguidas (6h) não é transitório: sai da vitrine. */
 const CICLOS_PARA_PAUSAR = 3;
+/** v345 — saldo tem prazo: só vira pausa/vermelho depois de 24h sem recarga. */
+const PRAZO_SALDO_MS = 24 * 60 * 60 * 1000;
+/** Janela de histórico lida para medir o streak de saldo (2h por ciclo). */
+const RUNS_JANELA_SALDO = 16;
 
 
 export type BenchRunResult = {
