@@ -197,7 +197,12 @@ export async function notifyAdminUniversalPaid(alert: UniversalPaidAlert): Promi
       alert.custoBrl && alert.custoBrl > 0
         ? alert.custoBrl
         : await realCostBrl(alert.pacote, alert.quantidade);
-    const res = await dispatchTelegram(buildUniversalPaidMessage({ ...alert, custoBrl }));
+    // v318 — venda paga SEMPRE chega, mesmo classificada como sucesso/info.
+    const res = await dispatchTelegram(buildUniversalPaidMessage({ ...alert, custoBrl }), {
+      force: true,
+      origem: "pedido-pago",
+    });
+
     if (!res.ok) console.error("[admin-notify] universal Telegram falhou", res.detail);
   } catch (e) {
     console.warn("[admin-notify] notifyAdminUniversalPaid falhou", e);
