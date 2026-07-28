@@ -42,7 +42,8 @@ export const Route = createFileRoute("/kwai")({
   head: () => {
     const title = "Comprar Seguidores no Kwai via Pix — Elite Boost Prime | BoostGG";
     const description =
-      "Compre seguidores, curtidas e views no Kwai com Pix. Entrega em minutos, perfis brasileiros e reposição de 30 dias nos pacotes brasileiros.";
+      "Compre seguidores, curtidas e views no Kwai com Pix. Entrega gradual em minutos, sem senha, com acompanhamento do pedido e suporte no WhatsApp.";
+
     const url = "https://boostgg.com.br/kwai";
     return {
       meta: [
