@@ -1,5 +1,5 @@
 // Backward-compatible facade. Real Telegram delivery lives in messaging.ts.
-import { dispatchTelegramAlert, type InlineKeyboardButton } from "./messaging";
+import { dispatchTelegramAlert, type InlineKeyboardButton, type AlertSeverity } from "./messaging";
 
 export type { InlineKeyboardButton };
 
