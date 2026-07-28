@@ -42,7 +42,7 @@ export const Route = createFileRoute("/trafego")({
   head: () => {
     const title = "Tráfego Web Real BR e Global — Segmentado — Elite Boost Prime | BoostGG";
     const description =
-      "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega imediata, segmentado, seguro e com reposição nos pacotes brasileiros.";
+      "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega automática, geo-segmentada e distribuição gradual.";
     const url = "https://boostgg.com.br/trafego";
     const ogImage = `https://boostgg.com.br${ogTrafego}?v=48`;
     return {
