@@ -63,6 +63,24 @@ export const CURVE_LANDING = 1.5;
 // o teto NUNCA come a margem mínima. Desce no máximo 20% por ciclo.
 export const CATEGORY_MAX_MULT = 1.6;
 
+// v328 — o prêmio de vitrine (1,6x) faz sentido em pacote-isca de R$ 10, onde
+// R$ 6 a mais ninguém contesta. Em pacote de R$ 800 o mesmo prêmio vira R$ 480
+// e mata a venda. O teto aperta conforme o preço justo sobe:
+//   justo ≤ R$ 50  → 1,60x   (isca — prêmio de marca preservado)
+//   justo ≥ R$ 500 → 1,05x   (ticket alto — preço justo é o alvo)
+export const SHOWCASE_CAP_MIN = 1.05;
+
+export function showcaseCap(justo: number): number {
+  const j = Number(justo);
+  if (!Number.isFinite(j) || j <= 50) return CATEGORY_MAX_MULT;
+  if (j >= 500) return SHOWCASE_CAP_MIN;
+  return (
+    CATEGORY_MAX_MULT *
+    Math.pow(SHOWCASE_CAP_MIN / CATEGORY_MAX_MULT, Math.log(j / 50) / Math.log(10))
+  );
+}
+
+
 
 const r2 = (v: number) => Number(v.toFixed(2));
 
