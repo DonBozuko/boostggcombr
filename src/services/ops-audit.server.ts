@@ -110,17 +110,22 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   }
 
 
-  const erro5xx = Number(h.erro_servidor_5xx ?? 0);
-  if (erro5xx >= 3) {
+  // v341 — 5xx só vira alerta se AINDA está falhando AGORA (15min), mesma
+  // régua do 404/401. Antes olhava 1h: uma rajada durante deploy, já curada,
+  // mantinha "robô batendo em erro" tocando por uma hora inteira.
+  const erro5xxAgora = Number(now15.erro_servidor_5xx ?? 0);
+  const erro5xxHora = Number(h.erro_servidor_5xx ?? 0);
+  if (erro5xxAgora >= 1 && erro5xxHora >= 3) {
     findings.push({
       code: "ROBO_ERRO_SERVIDOR",
       severity: "critical",
       titulo: "Robô batendo em erro do servidor",
-      problema: `${erro5xx} chamadas retornaram erro de servidor na última hora.`,
+      problema: `${erro5xxHora} chamadas retornaram erro de servidor na última hora (${erro5xxAgora} ainda agora).`,
       o_que_fazer: "Me avise para investigar o log da rota que está quebrando.",
-      evidencia: h,
+      evidencia: { agora: now15, ultima_hora: h },
     });
   }
+
 
 
   // 2) Cliente pagou e não recebeu
@@ -253,7 +258,10 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     if (promessas.length > 0) {
       findings.push({
         code: "SITE_PROMETE_O_QUE_NAO_TEM",
-        severity: "critical",
+        // v341 — texto de FAQ/landing não é dinheiro saindo agora: é aviso.
+        // Vermelho é só para cliente/dinheiro em risco imediato.
+        severity: "warning",
+
         titulo: "Texto do site promete o que o catálogo não entrega",
         problema: `${promessas.length} trecho(s) prometem algo que a rede não tem hoje (ex.: ${promessas
           .slice(0, 3)
@@ -279,7 +287,8 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     if (scan.violacoes.length > 0) {
       findings.push({
         code: "TEXTO_DE_PAGINA_PROMETE_DEMAIS",
-        severity: "critical",
+        severity: "warning",
+
         titulo: "Texto de página promete o que o catálogo não entrega",
         problema: `${scan.violacoes.length} trecho(s) no corpo das páginas prometem algo que a rede não tem hoje (ex.: ${scan.violacoes
           .slice(0, 3)

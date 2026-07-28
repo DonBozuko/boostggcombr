@@ -61,11 +61,15 @@ function frases(texto: string): string[] {
 
 function ehPromessa(frase: string, re: RegExp): boolean {
   if (!re.test(frase)) return false;
+  // v341 — pergunta não promete nada. "Consigo membros brasileiros?" é a
+  // dúvida do cliente; quem promete (ou nega) é a resposta.
+  if (/\?\s*$/.test(frase.trim())) return false;
   if (OUTRA_REDE_RE.test(frase)) return false;
   // "Hoje não temos linha brasileira" — a mesma frase nega a promessa.
   const antes = frase.slice(0, frase.search(re));
   return !/\bn[ãa]o\b/i.test(antes) && !NEGATION_RE.test(antes);
 }
+
 
 /**
  * Confere o texto público de UMA rede contra os fatos do catálogo dela.
