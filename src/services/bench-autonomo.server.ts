@@ -353,17 +353,18 @@ export async function runBenchAutonomo(
       const texto = linhas.join("\n");
       const sig = await assinatura(
         JSON.stringify({
-          recarga: s.recargaPorFornecedor,
-          estruturais: [...paraPausar.keys()].sort(),
+          recarga: sVitrine.recargaPorFornecedor,
+          pausados: [...pausados].sort(),
           margem,
         }),
       );
       if (await podeAlertar(sig)) {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
         const r = await dispatchTelegramAlert(texto, {
-          severity: precisaRecarga.length > 0 || paraPausar.size > 0 ? "critical" : "warning",
+          severity: precisaRecarga.length > 0 ? "critical" : "warning",
           origem: "bench-autonomo",
         });
+
         alertou = r.ok;
       }
     }
