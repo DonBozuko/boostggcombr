@@ -1,0 +1,1 @@
+UPDATE public.pricing_items SET is_sellable = true, sellable_reason = NULL WHERE is_sellable = false AND sellable_reason ILIKE 'BANCADA%saldo%';
