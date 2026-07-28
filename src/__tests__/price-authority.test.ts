@@ -20,11 +20,22 @@ describe("v305 — autoridade única de preço", () => {
     expect(dois.changes).toHaveLength(0);
   });
 
-  it("não derruba preço saudável quando o custo cai (fim da oscilação da vitrine)", () => {
+  it("não derruba preço saudável quando o custo cai pouco (fim da oscilação da vitrine)", () => {
     const preco = computeGuardedPrice(10, 1000);
-    const { changes } = planAuthorityPrices([row("p1k", 1000, 2, preco)]);
+    const { changes } = planAuthorityPrices([row("p1k", 1000, 9, preco)]);
     expect(changes).toHaveLength(0);
   });
+
+  it("v327 — custo despenca: preço desce em rampa até o teto de vitrine, sem oscilar de volta", () => {
+    let rows = [{ pacote: "p1k", category: "instagram:seguidores", quantidade: 1000, cost_brl: 2, price_brl: computeGuardedPrice(10, 1000) }];
+    const primeiro = planAuthorityPrices(rows);
+    expect(primeiro.changes[0].para).toBeCloseTo(rows[0].price_brl * 0.8, 1); // no máx. -20% por ciclo
+    for (let i = 0; i < 40; i++) rows = planAuthorityPrices(rows).rows;
+    expect(planAuthorityPrices(rows).changes).toHaveLength(0); // converge e para
+    expect(rows[0].price_brl).toBeLessThanOrEqual(computeGuardedPrice(2, 1000) * 1.6 + 0.01);
+    expect(respectsMinMargin(rows[0].price_brl, 2)).toBe(true);
+  });
+
 
   it("sobe preço quando o custo estoura a margem mínima (dentro do teto de +40%)", () => {
     const [r] = planAuthorityPrices([row("p1k", 1000, 3.2, 16)]).changes;
