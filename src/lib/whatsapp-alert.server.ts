@@ -13,10 +13,18 @@ export async function dispatchWhatsappAlert(
   // v311 — dá para marcar "a trava funcionou" como aviso. Sem isso todo alerta
   // entrava como crítico e o semáforo do admin ficava vermelho por proteção
   // que deu certo, escondendo o vermelho que é dinheiro/cliente em risco.
-  options: { inlineKeyboard?: InlineKeyboardButton[][]; severity?: AlertSeverity } = {},
+  // v318 — `force` existe porque DINHEIRO ENTRANDO não é ruído: mesmo classificado
+  // como info/sucesso, venda paga e recarga aprovada TÊM que chegar no celular.
+  options: {
+    inlineKeyboard?: InlineKeyboardButton[][];
+    severity?: AlertSeverity;
+    force?: boolean;
+    origem?: string;
+  } = {},
 ): Promise<{ ok: boolean; detail?: string }> {
   return dispatchTelegramAlert(message, options);
 }
+
 
 // Copy oficial de recuperação (mantida em sincronia com o /admin)
 export function buildRecoveryWhatsappText(): string {
