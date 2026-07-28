@@ -273,6 +273,36 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       });
     }
 
+    if (scan.visuais.length > 0) {
+      findings.push({
+        code: "PROVA_VISUAL_QUEBRADA",
+        severity: "warning",
+        titulo: "Imagem quebrada ou descrição enganosa em página de venda",
+        problema: `${scan.visuais.length} problema(s) de imagem nas páginas (ex.: ${scan.visuais
+          .slice(0, 3)
+          .map((v) => `${v.origem}: ${v.detalhe.slice(0, 90)}`)
+          .join(" | ")}).`,
+        o_que_fazer:
+          "Me avise para repor o arquivo que sumiu ou corrigir a descrição da imagem — cliente que vê caixa quebrada não compra.",
+        evidencia: scan.visuais.slice(0, 20),
+      });
+    }
+
+    if (scan.emails.length > 0) {
+      findings.push({
+        code: "EMAIL_TRANSACIONAL_INCOERENTE",
+        severity: "critical",
+        titulo: "E-mail enviado ao cliente promete demais ou tem lacuna",
+        problema: `${scan.emails.length} trecho(s) em e-mails automáticos (ex.: ${scan.emails
+          .slice(0, 3)
+          .map((e) => `${e.template}: "${e.trecho.slice(0, 90)}"`)
+          .join(" | ")}).`,
+        o_que_fazer:
+          "Me avise para corrigir o texto desses e-mails antes do próximo disparo.",
+        evidencia: scan.emails.slice(0, 20),
+      });
+    }
+
     const semDetector = familiasSemDetector().map((f) => f.nome);
     if (scan.rotasSemDeclaracao.length > 0 || semDetector.length > 0) {
       findings.push({
