@@ -25,7 +25,7 @@
 
 import { computeGuardedPrice, respectsMinMargin, FLOOR_BRL } from "./margin-guardian";
 import { enforceMonotonicLadder } from "./price-monotonic";
-import { enforceUnitCoherence } from "./price-unit-curve";
+import { enforceCategoryCurve } from "./price-unit-curve";
 
 /** Teto de reajuste automático para cima num único ciclo. */
 export const AUTHORITY_MAX_UP = 1.4;
@@ -130,7 +130,7 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
   // custar MAIS por unidade que um menor. Só corrige pra baixo e nunca abaixo
   // do preço justo (margem 4x) nem do piso comercial.
   const curvaInput = rows.filter((r) => r.category && Number(r.quantidade) > 0);
-  const { fixes: curvaFixes } = enforceUnitCoherence(curvaInput, (r) =>
+  const { fixes: curvaFixes } = enforceCategoryCurve(curvaInput, (r) =>
     Number(r.cost_brl) > 0
       ? Math.max(computeGuardedPrice(Number(r.cost_brl), Number(r.quantidade)), FLOOR_BRL)
       : 0,
