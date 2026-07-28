@@ -47,7 +47,7 @@ export default function P() {
   });
 
   it("mapa de cobertura declara explicitamente o que não tem detector", () => {
-    expect(FAMILIAS.some((f) => f.detector === null)).toBe(true);
+    expect(FAMILIAS.every((f) => f.detector !== null)).toBe(true);
     expect(FAMILIAS.every((f) => f.id && f.nome)).toBe(true);
   });
 });
