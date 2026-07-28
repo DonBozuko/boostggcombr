@@ -1601,20 +1601,33 @@ function AdminPage({ initialToken }: { initialToken: string }) {
                 })}
               </div>
               <div className="rounded-xl bg-black/30 border border-border p-4">
-                <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo · Tráfego Web</div>
-                {f ? (
-                  <div className="flex items-center gap-3 text-sm flex-wrap">
-                    <span className="inline-flex items-center gap-2">
-                      <span className={`h-2.5 w-2.5 rounded-full ${online ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
-                      {f.nome}: <strong>{online ? "Online" : f.status}</strong>
-                    </span>
-                    <span>· Saldo: <strong>R$ {f.saldo_brl?.toFixed(2) ?? "—"}</strong></span>
-                    <span>· Nível: <strong>{NIVEL_STYLE[f.nivel_alerta].emoji} {NIVEL_STYLE[f.nivel_alerta].label}</strong></span>
-                  </div>
-                ) : (
+                <div className="text-xs uppercase text-muted-foreground mb-2">🤖 Status global dos robôs de saldo · todos os fornecedores</div>
+                {fornecedores.length === 0 ? (
                   <div className="text-sm text-muted-foreground">Carregando status...</div>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {fornecedores.map((p) => {
+                      const saldo = typeof p.saldo_atual === "number" ? p.saldo_atual : null;
+                      const on = p.ativo && (p.status ?? "online") !== "offline";
+                      return (
+                        <div key={p.id} className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-background/40 px-3 py-2 text-sm">
+                          <span className="inline-flex items-center gap-2 min-w-0">
+                            <span className={`h-2.5 w-2.5 rounded-full ${on ? "bg-emerald-400" : "bg-red-500"} animate-pulse`} />
+                            <span className="truncate">{p.nome}</span>
+                          </span>
+                          <span className="flex items-center gap-2 shrink-0">
+                            <strong className={saldo !== null && saldo < 10 ? "text-red-400" : "text-emerald-300"}>
+                              {saldo !== null ? `R$ ${saldo.toFixed(2)}` : "—"}
+                            </strong>
+                            <RecargaFornecedor slug={p.slug} nome={p.nome} token={token} />
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
+
             </div>
           </div>
         )}
