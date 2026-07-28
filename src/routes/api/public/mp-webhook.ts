@@ -233,6 +233,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
               await dispatchWhatsappAlert(
                 `💰 RECARGA DE REVENDEDOR APROVADA\n\nPROBLEMA: nenhum — entrou dinheiro.\nValor: R$ ${Number(t.valor_brl).toFixed(2)}\nSaldo do revendedor agora: R$ ${Number(move.saldo).toFixed(2)}\n\nO QUE FAZER: nada. O saldo já foi creditado automaticamente.`,
+                { force: true, origem: "recarga-revendedor" },
+
               );
             } catch { /* alerta é best-effort */ }
             return;
