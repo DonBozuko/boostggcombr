@@ -114,7 +114,9 @@ export async function dispatchTelegramAlert(
     force?: boolean;
   } = {},
 ): Promise<{ ok: boolean; detail?: string }> {
-  const severity: AlertSeverity = options.severity ?? "critical";
+  // v316 — sem severidade explícita, DERIVA do texto. Antes herdava "critical"
+  // e transformava sucesso em vermelho, travando o semáforo do admin pra sempre.
+  const severity: AlertSeverity = options.severity ?? classifyAlertSeverity(message);
   const origem = options.origem ?? "system";
   await logAlertToDb(severity, message, origem);
 
