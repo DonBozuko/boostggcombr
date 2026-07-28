@@ -404,9 +404,13 @@ export async function runBenchAutonomo(
       if (await podeAlertar(sig)) {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
         const r = await dispatchTelegramAlert(texto, {
-          severity: precisaRecarga.length > 0 ? "critical" : "warning",
+          // v345: saldo dentro do prazo é amarelo. Vermelho só quando passa de
+          // 24h sem recarga (aí a entrega atrasa de fato) ou quando pacote foi
+          // pausado por motivo estrutural/margem.
+          severity: saldoVencido.size > 0 || pausados.length > 0 || margem > 0 ? "critical" : "warning",
           origem: "bench-autonomo",
         });
+
 
         alertou = r.ok;
       }
