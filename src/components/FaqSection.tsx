@@ -26,7 +26,7 @@ export const FAQS: Record<string, FaqItem[]> = {
   facebook: [
     { q: "Curtidas em página de Facebook ainda importam em 2026?", a: "Menos que antes, mas ainda pesam em decisões de compra B2B e credibilidade local. Para negócio físico e prestador de serviço, uma página com 5k+ curtidas converte melhor." },
     { q: "Posso comprar seguidores para perfil pessoal (não página)?", a: "Sim, temos plano específico para perfil. Perfil pessoal usa o botão 'Seguir', diferente de curtidas em fanpage." },
-    { q: "Curtidas caem depois?", a: "Facebook faz limpezas menos agressivas que Instagram. Nos pacotes com garantia (🇧🇷 Brasileiro Real) repomos por 30 dias em queda acima de 5%; nos pacotes Global, solicitamos reposição ao fornecedor e, se não houver garantia, tratamos caso a caso no WhatsApp." },
+    { q: "Curtidas caem depois?", a: "Facebook faz limpezas menos agressivas que Instagram. Todos os pacotes de Facebook são da linha 🌎 Global (não temos linha brasileira aqui): se houver queda relevante, solicitamos reposição ao fornecedor e, quando não há garantia, resolvemos caso a caso no WhatsApp — reenvio ou estorno." },
     { q: "Consigo alcance orgânico maior comprando curtidas?", a: "Curtidas não aumentam alcance direto (Facebook cobra por reach hoje), mas melhoram a prova social e a taxa de conversão do público que já chega na página." },
     { q: "Aceita pagamento via boleto ou cartão?", a: "Cartão de crédito sim, com um acréscimo de 7% referente à taxa da operadora. Boleto não. O Pix continua sendo o melhor preço e libera a entrega em segundos." },
   ],
