@@ -145,6 +145,15 @@ function TrafegoLanding() {
     brasil:  { category: "trafego:br",     fallback: brPlans, unitLabel: "Visitas" },
     mundial: { category: "trafego:global", fallback: glPlans, unitLabel: "Visitas" },
   });
+  // v335 — Prateleira honesta: aba só existe se houver pacote vendável nela.
+  const abas = [
+    dyn.brasil.length > 0 ? { key: "brasil", label: "Brasil", emoji: "🇧🇷", badge: "🔥 Mais Popular", badgeColor: "#39ff14" } : null,
+    dyn.mundial.length > 0 ? { key: "mundial", label: "Mundial", emoji: "🌎", badge: "Em Alta", badgeColor: "#fe0979" } : null,
+  ].filter((a): a is NonNullable<typeof a> => a !== null);
+  useEffect(() => {
+    if (abas.length === 0) return;
+    if (!abas.some((a) => a.key === categoria)) setCategoria(abas[0].key as Categoria);
+  }, [abas, categoria]);
   const currentPlans = categoria === "brasil" ? dyn.brasil : dyn.mundial;
   const dynAllPlans = [...dyn.brasil, ...dyn.mundial];
 
