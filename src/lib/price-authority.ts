@@ -126,9 +126,10 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
 
   }
 
-  // (f) v326 — curva de desconto por volume coerente: pacote maior nunca pode
-  // custar MAIS por unidade que um menor. Só corrige pra baixo e nunca abaixo
-  // do preço justo (margem 4x) nem do piso comercial.
+  // (f) v326 — curva coerente por categoria: preço legado muito acima da curva
+  // da própria categoria (mediana preço÷justo) desce até a curva. Só corrige
+  // pra baixo, nunca abaixo do preço justo (margem 4x) nem do piso comercial.
+
   const curvaInput = rows.filter((r) => r.category && Number(r.quantidade) > 0);
   const { fixes: curvaFixes } = enforceCategoryCurve(curvaInput, (r) =>
     Number(r.cost_brl) > 0
