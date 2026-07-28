@@ -7,7 +7,7 @@ type Review = { n: string; t: string; verified?: boolean };
 // v201 — Reviews segmentados por rede: cada landing mostra depoimentos alinhados
 // ao objetivo do visitante (monetização, alcance, membros, etc). Reduz sensação
 // de template e aumenta prova social contextual.
-const REVIEWS_BY_ROUTE: Record<RouteKey, Review[]> = {
+export const REVIEWS_BY_ROUTE: Record<RouteKey, Review[]> = {
   "/": [
     { n: "Camila R.", t: "Bati minha meta de 10k seguidores no Insta em 2 semanas. Surreal!", verified: true },
     { n: "Priscila A.", t: "Perfil bombou e ainda ganhei engajamento orgânico depois.", verified: true },
