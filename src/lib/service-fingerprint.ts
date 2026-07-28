@@ -164,6 +164,8 @@ export function productChanged(
 ): boolean {
   if (!currentName || !prev) return false;
   if (prev.provider !== link.provider || prev.service_id !== link.service_id) return false;
-  return prev.name_sig !== serviceSignature(currentName);
+  // v314 — só bloqueia a venda quando muda a INTENÇÃO (produto/rede).
+  // Renome cosmético do fornecedor não pode derrubar rota boa no ato da compra.
+  return intentSignature(prev.name_sig) !== intentSignature(serviceSignature(currentName));
 }
 
