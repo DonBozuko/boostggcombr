@@ -66,3 +66,66 @@ describe("v312 decisão de vínculo", () => {
     expect(d.action).toBe("unknown");
   });
 });
+
+describe("v314 baseline desconfiado e renome cosmético", () => {
+  const link = {
+    pacote: "ig-view-1000",
+    col: "smmhype_service_id",
+    provider: "smmhype",
+    service_id: "555",
+    current_name: "Instagram Likes BR",
+    category: "instagram:visualizacoes",
+  };
+  const matches = (cat: string | null | undefined, name: string) =>
+    !(String(cat ?? "").includes("visualizacoes") && /like|curtid/i.test(name));
+
+  it("vínculo novo que não bate com a categoria nasce suspeito, não normal", () => {
+    const [d] = decideFingerprints([link], new Map(), matches);
+    expect(d.action).toBe("suspect");
+  });
+
+  it("vínculo novo coerente vira baseline normal", () => {
+    const [d] = decideFingerprints([{ ...link, current_name: "Instagram Views BR" }], new Map(), matches);
+    expect(d.action).toBe("baseline");
+  });
+
+  it("nome novo com mesma intenção é renome, não desvincula", () => {
+    const stored = new Map([
+      [
+        fingerprintKey(link.pacote, link.col),
+        {
+          pacote: link.pacote,
+          col: link.col,
+          provider: "smmhype",
+          service_id: "555",
+          service_name: "Instagram Views BR",
+          name_sig: serviceSignature("Instagram Views BR"),
+        } as FingerprintRecord,
+      ],
+    ]);
+    const [d] = decideFingerprints(
+      [{ ...link, current_name: "Instagram Views Brasil Premium ⚡ HQ" }],
+      stored,
+      matches,
+    );
+    expect(d.action).toBe("rename");
+  });
+
+  it("troca real de produto continua sendo drift", () => {
+    const stored = new Map([
+      [
+        fingerprintKey(link.pacote, link.col),
+        {
+          pacote: link.pacote,
+          col: link.col,
+          provider: "smmhype",
+          service_id: "555",
+          service_name: "Instagram Views BR",
+          name_sig: serviceSignature("Instagram Views BR"),
+        } as FingerprintRecord,
+      ],
+    ]);
+    const [d] = decideFingerprints([link], stored, matches);
+    expect(d.action).toBe("drift");
+  });
+});

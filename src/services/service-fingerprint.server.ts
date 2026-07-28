@@ -160,6 +160,7 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
         checked_at: now,
       });
     } else if (d.action === "suspect" || d.action === "drift") {
+      if (d.action === "suspect") result.suspects += 1;
       result.drift.push({
         pacote: d.link.pacote,
         col: d.link.col,
