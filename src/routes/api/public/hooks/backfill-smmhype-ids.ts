@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { serviceMatchesIntent } from "@/lib/catalog-coherence";
 
 // v158 — Backfill SMMhype service_id por match de palavra-chave sobre o catálogo
 // completo. Grava apenas quando o match é INEQUÍVOCO (1 candidato). Ambíguo ou
