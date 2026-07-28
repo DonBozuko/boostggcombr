@@ -42,8 +42,11 @@ export type CurveFix = {
 /** Queda máxima por ciclo (0.8 = -20%). */
 export const CURVE_MAX_DOWN = 0.8;
 
-/** Só corrige quem está mais de 15% acima da curva da categoria. */
-export const CURVE_TOLERANCE = 1.15;
+/** Só corrige quem está MAIS QUE O DOBRO da curva da categoria (outlier claro). */
+export const CURVE_TOLERANCE = 2.0;
+
+/** Aterrissagem: o outlier desce até 1,5x a curva — preserva prêmio de vitrine. */
+export const CURVE_LANDING = 1.5;
 
 const r2 = (v: number) => Number(v.toFixed(2));
 
@@ -88,7 +91,7 @@ export function enforceCategoryCurve<T extends CurveRow>(
       const naCurva = justo * mult;
       if (price <= naCurva * CURVE_TOLERANCE + 0.009) continue;
 
-      const alvo = r2(Math.max(naCurva, justo, price * CURVE_MAX_DOWN));
+      const alvo = r2(Math.max(naCurva * CURVE_LANDING, justo, price * CURVE_MAX_DOWN));
       if (alvo < price - 0.009) {
         fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
         r.price_brl = alvo;
