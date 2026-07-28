@@ -1,6 +1,6 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
-import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
+import { normalizeCheckoutEmail, checkoutEmailError } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
@@ -185,7 +185,7 @@ function FacebookLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: resolveCheckoutEmail(email, "facebook"),
+          email: (normalizeCheckoutEmail(email) ?? ""),
           rede_social: "facebook",
           bump_upgrade: bumpUpgrade,
           ...getUtmParams(),
@@ -230,7 +230,7 @@ function FacebookLanding() {
       toast.error(parsed.error.issues[0].message);
       return;
     }
-    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
+    if (checkoutEmailError(email)) { toast.error(checkoutEmailError(email)!); return; }
     const upgrade = findUpgrade(selected, currentPlans);
     if (upgrade) {
       setPendingOrder({ plan: selected, profile: parsed.data.profile });
@@ -382,7 +382,7 @@ function FacebookLanding() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fb-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Label htmlFor="fb-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(obrigatório)</span></Label>
               <Input
                 id="fb-email"
                 type="email"
@@ -426,13 +426,13 @@ function FacebookLanding() {
                 const sch = sel.id.startsWith("ff") ? profileSchema : postSchema;
                 const parsed = sch.safeParse({ plan: sel.id, profile });
                 if (!parsed.success) { toast.error(parsed.error.issues[0].message); return null; }
-                if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido."); return null; }
+                if (checkoutEmailError(email)) { toast.error(checkoutEmailError(email)!); return null; }
                 return {
                   instagram_user: parsed.data.profile,
                   pacote: sel.id,
                   quantidade: sel.quantidade,
                   valor: sel.valor,
-                  email: resolveCheckoutEmail(email, "facebook"),
+                  email: (normalizeCheckoutEmail(email) ?? ""),
                   rede_social: "facebook" as const,
                   ...getUtmParams(),
                   cupom: getAppliedCoupon(),

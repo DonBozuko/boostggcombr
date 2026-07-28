@@ -35,7 +35,7 @@ import { getUtmParams } from "@/lib/utm";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { BrandHeader } from "@/components/BrandHeader";
-import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
+import { normalizeCheckoutEmail, checkoutEmailError } from "@/lib/checkout-email";
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/kwai")({
@@ -155,7 +155,7 @@ function KwaiLanding() {
           pacote: selected.id,
           quantidade: selected.quantidade,
           valor: selected.valor,
-          email: resolveCheckoutEmail(email, "kwai"),
+          email: (normalizeCheckoutEmail(email) ?? ""),
           rede_social: "kwai",
           bump_upgrade: bumpUpgrade,
           ...getUtmParams(),
@@ -187,7 +187,7 @@ function KwaiLanding() {
     const schema = selected.id.startsWith("kf") ? followersSchema : videoSchema;
     const parsed = schema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
-    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
+    if (checkoutEmailError(email)) { toast.error(checkoutEmailError(email)!); return; }
     const upgrade = findUpgrade(selected, currentPlans);
     if (upgrade) { setPendingOrder({ plan: selected, profile: parsed.data.profile }); setBumpOpen(true); return; }
     await dispatchPedido(selected, parsed.data.profile, false);
@@ -297,7 +297,7 @@ function KwaiLanding() {
                 className="h-12" style={{ background: "#111", borderColor: `${ORANGE}55`, color: "#fff" }} maxLength={300} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="kw-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Label htmlFor="kw-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(obrigatório)</span></Label>
               <Input id="kw-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="voce@email.com" className="h-12"
                 style={{ background: "#111", borderColor: `${ORANGE}55`, color: "#fff" }}
@@ -323,13 +323,13 @@ function KwaiLanding() {
                 const sch = sel.id.startsWith("kf") ? followersSchema : videoSchema;
                 const parsed = sch.safeParse({ plan: sel.id, profile });
                 if (!parsed.success) { toast.error(parsed.error.issues[0].message); return null; }
-                if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido."); return null; }
+                if (checkoutEmailError(email)) { toast.error(checkoutEmailError(email)!); return null; }
                 return {
                   instagram_user: parsed.data.profile,
                   pacote: sel.id,
                   quantidade: sel.quantidade,
                   valor: sel.valor,
-                  email: resolveCheckoutEmail(email, "kwai"),
+                  email: (normalizeCheckoutEmail(email) ?? ""),
                   rede_social: "kwai" as const,
                   ...getUtmParams(),
                   cupom: getAppliedCoupon(),

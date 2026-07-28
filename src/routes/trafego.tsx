@@ -1,5 +1,5 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
-import { resolveCheckoutEmail, isValidEmailOrEmpty } from "@/lib/checkout-email";
+import { normalizeCheckoutEmail, checkoutEmailError } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE_CLEAN } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
@@ -151,7 +151,7 @@ function TrafegoLanding() {
   const submit = async (selected: Plan) => {
     const parsed = urlSchema.safeParse({ plan: selected.id, profile });
     if (!parsed.success) { toast.error(parsed.error.issues[0].message); return; }
-    if (!isValidEmailOrEmpty(email)) { toast.error("E-mail inválido. Deixe em branco ou digite um e-mail válido."); return; }
+    if (checkoutEmailError(email)) { toast.error(checkoutEmailError(email)!); return; }
 
     // Sandbox Mode — flag global em admin_settings (server-only; nunca exposto publicamente)
     const sb = await getSandboxFn().catch(() => ({ enabled: false }));
@@ -175,7 +175,7 @@ function TrafegoLanding() {
         data: {
           instagram_user: parsed.data.profile, pacote: selected.id,
           quantidade: selected.quantidade, valor: selected.valor,
-          email: resolveCheckoutEmail(email, "trafego"), rede_social: "trafego", ...getUtmParams(),
+          email: (normalizeCheckoutEmail(email) ?? ""), rede_social: "trafego", ...getUtmParams(),
           cupom: getAppliedCoupon(),
         },
       });
@@ -279,7 +279,7 @@ function TrafegoLanding() {
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }} maxLength={500} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tw-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(opcional, recomendado)</span></Label>
+              <Label htmlFor="tw-email">E-mail para comprovante e status <span className="text-zinc-500 text-xs">(obrigatório)</span></Label>
               <Input id="tw-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)}
                 placeholder="voce@email.com"
                 className="h-12" style={{ background: "#111", borderColor: `${NEON}66`, color: "#fff" }}
@@ -305,7 +305,7 @@ function TrafegoLanding() {
                   pacote: sel.id,
                   quantidade: sel.quantidade,
                   valor: sel.valor,
-                  email: resolveCheckoutEmail(email, "trafego"),
+                  email: (normalizeCheckoutEmail(email) ?? ""),
                   rede_social: "trafego" as const,
                   ...getUtmParams(),
                   cupom: getAppliedCoupon(),
