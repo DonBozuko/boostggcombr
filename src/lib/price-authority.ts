@@ -125,7 +125,26 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
 
   }
 
+  // (f) v326 — curva de desconto por volume coerente: pacote maior nunca pode
+  // custar MAIS por unidade que um menor. Só corrige pra baixo e nunca abaixo
+  // do preço justo (margem 4x) nem do piso comercial.
+  const curvaInput = rows.filter((r) => r.category && Number(r.quantidade) > 0);
+  const { fixes: curvaFixes } = enforceUnitCoherence(curvaInput, (r) =>
+    Number(r.cost_brl) > 0
+      ? Math.max(computeGuardedPrice(Number(r.cost_brl), Number(r.quantidade)), FLOOR_BRL)
+      : 0,
+  );
+  const curvaTarget = new Map(curvaFixes.map((f) => [f.pacote, f.para]));
+  for (const r of rows) {
+    const alvo = curvaTarget.get(r.pacote);
+    if (alvo !== undefined) {
+      r.price_brl = alvo;
+      motivos.set(r.pacote, "curva");
+    }
+  }
+
   // (c) escada é aplicada sobre o alvo final, não sobre o lote de um motor.
+
   const ladderInput = rows.filter(
     (r) => r.category && Number(r.quantidade) > 0 && Number(r.price_brl) > 0,
   );
