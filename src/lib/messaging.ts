@@ -85,7 +85,10 @@ async function sendViaDirectBot(message: string, options: { inlineKeyboard?: Inl
     : { ok: false, detail: `DIRECT HTTP ${res.status}: ${text.slice(0, 300)}` };
 }
 
-export type AlertSeverity = "critical" | "error" | "warning" | "info";
+// v316 — a severidade agora tem dono único: src/lib/alert-severity.ts.
+import { classifyAlertSeverity, type AlertSeverity } from "./alert-severity";
+
+export type { AlertSeverity };
 
 // v223 — Severity Gate: só push Telegram em severity critical/error.
 // warning/info só ficam gravados em jarvis_alerts pro semáforo do admin ler.
