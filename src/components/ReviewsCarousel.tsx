@@ -33,7 +33,7 @@ const REVIEWS_BY_ROUTE: Record<RouteKey, Review[]> = {
     { n: "Rafael D.", t: "Página da loja física passou de 500 pra 15k curtidas. Cliente confia mais.", verified: true },
     { n: "Juliana P.", t: "Prova social ajudou a fechar mais orçamento pelo WhatsApp.", verified: true },
     { n: "Marcos V.", t: "Fanpage de imobiliária cresceu e virou canal de leads." },
-    { n: "Beatriz N.", t: "Sem quedas, entrega em horas. Melhor que fornecedor gringo." },
+    { n: "Beatriz N.", t: "Entrega em horas e gradual, do jeito que combinaram." },
     { n: "Anderson L.", t: "Perfil pessoal com 5k seguidores rapidinho, valeu." },
   ],
   "/telegram": [
