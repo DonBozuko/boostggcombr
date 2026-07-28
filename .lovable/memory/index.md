@@ -31,5 +31,6 @@ Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/d
 - [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight) — v297: checagem ao vivo de rota antes de gerar Pix/cartão, fail-open em timeout, fail-closed com veredito, auto-cura da prateleira.
 - [Nunca cobrar sem validar o alvo](mem://preferences/nunca-cobrar-sem-validar-alvo) — v301: perfil do Instagram precisa existir e estar público antes da cobrança; fail-open em instabilidade; mensagem clara no checkout.
 - [Modo Torre (Clean Code)](mem://preferences/modo-torre-clean-code) — Contrato de ciclo fechado: anti-arquivo-gigante, modular por feature, deletar lixo na hora, listar arquivos antes de codar, 4 perguntas de direcionamento.
+- [Regra 2x — causa raiz](mem://preferences/regra-2x-causa-raiz) — Problema repetido 2x proíbe patch: mapear rota do dinheiro, atacar o que o fornecedor muda sem o sistema perceber, trava antes da cobrança + teste de regressão.
 
 
