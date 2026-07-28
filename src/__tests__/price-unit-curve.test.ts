@@ -11,7 +11,8 @@ describe("v326 — curva de desconto por volume coerente", () => {
       { pacote: "p500", category: cat, quantidade: 500, price_brl: 19 },
       { pacote: "p750", category: cat, quantidade: 750, price_brl: 44.5 },
     ];
-    const { rows: out } = enforceUnitCoherence(rows, () => 5);
+    let out = rows;
+    for (let i = 0; i < 10; i++) out = enforceUnitCoherence(out, () => 5).rows;
     const p750 = out.find((r) => r.pacote === "p750")!;
     expect(p750.price_brl).toBeLessThan(44.5);
     expect(p750.price_brl / 750).toBeLessThanOrEqual(19 / 500 + 1e-9);
