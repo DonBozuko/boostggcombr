@@ -95,6 +95,19 @@ export function enforceCategoryCurve<T extends CurveRow>(
   }
 
   for (const [category, list] of byCategory) {
+    // v327 — teto absoluto: vale mesmo em categoria pequena (não depende de mediana).
+    for (const r of list) {
+      const justo = Number(fairFor(r));
+      const price = Number(r.price_brl);
+      const teto = justo * CATEGORY_MAX_MULT;
+      if (price <= teto + 0.009) continue;
+      const alvo = r2(Math.max(teto, justo, price * CURVE_MAX_DOWN));
+      if (alvo < price - 0.009) {
+        fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
+        r.price_brl = alvo;
+      }
+    }
+
     // Categoria pequena não tem mediana confiável: não mexe.
     if (list.length < 4) continue;
 
@@ -109,11 +122,14 @@ export function enforceCategoryCurve<T extends CurveRow>(
 
       const alvo = r2(Math.max(naCurva * CURVE_LANDING, justo, price * CURVE_MAX_DOWN));
       if (alvo < price - 0.009) {
-        fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
+        const antes = fixes.findIndex((f) => f.pacote === r.pacote);
+        if (antes >= 0) fixes[antes].para = alvo;
+        else fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
         r.price_brl = alvo;
       }
     }
   }
+
 
   return { rows: out, fixes };
 }
