@@ -195,6 +195,13 @@ function pickBest(cache: CacheRow[], item: PricingItem): string | null {
   const wantRefill = pacoteWantsRefill(item.pacote);
   let best: { id: string; score: number } | null = null;
   for (const row of cache) {
+    // v319 — TRAVA DE INTENÇÃO NA ORIGEM. Causa raiz do alerta eterno:
+    // a auditoria desvinculava o serviço incoerente (ex.: "Instagram Likes"
+    // num pacote de visualizações) e o religador escolhia o MESMO ID no ciclo
+    // seguinte. Desvincula → religa → alerta, para sempre. Agora quem grava o
+    // vínculo usa a mesma invariante da auditoria: serviço que contraria a
+    // intenção do pacote nunca é escolhido.
+    if (!serviceMatchesIntent(item.category, row.name)) continue;
     const s = scoreCandidate(row, { qty: item.quantidade, wantBr, wantRefill, matcher });
     if (s == null) continue;
     if (!best || s < best.score) best = { id: row.provider_service_id, score: s };
