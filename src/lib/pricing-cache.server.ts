@@ -374,7 +374,21 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     if ((missSince ?? null) !== (r.id_miss_since ?? null)) patch.id_miss_since = missSince;
 
     if (costs.length > 0) {
-      const best = costs.reduce((a, b) => (b.cost < a.cost ? b : a));
+      // v317 — HISTERESE DE FORNECEDOR (causa raiz do "preço mudou sozinho").
+      //
+      // Antes era `Math.min` puro entre os fornecedores. Como cada cache de
+      // fornecedor sincroniza em horário próprio, o vencedor trocava de um ciclo
+      // para o outro por diferença de centavos — e o custo do pacote pulava junto.
+      // O motor lia isso como "192 pacotes mudaram de preço", o freio de massa
+      // disparava e o Telegram mandava 51 alertas críticos em 48h. Não era o
+      // fornecedor mudando preço: era a nossa escolha de fornecedor balançando.
+      //
+      // Agora o fornecedor atual só é trocado quando o concorrente é
+      // materialmente mais barato (>5%). Empate técnico mantém quem já está.
+      const maisBarato = costs.reduce((a, b) => (b.cost < a.cost ? b : a));
+      const atual = costs.find((c) => c.slug === String(r.last_cost_source ?? ""));
+      const best =
+        atual && maisBarato.cost > atual.cost * (1 - SWITCH_MIN_GAIN) ? atual : maisBarato;
       const newCost = best.cost;
       const newPrice = computeGuardedPrice(newCost, qty); // Equação Fabiano Tiered v173
       const oldPrice = Number(r.price_brl ?? 0);
