@@ -60,3 +60,54 @@ describe("v322 bancada de provas", () => {
     expect(s.rotasComProblema).toEqual(["instagram:seguidores"]);
   });
 });
+
+describe("v335 diagnóstico honesto e recarga realista", () => {
+  it("fornecedor caro que estoura margem não rotula o pacote como prejuízo quando o barato só está sem saldo", () => {
+    const ranked = [
+      p({ slug: "smmpainel", cost_brl: 40, saldo_atual: 5 }),
+      p({ slug: "verified", cost_brl: 400, saldo_atual: 9999 }),
+    ];
+    const res = evaluateRoute(ranked, 200);
+    const c = classifyBench(ranked, res);
+    expect(c.verdict).toBe("saldo");
+    expect(c.faltaEm).toBe("smmpainel");
+  });
+
+  it("recarga de pacote que ninguém compra fica em 'sob demanda'", () => {
+    const base = {
+      category: "youtube:inscritos",
+      quantidade: 100000,
+      price_brl: 10,
+      fornecedor: "verified",
+      custoBrl: 2,
+    };
+    const s = summarizeBench(
+      [
+        { ...base, pacote: "ys1k", verdict: "saldo", motivo: "", faltaRecarregar: 30, faltaEm: "verified" },
+        { ...base, pacote: "ys100k", verdict: "saldo", motivo: "", faltaRecarregar: 91910, faltaEm: "verified" },
+      ] as BenchRow[],
+      { demanda: new Set(["ys1k"]) },
+    );
+    expect(s.recargaPorFornecedor.verified).toBe(30);
+    expect(s.recargaSobDemanda.verified).toBe(91910);
+  });
+
+  it("sem histórico de demanda, nada é escondido", () => {
+    const s = summarizeBench([
+      {
+        pacote: "x",
+        category: "c",
+        quantidade: 1,
+        price_brl: 1,
+        verdict: "saldo",
+        motivo: "",
+        fornecedor: "v",
+        custoBrl: 1,
+        faltaRecarregar: 50,
+        faltaEm: "v",
+      },
+    ]);
+    expect(s.recargaPorFornecedor.v).toBe(50);
+    expect(s.recargaSobDemanda).toEqual({});
+  });
+});

@@ -42,6 +42,12 @@ export function useDynamicPlans<K extends string>(
   const [gridBy, setGridBy] = useState<Record<K, GridItem[]>>(
     () => Object.fromEntries(keys.map((k) => [k, [] as GridItem[]])) as Record<K, GridItem[]>,
   );
+  // v335 — Prateleira honesta: banco respondeu vazio ≠ banco não respondeu.
+  // Sem isso, categoria 100% pausada caía no fallback estático e o cliente
+  // via pacote que o sistema sabe que não entrega.
+  const [loadedBy, setLoadedBy] = useState<Record<K, boolean>>(
+    () => Object.fromEntries(keys.map((k) => [k, false])) as Record<K, boolean>,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -54,10 +60,13 @@ export function useDynamicPlans<K extends string>(
       ).then((results) => {
         if (cancelled) return;
         const next = Object.fromEntries(keys.map((k) => [k, [] as GridItem[]])) as Record<K, GridItem[]>;
+        const loaded = Object.fromEntries(keys.map((k) => [k, false])) as Record<K, boolean>;
         results.forEach((r, i) => {
-          if (r?.items?.length) next[keys[i]] = r.items as GridItem[];
+          if (!r) return; // falha de rede: mantém o que já estava
+          loaded[keys[i]] = true;
+          if (r.items?.length) next[keys[i]] = r.items as GridItem[];
         });
-        if (keys.some((k) => next[k].length)) setGridBy(next);
+        if (keys.some((k) => loaded[k])) { setGridBy(next); setLoadedBy(loaded); }
       });
     };
     tick();
@@ -88,7 +97,7 @@ export function useDynamicPlans<K extends string>(
     for (const k of keys) {
       const items = gridBy[k];
       const { fallback, unitLabel } = map[k];
-      if (!items.length) { out[k] = fallback; continue; }
+      if (!items.length) { out[k] = loadedBy[k] ? [] : fallback; continue; }
       out[k] = items.map((it) => {
         const s = staticById.get(it.id);
         const qtyStr = it.quantidade.toLocaleString("pt-BR");
@@ -108,5 +117,5 @@ export function useDynamicPlans<K extends string>(
     }
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gridBy, bestsellers]);
+  }, [gridBy, loadedBy, bestsellers]);
 }

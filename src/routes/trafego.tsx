@@ -40,9 +40,9 @@ const BG = "#0a0a0a";
 
 export const Route = createFileRoute("/trafego")({
   head: () => {
-    const title = "Tráfego Web Real BR e Global — Segmentado — Elite Boost Prime | BoostGG";
+    const title = "Tráfego Web Real Segmentado via Pix — Elite Boost Prime | BoostGG";
     const description =
-      "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega automática, geo-segmentada e distribuição gradual.";
+      "Contrate tráfego web real via Pix. Entrega automática, geo-segmentada e distribuição gradual.";
     const url = "https://boostgg.com.br/trafego";
     const ogImage = `https://boostgg.com.br${ogTrafego}?v=48`;
     return {
@@ -145,6 +145,15 @@ function TrafegoLanding() {
     brasil:  { category: "trafego:br",     fallback: brPlans, unitLabel: "Visitas" },
     mundial: { category: "trafego:global", fallback: glPlans, unitLabel: "Visitas" },
   });
+  // v335 — Prateleira honesta: aba só existe se houver pacote vendável nela.
+  const abas = [
+    dyn.brasil.length > 0 ? { key: "brasil", label: "Brasil", emoji: "🇧🇷", badge: "🔥 Mais Popular", badgeColor: "#39ff14" } : null,
+    dyn.mundial.length > 0 ? { key: "mundial", label: "Mundial", emoji: "🌎", badge: "Em Alta", badgeColor: "#fe0979" } : null,
+  ].filter((a): a is NonNullable<typeof a> => a !== null);
+  useEffect(() => {
+    if (abas.length === 0) return;
+    if (!abas.some((a) => a.key === categoria)) setCategoria(abas[0].key as Categoria);
+  }, [abas, categoria]);
   const currentPlans = categoria === "brasil" ? dyn.brasil : dyn.mundial;
   const dynAllPlans = [...dyn.brasil, ...dyn.mundial];
 
@@ -215,7 +224,7 @@ function TrafegoLanding() {
       <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${NEON}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Tráfego Web Real Brasil e Global via Pix" />
+            <BrandHeader subtitle="Tráfego Web Real Segmentado via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>
@@ -224,15 +233,14 @@ function TrafegoLanding() {
         Tráfego Web Real Segmentado
       </h1>
       <ShowcaseShell>
-      <PremiumCategorySelector
-        accent={NEON}
-        active={categoria}
-        onChange={(k) => { setCategoria(k as Categoria); setPlanId(""); setProfile(""); }}
-        items={[
-          { key: "brasil",  label: "Brasil",   emoji: "🇧🇷", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
-          { key: "mundial", label: "Mundial",  emoji: "🌎", badge: "Em Alta",         badgeColor: "#fe0979" },
-        ]}
-      />
+      {abas.length > 1 && (
+        <PremiumCategorySelector
+          accent={NEON}
+          active={categoria}
+          onChange={(k) => { setCategoria(k as Categoria); setPlanId(""); setProfile(""); }}
+          items={abas}
+        />
+      )}
 
       <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
         <FabianoBadge variant="trafego" inline />

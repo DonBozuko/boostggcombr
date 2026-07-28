@@ -41,7 +41,7 @@ export const FAQS: Record<string, FaqItem[]> = {
   trafego: [
     { q: "Isso é tráfego real ou só bots contando view?", a: "São visitas reais de navegador, entregues de forma gradual. Não é robô de contador: o visitante abre a página. Mas é tráfego frio — não espere conversão em venda, o objetivo é volume e teste de página." },
     { q: "Google Analytics vai registrar essas visitas?", a: "Boa parte sim, mas o tráfego é IP-based e o GA pode filtrar parte como bot. Se o seu KPI é exatamente o número do GA, considere que a contagem pode vir menor que o pacote." },
-    { q: "Consigo escolher país de origem do tráfego?", a: "Hoje temos duas linhas: 🇧🇷 Visitas do Brasil (geo-segmentado) e 🌎 Global. Basta trocar a aba antes de escolher o pacote. O BR custa mais por escassez de IPs residenciais brasileiros." },
+    { q: "Consigo escolher país de origem do tráfego?", a: "O que estiver disponível aparece na própria página, em abas. Se só houver uma linha listada, é porque é a única que conseguimos entregar agora — não vendemos o que não podemos cumprir." },
     { q: "Tráfego pago dispara flag no AdSense?", a: "Não injetamos cliques em anúncios. O tráfego navega o site normalmente. Não recomendamos combinar com AdSense se seu objetivo é monetizar via ads." },
     { q: "Em quanto tempo entrega 10.000 visitas?", a: "Normalmente 24-72h após o Pix confirmado. A distribuição é escalonada para não gerar picos suspeitos no seu servidor ou analytics. Não há reposição garantida nesta categoria — qualquer problema resolvemos no WhatsApp." },
   ],

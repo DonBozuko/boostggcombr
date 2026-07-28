@@ -21,6 +21,9 @@ import { classifyBench, summarizeBench, type BenchRow } from "@/lib/bench-sweep"
 const PAUSE_PREFIX = "BANCADA";
 const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 const CONCURRENCY = 4;
+/** v335 — travado em 3 varreduras seguidas (6h) não é transitório: sai da vitrine. */
+const CICLOS_PARA_PAUSAR = 3;
+
 
 export type BenchRunResult = {
   ok: boolean;
@@ -145,10 +148,29 @@ export async function runBenchAutonomo(
     });
 
     const avaliados = rows.filter((r) => (r.verdict as string) !== "nao_avaliado");
-    const s = summarizeBench(avaliados);
+
+    // v335 — o que o cliente REALMENTE compra (90 dias). Recarga urgente só
+    // para esses; pacote gigante sem venda vira "sob encomenda".
+    const demanda = new Set<string>();
+    try {
+      const desde = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: vendidos } = await (supabaseAdmin as any)
+        .from("pedidos")
+        .select("pacote")
+        .gte("created_at", desde)
+        .not("pacote", "is", null);
+      for (const p of (vendidos as any[]) ?? []) if (p.pacote) demanda.add(String(p.pacote));
+    } catch {
+      // Sem histórico, tudo conta como demanda (não esconder problema).
+    }
+
+    const s = summarizeBench(avaliados, { demanda: demanda.size > 0 ? demanda : undefined });
 
     // ---- Correção automática -------------------------------------------
-    // Só o que é ESTRUTURAL sai da vitrine (v297). Saldo/margem é transitório.
+    // Estrutural sai na hora (v297). Saldo/margem é transitório e NÃO derruba
+    // no primeiro ciclo — mas v335: se travou em 3 varreduras seguidas (6h),
+    // não é transitório, é prateleira mentindo. Sai da vitrine com motivo em
+    // português e volta sozinho quando a rota é provada de novo.
     const estruturais = new Map<string, string>();
     for (const r of avaliados) {
       if (r.verdict === "catalogo" || r.verdict === "sem_fornecedor") {
@@ -156,8 +178,42 @@ export async function runBenchAutonomo(
       }
     }
 
+    const persistentes = new Map<string, string>();
+    try {
+      const { data: runsAnteriores } = await (supabaseAdmin as any)
+        .from("bench_runs")
+        .select("id")
+        .not("finished_at", "is", null)
+        .order("started_at", { ascending: false })
+        .limit(CICLOS_PARA_PAUSAR - 1);
+      const idsAnteriores: string[] = (runsAnteriores ?? []).map((r: any) => r.id);
+      if (idsAnteriores.length === CICLOS_PARA_PAUSAR - 1) {
+        const { data: antes } = await (supabaseAdmin as any)
+          .from("bench_findings")
+          .select("run_id, pacote")
+          .in("run_id", idsAnteriores);
+        const contagem = new Map<string, Set<string>>();
+        for (const a of (antes as any[]) ?? []) {
+          const set = contagem.get(String(a.pacote)) ?? new Set<string>();
+          set.add(String(a.run_id));
+          contagem.set(String(a.pacote), set);
+        }
+        for (const r of avaliados) {
+          if (r.verdict === "saldo" || r.verdict === "margem") {
+            if ((contagem.get(r.pacote)?.size ?? 0) >= CICLOS_PARA_PAUSAR - 1) {
+              persistentes.set(r.pacote, `${PAUSE_PREFIX}: ${r.motivo}`);
+            }
+          }
+        }
+      }
+    } catch {
+      // Sem histórico não pausa nada — silêncio nunca vira pausa.
+    }
+
+    const paraPausar = new Map<string, string>([...estruturais, ...persistentes]);
+
     const pausados: string[] = [];
-    for (const [pacote, motivo] of estruturais) {
+    for (const [pacote, motivo] of paraPausar) {
       const { data } = await supabaseAdmin
         .from("pricing_items" as any)
         .update({ is_sellable: false, sellable_reason: motivo.slice(0, 400) })
@@ -166,6 +222,7 @@ export async function runBenchAutonomo(
         .select("pacote");
       if ((data as any[])?.length) pausados.push(pacote);
     }
+
 
     // Religa SÓ o que esta trava pausou e que agora tem rota provada agora.
     const entregaveis = new Set(avaliados.filter((r) => r.verdict === "entregavel").map((r) => r.pacote));
@@ -228,7 +285,7 @@ export async function runBenchAutonomo(
     const margem = avaliados.filter((r) => r.verdict === "margem").length;
     const naoAvaliados = rows.length - avaliados.length;
 
-    if (options.notify !== false && (precisaRecarga.length > 0 || estruturais.size > 0 || margem > 0)) {
+    if (options.notify !== false && (precisaRecarga.length > 0 || paraPausar.size > 0 || margem > 0)) {
       const linhas: string[] = [];
       linhas.push("🧪 VARREDURA AUTOMÁTICA DE ENTREGA");
       linhas.push("");
@@ -237,14 +294,22 @@ export async function runBenchAutonomo(
       );
       if (precisaRecarga.length > 0) {
         linhas.push("");
-        linhas.push("Falta saldo:");
+        linhas.push("Falta saldo nos pacotes que vendem:");
         for (const [forn, falta] of precisaRecarga) {
           linhas.push(`• ${forn}: recarregar ${brl(falta)}`);
         }
       }
-      if (estruturais.size > 0) {
+      const sobDemanda = Object.entries(s.recargaSobDemanda);
+      if (sobDemanda.length > 0) {
         linhas.push("");
-        linhas.push(`Sem fornecedor válido: ${estruturais.size} pacote(s) — já tirei da vitrine sozinho.`);
+        linhas.push("Só sob encomenda (pacote gigante que ninguém comprou — não precisa recarregar agora):");
+        for (const [forn, falta] of sobDemanda) {
+          linhas.push(`• ${forn}: precisaria ${brl(falta)} se alguém comprar`);
+        }
+      }
+      if (paraPausar.size > 0) {
+        linhas.push("");
+        linhas.push(`Tirei da vitrine sozinho: ${paraPausar.size} pacote(s) que não entregariam agora.`);
       }
       if (margem > 0) {
         linhas.push("");
@@ -254,6 +319,7 @@ export async function runBenchAutonomo(
         linhas.push("");
         linhas.push(`Voltaram à vitrine sozinhos: ${religados.length} pacote(s).`);
       }
+
       if (naoAvaliados > 0) {
         linhas.push("");
         linhas.push(`Não consegui testar agora: ${naoAvaliados} pacote(s) (nada foi pausado por isso).`);
@@ -269,14 +335,14 @@ export async function runBenchAutonomo(
       const sig = await assinatura(
         JSON.stringify({
           recarga: s.recargaPorFornecedor,
-          estruturais: [...estruturais.keys()].sort(),
+          estruturais: [...paraPausar.keys()].sort(),
           margem,
         }),
       );
       if (await podeAlertar(sig)) {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
         const r = await dispatchTelegramAlert(texto, {
-          severity: precisaRecarga.length > 0 || estruturais.size > 0 ? "critical" : "warning",
+          severity: precisaRecarga.length > 0 || paraPausar.size > 0 ? "critical" : "warning",
           origem: "bench-autonomo",
         });
         alertou = r.ok;

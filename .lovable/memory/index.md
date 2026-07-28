@@ -42,3 +42,4 @@ Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/d
 
 - [Bancada Autônoma](mem://features/bancada-autonoma) — v323: robô a cada 2h prova entrega de TODOS os pacotes contra fornecedores, grava em `bench_runs`/`bench_findings`, pausa/religa sozinho e só alerta quando falta recarga.
 - [Alarme que não anda](mem://preferences/alarme-que-nao-anda) — v334: limiar de margem/dinheiro só pode existir no módulo dono (`margin-guardian`), varredura quebra o build se duplicar; achado repetido 6 varreduras vira defeito de engenharia com alerta próprio.
+- [Prateleira honesta](mem://preferences/prateleira-honesta) — Vitrine só mostra o que a Bancada prova que entrega: sem fallback estático, sem aba vazia, sem texto prometendo linha indisponível.
