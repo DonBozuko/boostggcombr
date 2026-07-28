@@ -21,10 +21,22 @@ const brl = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 export function BenchPanel({ token }: { token: string }) {
   const count = useServerFn(benchCount);
   const batch = useServerFn(benchBatch);
+  const lastRun = useServerFn(getLastBenchRun);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(0);
   const [total, setTotal] = useState(0);
   const [rows, setRows] = useState<BenchRow[]>([]);
+  const [auto, setAuto] = useState<any | null>(null);
+
+  const loadAuto = useCallback(async () => {
+    try {
+      const r = await lastRun({ data: { token } });
+      if (r.ok) setAuto(r.run ?? null);
+    } catch { /* silencioso: painel não pode quebrar por leitura */ }
+  }, [lastRun, token]);
+
+  useEffect(() => { void loadAuto(); }, [loadAuto]);
+
 
   const run = async () => {
     setRunning(true);
