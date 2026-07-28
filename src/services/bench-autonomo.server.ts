@@ -189,12 +189,12 @@ export async function runBenchAutonomo(
 
     // ---- Correção automática -------------------------------------------
     // Estrutural sai na hora (v297).
-    // v345 — SALDO NÃO É FALHA DE ENTREGA. O cliente tem prazo de entrega
-    // (24h); saldo o dono repõe a qualquer hora. Tirar da vitrine por saldo
-    // é perder venda por um problema que se resolve com um Pix. Então:
-    //   - margem persistente (3 ciclos / 6h) → pausa (vende no prejuízo);
-    //   - saldo → NÃO pausa; só pausa se passar de 24h sem recarga (falha
-    //     humana declarada, aí sim viraria entrega furada).
+    // v350 — SALDO NUNCA TIRA PACOTE DA VITRINE. O cliente tem prazo de
+    // entrega e o dono repõe saldo a qualquer hora, com aviso imediato no
+    // celular (v346). Pausar por saldo é perder venda por um problema que se
+    // resolve com um Pix — e o checkout já tem preflight que impede cobrar sem
+    // rota. Então: só margem persistente (3 ciclos / 6h) e falha estrutural
+    // pausam. Saldo, nunca — nem depois de 24h.
     const estruturais = new Map<string, string>();
     for (const r of avaliados) {
       if (r.verdict === "catalogo" || r.verdict === "sem_fornecedor") {
@@ -203,7 +203,7 @@ export async function runBenchAutonomo(
     }
 
     const persistentes = new Map<string, string>();
-    /** Pacotes com saldo faltando há mais de 24h (prazo estourado). */
+    /** v350 — mantido vazio de propósito: saldo não vence mais prazo. */
     const saldoVencido = new Set<string>();
     try {
       const { data: runsAnteriores } = await (supabaseAdmin as any)
@@ -243,26 +243,12 @@ export async function runBenchAutonomo(
           if (runsPrev.length >= CICLOS_PARA_PAUSAR - 1 && ciclos >= CICLOS_PARA_PAUSAR - 1) {
             persistentes.set(r.pacote, `${PAUSE_PREFIX}: ${r.motivo}`);
           }
-        } else if (r.verdict === "saldo") {
-          // Streak contínuo de saldo faltando, do mais recente para trás.
-          let desde = Date.now();
-          for (const run of runsPrev) {
-            if (porRun.get(run.id)?.get(r.pacote) !== "saldo") break;
-            const t = Date.parse(run.started_at);
-            if (Number.isFinite(t)) desde = t;
-          }
-          if (Date.now() - desde >= PRAZO_SALDO_MS) {
-            saldoVencido.add(r.pacote);
-            persistentes.set(
-              r.pacote,
-              `${PAUSE_PREFIX}: saldo pendente há mais de 24h — ${r.motivo}`,
-            );
-          }
         }
       }
     } catch {
       // Sem histórico não pausa nada — silêncio nunca vira pausa.
     }
+
 
     const paraPausar = new Map<string, string>([...estruturais, ...persistentes]);
 
