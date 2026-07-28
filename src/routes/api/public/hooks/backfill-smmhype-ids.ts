@@ -98,12 +98,12 @@ async function runBackfill() {
   const [{ data: nulos }] = await Promise.all([
     supabaseAdmin
       .from("pricing_items")
-      .select("pacote, quantidade")
+      .select("pacote, quantidade, category")
       .is("smmhype_service_id", null),
   ]);
 
   const svcs = (cache ?? []) as SvcRow[];
-  const rows = (nulos ?? []) as Array<{ pacote: string; quantidade: number }>;
+  const rows = (nulos ?? []) as Array<{ pacote: string; quantidade: number; category: string | null }>;
 
   const matched: Array<{ pacote: string; svc_id: number; score: number }> = [];
   const ambiguous: Array<{ pacote: string; candidates: number[] }> = [];
@@ -113,6 +113,11 @@ async function runBackfill() {
     const meta = decodePacote(r.pacote);
     if (!meta) { missing.push(r.pacote); continue; }
     const scored = svcs
+      // v319 — mesma trava de intenção do religador. Este backfill preenchia
+      // qualquer coluna NULL, inclusive a que a auditoria acabara de limpar por
+      // vínculo incoerente: o ID errado voltava no ciclo seguinte e o alerta
+      // nunca morria. Serviço que contraria a intenção do pacote fica de fora.
+      .filter((s) => serviceMatchesIntent(r.category, s.name))
       .map((s) => ({ svc: s, sc: scoreCandidate(meta, r.quantidade, s) }))
       .filter((x) => x.sc > 0)
       .sort((a, b) => b.sc - a.sc);
@@ -127,6 +132,7 @@ async function runBackfill() {
       });
     }
   }
+
 
   // 3. Grava matches inequívocos
   for (const m of matched) {

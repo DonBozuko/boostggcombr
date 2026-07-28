@@ -7,6 +7,8 @@
 //  - é brasileiro quando o pacote é brasileiro
 // Resultado salvo em pricing_items.<provider>_auto_id (não sobrescreve o manual).
 
+import { serviceMatchesIntent } from "@/lib/catalog-coherence";
+
 type Provider = "smmhype" | "smmpanel" | "verified";
 
 type CacheRow = {
