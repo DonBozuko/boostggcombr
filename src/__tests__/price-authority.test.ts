@@ -43,11 +43,13 @@ describe("v305 — autoridade única de preço", () => {
   it("resolve margem e escada no MESMO passe (o ping-pong dos dois motores)", () => {
     // Estado real que voltava todo ciclo: pacote maior mais barato que o menor.
     const banco = [row("ys20k", 20000, 100, 48100.5, "youtube:inscritos"), row("ys30k", 30000, 40, 17545.71, "youtube:inscritos")];
-    const plano = planAuthorityPrices(banco);
-    const final = new Map(plano.rows.map((r) => [r.pacote, r.price_brl]));
+    let rows = banco;
+    // v327: o teto de vitrine desce no máximo 20% por ciclo — converge em alguns passes.
+    for (let i = 0; i < 40; i++) rows = planAuthorityPrices(rows).rows;
+    const final = new Map(rows.map((r) => [r.pacote, r.price_brl]));
     expect(final.get("ys30k")!).toBeGreaterThan(final.get("ys20k")!);
     // e o resultado já está estável
-    expect(planAuthorityPrices(plano.rows).changes).toHaveLength(0);
+    expect(planAuthorityPrices(rows).changes).toHaveLength(0);
   });
 
   it("preço abaixo da margem nunca continua na vitrine: ou sobe, ou é bloqueado", () => {

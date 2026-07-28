@@ -67,6 +67,8 @@ describe("v326 — curva coerente por categoria", () => {
     for (let i = 1; i < asc.length; i++) expect(asc[i].price_brl).toBeGreaterThan(asc[i - 1].price_brl);
   });
 
+});
+
 describe("v327 — teto de vitrine por categoria", () => {
   const tk = "tiktok:seguidores";
   const row = (pacote: string, quantidade: number, price_brl: number) => ({ pacote, category: tk, quantidade, price_brl });
