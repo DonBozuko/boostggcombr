@@ -25,6 +25,7 @@
 
 import { computeGuardedPrice, respectsMinMargin, FLOOR_BRL } from "./margin-guardian";
 import { enforceMonotonicLadder } from "./price-monotonic";
+import { enforceUnitCoherence } from "./price-unit-curve";
 
 /** Teto de reajuste automático para cima num único ciclo. */
 export const AUTHORITY_MAX_UP = 1.4;
@@ -41,7 +42,7 @@ export type AuthorityChange = {
   pacote: string;
   de: number;
   para: number;
-  motivo: "margem" | "escada" | "primeiro_preco";
+  motivo: "margem" | "escada" | "curva" | "primeiro_preco";
 };
 
 export type AuthorityBlock = {
