@@ -41,7 +41,7 @@ const REVIEWS_BY_ROUTE: Record<RouteKey, Review[]> = {
     { n: "Igor M.", t: "Grupo de sinais cripto ganhou credibilidade na hora.", verified: true },
     { n: "Sabrina R.", t: "Membros silenciosos são exatamente o que eu precisava pra prova social." },
     { n: "Vinicius A.", t: "Entrega em minutos, nem precisei falar com o suporte." },
-    { n: "Camila O.", t: "Canal de notícias esportivas: 10k membros sem drop." },
+    { n: "Camila O.", t: "Canal de notícias esportivas: 10k membros entregues sem enrolação." },
   ],
   "/trafego": [
     { n: "Carolina T.", t: "Loja Shopify recebeu 25k visitas BR reais. GA registrou tudo.", verified: true },
