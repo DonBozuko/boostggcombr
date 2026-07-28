@@ -224,15 +224,14 @@ function TrafegoLanding() {
         Tráfego Web Real Segmentado
       </h1>
       <ShowcaseShell>
-      <PremiumCategorySelector
-        accent={NEON}
-        active={categoria}
-        onChange={(k) => { setCategoria(k as Categoria); setPlanId(""); setProfile(""); }}
-        items={[
-          { key: "brasil",  label: "Brasil",   emoji: "🇧🇷", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
-          { key: "mundial", label: "Mundial",  emoji: "🌎", badge: "Em Alta",         badgeColor: "#fe0979" },
-        ]}
-      />
+      {abas.length > 1 && (
+        <PremiumCategorySelector
+          accent={NEON}
+          active={categoria}
+          onChange={(k) => { setCategoria(k as Categoria); setPlanId(""); setProfile(""); }}
+          items={abas}
+        />
+      )}
 
       <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
         <FabianoBadge variant="trafego" inline />
