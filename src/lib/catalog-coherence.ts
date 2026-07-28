@@ -181,6 +181,7 @@ export function analyzeCatalogCoherence(
           pacote: r.pacote,
           category: cat,
           detalhe: `vinculado ao serviço "${name}" (${ref.provider} id ${ref.id}), incompatível com ${intent.label}`,
+          service: ref,
         });
       }
     }
