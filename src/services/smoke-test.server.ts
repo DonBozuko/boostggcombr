@@ -132,11 +132,21 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   }
 
   // 2) Todo pacote tem pelo menos 1 ID válido?
+  //
+  // v339 — MEDIR SÓ O QUE ESTÁ NA PRATELEIRA.
+  // Causa raiz de um alerta falso que tocava de hora em hora: o teste olhava
+  // TODOS os itens, inclusive os 30 pacotes gigantes que a Bancada já tirou da
+  // vitrine (is_sellable = false). Item pausado sempre aparece "com prejuízo",
+  // então o teste devolvia 503 para sempre, o agendador registrava isso como
+  // "erro de servidor" e a auditoria gritava "robô batendo em erro" — sem
+  // nenhum problema real por trás. Pacote fora da vitrine não vende, logo não
+  // pode reprovar o teste. O que estiver pausado é assunto da Bancada.
   const { data: items } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id");
+    .select("pacote, cost_brl, price_brl, is_sellable, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id");
 
   for (const it of (items as any[]) ?? []) {
+    if (it.is_sellable === false) continue;
     // v180 — auto_id (auto-resolver v171) é caminho válido de dispatch, conta como ID.
     const hasId =
       it.smmhype_service_id || it.smmpanel_service_id || it.verified_service_id || it.provider4_service_id ||
@@ -148,6 +158,7 @@ export async function runSmokeTest(): Promise<SmokeReport> {
     // v334 — régua única (margin-guardian). Nunca reescrever o número aqui.
     if (cost > 0 && !respectsMinMargin(price, cost)) report.packages_below_margin.push(it.pacote);
   }
+
 
   // 3) Auto-healer rodou recentemente?
   const { data: lastRun } = await supabaseAdmin
