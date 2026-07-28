@@ -10,7 +10,10 @@ export function buildSmmhypeAlertMessage(saldoBrl: number | null): string {
 
 export async function dispatchWhatsappAlert(
   message: string,
-  options: { inlineKeyboard?: InlineKeyboardButton[][] } = {},
+  // v311 — dá para marcar "a trava funcionou" como aviso. Sem isso todo alerta
+  // entrava como crítico e o semáforo do admin ficava vermelho por proteção
+  // que deu certo, escondendo o vermelho que é dinheiro/cliente em risco.
+  options: { inlineKeyboard?: InlineKeyboardButton[][]; severity?: AlertSeverity } = {},
 ): Promise<{ ok: boolean; detail?: string }> {
   return dispatchTelegramAlert(message, options);
 }
