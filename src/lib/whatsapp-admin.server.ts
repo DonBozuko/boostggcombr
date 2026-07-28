@@ -203,6 +203,18 @@ export async function notifyAdminUniversalPaid(alert: UniversalPaidAlert): Promi
       origem: "pedido-pago",
     });
 
+    // v321 — RECIBO DE AVISO DE VENDA. Sem isto, "não chegou notificação" era
+    // palavra contra palavra: o alerta ficava só no console do servidor. Agora
+    // todo envio de venda paga deixa registro no banco (entregue ou falhou).
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin.from("admin_audit_logs" as any).insert({
+        admin_email: "system@telegram",
+        action: res.ok ? "TELEGRAM_PAID_SENT" : "TELEGRAM_SEND_FAILED",
+        detail: { pedido_id: alert.pedidoId, valor: alert.vendaBrl, reason: res.ok ? null : (res.detail ?? "unknown") },
+      } as any);
+    } catch (e) { console.warn("[admin-notify] recibo v321 falhou", e); }
+
     if (!res.ok) console.error("[admin-notify] universal Telegram falhou", res.detail);
   } catch (e) {
     console.warn("[admin-notify] notifyAdminUniversalPaid falhou", e);
