@@ -52,7 +52,8 @@ export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
   });
 
 // v236 — Recarga de saldo: painel do fornecedor + Pix copia-e-cola salvo nos secrets.
-// Só responde com token de admin válido (mesmo gate das demais funções deste arquivo).
+// v343 — o painel passa a ser derivado do api_url do BANCO. Fornecedor novo
+// (ex.: provider4/SMMOficial) já nasce com botão funcionando, sem hardcode.
 const PAINEL_URL: Record<string, string> = {
   smmhype: "https://smmhype.com",
   smmpainel: "https://smmpainel.com",
@@ -60,12 +61,26 @@ const PAINEL_URL: Record<string, string> = {
   verified: "https://verifiedatacado.com",
 };
 
+/** Origem do api_url = painel do fornecedor (script SMM padrão). */
+function painelFromApiUrl(apiUrl: string | null | undefined): string | null {
+  const raw = String(apiUrl ?? "").trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== "https:" && u.protocol !== "http:") return null;
+    return u.origin;
+  } catch {
+    return null;
+  }
+}
+
 function pixFor(slug: string): string | null {
   const s = (slug || "").toLowerCase();
   if (s.includes("smmhype")) return process.env.SMMHYPE_PIX_COPIA_COLA?.trim() || null;
   if (s.includes("smmpainel") || s.includes("smmpanel")) return process.env.SMMPANEL_PIX_COPIA_COLA?.trim() || null;
   if (s.includes("verified")) return process.env.VERIFIED_PIX_COPIA_COLA?.trim() || null;
-  return null;
+  if (s.includes("provider4") || s.includes("smmoficial")) return process.env.PROVIDER4_PIX_COPIA_COLA?.trim() || null;
+  return process.env.PROVIDER_PIX_COPIA_COLA?.trim() || null;
 }
 
 export const getRecargaFornecedores = createServerFn({ method: "POST" })
@@ -75,20 +90,22 @@ export const getRecargaFornecedores = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("fornecedores")
-      .select("nome, slug, saldo_atual, ativo")
+      .select("nome, slug, saldo_atual, ativo, api_url")
       .order("prioridade", { ascending: true });
     return {
       ok: true as const,
       itens: (rows ?? []).map((r: any) => {
         const slug = String(r.slug ?? "").toLowerCase();
+        const painel = painelFromApiUrl(r.api_url) ?? PAINEL_URL[slug] ?? null;
         return {
           nome: r.nome as string,
           slug,
           ativo: !!r.ativo,
           saldo: typeof r.saldo_atual === "number" ? r.saldo_atual : null,
-          painelUrl: PAINEL_URL[slug] ?? null,
+          painelUrl: painel ? `${painel}/addfunds` : null,
           pix: pixFor(slug),
         };
       }),
     };
   });
+
