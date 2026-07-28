@@ -1,0 +1,1 @@
+DELETE FROM public.pricing_items WHERE category = 'trafego:br';
