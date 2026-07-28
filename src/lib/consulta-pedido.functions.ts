@@ -1,18 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+// v325 — ponto único de verdade da tradução de status para o cliente.
+import { statusLabelPt, toCanonicalStatus } from "./order-status";
 
 const input = z.object({ pedidoId: z.string().min(4).max(60) });
 
-const STATUS_MSG: Record<string, string> = {
-  pending: "Seu pedido está aguardando confirmação do pagamento Pix, senhor.",
-  paid: "Pagamento confirmado. Disparei o pedido para o fornecedor, senhor.",
-  Enviado: "Pedido enviado ao fornecedor com sucesso, senhor.",
-  waiting_provision: "Pagamento confirmado. Pedido aguardando automação de envio, senhor.",
-  processing: "Seu pedido está em processamento na rede ativa, senhor.",
-  completed: "Pedido entregue com sucesso! Operação concluída.",
-  failed: "Detectei uma falha no pedido. Acione o suporte para reprocessar, senhor.",
-  refunded: "Pedido reembolsado. Saldo devolvido pelo Mercado Pago.",
-};
 
 export const consultarPedidoPublico = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
@@ -36,11 +28,13 @@ export const consultarPedidoPublico = createServerFn({ method: "POST" })
       return { ok: false as const, message: "Não localizei esse pedido, senhor. Confirme o ID." };
     }
     const r = rows[0]!;
-    const base = STATUS_MSG[r.status] ?? `Status atual: ${r.status}.`;
+    const base = statusLabelPt(r.status);
     return {
       ok: true as const,
       message: `${base} (${r.rede_social ?? "rede"} · ${r.pacote} · ${r.quantidade}).`,
-      status: r.status,
+      // v325 — o cliente vê o estado público; o interno fica só no admin.
+      status: toCanonicalStatus(r.status),
     };
+
 
   });

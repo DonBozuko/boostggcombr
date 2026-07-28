@@ -11,6 +11,7 @@ Toda integração com fornecedor (SMMhype, SMMPainel, Verified, MP, TikTok, etc)
 Autonomia: quando a opção é claramente segura (não quebra receita, não apaga dado, não expõe segredo, reversível), EXECUTA direto sem pedir confirmação. Só pergunta em decisões irreversíveis ou trade-off real de negócio.
 Build só passa com `vitest run` verde (gate v243). Fluxo crítico novo/corrigido nasce com teste em `src/__tests__/`, e regra de dinheiro/entrega vive em módulo puro testável. Nunca remover o gate pra destravar deploy.
 Ordem sagrada do dinheiro: preflight de rota ao vivo → cobrança → despacho. Nunca cobrar sem provar que dá pra entregar agora. Ver [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight).
+Pedido pago nunca espera clique humano pra andar, e cliente só vê 8 status públicos traduzidos por `src/lib/order-status.ts`. Ver [Fila e status canônico](mem://features/fila-e-status-canonico).
 
 Modo Orquestrador (regra absoluta): antes de mexer, mapear impacto cruzado, definir ordem de execução, rollback e prova real. Causa raiz > remendo. Ver [Modo Orquestrador](mem://preferences/modo-orquestrador).
 Documento nunca manda no código: `ARQUITETURA.md` e os arquivos em `.lovable/*.md` são índice, não verdade. Se divergirem do código, o CÓDIGO vence e eu corrijo o documento no mesmo turno. Proibido cravar service ID, preço ou número que o sync muda sozinho dentro de documento.
