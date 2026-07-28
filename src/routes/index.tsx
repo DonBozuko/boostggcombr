@@ -451,8 +451,9 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         results.forEach((r, i) => {
           if (r?.items?.length) next[cats[i][0]] = r.items as GridItem[];
         });
-        if (next.seguidores.length || next.curtidas.length || next.visualizacoes.length) {
+        if (results.some((r) => r !== null)) {
           setGridBy(next);
+          setGridLoaded(true);
         }
       });
     getBrPricingGridFn({ data: { network: "instagram", kind: "seguidores" } })
