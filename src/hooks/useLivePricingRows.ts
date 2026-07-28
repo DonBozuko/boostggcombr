@@ -10,7 +10,10 @@
 
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getPricingGrid, type PricingCategory } from "@/lib/pricing.functions";
+import { getPricingGrid, getBrPricingGrid, type PricingCategory } from "@/lib/pricing.functions";
+
+/** v337 — landings BR leem a grade curada 'x:seguidores:br'. */
+export type LivePricingCategory = PricingCategory | "instagram:seguidores:br" | "tiktok:seguidores:br";
 
 export type LivePricingRow = {
   /** id do pacote em pricing_items (ex.: "kf1k"). */
