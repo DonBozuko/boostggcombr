@@ -71,6 +71,16 @@ export function serviceMatchesIntent(category: string | null | undefined, name: 
   return !intent.proibe?.test(String(name));
 }
 
+/**
+ * v338 — Linha (tier) do pacote a partir do id: "global", "br" ou "br-pro".
+ * Comparar preço/custo só faz sentido dentro da mesma linha.
+ */
+export function tierDoPacote(pacote: string | null | undefined): string {
+  const p = String(pacote ?? "").toLowerCase();
+  if (/^br[-_]?pro/.test(p) || /premium/.test(p)) return "br-pro";
+  if (/^br\b|^br[-_]/.test(p)) return "br";
+  return "global";
+}
 
 
 function median(nums: number[]): number {
