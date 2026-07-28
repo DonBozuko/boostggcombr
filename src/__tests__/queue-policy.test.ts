@@ -4,6 +4,8 @@ import {
   QUEUE_MIN_AGE_MIN,
   QUEUE_MAX_ATTEMPTS,
   QUEUE_BACKOFF_MIN,
+  QUEUE_BACKOFF_WAITING_MIN,
+  QUEUE_MAX_ATTEMPTS_WAITING,
 } from "@/lib/queue-policy";
 
 const NOW = new Date("2026-07-28T12:00:00Z").getTime();
@@ -48,5 +50,39 @@ describe("v324 — fila que anda sozinha", () => {
     for (let i = 1; i < QUEUE_BACKOFF_MIN.length; i++) {
       expect(QUEUE_BACKOFF_MIN[i]).toBeGreaterThan(QUEUE_BACKOFF_MIN[i - 1]);
     }
+  });
+});
+
+describe("v353 — pedido esperando recarga insiste por ~24h", () => {
+  it("não desiste no teto antigo (5 tentativas) quando está aguardando saldo", () => {
+    const d = decideQueueAction(
+      { id: "1", status: "waiting_provision", created_at: minAgo(5000), attempts: 5, last_attempt_at: minAgo(5000) },
+      NOW,
+    );
+    expect(d.action).toBe("retry");
+  });
+
+  it("só chama humano depois de ~24h insistindo", () => {
+    const soma = QUEUE_BACKOFF_WAITING_MIN.reduce((a, b) => a + b, 0);
+    expect(soma).toBeGreaterThanOrEqual(24 * 60);
+    const d = decideQueueAction(
+      {
+        id: "1",
+        status: "waiting_provision",
+        created_at: minAgo(5000),
+        attempts: QUEUE_MAX_ATTEMPTS_WAITING,
+        last_attempt_at: minAgo(5000),
+      },
+      NOW,
+    );
+    expect(d.action).toBe("escalate");
+  });
+
+  it("falha real (SMM_FAILED) continua com o teto curto", () => {
+    const d = decideQueueAction(
+      { id: "1", status: "SMM_FAILED", created_at: minAgo(5000), attempts: QUEUE_MAX_ATTEMPTS, last_attempt_at: minAgo(5000) },
+      NOW,
+    );
+    expect(d.action).toBe("escalate");
   });
 });
