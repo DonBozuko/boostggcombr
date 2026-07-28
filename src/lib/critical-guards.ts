@@ -54,6 +54,33 @@ export function providerCanServe(opts: {
 }
 
 /**
+ * v351 — CUSTO SÓ VALE DE QUEM ENTREGA A QUANTIDADE.
+ *
+ * Causa raiz dos 9 pacotes "venderia no prejuízo": o motor de preço pegava o
+ * MENOR custo entre os fornecedores vinculados sem olhar a faixa (min/max) do
+ * serviço. Ex.: yv10m (10 milhões de views) foi precificado com o custo do
+ * fornecedor cujo serviço aceita no máximo 1 milhão. Na hora do despacho o
+ * roteamento descarta esse fornecedor (v286) e sobra só o caro — preço abaixo
+ * do custo real, pacote pausado por margem em looping.
+ *
+ * Regra: quem não aceita a quantidade não entra na conta do custo. Faixa
+ * desconhecida (0/ausente) não bloqueia — nunca parar venda por falta de dado.
+ */
+export function serviceAcceptsQty(
+  svc: { min?: number | string | null; max?: number | string | null } | null | undefined,
+  qty: number,
+): boolean {
+  if (!svc) return true;
+  const q = Number(qty);
+  if (!Number.isFinite(q) || q <= 0) return true;
+  const min = Number(svc.min) || 0;
+  const max = Number(svc.max) || 0;
+  if (min > 0 && q < min) return false;
+  if (max > 0 && q > max) return false;
+  return true;
+}
+
+/**
  * Ordem de despacho. Regras, em ordem:
  * 1. Fornecedor instável vai pro fim.
  * 2. Em pacote BR, quem tem reposição (refill) ganha de quem não tem.
