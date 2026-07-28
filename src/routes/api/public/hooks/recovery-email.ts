@@ -27,6 +27,40 @@ export const Route = createFileRoute('/api/public/hooks/recovery-email')({
         const from = new Date(now - 24 * 60 * 60 * 1000).toISOString()
         const to = new Date(now - 30 * 60 * 1000).toISOString()
 
+        // v315 — repescagem: pedido marcado como "enviado" cujo e-mail na verdade
+        // falhou (failed/dlq) volta pra fila UMA vez. Sem isso, uma falha
+        // passageira do provedor de e-mail apagava a recuperação em silêncio.
+        let repescados = 0
+        try {
+          const { data: falhos } = await supabase
+            .from('email_send_log')
+            .select('message_id, status')
+            .eq('template_name', 'cart-recovery')
+            .in('status', ['failed', 'dlq'])
+            .gte('created_at', from)
+            .limit(100)
+
+          const ids = new Set<string>()
+          for (const row of falhos ?? []) {
+            const m = String(row.message_id ?? '').match(/^cart-recovery-([0-9a-f-]{36})-t(\d+)$/)
+            // só repesca quem ainda não passou de 2 tentativas
+            if (m && Number(m[2]) < 2) ids.add(m[1])
+          }
+
+          if (ids.size > 0) {
+            const { data: voltaram } = await supabase
+              .from('pedidos')
+              .update({ recovery_email_sent_at: null })
+              .in('id', Array.from(ids))
+              .in('status', ['pending', 'mp_pending', 'mp_in_process'])
+              .select('id')
+            repescados = voltaram?.length ?? 0
+          }
+        } catch (e) {
+          console.warn('[recovery-email] repescagem falhou', e)
+        }
+
+
         const { data: pedidos, error } = await supabase
           .from('pedidos')
           .select('id, email_contato, instagram_user, pacote, rede_social, valor, status')
