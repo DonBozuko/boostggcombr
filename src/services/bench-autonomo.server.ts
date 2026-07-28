@@ -285,7 +285,7 @@ export async function runBenchAutonomo(
     const margem = avaliados.filter((r) => r.verdict === "margem").length;
     const naoAvaliados = rows.length - avaliados.length;
 
-    if (options.notify !== false && (precisaRecarga.length > 0 || estruturais.size > 0 || margem > 0)) {
+    if (options.notify !== false && (precisaRecarga.length > 0 || paraPausar.size > 0 || margem > 0)) {
       const linhas: string[] = [];
       linhas.push("🧪 VARREDURA AUTOMÁTICA DE ENTREGA");
       linhas.push("");
@@ -335,14 +335,14 @@ export async function runBenchAutonomo(
       const sig = await assinatura(
         JSON.stringify({
           recarga: s.recargaPorFornecedor,
-          estruturais: [...estruturais.keys()].sort(),
+          estruturais: [...paraPausar.keys()].sort(),
           margem,
         }),
       );
       if (await podeAlertar(sig)) {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
         const r = await dispatchTelegramAlert(texto, {
-          severity: precisaRecarga.length > 0 || estruturais.size > 0 ? "critical" : "warning",
+          severity: precisaRecarga.length > 0 || paraPausar.size > 0 ? "critical" : "warning",
           origem: "bench-autonomo",
         });
         alertou = r.ok;
