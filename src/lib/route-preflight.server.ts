@@ -64,7 +64,28 @@ export async function preflightRouteOrBlock(opts: {
   }
 
   cache.set(key, { at: Date.now(), result });
-  if (result.ok) return { ...result, skipped: false };
+  if (result.ok) {
+    // v352 — vendeu com fornecedor sem saldo: NÃO bloqueia, mas o dono precisa
+    // saber na hora (ele recarrega na hora). Cooldown de 30min por pacote para
+    // não virar spam no celular.
+    if (result.needsTopup) {
+      const last = topupAlertAt.get(opts.pacote) ?? 0;
+      if (Date.now() - last > TOPUP_ALERT_COOLDOWN_MS) {
+        topupAlertAt.set(opts.pacote, Date.now());
+        try {
+          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+          await dispatchWhatsappAlert(
+            `💳 RECARREGUE O FORNECEDOR AGORA\n\n` +
+              `PROBLEMA: acabou de sair venda do pacote "${opts.pacote}" (${opts.quantidade}) e nenhum fornecedor tem saldo suficiente. ` +
+              `A venda foi liberada normalmente (o cliente tem prazo de entrega), mas o pedido fica esperando a recarga.\n\n` +
+              `O QUE FAZER: colocar saldo no fornecedor agora. Assim que o saldo entrar, o pedido é enviado sozinho.`,
+            { force: true },
+          ).catch(() => {});
+        } catch { /* noop */ }
+      }
+    }
+    return { ...result, skipped: false };
+  }
 
   console.error(`[v297] COBRANÇA BLOQUEADA ${opts.pacote} (${opts.quantidade}): ${result.reason}`, result.rejections);
 
