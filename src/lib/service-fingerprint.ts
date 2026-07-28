@@ -103,3 +103,16 @@ export function decideFingerprints(
 export function fingerprintKey(pacote: string, col: string): string {
   return `${pacote}|${col}`;
 }
+
+// v313 — versão de 1 vínculo, para usar no ato da venda (roteamento/despacho).
+// true = o fornecedor trocou o produto por trás do mesmo ID: não pode vender.
+export function productChanged(
+  currentName: string | null | undefined,
+  prev: Pick<FingerprintRecord, "provider" | "service_id" | "name_sig"> | undefined | null,
+  link: { provider: string; service_id: string },
+): boolean {
+  if (!currentName || !prev) return false;
+  if (prev.provider !== link.provider || prev.service_id !== link.service_id) return false;
+  return prev.name_sig !== serviceSignature(currentName);
+}
+
