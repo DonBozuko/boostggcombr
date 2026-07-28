@@ -79,6 +79,39 @@ export function SloPanel({ token }: { token: string }) {
             </div>
           </div>
 
+          {m.maturity && (
+            <div className="mt-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+              <div className="text-emerald-300 uppercase text-[9px] tracking-wider mb-2">
+                Termômetro real · últimos {m.maturity.windowDays} dias (número medido, não estimativa)
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-[11px]">
+                <div className="rounded-lg border border-white/10 bg-black/40 p-2">
+                  <div className="text-white/40 uppercase text-[9px] tracking-wider">Entrega sem toque humano</div>
+                  <div className="text-lg font-bold text-emerald-200">
+                    {m.maturity.autonomiaPct == null ? "—" : `${m.maturity.autonomiaPct}%`}
+                  </div>
+                  <div className="text-white/40 text-[9px]">
+                    {m.maturity.entreguesSemToque} de {m.maturity.entregues} entregues · {m.maturity.toquesHumanos} exigiram você
+                  </div>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-black/40 p-2">
+                  <div className="text-white/40 uppercase text-[9px] tracking-wider">Tempo pago → entregue</div>
+                  <div className="text-lg font-bold text-cyan-200">{fmtMin(m.maturity.pagoEntregueMedianaMin)}</div>
+                  <div className="text-white/40 text-[9px]">
+                    média {fmtMin(m.maturity.pagoEntregueMediaMin)} · amostra {m.maturity.amostraTempo}
+                  </div>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-black/40 p-2">
+                  <div className="text-white/40 uppercase text-[9px] tracking-wider">Estornos no mês</div>
+                  <div className={`text-lg font-bold ${m.maturity.estornos === 0 ? "text-emerald-200" : "text-amber-300"}`}>
+                    {m.maturity.estornos}
+                  </div>
+                  <div className="text-white/40 text-[9px]">dinheiro devolvido ao cliente</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="mt-3 grid grid-cols-2 md:grid-cols-6 gap-2 text-[10px]">
             <Chip label="Entregues" value={m.totals.entregues} color="emerald" />
             <Chip label="Processando" value={m.totals.processando} color="cyan" />
