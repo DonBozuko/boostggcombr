@@ -85,7 +85,7 @@ const urlSchema = z.object({
 type PedidoInfo = { price: string; tier: string; profile: string; pixCode: string; qrCodeBase64: string; pedidoId: string | null; quantidade: number };
 
 function TrafegoLanding() {
-  const [categoria, setCategoria] = useState<Categoria>("brasil");
+  const [categoria, setCategoria] = useState<Categoria>("mundial");
   const [planId, setPlanId] = useState("");
   const [profile, setProfile] = useState("");
   const [email, setEmail] = useState("");
