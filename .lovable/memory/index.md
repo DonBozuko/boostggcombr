@@ -14,6 +14,7 @@ Sinal verde é sempre ESCOPADO ao que tem detector; tudo sem invariante é decla
 Ordem sagrada do dinheiro: preflight de rota ao vivo → cobrança → despacho. Nunca cobrar sem provar que dá pra entregar agora. Ver [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight).
 Pedido pago nunca espera clique humano pra andar, e cliente só vê 8 status públicos traduzidos por `src/lib/order-status.ts`. Ver [Fila e status canônico](mem://features/fila-e-status-canonico).
 Falta de saldo NUNCA tira pacote da vitrine nem pinta vermelho — é aviso amarelo forçado no celular. Só estrutural e margem pausam. Ver [Saldo nunca pausa](mem://constraints/saldo-nunca-pausa).
+Falta de saldo também NUNCA recusa cobrança (v352): vende, avisa na hora com force, pedido espera a recarga e sai sozinho. Ver [Saldo nunca bloqueia venda](mem://constraints/saldo-nunca-bloqueia-venda).
 Custo só pode vir de fornecedor que aceita a quantidade do pacote (min/max) — a mesma faixa que o despacho usa. Ver [Custo só de quem entrega](mem://constraints/custo-so-de-quem-entrega).
 
 

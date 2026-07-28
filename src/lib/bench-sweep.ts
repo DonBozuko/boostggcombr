@@ -50,6 +50,31 @@ export function classifyBench(
   ranked: PreflightProvider[],
   res: PreflightResult,
 ): Pick<BenchRow, "verdict" | "motivo" | "fornecedor" | "custoBrl" | "faltaRecarregar" | "faltaEm"> {
+  // v352 — a venda não é mais bloqueada por saldo (o dono recarrega na hora),
+  // mas a bancada CONTINUA apontando "saldo" para o aviso amarelo no celular.
+  if (res.ok && res.needsTopup) {
+    const candidatos = ranked
+      .filter((p) => p.provider_service_id && p.cost_brl != null && Number(p.cost_brl) > 0)
+      .map((p) => ({
+        slug: p.slug,
+        custo: Number(p.cost_brl),
+        falta: Number(p.cost_brl) - Number(p.saldo_atual ?? 0),
+      }))
+      .filter((c) => c.falta > 0)
+      .sort((a, b) => a.falta - b.falta);
+    const alvo = candidatos[0];
+    if (alvo) {
+      return {
+        verdict: "saldo",
+        motivo: `Falta ${fmt(alvo.falta)} de saldo em ${alvo.slug} — a venda continua liberada, o pedido sai na recarga`,
+        fornecedor: alvo.slug,
+        custoBrl: alvo.custo,
+        faltaRecarregar: Number(alvo.falta.toFixed(2)),
+        faltaEm: alvo.slug,
+      };
+    }
+  }
+
   if (res.ok) {
     const melhor = [...res.viable].sort(
       (a, b) => (a.cost_brl ?? Infinity) - (b.cost_brl ?? Infinity),
@@ -63,6 +88,7 @@ export function classifyBench(
       faltaEm: null,
     };
   }
+
 
   if (ranked.length === 0) {
     return {

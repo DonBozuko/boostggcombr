@@ -12,10 +12,11 @@ const p = (o: Partial<PreflightProvider>): PreflightProvider => ({
 });
 
 describe("v322 bancada de provas", () => {
-  it("pacote grande com saldo curto NÃO é entregável (causa do estorno)", () => {
+  it("v352 — saldo curto vira aviso de recarga, mas a venda continua liberada", () => {
     const ranked = [p({ slug: "provider4", cost_brl: 40, saldo_atual: 16.53 })];
     const res = evaluateRoute(ranked, 283.44);
-    expect(res.ok).toBe(false);
+    expect(res.ok).toBe(true);
+    expect(res.needsTopup).toBe(true);
     const c = classifyBench(ranked, res);
     expect(c.verdict).toBe("saldo");
     expect(c.faltaRecarregar).toBeCloseTo(23.47, 2);

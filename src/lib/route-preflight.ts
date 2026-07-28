@@ -34,7 +34,17 @@ export type PreflightResult = {
   rejections: string[];
   /** true = nenhum fornecedor tem ID válido (problema de catálogo, não de saldo). */
   structural: boolean;
+  /** v352 — rota existe, mas nenhum fornecedor tem saldo agora: vender e recarregar. */
+  needsTopup: boolean;
 };
+
+/** Saldo cobre o custo conhecido deste pedido? */
+function cobreCusto(p: PreflightProvider): boolean {
+  const saldo = Number(p.saldo_atual);
+  if (!(saldo > 0)) return false;
+  if (p.cost_brl != null && Number(p.cost_brl) > 0 && saldo < Number(p.cost_brl)) return false;
+  return true;
+}
 
 export function evaluateRoute(ranked: PreflightProvider[], valorBrl: number): PreflightResult {
   const rejections: string[] = [];
@@ -59,34 +69,40 @@ export function evaluateRoute(ranked: PreflightProvider[], valorBrl: number): Pr
     return true;
   });
 
-  // v322 — SALDO PRECISA COBRIR O PEDIDO, não só ser maior que zero.
-  // Causa real do "pacote pequeno entrega, pacote grande falha": um fornecedor
-  // com R$16 passava nesta trava e recebia um pedido de custo R$70. O painel
-  // recusa por saldo, o cliente já pagou → estorno. Agora, quando o custo é
-  // conhecido, o fornecedor só entra na rota se o saldo cobrir o custo.
-  const comSaldo = comMargem.filter((p) => {
+  // v352 — SALDO NÃO BLOQUEIA VENDA. Substitui a v322 (que recusava a cobrança).
+  // Motivo: o dono repõe saldo na hora em que o aviso chega no celular, e o
+  // cliente tem prazo de entrega. Recusar a venda perde dinheiro por um
+  // problema que se resolve com um Pix. Fornecedor sem saldo vira ÚLTIMA opção
+  // (degradado), e o pedido, se preciso, parqueia em `waiting_provision` até a
+  // recarga — nunca some da vitrine, nunca é estorno automático imediato.
+  const comSaldo = comMargem.filter(cobreCusto);
+  const semSaldo = comMargem.filter((p) => !cobreCusto(p));
+  for (const p of semSaldo) {
     const saldo = Number(p.saldo_atual);
-    if (!(saldo > 0)) {
-      rejections.push(`${p.slug}: sem saldo`);
-      return false;
-    }
-    if (p.cost_brl != null && Number(p.cost_brl) > 0 && saldo < Number(p.cost_brl)) {
-      rejections.push(
-        `${p.slug}: saldo R$${saldo.toFixed(2)} não cobre o custo R$${Number(p.cost_brl).toFixed(2)}`,
-      );
-      return false;
-    }
-    return true;
-  });
-
+    rejections.push(
+      p.cost_brl != null && Number(p.cost_brl) > 0
+        ? `${p.slug}: saldo R$${saldo.toFixed(2)} não cobre o custo R$${Number(p.cost_brl).toFixed(2)} (degradado, aguarda recarga)`
+        : `${p.slug}: sem saldo (degradado, aguarda recarga)`,
+    );
+  }
 
   // Instável é degradado, não eliminado: só descartamos se houver alternativa
   // estável. Caso contrário o failover em runtime ainda tenta.
-  const estaveis = comSaldo.filter((p) => !p.unstable);
-  const viable = estaveis.length ? estaveis : comSaldo;
+  // Quem tem saldo entrega primeiro; sem saldo em ninguém, a rota ainda existe
+  // (parqueia e sai na recarga). Dentro do mesmo grupo, estável ganha.
+  const preferidos = comSaldo.length ? comSaldo : semSaldo;
+  const estaveis = preferidos.filter((p) => !p.unstable);
+  const ordem = estaveis.length ? estaveis : preferidos;
 
-  if (viable.length > 0) {
-    return { ok: true, viable, reason: null, rejections, structural: false };
+  if (ordem.length > 0) {
+    return {
+      ok: true,
+      viable: ordem,
+      reason: null,
+      rejections,
+      structural: false,
+      needsTopup: comSaldo.length === 0,
+    };
   }
 
   const structural = ranked.length === 0 || semId === ranked.length;
@@ -96,5 +112,6 @@ export function evaluateRoute(ranked: PreflightProvider[], valorBrl: number): Pr
       ? "Nenhum fornecedor tem ID de serviço válido no catálogo atual"
       : rejections[0] ?? "Sem rota de entrega disponível";
 
-  return { ok: false, viable: [], reason, rejections, structural };
+  return { ok: false, viable: [], reason, rejections, structural, needsTopup: false };
 }
+
