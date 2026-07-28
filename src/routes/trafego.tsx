@@ -97,7 +97,7 @@ function TrafegoLanding() {
   const getStatusFn = useServerFn(getPedidoStatus);
   const getSandboxFn = useServerFn(getSandboxEnabled);
   const blockedMap = useBlockedMap();
-  const trType = categoria === "brasil" ? "br" : "global";
+  const trType = "global";
   const tipoBloqueado = isBlocked(blockedMap, "trafego", trType);
 
   const [rejected, setRejected] = useState(false);
