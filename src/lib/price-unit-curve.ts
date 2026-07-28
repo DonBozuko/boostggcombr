@@ -94,6 +94,11 @@ export function enforceCategoryCurve<T extends CurveRow>(
     byCategory.set(r.category, list);
   }
 
+  // Preço no começo do ciclo: o limite de -20% vale para o ciclo INTEIRO
+  // (teto + mediana somados), nunca por passe.
+  const inicial = new Map(out.map((r) => [r.pacote, Number(r.price_brl)]));
+  const pisoDoCiclo = (r: CurveRow) => (inicial.get(r.pacote) ?? Number(r.price_brl)) * CURVE_MAX_DOWN;
+
   for (const [category, list] of byCategory) {
     // v327 — teto absoluto: vale mesmo em categoria pequena (não depende de mediana).
     for (const r of list) {
@@ -101,7 +106,7 @@ export function enforceCategoryCurve<T extends CurveRow>(
       const price = Number(r.price_brl);
       const teto = justo * CATEGORY_MAX_MULT;
       if (price <= teto + 0.009) continue;
-      const alvo = r2(Math.max(teto, justo, price * CURVE_MAX_DOWN));
+      const alvo = r2(Math.max(teto, justo, pisoDoCiclo(r)));
       if (alvo < price - 0.009) {
         fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
         r.price_brl = alvo;
@@ -120,7 +125,7 @@ export function enforceCategoryCurve<T extends CurveRow>(
       const naCurva = justo * mult;
       if (price <= naCurva * CURVE_TOLERANCE + 0.009) continue;
 
-      const alvo = r2(Math.max(naCurva * CURVE_LANDING, justo, price * CURVE_MAX_DOWN));
+      const alvo = r2(Math.max(naCurva * CURVE_LANDING, justo, pisoDoCiclo(r)));
       if (alvo < price - 0.009) {
         const antes = fixes.findIndex((f) => f.pacote === r.pacote);
         if (antes >= 0) fixes[antes].para = alvo;
@@ -128,6 +133,7 @@ export function enforceCategoryCurve<T extends CurveRow>(
         r.price_brl = alvo;
       }
     }
+
   }
 
 
