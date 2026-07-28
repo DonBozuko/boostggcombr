@@ -140,9 +140,18 @@ export function minNetRatio(costBrl: number): number {
   return (costTierMult(c) - 1) * 0.98;
 }
 
+/**
+ * v348 — TOLERÂNCIA DE CENTAVO (fim do falso "venderia no prejuízo").
+ * Caso real: br-tf100 custo R$ 1,1508 → o próprio motor gerou preço R$ 7,25 e
+ * a trava reprovou por 0,0007 de razão (arredondamento de centavo no preço
+ * gravado). Resultado: pacote lucrativo (4x líquido) saía da vitrine sozinho.
+ * 0,2% de folga não cria prejuízo nenhum e elimina a auto-contradição.
+ */
+const MARGIN_EPSILON = 0.998;
+
 export function respectsMinMargin(priceBrl: number, costBrl: number): boolean {
   if (!(costBrl > 0)) return false;
   const net = estimateNetProfit(priceBrl, costBrl);
-  return net / costBrl >= minNetRatio(costBrl);
+  return net / costBrl >= minNetRatio(costBrl) * MARGIN_EPSILON;
 }
 

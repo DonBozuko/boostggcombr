@@ -26,9 +26,9 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
     const cotacao = Number((fornecedor as any).cotacao_brl ?? USD_TO_BRL_DEFAULT) || USD_TO_BRL_DEFAULT;
 
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { data: historico } = await supabaseAdmin
+    const { data: historico } = await (supabaseAdmin as any)
       .from("monitoramento_saldo")
-      .select("saldo, status, data_hora")
+      .select("saldo, saldo_brl, cotacao_brl, status, data_hora")
       .eq("fornecedor_id", fornecedor.id)
       .gte("data_hora", since)
       .order("data_hora", { ascending: true });
@@ -52,12 +52,18 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
         usd_to_brl: cotacao,
         cotacao_brl: cotacao,
       },
-      historico: (historico ?? []).map((h) => ({
-        t: h.data_hora,
-        saldo_usd: h.saldo,
-        saldo_brl: h.saldo != null ? Number(h.saldo) * cotacao : null,
-        status: h.status,
-      })),
+      // v347 — histórico em BRL de verdade (coluna nova); linhas antigas caem
+      // no fallback USD × cotação para não abrir buraco no gráfico.
+      historico: ((historico as any[]) ?? []).map((h) => {
+        const fx = Number(h.cotacao_brl) > 0 ? Number(h.cotacao_brl) : cotacao;
+        const brl = h.saldo_brl != null ? Number(h.saldo_brl) : h.saldo != null ? Number(h.saldo) * fx : null;
+        return {
+          t: h.data_hora,
+          saldo_usd: brl != null && fx > 0 ? Number((brl / fx).toFixed(2)) : null,
+          saldo_brl: brl,
+          status: h.status,
+        };
+      }),
     };
   });
 

@@ -26,6 +26,7 @@ Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste
 Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/deletar. Arquivo pequeno, lógica em hook, feature em `src/features/`. Pedido vago ou grande = parar e fazer as 4 perguntas. Fechar ciclo perguntando sobre limpeza de lixo. Ver [Modo Torre](mem://preferences/modo-torre-clean-code).
 
 ## Memories
+- [Moeda única BRL](mem://constraints/moeda-unica-brl) — Dinheiro sempre em BRL. `monitoramento_saldo.saldo` é USD legado; usar `saldo_brl`/`fornecedores.saldo_atual`. Conferir moeda antes de afirmar número.
 - [Markup por custo](mem://features/markup-por-custo) — Múltiplo de lucro cai conforme custo do fornecedor sobe (5x→2x), teto de vitrine, piso de revenda. Consultar antes de mexer em preço.
 - [Fonte única de ID de fornecedor](mem://constraints/fonte-unica-id-fornecedor) — Proibido ID chumbado no código; catálogo vivo manda e toda escrita passa pelo portão bind-guard. Consultar antes de mexer em vínculo/roteamento.
 - [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho) — Como a dupla conduz tarefas: rótulo de complexidade, quando pedir sinal verde, código > documento, fechamento de ciclo, auditoria de coerência.

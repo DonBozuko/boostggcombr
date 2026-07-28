@@ -826,29 +826,35 @@ export type Database = {
       }
       monitoramento_saldo: {
         Row: {
+          cotacao_brl: number | null
           data_hora: string
           erro_retornado: string | null
           fornecedor_id: string
           id: string
           saldo: number | null
+          saldo_brl: number | null
           status: string
           tempo_resposta_ms: number | null
         }
         Insert: {
+          cotacao_brl?: number | null
           data_hora?: string
           erro_retornado?: string | null
           fornecedor_id: string
           id?: string
           saldo?: number | null
+          saldo_brl?: number | null
           status: string
           tempo_resposta_ms?: number | null
         }
         Update: {
+          cotacao_brl?: number | null
           data_hora?: string
           erro_retornado?: string | null
           fornecedor_id?: string
           id?: string
           saldo?: number | null
+          saldo_brl?: number | null
           status?: string
           tempo_resposta_ms?: number | null
         }
