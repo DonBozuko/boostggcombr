@@ -225,6 +225,33 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     console.warn("[ops-audit] v312 impressão digital falhou", e);
   }
 
+  // 6.6) v331 — O site promete o que o catálogo não tem?
+  // Detector permanente da família de falha que só aparecia em auditoria
+  // manual de layout: texto vendendo "brasileiro real" ou "reposição" em
+  // rede cujo catálogo é global/sem refill.
+  try {
+    const { runPromiseCoherence } = await import("@/services/promise-coherence.server");
+    const promessas = await runPromiseCoherence();
+    if (promessas.length > 0) {
+      findings.push({
+        code: "SITE_PROMETE_O_QUE_NAO_TEM",
+        severity: "critical",
+        titulo: "Texto do site promete o que o catálogo não entrega",
+        problema: `${promessas.length} trecho(s) prometem algo que a rede não tem hoje (ex.: ${promessas
+          .slice(0, 3)
+          .map((p) => `${p.origem}: "${p.trecho.slice(0, 90)}"`)
+          .join(" | ")}).`,
+        o_que_fazer:
+          "Me avise para corrigir o texto dessas páginas — ou para vincular um fornecedor que realmente entregue o que está escrito.",
+        evidencia: promessas.slice(0, 20),
+      });
+    }
+  } catch (e) {
+    console.warn("[ops-audit] v331 promessa×catálogo falhou", e);
+  }
+
+
+
   // 7) v291 — Coerência do catálogo (serviço errado, escada invertida, custo fora
   // da curva). Aditivo: se falhar, a auditoria antiga continua valendo.
   try {
