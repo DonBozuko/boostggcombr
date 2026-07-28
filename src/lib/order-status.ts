@@ -76,6 +76,7 @@ const MAP: Record<string, CanonicalStatus> = {
   // falha que precisa de olho humano ou robô
   failed: "ERRO",
   SMM_FAILED: "ERRO",
+  AWAITING_REFUND_APPROVAL: "ERRO",
   error: "ERRO",
   amount_mismatch: "ERRO",
 };
