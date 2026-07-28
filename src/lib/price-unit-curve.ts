@@ -1,31 +1,37 @@
-// v326 — COERÊNCIA DA CURVA DE DESCONTO POR VOLUME (função pura, testável).
+// v326 — CURVA COERENTE POR CATEGORIA (função pura, testável).
 //
-// CAUSA RAIZ: a autoridade (v305/v306) congela qualquer preço que já respeite
-// a margem real de 4x. Isso protege a margem, mas deixa preço legado esquisito
-// vivo para sempre. Resultado real no banco (instagram:seguidores):
+// CAUSA RAIZ: a autoridade (v305/v306) congela qualquer preço que já respeite a
+// margem real de 4x. Isso protege a margem, mas mantém vivo preço legado
+// esquisito. Caso real (instagram:seguidores):
 //   500 un → R$ 19,00  (R$ 0,038/un)
-//   750 un → R$ 44,50  (R$ 0,059/un)   ← mais caro POR UNIDADE que o de 500
+//   750 un → R$ 44,50  (R$ 0,059/un)  ← mais caro POR UNIDADE que o de 500
 //   5.000  → R$ 130,00 (R$ 0,026/un)
-// O cliente compara e conclui que o preço é aleatório. Não é margem: é lixo
-// histórico congelado.
+// O cliente compara e conclui que o preço é aleatório.
 //
-// Invariante nova: dentro da MESMA categoria, o preço POR UNIDADE nunca sobe
-// quando a quantidade sobe (desconto por volume sempre faz sentido).
+// POR QUE NÃO "preço por unidade sempre decrescente": simulado contra o banco
+// real, essa regra derruba a categoria inteira até o pacote-isca mais barato
+// (YouTube cairia -76%). Um outlier barato não pode ditar o preço de todos.
 //
-// Travas obrigatórias para não quebrar nada:
-//   - a correção só EMPURRA PRA BAIXO (nunca inventa aumento na cara do cliente);
-//   - nunca abaixo do preço justo (margem 4x líquida) nem do piso comercial;
-//   - queda máxima de 20% por ciclo — converge em poucos ciclos, sem choque;
+// REGRA ADOTADA: cada categoria tem um MÚLTIPLO DE VITRINE = mediana de
+// (preço atual ÷ preço justo). O preço justo já é uma curva suave (fórmula da
+// margem). Quem está muito acima da mediana da própria categoria é outlier e
+// desce até a curva; quem está dentro não é tocado.
+//
+// Travas para não quebrar nada:
+//   - só empurra PRA BAIXO (nunca inventa aumento na cara do cliente);
+//   - nunca abaixo do preço justo (margem 4x líquida) / piso comercial;
+//   - só age acima de 15% de desvio da mediana (filtro de ruído);
+//   - queda máxima de 20% por ciclo — converge suave, sem choque na vitrine;
 //   - a escada de total (v292) continua sendo a última palavra depois disto.
 
-export type UnitRow = {
+export type CurveRow = {
   pacote: string;
   category: string;
   quantidade: number;
   price_brl: number;
 };
 
-export type UnitFix = {
+export type CurveFix = {
   pacote: string;
   category: string;
   quantidade: number;
@@ -34,55 +40,59 @@ export type UnitFix = {
 };
 
 /** Queda máxima por ciclo (0.8 = -20%). */
-export const UNIT_MAX_DOWN = 0.8;
+export const CURVE_MAX_DOWN = 0.8;
 
-/** Filtro de ruído: só corrige quando a incoerência passa de 5% (v311). */
-export const UNIT_TOLERANCE = 1.05;
+/** Só corrige quem está mais de 15% acima da curva da categoria. */
+export const CURVE_TOLERANCE = 1.15;
 
 const r2 = (v: number) => Number(v.toFixed(2));
 
+function median(values: number[]): number {
+  if (values.length === 0) return 0;
+  const s = [...values].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
 /**
- * @param floorFor piso absoluto do pacote (preço justo / piso comercial).
- *                 Se devolver 0, o pacote não é corrigido (custo desconhecido).
+ * @param fairFor preço justo do pacote (margem 4x + piso comercial).
+ *                Devolver 0 quando o custo é desconhecido — o pacote é ignorado.
  */
-export function enforceUnitCoherence<T extends UnitRow>(
+export function enforceCategoryCurve<T extends CurveRow>(
   rows: T[],
-  floorFor: (row: T) => number,
-): { rows: T[]; fixes: UnitFix[] } {
-  const fixes: UnitFix[] = [];
+  fairFor: (row: T) => number,
+): { rows: T[]; fixes: CurveFix[] } {
+  const fixes: CurveFix[] = [];
   const out = rows.map((r) => ({ ...r }));
 
   const byCategory = new Map<string, T[]>();
   for (const r of out) {
-    const qty = Number(r.quantidade);
-    if (!r.category || !Number.isFinite(qty) || qty <= 0) continue;
-    if (!(Number(r.price_brl) > 0)) continue;
+    if (!r.category) continue;
+    if (!(Number(r.quantidade) > 0) || !(Number(r.price_brl) > 0)) continue;
+    if (!(Number(fairFor(r)) > 0)) continue;
     const list = byCategory.get(r.category) ?? [];
     list.push(r);
     byCategory.set(r.category, list);
   }
 
   for (const [category, list] of byCategory) {
-    list.sort((a, b) => Number(a.quantidade) - Number(b.quantidade));
-    let cap = Number.POSITIVE_INFINITY; // maior R$/unidade permitido daqui pra frente
+    // Categoria pequena não tem mediana confiável: não mexe.
+    if (list.length < 4) continue;
+
+    const mult = median(list.map((r) => Number(r.price_brl) / Number(fairFor(r))));
+    if (!(mult > 0)) continue;
 
     for (const r of list) {
-      const qty = Number(r.quantidade);
+      const justo = Number(fairFor(r));
       const price = Number(r.price_brl);
-      const unit = price / qty;
+      const naCurva = justo * mult;
+      if (price <= naCurva * CURVE_TOLERANCE + 0.009) continue;
 
-      if (unit > cap * UNIT_TOLERANCE + 1e-9) {
-        const piso = Number(floorFor(r)) || 0;
-        if (piso > 0) {
-          const alvo = r2(Math.max(cap * qty, piso, price * UNIT_MAX_DOWN));
-          if (alvo < price - 0.009) {
-            fixes.push({ pacote: r.pacote, category, quantidade: qty, de: r2(price), para: alvo });
-            r.price_brl = alvo;
-          }
-        }
+      const alvo = r2(Math.max(naCurva, justo, price * CURVE_MAX_DOWN));
+      if (alvo < price - 0.009) {
+        fixes.push({ pacote: r.pacote, category, quantidade: Number(r.quantidade), de: r2(price), para: alvo });
+        r.price_brl = alvo;
       }
-
-      cap = Math.min(cap, Number(r.price_brl) / qty);
     }
   }
 
