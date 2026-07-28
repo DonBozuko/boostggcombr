@@ -612,7 +612,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const msg = emQuarentena
         ? `⚠️ MUDANÇA DE PREÇO EM MASSA BLOQUEADA\n\nPROBLEMA: ${movers.length} de ${scannedTotal} pacotes mudariam de preço no mesmo ciclo. Isso quase sempre é leitura errada do fornecedor. NENHUM preço do site foi alterado e nada saiu da vitrine.\n\n${amostraQ}\n\nO QUE FAZER: nada urgente. Se a próxima leitura vier igual, o sistema aplica sozinho. Se quiser aplicar agora, aprovar no admin.`
         : `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`;
-      await dispatchWhatsappAlert(msg).catch(() => {});
+      // v311 — quarentena é PROTEÇÃO que funcionou: nada mudou de preço, nada
+      // saiu da vitrine, cliente não corre risco. Vira aviso, não vermelho.
+      await dispatchWhatsappAlert(msg, emQuarentena ? { severity: "warning" } : {}).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
         action: emQuarentena ? "preco_massa_bloqueado_v275" : "reprecificacao_forte_v266",
