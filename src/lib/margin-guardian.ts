@@ -114,7 +114,7 @@ export function computeGuardedPrice(costBrl: number, qty = 0): number {
   // ficava fora, e o preço resultante ficava ~0,6% abaixo do necessário para o
   // lucro líquido de 4x — o que fazia a própria validação de margem reprovar o
   // preço que este motor tinha acabado de calcular (pacote pausado eternamente).
-  const raw = ((c * effectiveProfitMult(qty) + PIX_FIXED) * COUPON_BUFFER) / PIX_NET;
+  const raw = ((c * effectiveProfitMult(qty, c) + PIX_FIXED) * COUPON_BUFFER) / PIX_NET;
   const guarded = Math.max(scaledFloor(qty), raw);
   return Number((Math.ceil(guarded * 100) / 100).toFixed(2));
 }
@@ -127,8 +127,22 @@ export function estimateNetProfit(priceBrl: number, costBrl: number): number {
   return Number((afterPix - costBrl).toFixed(4));
 }
 
+/**
+ * v328 — lucro líquido mínimo exigido, em múltiplos do custo.
+ * Acompanha o markup por faixa de custo: exigir 4x líquido num pacote de custo
+ * R$ 4.196 é o que mantinha o preço em R$ 24 mil e o pacote invendável.
+ * O preço guardado entrega exatamente (mult − 1) de lucro; 2% de folga cobre
+ * arredondamento de centavos.
+ */
+export function minNetRatio(costBrl: number): number {
+  const c = Number(costBrl);
+  if (!Number.isFinite(c) || c <= 5) return MIN_NET_PROFIT_RATIO;
+  return (costTierMult(c) - 1) * 0.98;
+}
+
 export function respectsMinMargin(priceBrl: number, costBrl: number): boolean {
   if (!(costBrl > 0)) return false;
   const net = estimateNetProfit(priceBrl, costBrl);
-  return net / costBrl >= MIN_NET_PROFIT_RATIO;
+  return net / costBrl >= minNetRatio(costBrl);
 }
+
