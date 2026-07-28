@@ -33,6 +33,10 @@ export type CoherenceIssue = {
   pacote: string;
   category: string;
   detalhe: string;
+  // v310 — qual vínculo exatamente está errado. Sem isso a remediação só sabia
+  // "esse pacote tem algo errado" e tirava o pacote inteiro da vitrine, mesmo
+  // quando as outras rotas do mesmo pacote estavam corretas.
+  service?: ServiceRef;
 };
 
 // Nome do serviço do fornecedor → precisa bater com a intenção da categoria.
@@ -177,6 +181,7 @@ export function analyzeCatalogCoherence(
           pacote: r.pacote,
           category: cat,
           detalhe: `vinculado ao serviço "${name}" (${ref.provider} id ${ref.id}), incompatível com ${intent.label}`,
+          service: ref,
         });
       }
     }

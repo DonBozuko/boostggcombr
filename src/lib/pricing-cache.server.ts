@@ -148,6 +148,9 @@ const GHOST_ALERT_STREAK = 3;
 // quando a leitura idêntica se repetir (2ª confirmação) ou o dono aprovar.
 // ============================================================
 const MASS_CHANGE_RATIO = 0.3;
+// v311 — variação de custo abaixo de 5% é ruído de câmbio/arredondamento do
+// fornecedor. Não conta como "pacote mudou de preço" para o freio de massa.
+const MOVE_THRESHOLD = 0.05;
 // v282 — Faixas de reajuste de custo do fornecedor.
 const AUTO_UP_MAX = 1.40;   // até +40%: aplica sozinho
 const RETIRE_ABOVE = 1.80;  // acima de +80%: aposenta o pacote
@@ -448,11 +451,19 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
 
     if (Object.keys(patch).length === 0) continue;
     const priceKeys = Object.keys(patch).filter((k) => PRICE_KEYS.has(k));
+    // v311 — "mudou de verdade" ≠ "mexeu 1 centavo".
+    // Bug real: qualquer oscilação de custo (até 0,0001) contava como mudança,
+    // então 245 de 281 pacotes entravam na conta toda hora, o freio de massa
+    // disparava para sempre, o custo novo nunca era gravado e o painel ficava
+    // vermelho de hora em hora sem nenhum risco real ao cliente.
+    const custoAntigo = Number(r.cost_brl ?? 0);
+    const custoNovo = patch.cost_brl !== undefined ? Number(patch.cost_brl) : custoAntigo;
+    const variacao = custoAntigo > 0 ? Math.abs(custoNovo / custoAntigo - 1) : (custoNovo > 0 ? 1 : 0);
     plans.push({
       pacote: r.pacote,
       patch,
       priceKeys,
-      movesPrice: patch.cost_brl !== undefined || patch.is_sellable !== undefined,
+      movesPrice: variacao > MOVE_THRESHOLD || patch.is_sellable !== undefined,
       restoredPacote,
     });
   }
@@ -475,7 +486,11 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
 
   const assinatura = await hashSignature(
     movers
-      .map((p) => `${p.pacote}:${Number(p.patch.price_brl ?? -1).toFixed(2)}:${p.patch.is_sellable === false ? "off" : "on"}`)
+      // v311 — a assinatura precisa refletir o que ESTE motor grava: custo.
+      // Antes usava price_brl, que a v305 parou de gravar aqui: toda leitura
+      // virava "-1.00", a confirmação por segunda leitura nunca fechava e a
+      // quarentena nunca liberava. Custo arredondado em centavo estabiliza.
+      .map((p) => `${p.pacote}:${Number(p.patch.cost_brl ?? -1).toFixed(2)}:${p.patch.is_sellable === false ? "off" : "on"}`)
       .sort()
       .join("|"),
   );
@@ -493,7 +508,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       approved: aprovadaManual ? false : (q?.signature === assinatura ? q?.approved === true : false),
       last_alert_at: q?.signature === assinatura ? (q?.last_alert_at ?? null) : null,
       updated_at: new Date().toISOString(),
-      amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+      amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.cost_brl ?? 0) })),
     });
   } else if (q) {
     await clearQuarantine(supabaseAdmin);
@@ -588,7 +603,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const base = emQuarentena ? movers : plans.filter((p) => p.movesPrice);
       const amostraQ = base
         .slice(0, 8)
-        .map((p) => `• ${p.pacote} → R$ ${Number(p.patch.price_brl ?? 0).toFixed(2)}`)
+        .map((p) => `• ${p.pacote} → custo R$ ${Number(p.patch.cost_brl ?? 0).toFixed(2)}`)
         .join("\n");
       const amostra = repriced
         .slice(0, 8)
@@ -597,7 +612,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const msg = emQuarentena
         ? `⚠️ MUDANÇA DE PREÇO EM MASSA BLOQUEADA\n\nPROBLEMA: ${movers.length} de ${scannedTotal} pacotes mudariam de preço no mesmo ciclo. Isso quase sempre é leitura errada do fornecedor. NENHUM preço do site foi alterado e nada saiu da vitrine.\n\n${amostraQ}\n\nO QUE FAZER: nada urgente. Se a próxima leitura vier igual, o sistema aplica sozinho. Se quiser aplicar agora, aprovar no admin.`
         : `💰 PREÇOS DO SITE MUDARAM SOZINHOS\n\nPROBLEMA: o fornecedor mexeu forte no custo de ${repriced.length} pacote(s). Reajuste pequeno já entrou sozinho; pacote que ficaria caro demais foi TIRADO DA VITRINE em vez de mudar o preço na cara do cliente.\n\n${amostra}\n\nO QUE FAZER: no admin, trocar o fornecedor desse pacote, aceitar o preço novo ou aposentar o pacote.`;
-      await dispatchWhatsappAlert(msg).catch(() => {});
+      // v311 — quarentena é PROTEÇÃO que funcionou: nada mudou de preço, nada
+      // saiu da vitrine, cliente não corre risco. Vira aviso, não vermelho.
+      await dispatchWhatsappAlert(msg, emQuarentena ? { severity: "warning" } : {}).catch(() => {});
       await supabaseAdmin.from("admin_audit_logs" as any).insert({
         admin_email: "system@sync",
         action: emQuarentena ? "preco_massa_bloqueado_v275" : "reprecificacao_forte_v266",
@@ -617,7 +634,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
           approved: false,
           last_alert_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.price_brl ?? 0) })),
+          amostra: movers.slice(0, 20).map((p) => ({ pacote: p.pacote, para: Number(p.patch.cost_brl ?? 0) })),
         });
       }
     } catch { /* noop */ }

@@ -99,21 +99,62 @@ const PAUSE_PREFIX = "auditoria de coerência";
 
 export async function remediateCoherence(
   issues: CoherenceIssue[],
-): Promise<{ paused: string[]; restored: string[]; errors: number }> {
+): Promise<{ paused: string[]; restored: string[]; unlinked: string[]; errors: number }> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const paused: string[] = [];
+  const unlinked: string[] = [];
+  let errors = 0;
+
+  // v310 — DESVINCULAR ANTES DE PAUSAR.
+  // Antes: um único ID sujo (ex.: verified 396 "Seguidores + Curtidas") tirava o
+  // pacote inteiro da vitrine mesmo com 2 rotas boas. Resultado: vitrine vazia e
+  // painel vermelho por defeito de vínculo, não por risco ao cliente.
+  // Agora: apaga só o ID errado; o pacote só sai da vitrine se ficar sem rota.
+  const porPacote = new Map<string, { provider: string; id: string }[]>();
+  for (const i of issues) {
+    if (i.code !== "SERVICO_INCOERENTE" || i.severity !== "critical" || !i.service) continue;
+    const lista = porPacote.get(i.pacote) ?? [];
+    lista.push(i.service);
+    porPacote.set(i.pacote, lista);
+  }
+
+  const semRota = new Set<string>();
+  for (const [pacote, refs] of porPacote) {
+    const cols = ID_COLUMNS.filter((c) => refs.some((r) => r.provider === c.provider));
+    const { data: atual } = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select(ID_COLUMNS.map((c) => c.col).join(", "))
+      .eq("pacote", pacote)
+      .maybeSingle();
+    if (!atual) continue;
+
+    const patch: Record<string, null> = {};
+    for (const c of cols) {
+      const v = (atual as any)[c.col];
+      if (v !== null && v !== undefined && refs.some((r) => String(v).trim() === r.id)) patch[c.col] = null;
+    }
+    if (Object.keys(patch).length === 0) continue;
+
+    const sobra = ID_COLUMNS.some(
+      (c) => !(c.col in patch) && (atual as any)[c.col] !== null && String((atual as any)[c.col] ?? "").trim() !== "",
+    );
+    if (!sobra) { semRota.add(pacote); continue; }
+
+    const { error } = await supabaseAdmin.from("pricing_items" as any).update(patch).eq("pacote", pacote);
+    if (error) { errors += 1; continue; }
+    unlinked.push(pacote);
+  }
+
   const alvos = new Map<string, string>();
   for (const i of issues) {
     if (!AUTO_PAUSE_CODES.has(i.code)) continue;
     // v308 — só tira da vitrine achado crítico. Custo alto com serviço correto
     // vira aviso, não pausa: tier premium é produto, não defeito.
     if (i.severity !== "critical") continue;
-
+    // v310 — vínculo sujo que já foi limpo e ainda tem rota boa não pausa nada.
+    if (i.code === "SERVICO_INCOERENTE" && i.service && !semRota.has(i.pacote)) continue;
     if (!alvos.has(i.pacote)) alvos.set(i.pacote, `${PAUSE_PREFIX}: ${i.detalhe}`);
   }
-
-
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const paused: string[] = [];
-  let errors = 0;
 
   for (const [pacote, motivo] of alvos) {
     const { error, data } = await supabaseAdmin
@@ -160,7 +201,10 @@ export async function remediateCoherence(
   if (restored.length > 0) {
     console.info(`[coerencia] v308 religou ${restored.length} pacote(s):`, restored.join(", "));
   }
-  return { paused, restored, errors };
+  if (unlinked.length > 0) {
+    console.info(`[coerencia] v310 desvinculou ID sujo de ${unlinked.length} pacote(s):`, unlinked.join(", "));
+  }
+  return { paused, restored, unlinked, errors };
 }
 
 
