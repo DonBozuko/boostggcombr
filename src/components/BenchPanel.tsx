@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { benchBatch, benchCount } from "@/lib/bench.functions";
+import { getLastBenchRun } from "@/lib/bench-autonomo.functions";
 import { summarizeBench, type BenchRow } from "@/lib/bench-sweep";
-import { Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Loader2, ShieldCheck, AlertTriangle, Bot } from "lucide-react";
 import { toast } from "sonner";
+
 
 const LABEL: Record<string, string> = {
   entregavel: "Entrega garantida",
@@ -19,10 +21,22 @@ const brl = (v: number) => `R$ ${v.toFixed(2).replace(".", ",")}`;
 export function BenchPanel({ token }: { token: string }) {
   const count = useServerFn(benchCount);
   const batch = useServerFn(benchBatch);
+  const lastRun = useServerFn(getLastBenchRun);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(0);
   const [total, setTotal] = useState(0);
   const [rows, setRows] = useState<BenchRow[]>([]);
+  const [auto, setAuto] = useState<any | null>(null);
+
+  const loadAuto = useCallback(async () => {
+    try {
+      const r = await lastRun({ data: { token } });
+      if (r.ok) setAuto(r.run ?? null);
+    } catch { /* silencioso: painel não pode quebrar por leitura */ }
+  }, [lastRun, token]);
+
+  useEffect(() => { void loadAuto(); }, [loadAuto]);
+
 
   const run = async () => {
     setRunning(true);
@@ -71,6 +85,41 @@ export function BenchPanel({ token }: { token: string }) {
         Pergunta a cada pacote, em todos os fornecedores: “se um cliente pagasse este agora, sairia?”.
         Usa a mesma decisão do checkout, com catálogo e saldo ao vivo. Não cobra ninguém e não despacha nada.
       </p>
+
+      {auto && (
+        <div
+          className={`mb-3 rounded-lg border p-3 text-xs ${
+            auto.total > 0 && auto.entregavel === auto.total
+              ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-300"
+              : "border-amber-500/40 bg-amber-500/5 text-amber-200"
+          }`}
+        >
+          <div className="mb-1 flex items-center gap-2 font-bold">
+            <Bot className="h-3.5 w-3.5" /> O sistema testou sozinho
+          </div>
+          <div className="text-muted-foreground">
+            Última varredura automática:{" "}
+            {auto.finished_at ? new Date(auto.finished_at).toLocaleString("pt-BR") : "—"} ·{" "}
+            <b>{auto.entregavel}</b> de <b>{auto.total}</b> pacotes com entrega garantida.
+          </div>
+          {Object.keys(auto.recarga_por_fornecedor ?? {}).length > 0 && (
+            <ul className="mt-1 text-muted-foreground">
+              {Object.entries(auto.recarga_por_fornecedor as Record<string, number>).map(([slug, falta]) => (
+                <li key={slug}>
+                  Recarregar <b>{brl(Number(falta))}</b> em <b>{slug}</b>.
+                </li>
+              ))}
+            </ul>
+          )}
+          {(auto.pausados?.length > 0 || auto.religados?.length > 0) && (
+            <div className="mt-1 text-muted-foreground">
+              Corrigido sozinho: {auto.pausados?.length ?? 0} tirado(s) da vitrine,{" "}
+              {auto.religados?.length ?? 0} religado(s).
+            </div>
+          )}
+        </div>
+      )}
+
 
       <Button onClick={run} disabled={running} className="mb-3">
         {running ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
