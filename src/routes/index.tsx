@@ -1,4 +1,5 @@
 import ogInstagram from "@/assets/og-instagram.jpg";
+import { getAdminToken } from "@/lib/admin-token-store";
 import { CHECKOUT_SUCCESS_TITLE, checkoutErrorMessage, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { JarvisBadge } from "@/components/JarvisBadge";
@@ -686,11 +687,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     const shadow =
       typeof window !== "undefined" &&
       window.localStorage.getItem("ADMIN_SHADOW") === "1" &&
-      !!window.localStorage.getItem("eliteboost_prime_admin_token");
+      !!getAdminToken();
     if (shadow) {
       setLoading(true);
       try {
-        const token = window.localStorage.getItem("eliteboost_prime_admin_token")!;
+        const token = getAdminToken();
         const simRes = await simulatePurchaseFn({
           data: { token, pacote: selected.id, quantidade: selected.quantidade, handle: result.data.profile },
         });
