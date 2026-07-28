@@ -184,10 +184,13 @@ export async function runBenchAutonomo(
 
 
     // ---- Correção automática -------------------------------------------
-    // Estrutural sai na hora (v297). Saldo/margem é transitório e NÃO derruba
-    // no primeiro ciclo — mas v335: se travou em 3 varreduras seguidas (6h),
-    // não é transitório, é prateleira mentindo. Sai da vitrine com motivo em
-    // português e volta sozinho quando a rota é provada de novo.
+    // Estrutural sai na hora (v297).
+    // v345 — SALDO NÃO É FALHA DE ENTREGA. O cliente tem prazo de entrega
+    // (24h); saldo o dono repõe a qualquer hora. Tirar da vitrine por saldo
+    // é perder venda por um problema que se resolve com um Pix. Então:
+    //   - margem persistente (3 ciclos / 6h) → pausa (vende no prejuízo);
+    //   - saldo → NÃO pausa; só pausa se passar de 24h sem recarga (falha
+    //     humana declarada, aí sim viraria entrega furada).
     const estruturais = new Map<string, string>();
     for (const r of avaliados) {
       if (r.verdict === "catalogo" || r.verdict === "sem_fornecedor") {
@@ -196,30 +199,60 @@ export async function runBenchAutonomo(
     }
 
     const persistentes = new Map<string, string>();
+    /** Pacotes com saldo faltando há mais de 24h (prazo estourado). */
+    const saldoVencido = new Set<string>();
     try {
       const { data: runsAnteriores } = await (supabaseAdmin as any)
         .from("bench_runs")
-        .select("id")
+        .select("id, started_at")
         .not("finished_at", "is", null)
         .order("started_at", { ascending: false })
-        .limit(CICLOS_PARA_PAUSAR - 1);
-      const idsAnteriores: string[] = (runsAnteriores ?? []).map((r: any) => r.id);
-      if (idsAnteriores.length === CICLOS_PARA_PAUSAR - 1) {
-        const { data: antes } = await (supabaseAdmin as any)
-          .from("bench_findings")
-          .select("run_id, pacote")
-          .in("run_id", idsAnteriores);
-        const contagem = new Map<string, Set<string>>();
-        for (const a of (antes as any[]) ?? []) {
-          const set = contagem.get(String(a.pacote)) ?? new Set<string>();
-          set.add(String(a.run_id));
-          contagem.set(String(a.pacote), set);
-        }
-        for (const r of avaliados) {
-          if (r.verdict === "saldo" || r.verdict === "margem") {
-            if ((contagem.get(r.pacote)?.size ?? 0) >= CICLOS_PARA_PAUSAR - 1) {
-              persistentes.set(r.pacote, `${PAUSE_PREFIX}: ${r.motivo}`);
-            }
+        .limit(RUNS_JANELA_SALDO);
+      const runsPrev: { id: string; started_at: string }[] = (runsAnteriores ?? []).map((r: any) => ({
+        id: String(r.id),
+        started_at: String(r.started_at),
+      }));
+
+      const { data: antes } = runsPrev.length
+        ? await (supabaseAdmin as any)
+            .from("bench_findings")
+            .select("run_id, pacote, verdict")
+            .in(
+              "run_id",
+              runsPrev.map((r) => r.id),
+            )
+        : { data: [] };
+
+      // run_id -> pacotes travados nele (por veredito)
+      const porRun = new Map<string, Map<string, string>>();
+      for (const a of ((antes as any[]) ?? [])) {
+        const m = porRun.get(String(a.run_id)) ?? new Map<string, string>();
+        m.set(String(a.pacote), String(a.verdict));
+        porRun.set(String(a.run_id), m);
+      }
+
+      for (const r of avaliados) {
+        if (r.verdict === "margem") {
+          const ciclos = runsPrev
+            .slice(0, CICLOS_PARA_PAUSAR - 1)
+            .filter((run) => porRun.get(run.id)?.has(r.pacote)).length;
+          if (runsPrev.length >= CICLOS_PARA_PAUSAR - 1 && ciclos >= CICLOS_PARA_PAUSAR - 1) {
+            persistentes.set(r.pacote, `${PAUSE_PREFIX}: ${r.motivo}`);
+          }
+        } else if (r.verdict === "saldo") {
+          // Streak contínuo de saldo faltando, do mais recente para trás.
+          let desde = Date.now();
+          for (const run of runsPrev) {
+            if (porRun.get(run.id)?.get(r.pacote) !== "saldo") break;
+            const t = Date.parse(run.started_at);
+            if (Number.isFinite(t)) desde = t;
+          }
+          if (Date.now() - desde >= PRAZO_SALDO_MS) {
+            saldoVencido.add(r.pacote);
+            persistentes.set(
+              r.pacote,
+              `${PAUSE_PREFIX}: saldo pendente há mais de 24h — ${r.motivo}`,
+            );
           }
         }
       }
@@ -239,6 +272,7 @@ export async function runBenchAutonomo(
         .select("pacote");
       if ((data as any[])?.length) pausados.push(pacote);
     }
+
 
 
     // Religa SÓ o que esta trava pausou e que agora tem rota provada agora.
