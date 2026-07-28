@@ -78,11 +78,22 @@ export const Route = createFileRoute('/api/public/hooks/recovery-email')({
             continue
           }
 
+          // v315 — chave de reenvio por tentativa.
+          // Antes a chave era fixa por pedido. Quando a 1ª tentativa falhava,
+          // toda repetição voltava 409 "already failed, use a new idempotency key"
+          // e o e-mail morria pra sempre (visto em 5 falhas + 1 DLQ no log real).
+          const { count: tentativas } = await supabase
+            .from('email_send_log')
+            .select('id', { count: 'exact', head: true })
+            .like('message_id', `cart-recovery-${p.id}%`)
+          const attempt = (tentativas ?? 0) + 1
+
           const { enqueueTemplateEmail } = await import('@/lib/email-enqueue.server')
           const res = await enqueueTemplateEmail(supabase, {
             templateName: 'cart-recovery',
             recipientEmail: email,
-            idempotencyKey: `cart-recovery-${p.id}`,
+            idempotencyKey: `cart-recovery-${p.id}-t${attempt}`,
+
             templateData: {
               instagramUser:
                 p.instagram_user && p.instagram_user !== '[anonimizado-lgpd]'
