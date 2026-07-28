@@ -45,11 +45,13 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Em quanto tempo entrega 10.000 visitas?", a: "Direto: 24-48h. Orgânico: 5-10 dias. A distribuição é escalonada para não gerar picos suspeitos no seu servidor ou analytics." },
   ],
   kwai: [
-    { q: "Comprar seguidores no Kwai é seguro?", a: "Sim. Não pedimos senha e usamos apenas o @ ou link do perfil. Entregamos com perfis brasileiros reais para prova social sem risco de banimento." },
+    { q: "Comprar seguidores no Kwai é seguro?", a: "Sim. Não pedimos senha e usamos apenas o @ ou link do perfil. A entrega é gradual, dentro dos limites da plataforma, sem risco de banimento." },
     { q: "Em quanto tempo os seguidores caem no meu Kwai?", a: "A entrega inicia em 5-30 minutos após o Pix confirmado. Distribuímos gradualmente (300-1000/dia) pra parecer crescimento orgânico e evitar drop." },
+    { q: "Os seguidores de Kwai são brasileiros?", a: "Não. Hoje todos os pacotes de Kwai são 🌎 Global (alto volume), como mostra o selo em cada card. Linha 🇧🇷 Brasileiro Real só existe em Instagram e TikTok." },
     { q: "Views do Kwai contam pra Kwai Rewards / monetização?", a: "Contam pra contagem pública do vídeo. A monetização Kwai Rewards depende de tempo de retenção e origem — combine com conteúdo bom pra maximizar." },
     { q: "Consigo comprar curtidas pra um vídeo específico?", a: "Sim. No checkout, cole o link do vídeo Kwai (kwai.com/@user/vídeo). As curtidas caem só naquele post, sem espalhar." },
-    { q: "Seguidores caem depois?", a: "Nos pacotes com selo 🇧🇷 Brasileiro Real, reposição garantida por 30 dias em queda acima de 5%. Nos pacotes Global, pedimos reposição ao fornecedor automaticamente; sem garantia disponível, avaliamos reenvio ou estorno. Abra chamado no WhatsApp com o link do perfil." },
+    { q: "Seguidores caem depois?", a: "Nos pacotes Global do Kwai não há reposição garantida: pedimos reposição ao fornecedor automaticamente e, se o serviço não tiver garantia, avaliamos reenvio ou estorno. Abra chamado no WhatsApp com o link do perfil." },
+
   ],
 };
 
