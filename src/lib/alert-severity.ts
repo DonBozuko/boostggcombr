@@ -44,6 +44,11 @@ const WARNING_MARKERS = [
   "ignorado",
   "tirado da vitrine",
   "instáv", // "webhook instável" com recuperação bem-sucedida
+  // v345 — saldo NÃO é falha de entrega: existe prazo de 24h e o dono repõe a
+  // qualquer hora. Só vira vermelho quando o prazo estoura (marcador abaixo).
+  "sem saldo",
+  "saldo baixo",
+  "recarregar",
 ];
 
 /** Crítico: dinheiro ou cliente em risco AGORA. Só isso pode acordar o dono. */
@@ -57,14 +62,14 @@ const CRITICAL_MARKERS = [
   "falhou",
   "estorno",
   "reembolso",
-  "sem saldo",
-  "saldo baixo",
-  "recarregar",
+  "saldo pendente há mais de 24h",
+  "saldo pendente ha mais de 24h",
   "cobrança órfã",
   "cobranca orfa",
   "todos fornecedores",
   "dupla entrega",
 ];
+
 
 function norm(s: string): string {
   return String(s ?? "").toLowerCase();
