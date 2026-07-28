@@ -459,11 +459,20 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     const custoAntigo = Number(r.cost_brl ?? 0);
     const custoNovo = patch.cost_brl !== undefined ? Number(patch.cost_brl) : custoAntigo;
     const variacao = custoAntigo > 0 ? Math.abs(custoNovo / custoAntigo - 1) : (custoNovo > 0 ? 1 : 0);
+    // v316 — CAUSA RAIZ DO IMPASSE. Antes bastava `patch.is_sellable !== undefined`
+    // para o pacote contar como "mudou". Só que o motor reescreve is_sellable=false
+    // em TODO ciclo para pacote que já estava pausado — mesmo valor, zero mudança
+    // real. Resultado: 192 de 281 pacotes entravam na conta toda hora, o freio de
+    // massa (>30%) disparava para sempre, NADA era gravado, e os pacotes pausados
+    // ficavam pausados eternamente porque a correção nunca chegava a ser aplicada.
+    // Loop que se alimenta sozinho: 51 alertas críticos em 48h e prateleira travada.
+    // Agora só conta como mudança quando o valor novo é DIFERENTE do valor atual.
+    const mudouSellable = patch.is_sellable !== undefined && patch.is_sellable !== r.is_sellable;
     plans.push({
       pacote: r.pacote,
       patch,
       priceKeys,
-      movesPrice: variacao > MOVE_THRESHOLD || patch.is_sellable !== undefined,
+      movesPrice: variacao > MOVE_THRESHOLD || mudouSellable,
       restoredPacote,
     });
   }
