@@ -1416,6 +1416,48 @@ export type Database = {
         }
         Relationships: []
       }
+      service_fingerprints: {
+        Row: {
+          bound_at: string
+          checked_at: string
+          col: string
+          drift_count: number
+          last_drift_at: string | null
+          last_drift_name: string | null
+          name_sig: string
+          pacote: string
+          provider: string
+          service_id: string
+          service_name: string
+        }
+        Insert: {
+          bound_at?: string
+          checked_at?: string
+          col: string
+          drift_count?: number
+          last_drift_at?: string | null
+          last_drift_name?: string | null
+          name_sig: string
+          pacote: string
+          provider: string
+          service_id: string
+          service_name: string
+        }
+        Update: {
+          bound_at?: string
+          checked_at?: string
+          col?: string
+          drift_count?: number
+          last_drift_at?: string | null
+          last_drift_name?: string | null
+          name_sig?: string
+          pacote?: string
+          provider?: string
+          service_id?: string
+          service_name?: string
+        }
+        Relationships: []
+      }
       service_id_matrix: {
         Row: {
           created_at: string
