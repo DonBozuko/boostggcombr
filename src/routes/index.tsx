@@ -432,6 +432,9 @@ function Landing() {
   });
   const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>([]);
   const [soBr, setSoBr] = useState(false);
+  // v336 — o banco respondeu (mesmo que vazio)? Só depois disso é honesto
+  // esconder pacote; antes disso o estático evita vitrine em branco no SSR.
+  const [gridLoaded, setGridLoaded] = useState(false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   useEffect(() => {
     let cancelled = false;
