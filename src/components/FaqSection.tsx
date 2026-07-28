@@ -35,7 +35,8 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Membros comprados escrevem no grupo?", a: "Não. São membros silenciosos para prova social. Se você precisa de interação real, combine com um plano de mensagens." },
     { q: "Meu canal é privado, funciona?", a: "Sim, se você gerar um link de convite público (t.me/+xxx). Não conseguimos entrar em canais totalmente fechados sem convite." },
     { q: "Telegram bane canal por comprar membros?", a: "Não. O Telegram não tem política ativa contra crescimento pago como Instagram. É a rede mais permissiva do mercado." },
-    { q: "Consigo membros brasileiros especificamente?", a: "Sim, temos plano BR (mais caro, entrega mais lenta). Recomendado se seu canal for de nicho local (política, futebol, cripto BR)." },
+    { q: "Consigo membros brasileiros especificamente?", a: "Hoje não. Todos os pacotes de Telegram são 🌎 Global (alto volume), como mostra o selo em cada card. Linha 🇧🇷 Brasileiro Real só existe em Instagram e TikTok." },
+    { q: "Os membros caem depois?", a: "Pode haver queda natural nos pacotes Global — não há reposição garantida. Pedimos reposição ao fornecedor automaticamente e, quando não há garantia, resolvemos no WhatsApp: reenvio ou estorno." },
   ],
   trafego: [
     { q: "Isso é tráfego real ou só bots contando view?", a: "Trabalhamos com duas modalidades: tráfego direto (rápido, para pump de números) e tráfego orgânico via redes sociais e busca (mais lento, gera cliques com sessão real)." },
