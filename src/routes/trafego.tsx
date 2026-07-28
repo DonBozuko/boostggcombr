@@ -9,7 +9,6 @@ import { FabianoBadge } from "@/components/FabianoBadge";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
 import { MobileFrame } from "@/components/MobileFrame";
-import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { useDynamicPlans } from "@/hooks/useDynamicPlans";
 import { createFileRoute } from "@tanstack/react-router";
@@ -66,7 +65,6 @@ export const Route = createFileRoute("/trafego")({
 
 // v349 — Tráfego BR removido do ar: nenhum dos 4 fornecedores entrega visita
 // geo-segmentada do Brasil hoje. Categoria fantasma não fica na loja.
-type Categoria = "mundial";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
 // v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
@@ -85,7 +83,6 @@ const urlSchema = z.object({
 type PedidoInfo = { price: string; tier: string; profile: string; pixCode: string; qrCodeBase64: string; pedidoId: string | null; quantidade: number };
 
 function TrafegoLanding() {
-  const [categoria, setCategoria] = useState<Categoria>("mundial");
   const [planId, setPlanId] = useState("");
   const [profile, setProfile] = useState("");
   const [email, setEmail] = useState("");
@@ -146,9 +143,6 @@ function TrafegoLanding() {
     mundial: { category: "trafego:global", fallback: glPlans, unitLabel: "Visitas" },
   });
   // v335 — Prateleira honesta: aba só existe se houver pacote vendável nela.
-  const abas = [
-    dyn.mundial.length > 0 ? { key: "mundial", label: "Mundial", emoji: "🌎", badge: "Em Alta", badgeColor: "#fe0979" } : null,
-  ].filter((a): a is NonNullable<typeof a> => a !== null);
   const currentPlans = dyn.mundial;
   const dynAllPlans = [...dyn.mundial];
 
