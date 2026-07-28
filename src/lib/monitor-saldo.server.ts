@@ -105,7 +105,13 @@ export async function checkSmmhypeBalance() {
         const inlineKeyboard = buildTopupKeyboard([
           { nome: fornecedor.nome, slug: fornecedor.slug, api_url: fornecedor.api_url, saldoBrl },
         ]);
-        await dispatchWhatsappAlert(alertaCriado.mensagem, inlineKeyboard.length ? { inlineKeyboard } : {});
+        // v346 — saldo é amarelo (tem prazo de 24h), mas PRECISA chegar no
+        // celular na hora: force ignora o gate de severidade.
+        await dispatchWhatsappAlert(alertaCriado.mensagem, {
+          force: true,
+          origem: "monitor-saldo",
+          ...(inlineKeyboard.length ? { inlineKeyboard } : {}),
+        });
 
       }
     }
