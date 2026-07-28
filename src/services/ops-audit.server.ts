@@ -287,7 +287,8 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     if (scan.violacoes.length > 0) {
       findings.push({
         code: "TEXTO_DE_PAGINA_PROMETE_DEMAIS",
-        severity: "critical",
+        severity: "warning",
+
         titulo: "Texto de página promete o que o catálogo não entrega",
         problema: `${scan.violacoes.length} trecho(s) no corpo das páginas prometem algo que a rede não tem hoje (ex.: ${scan.violacoes
           .slice(0, 3)
