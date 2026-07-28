@@ -43,16 +43,17 @@ export const Route = createFileRoute("/comprar-seguidores-kwai")({
     <SeoLanding
       accent="#ff6600"
       h1="Comprar Seguidores no Kwai via Pix"
-      subtitle="Entrega automática · perfis brasileiros · reposição de 30 dias nos pacotes brasileiros"
+      subtitle="Entrega automática · gradual · sem senha"
       ctaHref="/kwai"
       ctaLabel="Ver planos e comprar agora"
-      intro="Quer crescer no Kwai sem ficar refém do algoritmo? Nossa entrega de seguidores brasileiros dá o empurrão inicial de prova social pra vídeos ganharem tração — em minutos, com Pix e sem pedir sua senha. Mais de 3 mil pedidos entregues no Instagram, TikTok e YouTube; agora também no Kwai."
+      intro="Quer crescer no Kwai sem ficar refém do algoritmo? A entrega de seguidores dá o empurrão inicial de prova social pra vídeos ganharem tração — em minutos, com Pix e sem pedir sua senha. Mais de 3 mil pedidos entregues no Instagram, TikTok e YouTube; agora também no Kwai."
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Início em 5-30 min após o Pix confirmado." },
         { icon: "shield", title: "Sem senha", text: "Só o @ ou link do perfil. 100% seguro." },
-        { icon: "check", title: "Reposição 30 dias", text: "Garantia nos pacotes brasileiros; nos Global pedimos ao fornecedor." },
-        { icon: "clock", title: "Perfis brasileiros", text: "Audiência BR pra Kwai Rewards contar." },
+        { icon: "check", title: "Suporte no WhatsApp", text: "Deu problema, a gente reenvia ou estorna." },
+        { icon: "clock", title: "Entrega gradual", text: "Distribuída pra parecer crescimento orgânico." },
       ]}
+
       pricingTitle="Preços (a partir de)"
       pricing={[
         { qty: "100 seguidores BR", price: "R$ 5,00", note: "Ideal pra testar" },
