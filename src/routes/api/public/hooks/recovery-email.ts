@@ -159,7 +159,7 @@ export const Route = createFileRoute('/api/public/hooks/recovery-email')({
           enqueued++
         }
 
-        return Response.json({ ok: true, scanned: pedidos?.length ?? 0, enqueued, skipped })
+        return Response.json({ ok: true, scanned: pedidos?.length ?? 0, enqueued, skipped, repescados })
       },
     },
   },
