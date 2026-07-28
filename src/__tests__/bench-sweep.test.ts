@@ -13,12 +13,12 @@ const p = (o: Partial<PreflightProvider>): PreflightProvider => ({
 
 describe("v322 bancada de provas", () => {
   it("pacote grande com saldo curto NÃO é entregável (causa do estorno)", () => {
-    const ranked = [p({ slug: "provider4", cost_brl: 70, saldo_atual: 16.53 })];
+    const ranked = [p({ slug: "provider4", cost_brl: 40, saldo_atual: 16.53 })];
     const res = evaluateRoute(ranked, 283.44);
     expect(res.ok).toBe(false);
     const c = classifyBench(ranked, res);
     expect(c.verdict).toBe("saldo");
-    expect(c.faltaRecarregar).toBeCloseTo(53.47, 2);
+    expect(c.faltaRecarregar).toBeCloseTo(23.47, 2);
     expect(c.faltaEm).toBe("provider4");
   });
 
@@ -52,11 +52,11 @@ describe("v322 bancada de provas", () => {
     };
     const s = summarizeBench([
       { ...base, verdict: "saldo", motivo: "", faltaRecarregar: 10, faltaEm: "provider4" },
-      { ...base, verdict: "saldo", motivo: "", faltaRecarregar: 53.47, faltaEm: "provider4" },
+      { ...base, verdict: "saldo", motivo: "", faltaRecarregar: 23.47, faltaEm: "provider4" },
       { ...base, verdict: "entregavel", motivo: "", faltaRecarregar: null, faltaEm: null },
     ]);
     expect(s.entregavel).toBe(1);
-    expect(s.recargaPorFornecedor.provider4).toBeCloseTo(53.47, 2);
+    expect(s.recargaPorFornecedor.provider4).toBeCloseTo(23.47, 2);
     expect(s.rotasComProblema).toEqual(["instagram:seguidores"]);
   });
 });
