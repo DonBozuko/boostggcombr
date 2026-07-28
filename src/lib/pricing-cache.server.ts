@@ -448,11 +448,19 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
 
     if (Object.keys(patch).length === 0) continue;
     const priceKeys = Object.keys(patch).filter((k) => PRICE_KEYS.has(k));
+    // v311 — "mudou de verdade" ≠ "mexeu 1 centavo".
+    // Bug real: qualquer oscilação de custo (até 0,0001) contava como mudança,
+    // então 245 de 281 pacotes entravam na conta toda hora, o freio de massa
+    // disparava para sempre, o custo novo nunca era gravado e o painel ficava
+    // vermelho de hora em hora sem nenhum risco real ao cliente.
+    const custoAntigo = Number(r.cost_brl ?? 0);
+    const custoNovo = patch.cost_brl !== undefined ? Number(patch.cost_brl) : custoAntigo;
+    const variacao = custoAntigo > 0 ? Math.abs(custoNovo / custoAntigo - 1) : (custoNovo > 0 ? 1 : 0);
     plans.push({
       pacote: r.pacote,
       patch,
       priceKeys,
-      movesPrice: patch.cost_brl !== undefined || patch.is_sellable !== undefined,
+      movesPrice: variacao > MOVE_THRESHOLD || patch.is_sellable !== undefined,
       restoredPacote,
     });
   }
