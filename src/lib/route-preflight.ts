@@ -82,8 +82,8 @@ export function evaluateRoute(ranked: PreflightProvider[], valorBrl: number): Pr
 
   // Instável é degradado, não eliminado: só descartamos se houver alternativa
   // estável. Caso contrário o failover em runtime ainda tenta.
-  const estaveis = comMargem.filter((p) => !p.unstable);
-  const viable = estaveis.length ? estaveis : comMargem;
+  const estaveis = comSaldo.filter((p) => !p.unstable);
+  const viable = estaveis.length ? estaveis : comSaldo;
 
   if (viable.length > 0) {
     return { ok: true, viable, reason: null, rejections, structural: false };
