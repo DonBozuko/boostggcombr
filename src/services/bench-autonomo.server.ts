@@ -202,8 +202,7 @@ export async function runBenchAutonomo(
     }
 
     const persistentes = new Map<string, string>();
-    /** v350 — mantido vazio de propósito: saldo não vence mais prazo. */
-    const saldoVencido = new Set<string>();
+
     try {
       const { data: runsAnteriores } = await (supabaseAdmin as any)
         .from("bench_runs")
