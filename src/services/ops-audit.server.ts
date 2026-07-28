@@ -402,8 +402,12 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     // virou um loop de notificação e alerta repetido deixa de ser lido. Agora a
     // mesma lista de problemas só volta a tocar a cada 12h, com contador de
     // insistência. Problema NOVO (assinatura diferente) toca na hora, sempre.
+    // v338 — `evidencia` nem sempre é lista (há findings que mandam objeto ou
+    // texto). Antes, um desses no lote CRÍTICO derrubava a auditoria inteira
+    // com "map is not a function" — ou seja, o alerta mais importante do dia
+    // morria calado. Agora a assinatura tolera qualquer formato.
     const assinatura = await hashAlerta(
-      critical.map((f) => `${f.code}|${(f.evidencia ?? []).map((e: any) => e.pacote).sort().join(",")}`).sort().join("||"),
+      critical.map((f) => `${f.code}|${assinaturaEvidencia(f.evidencia)}`).sort().join("||"),
     );
     const { pode, vez } = await podeAlertar(assinatura);
 
