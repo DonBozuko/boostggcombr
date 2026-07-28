@@ -201,7 +201,10 @@ export async function remediateCoherence(
   if (restored.length > 0) {
     console.info(`[coerencia] v308 religou ${restored.length} pacote(s):`, restored.join(", "));
   }
-  return { paused, restored, errors };
+  if (unlinked.length > 0) {
+    console.info(`[coerencia] v310 desvinculou ID sujo de ${unlinked.length} pacote(s):`, unlinked.join(", "));
+  }
+  return { paused, restored, unlinked, errors };
 }
 
 
