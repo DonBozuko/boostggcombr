@@ -325,9 +325,16 @@ async function checkProviderBalance(fornecedor: any, fxRate?: number): Promise<P
 }
 
 async function persistProviderBalance(fornecedor: any, balance: ProviderCheck) {
-  await supabaseAdmin.from("monitoramento_saldo").insert({
+  // v347 — FIM DA ARMADILHA DO DÓLAR.
+  // A coluna `saldo` sempre foi USD, enquanto TODO o resto do sistema é BRL.
+  // Quem lesse o histórico direto (humano ou agente) via "27,69" e achava que
+  // era R$ 27,69 quando o saldo real era R$ 140,99. Agora gravamos o valor em
+  // reais e a cotação usada; `saldo` fica só por compatibilidade histórica.
+  await (supabaseAdmin as any).from("monitoramento_saldo").insert({
     fornecedor_id: fornecedor.id,
     saldo: balance.saldoUsd,
+    saldo_brl: balance.saldoBrl,
+    cotacao_brl: balance.cotacao,
     status: balance.statusPersistido,
     tempo_resposta_ms: balance.elapsed,
     erro_retornado: balance.erro,
