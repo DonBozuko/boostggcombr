@@ -298,16 +298,17 @@ export async function runBenchAutonomo(
 
     // ---- Aviso humano (só quando precisa de mão/dinheiro) ----------------
     let alertou = false;
-    const precisaRecarga = Object.entries(s.recargaPorFornecedor);
-    const margem = avaliados.filter((r) => r.verdict === "margem").length;
+    const precisaRecarga = Object.entries(sVitrine.recargaPorFornecedor);
+    const margem = avaliadosVitrine.filter((r) => r.verdict === "margem").length;
     const naoAvaliados = rows.length - avaliados.length;
+    const travadosVitrine = avaliadosVitrine.length - sVitrine.entregavel;
 
-    if (options.notify !== false && (precisaRecarga.length > 0 || paraPausar.size > 0 || margem > 0)) {
+    if (options.notify !== false && (precisaRecarga.length > 0 || pausados.length > 0 || margem > 0)) {
       const linhas: string[] = [];
       linhas.push("🧪 VARREDURA AUTOMÁTICA DE ENTREGA");
       linhas.push("");
       linhas.push(
-        `PROBLEMA: ${rows.length - s.entregavel} de ${rows.length} pacotes não teriam entrega garantida agora.`,
+        `PROBLEMA: ${travadosVitrine} de ${avaliadosVitrine.length} pacotes da vitrine não teriam entrega garantida agora.`,
       );
       if (precisaRecarga.length > 0) {
         linhas.push("");
@@ -316,26 +317,27 @@ export async function runBenchAutonomo(
           linhas.push(`• ${forn}: recarregar ${brl(falta)}`);
         }
       }
-      const sobDemanda = Object.entries(s.recargaSobDemanda);
+      const sobDemanda = Object.entries(sVitrine.recargaSobDemanda);
       if (sobDemanda.length > 0) {
         linhas.push("");
-        linhas.push("Só sob encomenda (pacote gigante que ninguém comprou — não precisa recarregar agora):");
+        linhas.push("Só sob encomenda (pacote grande que ninguém comprou — não precisa recarregar agora):");
         for (const [forn, falta] of sobDemanda) {
           linhas.push(`• ${forn}: precisaria ${brl(falta)} se alguém comprar`);
         }
       }
-      if (paraPausar.size > 0) {
+      if (pausados.length > 0) {
         linhas.push("");
-        linhas.push(`Tirei da vitrine sozinho: ${paraPausar.size} pacote(s) que não entregariam agora.`);
+        linhas.push(`Tirei da vitrine sozinho agora: ${pausados.length} pacote(s) que não entregariam.`);
       }
       if (margem > 0) {
         linhas.push("");
-        linhas.push(`Custo alto demais: ${margem} pacote(s) venderiam no prejuízo.`);
+        linhas.push(`Custo alto demais: ${margem} pacote(s) da vitrine venderiam no prejuízo.`);
       }
       if (religados.length > 0) {
         linhas.push("");
         linhas.push(`Voltaram à vitrine sozinhos: ${religados.length} pacote(s).`);
       }
+
 
       if (naoAvaliados > 0) {
         linhas.push("");
