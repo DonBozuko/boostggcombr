@@ -100,8 +100,12 @@ export async function runPromiseCoherence(): Promise<PromiseViolation[]> {
     if (!rota) continue;
     const textos: Array<{ origem: string; texto: string }> = [];
     for (const item of FAQS[rede] ?? []) {
-      textos.push({ origem: `FAQ /${rede}`, texto: `${item.q} ${item.a}` });
+      // v338 — mede só a RESPOSTA. A pergunta ("Consigo membros brasileiros?")
+      // não é promessa: é justamente o que o cliente quer saber, e a resposta
+      // honesta é "não". Somar pergunta + resposta acusava o FAQ correto.
+      textos.push({ origem: `FAQ /${rede}`, texto: item.a });
     }
+
     for (const rev of REVIEWS_BY_ROUTE[rota] ?? []) {
       textos.push({ origem: `Depoimento ${rota} (${rev.n})`, texto: rev.t });
     }
