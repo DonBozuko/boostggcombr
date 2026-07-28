@@ -17,6 +17,7 @@ Documento nunca manda no código: `ARQUITETURA.md` e os arquivos em `.lovable/*.
 Toda tarefa começa com rótulo: RÁPIDO (executo direto) · MÉDIO (mostro mapa de impacto e executo) · PESADO (dinheiro/dispatch/auth/migração — aviso que preciso do turno inteiro pra analisar antes de codar). Ver [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho).
 Problema achado por acaso = falha de instrumentação. Todo bug vira invariante automatizada + teste + achado na auditoria forense. Ver [Bug vira invariante](mem://preferences/bug-vira-invariante).
 Regra 2x: se o mesmo TIPO de problema aparecer pela 2ª vez, patch é proibido. Mapear a rota inteira e matar a causa, com trava antes da cobrança. Ver [Regra 2x](mem://preferences/regra-2x-causa-raiz).
+Medidor antes do remédio: antes de caçar bug, checar se o instrumento não é o defeito. Alerta nunca herda "critical"; no-op não conta como mudança; escolha de fornecedor tem histerese de 5%; oscilação de catálogo se diagnostica em `catalog_changes`, não por achismo. Ver [Medidor antes do remédio](mem://preferences/medidor-antes-do-remedio).
 
 
 Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste barra qualquer segundo escritor. Ver [Preço dono único](mem://preferences/preco-dono-unico).
