@@ -250,6 +250,54 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     console.warn("[ops-audit] v331 promessa×catálogo falhou", e);
   }
 
+  // 6.7) v332 — Varredura de superfície + mapa de cobertura.
+  // Não olha só FAQ/depoimento: lê o texto visível de TODAS as rotas públicas
+  // e ainda acusa rota nova sem detector declarado (ponto cego).
+  try {
+    const { runSurfaceScan } = await import("@/services/surface-scan.server");
+    const { familiasSemDetector } = await import("@/lib/coverage-map");
+    const scan = await runSurfaceScan();
+
+    if (scan.violacoes.length > 0) {
+      findings.push({
+        code: "TEXTO_DE_PAGINA_PROMETE_DEMAIS",
+        severity: "critical",
+        titulo: "Texto de página promete o que o catálogo não entrega",
+        problema: `${scan.violacoes.length} trecho(s) no corpo das páginas prometem algo que a rede não tem hoje (ex.: ${scan.violacoes
+          .slice(0, 3)
+          .map((p) => `${p.origem}: "${p.trecho.slice(0, 90)}"`)
+          .join(" | ")}).`,
+        o_que_fazer:
+          "Me avise para corrigir o texto dessas páginas — ou para vincular um fornecedor que entregue o que está escrito.",
+        evidencia: scan.violacoes.slice(0, 20),
+      });
+    }
+
+    const semDetector = familiasSemDetector().map((f) => f.nome);
+    if (scan.rotasSemDeclaracao.length > 0 || semDetector.length > 0) {
+      findings.push({
+        code: "PONTO_CEGO_SEM_DETECTOR",
+        severity: "warning",
+        titulo: "Áreas do site sem verificação automática",
+        problema: [
+          scan.rotasSemDeclaracao.length > 0
+            ? `${scan.rotasSemDeclaracao.length} página(s) novas ainda não entraram no mapa de conferência: ${scan.rotasSemDeclaracao.slice(0, 8).join(", ")}.`
+            : "",
+          semDetector.length > 0 ? `Sem robô conferindo: ${semDetector.join(", ")}.` : "",
+        ]
+          .filter(Boolean)
+          .join(" "),
+        o_que_fazer:
+          "Me avise para criar a conferência automática dessas áreas. Enquanto não existir, elas não podem receber sinal verde.",
+        evidencia: { rotasVarridas: scan.rotasVarridas, rotasSemDeclaracao: scan.rotasSemDeclaracao, semDetector },
+      });
+    }
+  } catch (e) {
+    console.warn("[ops-audit] v332 varredura de superfície falhou", e);
+  }
+
+
+
 
 
   // 7) v291 — Coerência do catálogo (serviço errado, escada invertida, custo fora
