@@ -128,6 +128,8 @@ export async function rankProvidersByCost(opts: {
   const providerIdMap: Record<string, string | null> = {};
   // v294 — precisamos saber se o ID veio curado (manual) ou auto-resolvido.
   const providerIdIsAuto: Record<string, boolean> = {};
+  // v313 — de qual coluna veio o ID (chave da impressão digital do serviço).
+  const providerIdCol: Record<string, string> = {};
   for (const slug of slugs) {
     const prefix = slugToColumn[slug] ?? slug;
     const manualCol = `${prefix}_service_id`;
@@ -137,7 +139,9 @@ export async function rankProvidersByCost(opts: {
     const fallbackId = slug === "smmhype" && serviceId != null ? String(serviceId) : null;
     providerIdMap[slug] = manualId ?? autoId ?? fallbackId;
     providerIdIsAuto[slug] = manualId == null && autoId != null;
+    providerIdCol[slug] = manualId != null ? manualCol : autoId != null ? autoCol : `${prefix}_service_id`;
   }
+
 
   // v241/v242/v245 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
   const refillMap: Record<string, boolean> = {};
@@ -157,11 +161,22 @@ export async function rankProvidersByCost(opts: {
       verified: "verified_services_cache",
       provider4: "provider4_services_cache",
     };
+    // v313 — impressão digital + intenção conferidas AO VIVO (não só na auditoria).
+    const { serviceMatchesIntent } = await import("./catalog-coherence");
+    const { productChanged, fingerprintKey } = await import("./service-fingerprint");
+    const { data: fpRows } = await supabaseAdmin
+      .from("service_fingerprints" as any)
+      .select("pacote, col, provider, service_id, name_sig")
+      .eq("pacote", opts.pacote);
+    const fpMap = new Map<string, any>();
+    for (const r of ((fpRows as any[]) ?? [])) fpMap.set(fingerprintKey(String(r.pacote), String(r.col)), r);
+
     for (const slug of Object.keys(providerIdMap)) {
       const pid = providerIdMap[slug];
       if (!pid) continue;
       const table = cacheTable[slug];
       if (!table) continue;
+
       const { data: svcRow } = await supabaseAdmin
         .from(table as any)
         .select("name, category, refill, min, max")
@@ -202,11 +217,28 @@ export async function rankProvidersByCost(opts: {
         }
         continue;
       }
+      // v313 — PRODUTO ERRADO NUNCA É COBRADO NEM DESPACHADO.
+      // (a) nome atual contradiz o que o pacote vende (ex.: pacote de
+      //     visualizações apontando para "Likes");
+      // (b) o fornecedor trocou o produto por trás do mesmo ID desde o vínculo.
+      const nomeAtual = String((svcRow as any).name ?? "");
+      const prevFp = fpMap.get(fingerprintKey(opts.pacote, providerIdCol[slug] ?? ""));
+      const trocou = productChanged(nomeAtual, prevFp, { provider: slug === "smmpainel" ? "smmpanel" : slug, service_id: String(pid) });
+      const intencaoOk = serviceMatchesIntent((catRow as any)?.category, nomeAtual);
+      if (!intencaoOk || trocou) {
+        providerIdMap[slug] = null;
+        console.error(
+          `[v313] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} "${nomeAtual}" ` +
+            (intencaoOk ? "mudou de produto desde o vínculo" : "não entrega o produto deste pacote"),
+        );
+        continue;
+      }
       if (!providerCanServe({ brPackage, svc: svcRow as any, requireRefill: brPackage })) {
         providerIdMap[slug] = null;
         const reason = brPackage && (svcRow as any).refill !== true ? "sem refill garantido" : "não é BR válido";
         console.warn(`[v245] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} ${reason}`);
       }
+
 
     }
     if (brPackage && Object.values(providerIdMap).every((v) => !v)) {

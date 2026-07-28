@@ -61,6 +61,17 @@ export function serviceKey(ref: ServiceRef): string {
   return `${ref.provider}:${ref.id}`;
 }
 
+// v313 — mesma invariante da auditoria, aplicada AO VIVO no momento da venda.
+// A auditoria roda de hora em hora; o cliente compra no minuto seguinte à troca
+// do fornecedor. Sem esta checagem no roteamento, o pedido errado já foi cobrado
+// e despachado antes de qualquer alerta. true = pode usar este serviço.
+export function serviceMatchesIntent(category: string | null | undefined, name: string | null | undefined): boolean {
+  const intent = intentOf(String(category ?? ""));
+  if (!intent || !name) return true;
+  return !intent.proibe?.test(String(name));
+}
+
+
 
 function median(nums: number[]): number {
   if (nums.length === 0) return 0;
