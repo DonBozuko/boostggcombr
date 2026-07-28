@@ -42,7 +42,7 @@ export const Route = createFileRoute("/trafego")({
   head: () => {
     const title = "Tráfego Web Real BR e Global — Segmentado — Elite Boost Prime | BoostGG";
     const description =
-      "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega imediata, segmentado, seguro e com reposição nos pacotes brasileiros.";
+      "Contrate tráfego web real, do Brasil ou global, via Pix. Entrega automática, geo-segmentada e distribuição gradual.";
     const url = "https://boostgg.com.br/trafego";
     const ogImage = `https://boostgg.com.br${ogTrafego}?v=48`;
     return {
@@ -231,9 +231,9 @@ function TrafegoLanding() {
         items={[
           { key: "brasil",  label: "Brasil",   emoji: "🇧🇷", badge: "🔥 Mais Popular", badgeColor: "#39ff14" },
           { key: "mundial", label: "Mundial",  emoji: "🌎", badge: "Em Alta",         badgeColor: "#fe0979" },
-          { key: "_geo",    label: "Geo-Alvo", emoji: "📍", badge: "Recomendado",     badgeColor: NEON },
         ]}
       />
+
       <div data-avatar-proof-row className="relative z-50 mx-auto mt-1 mb-2 flex w-full max-w-[550px] items-center justify-between gap-2 px-2 sm:px-3">
         <FabianoBadge variant="trafego" inline />
         <SocialProofPopup route="/trafego" />

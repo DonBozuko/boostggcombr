@@ -457,14 +457,19 @@ function buildContingencyPricingRows(now = new Date().toISOString()): {
 
 
 
+// v330 — pausa DURA: motivo sem fornecedor habilitado nunca volta pra vitrine.
+// Sem fornecedor vinculado não existe entrega possível — mostrar o card só gera
+// Pix pago sem entrega e estorno.
+const HARD_PAUSE = /nenhum fornecedor|sem fornecedor/i;
+
 // v47 — lê itens já precificados 1:1 do pricing_items.
-async function readCachedItems(category: Category): Promise<Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean }>> {
-  const out = new Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean }>();
+async function readCachedItems(category: Category): Promise<Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean; hardBlocked: boolean }>> {
+  const out = new Map<string, { cost: number; price: number; source: "api" | "fallback"; sellable: boolean; hardBlocked: boolean }>();
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, cost_brl, price_brl, source, is_sellable, last_dry_run")
+      .select("pacote, cost_brl, price_brl, source, is_sellable, last_dry_run, sellable_reason")
       .eq("category", category);
     for (const row of (data ?? []) as Array<any>) {
       // v290 — só confia na pausa se o teste seco rodou nas últimas 48h.
@@ -476,6 +481,7 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
         price: Number(row.price_brl) || 0,
         source: row.source === "api" ? "api" : "fallback",
         sellable: recente ? row.is_sellable !== false : true,
+        hardBlocked: row.is_sellable === false && HARD_PAUSE.test(String(row.sellable_reason ?? "")),
       });
     }
   } catch {
@@ -483,6 +489,7 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
   }
   return out;
 }
+
 
 
 type ExistingItem = {
@@ -572,8 +579,10 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   // v290 — prateleira honesta: pacote que o teste seco marcou como não vendável
   // some da vitrine, em vez de aparecer e travar no checkout. Se TODOS sumiriam,
   // mantém a lista (provável falso positivo) — o checkout ainda barra e alerta.
+  // v330 — exceção: pausa dura (sem fornecedor habilitado) nunca volta.
   const disponiveis = rawItems.filter((it) => itemsMap.get(it.id)?.sellable !== false);
-  const visiveis = disponiveis.length > 0 ? disponiveis : rawItems;
+  const semBloqueioDuro = rawItems.filter((it) => itemsMap.get(it.id)?.hardBlocked !== true);
+  const visiveis = disponiveis.length > 0 ? disponiveis : semBloqueioDuro;
 
   const items = [...visiveis].sort((a, b) => a.quantidade - b.quantidade);
 

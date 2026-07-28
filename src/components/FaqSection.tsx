@@ -39,11 +39,11 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Os membros caem depois?", a: "Pode haver queda natural nos pacotes Global — não há reposição garantida. Pedimos reposição ao fornecedor automaticamente e, quando não há garantia, resolvemos no WhatsApp: reenvio ou estorno." },
   ],
   trafego: [
-    { q: "Isso é tráfego real ou só bots contando view?", a: "Trabalhamos com duas modalidades: tráfego direto (rápido, para pump de números) e tráfego orgânico via redes sociais e busca (mais lento, gera cliques com sessão real)." },
-    { q: "Google Analytics vai registrar essas visitas?", a: "Sim no tráfego orgânico. O direto é IP-based e pode ser filtrado pelo GA como bot. Se seu KPI é GA, escolha o plano orgânico." },
-    { q: "Consigo escolher país de origem do tráfego?", a: "Sim: Brasil, EUA, Europa ou global. Preços variam. Brasil é mais caro por escassez de IPs residenciais BR." },
+    { q: "Isso é tráfego real ou só bots contando view?", a: "São visitas reais de navegador, entregues de forma gradual. Não é robô de contador: o visitante abre a página. Mas é tráfego frio — não espere conversão em venda, o objetivo é volume e teste de página." },
+    { q: "Google Analytics vai registrar essas visitas?", a: "Boa parte sim, mas o tráfego é IP-based e o GA pode filtrar parte como bot. Se o seu KPI é exatamente o número do GA, considere que a contagem pode vir menor que o pacote." },
+    { q: "Consigo escolher país de origem do tráfego?", a: "Hoje temos duas linhas: 🇧🇷 Visitas do Brasil (geo-segmentado) e 🌎 Global. Basta trocar a aba antes de escolher o pacote. O BR custa mais por escassez de IPs residenciais brasileiros." },
     { q: "Tráfego pago dispara flag no AdSense?", a: "Não injetamos cliques em anúncios. O tráfego navega o site normalmente. Não recomendamos combinar com AdSense se seu objetivo é monetizar via ads." },
-    { q: "Em quanto tempo entrega 10.000 visitas?", a: "Direto: 24-48h. Orgânico: 5-10 dias. A distribuição é escalonada para não gerar picos suspeitos no seu servidor ou analytics." },
+    { q: "Em quanto tempo entrega 10.000 visitas?", a: "Normalmente 24-72h após o Pix confirmado. A distribuição é escalonada para não gerar picos suspeitos no seu servidor ou analytics. Não há reposição garantida nesta categoria — qualquer problema resolvemos no WhatsApp." },
   ],
   kwai: [
     { q: "Comprar seguidores no Kwai é seguro?", a: "Sim. Não pedimos senha e usamos apenas o @ ou link do perfil. A entrega é gradual, dentro dos limites da plataforma, sem risco de banimento." },

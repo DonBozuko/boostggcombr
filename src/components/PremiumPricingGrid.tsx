@@ -49,16 +49,20 @@ function tonePalette(id: string, fire?: boolean): { border: string; glow: string
 
 // v245 — Selo de origem: transparência sobre nacionalidade do serviço.
 // v257 — Nível Premium BR: reposição de 90 dias declarada pelo fornecedor.
-type Origin = "br" | "brpro" | "global" | "views";
+// v330 — tráfego BR (wbr*) é visita geo-segmentada, NÃO perfil brasileiro com
+// reposição. Selo próprio pra não prometer garantia que o fornecedor não dá.
+type Origin = "br" | "brpro" | "global" | "views" | "geobr";
 function detectOrigin(id: string): Origin {
   if (/^br-pro/i.test(id)) return "brpro";
   if (/^(v|tv|yv)\d/i.test(id)) return "views";
-  if (/^(br-|wbr)/i.test(id)) return "br";
+  if (/^wbr/i.test(id)) return "geobr";
+  if (/^br-/i.test(id)) return "br";
   return "global";
 }
 function isSeguidoresBR(id: string): boolean {
   return /^(br-tf|wbr)/i.test(id);
 }
+
 
 
 
@@ -185,6 +189,16 @@ export function PremiumPricingGrid({
                   🇧🇷 Brasileiro Real · reposição 30 dias
                 </span>
               )}
+              {origin === "geobr" && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
+                  title="Visitas com IP do Brasil — geo-segmentado, sem reposição garantida"
+                >
+                  🇧🇷 Visitas do Brasil · geo-segmentado
+                </span>
+              )}
+
+
 
               {origin === "global" && (
                 <span
