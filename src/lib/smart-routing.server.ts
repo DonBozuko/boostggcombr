@@ -217,11 +217,29 @@ export async function rankProvidersByCost(opts: {
         }
         continue;
       }
+      // v313 — PRODUTO ERRADO NUNCA É COBRADO NEM DESPACHADO.
+      // (a) nome atual contradiz o que o pacote vende (ex.: pacote de
+      //     visualizações apontando para "Likes");
+      // (b) o fornecedor trocou o produto por trás do mesmo ID desde o vínculo.
+      const nomeAtual = String((svcRow as any).name ?? "");
+      const catFornecedor = `${nomeAtual} ${String((svcRow as any).category ?? "")}`;
+      const prevFp = fpMap.get(fingerprintKey(opts.pacote, providerIdCol[slug] ?? ""));
+      const trocou = productChanged(catFornecedor, prevFp, { provider: slug === "smmpainel" ? "smmpanel" : slug, service_id: String(pid) });
+      const intencaoOk = serviceMatchesIntent((catRow as any)?.category, nomeAtual);
+      if (!intencaoOk || trocou) {
+        providerIdMap[slug] = null;
+        console.error(
+          `[v313] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} "${nomeAtual}" ` +
+            (intencaoOk ? "mudou de produto desde o vínculo" : "não entrega o produto deste pacote"),
+        );
+        continue;
+      }
       if (!providerCanServe({ brPackage, svc: svcRow as any, requireRefill: brPackage })) {
         providerIdMap[slug] = null;
         const reason = brPackage && (svcRow as any).refill !== true ? "sem refill garantido" : "não é BR válido";
         console.warn(`[v245] ${slug} descartado p/ ${opts.pacote}: serviço ${pid} ${reason}`);
       }
+
 
     }
     if (brPackage && Object.values(providerIdMap).every((v) => !v)) {
