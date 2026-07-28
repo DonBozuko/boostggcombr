@@ -161,11 +161,22 @@ export async function rankProvidersByCost(opts: {
       verified: "verified_services_cache",
       provider4: "provider4_services_cache",
     };
+    // v313 — impressão digital + intenção conferidas AO VIVO (não só na auditoria).
+    const { serviceMatchesIntent } = await import("./catalog-coherence");
+    const { productChanged, fingerprintKey } = await import("./service-fingerprint");
+    const { data: fpRows } = await supabaseAdmin
+      .from("service_fingerprints" as any)
+      .select("pacote, col, provider, service_id, name_sig")
+      .eq("pacote", opts.pacote);
+    const fpMap = new Map<string, any>();
+    for (const r of ((fpRows as any[]) ?? [])) fpMap.set(fingerprintKey(String(r.pacote), String(r.col)), r);
+
     for (const slug of Object.keys(providerIdMap)) {
       const pid = providerIdMap[slug];
       if (!pid) continue;
       const table = cacheTable[slug];
       if (!table) continue;
+
       const { data: svcRow } = await supabaseAdmin
         .from(table as any)
         .select("name, category, refill, min, max")
