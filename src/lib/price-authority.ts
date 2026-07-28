@@ -25,6 +25,7 @@
 
 import { computeGuardedPrice, respectsMinMargin, FLOOR_BRL } from "./margin-guardian";
 import { enforceMonotonicLadder } from "./price-monotonic";
+import { enforceCategoryCurve } from "./price-unit-curve";
 
 /** Teto de reajuste automático para cima num único ciclo. */
 export const AUTHORITY_MAX_UP = 1.4;
@@ -41,7 +42,7 @@ export type AuthorityChange = {
   pacote: string;
   de: number;
   para: number;
-  motivo: "margem" | "escada" | "primeiro_preco";
+  motivo: "margem" | "escada" | "curva" | "primeiro_preco";
 };
 
 export type AuthorityBlock = {
@@ -125,7 +126,27 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
 
   }
 
+  // (f) v326 — curva coerente por categoria: preço legado muito acima da curva
+  // da própria categoria (mediana preço÷justo) desce até a curva. Só corrige
+  // pra baixo, nunca abaixo do preço justo (margem 4x) nem do piso comercial.
+
+  const curvaInput = rows.filter((r) => r.category && Number(r.quantidade) > 0);
+  const { fixes: curvaFixes } = enforceCategoryCurve(curvaInput, (r) =>
+    Number(r.cost_brl) > 0
+      ? Math.max(computeGuardedPrice(Number(r.cost_brl), Number(r.quantidade)), FLOOR_BRL)
+      : 0,
+  );
+  const curvaTarget = new Map(curvaFixes.map((f) => [f.pacote, f.para]));
+  for (const r of rows) {
+    const alvo = curvaTarget.get(r.pacote);
+    if (alvo !== undefined) {
+      r.price_brl = alvo;
+      motivos.set(r.pacote, "curva");
+    }
+  }
+
   // (c) escada é aplicada sobre o alvo final, não sobre o lote de um motor.
+
   const ladderInput = rows.filter(
     (r) => r.category && Number(r.quantidade) > 0 && Number(r.price_brl) > 0,
   );
