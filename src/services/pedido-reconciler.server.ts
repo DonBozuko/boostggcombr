@@ -133,6 +133,72 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
     }
   }
 
+  // v324 — FILA QUE ANDA SOZINHA: pedido pago parado em waiting_provision /
+  // MARGIN_HOLD / SMM_FAILED antes dependia do dono clicar no Telegram. Agora o
+  // próprio reconciliador retenta com backoff e só chama humano no teto.
+  try {
+    const { QUEUE_STATUSES, decideQueueAction, QUEUE_MAX_ATTEMPTS } = await import("@/lib/queue-policy");
+    const { data: fila } = await supabaseAdmin
+      .from("pedidos")
+      .select("id, status, created_at, valor, instagram_user, pacote, quantidade, reconcile_attempts, last_reconciled_at")
+      .in("status", QUEUE_STATUSES as unknown as string[])
+      .order("created_at", { ascending: true })
+      .limit(30);
+
+    for (const p of (fila as any[]) ?? []) {
+      const decisao = decideQueueAction({
+        id: p.id,
+        status: p.status,
+        created_at: p.created_at,
+        attempts: Number(p.reconcile_attempts ?? 0),
+        last_attempt_at: p.last_reconciled_at ?? null,
+      });
+
+      if (decisao.action === "wait") continue;
+
+      if (decisao.action === "escalate") {
+        // Alerta uma vez a cada 12h por pedido — o watcher de 10min já cobre o resto.
+        const ultima = p.last_reconciled_at ? new Date(p.last_reconciled_at).getTime() : 0;
+        if (Date.now() - ultima < 12 * 60 * 60 * 1000) continue;
+        await supabaseAdmin
+          .from("pedidos")
+          .update({ last_reconciled_at: new Date().toISOString() } as any)
+          .eq("id", p.id);
+        report.alertas_disparados++;
+        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FILA_ESCALADA: ${decisao.reason}` });
+        await dispatchWhatsappAlert(
+          `🚨 PEDIDO PAGO PARADO NA FILA\n\n` +
+            `PROBLEMA: o cliente @${p.instagram_user ?? "?"} pagou R$ ${Number(p.valor ?? 0).toFixed(2)} ` +
+            `(${p.pacote} × ${p.quantidade}) e o sistema já tentou ${QUEUE_MAX_ATTEMPTS}x enviar sozinho, sem conseguir.\n\n` +
+            `O QUE FAZER: abra o Admin › Pedidos, procure o pedido ${String(p.id).slice(0, 8)} e escolha: recarregar o fornecedor e reprocessar, ou devolver o dinheiro.`,
+        ).catch(() => {});
+        continue;
+      }
+
+      await supabaseAdmin
+        .from("pedidos")
+        .update({
+          reconcile_attempts: Number(p.reconcile_attempts ?? 0) + 1,
+          last_reconciled_at: new Date().toISOString(),
+        } as any)
+        .eq("id", p.id);
+
+      try {
+        const { reprocessWaitingProvision } = await import("@/lib/reprocess-waiting.server");
+        const r = await reprocessWaitingProvision(p.id);
+        if (r.ok) {
+          report.redispatch_sucesso++;
+          report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FILA_OK_${r.fornecedor}` });
+        } else {
+          report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FILA_FALHA: ${r.error}` });
+        }
+      } catch (e) {
+        report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FILA_EX: ${(e as Error).message}` });
+      }
+    }
+  } catch (e) {
+    report.detalhes.push({ id: "-", created_at: new Date().toISOString(), result: `FILA_SWEEP_EX: ${(e as Error).message}` });
+  }
 
   // Log de auditoria (mesmo quando 0 órfãos — prova que o cron rodou)
   try {
