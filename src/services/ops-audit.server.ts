@@ -52,6 +52,24 @@ export type OpsFinding = {
   evidencia: any;
 };
 
+/**
+ * v338 — Assinatura estável de qualquer formato de evidência (lista, objeto,
+ * texto ou vazio). Usada só para saber se o problema é o MESMO de antes.
+ */
+export function assinaturaEvidencia(evidencia: any): string {
+  if (evidencia == null) return "";
+  if (Array.isArray(evidencia)) {
+    return evidencia
+      .map((e: any) => (e && typeof e === "object" ? String(e.pacote ?? e.id ?? JSON.stringify(e)) : String(e)))
+      .sort()
+      .join(",");
+  }
+  if (typeof evidencia === "object") {
+    return Object.keys(evidencia).sort().map((k) => `${k}=${String((evidencia as any)[k])}`).join(",");
+  }
+  return String(evidencia);
+};
+
 export type OpsAuditReport = {
   ok: boolean;
   generated_at: string;
