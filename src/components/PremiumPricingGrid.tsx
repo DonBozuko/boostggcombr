@@ -189,6 +189,16 @@ export function PremiumPricingGrid({
                   🇧🇷 Brasileiro Real · reposição 30 dias
                 </span>
               )}
+              {origin === "geobr" && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/60 bg-emerald-500/10 text-emerald-300"
+                  title="Visitas com IP do Brasil — geo-segmentado, sem reposição garantida"
+                >
+                  🇧🇷 Visitas do Brasil · geo-segmentado
+                </span>
+              )}
+
+
 
               {origin === "global" && (
                 <span
