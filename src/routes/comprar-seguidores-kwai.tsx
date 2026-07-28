@@ -67,11 +67,12 @@ export const Route = createFileRoute("/comprar-seguidores-kwai")({
       bodySections={[
         {
           h2: "Por que comprar seguidores no Kwai vale a pena?",
-          body: "O Kwai brasileiro cresceu explosivamente com o Kwai Rewards, e o algoritmo prioriza vídeos com engajamento inicial rápido. Quem começa do zero tem dificuldade de sair da vitrine 'sem visualizações'. Uma injeção controlada de seguidores brasileiros cria o efeito bola de neve: mais seguidor → mais indicação orgânica → mais views reais. Não é atalho mágico, é combustível pro que seu conteúdo já é.",
+          body: "O Kwai brasileiro cresceu explosivamente com o Kwai Rewards, e o algoritmo prioriza vídeos com engajamento inicial rápido. Quem começa do zero tem dificuldade de sair da vitrine 'sem visualizações'. Uma injeção controlada de seguidores cria o efeito bola de neve: mais seguidor → mais indicação orgânica → mais views reais. Não é atalho mágico, é combustível pro que seu conteúdo já é.",
         },
         {
           h2: "É seguro? Kwai não pune?",
-          body: "O Kwai não tem histórico de punir contas por crescimento pago, diferente do Instagram. Entregamos com perfis reais brasileiros (não bots vazios) e de forma gradual pra parecer orgânico. Nunca tivemos relato de suspensão em mais de 3.100 pedidos entre todas as plataformas. Se cair alguém, repomos por 30 dias.",
+          body: "O Kwai não tem histórico de punir contas por crescimento pago, diferente do Instagram. A entrega é gradual, pra parecer orgânica, e nunca tivemos relato de suspensão em mais de 3.100 pedidos entre todas as plataformas. Os pacotes de Kwai são da linha Global: havendo queda relevante, solicitamos reposição ao fornecedor e, sem garantia, avaliamos reenvio ou estorno.",
+
         },
         {
           h2: "Seguidor comprado ajuda no Kwai Rewards?",
