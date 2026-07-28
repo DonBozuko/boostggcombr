@@ -55,13 +55,15 @@ export const Route = createFileRoute("/comprar-seguidores-kwai")({
       ]}
 
       pricingTitle="Preços (a partir de)"
+      pricingCategories={["kwai:seguidores"]}
       pricing={[
-        { qty: "100 seguidores BR", price: "R$ 5,00", note: "Ideal pra testar" },
-        { qty: "500 seguidores BR", price: "R$ 15,00" },
-        { qty: "1.000 seguidores BR", price: "R$ 28,00", note: "Mais popular" },
-        { qty: "5.000 seguidores BR", price: "R$ 110,00" },
-        { qty: "10.000 seguidores BR", price: "R$ 210,00", note: "Prova social forte" },
+        { id: "kf100", qty: "100 seguidores", price: "R$ 5,00", note: "Ideal pra testar" },
+        { id: "kf500", qty: "500 seguidores", price: "R$ 19,00" },
+        { id: "kf1k", qty: "1.000 seguidores", price: "R$ 53,70", note: "Mais popular" },
+        { id: "kf5k", qty: "5.000 seguidores", price: "R$ 264,82" },
+        { id: "kf10k", qty: "10.000 seguidores", price: "R$ 660,66", note: "Prova social forte" },
       ]}
+
       bodySections={[
         {
           h2: "Por que comprar seguidores no Kwai vale a pena?",
