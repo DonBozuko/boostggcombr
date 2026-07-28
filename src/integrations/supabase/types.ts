@@ -279,6 +279,110 @@ export type Database = {
         }
         Relationships: []
       }
+      bench_findings: {
+        Row: {
+          category: string | null
+          created_at: string
+          custo_brl: number | null
+          falta_em: string | null
+          falta_recarregar: number | null
+          fornecedor: string | null
+          id: number
+          motivo: string | null
+          pacote: string
+          price_brl: number | null
+          quantidade: number | null
+          run_id: string
+          verdict: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          custo_brl?: number | null
+          falta_em?: string | null
+          falta_recarregar?: number | null
+          fornecedor?: string | null
+          id?: number
+          motivo?: string | null
+          pacote: string
+          price_brl?: number | null
+          quantidade?: number | null
+          run_id: string
+          verdict: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          custo_brl?: number | null
+          falta_em?: string | null
+          falta_recarregar?: number | null
+          fornecedor?: string | null
+          id?: number
+          motivo?: string | null
+          pacote?: string
+          price_brl?: number | null
+          quantidade?: number | null
+          run_id?: string
+          verdict?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bench_findings_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "bench_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bench_runs: {
+        Row: {
+          alertou: boolean
+          entregavel: number
+          erro: string | null
+          finished_at: string | null
+          id: string
+          origem: string
+          pausados: string[]
+          por_veredito: Json
+          recarga_por_fornecedor: Json
+          religados: string[]
+          rotas_com_problema: string[]
+          started_at: string
+          total: number
+        }
+        Insert: {
+          alertou?: boolean
+          entregavel?: number
+          erro?: string | null
+          finished_at?: string | null
+          id?: string
+          origem?: string
+          pausados?: string[]
+          por_veredito?: Json
+          recarga_por_fornecedor?: Json
+          religados?: string[]
+          rotas_com_problema?: string[]
+          started_at?: string
+          total?: number
+        }
+        Update: {
+          alertou?: boolean
+          entregavel?: number
+          erro?: string | null
+          finished_at?: string | null
+          id?: string
+          origem?: string
+          pausados?: string[]
+          por_veredito?: Json
+          recarga_por_fornecedor?: Json
+          religados?: string[]
+          rotas_com_problema?: string[]
+          started_at?: string
+          total?: number
+        }
+        Relationships: []
+      }
       canary_alert_state: {
         Row: {
           alert_key: string
