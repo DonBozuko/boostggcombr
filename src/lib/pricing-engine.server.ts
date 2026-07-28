@@ -579,8 +579,10 @@ export async function getPricingGridImpl(category: Category): Promise<PricingGri
   // v290 — prateleira honesta: pacote que o teste seco marcou como não vendável
   // some da vitrine, em vez de aparecer e travar no checkout. Se TODOS sumiriam,
   // mantém a lista (provável falso positivo) — o checkout ainda barra e alerta.
+  // v330 — exceção: pausa dura (sem fornecedor habilitado) nunca volta.
   const disponiveis = rawItems.filter((it) => itemsMap.get(it.id)?.sellable !== false);
-  const visiveis = disponiveis.length > 0 ? disponiveis : rawItems;
+  const semBloqueioDuro = rawItems.filter((it) => itemsMap.get(it.id)?.hardBlocked !== true);
+  const visiveis = disponiveis.length > 0 ? disponiveis : semBloqueioDuro;
 
   const items = [...visiveis].sort((a, b) => a.quantidade - b.quantidade);
 
