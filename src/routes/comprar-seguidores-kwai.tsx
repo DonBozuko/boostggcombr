@@ -7,17 +7,19 @@ const URL = "https://boostgg.com.br/comprar-seguidores-kwai";
 
 const faq = [
   { q: "Como funciona a compra de seguidores no Kwai?", a: "Você escolhe o pacote, informa o @ ou link do perfil e paga via Pix. Em minutos os seguidores começam a entrar de forma gradual pra manter o crescimento natural." },
-  { q: "Seguidores do Kwai são brasileiros?", a: "Sim. Nosso plano padrão entrega perfis brasileiros pra prova social real — importante pra quem monetiza no Kwai Rewards e depende de audiência BR." },
+  { q: "Seguidores do Kwai são brasileiros?", a: "Não. Os pacotes de Kwai hoje são 🌎 Global (alto volume) — o selo aparece em cada card. Linha 🇧🇷 Brasileiro Real existe em Instagram e TikTok." },
   { q: "Preciso da senha da minha conta Kwai?", a: "Não. Trabalhamos só com dados públicos (@ ou link). Nunca peça senha para nenhum fornecedor de crescimento — é golpe." },
   { q: "Em quanto tempo entrega?", a: "Início em 5-30 minutos após o Pix confirmado. Pacotes pequenos concluem no mesmo dia; acima de 10 mil, distribuímos em 2-5 dias." },
-  { q: "E se cair seguidor?", a: "Nos pacotes 🇧🇷 Brasileiro Real, reposição garantida por 30 dias em queda acima de 5%. Nos pacotes Global, pedimos reposição ao fornecedor e, sem garantia, avaliamos reenvio ou estorno. Basta abrir chamado no WhatsApp com o link do perfil." },
+  { q: "E se cair seguidor?", a: "Nos pacotes Global do Kwai não há reposição garantida: solicitamos reposição ao fornecedor e, sem garantia disponível, avaliamos reenvio ou estorno. Abra chamado no WhatsApp com o link do perfil." },
+
 ];
 
 export const Route = createFileRoute("/comprar-seguidores-kwai")({
   head: () => {
-    const title = "Comprar Seguidores no Kwai (BR) via Pix — Elite Boost Prime | BoostGG";
+    const title = "Comprar Seguidores no Kwai via Pix — Elite Boost Prime | BoostGG";
     const description =
-      "Compre seguidores brasileiros no Kwai via Pix. Entrega em minutos, sem senha e com reposição de 30 dias nos pacotes brasileiros. A partir de R$ 5.";
+      "Compre seguidores no Kwai via Pix. Entrega gradual em minutos, sem senha e com acompanhamento do pedido. A partir de R$ 5.";
+
     return {
       meta: [
         { title },
@@ -41,32 +43,36 @@ export const Route = createFileRoute("/comprar-seguidores-kwai")({
     <SeoLanding
       accent="#ff6600"
       h1="Comprar Seguidores no Kwai via Pix"
-      subtitle="Entrega automática · perfis brasileiros · reposição de 30 dias nos pacotes brasileiros"
+      subtitle="Entrega automática · gradual · sem senha"
       ctaHref="/kwai"
       ctaLabel="Ver planos e comprar agora"
-      intro="Quer crescer no Kwai sem ficar refém do algoritmo? Nossa entrega de seguidores brasileiros dá o empurrão inicial de prova social pra vídeos ganharem tração — em minutos, com Pix e sem pedir sua senha. Mais de 3 mil pedidos entregues no Instagram, TikTok e YouTube; agora também no Kwai."
+      intro="Quer crescer no Kwai sem ficar refém do algoritmo? A entrega de seguidores dá o empurrão inicial de prova social pra vídeos ganharem tração — em minutos, com Pix e sem pedir sua senha. Mais de 3 mil pedidos entregues no Instagram, TikTok e YouTube; agora também no Kwai."
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Início em 5-30 min após o Pix confirmado." },
         { icon: "shield", title: "Sem senha", text: "Só o @ ou link do perfil. 100% seguro." },
-        { icon: "check", title: "Reposição 30 dias", text: "Garantia nos pacotes brasileiros; nos Global pedimos ao fornecedor." },
-        { icon: "clock", title: "Perfis brasileiros", text: "Audiência BR pra Kwai Rewards contar." },
+        { icon: "check", title: "Suporte no WhatsApp", text: "Deu problema, a gente reenvia ou estorna." },
+        { icon: "clock", title: "Entrega gradual", text: "Distribuída pra parecer crescimento orgânico." },
       ]}
+
       pricingTitle="Preços (a partir de)"
+      pricingCategories={["kwai:seguidores"]}
       pricing={[
-        { qty: "100 seguidores BR", price: "R$ 5,00", note: "Ideal pra testar" },
-        { qty: "500 seguidores BR", price: "R$ 15,00" },
-        { qty: "1.000 seguidores BR", price: "R$ 28,00", note: "Mais popular" },
-        { qty: "5.000 seguidores BR", price: "R$ 110,00" },
-        { qty: "10.000 seguidores BR", price: "R$ 210,00", note: "Prova social forte" },
+        { id: "kf100", qty: "100 seguidores", price: "R$ 5,00", note: "Ideal pra testar" },
+        { id: "kf500", qty: "500 seguidores", price: "R$ 19,00" },
+        { id: "kf1k", qty: "1.000 seguidores", price: "R$ 53,70", note: "Mais popular" },
+        { id: "kf5k", qty: "5.000 seguidores", price: "R$ 264,82" },
+        { id: "kf10k", qty: "10.000 seguidores", price: "R$ 660,66", note: "Prova social forte" },
       ]}
+
       bodySections={[
         {
           h2: "Por que comprar seguidores no Kwai vale a pena?",
-          body: "O Kwai brasileiro cresceu explosivamente com o Kwai Rewards, e o algoritmo prioriza vídeos com engajamento inicial rápido. Quem começa do zero tem dificuldade de sair da vitrine 'sem visualizações'. Uma injeção controlada de seguidores brasileiros cria o efeito bola de neve: mais seguidor → mais indicação orgânica → mais views reais. Não é atalho mágico, é combustível pro que seu conteúdo já é.",
+          body: "O Kwai brasileiro cresceu explosivamente com o Kwai Rewards, e o algoritmo prioriza vídeos com engajamento inicial rápido. Quem começa do zero tem dificuldade de sair da vitrine 'sem visualizações'. Uma injeção controlada de seguidores cria o efeito bola de neve: mais seguidor → mais indicação orgânica → mais views reais. Não é atalho mágico, é combustível pro que seu conteúdo já é.",
         },
         {
           h2: "É seguro? Kwai não pune?",
-          body: "O Kwai não tem histórico de punir contas por crescimento pago, diferente do Instagram. Entregamos com perfis reais brasileiros (não bots vazios) e de forma gradual pra parecer orgânico. Nunca tivemos relato de suspensão em mais de 3.100 pedidos entre todas as plataformas. Se cair alguém, repomos por 30 dias.",
+          body: "O Kwai não tem histórico de punir contas por crescimento pago, diferente do Instagram. A entrega é gradual, pra parecer orgânica, e nunca tivemos relato de suspensão em mais de 3.100 pedidos entre todas as plataformas. Os pacotes de Kwai são da linha Global: havendo queda relevante, solicitamos reposição ao fornecedor e, sem garantia, avaliamos reenvio ou estorno.",
+
         },
         {
           h2: "Seguidor comprado ajuda no Kwai Rewards?",

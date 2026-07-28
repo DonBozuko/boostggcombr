@@ -7,10 +7,14 @@ import { DeliveryTimes } from "@/components/DeliveryTimes";
 import { TrustBadges } from "@/components/TrustBadges";
 import { LivePurchasesTicker } from "@/components/LivePurchasesTicker";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
+import { useLivePricingRows } from "@/hooks/useLivePricingRows";
+import type { PricingCategory } from "@/lib/pricing.functions";
+
 
 export type SeoBenefit = { icon: "check" | "zap" | "shield" | "clock"; title: string; text: string };
 export type SeoFaq = { q: string; a: string };
-export type SeoPricingRow = { qty: string; price: string; note?: string };
+/** `id` (opcional) = pacote em pricing_items; quando presente, o preço vem vivo do catálogo. */
+export type SeoPricingRow = { qty: string; price: string; note?: string; id?: string };
 
 export interface SeoLandingProps {
   accent: string;
@@ -22,6 +26,8 @@ export interface SeoLandingProps {
   benefits: SeoBenefit[];
   pricingTitle: string;
   pricing: SeoPricingRow[];
+  /** v329 — categorias a consultar pra hidratar o preço real da tabela. */
+  pricingCategories?: PricingCategory[];
   bodySections: { h2: string; body: string }[];
   faq: SeoFaq[];
 }
@@ -29,6 +35,11 @@ export interface SeoLandingProps {
 const iconMap = { check: CheckCircle2, zap: Zap, shield: Shield, clock: Clock };
 
 export function SeoLanding(p: SeoLandingProps) {
+  const pricingRows = useLivePricingRows(
+    p.pricingCategories ?? [],
+    p.pricing.map((r) => ({ ...r, id: r.id ?? "" })),
+  );
+
   return (
     <MobileFrame bg="#0a0a0a">
       <header
@@ -101,7 +112,7 @@ export function SeoLanding(p: SeoLandingProps) {
                 </tr>
               </thead>
               <tbody>
-                {p.pricing.map((r, i) => (
+                {pricingRows.map((r, i) => (
                   <tr key={i} className="border-t" style={{ borderColor: `${p.accent}22` }}>
                     <td className="px-4 py-3">
                       <div className="text-white font-semibold">{r.qty}</div>

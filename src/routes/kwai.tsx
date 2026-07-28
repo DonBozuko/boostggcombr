@@ -42,7 +42,8 @@ export const Route = createFileRoute("/kwai")({
   head: () => {
     const title = "Comprar Seguidores no Kwai via Pix — Elite Boost Prime | BoostGG";
     const description =
-      "Compre seguidores, curtidas e views no Kwai com Pix. Entrega em minutos, perfis brasileiros e reposição de 30 dias nos pacotes brasileiros.";
+      "Compre seguidores, curtidas e views no Kwai com Pix. Entrega gradual em minutos, sem senha, com acompanhamento do pedido e suporte no WhatsApp.";
+
     const url = "https://boostgg.com.br/kwai";
     return {
       meta: [
@@ -220,7 +221,7 @@ function KwaiLanding() {
       <header className="sticky top-0 z-50 bg-black/90 border-b transition-all duration-300" style={{ borderColor: `${ORANGE}66` }}>
         <div className="container mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandHeader subtitle="Seguidores Brasileiros no Kwai via Pix" />
+            <BrandHeader subtitle="Seguidores e Views no Kwai via Pix" />
           </div>
           <ShowcaseTrigger />
         </div>
