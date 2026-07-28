@@ -27,6 +27,9 @@ const cache = new Map<string, CacheEntry>();
 
 export type PreflightOutcome = PreflightResult & { skipped: boolean };
 
+const TOPUP_ALERT_COOLDOWN_MS = 30 * 60_000;
+const topupAlertAt = new Map<string, number>();
+
 const PASS: PreflightOutcome = {
   ok: true,
   viable: [],
