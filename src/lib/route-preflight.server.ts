@@ -33,6 +33,7 @@ const PASS: PreflightOutcome = {
   reason: null,
   rejections: [],
   structural: false,
+  needsTopup: false,
   skipped: true,
 };
 
