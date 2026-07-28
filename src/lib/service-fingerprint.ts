@@ -45,6 +45,35 @@ export function serviceSignature(name: string): string {
   return [...new Set(hits)].sort().join("+");
 }
 
+// v314 — nem todo token pesa igual. Só estes definem O QUE o cliente recebe e
+// em qual rede. Mudança neles = produto diferente (desvincula). Mudança em
+// "br", "fast", "story" e afins é rótulo do fornecedor, não troca de produto.
+const INTENT_CORE = new Set([
+  "seguidores",
+  "curtidas",
+  "visualizacoes",
+  "comentarios",
+  "compartilhamentos",
+  "live",
+  "instagram",
+  "tiktok",
+  "youtube",
+  "facebook",
+  "twitter",
+  "kwai",
+  "telegram",
+]);
+
+/** Só a parte da assinatura que define produto+rede. */
+export function intentSignature(sigOrName: string): string {
+  const sig = sigOrName.includes("+") || INTENT_CORE.has(sigOrName) ? sigOrName : serviceSignature(sigOrName);
+  return sig
+    .split("+")
+    .filter((t) => INTENT_CORE.has(t))
+    .sort()
+    .join("+");
+}
+
 export type FingerprintRecord = {
   pacote: string;
   col: string;
@@ -61,23 +90,30 @@ export type FingerprintLink = {
   service_id: string;
   /** Nome atual do serviço no cache do fornecedor. null = não encontrado. */
   current_name: string | null;
+  /** v314 — categoria declarada do pacote, para validar o baseline. */
+  category?: string | null;
 };
 
 export type FingerprintDecision =
   | { action: "baseline"; link: FingerprintLink; sig: string }
   | { action: "ok"; link: FingerprintLink }
+  | { action: "rename"; link: FingerprintLink; sig: string }
   | { action: "unknown"; link: FingerprintLink }
+  | { action: "suspect"; link: FingerprintLink; motivo: string }
   | { action: "drift"; link: FingerprintLink; from: string; to: string; sig: string };
 
 /**
  * Compara os vínculos atuais com as impressões digitais gravadas.
- * - sem registro e nome conhecido → grava baseline (não desvincula na 1ª vez);
- * - nome sumiu do cache → "unknown" (outra trava já cuida de ID fantasma);
- * - assinatura diferente → "drift": o fornecedor trocou o produto por trás.
+ * v314:
+ * - baseline não é mais confiança cega: só grava se o nome do fornecedor bater
+ *   com a intenção declarada do pacote; se não bater nasce "suspect";
+ * - drift só desvincula quando muda token de intenção; nome novo com a mesma
+ *   intenção vira "rename" (atualiza a assinatura, mantém o vínculo).
  */
 export function decideFingerprints(
   links: FingerprintLink[],
   stored: Map<string, FingerprintRecord>,
+  matchesIntent?: (category: string | null | undefined, name: string) => boolean,
 ): FingerprintDecision[] {
   const out: FingerprintDecision[] = [];
   for (const link of links) {
@@ -87,18 +123,33 @@ export function decideFingerprints(
     }
     const sig = serviceSignature(link.current_name);
     const prev = stored.get(fingerprintKey(link.pacote, link.col));
-    if (!prev || prev.service_id !== link.service_id || prev.provider !== link.provider) {
+    const novoVinculo = !prev || prev.service_id !== link.service_id || prev.provider !== link.provider;
+
+    if (novoVinculo) {
+      if (matchesIntent && link.category && !matchesIntent(link.category, link.current_name)) {
+        out.push({
+          action: "suspect",
+          link,
+          motivo: `serviço "${link.current_name}" não corresponde a ${link.category}`,
+        });
+        continue;
+      }
       out.push({ action: "baseline", link, sig });
       continue;
     }
-    if (prev.name_sig === sig) {
+    if (prev!.name_sig === sig) {
       out.push({ action: "ok", link });
       continue;
     }
-    out.push({ action: "drift", link, from: prev.service_name, to: link.current_name, sig });
+    if (intentSignature(prev!.name_sig) === intentSignature(sig)) {
+      out.push({ action: "rename", link, sig });
+      continue;
+    }
+    out.push({ action: "drift", link, from: prev!.service_name, to: link.current_name, sig });
   }
   return out;
 }
+
 
 export function fingerprintKey(pacote: string, col: string): string {
   return `${pacote}|${col}`;
