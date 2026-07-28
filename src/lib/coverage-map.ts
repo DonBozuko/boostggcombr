@@ -25,6 +25,8 @@ export const FAMILIAS: Familia[] = [
   { id: "preco_exibido", nome: "Preço exibido × preço cobrado", detector: "paridade vitrine × servidor" },
   { id: "imagem", nome: "Imagens e provas visuais das landings", detector: "asset-coherence + surface-scan" },
   { id: "email", nome: "Texto dos e-mails transacionais", detector: "email-coherence + surface-scan" },
+  { id: "regra_duplicada", nome: "Mesma regra escrita em 2 lugares (margem, preço, limiar)", detector: "convergence.test (varredura de limiar duplicado)" },
+  { id: "nao_convergencia", nome: "Alarme que se repete e nunca resolve", detector: "convergence + bench-autonomo" },
 
 ];
 
