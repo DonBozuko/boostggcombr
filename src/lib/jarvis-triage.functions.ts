@@ -62,21 +62,30 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const since6h = new Date(now - 6 * 60 * 60 * 1000).toISOString();
-      // v235 — crítico só conta se for recente (2h). Alerta velho já tratado
-      // não pode manter o semáforo vermelho o dia inteiro.
-      const since2h = now - 2 * 60 * 60 * 1000;
+      // v342 — alerta vencido não mantém vermelho.
+      // Só o alerta MAIS RECENTE de cada origem conta, e só nos últimos 20 min.
+      // Se o ops-audit rodou de novo e deu OK, o vermelho de 1h atrás morre.
+      const since20m = now - 20 * 60 * 1000;
 
       // 1. Alertas abertos últimas 6h
       const { data: alertas } = await supabaseAdmin
         .from("jarvis_alerts")
-        .select("severidade, mensagem, created_at")
-        .gte("created_at", since6h);
-      for (const a of alertas ?? []) {
-        const s = String((a as { severidade?: string }).severidade ?? "").toLowerCase();
-        const at = new Date(String((a as { created_at?: string }).created_at ?? 0)).getTime();
-        if ((s === "critical" || s === "error") && at >= since2h) counters.criticalAlerts++;
+        .select("severidade, mensagem, origem, created_at")
+        .gte("created_at", since6h)
+        .order("created_at", { ascending: false });
+
+      const vistos = new Set<string>();
+      for (const a of (alertas ?? []) as unknown as Array<{ severidade?: string; origem?: string; created_at?: string }>) {
+        const s = String(a.severidade ?? "").toLowerCase();
+        const orig = String(a.origem ?? "system");
+        const at = new Date(String(a.created_at ?? 0)).getTime();
+        if (vistos.has(orig)) continue;
+        vistos.add(orig);
+        if (at < since20m) continue;
+        if (s === "critical" || s === "error") counters.criticalAlerts++;
         else if (s === "warning") counters.warningAlerts++;
       }
+
 
       // 2. Pedidos pagos travados >15min
       const cutoffPaid = new Date(now - 15 * 60 * 1000).toISOString();
