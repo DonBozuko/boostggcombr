@@ -12,8 +12,9 @@ Regra:
 - Toda escrita em qualquer coluna `*_service_id` / `*_auto_id` de `pricing_items`
   passa por `guardBindings` (`src/lib/bind-guard.server.ts`). Sem exceção.
 - Constante no código só pode ser semente/candidata — nunca gravada direto.
-- ID desconhecido no cache NÃO é motivo para apagar vínculo (cache pode estar
-  atrasado); só corta com prova positiva de incompatibilidade.
+- ID ausente do catálogo é cortado como fantasma SÓ quando a leitura daquele
+  fornecedor veio inteira e recente (≥200 serviços e <6h). Leitura parcial ou
+  velha nunca apaga vínculo bom.
 
 **Why:** duas fontes de verdade criaram o loop eterno de alerta: a auditoria
 desvinculava o produto errado e o motor de preço regravava a constante velha no
