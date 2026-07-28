@@ -137,7 +137,9 @@ export async function rankProvidersByCost(opts: {
     const fallbackId = slug === "smmhype" && serviceId != null ? String(serviceId) : null;
     providerIdMap[slug] = manualId ?? autoId ?? fallbackId;
     providerIdIsAuto[slug] = manualId == null && autoId != null;
+    providerIdCol[slug] = manualId != null ? manualCol : autoId != null ? autoCol : `${prefix}_service_id`;
   }
+
 
   // v241/v242/v245 — TRAVA BR EM RUNTIME + PREFERÊNCIA POR GARANTIA (caso Sybele).
   const refillMap: Record<string, boolean> = {};
