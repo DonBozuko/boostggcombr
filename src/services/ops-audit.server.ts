@@ -3,6 +3,46 @@
 // (HTTP do endpoint, pedido entregue, caixa lançado, e-mail entregue).
 // Só alerta quando existe impacto real (dinheiro ou cliente). Ruído é registrado, não enviado.
 
+// v319 — Silêncio inteligente: mesma lista de problemas só reavisa a cada 12h.
+const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
+
+async function hashAlerta(texto: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(texto));
+  return Array.from(new Uint8Array(buf))
+    .slice(0, 8)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function podeAlertar(assinatura: string): Promise<{ pode: boolean; vez: number }> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const key = `ops-audit:${assinatura}`;
+    const { data } = await (supabaseAdmin as any)
+      .from("canary_alert_state")
+      .select("alert_key, last_sent_at, detail")
+      .eq("alert_key", key)
+      .maybeSingle();
+
+    const agora = Date.now();
+    const ultimo = data?.last_sent_at ? Date.parse(data.last_sent_at) : 0;
+    if (ultimo && agora - ultimo < ALERTA_COOLDOWN_MS) return { pode: false, vez: 0 };
+
+    const vez = Number(data?.detail ?? 0) + 1;
+    await (supabaseAdmin as any)
+      .from("canary_alert_state")
+      .upsert(
+        { alert_key: key, last_sent_at: new Date().toISOString(), detail: String(vez) },
+        { onConflict: "alert_key" },
+      );
+    return { pode: true, vez };
+  } catch {
+    // Falha de estado nunca pode calar alerta crítico.
+    return { pode: true, vez: 1 };
+  }
+}
+
+
 export type OpsFinding = {
   code: string;
   severity: "critical" | "warning";
@@ -248,16 +288,34 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
 
   if (options.notify && critical.length > 0) {
     const { dispatchTelegramAlert } = await import("@/lib/messaging");
-    const texto = [
-      "🔎 AUDITORIA FORENSE — problemas que afetam dinheiro ou cliente",
-      "",
-      ...critical.map(
-        (f) => `⚠️ ${f.titulo}\nPROBLEMA: ${f.problema}\nO QUE FAZER: ${f.o_que_fazer}`,
-      ),
-    ].join("\n\n");
-    const r = await dispatchTelegramAlert(texto, { severity: "critical", origem: "ops-audit" });
-    telegramEnviado = r.ok;
+    const corpo = critical
+      .map((f) => `⚠️ ${f.titulo}\nPROBLEMA: ${f.problema}\nO QUE FAZER: ${f.o_que_fazer}`)
+      .join("\n\n");
+
+    // v319 — SILÊNCIO INTELIGENTE. A auditoria roda de hora em hora e reenviava
+    // exatamente o mesmo texto enquanto o problema existisse: o celular do dono
+    // virou um loop de notificação e alerta repetido deixa de ser lido. Agora a
+    // mesma lista de problemas só volta a tocar a cada 12h, com contador de
+    // insistência. Problema NOVO (assinatura diferente) toca na hora, sempre.
+    const assinatura = await hashAlerta(
+      critical.map((f) => `${f.code}|${(f.evidencia ?? []).map((e: any) => e.pacote).sort().join(",")}`).sort().join("||"),
+    );
+    const { pode, vez } = await podeAlertar(assinatura);
+
+    if (pode) {
+      const texto = [
+        "🔎 AUDITORIA FORENSE — problemas que afetam dinheiro ou cliente",
+        vez > 1 ? `(${vez}ª vez que aviso disso — segue sem resolver)` : "",
+        "",
+        corpo,
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      const r = await dispatchTelegramAlert(texto, { severity: "critical", origem: "ops-audit" });
+      telegramEnviado = r.ok;
+    }
   }
+
 
   try {
     await (supabaseAdmin as any).from("admin_audit_logs").insert({
