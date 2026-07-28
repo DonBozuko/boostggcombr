@@ -45,9 +45,9 @@ const REVIEWS_BY_ROUTE: Record<RouteKey, Review[]> = {
   ],
   "/trafego": [
     { n: "Carolina T.", t: "Loja Shopify recebeu 25k visitas BR reais. GA registrou tudo.", verified: true },
-    { n: "Henrique B.", t: "Blog saiu do zero em cliques. Tráfego orgânico bem segmentado.", verified: true },
+    { n: "Henrique B.", t: "Blog saiu do zero em cliques. Visitas bem distribuídas ao longo dos dias.", verified: true },
     { n: "Paula S.", t: "Landing de infoproduto testada com tráfego real antes de rodar ad." },
-    { n: "Thiago M.", t: "Preferi o plano orgânico. Analytics não filtrou como bot." },
+    { n: "Thiago M.", t: "Peguei o pacote BR e as visitas apareceram no meu painel certinho." },
     { n: "Vanessa L.", t: "Site de afiliado subiu em ranking depois do tráfego constante." },
   ],
   "/kwai": [
