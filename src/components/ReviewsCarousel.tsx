@@ -52,7 +52,7 @@ const REVIEWS_BY_ROUTE: Record<RouteKey, Review[]> = {
   ],
   "/kwai": [
     { n: "Thiago F.", t: "Reels no Kwai bombou depois de 500 views compradas.", verified: true },
-    { n: "Amanda C.", t: "Seguidores Kwai BR reais, com foto e histórico. Não parece bot.", verified: true },
+    { n: "Amanda C.", t: "Perfil saiu do zero rápido. Entrega gradual, não levantou suspeita.", verified: true },
     { n: "Douglas R.", t: "Kwai Rewards liberou pagamento depois que meu canal cresceu." },
     { n: "Patricia N.", t: "Melhor preço de Kwai que achei no mercado. Entrega rápida." },
     { n: "Wellington A.", t: "Turbina inicial que faltava pra sair do zero na plataforma." },
