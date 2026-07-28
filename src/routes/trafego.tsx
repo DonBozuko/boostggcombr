@@ -64,11 +64,12 @@ export const Route = createFileRoute("/trafego")({
   component: TrafegoLanding,
 });
 
-type Categoria = "brasil" | "mundial";
+// v349 — Tráfego BR removido do ar: nenhum dos 4 fornecedores entrega visita
+// geo-segmentada do Brasil hoje. Categoria fantasma não fica na loja.
+type Categoria = "mundial";
 type Plan = { id: string; tier: string; quantidade: number; valor: number; price: string; highlight?: boolean };
 
 // v307 — Faxina: preço vem SÓ do banco (Autoridade Única).
-const brPlans: Plan[] = [];
 const glPlans: Plan[] = [];
 
 
