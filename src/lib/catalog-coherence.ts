@@ -105,16 +105,24 @@ export function analyzeCatalogCoherence(
     nameOk.set(r.pacote, known && !bad);
   }
 
+  // v338 — MEDIR DENTRO DA MESMA PRATELEIRA.
+  // A escada e a curva de custo comparavam econômico com premium na mesma
+  // categoria. Um "BR Premium 100" custa mais por unidade que um "Global 1k"
+  // por natureza — isso não é defeito, é outro produto. O resultado era um
+  // painel vermelho permanente com 19 avisos que ninguém mais lia, escondendo
+  // a inversão de preço de verdade. Agora cada linha (global / BR / BR premium)
+  // é medida contra ela mesma.
   for (const r of rows) {
     const cat = String(r.category ?? "");
     if (!cat) continue;
-    if (!byCategory.has(cat)) byCategory.set(cat, []);
-    byCategory.get(cat)!.push(r);
+    const chave = `${cat}#${tierDoPacote(r.pacote)}`;
+    if (!byCategory.has(chave)) byCategory.set(chave, []);
+    byCategory.get(chave)!.push(r);
   }
 
+  for (const [chave, list] of byCategory) {
+    const cat = chave.split("#")[0];
 
-
-  for (const [cat, list] of byCategory) {
     const sorted = list
       .filter((r) => Number(r.quantidade) > 0 && Number(r.price_brl) > 0)
       .sort((a, b) => Number(a.quantidade) - Number(b.quantidade));
