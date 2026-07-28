@@ -29,3 +29,12 @@ varredura do texto visível de TODAS as rotas públicas e do blog, e denúncia d
 rota nova sem detector declarado). Antes de dar verde, ler esse mapa e listar
 o que está com `detector: null` como NÃO COBERTO.
 
+
+## v333 — mapa fechado (nenhuma família com `detector: null`)
+- Imagens/provas visuais: `src/lib/asset-coherence.ts` (arquivo ausente, imagem
+  sem descrição, descrição prometendo BR/reposição inexistente). Varre rotas
+  públicas + componentes de venda.
+- E-mails transacionais: `src/lib/email-coherence.ts` (promessa acima do
+  catálogo e lacuna `{{campo}}` / `undefined` vazando para o cliente).
+Regra: se alguém adicionar família nova em `coverage-map.ts` com `detector:
+null`, a auditoria volta a gritar PONTO CEGO — é assim que deve ser.
