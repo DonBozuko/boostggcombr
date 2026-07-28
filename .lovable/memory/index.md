@@ -37,3 +37,4 @@ Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/d
 - [Medidor antes do remédio](mem://preferences/medidor-antes-do-remedio) — v316/v317: severidade de alerta derivada em módulo único, no-op não conta como mudança, histerese de fornecedor (5%), livro-razão `catalog_changes` como fonte de verdade de oscilação.
 
 
+- [Bancada Autônoma](mem://features/bancada-autonoma) — v323: robô a cada 2h prova entrega de TODOS os pacotes contra fornecedores, grava em `bench_runs`/`bench_findings`, pausa/religa sozinho e só alerta quando falta recarga.
