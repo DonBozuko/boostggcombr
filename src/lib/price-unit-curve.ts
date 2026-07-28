@@ -48,6 +48,22 @@ export const CURVE_TOLERANCE = 2.0;
 /** Aterrissagem: o outlier desce até 1,5x a curva — preserva prêmio de vitrine. */
 export const CURVE_LANDING = 1.5;
 
+// v327 — TETO DE VITRINE POR CATEGORIA.
+//
+// CAUSA RAIZ que a v326 não pegava: a regra da mediana só acha OUTLIER DENTRO
+// da categoria. Quando a categoria INTEIRA está inflada, a mediana É a inflação
+// e nada é corrigido. Medido no banco real: instagram/facebook vivem em ~1,0x
+// do preço justo, mas tiktok:seguidores em 3,1x, youtube:inscritos em 4,1x e
+// telegram:grupo em 10x — daí "1.000 seguidores TikTok por R$ 278,50" enquanto
+// 1.000 do Instagram custa R$ 47,60. Preço que ninguém paga não é margem, é
+// prateleira morta (0 vendas acima de 1.000 un em 120 dias).
+//
+// Invariante nova: nenhum pacote pode ficar acima de CATEGORY_MAX_MULT do seu
+// preço justo. O justo já embute margem líquida de 4x + cupom + taxa Pix, então
+// o teto NUNCA come a margem mínima. Desce no máximo 20% por ciclo.
+export const CATEGORY_MAX_MULT = 1.6;
+
+
 const r2 = (v: number) => Number(v.toFixed(2));
 
 function median(values: number[]): number {
