@@ -112,7 +112,7 @@ export function SeoLanding(p: SeoLandingProps) {
                 </tr>
               </thead>
               <tbody>
-                {p.pricing.map((r, i) => (
+                {pricingRows.map((r, i) => (
                   <tr key={i} className="border-t" style={{ borderColor: `${p.accent}22` }}>
                     <td className="px-4 py-3">
                       <div className="text-white font-semibold">{r.qty}</div>
