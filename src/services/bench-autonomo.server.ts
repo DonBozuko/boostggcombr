@@ -409,6 +409,10 @@ export async function runBenchAutonomo(
           // pausado por motivo estrutural/margem.
           severity: saldoVencido.size > 0 || pausados.length > 0 || margem > 0 ? "critical" : "warning",
           origem: "bench-autonomo",
+          // v346: saldo é amarelo no painel, MAS tem que chegar no celular.
+          // Sem force, o gate de severidade engolia o aviso e o dono só
+          // descobria quando o prazo de 24h já tinha estourado (= vermelho).
+          force: precisaRecarga.length > 0,
         });
 
 
