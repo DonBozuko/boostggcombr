@@ -110,17 +110,22 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   }
 
 
-  const erro5xx = Number(h.erro_servidor_5xx ?? 0);
-  if (erro5xx >= 3) {
+  // v341 — 5xx só vira alerta se AINDA está falhando AGORA (15min), mesma
+  // régua do 404/401. Antes olhava 1h: uma rajada durante deploy, já curada,
+  // mantinha "robô batendo em erro" tocando por uma hora inteira.
+  const erro5xxAgora = Number(now15.erro_servidor_5xx ?? 0);
+  const erro5xxHora = Number(h.erro_servidor_5xx ?? 0);
+  if (erro5xxAgora >= 1 && erro5xxHora >= 3) {
     findings.push({
       code: "ROBO_ERRO_SERVIDOR",
       severity: "critical",
       titulo: "Robô batendo em erro do servidor",
-      problema: `${erro5xx} chamadas retornaram erro de servidor na última hora.`,
+      problema: `${erro5xxHora} chamadas retornaram erro de servidor na última hora (${erro5xxAgora} ainda agora).`,
       o_que_fazer: "Me avise para investigar o log da rota que está quebrando.",
-      evidencia: h,
+      evidencia: { agora: now15, ultima_hora: h },
     });
   }
+
 
 
   // 2) Cliente pagou e não recebeu
