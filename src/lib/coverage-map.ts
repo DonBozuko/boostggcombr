@@ -23,8 +23,9 @@ export const FAMILIAS: Familia[] = [
   { id: "rls", nome: "Acesso a dados", detector: "linter RLS" },
   { id: "promessa", nome: "Promessa do site × catálogo", detector: "promise-coherence + surface-scan" },
   { id: "preco_exibido", nome: "Preço exibido × preço cobrado", detector: "paridade vitrine × servidor" },
-  { id: "imagem", nome: "Imagens e provas visuais das landings", detector: null },
-  { id: "email", nome: "Texto dos e-mails transacionais", detector: null },
+  { id: "imagem", nome: "Imagens e provas visuais das landings", detector: "asset-coherence + surface-scan" },
+  { id: "email", nome: "Texto dos e-mails transacionais", detector: "email-coherence + surface-scan" },
+
 ];
 
 /** Rotas públicas já declaradas como cobertas pela varredura de superfície. */
