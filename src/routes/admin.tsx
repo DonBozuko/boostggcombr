@@ -1519,7 +1519,9 @@ function AdminPage({ initialToken }: { initialToken: string }) {
         
         
 
+        <div className={`${folder === "auditoria" ? "block" : "hidden"} mb-3`}><BenchPanel token={token} /></div>
         <div className={`${folder === "auditoria" ? "block" : "hidden"} mb-3`}><CanaryPanel token={token} /></div>
+
         <div className={`${folder === "auditoria" ? "block" : "hidden"} mb-3`}><OpsAuditPanel /></div>
 
         <div className={`${folder === "auditoria" ? "block" : "hidden"}`}><JarvisAlertCenter /></div>
