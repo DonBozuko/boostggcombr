@@ -354,6 +354,10 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       bound[p.slug] = (bound[p.slug] ?? 0) + 1;
       const rate = Number(hit.rate);
       if (!Number.isFinite(rate) || rate <= 0) continue;
+      // v351 — fornecedor que não aceita a quantidade do pacote NÃO define o
+      // custo. O despacho já o descarta (v286); deixá-lo precificar cria preço
+      // abaixo do custo real de quem entrega de verdade.
+      if (!serviceAcceptsQty(hit, qty)) continue;
       // rate é por 1000 na moeda do fornecedor → normaliza para BRL.
       costs.push({ slug: p.slug, cost: Number(((rate * p.fx * qty) / 1000).toFixed(4)) });
     }
