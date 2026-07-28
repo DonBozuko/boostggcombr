@@ -506,7 +506,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
   const bestsellers = useBestsellers();
 
   const buildDyn = (items: GridItem[], fallback: Plan[], unitLabel: string): Plan[] => {
-    if (!items.length) return fallback;
+    if (!items.length) return gridLoaded ? [] : fallback; // v336 — vazio do banco não vira fallback fantasma
     const tagFor = (q: number): string => {
       if (q <= 200) return "+ MINI";
       if (q <= 750) return "+ STARTER";
