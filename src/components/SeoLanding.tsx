@@ -7,6 +7,9 @@ import { DeliveryTimes } from "@/components/DeliveryTimes";
 import { TrustBadges } from "@/components/TrustBadges";
 import { LivePurchasesTicker } from "@/components/LivePurchasesTicker";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
+import { useLivePricingRows } from "@/hooks/useLivePricingRows";
+import type { PricingCategory } from "@/lib/pricing.functions";
+
 
 export type SeoBenefit = { icon: "check" | "zap" | "shield" | "clock"; title: string; text: string };
 export type SeoFaq = { q: string; a: string };
