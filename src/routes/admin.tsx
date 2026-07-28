@@ -23,6 +23,8 @@ import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
 import { ProbeCancelButton } from "@/components/ProbeCancelButton";
 import OpsAuditPanel from "@/components/OpsAuditPanel";
 import { CanaryPanel } from "@/components/CanaryPanel";
+import { BenchPanel } from "@/components/BenchPanel";
+
 
 
 
