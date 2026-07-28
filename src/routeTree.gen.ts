@@ -86,6 +86,7 @@ import { Route as ApiPublicHooksAutoHealerRouteImport } from './routes/api/publi
 import { Route as ApiPublicHooksAutoResolveServiceIdsRouteImport } from './routes/api/public/hooks/auto-resolve-service-ids'
 import { Route as ApiPublicHooksBackfillSmmhypeIdsRouteImport } from './routes/api/public/hooks/backfill-smmhype-ids'
 import { Route as ApiPublicHooksBackupDrillRouteImport } from './routes/api/public/hooks/backup-drill'
+import { Route as ApiPublicHooksBenchSweepRouteImport } from './routes/api/public/hooks/bench-sweep'
 import { Route as ApiPublicHooksBestsellerScanRouteImport } from './routes/api/public/hooks/bestseller-scan'
 import { Route as ApiPublicHooksCanaryRouteImport } from './routes/api/public/hooks/canary'
 import { Route as ApiPublicHooksDeliveryWatcherRouteImport } from './routes/api/public/hooks/delivery-watcher'
@@ -519,6 +520,12 @@ const ApiPublicHooksBackupDrillRoute =
     path: '/api/public/hooks/backup-drill',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksBenchSweepRoute =
+  ApiPublicHooksBenchSweepRouteImport.update({
+    id: '/api/public/hooks/bench-sweep',
+    path: '/api/public/hooks/bench-sweep',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksBestsellerScanRoute =
   ApiPublicHooksBestsellerScanRouteImport.update({
     id: '/api/public/hooks/bestseller-scan',
@@ -752,6 +759,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
+  '/api/public/hooks/bench-sweep': typeof ApiPublicHooksBenchSweepRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/canary': typeof ApiPublicHooksCanaryRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
@@ -858,6 +866,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
+  '/api/public/hooks/bench-sweep': typeof ApiPublicHooksBenchSweepRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/canary': typeof ApiPublicHooksCanaryRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
@@ -965,6 +974,7 @@ export interface FileRoutesById {
   '/api/public/hooks/auto-resolve-service-ids': typeof ApiPublicHooksAutoResolveServiceIdsRoute
   '/api/public/hooks/backfill-smmhype-ids': typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   '/api/public/hooks/backup-drill': typeof ApiPublicHooksBackupDrillRoute
+  '/api/public/hooks/bench-sweep': typeof ApiPublicHooksBenchSweepRoute
   '/api/public/hooks/bestseller-scan': typeof ApiPublicHooksBestsellerScanRoute
   '/api/public/hooks/canary': typeof ApiPublicHooksCanaryRoute
   '/api/public/hooks/delivery-watcher': typeof ApiPublicHooksDeliveryWatcherRoute
@@ -1073,6 +1083,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
+    | '/api/public/hooks/bench-sweep'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/canary'
     | '/api/public/hooks/delivery-watcher'
@@ -1179,6 +1190,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
+    | '/api/public/hooks/bench-sweep'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/canary'
     | '/api/public/hooks/delivery-watcher'
@@ -1285,6 +1297,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/auto-resolve-service-ids'
     | '/api/public/hooks/backfill-smmhype-ids'
     | '/api/public/hooks/backup-drill'
+    | '/api/public/hooks/bench-sweep'
     | '/api/public/hooks/bestseller-scan'
     | '/api/public/hooks/canary'
     | '/api/public/hooks/delivery-watcher'
@@ -1390,6 +1403,7 @@ export interface RootRouteChildren {
   ApiPublicHooksAutoResolveServiceIdsRoute: typeof ApiPublicHooksAutoResolveServiceIdsRoute
   ApiPublicHooksBackfillSmmhypeIdsRoute: typeof ApiPublicHooksBackfillSmmhypeIdsRoute
   ApiPublicHooksBackupDrillRoute: typeof ApiPublicHooksBackupDrillRoute
+  ApiPublicHooksBenchSweepRoute: typeof ApiPublicHooksBenchSweepRoute
   ApiPublicHooksBestsellerScanRoute: typeof ApiPublicHooksBestsellerScanRoute
   ApiPublicHooksCanaryRoute: typeof ApiPublicHooksCanaryRoute
   ApiPublicHooksDeliveryWatcherRoute: typeof ApiPublicHooksDeliveryWatcherRoute
@@ -1960,6 +1974,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksBackupDrillRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/bench-sweep': {
+      id: '/api/public/hooks/bench-sweep'
+      path: '/api/public/hooks/bench-sweep'
+      fullPath: '/api/public/hooks/bench-sweep'
+      preLoaderRoute: typeof ApiPublicHooksBenchSweepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/bestseller-scan': {
       id: '/api/public/hooks/bestseller-scan'
       path: '/api/public/hooks/bestseller-scan'
@@ -2244,6 +2265,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicHooksAutoResolveServiceIdsRoute,
   ApiPublicHooksBackfillSmmhypeIdsRoute: ApiPublicHooksBackfillSmmhypeIdsRoute,
   ApiPublicHooksBackupDrillRoute: ApiPublicHooksBackupDrillRoute,
+  ApiPublicHooksBenchSweepRoute: ApiPublicHooksBenchSweepRoute,
   ApiPublicHooksBestsellerScanRoute: ApiPublicHooksBestsellerScanRoute,
   ApiPublicHooksCanaryRoute: ApiPublicHooksCanaryRoute,
   ApiPublicHooksDeliveryWatcherRoute: ApiPublicHooksDeliveryWatcherRoute,
