@@ -18,8 +18,25 @@ export const QUEUE_MIN_AGE_MIN = 15;
 /** Backoff entre retentativas (minutos), por número de tentativas já feitas. */
 export const QUEUE_BACKOFF_MIN = [15, 30, 60, 120, 240];
 
+/**
+ * v353 — pedido parado só por falta de saldo no fornecedor não pode desistir em
+ * ~8h. O dono recarrega rápido, mas pode acontecer movimento grande e demorar.
+ * Regra declarada: a fila insiste sozinha por ~24h antes de chamar humano.
+ */
+export const QUEUE_BACKOFF_WAITING_MIN = [15, 30, 60, 120, 240, 240, 240, 240, 240, 240];
+
 /** Depois disso, para de tentar sozinho e chama humano. */
 export const QUEUE_MAX_ATTEMPTS = QUEUE_BACKOFF_MIN.length;
+
+/** Teto de tentativas para pedido aguardando recarga (~24h de insistência). */
+export const QUEUE_MAX_ATTEMPTS_WAITING = QUEUE_BACKOFF_WAITING_MIN.length;
+
+function tabela(status: string) {
+  return status === "waiting_provision"
+    ? { backoff: QUEUE_BACKOFF_WAITING_MIN, max: QUEUE_MAX_ATTEMPTS_WAITING }
+    : { backoff: QUEUE_BACKOFF_MIN, max: QUEUE_MAX_ATTEMPTS };
+}
+
 
 export type QueueItem = {
   id: string;
