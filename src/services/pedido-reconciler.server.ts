@@ -185,7 +185,9 @@ export async function runPedidoReconciler(): Promise<ReconcilerReport> {
 
       try {
         const { reprocessWaitingProvision } = await import("@/lib/reprocess-waiting.server");
-        const r = await reprocessWaitingProvision(p.id);
+        const { AUTO_QUEUE_TAG } = await import("@/lib/maturity-metrics");
+        // v354 — marca a origem: fila andou sozinha, sem toque humano.
+        const r = await reprocessWaitingProvision(p.id, { tag: AUTO_QUEUE_TAG });
         if (r.ok) {
           report.redispatch_sucesso++;
           report.detalhes.push({ id: p.id, created_at: p.created_at, result: `FILA_OK_${r.fornecedor}` });
