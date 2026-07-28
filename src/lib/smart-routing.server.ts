@@ -222,9 +222,8 @@ export async function rankProvidersByCost(opts: {
       //     visualizações apontando para "Likes");
       // (b) o fornecedor trocou o produto por trás do mesmo ID desde o vínculo.
       const nomeAtual = String((svcRow as any).name ?? "");
-      const catFornecedor = `${nomeAtual} ${String((svcRow as any).category ?? "")}`;
       const prevFp = fpMap.get(fingerprintKey(opts.pacote, providerIdCol[slug] ?? ""));
-      const trocou = productChanged(catFornecedor, prevFp, { provider: slug === "smmpainel" ? "smmpanel" : slug, service_id: String(pid) });
+      const trocou = productChanged(nomeAtual, prevFp, { provider: slug === "smmpainel" ? "smmpanel" : slug, service_id: String(pid) });
       const intencaoOk = serviceMatchesIntent((catRow as any)?.category, nomeAtual);
       if (!intencaoOk || trocou) {
         providerIdMap[slug] = null;
