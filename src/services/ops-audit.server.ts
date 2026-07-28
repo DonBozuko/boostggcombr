@@ -258,7 +258,10 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     if (promessas.length > 0) {
       findings.push({
         code: "SITE_PROMETE_O_QUE_NAO_TEM",
-        severity: "critical",
+        // v341 — texto de FAQ/landing não é dinheiro saindo agora: é aviso.
+        // Vermelho é só para cliente/dinheiro em risco imediato.
+        severity: "warning",
+
         titulo: "Texto do site promete o que o catálogo não entrega",
         problema: `${promessas.length} trecho(s) prometem algo que a rede não tem hoje (ex.: ${promessas
           .slice(0, 3)
