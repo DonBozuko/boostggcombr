@@ -7,10 +7,11 @@ const URL = "https://boostgg.com.br/comprar-seguidores-kwai";
 
 const faq = [
   { q: "Como funciona a compra de seguidores no Kwai?", a: "Você escolhe o pacote, informa o @ ou link do perfil e paga via Pix. Em minutos os seguidores começam a entrar de forma gradual pra manter o crescimento natural." },
-  { q: "Seguidores do Kwai são brasileiros?", a: "Sim. Nosso plano padrão entrega perfis brasileiros pra prova social real — importante pra quem monetiza no Kwai Rewards e depende de audiência BR." },
+  { q: "Seguidores do Kwai são brasileiros?", a: "Não. Os pacotes de Kwai hoje são 🌎 Global (alto volume) — o selo aparece em cada card. Linha 🇧🇷 Brasileiro Real existe em Instagram e TikTok." },
   { q: "Preciso da senha da minha conta Kwai?", a: "Não. Trabalhamos só com dados públicos (@ ou link). Nunca peça senha para nenhum fornecedor de crescimento — é golpe." },
   { q: "Em quanto tempo entrega?", a: "Início em 5-30 minutos após o Pix confirmado. Pacotes pequenos concluem no mesmo dia; acima de 10 mil, distribuímos em 2-5 dias." },
-  { q: "E se cair seguidor?", a: "Nos pacotes 🇧🇷 Brasileiro Real, reposição garantida por 30 dias em queda acima de 5%. Nos pacotes Global, pedimos reposição ao fornecedor e, sem garantia, avaliamos reenvio ou estorno. Basta abrir chamado no WhatsApp com o link do perfil." },
+  { q: "E se cair seguidor?", a: "Nos pacotes Global do Kwai não há reposição garantida: solicitamos reposição ao fornecedor e, sem garantia disponível, avaliamos reenvio ou estorno. Abra chamado no WhatsApp com o link do perfil." },
+
 ];
 
 export const Route = createFileRoute("/comprar-seguidores-kwai")({
