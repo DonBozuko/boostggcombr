@@ -21,6 +21,12 @@ const FONTES = import.meta.glob("/src/routes/**/*.tsx", {
   eager: true,
 }) as Record<string, string>;
 
+const COMPONENTES = import.meta.glob("/src/components/**/*.tsx", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+
 const EMAILS = import.meta.glob("/src/lib/email-templates/*.tsx", {
   query: "?raw",
   import: "default",
@@ -71,6 +77,19 @@ export async function runSurfaceScan(): Promise<{
       texto,
     }));
     violacoes.push(...checkPromiseCoherence({ network: rede, facts: f, textos }));
+  }
+
+  // Componentes reutilizados também mostram prova visual ao cliente.
+  for (const [path, source] of Object.entries(COMPONENTES)) {
+    if (/\/(ui|Admin|Jarvis|Bench|Ops|Reseller|Affiliates|Treasury|Canary|Laboratorio|Simulate|Sandbox|Claude|Pendencias|Recovery|Slo|Roas|Funnel|Catalog|Pricing|Waiting|Probe|Insights|Auditoria|Conversion)/.test(path)) continue;
+    const nome = path.split("/").pop()!.replace(/\.tsx?$/, "");
+    visuais.push(
+      ...checkVisualCoherence({
+        origem: `Componente ${nome}`,
+        source,
+        arquivosExistentes: PUBLICOS,
+      }),
+    );
   }
 
   // E-mails falam de todas as redes: só é mentira se NENHUMA rede entrega.
