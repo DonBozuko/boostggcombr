@@ -15,13 +15,27 @@
 export const CLAIM_BR_RE =
   /brasileiro\s*real|perfis?\s+brasileir|seguidores?\s+brasileir|membros?\s+brasileir|curtidas?\s+brasileir|linha\s+br\b|pacotes?\s+brasileir|audi[êe]ncia\s+brasileira/i;
 
-/** Promessa de reposição/garantia contra queda. */
+/**
+ * Promessa de reposição/garantia contra queda.
+ * v338 — a versão antiga só via "reposição garantida/de 30 dias". Passava batido
+ * "30 dias de reposição em caso de queda" e "garantia de 30 dias", que é a mesma
+ * promessa escrita ao contrário. Agora as duas ordens contam.
+ */
 export const CLAIM_REFILL_RE =
-  /reposi[çc][ãa]o\s+(?:[ée]\s+)?(?:garantid|por\s+\d+|de\s+\d+|nos?\s+)|garantia\s+de\s+reposi[çc][ãa]o|refill\s+garantid|sem\s+drop|sem\s+queda|n[ãa]o\s+cai(?:em)?\b/i;
+  /reposi[çc][ãa]o\s+(?:[ée]\s+)?(?:garantid|autom[áa]tic|por\s+\d+|de\s+\d+|nos?\s+|em\s+caso)|\d+\s*dias?\s+de\s+reposi[çc][ãa]o|garantia\s+de\s+reposi[çc][ãa]o|garantia\s+(?:de\s+)?\d+\s*dias|refill\s+garantid|sem\s+drop|sem\s+queda|n[ãa]o\s+cai(?:em)?\b/i;
 
 /** Negativas explícitas ("hoje não", "não há reposição garantida") não são promessa. */
 const NEGATION_RE =
   /\b(n[ãa]o|sem\s+garantia|hoje\s+n[ãa]o|nenhum|inexistente)\b[^.]{0,60}$/i;
+
+/**
+ * v338 — a frase atribui a promessa a OUTRA rede? ("Linha Brasileiro Real
+ * existe em Instagram e TikTok" numa página de Kwai é informação correta,
+ * não promessa da rede da página.)
+ */
+const OUTRA_REDE_RE =
+  /\b(existe|dispon[íi]vel|s[óo]|apenas|somente)\b[^.]{0,40}\b(instagram|tiktok|youtube|kwai|facebook|telegram)\b/i;
+
 
 export type PromiseFacts = {
   /** Rede tem ao menos um pacote vendável de origem brasileira. */
