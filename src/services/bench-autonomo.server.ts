@@ -23,10 +23,9 @@ const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 const CONCURRENCY = 4;
 /** v335 — travado em 3 varreduras seguidas (6h) não é transitório: sai da vitrine. */
 const CICLOS_PARA_PAUSAR = 3;
-/** v345 — saldo tem prazo: só vira pausa/vermelho depois de 24h sem recarga. */
-const PRAZO_SALDO_MS = 24 * 60 * 60 * 1000;
-/** Janela de histórico lida para medir o streak de saldo (2h por ciclo). */
+/** Janela de histórico lida para medir persistência (2h por ciclo). */
 const RUNS_JANELA_SALDO = 16;
+
 
 
 export type BenchRunResult = {
@@ -189,12 +188,12 @@ export async function runBenchAutonomo(
 
     // ---- Correção automática -------------------------------------------
     // Estrutural sai na hora (v297).
-    // v345 — SALDO NÃO É FALHA DE ENTREGA. O cliente tem prazo de entrega
-    // (24h); saldo o dono repõe a qualquer hora. Tirar da vitrine por saldo
-    // é perder venda por um problema que se resolve com um Pix. Então:
-    //   - margem persistente (3 ciclos / 6h) → pausa (vende no prejuízo);
-    //   - saldo → NÃO pausa; só pausa se passar de 24h sem recarga (falha
-    //     humana declarada, aí sim viraria entrega furada).
+    // v350 — SALDO NUNCA TIRA PACOTE DA VITRINE. O cliente tem prazo de
+    // entrega e o dono repõe saldo a qualquer hora, com aviso imediato no
+    // celular (v346). Pausar por saldo é perder venda por um problema que se
+    // resolve com um Pix — e o checkout já tem preflight que impede cobrar sem
+    // rota. Então: só margem persistente (3 ciclos / 6h) e falha estrutural
+    // pausam. Saldo, nunca — nem depois de 24h.
     const estruturais = new Map<string, string>();
     for (const r of avaliados) {
       if (r.verdict === "catalogo" || r.verdict === "sem_fornecedor") {
@@ -203,8 +202,7 @@ export async function runBenchAutonomo(
     }
 
     const persistentes = new Map<string, string>();
-    /** Pacotes com saldo faltando há mais de 24h (prazo estourado). */
-    const saldoVencido = new Set<string>();
+
     try {
       const { data: runsAnteriores } = await (supabaseAdmin as any)
         .from("bench_runs")
@@ -243,26 +241,12 @@ export async function runBenchAutonomo(
           if (runsPrev.length >= CICLOS_PARA_PAUSAR - 1 && ciclos >= CICLOS_PARA_PAUSAR - 1) {
             persistentes.set(r.pacote, `${PAUSE_PREFIX}: ${r.motivo}`);
           }
-        } else if (r.verdict === "saldo") {
-          // Streak contínuo de saldo faltando, do mais recente para trás.
-          let desde = Date.now();
-          for (const run of runsPrev) {
-            if (porRun.get(run.id)?.get(r.pacote) !== "saldo") break;
-            const t = Date.parse(run.started_at);
-            if (Number.isFinite(t)) desde = t;
-          }
-          if (Date.now() - desde >= PRAZO_SALDO_MS) {
-            saldoVencido.add(r.pacote);
-            persistentes.set(
-              r.pacote,
-              `${PAUSE_PREFIX}: saldo pendente há mais de 24h — ${r.motivo}`,
-            );
-          }
         }
       }
     } catch {
       // Sem histórico não pausa nada — silêncio nunca vira pausa.
     }
+
 
     const paraPausar = new Map<string, string>([...estruturais, ...persistentes]);
 
@@ -280,7 +264,10 @@ export async function runBenchAutonomo(
 
 
     // Religa SÓ o que esta trava pausou e que agora tem rota provada agora.
+    // v350 — pausa antiga por saldo é liberada de imediato: saldo deixou de ser
+    // motivo de tirar pacote do ar.
     const entregaveis = new Set(avaliados.filter((r) => r.verdict === "entregavel").map((r) => r.pacote));
+    const soFaltaSaldo = new Set(avaliados.filter((r) => r.verdict === "saldo").map((r) => r.pacote));
     const religados: string[] = [];
     const { data: pausadosDb } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -289,7 +276,10 @@ export async function runBenchAutonomo(
       .like("sellable_reason", `${PAUSE_PREFIX}%`);
     for (const p of ((pausadosDb as any[]) ?? [])) {
       const pacote = String(p.pacote);
-      if (!entregaveis.has(pacote)) continue;
+      const motivoAntigo = String(p.sellable_reason ?? "");
+      const eraSaldo = /saldo/i.test(motivoAntigo);
+      if (!entregaveis.has(pacote) && !(eraSaldo || soFaltaSaldo.has(pacote))) continue;
+
       const { data } = await supabaseAdmin
         .from("pricing_items" as any)
         .update({ is_sellable: true, sellable_reason: null })
@@ -351,10 +341,9 @@ export async function runBenchAutonomo(
       if (precisaRecarga.length > 0) {
         linhas.push("");
         linhas.push(
-          saldoVencido.size > 0
-            ? "Saldo pendente há MAIS DE 24h (agora atrasa entrega de verdade):"
-            : "Falta saldo (dentro do prazo de entrega — pode repor hoje, nada foi tirado da vitrine por isso):",
+          "Falta saldo em fornecedor (dentro do prazo de entrega — nada foi tirado da vitrine por isso):",
         );
+
         for (const [forn, falta] of precisaRecarga) {
           linhas.push(`• ${forn}: recarregar ${brl(falta)}`);
         }
@@ -404,10 +393,11 @@ export async function runBenchAutonomo(
       if (await podeAlertar(sig)) {
         const { dispatchTelegramAlert } = await import("@/lib/messaging");
         const r = await dispatchTelegramAlert(texto, {
-          // v345: saldo dentro do prazo é amarelo. Vermelho só quando passa de
-          // 24h sem recarga (aí a entrega atrasa de fato) ou quando pacote foi
-          // pausado por motivo estrutural/margem.
-          severity: saldoVencido.size > 0 || pausados.length > 0 || margem > 0 ? "critical" : "warning",
+          // v350: saldo NUNCA é vermelho — é aviso amarelo que chega no
+          // celular na hora. Vermelho só quando pacote foi pausado por motivo
+          // estrutural ou margem (aí sim é falha de entrega).
+          severity: pausados.length > 0 || margem > 0 ? "critical" : "warning",
+
           origem: "bench-autonomo",
           // v346: saldo é amarelo no painel, MAS tem que chegar no celular.
           // Sem force, o gate de severidade engolia o aviso e o dono só
