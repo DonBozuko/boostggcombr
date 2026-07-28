@@ -50,9 +50,49 @@ export async function loadCatalogFacts(): Promise<
   return facts;
 }
 
+// v338 — PONTO CEGO FECHADO: até aqui o detector só lia FAQ e depoimentos das
+// 7 rotas de rede. As ~15 landings de SEO têm copy própria (intro, benefícios,
+// bodySections, FAQ local) e NUNCA foram medidas — foi lá que apareceu
+// "garantia de 30 dias nos pacotes brasileiros" numa página de YouTube global.
+// Agora o código-fonte das rotas entra na varredura como texto.
+const FONTES_ROTAS = import.meta.glob("/src/routes/*.tsx", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+
+/** Rede de uma landing pelo nome do arquivo. */
+export function redeDaRota(arquivo: string): string | null {
+  const nome = arquivo.split("/").pop()?.replace(/\.tsx$/, "") ?? "";
+  if (/tiktok/i.test(nome)) return "tiktok";
+  if (/youtube/i.test(nome)) return "youtube";
+  if (/kwai/i.test(nome)) return "kwai";
+  if (/facebook/i.test(nome)) return "facebook";
+  if (/telegram/i.test(nome)) return "telegram";
+  if (/trafego/i.test(nome)) return "trafego";
+  if (/instagram|seguidores|curtidas|brasileir|pix|engajamento|impulsionar|audiencia|promo/i.test(nome))
+    return "instagram";
+  return null;
+}
+
+/** Só frases de copy: literais longos em português, sem cara de código. */
+export function textosDeCopy(fonte: string): string[] {
+  const out: string[] = [];
+  const re = /"([^"\\\n]{28,400})"|'([^'\\\n]{28,400})'/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(fonte))) {
+    const s = (m[1] ?? m[2] ?? "").trim();
+    if (!/\s/.test(s)) continue;
+    if (/^[\w:@/.$#-]+$/.test(s)) continue;          // classes, urls, ids
+    if (/[{}<>]|=>|className|https?:\/\//.test(s)) continue;
+    if (!/[áàâãéêíóôõúçA-Z]/.test(s)) continue;
+    out.push(s);
+  }
+  return out;
+}
+
 export async function runPromiseCoherence(): Promise<PromiseViolation[]> {
   const facts = await loadCatalogFacts();
-
 
   const out: PromiseViolation[] = [];
   for (const [rede, f] of facts) {
@@ -67,5 +107,20 @@ export async function runPromiseCoherence(): Promise<PromiseViolation[]> {
     }
     out.push(...checkPromiseCoherence({ network: rede, facts: f, textos }));
   }
+
+  // v338 — copy das landings de SEO (fonte das rotas).
+  for (const [arquivo, fonte] of Object.entries(FONTES_ROTAS)) {
+    const rede = redeDaRota(arquivo);
+    if (!rede) continue;
+    const f = facts.get(rede);
+    if (!f) continue;
+    const pagina = arquivo.split("/").pop()?.replace(/\.tsx$/, "") ?? arquivo;
+    const textos = textosDeCopy(fonte).map((texto) => ({
+      origem: `Página /${pagina === "index" ? "" : pagina}`,
+      texto,
+    }));
+    out.push(...checkPromiseCoherence({ network: rede, facts: f, textos }));
+  }
+
   return out;
 }
