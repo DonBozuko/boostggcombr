@@ -166,11 +166,14 @@ export async function notifyAdminProvisioning(alert: ProvisioningAlert): Promise
       ? alert.custoBrl
       : await realCostBrl(alert.pacote, alert.quantidade);
   const text = buildProvisioningMessage({ ...alert, custoBrl, saldoCritical });
+  // v318 — provisão é dinheiro em jogo: sempre chega no celular, mesmo que o
+  // classificador leia o texto como sucesso.
   const opts = saldoCritical || alert.criticalCaixaZero
-    ? { inlineKeyboard: rechargeKeyboard(alert.pedidoId) }
-    : undefined;
+    ? { inlineKeyboard: rechargeKeyboard(alert.pedidoId), force: true, origem: "pedido-pago" }
+    : { force: true, origem: "pedido-pago" };
   try {
     const res = await dispatchTelegram(text, opts);
+
     if (!res.ok) {
       console.error("[admin-notify] Telegram falhou", res.detail);
       try {
