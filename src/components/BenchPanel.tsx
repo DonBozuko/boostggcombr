@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { benchBatch, benchCount } from "@/lib/bench.functions";
+import { getLastBenchRun } from "@/lib/bench-autonomo.functions";
 import { summarizeBench, type BenchRow } from "@/lib/bench-sweep";
-import { Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
+import { Loader2, ShieldCheck, AlertTriangle, Bot } from "lucide-react";
 import { toast } from "sonner";
+
 
 const LABEL: Record<string, string> = {
   entregavel: "Entrega garantida",
