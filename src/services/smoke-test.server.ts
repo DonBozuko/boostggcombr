@@ -2,9 +2,13 @@
 // Valida a cada 15min:
 //  1. Cada fornecedor ativo responde /balance (endpoint vivo + API key OK)
 //  2. Todo pacote tem pelo menos 1 service_id válido no catálogo do fornecedor
-//  3. Margem >= 75% em 100% do catálogo (trigger v177 garante, mas conferimos)
+//  3. Margem mínima — régua ÚNICA de `margin-guardian` (v334). Antes havia aqui
+//     um `cost * 2.9` escrito à mão que brigava com a v328 e acusava prejuízo
+//     falso em pacote de custo alto (p500k, yv1m...). Nunca mais duplicar.
 //  4. Cron do auto-healer rodou nas últimas 2 execuções
 // Dispara alerta no Telegram se qualquer camada quebrar.
+
+import { respectsMinMargin } from "@/lib/margin-guardian";
 
 type SmokeReport = {
   ok: boolean;
@@ -141,8 +145,8 @@ export async function runSmokeTest(): Promise<SmokeReport> {
 
     const cost = Number(it.cost_brl) || 0;
     const price = Number(it.price_brl) || 0;
-    // Alinhado com trigger enforce_pricing_markup (v170): 3x mínimo p/ pacotes pequenos
-    if (cost > 0 && price < cost * 2.9 - 0.01) report.packages_below_margin.push(it.pacote);
+    // v334 — régua única (margin-guardian). Nunca reescrever o número aqui.
+    if (cost > 0 && !respectsMinMargin(price, cost)) report.packages_below_margin.push(it.pacote);
   }
 
   // 3) Auto-healer rodou recentemente?
