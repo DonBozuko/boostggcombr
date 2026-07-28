@@ -4,10 +4,23 @@ const NETWORK_BENEFIT: Record<RouteKey, string> = {
   "/": "Seguidores Brasileiros e Curtidas",
   "/tiktok": "Seguidores Brasileiros e Curtidas",
   "/youtube": "Inscritos e Watch Time",
-  "/facebook": "Seguidores Brasileiros e Curtidas",
+  "/facebook": "Seguidores e Curtidas",
   "/telegram": "Membros e Visualizações",
   "/trafego": "Visitas Geo-segmentadas",
-  "/kwai": "Seguidores BR e Views Kwai",
+  "/kwai": "Seguidores e Views Kwai",
+};
+
+// v329 — só Instagram e TikTok têm linha 🇧🇷 Brasileiro Real com reposição no
+// catálogo. Prometer "perfis brasileiros" e "reposição" nas outras rotas é
+// promessa que o fornecedor não cumpre → estorno e má fama. Selo segue o real.
+const HAS_BR_LINE: Record<RouteKey, boolean> = {
+  "/": true,
+  "/tiktok": true,
+  "/youtube": false,
+  "/facebook": false,
+  "/telegram": false,
+  "/trafego": false,
+  "/kwai": false,
 };
 
 export function BenefitsGrid({
@@ -17,14 +30,16 @@ export function BenefitsGrid({
   route?: RouteKey;
   accent?: string;
 }) {
+  const temBR = HAS_BR_LINE[route] ?? false;
   const items = [
-    "Perfis Brasileiros",
+    temBR ? "Perfis Brasileiros" : "Entrega Gradual",
     "Entrega Automática",
     "Pagamento via Pix",
     "Sem solicitar senha",
-    "Reposição nos pacotes BR",
+    temBR ? "Reposição nos pacotes BR" : "Suporte no WhatsApp",
     NETWORK_BENEFIT[route] ?? "Crescimento Real",
   ];
+
   return (
     <section className="mx-2 mt-1 mb-1" aria-label="Benefícios BoostGG">
       <div className="grid grid-cols-2 gap-1.5">
