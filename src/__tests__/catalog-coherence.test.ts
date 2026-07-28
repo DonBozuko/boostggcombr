@@ -63,7 +63,7 @@ describe("coerência do catálogo", () => {
         base({ pacote: "a", quantidade: 1000, cost_brl: 1, price_brl: 10 }),
         base({ pacote: "b", quantidade: 2000, cost_brl: 2, price_brl: 20 }),
         base({
-          pacote: "brpro",
+          pacote: "c",
           quantidade: 1000,
           cost_brl: 7.35,
           price_brl: 60,
@@ -72,9 +72,24 @@ describe("coerência do catálogo", () => {
       ],
       names,
     );
-    const achado = issues.find((i) => i.code === "CUSTO_FORA_DA_CURVA" && i.pacote === "brpro");
+    const achado = issues.find((i) => i.code === "CUSTO_FORA_DA_CURVA" && i.pacote === "c");
     expect(achado?.severity).toBe("warning");
   });
+
+  // v338 — premium é outro produto: comparar com o econômico gerava aviso
+  // eterno e escondia o problema real.
+  it("linha premium não é comparada com a econômica", () => {
+    const issues = analyzeCatalogCoherence(
+      [
+        base({ pacote: "br-p1k", quantidade: 1000, cost_brl: 1, price_brl: 10 }),
+        base({ pacote: "br-p2k", quantidade: 2000, cost_brl: 2, price_brl: 20 }),
+        base({ pacote: "br-pro1k", quantidade: 1000, cost_brl: 7.35, price_brl: 60 }),
+      ],
+      new Map(),
+    );
+    expect(issues.filter((i) => i.pacote === "br-pro1k")).toEqual([]);
+  });
+
 
   it("pega custo fora da curva", () => {
     const issues = analyzeCatalogCoherence(
