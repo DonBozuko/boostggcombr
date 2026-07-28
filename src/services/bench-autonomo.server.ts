@@ -287,6 +287,56 @@ export async function runBenchAutonomo(
       await (supabaseAdmin as any).from("bench_runs").update({ alertou }).eq("id", runId);
     }
 
+    // ---- v334: o alarme está ANDANDO? -----------------------------------
+    // Achado idêntico nas últimas N varreduras = trava nossa que não converge.
+    // Sobe com texto e cooldown próprios: a ação é consertar código, não
+    // recarregar saldo.
+    if (options.notify !== false) {
+      try {
+        const { achadosNaoConvergentes, mensagemNaoConvergencia, CICLOS_PARA_DEFEITO } =
+          await import("@/lib/convergence");
+
+        const { data: ultimasRuns } = await (supabaseAdmin as any)
+          .from("bench_runs")
+          .select("id")
+          .not("finished_at", "is", null)
+          .order("started_at", { ascending: false })
+          .limit(CICLOS_PARA_DEFEITO);
+
+        const ids: string[] = (ultimasRuns ?? []).map((r: any) => r.id);
+        if (ids.length === CICLOS_PARA_DEFEITO) {
+          const { data: achados } = await (supabaseAdmin as any)
+            .from("bench_findings")
+            .select("run_id, pacote, verdict")
+            .in("run_id", ids);
+
+          const porRun = new Map<string, string[]>(ids.map((id) => [id, []]));
+          for (const a of achados ?? []) {
+            porRun.get(a.run_id)?.push(`${a.pacote}|${a.verdict}`);
+          }
+          const ciclos = ids.map((id) => ({ runId: id, assinaturas: porRun.get(id) ?? [] }));
+          const travados = achadosNaoConvergentes(ciclos);
+          const msg = mensagemNaoConvergencia(travados);
+
+          if (msg) {
+            const sigLoop = await assinatura(
+              JSON.stringify({ loop: travados.map((t) => t.assinatura) }),
+            );
+            if (await podeAlertar(sigLoop)) {
+              const { dispatchTelegramAlert } = await import("@/lib/messaging");
+              await dispatchTelegramAlert(msg, {
+                severity: "critical",
+                origem: "bench-nao-convergencia",
+              });
+            }
+          }
+        }
+      } catch {
+        // Falha nossa aqui nunca pode derrubar a varredura.
+      }
+    }
+
+
     return {
       ok: true,
       run_id: runId,
