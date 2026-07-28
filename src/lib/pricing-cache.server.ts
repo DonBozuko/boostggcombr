@@ -676,7 +676,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
 
   // v282 — Aviso em destaque: reajuste automático, aposentadoria e volta ao normal.
   // Só faz sentido quando os preços realmente foram gravados (fora da quarentena).
-  if (!emQuarentena && (reajustados.length > 0 || aposentados.length > 0 || restored.length > 0)) {
+  // v319 — "pacote voltou ao normal" sozinho não é notícia: é o sistema
+  // funcionando. Só vai junto quando houve reajuste ou aposentadoria de verdade.
+  if (!emQuarentena && (reajustados.length > 0 || aposentados.length > 0)) {
     try {
       const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
       const linhas = (arr: typeof reajustados) =>
