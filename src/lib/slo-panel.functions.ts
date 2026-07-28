@@ -24,6 +24,8 @@ type SloMetrics = {
   successRate: number; // % de pedidos pagos que viraram completed/processing (não falharam)
   refundRatePct: number; // % refunded sobre total pagos
   perDay: Array<{ day: string; pagos: number; entregues: number; refunded: number; failed: number }>;
+  /** v354 — medidor real de 30 dias (substitui o "% de sistema pronto"). */
+  maturity: import("@/lib/maturity-metrics").MaturityMetrics | null;
   generatedAt: string;
 };
 
@@ -36,7 +38,7 @@ export const getSloMetrics = createServerFn({ method: "POST" })
         ok: false, windowDays: 7,
         totals: { pagos: 0, entregues: 0, processando: 0, refunded: 0, awaiting_approval: 0, smm_failed: 0, margin_hold: 0, revenue_brl: 0 },
         deliveryLatency: { p50Min: null, p95Min: null, maxMin: null, sample: 0 },
-        successRate: 0, refundRatePct: 0, perDay: [], generatedAt: new Date().toISOString(),
+        successRate: 0, refundRatePct: 0, perDay: [], maturity: null, generatedAt: new Date().toISOString(),
       };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -50,6 +52,16 @@ export const getSloMetrics = createServerFn({ method: "POST" })
       .limit(5000);
 
     const list = (rows as any[]) ?? [];
+
+    // v354 — medidor de 30 dias: autonomia, tempo pago→entregue e estornos.
+    const { computeMaturity } = await import("@/lib/maturity-metrics");
+    const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: rows30 } = await supabaseAdmin
+      .from("pedidos")
+      .select("status, created_at, dispatched_at, last_reconciled_at, error_detail")
+      .gte("created_at", since30)
+      .limit(20000);
+    const maturity = computeMaturity((rows30 as any[]) ?? [], 30);
 
     const PAID = new Set(["paid", "pago", "processing", "completed", "concluido", "concluído", "Enviado", "provisioning", "provisioned"]);
     const DELIVERED = new Set(["completed", "concluido", "concluído", "Enviado"]);
@@ -116,6 +128,7 @@ export const getSloMetrics = createServerFn({ method: "POST" })
       successRate: Math.round(successRate * 10) / 10,
       refundRatePct: Math.round(refundRatePct * 10) / 10,
       perDay,
+      maturity,
       generatedAt: new Date().toISOString(),
     };
   });
