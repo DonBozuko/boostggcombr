@@ -36,6 +36,9 @@ export type UnitFix = {
 /** Queda máxima por ciclo (0.8 = -20%). */
 export const UNIT_MAX_DOWN = 0.8;
 
+/** Filtro de ruído: só corrige quando a incoerência passa de 5% (v311). */
+export const UNIT_TOLERANCE = 1.05;
+
 const r2 = (v: number) => Number(v.toFixed(2));
 
 /**
@@ -68,7 +71,7 @@ export function enforceUnitCoherence<T extends UnitRow>(
       const price = Number(r.price_brl);
       const unit = price / qty;
 
-      if (unit > cap + 1e-9) {
+      if (unit > cap * UNIT_TOLERANCE + 1e-9) {
         const piso = Number(floorFor(r)) || 0;
         if (piso > 0) {
           const alvo = r2(Math.max(cap * qty, piso, price * UNIT_MAX_DOWN));
