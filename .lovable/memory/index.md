@@ -16,6 +16,7 @@ Modo Orquestrador (regra absoluta): antes de mexer, mapear impacto cruzado, defi
 Documento nunca manda no código: `ARQUITETURA.md` e os arquivos em `.lovable/*.md` são índice, não verdade. Se divergirem do código, o CÓDIGO vence e eu corrijo o documento no mesmo turno. Proibido cravar service ID, preço ou número que o sync muda sozinho dentro de documento.
 Toda tarefa começa com rótulo: RÁPIDO (executo direto) · MÉDIO (mostro mapa de impacto e executo) · PESADO (dinheiro/dispatch/auth/migração — aviso que preciso do turno inteiro pra analisar antes de codar). Ver [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho).
 Problema achado por acaso = falha de instrumentação. Todo bug vira invariante automatizada + teste + achado na auditoria forense. Ver [Bug vira invariante](mem://preferences/bug-vira-invariante).
+Regra 2x: se o mesmo TIPO de problema aparecer pela 2ª vez, patch é proibido. Mapear a rota inteira e matar a causa, com trava antes da cobrança. Ver [Regra 2x](mem://preferences/regra-2x-causa-raiz).
 
 
 Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste barra qualquer segundo escritor. Ver [Preço dono único](mem://preferences/preco-dono-unico).
@@ -30,5 +31,6 @@ Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/d
 - [Nunca cobrar sem preflight](mem://preferences/nunca-cobrar-sem-preflight) — v297: checagem ao vivo de rota antes de gerar Pix/cartão, fail-open em timeout, fail-closed com veredito, auto-cura da prateleira.
 - [Nunca cobrar sem validar o alvo](mem://preferences/nunca-cobrar-sem-validar-alvo) — v301: perfil do Instagram precisa existir e estar público antes da cobrança; fail-open em instabilidade; mensagem clara no checkout.
 - [Modo Torre (Clean Code)](mem://preferences/modo-torre-clean-code) — Contrato de ciclo fechado: anti-arquivo-gigante, modular por feature, deletar lixo na hora, listar arquivos antes de codar, 4 perguntas de direcionamento.
+- [Regra 2x — causa raiz](mem://preferences/regra-2x-causa-raiz) — Problema repetido 2x proíbe patch: mapear rota do dinheiro, atacar o que o fornecedor muda sem o sistema perceber, trava antes da cobrança + teste de regressão.
 
 
