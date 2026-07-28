@@ -294,14 +294,22 @@ export async function runBenchAutonomo(
       );
       if (precisaRecarga.length > 0) {
         linhas.push("");
-        linhas.push("Falta saldo:");
+        linhas.push("Falta saldo nos pacotes que vendem:");
         for (const [forn, falta] of precisaRecarga) {
           linhas.push(`• ${forn}: recarregar ${brl(falta)}`);
         }
       }
-      if (estruturais.size > 0) {
+      const sobDemanda = Object.entries(s.recargaSobDemanda);
+      if (sobDemanda.length > 0) {
         linhas.push("");
-        linhas.push(`Sem fornecedor válido: ${estruturais.size} pacote(s) — já tirei da vitrine sozinho.`);
+        linhas.push("Só sob encomenda (pacote gigante que ninguém comprou — não precisa recarregar agora):");
+        for (const [forn, falta] of sobDemanda) {
+          linhas.push(`• ${forn}: precisaria ${brl(falta)} se alguém comprar`);
+        }
+      }
+      if (paraPausar.size > 0) {
+        linhas.push("");
+        linhas.push(`Tirei da vitrine sozinho: ${paraPausar.size} pacote(s) que não entregariam agora.`);
       }
       if (margem > 0) {
         linhas.push("");
@@ -311,6 +319,7 @@ export async function runBenchAutonomo(
         linhas.push("");
         linhas.push(`Voltaram à vitrine sozinhos: ${religados.length} pacote(s).`);
       }
+
       if (naoAvaliados > 0) {
         linhas.push("");
         linhas.push(`Não consegui testar agora: ${naoAvaliados} pacote(s) (nada foi pausado por isso).`);
