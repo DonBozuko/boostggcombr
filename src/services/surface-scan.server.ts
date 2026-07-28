@@ -81,10 +81,10 @@ export async function runSurfaceScan(): Promise<{
   const emails: EmailViolation[] = [];
   for (const [path, source] of Object.entries(EMAILS)) {
     const nome = path.split("/").pop()!.replace(/\.tsx?$/, "");
-    emails.push(checkEmailCoherence({ template: nome, source, facts: agregado }).length
-      ? ...[]
-      : ...[]);
+    if (nome === "registry") continue;
+    emails.push(...checkEmailCoherence({ template: nome, source, facts: agregado }));
   }
+
 
   return {
     violacoes,
