@@ -66,19 +66,26 @@ describe("v325 — mapa canônico de status", () => {
   });
 
   // TRAVA: status gravado em pedidos.status que não esteja no mapa quebra o build.
-  it("todo status escrito no código está mapeado", () => {
+  it("todo status escrito na tabela de pedidos está mapeado", () => {
     const files = walk(join(process.cwd(), "src"));
     const desconhecidos = new Set<string>();
     for (const f of files) {
       if (f.includes("order-status")) continue;
-      const src = readFileSync(f, "utf8");
-      // só considera trechos que atualizam pedidos: `status: "x"` perto de pedidos
-      if (!/from\("pedidos"\)|\.from\('pedidos'\)/.test(src)) continue;
-      for (const m of src.matchAll(/status:\s*"([A-Za-z_]+)"/g)) {
-        const v = m[1];
-        if (!isKnownInternalStatus(v)) desconhecidos.add(`${v} (${f.split("/src/")[1]})`);
+      const linhas = readFileSync(f, "utf8").split("\n");
+      // só olha os 20 linhas seguintes a um .from("pedidos") — evita confundir
+      // com status de outras tabelas (alerts, fila de recuperação, fornecedores).
+      let janela = 0;
+      for (const l of linhas) {
+        if (/\.from\(["']pedidos["']\)/.test(l)) janela = 20;
+        else if (janela > 0) janela -= 1;
+        if (janela === 0) continue;
+        const m = l.match(/status:\s*"([A-Za-z_]+)"/);
+        if (m && !isKnownInternalStatus(m[1])) {
+          desconhecidos.add(`${m[1]} (${f.split("/src/")[1]})`);
+        }
       }
     }
     expect([...desconhecidos]).toEqual([]);
   });
 });
+
