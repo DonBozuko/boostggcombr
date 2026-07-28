@@ -151,6 +151,9 @@ const MASS_CHANGE_RATIO = 0.3;
 // v311 — variação de custo abaixo de 5% é ruído de câmbio/arredondamento do
 // fornecedor. Não conta como "pacote mudou de preço" para o freio de massa.
 const MOVE_THRESHOLD = 0.05;
+// v317 — só troca o fornecedor vencedor se o concorrente for >5% mais barato.
+// Empate técnico mantém quem já está: fim do ping-pong de fornecedor.
+const SWITCH_MIN_GAIN = 0.05;
 // v282 — Faixas de reajuste de custo do fornecedor.
 const AUTO_UP_MAX = 1.40;   // até +40%: aplica sozinho
 const RETIRE_ABOVE = 1.80;  // acima de +80%: aposenta o pacote
@@ -374,7 +377,21 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     if ((missSince ?? null) !== (r.id_miss_since ?? null)) patch.id_miss_since = missSince;
 
     if (costs.length > 0) {
-      const best = costs.reduce((a, b) => (b.cost < a.cost ? b : a));
+      // v317 — HISTERESE DE FORNECEDOR (causa raiz do "preço mudou sozinho").
+      //
+      // Antes era `Math.min` puro entre os fornecedores. Como cada cache de
+      // fornecedor sincroniza em horário próprio, o vencedor trocava de um ciclo
+      // para o outro por diferença de centavos — e o custo do pacote pulava junto.
+      // O motor lia isso como "192 pacotes mudaram de preço", o freio de massa
+      // disparava e o Telegram mandava 51 alertas críticos em 48h. Não era o
+      // fornecedor mudando preço: era a nossa escolha de fornecedor balançando.
+      //
+      // Agora o fornecedor atual só é trocado quando o concorrente é
+      // materialmente mais barato (>5%). Empate técnico mantém quem já está.
+      const maisBarato = costs.reduce((a, b) => (b.cost < a.cost ? b : a));
+      const atual = costs.find((c) => c.slug === String(r.last_cost_source ?? ""));
+      const best =
+        atual && maisBarato.cost > atual.cost * (1 - SWITCH_MIN_GAIN) ? atual : maisBarato;
       const newCost = best.cost;
       const newPrice = computeGuardedPrice(newCost, qty); // Equação Fabiano Tiered v173
       const oldPrice = Number(r.price_brl ?? 0);
@@ -459,11 +476,20 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     const custoAntigo = Number(r.cost_brl ?? 0);
     const custoNovo = patch.cost_brl !== undefined ? Number(patch.cost_brl) : custoAntigo;
     const variacao = custoAntigo > 0 ? Math.abs(custoNovo / custoAntigo - 1) : (custoNovo > 0 ? 1 : 0);
+    // v316 — CAUSA RAIZ DO IMPASSE. Antes bastava `patch.is_sellable !== undefined`
+    // para o pacote contar como "mudou". Só que o motor reescreve is_sellable=false
+    // em TODO ciclo para pacote que já estava pausado — mesmo valor, zero mudança
+    // real. Resultado: 192 de 281 pacotes entravam na conta toda hora, o freio de
+    // massa (>30%) disparava para sempre, NADA era gravado, e os pacotes pausados
+    // ficavam pausados eternamente porque a correção nunca chegava a ser aplicada.
+    // Loop que se alimenta sozinho: 51 alertas críticos em 48h e prateleira travada.
+    // Agora só conta como mudança quando o valor novo é DIFERENTE do valor atual.
+    const mudouSellable = patch.is_sellable !== undefined && patch.is_sellable !== r.is_sellable;
     plans.push({
       pacote: r.pacote,
       patch,
       priceKeys,
-      movesPrice: variacao > MOVE_THRESHOLD || patch.is_sellable !== undefined,
+      movesPrice: variacao > MOVE_THRESHOLD || mudouSellable,
       restoredPacote,
     });
   }
