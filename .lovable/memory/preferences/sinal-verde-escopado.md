@@ -23,7 +23,9 @@ nenhuma invariante — então nunca apareciam como vermelho, e eu confundia
    têm detector hoje? O que sobrou fora?
 
 ## Famílias com detector (atualizar quando mudar)
-preço/margem, escada e curva unitária, vínculo com fornecedor (bind-guard,
-fingerprint), saldo vs custo, prateleira honesta/pausa dura, robôs e crons,
-pago sem entrega, caixa, e-mail, RLS, e — desde v331 — promessa do site ×
-catálogo real (`src/lib/promise-coherence.ts`).
+Fonte da verdade: `src/lib/coverage-map.ts` (inventário de famílias × detector)
++ `src/lib/surface-text.ts` / `src/services/surface-scan.server.ts` (v332:
+varredura do texto visível de TODAS as rotas públicas e do blog, e denúncia de
+rota nova sem detector declarado). Antes de dar verde, ler esse mapa e listar
+o que está com `detector: null` como NÃO COBERTO.
+
