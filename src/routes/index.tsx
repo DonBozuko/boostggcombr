@@ -432,6 +432,9 @@ function Landing() {
   });
   const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>([]);
   const [soBr, setSoBr] = useState(false);
+  // v336 — o banco respondeu (mesmo que vazio)? Só depois disso é honesto
+  // esconder pacote; antes disso o estático evita vitrine em branco no SSR.
+  const [gridLoaded, setGridLoaded] = useState(false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   useEffect(() => {
     let cancelled = false;
@@ -448,8 +451,9 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         results.forEach((r, i) => {
           if (r?.items?.length) next[cats[i][0]] = r.items as GridItem[];
         });
-        if (next.seguidores.length || next.curtidas.length || next.visualizacoes.length) {
+        if (results.some((r) => r !== null)) {
           setGridBy(next);
+          setGridLoaded(true);
         }
       });
     getBrPricingGridFn({ data: { network: "instagram", kind: "seguidores" } })
@@ -506,7 +510,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
   const bestsellers = useBestsellers();
 
   const buildDyn = (items: GridItem[], fallback: Plan[], unitLabel: string): Plan[] => {
-    if (!items.length) return fallback;
+    if (!items.length) return gridLoaded ? [] : fallback; // v336 — vazio do banco não vira fallback fantasma
     const tagFor = (q: number): string => {
       if (q <= 200) return "+ MINI";
       if (q <= 750) return "+ STARTER";
@@ -534,11 +538,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     });
   };
 
-  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores, bestsellers]);
-  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr, bestsellers]);
+  const dynPlansMundial = useMemo(() => buildDyn(gridBy.seguidores,    plans,      "Seguidores"),    [gridBy.seguidores, gridLoaded, bestsellers]);
+  const dynPlansBr      = useMemo(() => buildDyn(seguidoresBr,         plans,      "Seguidores BR"), [seguidoresBr, gridLoaded, bestsellers]);
   const dynPlans        = categoria === "seguidores" && soBr ? dynPlansBr : dynPlansMundial;
-  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas, bestsellers]);
-  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes, bestsellers]);
+  const dynLikesPlans = useMemo(() => buildDyn(gridBy.curtidas,      likesPlans, "Curtidas"),      [gridBy.curtidas, gridLoaded, bestsellers]);
+  const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes, gridLoaded, bestsellers]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
 
   // Polling: a cada 5s consulta o status do pedido até detectar 'paid' ou rejeição.

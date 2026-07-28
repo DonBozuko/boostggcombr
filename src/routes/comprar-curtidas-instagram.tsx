@@ -72,12 +72,13 @@ function Page() {
         { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela de preços — curtidas Instagram"
+      pricingCategories={["instagram:curtidas"]}
       pricing={[
-        { qty: "100 curtidas", price: "R$ 3,90" },
-        { qty: "500 curtidas", price: "R$ 9,90", note: "Mais vendido" },
-        { qty: "1.000 curtidas", price: "R$ 14,90" },
-        { qty: "5.000 curtidas", price: "R$ 49,90" },
-        { qty: "10.000 curtidas", price: "R$ 89,90" },
+        { id: "l100", qty: "100 curtidas", price: "R$ 5,50" },
+        { id: "l500", qty: "500 curtidas", price: "R$ 7,00", note: "Mais vendido" },
+        { id: "l1k", qty: "1.000 curtidas", price: "R$ 9,00" },
+        { id: "l5k", qty: "5.000 curtidas", price: "R$ 38,40" },
+        { id: "l10k", qty: "10.000 curtidas", price: "R$ 54,40" },
       ]}
       bodySections={[
         {

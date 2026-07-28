@@ -52,11 +52,12 @@ function Page() {
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos de crescimento — YouTube"
+      pricingCategories={["youtube:inscritos"]}
       pricing={[
-        { qty: "Starter", price: "R$ 9,90" },
-        { qty: "Essencial", price: "R$ 29,90", note: "Mais escolhido" },
-        { qty: "Pro", price: "R$ 79,90" },
-        { qty: "Elite", price: "R$ 199,90" },
+        { id: "ys100", qty: "100 inscritos", price: "R$ 39,90" },
+        { id: "ys500", qty: "500 inscritos", price: "R$ 138,80", note: "Mais escolhido" },
+        { id: "ys1k", qty: "1.000 inscritos", price: "R$ 223,54" },
+        { id: "ys2k", qty: "2.000 inscritos", price: "R$ 358,65" },
       ]}
       bodySections={[
         { h2: "Por que investir em gestão de crescimento no YouTube", body: "Canal com 50 inscritos não vira recomendação. YouTube usa autoridade como sinal para recomendar. Empurrão inicial cria a base pro algoritmo começar a levar seus vídeos pra sugeridos e Home de mais gente." },

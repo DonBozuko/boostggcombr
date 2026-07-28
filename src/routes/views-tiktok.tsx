@@ -52,11 +52,12 @@ function Page() {
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos de views — TikTok"
+      pricingCategories={["tiktok:visualizacoes"]}
       pricing={[
-        { qty: "Starter", price: "R$ 3,90" },
-        { qty: "Essencial", price: "R$ 9,90", note: "Mais escolhido" },
-        { qty: "Pro", price: "R$ 19,90" },
-        { qty: "Elite", price: "R$ 49,90" },
+        { id: "tv1k", qty: "1.000 views", price: "R$ 6,00" },
+        { id: "tv2k", qty: "2.000 views", price: "R$ 18,00", note: "Mais escolhido" },
+        { id: "tv5k", qty: "5.000 views", price: "R$ 27,00" },
+        { id: "tv10k", qty: "10.000 views", price: "R$ 54,40" },
       ]}
       bodySections={[
         { h2: "Por que boost de views acelera o For You", body: "O algoritmo do TikTok testa vídeos novos em pequenos grupos. Se performar, distribui pra mais. Boost inicial de views manda sinal forte nas primeiras horas — a janela em que vídeo decide se vira viral ou morre." },

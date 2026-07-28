@@ -52,11 +52,12 @@ function Page() {
         { icon: "clock", title: "Pix 24/7", text: "Aprovação instantânea." },
       ]}
       pricingTitle="Planos audiência brasileira"
+      pricingCategories={["instagram:seguidores:br"]}
       pricing={[
-        { qty: "Starter", price: "R$ 9,90" },
-        { qty: "Essencial", price: "R$ 29,90", note: "Mais escolhido" },
-        { qty: "Pro", price: "R$ 49,90" },
-        { qty: "Elite", price: "R$ 149,90" },
+        { id: "br-p100", qty: "100 seguidores BR", price: "R$ 5,89" },
+        { id: "br-p500", qty: "500 seguidores BR", price: "R$ 57,00", note: "Mais escolhido" },
+        { id: "br-p1k", qty: "1.000 seguidores BR", price: "R$ 113,00" },
+        { id: "br-p2k", qty: "2.000 seguidores BR", price: "R$ 213,00" },
       ]}
       bodySections={[
         { h2: "Por que audiência brasileira converte mais", body: "Vender no Brasil com audiência de índia, indonésia e russa não fecha venda. Comentário em português, DM em português, seguidor que entende sua oferta. Custa mais, mas o ROI é outro." },

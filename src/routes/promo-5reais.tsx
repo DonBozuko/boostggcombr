@@ -37,9 +37,11 @@ export const Route = createFileRoute("/promo-5reais")({
 });
 
 const PACOTE_ID = "p100";
-const PRECO_BASE = 5.0;
+// v337 — preço-base vem do catálogo (Autoridade de Preço). O valor abaixo é só
+// fallback de SSR; ao hidratar, o real de `pricing_items` assume.
+const PRECO_BASE_FALLBACK = 5.5;
 const CUPOM = "PRIME15";
-const PRECO_FINAL = +(PRECO_BASE * 0.85).toFixed(2); // R$ 4,25
+const DESCONTO = 0.85;
 
 function Promo5Page() {
   const criar = useServerFn(criarPedido);
@@ -52,6 +54,8 @@ function Promo5Page() {
   const [allPlans, setAllPlans] = useState<BumpPlan[]>([]);
   const [bumpOpen, setBumpOpen] = useState(false);
   const [pendingForm, setPendingForm] = useState<null | (() => Promise<void>)>(null);
+  const [precoBase, setPrecoBase] = useState(PRECO_BASE_FALLBACK);
+  const PRECO_FINAL = +(precoBase * DESCONTO).toFixed(2);
 
   useEffect(() => {
     fetchGrid({ data: { category: "instagram:seguidores" } })
@@ -60,13 +64,15 @@ function Promo5Page() {
           id: it.id, quantidade: it.quantidade, valor: it.valor, price: it.price, tier: it.id,
         }));
         setAllPlans(plans);
+        const base = plans.find((pl) => pl.id === PACOTE_ID);
+        if (base && base.valor > 0) setPrecoBase(base.valor);
       })
       .catch(() => { /* fallback: sem bump, fluxo normal */ });
   }, [fetchGrid]);
 
   const currentPlan: BumpPlan = {
-    id: PACOTE_ID, quantidade: 100, valor: PRECO_BASE,
-    price: `R$ ${PRECO_BASE.toFixed(2).replace(".", ",")}`, tier: PACOTE_ID,
+    id: PACOTE_ID, quantidade: 100, valor: precoBase,
+    price: `R$ ${precoBase.toFixed(2).replace(".", ",")}`, tier: PACOTE_ID,
   };
   const bumpAvailable = allPlans.length > 0 && !!findUpgrade(currentPlan, allPlans);
 
@@ -79,7 +85,7 @@ function Promo5Page() {
           instagram_user: instagram.replace(/^@/, "").trim(),
           pacote: PACOTE_ID,
           quantidade: 100,
-          valor: PRECO_BASE,
+          valor: precoBase,
           email: email.trim(),
           whatsapp_contato: whats.trim(),
           rede_social: "instagram",
