@@ -936,25 +936,10 @@ function AdminPage({ initialToken }: { initialToken: string }) {
 
 
 
-  // Espelho client-safe do resolveServiceId — só p/ exibir badge no pedido.
-  const resolveServiceIdClient = (pacote: string, qty: number): number | null => {
-    const p = String(pacote ?? "").trim().toLowerCase();
-    if (p.startsWith("tg")) return null;
-    if (p.startsWith("wbr")) return 9313;
-    if (p.startsWith("wgl")) return 10351;
-    if (p.startsWith("ff")) return 18870;
-    if (p.startsWith("fl")) return 7593;
-    if (p.startsWith("ys")) return 19440;
-    if (p.startsWith("yv")) return 14321;
-    if (p.startsWith("tf")) return 14330;
-    if (p.startsWith("tl")) return 19191;
-    if (p.startsWith("tv")) return 14907;
-    if (p.startsWith("v")) return 18855;
-    if (p.startsWith("l")) return 18860;
-    if (qty >= 100 && qty <= 2000) return 14325;
-    if (qty >= 5000 && qty <= 100000) return 14225;
-    return null;
-  };
+  // v320 — removido: espelho de IDs chumbados (7593/14225/18855) que já não
+  // existem ou mudaram de produto no fornecedor. Ninguém consumia a função e
+  // ela só servia de fonte de verdade falsa para quem lesse o arquivo.
+
 
 
   const [token, setToken] = useState<string>(() => {

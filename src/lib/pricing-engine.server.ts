@@ -3,6 +3,8 @@
 // NÃO importar de módulos client-reachable em escopo de módulo.
 
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
+import { guardBindings } from "./bind-guard.server";
+
 
 export type Category =
   | "instagram:seguidores"
@@ -612,9 +614,13 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
     itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
+    // v320 — a contingência escreve IDs chumbados no código. Se o fornecedor
+    // reaproveitou o número para outro produto, o portão zera antes de gravar.
+    itemRows = (await guardBindings(itemRows)).rows;
     const { error: e1 } = await supabaseAdmin
       .from("pricing_items" as any)
       .upsert(itemRows, { onConflict: "pacote" });
+
     const { error: e2 } = await supabaseAdmin
       .from("pricing_cache" as any)
       .upsert([
@@ -677,9 +683,12 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
   itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
+  // v320 — portão único de vínculo antes de qualquer escrita de ID.
+  itemRows = (await guardBindings(itemRows)).rows;
   const { error: e1 } = await supabaseAdmin
     .from("pricing_items" as any)
     .upsert(itemRows, { onConflict: "pacote" });
+
   const summaryRows = catSummary.map((r) => ({
     category: r.category,
     cost_per_1k_brl: Number(r.cost.toFixed(4)),
