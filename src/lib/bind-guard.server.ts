@@ -38,7 +38,15 @@ const CACHE_TABLES: Array<{ table: string; provider: string }> = [
 
 export type ServiceNameMap = Map<string, string>;
 
+/** Fornecedor cujo catálogo veio inteiro e recente — só nele o "não existe" vale como prova. */
+export type TrustedProviders = Set<string>;
+
 const key = (provider: string, id: string | number) => `${provider}:${String(id).trim()}`;
+
+// Abaixo disso o catálogo veio pela metade (queda de API, timeout). Não dá para
+// concluir "esse ID não existe" a partir de uma leitura incompleta.
+const MIN_SERVICOS_PARA_CONFIAR = 200;
+const IDADE_MAX_CACHE_MS = 6 * 60 * 60 * 1000;
 
 /**
  * Carrega o nome real de cada serviço em cada fornecedor.
@@ -46,59 +54,89 @@ const key = (provider: string, id: string | number) => `${provider}:${String(id)
  * em 1.000 — ler só a primeira página deixaria o portão cego e ele rejeitaria
  * vínculo bom (pior que não ter portão).
  */
-export async function loadServiceNames(): Promise<ServiceNameMap> {
+export async function loadServiceNames(): Promise<{
+  names: ServiceNameMap;
+  trusted: TrustedProviders;
+}> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const names: ServiceNameMap = new Map();
+  const trusted: TrustedProviders = new Set();
   const PAGE = 1000;
   await Promise.all(
     CACHE_TABLES.map(async ({ table, provider }) => {
       try {
+        let carregados = 0;
+        let maisRecente = 0;
         for (let from = 0; ; from += PAGE) {
           const { data } = await supabaseAdmin
             .from(table as any)
-            .select("provider_service_id, name")
+            .select("provider_service_id, name, updated_at")
             .range(from, from + PAGE - 1);
           const page = (data as any[]) ?? [];
           for (const s of page) {
             const id = String(s.provider_service_id ?? "").trim();
-            if (id && s.name) names.set(key(provider, id), String(s.name));
+            if (id && s.name) {
+              names.set(key(provider, id), String(s.name));
+              carregados++;
+            }
+            const t = s.updated_at ? Date.parse(String(s.updated_at)) : NaN;
+            if (Number.isFinite(t) && t > maisRecente) maisRecente = t;
           }
           if (page.length < PAGE) break;
         }
+        const fresco = maisRecente > 0 && Date.now() - maisRecente < IDADE_MAX_CACHE_MS;
+        if (carregados >= MIN_SERVICOS_PARA_CONFIAR && fresco) trusted.add(provider);
       } catch (e) {
         console.warn(`[bind-guard] falha lendo ${table}:`, e);
       }
     }),
   );
-  return names;
+  return { names, trusted };
 }
 
-export type BindRejection = { pacote: string; col: string; id: string; nome: string };
+export type BindRejection = {
+  pacote: string;
+  col: string;
+  id: string;
+  nome: string;
+  motivo: "incompativel" | "fantasma";
+};
 
 /**
- * Zera todo ID cujo nome real no fornecedor contraria a intenção do pacote.
- * Silêncio deliberado quando o nome é desconhecido: cache atrasado não pode
- * apagar vínculo bom. Só corta quando há prova positiva de incompatibilidade.
+ * Zera todo ID que não pode ser entregue:
+ *   - "incompativel": o nome real no fornecedor contraria a intenção do pacote;
+ *   - "fantasma": o ID sumiu do catálogo de um fornecedor cuja leitura veio
+ *     inteira e recente — o número não existe mais lá, e mandar pedido nele
+ *     falha na hora da compra.
+ * Quando o catálogo do fornecedor veio incompleto ou velho, o silêncio é
+ * deliberado: leitura ruim não pode apagar vínculo bom.
  */
 export function sanitizeBindings<T extends Record<string, any>>(
   rows: T[],
   names: ServiceNameMap,
+  trusted: TrustedProviders = new Set(),
 ): { rows: T[]; rejected: BindRejection[] } {
   const rejected: BindRejection[] = [];
   const out = rows.map((row) => {
     const category = row.category ?? null;
     if (!category) return row;
     let patched: T | null = null;
+    const cortar = (col: string, id: string, nome: string, motivo: BindRejection["motivo"]) => {
+      patched = patched ?? ({ ...row } as T);
+      (patched as any)[col] = null;
+      rejected.push({ pacote: String(row.pacote ?? "?"), col, id, nome, motivo });
+    };
     for (const { col, provider } of ID_COLUMNS) {
       const raw = row[col];
       if (raw === null || raw === undefined || String(raw).trim() === "") continue;
       const id = String(raw).trim();
       const nome = names.get(key(provider, id));
-      if (!nome) continue; // desconhecido ≠ errado
+      if (!nome) {
+        if (trusted.has(provider)) cortar(col, id, "(não existe no fornecedor)", "fantasma");
+        continue;
+      }
       if (serviceMatchesIntent(category, nome)) continue;
-      patched = patched ?? ({ ...row } as T);
-      (patched as any)[col] = null;
-      rejected.push({ pacote: String(row.pacote ?? "?"), col, id, nome });
+      cortar(col, id, nome, "incompativel");
     }
     return patched ?? row;
   });
@@ -109,16 +147,17 @@ export function sanitizeBindings<T extends Record<string, any>>(
 export async function guardBindings<T extends Record<string, any>>(
   rows: T[],
 ): Promise<{ rows: T[]; rejected: BindRejection[] }> {
-  const names = await loadServiceNames();
-  const res = sanitizeBindings(rows, names);
+  const { names, trusted } = await loadServiceNames();
+  const res = sanitizeBindings(rows, names, trusted);
   if (res.rejected.length > 0) {
     const amostra = res.rejected
       .slice(0, 5)
-      .map((r) => `${r.pacote}.${r.col}=${r.id} ("${r.nome.slice(0, 40)}")`)
+      .map((r) => `${r.pacote}.${r.col}=${r.id} [${r.motivo}] ("${r.nome.slice(0, 40)}")`)
       .join(" | ");
     console.warn(
-      `[bind-guard] v320 barrou ${res.rejected.length} vínculo(s) incompatível(is): ${amostra}`,
+      `[bind-guard] v320 barrou ${res.rejected.length} vínculo(s) inválido(s): ${amostra}`,
     );
   }
   return res;
 }
+
