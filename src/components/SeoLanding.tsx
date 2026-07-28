@@ -8,7 +8,7 @@ import { TrustBadges } from "@/components/TrustBadges";
 import { LivePurchasesTicker } from "@/components/LivePurchasesTicker";
 import { CheckCircle2, Zap, Shield, Clock } from "lucide-react";
 import { useLivePricingRows } from "@/hooks/useLivePricingRows";
-import type { PricingCategory } from "@/lib/pricing.functions";
+import type { LivePricingCategory } from "@/hooks/useLivePricingRows";
 
 
 export type SeoBenefit = { icon: "check" | "zap" | "shield" | "clock"; title: string; text: string };
@@ -27,7 +27,7 @@ export interface SeoLandingProps {
   pricingTitle: string;
   pricing: SeoPricingRow[];
   /** v329 — categorias a consultar pra hidratar o preço real da tabela. */
-  pricingCategories?: PricingCategory[];
+  pricingCategories?: LivePricingCategory[];
   bodySections: { h2: string; body: string }[];
   faq: SeoFaq[];
 }
