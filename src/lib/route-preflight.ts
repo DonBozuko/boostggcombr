@@ -88,12 +88,11 @@ export function evaluateRoute(ranked: PreflightProvider[], valorBrl: number): Pr
 
   // Instável é degradado, não eliminado: só descartamos se houver alternativa
   // estável. Caso contrário o failover em runtime ainda tenta.
-  const ordem = [
-    ...comSaldo.filter((p) => !p.unstable),
-    ...comSaldo.filter((p) => p.unstable),
-    ...semSaldo.filter((p) => !p.unstable),
-    ...semSaldo.filter((p) => p.unstable),
-  ];
+  // Quem tem saldo entrega primeiro; sem saldo em ninguém, a rota ainda existe
+  // (parqueia e sai na recarga). Dentro do mesmo grupo, estável ganha.
+  const preferidos = comSaldo.length ? comSaldo : semSaldo;
+  const estaveis = preferidos.filter((p) => !p.unstable);
+  const ordem = estaveis.length ? estaveis : preferidos;
 
   if (ordem.length > 0) {
     return {
