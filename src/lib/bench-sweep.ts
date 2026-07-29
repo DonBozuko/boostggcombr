@@ -193,19 +193,21 @@ export function classifyBench(
 /**
  * v361 — DUPLA CONFIRMAÇÃO ANTES DE TIRAR PACOTE DA VITRINE POR MARGEM.
  *
- * Causa raiz do alarme eterno "br-tf100|margem": existem DUAS leituras de custo
- * para o mesmo pacote. O preço da vitrine é formado com o custo GRAVADO no
- * banco (escolhido pelo mais barato, com histerese) e a Bancada julga com o
- * custo VIVO do fornecedor que a rota escolheria (em pacote BR, quem tem
- * reposição garantida vence o mais barato — e costuma custar mais).
+ * Existem DUAS leituras de custo para o mesmo pacote: o preço da vitrine é
+ * formado com o custo GRAVADO no banco, e a Bancada julga com o custo VIVO do
+ * fornecedor que a rota escolheria agora.
  *
- * Enquanto as duas leituras não forem a mesma, a divergência não pode virar
- * pausa: tirar da vitrine um pacote que lucra 4x pelo custo real gravado é
- * perder venda por defeito de instrumento.
+ * Só ignora o veredito quando a diferença entre as duas leituras é RUÍDO
+ * (≤5%: centavo de arredondamento, dólar do dia, tarifa que mexeu um fio).
+ * Nesse caso pausar seria perder venda de um pacote que lucra — foi o que
+ * prendeu o `br-tf100` (custo gravado R$ 1,15 × vivo R$ 1,1566, 0,6%).
  *
- * Regra: só é prejuízo de verdade quando as DUAS leituras reprovam.
- * `margemOk` é sempre `respectsMinMargin` (dono único, v334).
+ * Diferença ESTRUTURAL (>5%: outro fornecedor, outro preço de tabela) continua
+ * valendo como prejuízo e pode pausar — margem nunca é sacrificada para calar
+ * alarme.
  */
+export const DIVERGENCIA_RUIDO_MAX = 1.05;
+
 export function margemReprovaNasDuasLeituras(
   priceBrl: number,
   custoVivo: number | null | undefined,
@@ -215,9 +217,13 @@ export function margemReprovaNasDuasLeituras(
   const gravado = Number(custoGravado);
   if (!Number.isFinite(gravado) || gravado <= 0) return true; // sem 2ª leitura, vale o veredito vivo
   const vivo = Number(custoVivo);
-  if (Number.isFinite(vivo) && vivo > 0 && margemOk(priceBrl, vivo)) return false;
+  if (!Number.isFinite(vivo) || vivo <= 0) return !margemOk(priceBrl, gravado);
+  if (margemOk(priceBrl, vivo)) return false;
+  const ruido = vivo <= gravado * DIVERGENCIA_RUIDO_MAX;
+  if (!ruido) return true; // custo de verdade é outro: prejuízo real
   return !margemOk(priceBrl, gravado);
 }
+
 
 
 
