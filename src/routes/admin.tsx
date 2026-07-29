@@ -69,6 +69,7 @@ import { ConversionAnalytics } from "@/components/ConversionAnalytics";
 import { InsightsIA } from "@/components/InsightsIA";
 import { RoasPanel } from "@/components/RoasPanel";
 import { FunnelPanel } from "@/components/FunnelPanel";
+import { FunilEtapasPanel } from "@/components/FunilEtapasPanel";
 import { RecoveryPanel } from "@/components/RecoveryPanel";
 import { AdminAuditLog } from "@/components/AdminAuditLog";
 import { useAdminRealtime } from "@/hooks/useAdminRealtime";
@@ -1558,6 +1559,7 @@ function AdminPage({ initialToken }: { initialToken: string }) {
           <div className="space-y-4">
             <RecoveryPanel token={token} />
             <FunnelPanel token={token} />
+            <FunilEtapasPanel token={token} />
             <InsightsIA token={token} />
             <RoasPanel token={token} />
             <ConversionAnalytics />

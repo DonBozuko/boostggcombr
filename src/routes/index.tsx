@@ -69,6 +69,7 @@ import { trackInitiateCheckout, trackViewContent, trackAddToCart } from "@/lib/t
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 import { simulatePurchase } from "@/lib/simulate-purchase.functions";
 import { getUtmParams } from "@/lib/utm";
+import { trackFunnel } from "@/lib/funnel-beacon";
 import { getPedidoStatus } from "@/lib/admin.functions";
 import { CheckCircle2 } from "lucide-react";
 
@@ -601,6 +602,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
   // Redirect para /obrigado quando pagamento confirmado (dispara pixel de conversão)
   useEffect(() => {
     if (!paid || !pedidoInfo?.pedidoId) return;
+    trackFunnel("pagou", { plan_id: form.plan || null, categoria });
     const t = setTimeout(() => {
       const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : "";
       const q = new URLSearchParams({
@@ -633,9 +635,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       });
       if (!res?.ok) {
         console.error("criarPedido falhou:", res);
+        trackFunnel("pix_falhou", { plan_id: selected.id, categoria, valor: selected.valor, detail: String(res?.error ?? "desconhecido") });
         toast.error(checkoutErrorMessage(res?.error));
         return;
       }
+      trackFunnel("pix_gerado", { plan_id: selected.id, categoria, valor: selected.valor });
       trackInitiateCheckout({
         orderId: res.pedidoId ?? "",
         value: selected.valor,
@@ -678,6 +682,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       toast.error("Pacote inválido.");
       return;
     }
+    trackFunnel("enviou_formulario", { plan_id: selected.id, categoria, valor: selected.valor });
     trackEvent("checkout_submit", {
       plan_id: selected.id,
       plan_tier: selected.tier,
@@ -735,6 +740,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     if (!pedidoInfo) return;
     try {
       await navigator.clipboard.writeText(pedidoInfo.pixCode);
+      trackFunnel("pix_copiado", { plan_id: form.plan || null, categoria });
       toast.success("Código Pix copiado!");
     } catch {
       toast.error("Não foi possível copiar. Copie manualmente.");
@@ -897,6 +903,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           const plans = categoria === "seguidores" ? dynPlans : categoria === "curtidas" ? dynLikesPlans : dynViewsPlans;
           const chosen = plans.find((p) => p.id === id);
           if (chosen) trackAddToCart({ planId: id, value: chosen.valor, contentName: `${chosen.quantidade} ${categoria}` });
+          trackFunnel("escolheu_pacote", { plan_id: id, categoria, valor: chosen?.valor ?? null });
           (document.getElementById("form-pedido") ?? document.getElementById("pedido"))?.scrollIntoView({
             behavior: "smooth",
             block: "start",
@@ -966,7 +973,12 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                   className="h-12 pl-10"
                   value={form.profile}
                   onChange={(e) => setForm((f) => ({ ...f, profile: e.target.value }))}
-                  onBlur={(e) => { void saveCheckoutAttempt(e.target.value); }}
+                  onBlur={(e) => {
+                    if (e.target.value.trim().length >= 2) {
+                      trackFunnel("preencheu_perfil", { plan_id: form.plan || null, categoria });
+                    }
+                    void saveCheckoutAttempt(e.target.value);
+                  }}
                   maxLength={200}
                 />
               </div>

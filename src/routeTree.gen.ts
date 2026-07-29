@@ -68,6 +68,7 @@ import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicCheckoutAttemptRouteImport } from './routes/api/public/checkout-attempt'
+import { Route as ApiPublicFunnelRouteImport } from './routes/api/public/funnel'
 import { Route as ApiPublicJarvisPipelineRouteImport } from './routes/api/public/jarvis-pipeline'
 import { Route as ApiPublicLgpdDeleteRouteImport } from './routes/api/public/lgpd-delete'
 import { Route as ApiPublicMpWebhookRouteImport } from './routes/api/public/mp-webhook'
@@ -422,6 +423,11 @@ const ApiPublicCheckoutAttemptRoute =
     path: '/api/public/checkout-attempt',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicFunnelRoute = ApiPublicFunnelRouteImport.update({
+  id: '/api/public/funnel',
+  path: '/api/public/funnel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJarvisPipelineRoute = ApiPublicJarvisPipelineRouteImport.update({
   id: '/api/public/jarvis-pipeline',
   path: '/api/public/jarvis-pipeline',
@@ -741,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/checkout-attempt': typeof ApiPublicCheckoutAttemptRoute
+  '/api/public/funnel': typeof ApiPublicFunnelRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -848,6 +855,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/checkout-attempt': typeof ApiPublicCheckoutAttemptRoute
+  '/api/public/funnel': typeof ApiPublicFunnelRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -956,6 +964,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/checkout-attempt': typeof ApiPublicCheckoutAttemptRoute
+  '/api/public/funnel': typeof ApiPublicFunnelRoute
   '/api/public/jarvis-pipeline': typeof ApiPublicJarvisPipelineRoute
   '/api/public/lgpd-delete': typeof ApiPublicLgpdDeleteRoute
   '/api/public/mp-webhook': typeof ApiPublicMpWebhookRoute
@@ -1065,6 +1074,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/checkout-attempt'
+    | '/api/public/funnel'
     | '/api/public/jarvis-pipeline'
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
@@ -1172,6 +1182,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/checkout-attempt'
+    | '/api/public/funnel'
     | '/api/public/jarvis-pipeline'
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
@@ -1279,6 +1290,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/check-saldo'
     | '/api/public/checkout-attempt'
+    | '/api/public/funnel'
     | '/api/public/jarvis-pipeline'
     | '/api/public/lgpd-delete'
     | '/api/public/mp-webhook'
@@ -1385,6 +1397,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicCheckoutAttemptRoute: typeof ApiPublicCheckoutAttemptRoute
+  ApiPublicFunnelRoute: typeof ApiPublicFunnelRoute
   ApiPublicJarvisPipelineRoute: typeof ApiPublicJarvisPipelineRoute
   ApiPublicLgpdDeleteRoute: typeof ApiPublicLgpdDeleteRoute
   ApiPublicMpWebhookRoute: typeof ApiPublicMpWebhookRoute
@@ -1848,6 +1861,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCheckoutAttemptRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/funnel': {
+      id: '/api/public/funnel'
+      path: '/api/public/funnel'
+      fullPath: '/api/public/funnel'
+      preLoaderRoute: typeof ApiPublicFunnelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jarvis-pipeline': {
       id: '/api/public/jarvis-pipeline'
       path: '/api/public/jarvis-pipeline'
@@ -2246,6 +2266,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicCheckoutAttemptRoute: ApiPublicCheckoutAttemptRoute,
+  ApiPublicFunnelRoute: ApiPublicFunnelRoute,
   ApiPublicJarvisPipelineRoute: ApiPublicJarvisPipelineRoute,
   ApiPublicLgpdDeleteRoute: ApiPublicLgpdDeleteRoute,
   ApiPublicMpWebhookRoute: ApiPublicMpWebhookRoute,
