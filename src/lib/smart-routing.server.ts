@@ -249,8 +249,29 @@ export async function rankProvidersByCost(opts: {
 
   // Busca rates de todos os fornecedores ativos em paralelo.
   const providerRateMap: Record<string, number | null> = {};
-  const smmhypeRate = Number((svc as any)?.rate);
-  providerRateMap["smmhype"] = Number.isFinite(smmhypeRate) && smmhypeRate > 0 ? smmhypeRate : null;
+
+  // v360 — CUSTO DA SMMHYPE VEM DO SERVIÇO QUE VAI SER DESPACHADO.
+  // Causa raiz do loop "PACOTE APOSENTADO" nos pacotes de YouTube Views: aqui a
+  // tarifa da smmhype era lida de `services_cache` pelo ID SEMENTE do código
+  // (`resolveServiceIdAsync` → 14321, que aceita no máximo 1M), enquanto o
+  // vínculo do banco (18785, aceita 10M) era quem realmente entregava. Dois
+  // custos diferentes para o mesmo pacote: o motor de preço formava o preço com
+  // 0,44 e a Bancada julgava a margem com 0,63 → "venderia no prejuízo" → pausa
+  // → religa → alerta idêntico para sempre.
+  // Regra (v351 + v359): o custo sai do MESMO ID que o dispatch usa.
+  const smmhypeBoundId = providerIdMap["smmhype"];
+  if (smmhypeBoundId) {
+    const { data: hypeSvc } = await supabaseAdmin
+      .from("smmhype_services_cache" as any)
+      .select("rate")
+      .eq("provider_service_id", String(smmhypeBoundId))
+      .maybeSingle();
+    const r = Number((hypeSvc as any)?.rate);
+    providerRateMap["smmhype"] = Number.isFinite(r) && r > 0 ? r : null;
+  } else {
+    const smmhypeRate = Number((svc as any)?.rate);
+    providerRateMap["smmhype"] = Number.isFinite(smmhypeRate) && smmhypeRate > 0 ? smmhypeRate : null;
+  }
 
   await Promise.all(
     slugs
@@ -262,6 +283,20 @@ export async function rankProvidersByCost(opts: {
         providerRateMap[slug] = await fetchServiceRate(slug, f.api_url, apiKey, providerIdMap[slug]);
       }),
   );
+
+  // Sem tarifa no cache do fornecedor: tenta ao vivo pelo MESMO ID vinculado.
+  if (providerRateMap["smmhype"] == null && smmhypeBoundId) {
+    const f = (forn as any[]).find((x) => x.slug === "smmhype");
+    if (f) {
+      providerRateMap["smmhype"] = await fetchServiceRate(
+        "smmhype",
+        f.api_url,
+        process.env[f.api_key_secret],
+        String(smmhypeBoundId),
+      );
+    }
+  }
+
 
   const healthMap = new Map<string, string | null>();
   ((health as any[]) ?? []).forEach((h) => healthMap.set(h.slug, h.unstable_until));
