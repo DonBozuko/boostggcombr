@@ -22,6 +22,14 @@ import { evaluateRoute, type PreflightProvider, type PreflightResult } from "./r
 const TIMEOUT_MS = 7_000;
 const CACHE_TTL_MS = 60_000;
 
+// v364 — FAIL-OPEN TEM LIMITE DE VALOR.
+// Causa real dos estornos depois do pagamento: quando o preflight não conseguia
+// decidir (timeout/erro), a venda passava mesmo assim. Em pacote pequeno isso é
+// barato e o despacho conserta. Em pacote grande vira estorno de R$ 283 e
+// queima a credibilidade. Acima deste valor, sem prova viva de rota → não cobra.
+const FAIL_OPEN_MAX_BRL = 100;
+
+
 type CacheEntry = { at: number; result: PreflightResult };
 const cache = new Map<string, CacheEntry>();
 
