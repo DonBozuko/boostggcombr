@@ -259,7 +259,7 @@ export async function rankProvidersByCost(opts: {
   // 0,44 e a Bancada julgava a margem com 0,63 → "venderia no prejuízo" → pausa
   // → religa → alerta idêntico para sempre.
   // Regra (v351 + v359): o custo sai do MESMO ID que o dispatch usa.
-  const smmhypeBoundId = providerRateMap && providerIdMap["smmhype"];
+  const smmhypeBoundId = providerIdMap["smmhype"];
   if (smmhypeBoundId) {
     const { data: hypeSvc } = await supabaseAdmin
       .from("smmhype_services_cache" as any)
