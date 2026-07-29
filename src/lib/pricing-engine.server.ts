@@ -287,8 +287,12 @@ async function markUnstable(name: string, reason: string): Promise<void> {
 // removido da rotação por 30min; sistema cai em FALLBACK_RATES_PER_1K.
 async function loadProviderRateMap(): Promise<{
   rateById: Map<number, number>;
+  // v359 — faixa min/max viva: sem ela não dá para saber se o vínculo atual
+  // entrega a quantidade do pacote.
+  rangeById: Map<number, { min?: number; max?: number }>;
   provider: "smmhype" | "smmpanel" | "verified" | "none";
 }> {
+
   const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
     { name: "smmhype",  url: "https://smmhype.com/api/v2",   key: process.env.SMMHYPE_API_KEY },
     { name: "smmpanel", url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
