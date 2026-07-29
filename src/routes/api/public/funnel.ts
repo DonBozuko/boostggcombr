@@ -36,7 +36,7 @@ export const Route = createFileRoute("/api/public/funnel")({
 
           const d = parsed.data;
           if (d.path && isInternalPath(d.path)) return new Response(null, { status: 204 });
-          if (isInternalTraffic(request.headers.get("referer"))) {
+          if (isOwnerPreviewTraffic(request.headers.get("referer"))) {
             return new Response(null, { status: 204 });
           }
           const ua = request.headers.get("user-agent") ?? "";
