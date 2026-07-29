@@ -62,16 +62,30 @@ export async function runAutoHealer(): Promise<HealReport> {
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { markProviderUnstable } = await import("@/lib/smart-routing.server");
+  const { pickSubstituteService } = await import("@/lib/service-substitute");
 
   // 1) Snapshot pricing_items
   const { data: items, error: itemsErr } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, category, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
   if (itemsErr || !items) {
     report.errors.push(`pricing_items load failed: ${itemsErr?.message ?? "unknown"}`);
     return report;
   }
   report.scanned = (items as any[]).length;
+
+  // v362 — assinatura gravada de cada vínculo: é ela que identifica o produto
+  // quando o ID some. Sem isso, cairia no nome do pacote (que não casa nunca).
+  const fingerprints = new Map<string, string>();
+  try {
+    const { data: fps } = await supabaseAdmin
+      .from("service_fingerprints" as any)
+      .select("pacote, col, name_sig");
+    for (const f of ((fps as any[]) ?? [])) {
+      if (f?.name_sig) fingerprints.set(`${f.pacote}::${f.col}`, String(f.name_sig));
+    }
+  } catch { /* sem impressão digital, cai para a categoria do pacote */ }
+
 
   // 2) Snapshot fornecedores + catálogos externos ao vivo
   const { data: forn } = await supabaseAdmin
