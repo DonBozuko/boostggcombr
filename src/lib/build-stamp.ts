@@ -13,7 +13,7 @@
  * Ao entregar uma correção que muda regra de preço/margem/entrega, suba este
  * número no mesmo commit.
  */
-export const APP_VERSION = "v365";
+export const APP_VERSION = "v366";
 
 /** Linha curta, em português direto, para o rodapé de alertas. */
 export function carimboVersao(): string {
