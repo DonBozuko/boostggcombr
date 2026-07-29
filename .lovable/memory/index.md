@@ -16,6 +16,8 @@ Pedido pago nunca espera clique humano pra andar, e cliente só vê 8 status pú
 Falta de saldo NUNCA tira pacote da vitrine nem pinta vermelho — é aviso amarelo forçado no celular. Só estrutural e margem pausam. Ver [Saldo nunca pausa](mem://constraints/saldo-nunca-pausa).
 Falta de saldo também NUNCA recusa cobrança (v352): vende, avisa na hora com force, pedido espera a recarga e sai sozinho. Ver [Saldo nunca bloqueia venda](mem://constraints/saldo-nunca-bloqueia-venda).
 Custo só pode vir de fornecedor que aceita a quantidade do pacote (min/max) — a mesma faixa que o despacho usa, inclusive no recusto de reserva. Ver [Custo só de quem entrega](mem://constraints/custo-so-de-quem-entrega) e [Recusto respeita a faixa](mem://constraints/recusto-respeita-faixa).
+ID de fornecedor gravado no banco vence o ID chumbado no código; a sincronização nunca desfaz vínculo bom. Ver [Vínculo do banco vence o código](mem://constraints/vinculo-banco-vence-codigo).
+
 
 
 Modo Orquestrador (regra absoluta): antes de mexer, mapear impacto cruzado, definir ordem de execução, rollback e prova real. Causa raiz > remendo. Ver [Modo Orquestrador](mem://preferences/modo-orquestrador).

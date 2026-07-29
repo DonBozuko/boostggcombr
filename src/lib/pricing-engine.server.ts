@@ -5,6 +5,8 @@
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
 import { guardBindings } from "./bind-guard.server";
 import { costTierMult } from "./margin-guardian";
+import { chooseBoundServiceId } from "./bind-authority";
+
 
 
 
@@ -287,8 +289,12 @@ async function markUnstable(name: string, reason: string): Promise<void> {
 // removido da rotação por 30min; sistema cai em FALLBACK_RATES_PER_1K.
 async function loadProviderRateMap(): Promise<{
   rateById: Map<number, number>;
+  // v359 — faixa min/max viva: sem ela não dá para saber se o vínculo atual
+  // entrega a quantidade do pacote.
+  rangeById: Map<number, { min?: number; max?: number }>;
   provider: "smmhype" | "smmpanel" | "verified" | "none";
 }> {
+
   const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
     { name: "smmhype",  url: "https://smmhype.com/api/v2",   key: process.env.SMMHYPE_API_KEY },
     { name: "smmpanel", url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
@@ -330,19 +336,29 @@ async function loadProviderRateMap(): Promise<{
       continue;
     }
     const map = new Map<number, number>();
+    const ranges = new Map<number, { min?: number; max?: number }>();
     for (const s of list) {
       const id = Number((s as any).service);
       const r = Number((s as any).rate);
       if (Number.isFinite(id) && Number.isFinite(r) && r > 0) map.set(id, r);
+      if (Number.isFinite(id)) {
+        const min = Number((s as any).min);
+        const max = Number((s as any).max);
+        ranges.set(id, {
+          min: Number.isFinite(min) ? min : undefined,
+          max: Number.isFinite(max) ? max : undefined,
+        });
+      }
     }
     if (map.size < MIN_HEALTHY_SERVICES) {
       if (!hasBalance) await markUnstable(p.name, `corrupt_ids:${map.size}`);
       continue;
     }
     console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
-    return { rateById: map, provider: p.name };
+    return { rateById: map, rangeById: ranges, provider: p.name };
   }
-  return { rateById: new Map(), provider: "none" };
+  return { rateById: new Map(), rangeById: new Map(), provider: "none" };
+
 }
 
 async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> {
@@ -488,6 +504,7 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
 
 
 type ExistingItem = {
+  smmhype_service_id: string | null;
   smmpanel_service_id: string | null;
   verified_service_id: string | null;
   cost_brl: number;
@@ -501,9 +518,10 @@ async function readExistingReserveIds(): Promise<Map<string, ExistingItem>> {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, smmpanel_service_id, verified_service_id, cost_brl, price_brl, last_cost_source");
+      .select("pacote, smmhype_service_id, smmpanel_service_id, verified_service_id, cost_brl, price_brl, last_cost_source");
     for (const row of (data ?? []) as Array<any>) {
       out.set(String(row.pacote), {
+        smmhype_service_id: row.smmhype_service_id ? String(row.smmhype_service_id) : null,
         smmpanel_service_id: row.smmpanel_service_id ? String(row.smmpanel_service_id) : null,
         verified_service_id: row.verified_service_id ? String(row.verified_service_id) : null,
         cost_brl: Number(row.cost_brl ?? 0),
@@ -515,6 +533,46 @@ async function readExistingReserveIds(): Promise<Map<string, ExistingItem>> {
   return out;
 }
 
+/**
+ * v359 — o vínculo gravado no banco manda; o ID da matriz do código é semente.
+ * Sem isso, toda sincronização desfazia a escolha do dono no admin e o pacote
+ * voltava para um fornecedor que não entrega a quantidade (loop de alerta).
+ */
+function preserveLiveBoundId(
+  rows: PricingItemRow[],
+  existing: Map<string, ExistingItem>,
+  rangeById: Map<number, { min?: number; max?: number }>,
+  rateById: Map<number, number>,
+): PricingItemRow[] {
+  return rows.map((r) => {
+    const old = existing.get(r.pacote);
+    if (!old?.smmhype_service_id) return r;
+    const escolhido = chooseBoundServiceId({
+      candidate: r.smmhype_service_id,
+      existing: old.smmhype_service_id,
+      qty: Number(r.quantidade),
+      ranges: rangeById,
+    });
+    if (escolhido === r.smmhype_service_id) return r;
+    const n = Number(escolhido);
+    const out: PricingItemRow = {
+      ...r,
+      smmhype_service_id: escolhido,
+      provider_service_id: Number.isFinite(n) ? n : r.provider_service_id,
+    };
+    // O custo tem de vir de QUEM entrega: trocou o ID, recalcula a tarifa.
+    const usdPer1k = Number.isFinite(n) ? rateById.get(n) : undefined;
+    if (typeof usdPer1k === "number" && usdPer1k > 0) {
+      const cost = (Number(r.quantidade) / 1000) * usdPer1k * USD_TO_BRL;
+      out.cost_brl = Number(cost.toFixed(4));
+      out.price_brl = Number(seedPriceFromCost(Number(r.quantidade), cost).toFixed(2));
+      out.source = "api";
+    }
+    return out;
+  });
+}
+
+
 function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, ExistingItem>): PricingItemRow[] {
   return rows.map((r) => {
     const old = existing.get(r.pacote);
@@ -524,6 +582,7 @@ function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Existi
       smmpanel_service_id: r.smmpanel_service_id ?? old.smmpanel_service_id,
       verified_service_id: r.verified_service_id ?? old.verified_service_id,
     };
+
   });
 }
 
@@ -608,9 +667,10 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 
   // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático.
   // v50-Patch: forceContingency ignora rede e popula tudo pela matriz local.
-  const { rateById, provider } = options.forceContingency
-    ? { rateById: new Map<number, number>(), provider: "none" as const }
+  const { rateById, rangeById, provider } = options.forceContingency
+    ? { rateById: new Map<number, number>(), rangeById: new Map<number, { min?: number; max?: number }>(), provider: "none" as const }
     : await loadProviderRateMap();
+
   console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
 
 
@@ -623,7 +683,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
+    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
     // v320 — a contingência escreve IDs chumbados no código. Se o fornecedor
     // reaproveitou o número para outro produto, o portão zera antes de gravar.
     itemRows = (await guardBindings(itemRows)).rows;
@@ -692,7 +752,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
+  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
   // v320 — portão único de vínculo antes de qualquer escrita de ID.
   itemRows = (await guardBindings(itemRows)).rows;
   const { error: e1 } = await supabaseAdmin
