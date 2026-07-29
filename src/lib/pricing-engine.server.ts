@@ -759,22 +759,31 @@ export async function recostFromReserves(): Promise<{
   const rows = (items ?? []) as Array<Record<string, any>>;
   if (!rows.length) return { checked: 0, fixed: 0, items: [] };
 
+  const { serviceAcceptsQty } = await import("@/lib/critical-guards");
   const [{ data: sp }, { data: vf }] = await Promise.all([
-    supabaseAdmin.from("smmpanel_services_cache" as any).select("provider_service_id, rate"),
-    supabaseAdmin.from("verified_services_cache" as any).select("provider_service_id, rate"),
+    supabaseAdmin.from("smmpanel_services_cache" as any).select("provider_service_id, rate, min, max"),
+    supabaseAdmin.from("verified_services_cache" as any).select("provider_service_id, rate, min, max"),
   ]);
-  const rateSp = new Map<string, number>();
-  for (const r of (sp ?? []) as any[]) rateSp.set(String(r.provider_service_id), Number(r.rate));
-  const rateVf = new Map<string, number>();
-  for (const r of (vf ?? []) as any[]) rateVf.set(String(r.provider_service_id), Number(r.rate));
+  type Svc = { rate: number; min?: number | string | null; max?: number | string | null };
+  const svcSp = new Map<string, Svc>();
+  for (const r of (sp ?? []) as any[]) svcSp.set(String(r.provider_service_id), { rate: Number(r.rate), min: r.min, max: r.max });
+  const svcVf = new Map<string, Svc>();
+  for (const r of (vf ?? []) as any[]) svcVf.set(String(r.provider_service_id), { rate: Number(r.rate), min: r.min, max: r.max });
 
   const fixed: Array<{ pacote: string; de: number; para: number }> = [];
   for (const row of rows) {
     const qty = Number(row.quantidade) || 0;
     if (qty <= 0) continue;
-    const rate =
-      rateSp.get(String(row.smmpanel_service_id ?? "")) ??
-      rateVf.get(String(row.verified_service_id ?? ""));
+    // v358 — CAUSA RAIZ do loop "PACOTE APOSENTADO" em p350k/p500k: o recusto
+    // pegava a tarifa de um serviço de reserva com TETO menor que o pacote
+    // (smmpanel #52, max 200k, usado em pacote de 350k/500k). O custo baixava
+    // sozinho, o ciclo seguinte lia o custo real de quem entrega, via um salto
+    // de 4x e aposentava o pacote — de novo, e de novo. Mesma trava do
+    // despacho (v351): custo só vale de quem entrega a quantidade.
+    const candidatos = [svcSp.get(String(row.smmpanel_service_id ?? "")), svcVf.get(String(row.verified_service_id ?? ""))]
+      .filter((s): s is Svc => !!s && Number.isFinite(s.rate) && s.rate > 0)
+      .filter((s) => serviceAcceptsQty(s, qty));
+    const rate = candidatos.length ? Math.min(...candidatos.map((s) => s.rate)) : 0;
     if (!Number.isFinite(rate) || !rate || rate <= 0) continue;
 
     const realCost = (qty / 1000) * (rate as number);
