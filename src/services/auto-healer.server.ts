@@ -122,17 +122,29 @@ export async function runAutoHealer(): Promise<HealReport> {
       if (!currentId) continue;
       if (cat.has(String(currentId))) continue;
 
-      // ID quebrado — tentar reencontrar por nome-do-pacote via heurística mínima
+      // v362 — ID quebrado NÃO é mais motivo para perder a rota. Procuramos o
+      // substituto pela impressão digital gravada (rede + produto), pela faixa
+      // de quantidade e pelo custo — nunca por "nome parecido com o pacote",
+      // que nunca casava e zerava vínculo bom.
       const pacote = String(it.pacote ?? "");
-      const guess = [...cat.values()].find((s) =>
-        String(s.name ?? "").toLowerCase().includes(pacote.toLowerCase()),
-      );
+      const sigAntiga =
+        fingerprints.get(`${pacote}::${p.idCol}`) ?? String(it.category ?? "");
+      const guess = sigAntiga
+        ? pickSubstituteService({
+            previousSignature: sigAntiga,
+            qty: Number(it.quantidade) || 0,
+            catalog: [...cat.values()] as any,
+          })
+        : null;
       if (guess) {
         await supabaseAdmin
           .from("pricing_items" as any)
-          .update({ [p.idCol]: String(guess.service), synced_at: new Date().toISOString() } as any)
+          .update({ [p.idCol]: guess.service_id, synced_at: new Date().toISOString() } as any)
           .eq("pacote", it.pacote);
         report.id_fixed++;
+        report.errors.push(
+          `ID trocado em ${pacote} (${p.slug}): ${currentId} → ${guess.service_id} (${guess.name})`,
+        );
       } else {
         // ID órfão → zera para o smart-routing pular esta rota
         await supabaseAdmin
