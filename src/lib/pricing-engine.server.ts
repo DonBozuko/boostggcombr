@@ -542,6 +542,7 @@ function preserveLiveBoundId(
   rows: PricingItemRow[],
   existing: Map<string, ExistingItem>,
   rangeById: Map<number, { min?: number; max?: number }>,
+  rateById: Map<number, number>,
 ): PricingItemRow[] {
   return rows.map((r) => {
     const old = existing.get(r.pacote);
@@ -554,13 +555,23 @@ function preserveLiveBoundId(
     });
     if (escolhido === r.smmhype_service_id) return r;
     const n = Number(escolhido);
-    return {
+    const out: PricingItemRow = {
       ...r,
       smmhype_service_id: escolhido,
       provider_service_id: Number.isFinite(n) ? n : r.provider_service_id,
     };
+    // O custo tem de vir de QUEM entrega: trocou o ID, recalcula a tarifa.
+    const usdPer1k = Number.isFinite(n) ? rateById.get(n) : undefined;
+    if (typeof usdPer1k === "number" && usdPer1k > 0) {
+      const cost = (Number(r.quantidade) / 1000) * usdPer1k * USD_TO_BRL;
+      out.cost_brl = Number(cost.toFixed(4));
+      out.price_brl = Number(seedPriceFromCost(Number(r.quantidade), cost).toFixed(2));
+      out.source = "api";
+    }
+    return out;
   });
 }
+
 
 function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, ExistingItem>): PricingItemRow[] {
   return rows.map((r) => {
