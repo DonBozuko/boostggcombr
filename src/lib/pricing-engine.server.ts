@@ -502,6 +502,7 @@ async function readCachedItems(category: Category): Promise<Map<string, { cost: 
 
 
 type ExistingItem = {
+  smmhype_service_id: string | null;
   smmpanel_service_id: string | null;
   verified_service_id: string | null;
   cost_brl: number;
@@ -515,9 +516,10 @@ async function readExistingReserveIds(): Promise<Map<string, ExistingItem>> {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("pricing_items" as any)
-      .select("pacote, smmpanel_service_id, verified_service_id, cost_brl, price_brl, last_cost_source");
+      .select("pacote, smmhype_service_id, smmpanel_service_id, verified_service_id, cost_brl, price_brl, last_cost_source");
     for (const row of (data ?? []) as Array<any>) {
       out.set(String(row.pacote), {
+        smmhype_service_id: row.smmhype_service_id ? String(row.smmhype_service_id) : null,
         smmpanel_service_id: row.smmpanel_service_id ? String(row.smmpanel_service_id) : null,
         verified_service_id: row.verified_service_id ? String(row.verified_service_id) : null,
         cost_brl: Number(row.cost_brl ?? 0),
@@ -529,6 +531,35 @@ async function readExistingReserveIds(): Promise<Map<string, ExistingItem>> {
   return out;
 }
 
+/**
+ * v359 — o vínculo gravado no banco manda; o ID da matriz do código é semente.
+ * Sem isso, toda sincronização desfazia a escolha do dono no admin e o pacote
+ * voltava para um fornecedor que não entrega a quantidade (loop de alerta).
+ */
+function preserveLiveBoundId(
+  rows: PricingItemRow[],
+  existing: Map<string, ExistingItem>,
+  rangeById: Map<number, { min?: number; max?: number }>,
+): PricingItemRow[] {
+  return rows.map((r) => {
+    const old = existing.get(r.pacote);
+    if (!old?.smmhype_service_id) return r;
+    const escolhido = chooseBoundServiceId({
+      candidate: r.smmhype_service_id,
+      existing: old.smmhype_service_id,
+      qty: Number(r.quantidade),
+      ranges: rangeById,
+    });
+    if (escolhido === r.smmhype_service_id) return r;
+    const n = Number(escolhido);
+    return {
+      ...r,
+      smmhype_service_id: escolhido,
+      provider_service_id: Number.isFinite(n) ? n : r.provider_service_id,
+    };
+  });
+}
+
 function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, ExistingItem>): PricingItemRow[] {
   return rows.map((r) => {
     const old = existing.get(r.pacote);
@@ -538,6 +569,7 @@ function preserveReserveIds(rows: PricingItemRow[], existing: Map<string, Existi
       smmpanel_service_id: r.smmpanel_service_id ?? old.smmpanel_service_id,
       verified_service_id: r.verified_service_id ?? old.verified_service_id,
     };
+
   });
 }
 
