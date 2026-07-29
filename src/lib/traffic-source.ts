@@ -32,6 +32,19 @@ export function isInternalTraffic(referrer: string | null | undefined): boolean 
   return !!h && INTERNAL.test(h);
 }
 
+// v365 — CAUSA DO MEDIDOR MORTO.
+// Em chamada do próprio site para o próprio site (beacon do funil), o navegador
+// manda Referer = boostgg.com.br. Usar `isInternalTraffic` aí descartava 100%
+// dos eventos de cliente real — o medidor nasceu vazio e ninguém percebeu.
+// Para telemetria de dentro da página, "interno" é só o editor/preview.
+const OWNER_PREVIEW = /(^|\.)(lovable\.dev|lovableproject\.com|lovable\.app)$/;
+
+/** true = eu testando pelo editor/preview, não cliente real. */
+export function isOwnerPreviewTraffic(referrer: string | null | undefined): boolean {
+  const h = hostOf(referrer);
+  return !!h && OWNER_PREVIEW.test(h);
+}
+
 export function classifyTrafficSource(
   utm: string | null | undefined,
   ref: string | null | undefined,
