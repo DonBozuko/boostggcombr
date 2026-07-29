@@ -112,19 +112,20 @@ export function classifyBench(
     };
   }
 
-  // v335 — DIAGNÓSTICO PELO FORNECEDOR QUE ENTREGARIA.
+  // v335/v361 — DIAGNÓSTICO PELO FORNECEDOR QUE REALMENTE ENTREGARIA.
   //
   // Antes: bastava QUALQUER fornecedor reprovar por margem para o pacote ser
   // rotulado "vendendo no prejuízo" — mesmo quando o real bloqueio era falta de
   // saldo no fornecedor mais barato. Isso inflou "margem" de 10 → 51 num ciclo
   // e mandou o dono recarregar/consertar a coisa errada.
-  // Agora o veredito é o motivo do fornecedor MAIS BARATO com ID válido — que é
-  // exatamente quem entregaria o pedido.
+  // v361: `ranked` JÁ vem na ordem real de despacho (em pacote BR, quem tem
+  // reposição garantida vence o mais barato). Reordenar por custo aqui fazia a
+  // mensagem citar um fornecedor que a rota nem usaria.
   const comId = ranked.filter(
     (p) => p.provider_service_id && p.cost_brl != null && Number(p.cost_brl) > 0,
   );
 
-  const escolhido = [...comId].sort((a, b) => Number(a.cost_brl) - Number(b.cost_brl))[0];
+  const escolhido = comId[0];
 
   if (escolhido) {
     const custo = Number(escolhido.cost_brl);
@@ -141,6 +142,7 @@ export function classifyBench(
         faltaEm: null,
       };
     }
+
 
     // Falta de saldo: existe ID válido e custo conhecido, só falta dinheiro lá.
     const candidatos = comId
@@ -187,6 +189,37 @@ export function classifyBench(
     faltaEm: null,
   };
 }
+
+/**
+ * v361 — DUPLA CONFIRMAÇÃO ANTES DE TIRAR PACOTE DA VITRINE POR MARGEM.
+ *
+ * Causa raiz do alarme eterno "br-tf100|margem": existem DUAS leituras de custo
+ * para o mesmo pacote. O preço da vitrine é formado com o custo GRAVADO no
+ * banco (escolhido pelo mais barato, com histerese) e a Bancada julga com o
+ * custo VIVO do fornecedor que a rota escolheria (em pacote BR, quem tem
+ * reposição garantida vence o mais barato — e costuma custar mais).
+ *
+ * Enquanto as duas leituras não forem a mesma, a divergência não pode virar
+ * pausa: tirar da vitrine um pacote que lucra 4x pelo custo real gravado é
+ * perder venda por defeito de instrumento.
+ *
+ * Regra: só é prejuízo de verdade quando as DUAS leituras reprovam.
+ * `margemOk` é sempre `respectsMinMargin` (dono único, v334).
+ */
+export function margemReprovaNasDuasLeituras(
+  priceBrl: number,
+  custoVivo: number | null | undefined,
+  custoGravado: number | null | undefined,
+  margemOk: (price: number, cost: number) => boolean,
+): boolean {
+  const gravado = Number(custoGravado);
+  if (!Number.isFinite(gravado) || gravado <= 0) return true; // sem 2ª leitura, vale o veredito vivo
+  const vivo = Number(custoVivo);
+  if (Number.isFinite(vivo) && vivo > 0 && margemOk(priceBrl, vivo)) return false;
+  return !margemOk(priceBrl, gravado);
+}
+
+
 
 export type BenchSummary = {
   total: number;

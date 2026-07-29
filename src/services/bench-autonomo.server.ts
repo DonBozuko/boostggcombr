@@ -107,7 +107,7 @@ export async function runBenchAutonomo(
     for (let from = 0; ; from += 1000) {
       const { data } = await supabaseAdmin
         .from("pricing_items" as any)
-        .select("pacote, category, quantidade, price_brl, is_sellable, sellable_reason")
+        .select("pacote, category, quantidade, price_brl, cost_brl, is_sellable, sellable_reason")
         .order("category")
         .order("quantidade")
         .range(from, from + 999);
@@ -203,6 +203,24 @@ export async function runBenchAutonomo(
 
     const persistentes = new Map<string, string>();
 
+    // v361 — custo GRAVADO por pacote: segunda leitura obrigatória antes de
+    // pausar por margem (ver `margemReprovaNasDuasLeituras`).
+    const custoGravado = new Map<string, number>();
+    for (const it of items) {
+      const c = Number((it as any).cost_brl);
+      if (Number.isFinite(c) && c > 0) custoGravado.set(String(it.pacote), c);
+    }
+    const { margemReprovaNasDuasLeituras } = await import("@/lib/bench-sweep");
+    const { respectsMinMargin } = await import("@/lib/margin-guardian");
+    const prejuizoReal = (r: BenchRow) =>
+      margemReprovaNasDuasLeituras(
+        Number(r.price_brl),
+        r.custoBrl,
+        custoGravado.get(r.pacote),
+        respectsMinMargin,
+      );
+
+
     try {
       const { data: runsAnteriores } = await (supabaseAdmin as any)
         .from("bench_runs")
@@ -234,7 +252,9 @@ export async function runBenchAutonomo(
       }
 
       for (const r of avaliados) {
-        if (r.verdict === "margem") {
+        // v361 — só pausa se as DUAS leituras de custo reprovarem. Divergência
+        // entre custo gravado e custo vivo é defeito nosso, não prejuízo.
+        if (r.verdict === "margem" && prejuizoReal(r)) {
           const ciclos = runsPrev
             .slice(0, CICLOS_PARA_PAUSAR - 1)
             .filter((run) => porRun.get(run.id)?.has(r.pacote)).length;
@@ -243,6 +263,7 @@ export async function runBenchAutonomo(
           }
         }
       }
+
     } catch {
       // Sem histórico não pausa nada — silêncio nunca vira pausa.
     }
@@ -268,6 +289,11 @@ export async function runBenchAutonomo(
     // motivo de tirar pacote do ar.
     const entregaveis = new Set(avaliados.filter((r) => r.verdict === "entregavel").map((r) => r.pacote));
     const soFaltaSaldo = new Set(avaliados.filter((r) => r.verdict === "saldo").map((r) => r.pacote));
+    // v361 — pausa antiga por margem cai sozinha quando o custo gravado prova
+    // que o pacote lucra (divergência de leitura não pode segurar venda).
+    const margemDivergente = new Set(
+      avaliados.filter((r) => r.verdict === "margem" && !prejuizoReal(r)).map((r) => r.pacote),
+    );
     const religados: string[] = [];
     const { data: pausadosDb } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -278,7 +304,9 @@ export async function runBenchAutonomo(
       const pacote = String(p.pacote);
       const motivoAntigo = String(p.sellable_reason ?? "");
       const eraSaldo = /saldo/i.test(motivoAntigo);
-      if (!entregaveis.has(pacote) && !(eraSaldo || soFaltaSaldo.has(pacote))) continue;
+      const liberaMargem = /margem|prejuízo|prejuizo/i.test(motivoAntigo) && margemDivergente.has(pacote);
+      if (!entregaveis.has(pacote) && !(eraSaldo || soFaltaSaldo.has(pacote)) && !liberaMargem) continue;
+
 
       const { data } = await supabaseAdmin
         .from("pricing_items" as any)
@@ -443,7 +471,9 @@ export async function runBenchAutonomo(
           }
           const ciclos = ids.map((id) => ({ runId: id, assinaturas: porRun.get(id) ?? [] }));
           const travados = achadosNaoConvergentes(ciclos);
-          const msg = mensagemNaoConvergencia(travados);
+          const msgBase = mensagemNaoConvergencia(travados);
+          const { carimboVersao } = await import("@/lib/build-stamp");
+          const msg = msgBase ? `${msgBase}\n\n${carimboVersao()}` : msgBase;
 
           if (msg) {
             const sigLoop = await assinatura(
@@ -457,6 +487,7 @@ export async function runBenchAutonomo(
               });
             }
           }
+
         }
       } catch {
         // Falha nossa aqui nunca pode derrubar a varredura.
