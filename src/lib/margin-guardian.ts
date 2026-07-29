@@ -147,7 +147,13 @@ export function minNetRatio(costBrl: number): number {
  * gravado). Resultado: pacote lucrativo (4x líquido) saía da vitrine sozinho.
  * 0,2% de folga não cria prejuízo nenhum e elimina a auto-contradição.
  */
-const MARGIN_EPSILON = 0.998;
+// v360 — a folga cobre também o DRIFT DE TARIFA do fornecedor entre o momento
+// em que o preço foi formado e o momento em que a Bancada julga a margem
+// (br-tf100: custo gravado R$ 1,15 x tarifa lida R$ 1,16 = 0,87% → pacote
+// lucrativo saía da vitrine sozinho). 1,5% de folga sobre um lucro de 4x não
+// cria prejuízo nenhum; o ciclo de preço seguinte reajusta o preço de verdade.
+const MARGIN_EPSILON = 0.985;
+
 
 export function respectsMinMargin(priceBrl: number, costBrl: number): boolean {
   if (!(costBrl > 0)) return false;
