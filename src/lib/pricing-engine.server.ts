@@ -334,19 +334,29 @@ async function loadProviderRateMap(): Promise<{
       continue;
     }
     const map = new Map<number, number>();
+    const ranges = new Map<number, { min?: number; max?: number }>();
     for (const s of list) {
       const id = Number((s as any).service);
       const r = Number((s as any).rate);
       if (Number.isFinite(id) && Number.isFinite(r) && r > 0) map.set(id, r);
+      if (Number.isFinite(id)) {
+        const min = Number((s as any).min);
+        const max = Number((s as any).max);
+        ranges.set(id, {
+          min: Number.isFinite(min) ? min : undefined,
+          max: Number.isFinite(max) ? max : undefined,
+        });
+      }
     }
     if (map.size < MIN_HEALTHY_SERVICES) {
       if (!hasBalance) await markUnstable(p.name, `corrupt_ids:${map.size}`);
       continue;
     }
     console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
-    return { rateById: map, provider: p.name };
+    return { rateById: map, rangeById: ranges, provider: p.name };
   }
-  return { rateById: new Map(), provider: "none" };
+  return { rateById: new Map(), rangeById: new Map(), provider: "none" };
+
 }
 
 async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> {
