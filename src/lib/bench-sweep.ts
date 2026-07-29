@@ -112,19 +112,20 @@ export function classifyBench(
     };
   }
 
-  // v335 — DIAGNÓSTICO PELO FORNECEDOR QUE ENTREGARIA.
+  // v335/v361 — DIAGNÓSTICO PELO FORNECEDOR QUE REALMENTE ENTREGARIA.
   //
   // Antes: bastava QUALQUER fornecedor reprovar por margem para o pacote ser
   // rotulado "vendendo no prejuízo" — mesmo quando o real bloqueio era falta de
   // saldo no fornecedor mais barato. Isso inflou "margem" de 10 → 51 num ciclo
   // e mandou o dono recarregar/consertar a coisa errada.
-  // Agora o veredito é o motivo do fornecedor MAIS BARATO com ID válido — que é
-  // exatamente quem entregaria o pedido.
+  // v361: `ranked` JÁ vem na ordem real de despacho (em pacote BR, quem tem
+  // reposição garantida vence o mais barato). Reordenar por custo aqui fazia a
+  // mensagem citar um fornecedor que a rota nem usaria.
   const comId = ranked.filter(
     (p) => p.provider_service_id && p.cost_brl != null && Number(p.cost_brl) > 0,
   );
 
-  const escolhido = [...comId].sort((a, b) => Number(a.cost_brl) - Number(b.cost_brl))[0];
+  const escolhido = comId[0];
 
   if (escolhido) {
     const custo = Number(escolhido.cost_brl);
@@ -141,6 +142,7 @@ export function classifyBench(
         faltaEm: null,
       };
     }
+
 
     // Falta de saldo: existe ID válido e custo conhecido, só falta dinheiro lá.
     const candidatos = comId
@@ -187,6 +189,43 @@ export function classifyBench(
     faltaEm: null,
   };
 }
+
+/**
+ * v361 — DUPLA CONFIRMAÇÃO ANTES DE TIRAR PACOTE DA VITRINE POR MARGEM.
+ *
+ * Existem DUAS leituras de custo para o mesmo pacote: o preço da vitrine é
+ * formado com o custo GRAVADO no banco, e a Bancada julga com o custo VIVO do
+ * fornecedor que a rota escolheria agora.
+ *
+ * Só ignora o veredito quando a diferença entre as duas leituras é RUÍDO
+ * (≤5%: centavo de arredondamento, dólar do dia, tarifa que mexeu um fio).
+ * Nesse caso pausar seria perder venda de um pacote que lucra — foi o que
+ * prendeu o `br-tf100` (custo gravado R$ 1,15 × vivo R$ 1,1566, 0,6%).
+ *
+ * Diferença ESTRUTURAL (>5%: outro fornecedor, outro preço de tabela) continua
+ * valendo como prejuízo e pode pausar — margem nunca é sacrificada para calar
+ * alarme.
+ */
+export const DIVERGENCIA_RUIDO_MAX = 1.05;
+
+export function margemReprovaNasDuasLeituras(
+  priceBrl: number,
+  custoVivo: number | null | undefined,
+  custoGravado: number | null | undefined,
+  margemOk: (price: number, cost: number) => boolean,
+): boolean {
+  const gravado = Number(custoGravado);
+  if (!Number.isFinite(gravado) || gravado <= 0) return true; // sem 2ª leitura, vale o veredito vivo
+  const vivo = Number(custoVivo);
+  if (!Number.isFinite(vivo) || vivo <= 0) return !margemOk(priceBrl, gravado);
+  if (margemOk(priceBrl, vivo)) return false;
+  const ruido = vivo <= gravado * DIVERGENCIA_RUIDO_MAX;
+  if (!ruido) return true; // custo de verdade é outro: prejuízo real
+  return !margemOk(priceBrl, gravado);
+}
+
+
+
 
 export type BenchSummary = {
   total: number;
