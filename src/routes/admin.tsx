@@ -17,6 +17,7 @@ import { PendenciasManuaisPanel } from "@/components/PendenciasManuaisPanel";
 import { JarvisDetectorMentiras } from "@/components/JarvisDetectorMentiras";
 import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
+import { CatalogRaioXPanel } from "@/components/CatalogRaioXPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
 
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
