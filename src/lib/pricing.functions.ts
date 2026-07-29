@@ -17,7 +17,6 @@ const VALID: PricingCategory[] = [
   "facebook:curtidas",
   "telegram:canal",
   "telegram:grupo",
-  "trafego:br",
   "trafego:global",
   "kwai:seguidores",
   "kwai:curtidas",
