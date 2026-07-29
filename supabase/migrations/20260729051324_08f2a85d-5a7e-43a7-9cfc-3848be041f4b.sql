@@ -1,0 +1,2 @@
+update pricing_items set smmhype_service_id='8666', provider_service_id=8666, is_sellable=true where pacote in ('p350k','p500k');
+update pricing_items set smmhype_service_id='18785', provider_service_id=18785, is_sellable=true where pacote in ('yv1.5m','yv2m','yv3m','yv5m','yv10m');
