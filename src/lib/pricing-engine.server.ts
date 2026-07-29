@@ -741,7 +741,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds), existingReserveIds);
+  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds, rangeById), existingReserveIds), existingReserveIds);
   // v320 — portão único de vínculo antes de qualquer escrita de ID.
   itemRows = (await guardBindings(itemRows)).rows;
   const { error: e1 } = await supabaseAdmin
