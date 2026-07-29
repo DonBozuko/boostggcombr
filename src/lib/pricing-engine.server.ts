@@ -683,7 +683,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById), existingReserveIds), existingReserveIds);
+    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
     // v320 — a contingência escreve IDs chumbados no código. Se o fornecedor
     // reaproveitou o número para outro produto, o portão zera antes de gravar.
     itemRows = (await guardBindings(itemRows)).rows;
@@ -752,7 +752,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds, rangeById), existingReserveIds), existingReserveIds);
+  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
   // v320 — portão único de vínculo antes de qualquer escrita de ID.
   itemRows = (await guardBindings(itemRows)).rows;
   const { error: e1 } = await supabaseAdmin
