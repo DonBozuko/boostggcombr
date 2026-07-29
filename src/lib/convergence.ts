@@ -27,6 +27,22 @@ export type NaoConvergente = {
   ciclos: number;
 };
 
+// v355 — Vereditos que NÃO são defeito nosso, por mais que se repitam.
+// "saldo" é estado operacional do dono (recarrega quando quiser, regra v350/
+// v352: saldo nunca pausa e nunca bloqueia venda). Um pacote gigante sem venda
+// pode ficar meses sem saldo — isso é escolha de caixa, não trava de código.
+// Se entrar aqui como "defeito", o dono recebe alarme eterno que nenhum
+// conserto resolve, e aprende a ignorar o Telegram.
+export const VEREDITOS_NAO_DEFEITO = new Set(["saldo"]);
+
+/** Remove das assinaturas os vereditos que nunca são defeito de engenharia. */
+export function somenteDefeitoNosso(assinaturas: string[]): string[] {
+  return assinaturas.filter((sig) => {
+    const veredito = sig.slice(sig.lastIndexOf("|") + 1);
+    return !VEREDITOS_NAO_DEFEITO.has(veredito);
+  });
+}
+
 /**
  * Achados presentes em TODOS os últimos `minCiclos` ciclos.
  * Exige a janela cheia: com menos ciclos gravados não há evidência de loop.
@@ -39,7 +55,8 @@ export function achadosNaoConvergentes(
   const janela = ciclos.slice(0, minCiclos);
   if (janela.length < minCiclos) return [];
 
-  const conjuntos = janela.map((c) => new Set(c.assinaturas));
+  // v355: filtra na fonte — quem chama não consegue reintroduzir saldo por engano.
+  const conjuntos = janela.map((c) => new Set(somenteDefeitoNosso(c.assinaturas)));
   const [primeiro, ...resto] = conjuntos;
 
   const persistentes: NaoConvergente[] = [];
