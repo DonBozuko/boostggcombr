@@ -38,6 +38,20 @@ describe("v334 — detector de não-convergência", () => {
     expect(msg).not.toMatch(/SLA|ledger|smoke|parqueado/i);
   });
 
+  it("v355 — saldo repetido NUNCA vira defeito nosso (regra v350/v352)", () => {
+    const ciclos = Array.from({ length: CICLOS_PARA_DEFEITO }, (_, i) =>
+      ciclo(`r${i}`, ["ff100k|saldo", "kv250k|saldo", "tv1m|saldo"]),
+    );
+    expect(achadosNaoConvergentes(ciclos)).toEqual([]);
+  });
+
+  it("v355 — defeito real continua acusado mesmo com saldo no meio", () => {
+    const ciclos = Array.from({ length: CICLOS_PARA_DEFEITO }, (_, i) =>
+      ciclo(`r${i}`, ["ff100k|saldo", "p500k|margem"]),
+    );
+    expect(achadosNaoConvergentes(ciclos).map((x) => x.assinatura)).toEqual(["p500k|margem"]);
+  });
+
   it("sem itens, não gera alarme", () => {
     expect(mensagemNaoConvergencia([])).toBeNull();
   });
