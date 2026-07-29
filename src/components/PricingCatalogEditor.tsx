@@ -17,7 +17,7 @@ const CATEGORIES = [
   "youtube:inscritos", "youtube:visualizacoes",
   "facebook:seguidores", "facebook:curtidas",
   "telegram:canal", "telegram:grupo",
-  "trafego:br", "trafego:global",
+  "trafego:global",
 ] as const;
 
 type FormState = {

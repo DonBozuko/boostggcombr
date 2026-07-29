@@ -21,7 +21,6 @@ export type Category =
   | "facebook:curtidas"
   | "telegram:canal"
   | "telegram:grupo"
-  | "trafego:br"
   | "trafego:global"
   | "kwai:seguidores"
   | "kwai:curtidas"
@@ -64,7 +63,6 @@ const FB_SEG_QTYS  = [100,250,500,1000,2000,3000,5000,10000,20000,50000,100000,2
 const FB_LIKE_QTYS = [100,500,1000,2500,5000,10000,25000,50000];
 const TG_CANAL_QTYS = [100,250,500,1000,2000,3000,5000,10000,25000,50000];
 const TG_GRUPO_QTYS = [100,250,500,1000,2000,3000,5000,10000,25000,50000];
-const TRAF_BR_QTYS  = [1000,2500,5000,10000,25000,50000,75000,100000,200000,500000];
 const TRAF_GL_QTYS  = [1000,2500,5000,10000,25000,50000,75000,100000,200000,500000];
 // v210 — Kwai (SMMhype). Foco em BR: seguidores/curtidas/views.
 const KW_SEG_QTYS   = [100,250,500,1000,2000,3000,5000,10000,20000,50000,100000];
@@ -84,7 +82,6 @@ const CANONICAL_QTYS: Record<Category, Array<{ id: string; qty: number }>> = {
   "facebook:curtidas":       FB_LIKE_QTYS.map((q) => pid("fl", q)),
   "telegram:canal":          TG_CANAL_QTYS.map((q) => pid("tgc", q)),
   "telegram:grupo":          TG_GRUPO_QTYS.map((q) => pid("tgg", q)),
-  "trafego:br":              TRAF_BR_QTYS.map((q) => pid("wbr", q)),
   "trafego:global":          TRAF_GL_QTYS.map((q) => pid("wgl", q)),
   "kwai:seguidores":         KW_SEG_QTYS.map((q) => pid("kf", q)),
   "kwai:curtidas":           KW_LIKE_QTYS.map((q) => pid("kl", q)),
@@ -110,7 +107,6 @@ const PROBE: Record<Category, { pacote: string; qty: number }> = {
   "facebook:curtidas":       { pacote: "fl1k", qty: 1000 },
   "telegram:canal":          { pacote: "tgc1k", qty: 1000 },
   "telegram:grupo":          { pacote: "tgg1k", qty: 1000 },
-  "trafego:br":              { pacote: "wbr1k", qty: 1000 },
   "trafego:global":          { pacote: "wgl1k", qty: 1000 },
   "kwai:seguidores":         { pacote: "kf1k", qty: 1000 },
   "kwai:curtidas":           { pacote: "kl1k", qty: 1000 },
@@ -132,7 +128,6 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
   "facebook:curtidas":        3.0,
   "telegram:canal":          18.0,
   "telegram:grupo":          18.0,
-  "trafego:br":               4.0,
   "trafego:global":           2.0,
   "kwai:seguidores":          5.5,
   "kwai:curtidas":            3.0,
@@ -826,7 +821,8 @@ export function categoryFromPacote(pacote: string): Category | null {
   const p = pacote.toLowerCase();
   if (p.startsWith("tgc")) return "telegram:canal";
   if (p.startsWith("tgg")) return "telegram:grupo";
-  if (p.startsWith("wbr")) return "trafego:br";
+  // v356 — trafego:br apagado do catálogo (sem fornecedor BR real). Pacote wbr* não existe mais.
+  if (p.startsWith("wbr")) return null;
   if (p.startsWith("wgl")) return "trafego:global";
   if (p.startsWith("ff"))  return "facebook:seguidores";
   if (p.startsWith("fl"))  return "facebook:curtidas";
