@@ -22,6 +22,14 @@ import { evaluateRoute, type PreflightProvider, type PreflightResult } from "./r
 const TIMEOUT_MS = 7_000;
 const CACHE_TTL_MS = 60_000;
 
+// v364 — FAIL-OPEN TEM LIMITE DE VALOR.
+// Causa real dos estornos depois do pagamento: quando o preflight não conseguia
+// decidir (timeout/erro), a venda passava mesmo assim. Em pacote pequeno isso é
+// barato e o despacho conserta. Em pacote grande vira estorno de R$ 283 e
+// queima a credibilidade. Acima deste valor, sem prova viva de rota → não cobra.
+const FAIL_OPEN_MAX_BRL = 100;
+
+
 type CacheEntry = { at: number; result: PreflightResult };
 const cache = new Map<string, CacheEntry>();
 
@@ -62,9 +70,32 @@ export async function preflightRouteOrBlock(opts: {
       new Promise<never>((_, rej) => setTimeout(() => rej(new Error("preflight timeout")), TIMEOUT_MS)),
     ]);
   } catch (err) {
+    // v364 — sem veredito: libera só pacote barato. Caro, não cobra.
+    if (opts.valorBrl > FAIL_OPEN_MAX_BRL) {
+      console.error(`[v364] COBRANÇA BLOQUEADA ${opts.pacote} R$${opts.valorBrl}: sem prova de rota`, err);
+      try {
+        const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+        await dispatchWhatsappAlert(
+          `🛑 VENDA GRANDE BLOQUEADA POR FALTA DE PROVA\n\n` +
+            `PROBLEMA: cliente tentou comprar "${opts.pacote}" (${opts.quantidade}) por R$${opts.valorBrl.toFixed(2)} e o sistema não conseguiu confirmar com os fornecedores se entrega agora. Preferi não cobrar a cobrar e devolver depois.\n\n` +
+            `O QUE FAZER: abrir Admin › Saúde do Catálogo e ver se algum fornecedor está fora do ar.`,
+          { force: true },
+        ).catch(() => {});
+      } catch { /* noop */ }
+      return {
+        ok: false,
+        viable: [],
+        reason: "Não foi possível confirmar entrega com os fornecedores agora",
+        rejections: [String((err as any)?.message ?? err)],
+        structural: false,
+        needsTopup: false,
+        skipped: false,
+      };
+    }
     console.warn(`[v297] preflight indisponível p/ ${opts.pacote} — liberando venda:`, err);
     return PASS;
   }
+
 
   cache.set(key, { at: Date.now(), result });
   if (result.ok) {
