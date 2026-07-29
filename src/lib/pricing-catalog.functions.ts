@@ -110,9 +110,23 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
       source: "manual",
       synced_at: new Date().toISOString(),
     };
+    // v359 — o cadastro manual também passa pelo PORTÃO ÚNICO DE VÍNCULO (v320).
+    // Era a última porta aberta: ID digitado na mão entrava sem conferir o nome
+    // real no fornecedor, o motor de preço lia esse vínculo no ciclo seguinte e
+    // a auditoria desvinculava — nascia o loop de alerta.
+    const { guardBindings } = await import("@/lib/bind-guard.server");
+    const guarded = await guardBindings([row as Record<string, any>]);
+    if (guarded.rejected.length > 0) {
+      const r = guarded.rejected[0];
+      return {
+        ok: false,
+        error: `⛔ Vínculo recusado: o ID ${r.id} no fornecedor é "${r.nome}", que não combina com "${row.category}". Confira o número no painel do fornecedor.`,
+      };
+    }
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
-      .upsert(row, { onConflict: "pacote" });
+      .upsert(guarded.rows[0], { onConflict: "pacote" });
+
     if (error) {
       // Traduz erro do CHECK CONSTRAINT do banco
       if (error.message?.includes("pricing_items_no_duplicate_service_ids")) {
