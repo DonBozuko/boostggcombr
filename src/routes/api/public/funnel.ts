@@ -1,6 +1,6 @@
 // v363 — Recebe as etapas do funil. Público, só grava (nunca lê).
 import { createFileRoute } from "@tanstack/react-router";
-import { isInternalPath, isInternalTraffic } from "@/lib/traffic-source";
+import { isInternalPath, isOwnerPreviewTraffic } from "@/lib/traffic-source";
 import { z } from "zod";
 
 const STEPS = [
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/api/public/funnel")({
 
           const d = parsed.data;
           if (d.path && isInternalPath(d.path)) return new Response(null, { status: 204 });
-          if (isInternalTraffic(request.headers.get("referer"))) {
+          if (isOwnerPreviewTraffic(request.headers.get("referer"))) {
             return new Response(null, { status: 204 });
           }
           const ua = request.headers.get("user-agent") ?? "";
