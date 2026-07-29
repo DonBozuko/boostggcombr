@@ -62,16 +62,30 @@ export async function runAutoHealer(): Promise<HealReport> {
 
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { markProviderUnstable } = await import("@/lib/smart-routing.server");
+  const { pickSubstituteService } = await import("@/lib/service-substitute");
 
   // 1) Snapshot pricing_items
   const { data: items, error: itemsErr } = await supabaseAdmin
     .from("pricing_items" as any)
-    .select("pacote, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
+    .select("pacote, category, quantidade, cost_brl, price_brl, smmhype_service_id, smmpanel_service_id, verified_service_id");
   if (itemsErr || !items) {
     report.errors.push(`pricing_items load failed: ${itemsErr?.message ?? "unknown"}`);
     return report;
   }
   report.scanned = (items as any[]).length;
+
+  // v362 — assinatura gravada de cada vínculo: é ela que identifica o produto
+  // quando o ID some. Sem isso, cairia no nome do pacote (que não casa nunca).
+  const fingerprints = new Map<string, string>();
+  try {
+    const { data: fps } = await supabaseAdmin
+      .from("service_fingerprints" as any)
+      .select("pacote, col, name_sig");
+    for (const f of ((fps as any[]) ?? [])) {
+      if (f?.name_sig) fingerprints.set(`${f.pacote}::${f.col}`, String(f.name_sig));
+    }
+  } catch { /* sem impressão digital, cai para a categoria do pacote */ }
+
 
   // 2) Snapshot fornecedores + catálogos externos ao vivo
   const { data: forn } = await supabaseAdmin
@@ -122,17 +136,29 @@ export async function runAutoHealer(): Promise<HealReport> {
       if (!currentId) continue;
       if (cat.has(String(currentId))) continue;
 
-      // ID quebrado — tentar reencontrar por nome-do-pacote via heurística mínima
+      // v362 — ID quebrado NÃO é mais motivo para perder a rota. Procuramos o
+      // substituto pela impressão digital gravada (rede + produto), pela faixa
+      // de quantidade e pelo custo — nunca por "nome parecido com o pacote",
+      // que nunca casava e zerava vínculo bom.
       const pacote = String(it.pacote ?? "");
-      const guess = [...cat.values()].find((s) =>
-        String(s.name ?? "").toLowerCase().includes(pacote.toLowerCase()),
-      );
+      const sigAntiga =
+        fingerprints.get(`${pacote}::${p.idCol}`) ?? String(it.category ?? "");
+      const guess = sigAntiga
+        ? pickSubstituteService({
+            previousSignature: sigAntiga,
+            qty: Number(it.quantidade) || 0,
+            catalog: [...cat.values()] as any,
+          })
+        : null;
       if (guess) {
         await supabaseAdmin
           .from("pricing_items" as any)
-          .update({ [p.idCol]: String(guess.service), synced_at: new Date().toISOString() } as any)
+          .update({ [p.idCol]: guess.service_id, synced_at: new Date().toISOString() } as any)
           .eq("pacote", it.pacote);
         report.id_fixed++;
+        report.errors.push(
+          `ID trocado em ${pacote} (${p.slug}): ${currentId} → ${guess.service_id} (${guess.name})`,
+        );
       } else {
         // ID órfão → zera para o smart-routing pular esta rota
         await supabaseAdmin
