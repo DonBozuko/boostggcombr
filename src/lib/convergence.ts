@@ -55,7 +55,8 @@ export function achadosNaoConvergentes(
   const janela = ciclos.slice(0, minCiclos);
   if (janela.length < minCiclos) return [];
 
-  const conjuntos = janela.map((c) => new Set(c.assinaturas));
+  // v355: filtra na fonte — quem chama não consegue reintroduzir saldo por engano.
+  const conjuntos = janela.map((c) => new Set(somenteDefeitoNosso(c.assinaturas)));
   const [primeiro, ...resto] = conjuntos;
 
   const persistentes: NaoConvergente[] = [];
