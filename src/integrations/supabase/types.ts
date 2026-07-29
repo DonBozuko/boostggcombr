@@ -770,6 +770,45 @@ export type Database = {
         }
         Relationships: []
       }
+      funnel_events: {
+        Row: {
+          categoria: string | null
+          created_at: string
+          detail: string | null
+          device_id: string | null
+          id: number
+          path: string | null
+          plan_id: string | null
+          session_id: string | null
+          step: string
+          valor: number | null
+        }
+        Insert: {
+          categoria?: string | null
+          created_at?: string
+          detail?: string | null
+          device_id?: string | null
+          id?: number
+          path?: string | null
+          plan_id?: string | null
+          session_id?: string | null
+          step: string
+          valor?: number | null
+        }
+        Update: {
+          categoria?: string | null
+          created_at?: string
+          detail?: string | null
+          device_id?: string | null
+          id?: number
+          path?: string | null
+          plan_id?: string | null
+          session_id?: string | null
+          step?: string
+          valor?: number | null
+        }
+        Relationships: []
+      }
       jarvis_alerts: {
         Row: {
           created_at: string
