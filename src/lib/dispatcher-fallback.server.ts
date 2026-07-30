@@ -59,6 +59,7 @@ export async function dispatchSmmV2(opts: {
   quantidade: number;
   instagram_user: string;
   serviceIdOverride?: string | number | null;
+  pedidoId?: string | null;
 }): Promise<SmmDispatchResult> {
   if (!opts.apiKey) return { ok: false, error: `${opts.fornecedor}: API key ausente` };
   const serviceId =
@@ -86,6 +87,7 @@ export async function dispatchSmmV2(opts: {
     service_id: serviceId,
     quantidade: opts.quantidade,
     target_link: link,
+    pedido_id: opts.pedidoId ?? null,
   };
 
   try {
