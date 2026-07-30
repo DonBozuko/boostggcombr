@@ -4,7 +4,7 @@ vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {} as unknown,
 }));
 
-const { linksDoAlvo, alvoValido } = await import("@/services/canary.server");
+const { linksDoAlvo, alvoValido, intervaloDoAlvo } = await import("@/services/canary.server");
 
 describe("canário v289 — pool de links de teste", () => {
   it("aceita vários links separados por vírgula, ponto-e-vírgula ou quebra de linha", () => {
@@ -21,5 +21,12 @@ describe("canário v289 — pool de links de teste", () => {
     expect(alvoValido({ rede: "ig", link: "", pacote: "p50", quantidade: 50, ativo: true, intervalo_horas: 0 })).toBe(false);
     expect(alvoValido({ rede: "ig", link: "@x", pacote: "p50", quantidade: 0, ativo: true, intervalo_horas: 0 })).toBe(false);
     expect(alvoValido({ rede: "ig", link: "@x", pacote: "p50", quantidade: 50, ativo: true, intervalo_horas: 0 })).toBe(true);
+  });
+});
+
+describe("canário v369 — relógio próprio por rede", () => {
+  it("usa o intervalo da rede quando definido e o geral quando é zero", () => {
+    expect(intervaloDoAlvo({ rede: "yt", link: "@x", pacote: "ys50", quantidade: 50, ativo: true, intervalo_horas: 48 }, 12)).toBe(48);
+    expect(intervaloDoAlvo({ rede: "ig", link: "@x", pacote: "p50", quantidade: 50, ativo: true, intervalo_horas: 0 }, 12)).toBe(12);
   });
 });
