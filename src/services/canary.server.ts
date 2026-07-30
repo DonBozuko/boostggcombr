@@ -252,8 +252,29 @@ export type CanaryReport = {
   novo_pedido?: { id: string; fornecedor: string; ordem: string; pacote: string; quantidade: number };
   verificados: Array<{ id: string; fornecedor: string; ordem: string; resultado: string }>;
   alertas: string[];
+  /** v368 — custo REAL de fornecedor gasto em testes no mês corrente (BRL) e teto. */
+  gasto_mes_brl?: number;
+  teto_mes_brl?: number;
   ts: string;
 };
+
+/** v368 — CUSTO REAL DE TESTE. `canary_runs.cost_brl` é o custo de FORNECEDOR
+ *  do pedido (quantidade/1000 × tarifa × câmbio), nunca o preço de vitrine.
+ *  Aqui somamos o mês corrente para dar teto ao gasto de teste. */
+export async function canarySpendThisMonth(): Promise<number> {
+  const inicio = new Date();
+  inicio.setUTCDate(1);
+  inicio.setUTCHours(0, 0, 0, 0);
+  const { data } = await supabaseAdmin
+    .from("canary_runs")
+    .select("cost_brl")
+    .gte("created_at", inicio.toISOString())
+    .limit(2000);
+  return Number(
+    (((data as any[]) ?? []).reduce((s, r) => s + (Number(r.cost_brl) || 0), 0)).toFixed(2),
+  );
+}
+
 
 
 /** v289 — quantos fornecedores AINDA conseguem atender esse pacote (fora da
