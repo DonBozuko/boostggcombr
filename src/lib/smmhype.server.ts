@@ -249,6 +249,7 @@ export async function dispatchSmmhype(args: {
   quantidade: number;
   instagram_user: string;
   serviceIdOverride?: string | number | null;
+  pedidoId?: string | null;
 }): Promise<SmmDispatchResult> {
   const smmKey = process.env.SMMHYPE_API_KEY;
   if (!smmKey) return { ok: false, error: "SMMHYPE_API_KEY ausente" };
