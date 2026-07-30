@@ -161,7 +161,7 @@ export function CanaryPanel({ token }: { token: string }) {
               <div className="text-[11px] text-amber-300 font-mono">Nenhuma rede configurada — o canário não roda.</div>
             )}
             {form.alvos.map((a, i) => (
-              <div key={i} className="grid grid-cols-2 md:grid-cols-6 gap-2 text-[11px] items-end rounded-lg border border-white/10 bg-black/40 p-2">
+              <div key={i} className="grid grid-cols-2 md:grid-cols-7 gap-2 text-[11px] items-end rounded-lg border border-white/10 bg-black/40 p-2">
                 <input value={a.rede} onChange={(e) => setAlvo(i, { rede: e.target.value })}
                   placeholder="rede (instagram)"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
@@ -175,6 +175,10 @@ export function CanaryPanel({ token }: { token: string }) {
                 <input type="number" value={a.quantidade} onChange={(e) => setAlvo(i, { quantidade: Number(e.target.value) })}
                   placeholder="qtd"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+                <input type="number" value={a.intervalo_horas} onChange={(e) => setAlvo(i, { intervalo_horas: Number(e.target.value) })}
+                  placeholder="testar a cada (h)"
+                  title="De quantas em quantas horas testar esta rede. 0 = usa o intervalo geral."
+                  className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
                 <div className="flex items-center gap-2">
                   <label className="flex items-center gap-1 text-white/70">
                     <input type="checkbox" checked={a.ativo} onChange={(e) => setAlvo(i, { ativo: e.target.checked })} />
@@ -182,6 +186,8 @@ export function CanaryPanel({ token }: { token: string }) {
                   </label>
                   <button onClick={() => removeAlvo(i)} className="text-red-300 border border-red-400/40 rounded px-2">×</button>
                 </div>
+              </div>
+
               </div>
             ))}
             <div className="flex gap-2 flex-wrap">
