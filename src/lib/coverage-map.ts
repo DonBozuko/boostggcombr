@@ -110,7 +110,7 @@ export const FAMILIAS: Familia[] = [
     id: "rls",
     nome: "Acesso a dados",
     detector: "linter RLS + autenticação dos robôs",
-    provas: ["cron-auth.test.ts", "rate-limit.test.ts"],
+    provas: ["cron-auth.test.ts", "rate-limit.test.ts", "status-publico-sem-vazamento.test.ts"],
   },
   {
     id: "promessa",
