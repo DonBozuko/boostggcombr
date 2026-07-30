@@ -46,7 +46,8 @@ export function CanaryPanel({ token }: { token: string }) {
     setForm((f) => ({ ...f, alvos: f.alvos.map((a, idx) => (idx === i ? { ...a, ...patch } : a)) }));
 
   const addAlvo = () =>
-    setForm((f) => ({ ...f, alvos: [...f.alvos, { rede: "", link: "", pacote: "", quantidade: 0, ativo: true }] }));
+    setForm((f) => ({ ...f, alvos: [...f.alvos, { rede: "", link: "", pacote: "", quantidade: 0, ativo: true, intervalo_horas: 0 }] }));
+
 
   const removeAlvo = (i: number) =>
     setForm((f) => ({ ...f, alvos: f.alvos.filter((_, idx) => idx !== i) }));
