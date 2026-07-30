@@ -560,8 +560,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         const res = await getStatusFn({ data: { id } });
         if (cancelled || !res.ok) return;
         if (res.status === "paid" || res.status === "Enviado") {
-          const m = String((res as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
-          if (m) setMysteryBonus(Number(m[1]));
+          const mb = (res as { mystery_bonus?: number | null }).mystery_bonus;
+          if (mb) setMysteryBonus(Number(mb));
           const valorNum = pedidoInfo?.price ? Number(pedidoInfo.price.replace(/[^\d,]/g, "").replace(",", ".")) : undefined;
           trackEvent("purchase", { value: valorNum, currency: "BRL", order_id: id, tier: pedidoInfo?.tier });
           stop(); setPaid(true); playSuccessAudio(); return;
