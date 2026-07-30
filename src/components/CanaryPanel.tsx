@@ -201,7 +201,7 @@ export function CanaryPanel({ token }: { token: string }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] mb-3">
 
             <label className="flex flex-col gap-1">
-              <span className="text-white/50">Intervalo entre testes (h)</span>
+              <span className="text-white/50">Intervalo geral entre testes (h) — vale para rede sem relógio próprio</span>
               <input type="number" value={form.interval_hours} onChange={(e) => setForm({ ...form, interval_hours: Number(e.target.value) })}
                 className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
             </label>
