@@ -115,8 +115,16 @@ export const suggestCanaryTargets = createServerFn({ method: "POST" })
       }
       void rede;
     }
-    return { ok: true as const, sugestoes: [...best.values()].sort((a, b) => a.rede.localeCompare(b.rede)) };
+    // v369 — rede cara (custo do teste acima de R$ 1) só precisa ser provada a
+    // cada 48h; rede de centavos roda a cada 12h. Mesma prova, metade do gasto.
+    return {
+      ok: true as const,
+      sugestoes: [...best.values()]
+        .sort((a, b) => a.rede.localeCompare(b.rede))
+        .map((s) => ({ ...s, intervalo_horas: s.cost_brl > 1 ? 48 : 12 })),
+    };
   });
+
 
 export const runCanaryNow = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenIn.parse(i))
