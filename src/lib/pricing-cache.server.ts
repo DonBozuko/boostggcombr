@@ -156,8 +156,12 @@ const MOVE_THRESHOLD = 0.05;
 // Empate técnico mantém quem já está: fim do ping-pong de fornecedor.
 const SWITCH_MIN_GAIN = 0.05;
 // v282 — Faixas de reajuste de custo do fornecedor.
-const AUTO_UP_MAX = 1.40;   // até +40%: aplica sozinho
-const RETIRE_ABOVE = 1.80;  // acima de +80%: aposenta o pacote
+const AUTO_UP_MAX = 1.40;   // até +40%: reajuste "silencioso" (só classifica o aviso)
+// v370 — RETIRE_ABOVE morreu. Alta de custo NÃO aposenta pacote: quem decide
+// preço e vitrine é a Autoridade (rampa de +40%/ciclo + pausa com volta
+// automática). Aposentar por percentual era catraca: todo fornecedor mexe em
+// preço, então em N ciclos o catálogo inteiro morreria sem nenhum motivo real.
+
 const QUARANTINE_KEY = "price_quarantine";
 const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
 const PRICE_KEYS = new Set([
