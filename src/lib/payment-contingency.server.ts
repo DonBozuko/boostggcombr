@@ -219,6 +219,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       quantidade: pedido.quantidade,
       instagram_user: pedido.instagram_user,
       serviceIdOverride: f.slug === "smmhype" ? undefined : serviceIdMap.get(f.slug) ?? null,
+      pedidoId: pedido.id,
     });
     if (r.ok) {
       sucesso = true;
@@ -436,6 +437,7 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
       quantidade: Number(pedido.quantidade),
       instagram_user: pedido.instagram_user,
       serviceIdOverride: f.provider_service_id ?? null,
+      pedidoId: pedido.id,
     });
     if (r.ok) {
       // Idempotency: só grava se ainda for órfão. Se outro processo despachou paralelo, aborta.
