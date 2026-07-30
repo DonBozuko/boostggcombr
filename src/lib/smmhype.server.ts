@@ -294,6 +294,15 @@ export async function dispatchSmmhype(args: {
 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 15_000);
+  // v374 — trilha forense: grava SEMPRE, com corpo bruto sem truncar.
+  const { logDispatchAttempt } = await import("./dispatch-log.server");
+  const base = {
+    provider_slug: "smmhype",
+    pacote: args.pacote,
+    service_id: serviceId,
+    quantidade: args.quantidade,
+    target_link: link,
+  };
   try {
     const res = await fetch(SMMHYPE_ENDPOINT, {
       method: "POST",
@@ -308,17 +317,22 @@ export async function dispatchSmmhype(args: {
     const apiError = (json as { error?: string } | null)?.error;
     if (!res.ok || apiError) {
       const detail = apiError ? String(apiError) : text.slice(0, 200);
+      void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: `SMMhype falhou: ${detail}` });
       return { ok: false, error: `SMMhype falhou: ${detail}`, status: res.status, body: json ?? text };
     }
     const orderId = (json as { order?: string | number } | null)?.order;
     if (orderId == null || orderId === "") {
+      void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: "resposta sem orderId" });
       return { ok: false, error: `SMMhype: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
     }
+    void logDispatchAttempt({ ...base, ok: true, http_status: res.status, raw_response: text, order_id: orderId });
     return { ok: true, orderId, body: json ?? text };
   } catch (err) {
     const msg = (err as Error).name === "AbortError" ? "timeout 15s" : (err as Error).message;
+    void logDispatchAttempt({ ...base, ok: false, raw_response: null, error_text: `rede ${msg}` });
     return { ok: false, error: `SMMhype: rede ${msg}` };
   } finally {
     clearTimeout(timer);
   }
 }
+
