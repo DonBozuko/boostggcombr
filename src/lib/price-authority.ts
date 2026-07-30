@@ -110,16 +110,24 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
     // subir sozinho quando o fornecedor baixar o custo (margem fica mais gorda).
     const alvo = Math.min(justo, price * AUTHORITY_MAX_UP);
     if (!respectsMinMargin(alvo, cost)) {
-      // Nem o teto de +40% cobre o custo: vender aqui é prejuízo real.
+      // v371 — A RAMPA ANDA MESMO PAUSADO.
+      // Antes: quando nem +40% cobria o custo, o preço ficava CONGELADO e o
+      // pacote pausado para sempre. Como nada mudava, a varredura repetia o
+      // mesmo alerta ("alarme que não anda") ciclo após ciclo — br-tf100 e
+      // br-tf500 travados assim. O teto de +40% é limite POR CICLO, não
+      // sentença: o preço sobe o que pode agora, o pacote fica fora da vitrine
+      // enquanto não fecha a margem, e em 1-2 ciclos converge sozinho.
       blocked.push({
         pacote: r.pacote,
         atual: r2(price),
         justo: r2(justo),
         salto: Number((justo / price).toFixed(3)),
       });
-      r.price_brl = price;
+      r.price_brl = r2(alvo);
+      if (Math.abs(alvo - price) > 0.009) motivos.set(r.pacote, "margem");
       continue;
     }
+
 
     r.price_brl = r2(alvo);
     motivos.set(r.pacote, "margem");
