@@ -18,6 +18,9 @@ export type CanaryAlvo = {
   pacote: string;        // pacote real do catálogo dessa rede
   quantidade: number;    // menor quantidade possível
   ativo: boolean;
+  /** v369 — intervalo próprio desta rede em horas. 0 = usa o intervalo geral.
+   *  Rede cara (YouTube/Kwai) roda a cada 48h; rede de centavos a cada 12h. */
+  intervalo_horas: number;
 };
 
 export type CanaryConfig = {
@@ -45,12 +48,19 @@ function normAlvo(a: Partial<CanaryAlvo>): CanaryAlvo {
     pacote: String(a.pacote ?? "").trim(),
     quantidade: Number(a.quantidade ?? 0) || 0,
     ativo: a.ativo !== false,
+    intervalo_horas: Math.max(0, Number(a.intervalo_horas ?? 0) || 0),
   };
+}
+
+/** Intervalo efetivo do alvo: o próprio, se definido; senão o geral. */
+export function intervaloDoAlvo(a: CanaryAlvo, geral: number): number {
+  return a.intervalo_horas > 0 ? a.intervalo_horas : geral;
 }
 
 export function alvoValido(a: CanaryAlvo): boolean {
   return Boolean(a.ativo && a.link && a.pacote && a.quantidade > 0);
 }
+
 
 export async function getCanaryConfig(): Promise<CanaryConfig> {
   const { data } = await supabaseAdmin
