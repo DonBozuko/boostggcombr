@@ -21,9 +21,12 @@ describe("v370 — sem aposentadoria por percentual de custo", () => {
     expect(src).not.toMatch(/PACOTE APOSENTADO/);
   });
 
-  it("pausa por custo tem volta automática pela Autoridade", () => {
+  it("pausa por custo tem volta automática pela Autoridade de Vitrine (v372)", () => {
     const src = read("../lib/price-authority.server.ts");
-    expect(src).toMatch(/\.like\("sellable_reason", "custo do fornecedor%"\)/);
+    // v372: o religamento manual sumiu porque o motor virou votante. Ele só
+    // declara o veto do ciclo; veto não renovado expira e o pacote volta só.
+    expect(src).toMatch(/syncShelfVetoes\(\s*\n?\s*"margem"/);
+    expect(src).not.toMatch(/is_sellable:\s*(true|false)/);
   });
 
   it("custo +83% (br-tf100 real) vira rampa de preço, não pausa", () => {
