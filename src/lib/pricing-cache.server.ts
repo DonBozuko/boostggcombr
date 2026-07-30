@@ -8,7 +8,7 @@
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
 import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
-import { serviceAcceptsQty } from "./critical-guards";
+import { isBrPackage, providerCanServe, serviceAcceptsQty } from "./critical-guards";
 
 type PricingRow = {
   pacote: string;
@@ -342,6 +342,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
     let hadBoundId = false;
     let anyRelevantCatalogAlive = false;
     let resolvedAny = false;
+    // v367 — quem o DESPACHO descarta não pode formar preço.
+    const brPkg = isBrPackage(String(r.pacote), r.category);
+    const inelegiveis = new Set<string>();
 
     for (const p of providers) {
       const entry = idx.get(p.slug)!;
@@ -359,6 +362,16 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       // custo. O despacho já o descarta (v286); deixá-lo precificar cria preço
       // abaixo do custo real de quem entrega de verdade.
       if (!serviceAcceptsQty(hit, qty)) continue;
+      // v367 — CAUSA RAIZ DO "ALARME QUE NÃO ANDA" (br-tf*, br-p*).
+      // Em pacote BR o roteamento exige reposição garantida (refill) e nome BR
+      // (v245). O painel mais barato NÃO tem refill → nunca despacha, mas era
+      // ele quem formava o preço. Resultado: preço nascia sobre um custo que
+      // ninguém pratica, e a Bancada julgava a margem com o custo de quem
+      // realmente entrega → "venderia no prejuízo" para sempre.
+      if (!providerCanServe({ brPackage: brPkg, svc: hit as any, requireRefill: brPkg })) {
+        inelegiveis.add(p.slug);
+        continue;
+      }
       // rate é por 1000 na moeda do fornecedor → normaliza para BRL.
       costs.push({ slug: p.slug, cost: Number(((rate * p.fx * qty) / 1000).toFixed(4)) });
     }
@@ -410,8 +423,14 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       //   acima     → aposenta o pacote (fornecedor inviável)
       const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
       const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
-      const subiu = saltoCusto > AUTO_UP_MAX;
-      const disparou = saltoCusto > RETIRE_ABOVE;
+      // v367 — CORREÇÃO DE FONTE NÃO É ALTA DE CUSTO.
+      // Se o custo antigo vinha de um fornecedor que o despacho nem usa (sem
+      // refill em pacote BR), o custo não "disparou": ele estava errado. Nesse
+      // caso o ciclo só corrige o custo e deixa a autoridade de preço reajustar
+      // — aposentar/pausar aqui tiraria da vitrine um pacote que vende bem.
+      const fonteInvalida = inelegiveis.has(String(r.last_cost_source ?? "")) && best.slug !== String(r.last_cost_source ?? "");
+      const subiu = !fonteInvalida && saltoCusto > AUTO_UP_MAX;
+      const disparou = !fonteInvalida && saltoCusto > RETIRE_ABOVE;
       const encareceuDeVerdade = subiu && saltoPreco > 1.05;
 
       if (costChanged || priceChanged) {
