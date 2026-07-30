@@ -38,7 +38,9 @@ export const getCanaryPanel = createServerFn({ method: "POST" })
     return {
       ok: true as const,
       config: cfg,
+      gasto_mes_brl,
       runs: (runs as any[]) ?? [],
+
       quarentena: (((quarentena as any[]) ?? []).filter((q) => new Date(q.until).getTime() > agora)) as any[],
       alertas_abertos: (((alertas as any[]) ?? []).filter((a) => !a.resolved_at)) as any[],
     };
