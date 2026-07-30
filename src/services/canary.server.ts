@@ -18,6 +18,9 @@ export type CanaryAlvo = {
   pacote: string;        // pacote real do catálogo dessa rede
   quantidade: number;    // menor quantidade possível
   ativo: boolean;
+  /** v369 — intervalo próprio desta rede em horas. 0 = usa o intervalo geral.
+   *  Rede cara (YouTube/Kwai) roda a cada 48h; rede de centavos a cada 12h. */
+  intervalo_horas: number;
 };
 
 export type CanaryConfig = {
@@ -45,12 +48,19 @@ function normAlvo(a: Partial<CanaryAlvo>): CanaryAlvo {
     pacote: String(a.pacote ?? "").trim(),
     quantidade: Number(a.quantidade ?? 0) || 0,
     ativo: a.ativo !== false,
+    intervalo_horas: Math.max(0, Number(a.intervalo_horas ?? 0) || 0),
   };
+}
+
+/** Intervalo efetivo do alvo: o próprio, se definido; senão o geral. */
+export function intervaloDoAlvo(a: CanaryAlvo, geral: number): number {
+  return a.intervalo_horas > 0 ? a.intervalo_horas : geral;
 }
 
 export function alvoValido(a: CanaryAlvo): boolean {
   return Boolean(a.ativo && a.link && a.pacote && a.quantidade > 0);
 }
+
 
 export async function getCanaryConfig(): Promise<CanaryConfig> {
   const { data } = await supabaseAdmin
@@ -433,14 +443,23 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
     }
   }
 
-  // O alvo mais "velho" (ou nunca testado) é o próximo da fila.
-  const alvo = [...alvos].sort(
+  // v369 — cada rede tem seu próprio relógio. Rede cara (YouTube/Kwai) espera
+  // mais; rede de centavos roda sempre. Só entram na fila os alvos VENCIDOS.
+  // interval_hours = 0 significa "testar agora" (botão manual).
+  const forcado = cfg.interval_hours === 0;
+  const vencidos = alvos.filter((a) => {
+    if (activeByPacote.has(a.pacote)) return false;
+    if (forcado) return true;
+    const last = lastByPacote.get(a.pacote) ?? 0;
+    return last === 0 || Date.now() - last >= intervaloDoAlvo(a, cfg.interval_hours) * 3_600_000;
+  });
+  if (vencidos.length === 0) return;
+
+  // Entre os vencidos, o que está há mais tempo sem teste.
+  const alvo = [...vencidos].sort(
     (a, b) => (lastByPacote.get(a.pacote) ?? 0) - (lastByPacote.get(b.pacote) ?? 0),
   )[0];
 
-  const lastAt = lastByPacote.get(alvo.pacote) ?? 0;
-  if (lastAt > 0 && Date.now() - lastAt < cfg.interval_hours * 3_600_000) return;
-  if (activeByPacote.has(alvo.pacote)) return;
 
   // v289 — pool de links: o fornecedor recusa link com pedido ativo/recente.
   // Com pool, o canário troca de perfil em vez de gerar alarme falso.

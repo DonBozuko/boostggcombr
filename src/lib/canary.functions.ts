@@ -57,7 +57,9 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
         pacote: z.string().max(120),
         quantidade: z.number().int().min(0).max(5000),
         ativo: z.boolean(),
+        intervalo_horas: z.number().int().min(0).max(720).optional(),
       })).max(12),
+
       interval_hours: z.number().int().min(1).max(168),
       sla_hours: z.number().int().min(1).max(72),
       budget_brl_month: z.number().min(0).max(2000).optional(),
@@ -70,8 +72,15 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
     const value = {
       enabled: data.enabled,
       alvos: data.alvos
-        .map((a) => ({ ...a, rede: a.rede.trim(), link: a.link.trim(), pacote: a.pacote.trim() }))
+        .map((a) => ({
+          ...a,
+          rede: a.rede.trim(),
+          link: a.link.trim(),
+          pacote: a.pacote.trim(),
+          intervalo_horas: a.intervalo_horas ?? 0,
+        }))
         .filter((a) => a.link || a.pacote),
+
       interval_hours: data.interval_hours,
       sla_hours: data.sla_hours,
       budget_brl_month: data.budget_brl_month ?? 40,
@@ -106,8 +115,16 @@ export const suggestCanaryTargets = createServerFn({ method: "POST" })
       }
       void rede;
     }
-    return { ok: true as const, sugestoes: [...best.values()].sort((a, b) => a.rede.localeCompare(b.rede)) };
+    // v369 — rede cara (custo do teste acima de R$ 1) só precisa ser provada a
+    // cada 48h; rede de centavos roda a cada 12h. Mesma prova, metade do gasto.
+    return {
+      ok: true as const,
+      sugestoes: [...best.values()]
+        .sort((a, b) => a.rede.localeCompare(b.rede))
+        .map((s) => ({ ...s, intervalo_horas: s.cost_brl > 1 ? 48 : 12 })),
+    };
   });
+
 
 export const runCanaryNow = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenIn.parse(i))

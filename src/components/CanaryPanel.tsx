@@ -8,7 +8,7 @@ import { Bird, RefreshCw, Play } from "lucide-react";
 import { toast } from "sonner";
 
 type Panel = Awaited<ReturnType<typeof getCanaryPanel>>;
-type Alvo = { rede: string; link: string; pacote: string; quantidade: number; ativo: boolean };
+type Alvo = { rede: string; link: string; pacote: string; quantidade: number; ativo: boolean; intervalo_horas: number };
 type Run = { id: string; created_at: string; pacote: string; quantidade: number; provider_slug: string | null; provider_order_id: string | null; status: string; remains: number | null; delivered_at: string | null; detail: string | null; cost_brl: number | null };
 
 const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
@@ -46,7 +46,8 @@ export function CanaryPanel({ token }: { token: string }) {
     setForm((f) => ({ ...f, alvos: f.alvos.map((a, idx) => (idx === i ? { ...a, ...patch } : a)) }));
 
   const addAlvo = () =>
-    setForm((f) => ({ ...f, alvos: [...f.alvos, { rede: "", link: "", pacote: "", quantidade: 0, ativo: true }] }));
+    setForm((f) => ({ ...f, alvos: [...f.alvos, { rede: "", link: "", pacote: "", quantidade: 0, ativo: true, intervalo_horas: 0 }] }));
+
 
   const removeAlvo = (i: number) =>
     setForm((f) => ({ ...f, alvos: f.alvos.filter((_, idx) => idx !== i) }));
@@ -59,7 +60,15 @@ export function CanaryPanel({ token }: { token: string }) {
         const jaTem = new Map(f.alvos.map((a) => [a.pacote, a]));
         const novos: Alvo[] = r.sugestoes.map((s) => {
           const ex = jaTem.get(s.pacote);
-          return { rede: s.rede, link: ex?.link ?? "", pacote: s.pacote, quantidade: s.quantidade, ativo: Boolean(ex?.link) };
+          return {
+            rede: s.rede,
+            link: ex?.link ?? "",
+            pacote: s.pacote,
+            quantidade: s.quantidade,
+            ativo: Boolean(ex?.link),
+            intervalo_horas: ex?.intervalo_horas || s.intervalo_horas,
+          };
+
         });
         return { ...f, alvos: novos.slice(0, 12) };
       });
@@ -152,7 +161,7 @@ export function CanaryPanel({ token }: { token: string }) {
               <div className="text-[11px] text-amber-300 font-mono">Nenhuma rede configurada — o canário não roda.</div>
             )}
             {form.alvos.map((a, i) => (
-              <div key={i} className="grid grid-cols-2 md:grid-cols-6 gap-2 text-[11px] items-end rounded-lg border border-white/10 bg-black/40 p-2">
+              <div key={i} className="grid grid-cols-2 md:grid-cols-7 gap-2 text-[11px] items-end rounded-lg border border-white/10 bg-black/40 p-2">
                 <input value={a.rede} onChange={(e) => setAlvo(i, { rede: e.target.value })}
                   placeholder="rede (instagram)"
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
@@ -165,6 +174,10 @@ export function CanaryPanel({ token }: { token: string }) {
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
                 <input type="number" value={a.quantidade} onChange={(e) => setAlvo(i, { quantidade: Number(e.target.value) })}
                   placeholder="qtd"
+                  className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+                <input type="number" value={a.intervalo_horas} onChange={(e) => setAlvo(i, { intervalo_horas: Number(e.target.value) })}
+                  placeholder="testar a cada (h)"
+                  title="De quantas em quantas horas testar esta rede. 0 = usa o intervalo geral."
                   className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
                 <div className="flex items-center gap-2">
                   <label className="flex items-center gap-1 text-white/70">
@@ -188,7 +201,7 @@ export function CanaryPanel({ token }: { token: string }) {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[11px] mb-3">
 
             <label className="flex flex-col gap-1">
-              <span className="text-white/50">Intervalo entre testes (h)</span>
+              <span className="text-white/50">Intervalo geral entre testes (h) — vale para rede sem relógio próprio</span>
               <input type="number" value={form.interval_hours} onChange={(e) => setForm({ ...form, interval_hours: Number(e.target.value) })}
                 className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
             </label>
