@@ -8,7 +8,7 @@
 // Mystery Box v115, Margin Guardian v135, Rate Limit v129, Telegram v125.
 
 import { computeGuardedPrice, respectsMinMargin } from "./margin-guardian";
-import { serviceAcceptsQty } from "./critical-guards";
+import { isBrPackage, providerCanServe, serviceAcceptsQty } from "./critical-guards";
 
 type PricingRow = {
   pacote: string;
