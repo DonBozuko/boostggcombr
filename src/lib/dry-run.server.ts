@@ -153,6 +153,7 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
   };
 
   const now = new Date().toISOString();
+  const vetos: { pacote: string; motivo: string }[] = [];
 
   for (const raw of ((rows as any[]) ?? [])) {
     summary.total++;
