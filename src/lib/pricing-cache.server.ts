@@ -161,6 +161,9 @@ const AUTO_UP_MAX = 1.40;   // até +40%: reajuste "silencioso" (só classifica 
 // preço e vitrine é a Autoridade (rampa de +40%/ciclo + pausa com volta
 // automática). Aposentar por percentual era catraca: todo fornecedor mexe em
 // preço, então em N ciclos o catálogo inteiro morreria sem nenhum motivo real.
+// Acima disso o aviso é destacado — mas o pacote continua vendendo.
+const STRONG_UP = 1.80;
+
 
 const QUARANTINE_KEY = "price_quarantine";
 const ALERT_COOLDOWN_MS = 6 * 60 * 60 * 1000;
