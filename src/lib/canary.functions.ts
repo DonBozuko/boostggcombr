@@ -56,6 +56,8 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
       })).max(12),
       interval_hours: z.number().int().min(1).max(168),
       sla_hours: z.number().int().min(1).max(72),
+      budget_brl_month: z.number().min(0).max(2000).optional(),
+
     }).parse(i),
   )
   .handler(async ({ data }) => {
