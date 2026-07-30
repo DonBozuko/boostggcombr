@@ -124,16 +124,12 @@ export async function preflightRouteOrBlock(opts: {
   console.error(`[v297] COBRANÇA BLOQUEADA ${opts.pacote} (${opts.quantidade}): ${result.reason}`, result.rejections);
 
   // Auto-cura da prateleira: só para falha estrutural de catálogo.
+  // v372 — veto com prazo (6h). Se o robô de catálogo achar rota nesse meio
+  // tempo, o veto expira e o pacote volta sozinho. Pausa sem retorno é bug.
   if (result.structural) {
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin
-        .from("pricing_items" as any)
-        .update({
-          is_sellable: false,
-          sellable_reason: `v297 preflight: ${result.reason}`,
-        } as any)
-        .eq("pacote", opts.pacote);
+      const { addShelfVeto } = await import("./shelf-authority.server");
+      await addShelfVeto("preflight", opts.pacote, `v297 preflight: ${result.reason}`);
     } catch { /* nunca derrubar o fluxo por causa do auto-cura */ }
   }
 

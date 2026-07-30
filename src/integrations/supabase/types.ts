@@ -1745,6 +1745,36 @@ export type Database = {
         }
         Relationships: []
       }
+      shelf_vetoes: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          motivo: string
+          pacote: string
+          refreshed_at: string
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          motivo: string
+          pacote: string
+          refreshed_at?: string
+          source: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          motivo?: string
+          pacote?: string
+          refreshed_at?: string
+          source?: string
+        }
+        Relationships: []
+      }
       smmpanel_services_cache: {
         Row: {
           category: string

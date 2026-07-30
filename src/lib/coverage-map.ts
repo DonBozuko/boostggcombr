@@ -132,8 +132,12 @@ export const FAMILIAS: Familia[] = [
   {
     id: "prateleira",
     nome: "Vitrine honesta (só mostra o que entrega)",
-    detector: "shelf-availability / honest-shelf-fallback",
-    provas: ["shelf-availability.test.ts", "honest-shelf-fallback.test.ts"],
+    detector: "shelf-authority (escritor único) / shelf-availability / honest-shelf-fallback",
+    provas: [
+      "shelf-availability.test.ts",
+      "honest-shelf-fallback.test.ts",
+      "shelf-single-writer.test.ts",
+    ],
   },
   {
     id: "imagem",

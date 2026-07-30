@@ -153,6 +153,7 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
   };
 
   const now = new Date().toISOString();
+  const vetos: { pacote: string; motivo: string }[] = [];
 
   for (const raw of ((rows as any[]) ?? [])) {
     summary.total++;
@@ -227,14 +228,23 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
     const changed = r.is_sellable !== sellable || (r.sellable_reason ?? "") !== reason;
     if (changed) summary.changed++;
 
+    // v372 — o teste seco NÃO grava mais `is_sellable`. Ele registra a data da
+    // checagem e vota; a Autoridade de Vitrine decide.
+    if (!sellable) vetos.push({ pacote: String(r.pacote), motivo: reason });
+
     await supabaseAdmin
       .from("pricing_items" as any)
-      .update({
-        is_sellable: sellable,
-        sellable_reason: reason,
-        last_dry_run: now,
-      })
+      .update({ last_dry_run: now })
       .eq("pacote", r.pacote);
+  }
+
+  // Sem catálogo vivo não dá para revalidar nada: preserva o estado anterior
+  // (não mexe nos vetos) em vez de pausar o catálogo inteiro por cegueira.
+  if (catalogsAlive > 0) {
+    const { syncShelfVetoes } = await import("./shelf-authority.server");
+    await syncShelfVetoes("teste-seco", vetos).catch((e) =>
+      console.error("[teste-seco] v372 veto falhou", e),
+    );
   }
 
   return summary;

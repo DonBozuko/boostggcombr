@@ -156,44 +156,19 @@ export async function remediateCoherence(
     if (!alvos.has(i.pacote)) alvos.set(i.pacote, `${PAUSE_PREFIX}: ${i.detalhe}`);
   }
 
-  for (const [pacote, motivo] of alvos) {
-    const { error, data } = await supabaseAdmin
-      .from("pricing_items" as any)
-      .update({ is_sellable: false, sellable_reason: motivo.slice(0, 400) })
-      .eq("pacote", pacote)
-      .neq("is_sellable", false)
-      .select("pacote");
-    if (error) {
-      errors += 1;
-      console.error("[coerencia] v304 auto-pausa falhou", { pacote, error: error.message });
-      continue;
-    }
-    if ((data as any[])?.length) paused.push(pacote);
-  }
-
-  // v308 — religamento do que esta trava pausou e não é mais problema.
-  // Só volta à vitrine quem: foi pausado por ESTA trava, não tem mais achado
-  // crítico, e passou por teste seco nas últimas 48h. Sem teste recente, fica fora.
-  const restored: string[] = [];
-  const limite = new Date(Date.now() - 48 * 3600_000).toISOString();
-  const { data: pausados } = await supabaseAdmin
-    .from("pricing_items" as any)
-    .select("pacote, sellable_reason, last_dry_run")
-    .eq("is_sellable", false)
-    .like("sellable_reason", `${PAUSE_PREFIX}%`);
-
-  for (const p of ((pausados as any[]) ?? [])) {
-    const pacote = String(p.pacote);
-    if (alvos.has(pacote)) continue;
-    if (!p.last_dry_run || String(p.last_dry_run) < limite) continue;
-    const { error } = await supabaseAdmin
-      .from("pricing_items" as any)
-      .update({ is_sellable: true, sellable_reason: null })
-      .eq("pacote", pacote)
-      .eq("is_sellable", false);
-    if (error) { errors += 1; continue; }
-    restored.push(pacote);
-  }
+  // v372 — a coerência não grava mais `is_sellable`: declara os vetos deste
+  // ciclo e a Autoridade de Vitrine decide. Religamento é consequência de o
+  // achado crítico ter sumido, não código separado.
+  const { syncShelfVetoes } = await import("@/lib/shelf-authority.server");
+  const decisao = await syncShelfVetoes(
+    "coerencia",
+    [...alvos].map(([pacote, motivo]) => ({ pacote, motivo })),
+  ).catch((e) => {
+    console.error("[coerencia] v372 veto falhou", e);
+    return { pausados: [] as string[], religados: [] as string[] };
+  });
+  paused.push(...decisao.pausados);
+  const restored: string[] = decisao.religados;
 
   if (paused.length > 0) {
     console.warn(`[coerencia] v304 pausou ${paused.length} pacote(s) incoerente(s):`, paused.join(", "));

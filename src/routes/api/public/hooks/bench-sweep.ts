@@ -12,7 +12,15 @@ export const Route = createFileRoute("/api/public/hooks/bench-sweep")({
         }
         const { runBenchAutonomo } = await import("@/services/bench-autonomo.server");
         const res = await runBenchAutonomo({ notify: true, origem: "cron" });
-        return Response.json(res, { status: res.ok ? 200 : 500 });
+        // v372 — a cada varredura, a Autoridade de Vitrine limpa vetos vencidos
+        // e devolve à vitrine quem não tem mais nenhum bloqueio ativo. Sem isso,
+        // um veto de motor que parou de rodar prenderia o pacote pra sempre.
+        const { reconcileShelf } = await import("@/lib/shelf-authority.server");
+        const shelf = await reconcileShelf().catch((e) => {
+          console.error("[vitrine] v372 reconciliação falhou", e);
+          return null;
+        });
+        return Response.json({ ...res, shelf }, { status: res.ok ? 200 : 500 });
       },
     },
   },

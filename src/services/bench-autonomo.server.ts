@@ -271,51 +271,20 @@ export async function runBenchAutonomo(
 
     const paraPausar = new Map<string, string>([...estruturais, ...persistentes]);
 
-    const pausados: string[] = [];
-    for (const [pacote, motivo] of paraPausar) {
-      const { data } = await supabaseAdmin
-        .from("pricing_items" as any)
-        .update({ is_sellable: false, sellable_reason: motivo.slice(0, 400) })
-        .eq("pacote", pacote)
-        .neq("is_sellable", false)
-        .select("pacote");
-      if ((data as any[])?.length) pausados.push(pacote);
-    }
-
-
-
-    // Religa SÓ o que esta trava pausou e que agora tem rota provada agora.
-    // v350 — pausa antiga por saldo é liberada de imediato: saldo deixou de ser
-    // motivo de tirar pacote do ar.
-    const entregaveis = new Set(avaliados.filter((r) => r.verdict === "entregavel").map((r) => r.pacote));
-    const soFaltaSaldo = new Set(avaliados.filter((r) => r.verdict === "saldo").map((r) => r.pacote));
-    // v361 — pausa antiga por margem cai sozinha quando o custo gravado prova
-    // que o pacote lucra (divergência de leitura não pode segurar venda).
-    const margemDivergente = new Set(
-      avaliados.filter((r) => r.verdict === "margem" && !prejuizoReal(r)).map((r) => r.pacote),
-    );
-    const religados: string[] = [];
-    const { data: pausadosDb } = await supabaseAdmin
-      .from("pricing_items" as any)
-      .select("pacote, sellable_reason")
-      .eq("is_sellable", false)
-      .like("sellable_reason", `${PAUSE_PREFIX}%`);
-    for (const p of ((pausadosDb as any[]) ?? [])) {
-      const pacote = String(p.pacote);
-      const motivoAntigo = String(p.sellable_reason ?? "");
-      const eraSaldo = /saldo/i.test(motivoAntigo);
-      const liberaMargem = /margem|prejuízo|prejuizo/i.test(motivoAntigo) && margemDivergente.has(pacote);
-      if (!entregaveis.has(pacote) && !(eraSaldo || soFaltaSaldo.has(pacote)) && !liberaMargem) continue;
-
-
-      const { data } = await supabaseAdmin
-        .from("pricing_items" as any)
-        .update({ is_sellable: true, sellable_reason: null })
-        .eq("pacote", pacote)
-        .eq("is_sellable", false)
-        .select("pacote");
-      if ((data as any[])?.length) religados.push(pacote);
-    }
+    // v372 — a bancada não grava mais `is_sellable`. Ela declara os vetos que
+    // enxerga NESTE ciclo; a Autoridade de Vitrine decide. Pacote que saiu da
+    // lista volta sozinho — o religamento manual (saldo/margem/entregável)
+    // deixou de existir porque o veto simplesmente não é renovado.
+    const { syncShelfVetoes } = await import("@/lib/shelf-authority.server");
+    const decisao = await syncShelfVetoes(
+      "bancada",
+      [...paraPausar].map(([pacote, motivo]) => ({ pacote, motivo })),
+    ).catch((e) => {
+      console.error("[bancada] v372 veto falhou", e);
+      return { pausados: [] as string[], religados: [] as string[] };
+    });
+    const pausados: string[] = decisao.pausados;
+    const religados: string[] = decisao.religados;
 
     // ---- Persistência ---------------------------------------------------
     if (runId) {
