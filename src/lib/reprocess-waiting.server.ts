@@ -204,6 +204,7 @@ export async function reprocessWaitingProvision(
       quantidade: Number(pedido.quantidade),
       instagram_user: pedido.instagram_user,
       serviceIdOverride: f.provider_service_id ?? null,
+      pedidoId: pedido.id,
     });
     if (r.ok) {
       await clearProviderUnstable(f.slug);
