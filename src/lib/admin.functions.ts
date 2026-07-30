@@ -12,20 +12,23 @@ export const getPedidoStatus = createServerFn({ method: "GET" })
       .select("status, error_detail")
       .eq("id", data.id)
       .maybeSingle();
-    if (error || !row) return { ok: false as const, status: null, error_detail: null as string | null };
+    if (error || !row) return { ok: false as const, status: null, mystery_bonus: null as number | null };
 
     if (["pending", "mp_pending", "mp_in_process"].includes(String(row.status))) {
       try {
         const { confirmAndDispatchIfPaid } = await import("@/lib/payment-contingency.server");
         const r = await confirmAndDispatchIfPaid(data.id);
-        if (r.ok) return { ok: true as const, status: r.status, error_detail: null as string | null };
+        if (r.ok) return { ok: true as const, status: r.status, mystery_bonus: null as number | null };
       } catch (e) {
         console.warn("[getPedidoStatus] contingency falhou", e);
       }
     }
     const safeStatus = ["mp_pending", "mp_in_process"].includes(String(row.status)) ? "pending" : String(row.status);
-    return { ok: true as const, status: safeStatus, error_detail: (row as { error_detail?: string | null }).error_detail ?? null };
+    // v373: nunca devolver texto técnico ao cliente. Só o bônus (MB:<n>) é extraído.
+    const mb = String((row as { error_detail?: string | null }).error_detail ?? "").match(/MB:(\d+)/);
+    return { ok: true as const, status: safeStatus, mystery_bonus: mb ? Number(mb[1]) : null };
   });
+
 
 // === ADMIN: listar pedidos pagos e reprocessar ===
 const adminInput = z.object({ token: z.string().min(8) });
