@@ -70,6 +70,8 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
         .filter((a) => a.link || a.pacote),
       interval_hours: data.interval_hours,
       sla_hours: data.sla_hours,
+      budget_brl_month: data.budget_brl_month ?? 40,
+
     };
     const { error } = await supabaseAdmin
       .from("admin_settings")
