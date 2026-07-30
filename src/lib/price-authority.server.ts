@@ -58,38 +58,17 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
   }
 
   // Salto grande não vira preço novo às cegas — mas também não pode continuar
-  // vendendo abaixo da margem. Sai da vitrine com motivo em português.
-  for (const b of plan.blocked) {
-    // v371 — o motivo é REESCRITO a cada ciclo (antes o `.neq` impedia atualizar
-    // pacote já pausado, e o texto ficava eternamente com o motivo antigo
-    // "custo disparou 90%"). Só sobrescreve pausa de margem ou pacote ativo —
-    // nunca apaga pausa de outro motor (ex.: sem fornecedor na faixa).
-    await supabaseAdmin
-      .from("pricing_items" as any)
-      .update({
-        is_sellable: false,
-        sellable_reason: `custo do fornecedor subiu: preço justo seria R$ ${b.justo.toFixed(2)} (hoje R$ ${b.atual.toFixed(2)}) — subindo em rampa até fechar a margem`,
-      })
-      .eq("pacote", b.pacote)
-      .or("is_sellable.eq.true,sellable_reason.is.null,sellable_reason.like.custo do fornecedor%");
-  }
-
-
-  // Contrapartida obrigatória: pacote que a AUTORIDADE pausou e que já teve o
-  // preço corrigido volta sozinho para a vitrine. Sem isso, a pausa vira lixo
-  // permanente e o pacote some do site sem motivo real.
-  // v370 — cobre também os pacotes "aposentados" por alta de custo no motor
-  // antigo ("custo do fornecedor disparou ..."). Aposentadoria por percentual
-  // não existe mais: se a margem fecha no preço vigente, volta a vender.
-  const bloqueados = new Set(plan.blocked.map((b) => b.pacote));
-  const voltar = plan.rows.filter((r) => !bloqueados.has(r.pacote)).map((r) => r.pacote);
-  if (voltar.length > 0) {
-    await supabaseAdmin
-      .from("pricing_items" as any)
-      .update({ is_sellable: true, sellable_reason: null })
-      .in("pacote", voltar)
-      .like("sellable_reason", "custo do fornecedor%");
-  }
+  // vendendo abaixo da margem. v372: a autoridade de preço NÃO grava mais
+  // `is_sellable`. Ela declara o veto dela e a Autoridade de Vitrine decide.
+  // Pacote que saiu da lista de bloqueados volta sozinho: o veto some.
+  const { syncShelfVetoes } = await import("./shelf-authority.server");
+  await syncShelfVetoes(
+    "margem",
+    plan.blocked.map((b) => ({
+      pacote: b.pacote,
+      motivo: `custo do fornecedor subiu: preço justo seria R$ ${b.justo.toFixed(2)} (hoje R$ ${b.atual.toFixed(2)}) — subindo em rampa até fechar a margem`,
+    })),
+  ).catch((e) => console.error("[pricing] v372 veto de margem falhou", e));
 
 
 
