@@ -303,6 +303,7 @@ export async function dispatchSmmhype(args: {
     service_id: serviceId,
     quantidade: args.quantidade,
     target_link: link,
+    pedido_id: args.pedidoId ?? null,
   };
   try {
     const res = await fetch(SMMHYPE_ENDPOINT, {
