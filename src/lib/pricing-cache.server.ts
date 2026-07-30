@@ -456,9 +456,13 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
           if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
+        } else if (saltoCusto > STRONG_UP) {
+          // Alta forte: aviso destacado, pacote SEGUE vendendo (rampa).
+          aposentados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
         } else {
           reajustados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
         }
+
       }
 
 
