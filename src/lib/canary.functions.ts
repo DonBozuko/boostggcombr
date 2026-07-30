@@ -13,8 +13,10 @@ export const getCanaryPanel = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCanaryConfig } = await import("@/services/canary.server");
+    const { getCanaryConfig, canarySpendThisMonth } = await import("@/services/canary.server");
     const cfg = await getCanaryConfig();
+    const gasto_mes_brl = await canarySpendThisMonth();
+
     const [{ data: runs }, { data: quarentena }, { data: alertas }] = await Promise.all([
       supabaseAdmin
         .from("canary_runs")
