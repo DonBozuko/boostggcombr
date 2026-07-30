@@ -703,9 +703,10 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       }
       if (aposentados.length > 0) {
         partes.push(
-          `⛔ PACOTE APOSENTADO (custo disparou mais de 80%)\n\nPROBLEMA: ${aposentados.length} pacote(s) ficaram caros demais e saíram da vitrine em vez de subir o preço na cara do cliente.\n\n${linhas(aposentados)}\n\nO QUE FAZER: escolher outro fornecedor para esse pacote no admin, ou deixar aposentado.`,
+          `🔺 CUSTO SUBIU FORTE (preço vai subir aos poucos)\n\nPROBLEMA: ${aposentados.length} pacote(s) ficaram bem mais caros no fornecedor. Nenhum saiu da vitrine: o preço sobe no máximo 40% por vez até chegar no valor justo.\n\n${linhas(aposentados)}\n\nO QUE FAZER: nada agora. Se quiser preço menor, escolher outro fornecedor para o pacote no admin.`,
         );
       }
+
       if (restored.length > 0) {
         partes.push(
           `✅ PACOTE VOLTOU AO NORMAL\n\nPROBLEMA: nenhum. O custo caiu de novo e ${restored.length} pacote(s) voltaram para a vitrine com preço menor.\n\n${restored.slice(0, 8).map((p) => `• ${p}`).join("\n")}\n\nO QUE FAZER: nada. Só avisando para você saber que o preço baixou.`,
