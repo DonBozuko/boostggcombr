@@ -423,8 +423,14 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       //   acima     → aposenta o pacote (fornecedor inviável)
       const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
       const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
-      const subiu = saltoCusto > AUTO_UP_MAX;
-      const disparou = saltoCusto > RETIRE_ABOVE;
+      // v367 — CORREÇÃO DE FONTE NÃO É ALTA DE CUSTO.
+      // Se o custo antigo vinha de um fornecedor que o despacho nem usa (sem
+      // refill em pacote BR), o custo não "disparou": ele estava errado. Nesse
+      // caso o ciclo só corrige o custo e deixa a autoridade de preço reajustar
+      // — aposentar/pausar aqui tiraria da vitrine um pacote que vende bem.
+      const fonteInvalida = inelegiveis.has(String(r.last_cost_source ?? "")) && best.slug !== String(r.last_cost_source ?? "");
+      const subiu = !fonteInvalida && saltoCusto > AUTO_UP_MAX;
+      const disparou = !fonteInvalida && saltoCusto > RETIRE_ABOVE;
       const encareceuDeVerdade = subiu && saltoPreco > 1.05;
 
       if (costChanged || priceChanged) {
