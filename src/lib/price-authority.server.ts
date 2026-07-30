@@ -60,15 +60,20 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
   // Salto grande não vira preço novo às cegas — mas também não pode continuar
   // vendendo abaixo da margem. Sai da vitrine com motivo em português.
   for (const b of plan.blocked) {
+    // v371 — o motivo é REESCRITO a cada ciclo (antes o `.neq` impedia atualizar
+    // pacote já pausado, e o texto ficava eternamente com o motivo antigo
+    // "custo disparou 90%"). Só sobrescreve pausa de margem ou pacote ativo —
+    // nunca apaga pausa de outro motor (ex.: sem fornecedor na faixa).
     await supabaseAdmin
       .from("pricing_items" as any)
       .update({
         is_sellable: false,
-        sellable_reason: `custo do fornecedor subiu: preço justo seria R$ ${b.justo.toFixed(2)} (hoje R$ ${b.atual.toFixed(2)}) — revisar fornecedor ou aceitar o preço novo`,
+        sellable_reason: `custo do fornecedor subiu: preço justo seria R$ ${b.justo.toFixed(2)} (hoje R$ ${b.atual.toFixed(2)}) — subindo em rampa até fechar a margem`,
       })
       .eq("pacote", b.pacote)
-      .neq("is_sellable", false);
+      .or("is_sellable.eq.true,sellable_reason.is.null,sellable_reason.like.custo do fornecedor%");
   }
+
 
   // Contrapartida obrigatória: pacote que a AUTORIDADE pausou e que já teve o
   // preço corrigido volta sozinho para a vitrine. Sem isso, a pausa vira lixo

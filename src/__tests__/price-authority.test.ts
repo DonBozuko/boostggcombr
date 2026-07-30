@@ -45,11 +45,19 @@ describe("v305 — autoridade única de preço", () => {
   });
 
 
-  it("não aplica salto acima do teto: vira decisão do dono", () => {
-    const { changes, blocked } = planAuthorityPrices([row("p1k", 1000, 500, 30)]);
-    expect(changes).toHaveLength(0);
-    expect(blocked[0].salto).toBeGreaterThan(AUTHORITY_MAX_UP);
+  it("v371 — salto grande não congela o preço: sobe em rampa e converge (fim do alarme que não anda)", () => {
+    let rows = [row("p1k", 1000, 500, 30)];
+    const primeiro = planAuthorityPrices(rows);
+    // continua fora da vitrine (não vende no prejuízo)...
+    expect(primeiro.blocked[0].salto).toBeGreaterThan(AUTHORITY_MAX_UP);
+    // ...mas o preço ANDA: nada de repetir o mesmo alerta para sempre.
+    expect(primeiro.changes[0].para).toBeCloseTo(30 * AUTHORITY_MAX_UP, 1);
+    for (let i = 0; i < 30; i++) rows = planAuthorityPrices(rows).rows;
+    const fim = planAuthorityPrices(rows);
+    expect(fim.blocked).toHaveLength(0);
+    expect(respectsMinMargin(rows[0].price_brl, 500)).toBe(true);
   });
+
 
   it("resolve margem e escada no MESMO passe (o ping-pong dos dois motores)", () => {
     // Estado real que voltava todo ciclo: pacote maior mais barato que o menor.
@@ -72,7 +80,9 @@ describe("v305 — autoridade única de preço", () => {
       expect(r.price_brl).toBeGreaterThanOrEqual(computeGuardedPrice(r.cost_brl, r.quantidade) - 0.01);
     }
     // nenhum dos dois pode simplesmente ficar como estava vendendo no prejuízo
-    expect(bloqueados.size + plano.changes.length).toBe(2);
+    // (v371: bloqueado TAMBÉM tem preço em rampa — conta pacote tratado, não soma de listas)
+    const tratados = new Set([...bloqueados, ...plano.changes.map((c) => c.pacote)]);
+    expect(tratados.size).toBe(2);
   });
 });
 
@@ -86,6 +96,6 @@ describe("v306 — piso comercial não pausa pacote com margem real", () => {
 
   it("mas preço sem margem real continua sendo tratado", () => {
     const plano = planAuthorityPrices([row("x1k", 1000, 3.0, 6, "instagram:visualizacoes")]);
-    expect(plano.blocked.length + plano.changes.length).toBe(1);
+    expect(new Set([...plano.blocked.map((b) => b.pacote), ...plano.changes.map((c) => c.pacote)]).size).toBe(1);
   });
 });
