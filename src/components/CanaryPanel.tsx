@@ -187,8 +187,6 @@ export function CanaryPanel({ token }: { token: string }) {
                   <button onClick={() => removeAlvo(i)} className="text-red-300 border border-red-400/40 rounded px-2">×</button>
                 </div>
               </div>
-
-              </div>
             ))}
             <div className="flex gap-2 flex-wrap">
               <button onClick={addAlvo} className="text-[10px] uppercase tracking-wider text-emerald-300 border border-emerald-500/40 rounded px-2 py-1">
