@@ -74,6 +74,8 @@ export async function getCanaryConfig(): Promise<CanaryConfig> {
     alvos,
     interval_hours: Number(v.interval_hours ?? DEFAULTS.interval_hours) || DEFAULTS.interval_hours,
     sla_hours: Number(v.sla_hours ?? DEFAULTS.sla_hours) || DEFAULTS.sla_hours,
+    budget_brl_month: Number(v.budget_brl_month ?? DEFAULTS.budget_brl_month) || DEFAULTS.budget_brl_month,
+
   };
 }
 
