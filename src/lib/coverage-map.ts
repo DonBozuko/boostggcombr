@@ -66,6 +66,7 @@ export const FAMILIAS: Familia[] = [
       "cost-bound-service.test.ts",
       "cost-qty-range.test.ts",
       "recost-qty-range.test.ts",
+      "custo-fonte-elegivel.test.ts",
     ],
   },
   {
