@@ -47,8 +47,8 @@ export const Route = createFileRoute("/youtube")({
     const title = "Crescer YouTube — Inscritos e Views — Elite Boost Prime | BoostGG";
     const description =
       "Cresça no YouTube com inscritos, views e likes via Pix. Acelera monetização, entrega acompanhada e sem pedir sua senha.";
-    const url = "https://boostgg.com.br/youtube";
-    const ogImage = `https://boostgg.com.br${ogYoutube}?v=48`;
+    const url = "https://www.boostgg.com.br/youtube";
+    const ogImage = `https://www.boostgg.com.br${ogYoutube}?v=48`;
     return {
       meta: [
         { title },

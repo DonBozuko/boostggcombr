@@ -160,9 +160,9 @@ export const Route = createFileRoute("/")({
             "@graph": [
               {
                 "@type": "Organization",
-                "@id": "https://boostgg.com.br/#organization",
+                "@id": "https://www.boostgg.com.br/#organization",
                 name: "BoostGG",
-                url: "https://boostgg.com.br/",
+                url: "https://www.boostgg.com.br/",
                 logo: ogImage,
                 description,
                 sameAs: [],
@@ -171,11 +171,11 @@ export const Route = createFileRoute("/")({
               },
               {
                 "@type": "WebSite",
-                "@id": "https://boostgg.com.br/#website",
-                url: "https://boostgg.com.br/",
+                "@id": "https://www.boostgg.com.br/#website",
+                url: "https://www.boostgg.com.br/",
                 name: "BoostGG",
                 inLanguage: "pt-BR",
-                publisher: { "@id": "https://boostgg.com.br/#organization" },
+                publisher: { "@id": "https://www.boostgg.com.br/#organization" },
               },
               // v302 — O nó Service foi REMOVIDO de propósito.
               // O Google reportou "Review snippets: tipo de objeto do campo
@@ -217,7 +217,7 @@ export const Route = createFileRoute("/")({
               },
               {
                 "@type": "Product",
-                "@id": "https://boostgg.com.br/#product",
+                "@id": "https://www.boostgg.com.br/#product",
                 name: "Seguidores para Instagram - BoostGG",
                 description,
                 brand: { "@type": "Brand", name: "BoostGG" },

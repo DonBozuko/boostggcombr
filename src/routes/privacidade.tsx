@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Lock, Database, Mail, TrendingUp } from "lucide-react";
 import { useState } from "react";
 
-const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => {
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/privacidade")({
         { name: "robots", content: "index, follow" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        { property: "og:url", content: "https://boostgg.com.br/privacidade" },
+        { property: "og:url", content: "https://www.boostgg.com.br/privacidade" },
         { property: "og:type", content: "website" },
         { property: "og:image", content: OG_IMAGE },
         { property: "og:image:alt", content: title },
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/privacidade")({
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: OG_IMAGE },
       ],
-      links: [{ rel: "canonical", href: "https://boostgg.com.br/privacidade" }],
+      links: [{ rel: "canonical", href: "https://www.boostgg.com.br/privacidade" }],
     };
   },
   component: TrustPage,

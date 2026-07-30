@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/comprar-visualizacoes-tiktok";
+const URL = "https://www.boostgg.com.br/comprar-visualizacoes-tiktok";
 const TITLE = "Comprar Visualizações TikTok — Views Rápidas e Baratas via Pix — Elite Boost Prime | BoostGG";
 const DESC =
   "Compre visualizações para vídeos do TikTok a partir de R$ 3,90 por 1.000. Entrega em minutos, sem senha, com Pix. Impulsione o algoritmo do TikTok.";
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/comprar-visualizacoes-tiktok")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "TikTok", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Visualizações TikTok", url: URL }])],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "TikTok", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://www.boostgg.com.br/" }, { name: "Visualizações TikTok", url: URL }])],
   }),
   component: Page,
 });

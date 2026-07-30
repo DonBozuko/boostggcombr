@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Star, MessageSquare, ExternalLink, ShieldCheck, TrendingUp } from "lucide-react";
 
-const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/avaliacoes")({
   head: () => {
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/avaliacoes")({
         { name: "robots", content: "index, follow" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
-        { property: "og:url", content: "https://boostgg.com.br/avaliacoes" },
+        { property: "og:url", content: "https://www.boostgg.com.br/avaliacoes" },
         { property: "og:type", content: "website" },
         { property: "og:image", content: OG_IMAGE },
         { property: "og:image:alt", content: title },
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/avaliacoes")({
         { name: "twitter:description", content: description },
         { name: "twitter:image", content: OG_IMAGE },
       ],
-      links: [{ rel: "canonical", href: "https://boostgg.com.br/avaliacoes" }],
+      links: [{ rel: "canonical", href: "https://www.boostgg.com.br/avaliacoes" }],
     };
   },
   component: AvaliacoesPage,

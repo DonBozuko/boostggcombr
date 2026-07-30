@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/comprar-seguidores-instagram";
+const URL = "https://www.boostgg.com.br/comprar-seguidores-instagram";
 const TITLE = "Comprar Seguidores Instagram — Elite Boost Prime | BoostGG";
 const DESC =
   "Compre seguidores para Instagram com entrega em minutos, pagamento via Pix e reposição nos pacotes brasileiros. Perfis brasileiros, sem senha, 100% seguro.";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/comprar-seguidores-instagram")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Seguidores Instagram", url: URL }])],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://www.boostgg.com.br/" }, { name: "Seguidores Instagram", url: URL }])],
   }),
   component: Page,
 });

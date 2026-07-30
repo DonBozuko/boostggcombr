@@ -48,8 +48,8 @@ export const Route = createFileRoute("/tiktok")({
     const title = "Turbinar TikTok — Seguidores e Views — Elite Boost Prime | BoostGG";
     const description =
       "Turbine seu TikTok com seguidores, curtidas e views via Pix. Entrega imediata e reposição nos pacotes brasileiros.";
-    const url = "https://boostgg.com.br/tiktok";
-    const ogImage = `https://boostgg.com.br${ogTiktok}?v=48`;
+    const url = "https://www.boostgg.com.br/tiktok";
+    const ogImage = `https://www.boostgg.com.br${ogTiktok}?v=48`;
     return {
       meta: [
         { title },

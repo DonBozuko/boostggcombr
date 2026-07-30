@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/comprar-seguidores-kwai";
+const URL = "https://www.boostgg.com.br/comprar-seguidores-kwai";
 
 const faq = [
   { q: "Como funciona a compra de seguidores no Kwai?", a: "Você escolhe o pacote, informa o @ ou link do perfil e paga via Pix. Em minutos os seguidores começam a entrar de forma gradual pra manter o crescimento natural." },

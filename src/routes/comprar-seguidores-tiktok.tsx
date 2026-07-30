@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/comprar-seguidores-tiktok";
+const URL = "https://www.boostgg.com.br/comprar-seguidores-tiktok";
 const TITLE = "Comprar Seguidores TikTok — Elite Boost Prime | BoostGG";
 const DESC =
   "Compre seguidores para TikTok com entrega imediata, pagamento via Pix e reposição de 30 dias nos pacotes brasileiros. Sem senha, sem risco, a partir de R$ 4,90.";
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/comprar-seguidores-tiktok")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "TikTok", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Seguidores TikTok", url: URL }])],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "TikTok", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://www.boostgg.com.br/" }, { name: "Seguidores TikTok", url: URL }])],
   }),
   component: Page,
 });

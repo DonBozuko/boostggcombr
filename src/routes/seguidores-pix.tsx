@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/seguidores-pix";
+const URL = "https://www.boostgg.com.br/seguidores-pix";
 const TITLE = "Seguidores no Pix — Elite Boost Prime | BoostGG";
 const DESC =
   "Comprar seguidores pagando no Pix: aprovação na hora, entrega automática e reposição nos pacotes brasileiros. Sem cadastro, sem senha, sem cartão.";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/seguidores-pix")({
       buildFaqJsonLd(FAQ),
       buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }),
       buildBreadcrumbJsonLd([
-        { name: "Início", url: "https://boostgg.com.br/" },
+        { name: "Início", url: "https://www.boostgg.com.br/" },
         { name: "Seguidores no Pix", url: URL },
       ]),
     ],
