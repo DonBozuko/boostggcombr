@@ -80,7 +80,9 @@ describe("v305 — autoridade única de preço", () => {
       expect(r.price_brl).toBeGreaterThanOrEqual(computeGuardedPrice(r.cost_brl, r.quantidade) - 0.01);
     }
     // nenhum dos dois pode simplesmente ficar como estava vendendo no prejuízo
-    expect(bloqueados.size + plano.changes.length).toBe(2);
+    // (v371: bloqueado TAMBÉM tem preço em rampa — conta pacote tratado, não soma de listas)
+    const tratados = new Set([...bloqueados, ...plano.changes.map((c) => c.pacote)]);
+    expect(tratados.size).toBe(2);
   });
 });
 
@@ -94,6 +96,6 @@ describe("v306 — piso comercial não pausa pacote com margem real", () => {
 
   it("mas preço sem margem real continua sendo tratado", () => {
     const plano = planAuthorityPrices([row("x1k", 1000, 3.0, 6, "instagram:visualizacoes")]);
-    expect(plano.blocked.length + plano.changes.length).toBe(1);
+    expect(new Set([...plano.blocked.map((b) => b.pacote), ...plano.changes.map((c) => c.pacote)]).size).toBe(1);
   });
 });
