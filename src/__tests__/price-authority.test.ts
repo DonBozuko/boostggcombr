@@ -45,11 +45,19 @@ describe("v305 — autoridade única de preço", () => {
   });
 
 
-  it("não aplica salto acima do teto: vira decisão do dono", () => {
-    const { changes, blocked } = planAuthorityPrices([row("p1k", 1000, 500, 30)]);
-    expect(changes).toHaveLength(0);
-    expect(blocked[0].salto).toBeGreaterThan(AUTHORITY_MAX_UP);
+  it("v371 — salto grande não congela o preço: sobe em rampa e converge (fim do alarme que não anda)", () => {
+    let rows = [row("p1k", 1000, 500, 30)];
+    const primeiro = planAuthorityPrices(rows);
+    // continua fora da vitrine (não vende no prejuízo)...
+    expect(primeiro.blocked[0].salto).toBeGreaterThan(AUTHORITY_MAX_UP);
+    // ...mas o preço ANDA: nada de repetir o mesmo alerta para sempre.
+    expect(primeiro.changes[0].para).toBeCloseTo(30 * AUTHORITY_MAX_UP, 1);
+    for (let i = 0; i < 30; i++) rows = planAuthorityPrices(rows).rows;
+    const fim = planAuthorityPrices(rows);
+    expect(fim.blocked).toHaveLength(0);
+    expect(respectsMinMargin(rows[0].price_brl, 500)).toBe(true);
   });
+
 
   it("resolve margem e escada no MESMO passe (o ping-pong dos dois motores)", () => {
     // Estado real que voltava todo ciclo: pacote maior mais barato que o menor.
