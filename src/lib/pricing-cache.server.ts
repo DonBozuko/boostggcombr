@@ -157,7 +157,7 @@ const MOVE_THRESHOLD = 0.05;
 const SWITCH_MIN_GAIN = 0.05;
 // v282 — Faixas de reajuste de custo do fornecedor.
 const AUTO_UP_MAX = 1.40;   // até +40%: reajuste "silencioso" (só classifica o aviso)
-// v370 — RETIRE_ABOVE morreu. Alta de custo NÃO aposenta pacote: quem decide
+// v370 — o teto de aposentadoria morreu. Alta de custo NÃO aposenta pacote: quem decide
 // preço e vitrine é a Autoridade (rampa de +40%/ciclo + pausa com volta
 // automática). Aposentar por percentual era catraca: todo fornecedor mexe em
 // preço, então em N ciclos o catálogo inteiro morreria sem nenhum motivo real.

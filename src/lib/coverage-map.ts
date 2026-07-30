@@ -37,6 +37,7 @@ export const FAMILIAS: Familia[] = [
       "margem-dupla-leitura.test.ts",
       "cost-tier-markup.test.ts",
       "card-pricing.test.ts",
+      "aposentadoria-catraca.test.ts",
     ],
   },
   {
