@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/audiencia-brasileira";
+const URL = "https://www.boostgg.com.br/audiencia-brasileira";
 const TITLE = "Audiência Brasileira — Perfis 100% Nacionais — Elite Boost Prime | BoostGG";
 const DESC =
   "Amplie seu perfil com audiência 100% brasileira, real e engajada. Ideal para quem vende no Brasil. Pagamento via Pix.";

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/turbinar-tiktok";
+const URL = "https://www.boostgg.com.br/turbinar-tiktok";
 const TITLE = "Turbinar TikTok — Gestão de Crescimento de Perfil — Elite Boost Prime | BoostGG";
 const DESC =
   "Gestão profissional de crescimento para perfis TikTok. Amplie audiência, prova social e alcance com pagamento via Pix e resultado em minutos.";

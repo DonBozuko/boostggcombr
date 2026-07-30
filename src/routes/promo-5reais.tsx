@@ -14,7 +14,7 @@ import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
 import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderBumpDialog";
 import { buildProductJsonLd } from "@/lib/seo-jsonld";
 
-const PROMO_URL = "https://boostgg.com.br/promo-5reais";
+const PROMO_URL = "https://www.boostgg.com.br/promo-5reais";
 const PROMO_DESC =
   "Promoção relâmpago: 100 seguidores no Instagram por R$5 via Pix. Cupom PRIME15 dá mais 15% off. Entrega em minutos.";
 

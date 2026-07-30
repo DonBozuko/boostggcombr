@@ -14,7 +14,7 @@ import { trackInitiateCheckout } from "@/lib/tiktok-pixel";
 import { OrderBumpDialog, findUpgrade, type BumpPlan } from "@/components/OrderBumpDialog";
 import { buildProductJsonLd } from "@/lib/seo-jsonld";
 
-const KIT_URL = "https://boostgg.com.br/kit-creator";
+const KIT_URL = "https://www.boostgg.com.br/kit-creator";
 const KIT_DESC =
   "Pacote Creator: 1.000 seguidores no Instagram via Pix. Entrega em minutos, reposição 30 dias (pacotes BR), sem senha. Cupom PRIME15 aplicado.";
 

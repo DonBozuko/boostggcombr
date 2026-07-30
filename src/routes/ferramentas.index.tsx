@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import { Calculator, Users, Sparkles, ArrowRight } from "lucide-react";
 
-const CANON = "https://boostgg.com.br/ferramentas";
+const CANON = "https://www.boostgg.com.br/ferramentas";
 const TITLE = "Ferramentas Grátis para Instagram | BoostGG";
 const DESC =
   "Ferramentas 100% grátis para creators: gerador de legenda com IA, contador de seguidores em tempo real e calculadora de engajamento do Instagram. Sem login.";
@@ -28,7 +28,7 @@ const TOOLS = [
   },
 ];
 
-const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/ferramentas/")({
   head: () => ({
@@ -62,7 +62,7 @@ export const Route = createFileRoute("/ferramentas/")({
           hasPart: TOOLS.map((t) => ({
             "@type": "WebApplication",
             name: t.title,
-            url: `https://boostgg.com.br${t.to}`,
+            url: `https://www.boostgg.com.br${t.to}`,
             applicationCategory: "UtilityApplication",
             operatingSystem: "Any",
             offers: { "@type": "Offer", price: "0", priceCurrency: "BRL" },

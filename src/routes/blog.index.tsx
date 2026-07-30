@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TrendingUp } from "lucide-react";
 
-const BASE = "https://boostgg.com.br";
+const BASE = "https://www.boostgg.com.br";
 
 const POSTS = [
   {
@@ -46,7 +46,7 @@ const POSTS = [
   },
 ];
 
-const OG_IMAGE = "https://boostgg.com.br/og-instagram.jpg";
+const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/blog/")({
   head: () => {

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Users, UserPlus, Image as ImageIcon, BadgeCheck, Lock } from "lucide-react";
 
-const CANON = "https://boostgg.com.br/ferramentas/contador-seguidores";
+const CANON = "https://www.boostgg.com.br/ferramentas/contador-seguidores";
 
 const FAQ = [
   {
@@ -102,8 +102,8 @@ export const Route = createFileRoute("/ferramentas/contador-seguidores")({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "https://boostgg.com.br/" },
-            { "@type": "ListItem", position: 2, name: "Ferramentas", item: "https://boostgg.com.br/ferramentas" },
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://www.boostgg.com.br/" },
+            { "@type": "ListItem", position: 2, name: "Ferramentas", item: "https://www.boostgg.com.br/ferramentas" },
             { "@type": "ListItem", position: 3, name: "Contador de Seguidores Instagram", item: CANON },
           ],
         }),

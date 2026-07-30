@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Loader2, Copy, Check, Sparkles } from "lucide-react";
 
-const CANON = "https://boostgg.com.br/ferramentas/gerador-legenda-instagram";
+const CANON = "https://www.boostgg.com.br/ferramentas/gerador-legenda-instagram";
 const TITLE = "Gerador de Legenda Instagram Grátis com IA 2026";
 const DESC =
   "Gerador de legenda para Instagram grátis com IA. Crie 3 legendas persuasivas em segundos com hashtags e CTA. Sem login, sem cadastro.";
@@ -106,8 +106,8 @@ export const Route = createFileRoute("/ferramentas/gerador-legenda-instagram")({
           "@context": "https://schema.org",
           "@type": "BreadcrumbList",
           itemListElement: [
-            { "@type": "ListItem", position: 1, name: "Home", item: "https://boostgg.com.br/" },
-            { "@type": "ListItem", position: 2, name: "Ferramentas", item: "https://boostgg.com.br/ferramentas" },
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://www.boostgg.com.br/" },
+            { "@type": "ListItem", position: 2, name: "Ferramentas", item: "https://www.boostgg.com.br/ferramentas" },
             { "@type": "ListItem", position: 3, name: "Gerador de Legenda Instagram", item: CANON },
           ],
         }),

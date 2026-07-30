@@ -1,7 +1,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { BlogLayout } from "@/components/BlogLayout";
 
-const BASE = "https://boostgg.com.br";
+const BASE = "https://www.boostgg.com.br";
 
 type Post = {
   title: string;

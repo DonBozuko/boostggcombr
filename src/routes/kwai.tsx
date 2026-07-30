@@ -44,7 +44,7 @@ export const Route = createFileRoute("/kwai")({
     const description =
       "Compre seguidores, curtidas e views no Kwai com Pix. Entrega gradual em minutos, sem senha, com acompanhamento do pedido e suporte no WhatsApp.";
 
-    const url = "https://boostgg.com.br/kwai";
+    const url = "https://www.boostgg.com.br/kwai";
     return {
       meta: [
         { title },

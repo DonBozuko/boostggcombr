@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
-const URL = "https://boostgg.com.br/comprar-seguidores-instagram-barato";
+const URL = "https://www.boostgg.com.br/comprar-seguidores-instagram-barato";
 const TITLE = "Seguidores Instagram Barato — Elite Boost Prime | BoostGG";
 const DESC =
   "Seguidores Instagram barato de verdade: pacote inicial a partir de R$5 no Pix, entrega em minutos e reposição de 30 dias nos pacotes brasileiros. Sem senha, sem enrolação.";
@@ -49,7 +49,7 @@ export const Route = createFileRoute("/comprar-seguidores-instagram-barato")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://boostgg.com.br/" }, { name: "Seguidores Instagram Barato", url: URL }])],
+    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://www.boostgg.com.br/" }, { name: "Seguidores Instagram Barato", url: URL }])],
   }),
   component: Page,
 });

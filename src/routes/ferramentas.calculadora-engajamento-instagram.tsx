@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Heart, MessageCircle, Users, TrendingUp, Zap } from "lucide-react";
 
-const CANON = "https://boostgg.com.br/ferramentas/calculadora-engajamento-instagram";
+const CANON = "https://www.boostgg.com.br/ferramentas/calculadora-engajamento-instagram";
 const TITLE = "Calculadora de Engajamento Instagram Grátis 2026 | BoostGG";
 const DESC =
   "Calcule a taxa de engajamento de qualquer post do Instagram em segundos. Grátis, sem login. Descubra se o perfil tem engajamento real ou inflado.";
