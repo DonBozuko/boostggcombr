@@ -18,6 +18,8 @@ import fbLeft from "@/assets/char-fb-left.png";
 import fbRight from "@/assets/char-fb-right.png";
 import tgLeft from "@/assets/char-tg-left.png";
 import tgRight from "@/assets/char-tg-right.png";
+import kwLeft from "@/assets/char-kw-left.png";
+import kwRight from "@/assets/char-kw-right.png";
 
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego" | "/kwai";
 
@@ -28,6 +30,7 @@ const characters: Partial<Record<RouteKey, { left: string; right: string; leftCt
   "/trafego": { left: tfLeft, right: tfRight, leftCta: "SEO local que domina.", rightCta: "Visitas Google em escala." },
   "/facebook": { left: fbLeft, right: fbRight, leftCta: "Páginas que monetizam.", rightCta: "Comunidades que escalam alcance." },
   "/telegram": { left: tgLeft, right: tgRight, leftCta: "Grupos privados lotados.", rightCta: "Engajamento recorrente em canais VIP." },
+  "/kwai": { left: kwLeft, right: kwRight, leftCta: "Kwai brasileiro em explosão.", rightCta: "Views que viram Kwai Rewards." },
 };
 
 const billboards: Record<
