@@ -18,6 +18,7 @@ Falta de saldo NUNCA tira pacote da vitrine nem pinta vermelho — é aviso amar
 Falta de saldo também NUNCA recusa cobrança (v352): vende, avisa na hora com force, pedido espera a recarga e sai sozinho. Ver [Saldo nunca bloqueia venda](mem://constraints/saldo-nunca-bloqueia-venda).
 Custo só pode vir de fornecedor que aceita a quantidade do pacote (min/max) — a mesma faixa que o despacho usa, inclusive no recusto de reserva. Ver [Custo só de quem entrega](mem://constraints/custo-so-de-quem-entrega) e [Recusto respeita a faixa](mem://constraints/recusto-respeita-faixa).
 Custo que julga margem sai do MESMO ID vinculado que o despacho vai usar — nunca do ID semente do código. Ver [Custo do serviço despachado](mem://constraints/custo-do-servico-despachado).
+Toda pausa precisa de rampa de saída automática e motivo reescrito a cada ciclo — teto por ciclo é limite de velocidade, nunca sentença. Ver [Regra que não anda](mem://constraints/regra-que-nao-anda).
 ID de fornecedor é descartável: se sumir/mudar, o vínculo é refeito por impressão digital (rede+produto) + faixa de quantidade + custo. Nunca por nome parecido. Ver [ID descartável](mem://constraints/id-descartavel).
 ID de fornecedor gravado no banco vence o ID chumbado no código; a sincronização nunca desfaz vínculo bom. Ver [Vínculo do banco vence o código](mem://constraints/vinculo-banco-vence-codigo).
 
