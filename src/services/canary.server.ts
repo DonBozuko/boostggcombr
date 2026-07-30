@@ -397,6 +397,21 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
   const alvos = cfg.alvos.filter(alvoValido);
   if (alvos.length === 0) return;
 
+  // v368 — TETO DE GASTO DE TESTE. Teste é custo fixo do dono, não venda.
+  // Estourou o teto do mês: para de comprar e avisa (não silencia nada mais).
+  const gasto = await canarySpendThisMonth();
+  report.gasto_mes_brl = gasto;
+  report.teto_mes_brl = cfg.budget_brl_month;
+  if (cfg.budget_brl_month > 0 && gasto >= cfg.budget_brl_month) {
+    const m =
+      `💸 TESTES AUTOMÁTICOS PAUSADOS NESTE MÊS\n\n` +
+      `PROBLEMA: os pedidos de teste já custaram R$ ${gasto.toFixed(2)} no fornecedor e o limite que você definiu é R$ ${cfg.budget_brl_month.toFixed(2)}.\n\n` +
+      `O QUE FAZER: nada, se estiver de bom tamanho — os testes voltam sozinhos no dia 1º. Se quiser continuar testando agora, aumente o limite em Admin › Canário.`;
+    if (await alert("canary:budget", m)) report.alertas.push(m);
+    return;
+  }
+
+
   const { data: recent } = await supabaseAdmin
     .from("canary_runs")
     .select("pacote, target_link, created_at, status")
