@@ -25,6 +25,8 @@ export type CanaryConfig = {
   alvos: CanaryAlvo[];
   interval_hours: number;
   sla_hours: number;     // prazo máximo para entregar antes de alertar
+  /** v368 — teto de gasto REAL de teste no mês corrente (BRL, custo de fornecedor). */
+  budget_brl_month: number;
 };
 
 const DEFAULTS: CanaryConfig = {
@@ -32,7 +34,9 @@ const DEFAULTS: CanaryConfig = {
   alvos: [],
   interval_hours: 12,
   sla_hours: 6,
+  budget_brl_month: 40,
 };
+
 
 function normAlvo(a: Partial<CanaryAlvo>): CanaryAlvo {
   return {
