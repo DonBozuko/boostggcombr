@@ -189,6 +189,7 @@ import { backoffDelayMs, isTransientError, MAX_DISPATCH_ATTEMPTS } from "@/lib/r
 export async function dispatchByFornecedor(slug: string, args: {
   pacote: string; quantidade: number; instagram_user: string;
   serviceIdOverride?: string | number | null;
+  pedidoId?: string | null;
 }): Promise<SmmDispatchResult> {
   // Circuit breaker: se aberto, skip imediato (failover chain vai pro próximo)
   if (await isCircuitOpen(slug)) {
