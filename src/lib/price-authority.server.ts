@@ -73,6 +73,9 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
   // Contrapartida obrigatória: pacote que a AUTORIDADE pausou e que já teve o
   // preço corrigido volta sozinho para a vitrine. Sem isso, a pausa vira lixo
   // permanente e o pacote some do site sem motivo real.
+  // v370 — cobre também os pacotes "aposentados" por alta de custo no motor
+  // antigo ("custo do fornecedor disparou ..."). Aposentadoria por percentual
+  // não existe mais: se a margem fecha no preço vigente, volta a vender.
   const bloqueados = new Set(plan.blocked.map((b) => b.pacote));
   const voltar = plan.rows.filter((r) => !bloqueados.has(r.pacote)).map((r) => r.pacote);
   if (voltar.length > 0) {
@@ -80,8 +83,9 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
       .from("pricing_items" as any)
       .update({ is_sellable: true, sellable_reason: null })
       .in("pacote", voltar)
-      .like("sellable_reason", "custo do fornecedor subiu%");
+      .like("sellable_reason", "custo do fornecedor%");
   }
+
 
 
   return { checked: plan.checked, applied, errors, changes: plan.changes, blocked: plan.blocked };
