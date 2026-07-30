@@ -27,8 +27,8 @@ export function CanaryPanel({ token }: { token: string }) {
 
   const [panel, setPanel] = useState<Panel | null>(null);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState<{ enabled: boolean; alvos: Alvo[]; interval_hours: number; sla_hours: number }>(
-    { enabled: false, alvos: [], interval_hours: 12, sla_hours: 6 },
+  const [form, setForm] = useState<{ enabled: boolean; alvos: Alvo[]; interval_hours: number; sla_hours: number; budget_brl_month: number }>(
+    { enabled: false, alvos: [], interval_hours: 12, sla_hours: 6, budget_brl_month: 40 },
   );
 
   const load = useCallback(async () => {
@@ -77,6 +77,7 @@ export function CanaryPanel({ token }: { token: string }) {
           enabled: form.enabled,
           interval_hours: Number(form.interval_hours) || 12,
           sla_hours: Number(form.sla_hours) || 6,
+          budget_brl_month: Number(form.budget_brl_month) || 40,
           alvos: form.alvos.map((a) => ({ ...a, quantidade: Number(a.quantidade) || 0 })),
         },
       });
