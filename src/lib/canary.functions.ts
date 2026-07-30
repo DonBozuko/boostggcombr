@@ -13,8 +13,10 @@ export const getCanaryPanel = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { getCanaryConfig } = await import("@/services/canary.server");
+    const { getCanaryConfig, canarySpendThisMonth } = await import("@/services/canary.server");
     const cfg = await getCanaryConfig();
+    const gasto_mes_brl = await canarySpendThisMonth();
+
     const [{ data: runs }, { data: quarentena }, { data: alertas }] = await Promise.all([
       supabaseAdmin
         .from("canary_runs")
@@ -36,7 +38,9 @@ export const getCanaryPanel = createServerFn({ method: "POST" })
     return {
       ok: true as const,
       config: cfg,
+      gasto_mes_brl,
       runs: (runs as any[]) ?? [],
+
       quarentena: (((quarentena as any[]) ?? []).filter((q) => new Date(q.until).getTime() > agora)) as any[],
       alertas_abertos: (((alertas as any[]) ?? []).filter((a) => !a.resolved_at)) as any[],
     };
@@ -56,6 +60,8 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
       })).max(12),
       interval_hours: z.number().int().min(1).max(168),
       sla_hours: z.number().int().min(1).max(72),
+      budget_brl_month: z.number().min(0).max(2000).optional(),
+
     }).parse(i),
   )
   .handler(async ({ data }) => {
@@ -68,6 +74,8 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
         .filter((a) => a.link || a.pacote),
       interval_hours: data.interval_hours,
       sla_hours: data.sla_hours,
+      budget_brl_month: data.budget_brl_month ?? 40,
+
     };
     const { error } = await supabaseAdmin
       .from("admin_settings")

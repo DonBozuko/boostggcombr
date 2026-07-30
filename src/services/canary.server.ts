@@ -25,6 +25,8 @@ export type CanaryConfig = {
   alvos: CanaryAlvo[];
   interval_hours: number;
   sla_hours: number;     // prazo máximo para entregar antes de alertar
+  /** v368 — teto de gasto REAL de teste no mês corrente (BRL, custo de fornecedor). */
+  budget_brl_month: number;
 };
 
 const DEFAULTS: CanaryConfig = {
@@ -32,7 +34,9 @@ const DEFAULTS: CanaryConfig = {
   alvos: [],
   interval_hours: 12,
   sla_hours: 6,
+  budget_brl_month: 40,
 };
+
 
 function normAlvo(a: Partial<CanaryAlvo>): CanaryAlvo {
   return {
@@ -70,6 +74,8 @@ export async function getCanaryConfig(): Promise<CanaryConfig> {
     alvos,
     interval_hours: Number(v.interval_hours ?? DEFAULTS.interval_hours) || DEFAULTS.interval_hours,
     sla_hours: Number(v.sla_hours ?? DEFAULTS.sla_hours) || DEFAULTS.sla_hours,
+    budget_brl_month: Number(v.budget_brl_month ?? DEFAULTS.budget_brl_month) || DEFAULTS.budget_brl_month,
+
   };
 }
 
@@ -246,8 +252,29 @@ export type CanaryReport = {
   novo_pedido?: { id: string; fornecedor: string; ordem: string; pacote: string; quantidade: number };
   verificados: Array<{ id: string; fornecedor: string; ordem: string; resultado: string }>;
   alertas: string[];
+  /** v368 — custo REAL de fornecedor gasto em testes no mês corrente (BRL) e teto. */
+  gasto_mes_brl?: number;
+  teto_mes_brl?: number;
   ts: string;
 };
+
+/** v368 — CUSTO REAL DE TESTE. `canary_runs.cost_brl` é o custo de FORNECEDOR
+ *  do pedido (quantidade/1000 × tarifa × câmbio), nunca o preço de vitrine.
+ *  Aqui somamos o mês corrente para dar teto ao gasto de teste. */
+export async function canarySpendThisMonth(): Promise<number> {
+  const inicio = new Date();
+  inicio.setUTCDate(1);
+  inicio.setUTCHours(0, 0, 0, 0);
+  const { data } = await supabaseAdmin
+    .from("canary_runs")
+    .select("cost_brl")
+    .gte("created_at", inicio.toISOString())
+    .limit(2000);
+  return Number(
+    (((data as any[]) ?? []).reduce((s, r) => s + (Number(r.cost_brl) || 0), 0)).toFixed(2),
+  );
+}
+
 
 
 /** v289 — quantos fornecedores AINDA conseguem atender esse pacote (fora da
@@ -369,6 +396,21 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
 async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<void> {
   const alvos = cfg.alvos.filter(alvoValido);
   if (alvos.length === 0) return;
+
+  // v368 — TETO DE GASTO DE TESTE. Teste é custo fixo do dono, não venda.
+  // Estourou o teto do mês: para de comprar e avisa (não silencia nada mais).
+  const gasto = await canarySpendThisMonth();
+  report.gasto_mes_brl = gasto;
+  report.teto_mes_brl = cfg.budget_brl_month;
+  if (cfg.budget_brl_month > 0 && gasto >= cfg.budget_brl_month) {
+    const m =
+      `💸 TESTES AUTOMÁTICOS PAUSADOS NESTE MÊS\n\n` +
+      `PROBLEMA: os pedidos de teste já custaram R$ ${gasto.toFixed(2)} no fornecedor e o limite que você definiu é R$ ${cfg.budget_brl_month.toFixed(2)}.\n\n` +
+      `O QUE FAZER: nada, se estiver de bom tamanho — os testes voltam sozinhos no dia 1º. Se quiser continuar testando agora, aumente o limite em Admin › Canário.`;
+    if (await alert("canary:budget", m)) report.alertas.push(m);
+    return;
+  }
+
 
   const { data: recent } = await supabaseAdmin
     .from("canary_runs")

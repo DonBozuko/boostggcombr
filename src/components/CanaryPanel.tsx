@@ -27,8 +27,8 @@ export function CanaryPanel({ token }: { token: string }) {
 
   const [panel, setPanel] = useState<Panel | null>(null);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState<{ enabled: boolean; alvos: Alvo[]; interval_hours: number; sla_hours: number }>(
-    { enabled: false, alvos: [], interval_hours: 12, sla_hours: 6 },
+  const [form, setForm] = useState<{ enabled: boolean; alvos: Alvo[]; interval_hours: number; sla_hours: number; budget_brl_month: number }>(
+    { enabled: false, alvos: [], interval_hours: 12, sla_hours: 6, budget_brl_month: 40 },
   );
 
   const load = useCallback(async () => {
@@ -77,6 +77,7 @@ export function CanaryPanel({ token }: { token: string }) {
           enabled: form.enabled,
           interval_hours: Number(form.interval_hours) || 12,
           sla_hours: Number(form.sla_hours) || 6,
+          budget_brl_month: Number(form.budget_brl_month) || 40,
           alvos: form.alvos.map((a) => ({ ...a, quantidade: Number(a.quantidade) || 0 })),
         },
       });
@@ -196,11 +197,28 @@ export function CanaryPanel({ token }: { token: string }) {
               <input type="number" value={form.sla_hours} onChange={(e) => setForm({ ...form, sla_hours: Number(e.target.value) })}
                 className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
             </label>
+            <label className="flex flex-col gap-1">
+              <span className="text-white/50">Limite de gasto de teste por mês (R$)</span>
+              <input type="number" step="1" value={form.budget_brl_month} onChange={(e) => setForm({ ...form, budget_brl_month: Number(e.target.value) })}
+                className="bg-black/50 border border-white/15 rounded px-2 py-1 text-white" />
+            </label>
             <label className="flex items-end gap-2 pb-1">
               <input type="checkbox" checked={form.enabled} onChange={(e) => setForm({ ...form, enabled: e.target.checked })} />
               <span className="text-white/70">Ligado (compra automática)</span>
             </label>
           </div>
+
+          {panel?.ok && typeof (panel as any).gasto_mes_brl === "number" && (
+            <div className="mb-3 text-[11px] text-white/70 border border-white/10 rounded px-2 py-1">
+              Gasto real de teste neste mês:{" "}
+              <strong className="text-white">
+                R$ {Number((panel as any).gasto_mes_brl).toFixed(2)}
+              </strong>{" "}
+              de R$ {Number(form.budget_brl_month || 0).toFixed(2)} — este é o custo pago ao
+              fornecedor, não o preço de vitrine.
+            </div>
+          )}
+
 
           <button onClick={save} disabled={busy}
             className="text-[11px] uppercase tracking-wider border border-emerald-500/40 text-emerald-300 rounded px-3 py-1 mb-4 disabled:opacity-40">
