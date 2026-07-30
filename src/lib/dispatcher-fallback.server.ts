@@ -69,13 +69,24 @@ export async function dispatchSmmV2(opts: {
     SMMHYPE_SERVICE_IDS[opts.pacote.toLowerCase()];
   if (!serviceId) return { ok: false, error: `${opts.fornecedor}: service id ausente` };
 
+  const link = normalizeLink(opts.pacote, opts.instagram_user);
   const body = new URLSearchParams({
     key: opts.apiKey,
     action: "add",
     service: String(serviceId),
-    link: normalizeLink(opts.pacote, opts.instagram_user),
+    link,
     quantity: String(opts.quantidade),
   });
+
+  // v374 — trilha forense: fornecedor, service id, quantidade, HTTP e corpo bruto.
+  const { logDispatchAttempt } = await import("./dispatch-log.server");
+  const base = {
+    provider_slug: opts.fornecedor,
+    pacote: opts.pacote,
+    service_id: serviceId,
+    quantidade: opts.quantidade,
+    target_link: link,
+  };
 
   try {
     const ctrl = new AbortController();
@@ -93,21 +104,26 @@ export async function dispatchSmmV2(opts: {
       const apiError = (json as { error?: string } | null)?.error;
       if (!res.ok || apiError) {
         const detail = apiError ? String(apiError) : text.slice(0, 200);
+        void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: detail });
         return { ok: false, error: `${opts.fornecedor} falhou: ${detail}`, status: res.status, body: json ?? text };
       }
       const orderId = (json as { order?: string | number } | null)?.order;
       if (orderId == null || orderId === "") {
+        void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: "resposta sem orderId" });
         return { ok: false, error: `${opts.fornecedor}: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
       }
+      void logDispatchAttempt({ ...base, ok: true, http_status: res.status, raw_response: text, order_id: orderId });
       return { ok: true, orderId, body: json ?? text };
     } finally {
       clearTimeout(timer);
     }
   } catch (err) {
     const msg = (err as Error).name === "AbortError" ? "timeout 15s" : (err as Error).message;
+    void logDispatchAttempt({ ...base, ok: false, error_text: `rede ${msg}` });
     return { ok: false, error: `${opts.fornecedor}: rede ${msg}` };
   }
 }
+
 
 // v222 — Circuit breaker + retry transient: se erro de rede/timeout, tenta 1x
 // de novo antes de deixar o failover cair pro próximo fornecedor. Isso mata

@@ -584,6 +584,57 @@ export type Database = {
         }
         Relationships: []
       }
+      dispatch_attempts_logs: {
+        Row: {
+          attempt: number
+          created_at: string
+          error_text: string | null
+          http_status: number | null
+          id: string
+          ok: boolean
+          order_id: string | null
+          pacote: string | null
+          pedido_id: string | null
+          provider_slug: string
+          quantidade: number | null
+          raw_response: string | null
+          service_id: string | null
+          target_link: string | null
+        }
+        Insert: {
+          attempt?: number
+          created_at?: string
+          error_text?: string | null
+          http_status?: number | null
+          id?: string
+          ok?: boolean
+          order_id?: string | null
+          pacote?: string | null
+          pedido_id?: string | null
+          provider_slug: string
+          quantidade?: number | null
+          raw_response?: string | null
+          service_id?: string | null
+          target_link?: string | null
+        }
+        Update: {
+          attempt?: number
+          created_at?: string
+          error_text?: string | null
+          http_status?: number | null
+          id?: string
+          ok?: boolean
+          order_id?: string | null
+          pacote?: string | null
+          pedido_id?: string | null
+          provider_slug?: string
+          quantidade?: number | null
+          raw_response?: string | null
+          service_id?: string | null
+          target_link?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
