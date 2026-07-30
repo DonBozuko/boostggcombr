@@ -72,8 +72,15 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
     const value = {
       enabled: data.enabled,
       alvos: data.alvos
-        .map((a) => ({ ...a, rede: a.rede.trim(), link: a.link.trim(), pacote: a.pacote.trim() }))
+        .map((a) => ({
+          ...a,
+          rede: a.rede.trim(),
+          link: a.link.trim(),
+          pacote: a.pacote.trim(),
+          intervalo_horas: a.intervalo_horas ?? 0,
+        }))
         .filter((a) => a.link || a.pacote),
+
       interval_hours: data.interval_hours,
       sla_hours: data.sla_hours,
       budget_brl_month: data.budget_brl_month ?? 40,
