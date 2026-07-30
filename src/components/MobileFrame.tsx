@@ -18,6 +18,8 @@ import fbLeft from "@/assets/char-fb-left.png";
 import fbRight from "@/assets/char-fb-right.png";
 import tgLeft from "@/assets/char-tg-left.png";
 import tgRight from "@/assets/char-tg-right.png";
+import kwLeft from "@/assets/char-kw-left.png";
+import kwRight from "@/assets/char-kw-right.png";
 
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego" | "/kwai";
 
