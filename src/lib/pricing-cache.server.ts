@@ -421,26 +421,30 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       const costChanged = Math.abs(newCost - oldCost) > 0.0001;
       const priceChanged = Math.abs(newPrice - oldPrice) > 0.009;
       // v271 — O gatilho olha CUSTO contra CUSTO (nunca preço contra preço).
-      // v282 — Faixas de reajuste automático em vez de trava binária:
-      //   até +40%  → aplica sozinho (margem continua protegida)
-      //   +40..+80% → pausa e espera decisão do dono
-      //   acima     → aposenta o pacote (fornecedor inviável)
+      // v370 — Alta de custo é REAJUSTE, nunca aposentadoria.
+      //   este ciclo   → grava CUSTO e classifica o aviso
+      //   Autoridade   → decide preço (rampa +40%/ciclo) e pausa só se nem a
+      //                  rampa cobrir a margem — com volta automática depois.
       const saltoCusto = oldCost > 0 ? newCost / oldCost : 1;
       const saltoPreco = oldPrice > 0 ? newPrice / oldPrice : 1;
       // v367 — CORREÇÃO DE FONTE NÃO É ALTA DE CUSTO.
       // Se o custo antigo vinha de um fornecedor que o despacho nem usa (sem
-      // refill em pacote BR), o custo não "disparou": ele estava errado. Nesse
-      // caso o ciclo só corrige o custo e deixa a autoridade de preço reajustar
-      // — aposentar/pausar aqui tiraria da vitrine um pacote que vende bem.
+      // refill em pacote BR), o custo não "disparou": ele estava errado.
       const fonteInvalida = inelegiveis.has(String(r.last_cost_source ?? "")) && best.slug !== String(r.last_cost_source ?? "");
       const subiu = !fonteInvalida && saltoCusto > AUTO_UP_MAX;
-      const disparou = !fonteInvalida && saltoCusto > RETIRE_ABOVE;
       const encareceuDeVerdade = subiu && saltoPreco > 1.05;
 
       if (costChanged || priceChanged) {
         patch.cost_brl = newCost;
         patch.last_cost_source = best.slug;
         patch.synced_at = new Date().toISOString();
+
+        // v370 — Pacote aposentado/pausado por este motor no passado volta a
+        // concorrer: quem julga margem agora é a Autoridade, com o custo novo.
+        if (r.is_sellable === false && /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""))) {
+          patch.is_sellable = true;
+          patch.sellable_reason = null;
+        }
 
         if (!encareceuDeVerdade) {
           // v305 — grava só o CUSTO. O preço é decidido pela autoridade única
@@ -449,32 +453,11 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
           if (oldCost > 0 && saltoCusto <= 0.6) {
             repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
           }
-        } else if (!disparou && respectsMinMargin(newPrice, newCost)) {
-          // v282 — Reajuste dentro do teto: religa o pacote; o preço novo sai
-          // da autoridade única logo em seguida.
-          if (r.is_sellable === false && /^custo (do|real do) fornecedor/i.test(String(r.sellable_reason ?? ""))) {
-            patch.is_sellable = true;
-            patch.sellable_reason = null;
-          }
-          reajustados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-        } else if (disparou) {
-          // v282 — Salto acima de +80%: fornecedor virou inviável. Aposenta.
-          patch.is_sellable = false;
-          patch.sellable_reason = `custo do fornecedor disparou (${Math.round((saltoCusto - 1) * 100)}%): pacote aposentado automaticamente — preço justo seria R$ ${newPrice.toFixed(2)}`;
-          if (r.is_sellable !== false) {
-            aposentados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-          }
         } else {
-          // v271 — Faixa de decisão (+40% a +80%): NÃO sobrescreve o preço da
-          // vitrine. O pacote sai de venda e o preço justo fica no motivo.
-          patch.is_sellable = false;
-          patch.sellable_reason = `custo do fornecedor subiu: preço justo seria R$ ${newPrice.toFixed(2)} (hoje R$ ${oldPrice.toFixed(2)}) — revisar fornecedor ou preço`;
-          if (r.is_sellable !== false) {
-            repriced.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
-          }
+          reajustados.push({ pacote: r.pacote, de: oldPrice, para: newPrice, fornecedor: best.slug });
         }
       }
+
 
       // v267 — Auto-religamento. Sem isso o pacote pausado por custo ficava
       // pausado PARA SEMPRE, mesmo depois de o preço já ter convergido para o
