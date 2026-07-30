@@ -719,7 +719,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
         action: "reajuste_automatico_v282",
         detail: {
           teto_automatico: AUTO_UP_MAX,
-          teto_aposentadoria: RETIRE_ABOVE,
+          alta_forte: STRONG_UP,
           reajustados: reajustados.slice(0, 50),
           aposentados: aposentados.slice(0, 50),
           voltaram: restored.slice(0, 50),
