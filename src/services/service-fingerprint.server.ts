@@ -184,6 +184,7 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
   }
 
   // Desvincula rota podre. Só pausa se o pacote ficar sem nenhuma rota.
+  const vetos: { pacote: string; motivo: string }[] = [];
   for (const [pacote, ruins] of driftPorPacote) {
     const todas = linksByPacote.get(pacote) ?? [];
     const colsRuins = new Set(ruins.map((r) => r.col));
@@ -213,16 +214,22 @@ export async function runServiceFingerprints(): Promise<FingerprintRunResult> {
     }
 
     if (!sobra) {
-      const motivo = `${PAUSE_PREFIX}: fornecedor trocou o produto do id ${ruins[0].provider} ${ruins[0].service_id}`;
-      const { error: e2, data } = await supabaseAdmin
-        .from("pricing_items" as any)
-        .update({ is_sellable: false, sellable_reason: motivo.slice(0, 400) })
-        .eq("pacote", pacote)
-        .neq("is_sellable", false)
-        .select("pacote");
-      if (e2) { result.errors += 1; continue; }
-      if ((data as any[])?.length) result.paused.push(pacote);
+      vetos.push({
+        pacote,
+        motivo: `${PAUSE_PREFIX}: fornecedor trocou o produto do id ${ruins[0].provider} ${ruins[0].service_id}`,
+      });
     }
+  }
+
+  // v372 — voto, não decisão. Pacote que reencontrou rota some da lista de
+  // vetos no ciclo seguinte e volta à vitrine sozinho.
+  {
+    const { syncShelfVetoes } = await import("@/lib/shelf-authority.server");
+    const decisao = await syncShelfVetoes("impressao", vetos).catch((e) => {
+      console.error("[fingerprint] v372 veto falhou", e);
+      return { pausados: [] as string[] };
+    });
+    result.paused.push(...decisao.pausados);
   }
 
   if (result.drift.length > 0) {
