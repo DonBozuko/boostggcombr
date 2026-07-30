@@ -60,7 +60,15 @@ export function CanaryPanel({ token }: { token: string }) {
         const jaTem = new Map(f.alvos.map((a) => [a.pacote, a]));
         const novos: Alvo[] = r.sugestoes.map((s) => {
           const ex = jaTem.get(s.pacote);
-          return { rede: s.rede, link: ex?.link ?? "", pacote: s.pacote, quantidade: s.quantidade, ativo: Boolean(ex?.link) };
+          return {
+            rede: s.rede,
+            link: ex?.link ?? "",
+            pacote: s.pacote,
+            quantidade: s.quantidade,
+            ativo: Boolean(ex?.link),
+            intervalo_horas: ex?.intervalo_horas || s.intervalo_horas,
+          };
+
         });
         return { ...f, alvos: novos.slice(0, 12) };
       });
