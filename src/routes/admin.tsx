@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { listarPedidosPagos, listarPedidosFalhos, listarPedidosPendentes, reprocessarPedido, getFaturamentoPorRede, pingSmmhype, pingAllProviders, sincronizarIdsApi, getGrowthCentral, smartApproveIds } from "@/lib/admin.functions";
 import { getMonitorSaldo, verificarSaldoAgora, getCronStatus, testarCron, getCaixaAssistente, atualizarCotacaoFornecedor } from "@/lib/monitor.functions";
 import { getServicesCacheStatus, sincronizarServicosAgora } from "@/lib/services-cache.functions";
-import { listarFornecedores, toggleFornecedorAtivo, getRecargaFornecedores } from "@/lib/fornecedores.functions";
+import { listarFornecedores, toggleFornecedorAtivo } from "@/lib/fornecedores.functions";
 import { runBackupDrill, getBackupDrillStatus } from "@/lib/backup-drill.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
