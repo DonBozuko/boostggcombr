@@ -69,6 +69,7 @@ function isDelivered(s: ProviderStatus, quantidade: number): boolean {
 
 export type DeliveryReport = {
   scanned: number;
+  reposicoes_pedidas: number;
   concluidos: number;
   ainda_processando: number;
   travados_alertados: number;
@@ -80,6 +81,7 @@ export type DeliveryReport = {
 export async function runDeliveryWatcher(): Promise<DeliveryReport> {
   const report: DeliveryReport = {
     scanned: 0,
+    reposicoes_pedidas: 0,
     concluidos: 0,
     ainda_processando: 0,
     travados_alertados: 0,
@@ -94,7 +96,7 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
 
   const { data: pedidos, error } = await supabaseAdmin
     .from("pedidos")
-    .select("id, status, provider_slug, provider_order_id, dispatched_at, instagram_user, pacote, quantidade, valor, alerted_at, last_remains, last_remains_at")
+    .select("id, status, provider_slug, provider_order_id, dispatched_at, instagram_user, pacote, quantidade, valor, alerted_at, last_remains, last_remains_at, refill_requested_at")
     .in("status", STATUS_EM_ENTREGA)
     .not("provider_order_id", "is", null)
     .not("provider_slug", "is", null)
@@ -111,6 +113,23 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
   report.scanned = rows.length;
 
   const stuckAlerts: string[] = [];
+
+  // v392 — Nível 2 da escada de autonomia: reposição automática com teto.
+  // Nada de dinheiro saindo (quem repõe é o fornecedor). Desligada por padrão:
+  // só roda com admin_settings.autonomia_reposicao ligado.
+  const { autonomiaLigada } = await import("@/lib/autonomy-flags.server");
+  const { decidirReposicao } = await import("@/lib/refill-cap");
+  const flagReposicao = await autonomiaLigada("autonomia_reposicao");
+  let reposicoesHoje = 0;
+  if (flagReposicao) {
+    const inicioDoDia = new Date();
+    inicioDoDia.setUTCHours(0, 0, 0, 0);
+    const { count } = await supabaseAdmin
+      .from("pedidos")
+      .select("id", { count: "exact", head: true })
+      .gte("refill_requested_at", inicioDoDia.toISOString());
+    reposicoesHoje = count ?? 0;
+  }
 
   for (const p of rows) {
     const slug = String(p.provider_slug);
@@ -152,6 +171,36 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
         .from("pedidos")
         .update({ last_remains: remainsNow, last_remains_at: new Date().toISOString() } as any)
         .eq("id", p.id);
+    }
+
+    // v392 — antes de incomodar o dono, tenta repor sozinho (dentro do teto).
+    if (flagReposicao) {
+      const decisao = decidirReposicao(
+        {
+          quantidade: Number(p.quantidade ?? 0),
+          remains: isNaN(remainsNow) ? 0 : remainsNow,
+          horasParado,
+          jaPediu: Boolean(p.refill_requested_at),
+        },
+        { flagLigada: true, reposicoesHoje, horasTravadoMin: STALLED_HOURS },
+      );
+      if (decisao.repor) {
+        const { loadProviderConfigs, requestRefill } = await import("@/services/drop-watcher.server");
+        const cfgs = await loadProviderConfigs();
+        const r = await requestRefill(cfgs, slug, orderId);
+        reposicoesHoje++;
+        if (r.ok) report.reposicoes_pedidas++;
+        await supabaseAdmin
+          .from("pedidos")
+          .update({
+            refill_requested_at: new Date().toISOString(),
+            refill_result: `${r.ok ? "OK" : "RECUSADO"} (auto v392): ${r.detail}`,
+          } as any)
+          .eq("id", p.id)
+          .is("refill_requested_at", null);
+        report.detalhes.push({ id: p.id, provider: slug, order: orderId, result: `REFILL ${r.ok ? "OK" : "RECUSADO"}: ${r.detail}` });
+        if (r.ok) continue; // repôs: não incomoda o dono nesta rodada
+      }
     }
 
     // Trava anti-spam: alerta uma vez só (alerted_at)
