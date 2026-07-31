@@ -6,6 +6,7 @@ import { getLastBenchRun } from "@/lib/bench-autonomo.functions";
 import { summarizeBench, type BenchRow } from "@/lib/bench-sweep";
 import { Loader2, ShieldCheck, AlertTriangle, Bot } from "lucide-react";
 import { toast } from "sonner";
+import { RecargaFornecedor } from "@/components/RecargaFornecedorButton";
 
 
 const LABEL: Record<string, string> = {
@@ -70,7 +71,16 @@ export function BenchPanel({ token }: { token: string }) {
   };
 
   const s = summarizeBench(rows);
-  const travados = rows.filter((r) => r.verdict !== "entregavel");
+  // v384 — saldo NÃO é bloqueio (v350/v352): sai da tabela de problemas e vira
+  // lista de recarga agrupada por fornecedor. A tabela guarda só o que impede
+  // de verdade a entrega (catálogo, margem, sem fornecedor).
+  const esperandoRecarga = rows.filter((r) => r.verdict === "saldo");
+  const travados = rows.filter((r) => r.verdict !== "entregavel" && r.verdict !== "saldo");
+  const porSaldo: Record<string, BenchRow[]> = {};
+  for (const r of esperandoRecarga) {
+    const k = r.faltaEm ?? "fornecedor";
+    (porSaldo[k] ??= []).push(r);
+  }
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
@@ -169,6 +179,9 @@ export function BenchPanel({ token }: { token: string }) {
           )}
 
           {travados.length > 0 && (
+            <div className="text-xs font-bold text-red-400">Bloqueio real de entrega ({travados.length})</div>
+          )}
+          {travados.length > 0 && (
             <div className="max-h-80 overflow-auto rounded-lg border border-border/50">
               <table className="w-full text-left text-[11px]">
                 <thead className="sticky top-0 bg-background/90">
@@ -195,7 +208,7 @@ export function BenchPanel({ token }: { token: string }) {
 
           {travados.length === 0 && !running && (
             <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3 text-xs text-emerald-300">
-              Todos os {rows.length} pacotes passariam agora: pequeno e grande, em todas as rotas.
+              Nenhum pacote bloqueado: todos entregam ou saem sozinhos na recarga.
             </div>
           )}
         </div>
