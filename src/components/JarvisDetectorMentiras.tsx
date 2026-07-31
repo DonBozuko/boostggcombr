@@ -11,19 +11,28 @@ export function JarvisDetectorMentiras() {
   const run = useServerFn(runJarvisLieDetector);
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   const onRun = async () => {
     setLoading(true);
+    setErro(null);
     try {
       const token = getAdminToken();
+      // v385: token vazio/expirado fazia o botão "não fazer nada" (erro engolido).
+      if (!token || token.length < 8) {
+        setErro("Sessão do painel expirou. Recarregue a página e entre de novo.");
+        return;
+      }
       const r = await run({ data: { token } });
       setReport(r);
     } catch (e) {
       console.error(e);
+      setErro("Não deu para auditar agora. Tente de novo em alguns segundos.");
     } finally {
       setLoading(false);
     }
   };
+
 
   const blocked = report?.blockDeploy;
 
