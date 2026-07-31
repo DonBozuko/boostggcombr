@@ -84,15 +84,17 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   // v238 — janela de 1h: erro antigo já corrigido não pode manter alerta vermelho.
   // v250 — só alerta se AINDA está falhando agora (últimos 15min). Rajada isolada
   // durante deploy que já se curou sozinha não vira alerta crítico.
-  const [{ data: snap }, { data: http }, { data: agora }] = await Promise.all([
+  const [{ data: snap }, { data: http }, { data: agora }, { data: forma }] = await Promise.all([
     (supabaseAdmin as any).rpc("ops_forensics"),
     (supabaseAdmin as any).rpc("ops_http_health", { _hours: 1 }),
     (supabaseAdmin as any).rpc("ops_http_recent_failures", { _minutes: 15 }),
+    (supabaseAdmin as any).rpc("ops_http_failure_shape", { _minutes: 15 }),
   ]);
 
   const s = (snap ?? {}) as any;
   const h = (http ?? {}) as any;
   const now15 = (agora ?? {}) as any;
+  const shape15 = (forma ?? {}) as any;
   const findings: OpsFinding[] = [];
 
   // 1) Robôs que dispararam mas o destino recusou (404/401) — falso "verde"
