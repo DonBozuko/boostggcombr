@@ -65,7 +65,7 @@ export const ACOES: AcaoAutonoma[] = [
   },
   {
     id: "limpar_fantasma_recuperacao",
-    familia: "recuperacao",
+    familia: "recuperacao_pix",
     nome: "Marcar Pix expirado/cancelado como perdido",
     nivel: 1,
     executor: "routes/api/public/hooks/recovery-scan.ts",
