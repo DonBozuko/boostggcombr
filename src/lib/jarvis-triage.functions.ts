@@ -97,12 +97,24 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         .lt("created_at", cutoffPaid);
       counters.stuckOrders = stuck ?? 0;
 
-      // 3. Fila de recuperação Pix (novos)
-      const { count: pending } = await supabaseAdmin
+      // 3. Fila de recuperação Pix. Defesa em profundidade: a fila sozinha não
+      // prova abandono; o pedido ainda precisa estar pendente e dentro de 24h.
+      const recoveryCutoff = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+      const { data: recoveryRows } = await supabaseAdmin
         .from("pix_recovery_queue")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "novo");
-      counters.pendingRecovery = pending ?? 0;
+        .select("pedido_id")
+        .in("status", ["novo", "contatado"])
+        .gte("first_seen_at", recoveryCutoff)
+        .limit(500);
+      const recoveryIds = (recoveryRows ?? []).map((row) => row.pedido_id);
+      if (recoveryIds.length > 0) {
+        const { count: actionable } = await supabaseAdmin
+          .from("pedidos")
+          .select("id", { count: "exact", head: true })
+          .in("id", recoveryIds)
+          .in("status", ["pending", "mp_pending", "mp_in_process"]);
+        counters.pendingRecovery = actionable ?? 0;
+      }
 
       // 4. Saldos baixos — colunas reais são saldo_atual + limite_alerta
       try {

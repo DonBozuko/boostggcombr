@@ -763,17 +763,21 @@ export const getRecoveryQueue = createServerFn({ method: "POST" })
     if (error) return { ok: false as const, error: error.message };
     const pedidoIds = Array.from(new Set((rows ?? []).map((r) => (r as { pedido_id?: string }).pedido_id).filter(Boolean))) as string[];
     const emailMap = new Map<string, string | null>();
+    const actionableIds = new Set<string>();
     if (pedidoIds.length > 0) {
       const { data: peds } = await supabaseAdmin
         .from("pedidos")
-        .select("id, email_contato")
-        .in("id", pedidoIds);
+        .select("id, email_contato, status, created_at")
+        .in("id", pedidoIds)
+        .in("status", ["pending", "mp_pending", "mp_in_process"])
+        .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
       for (const p of peds ?? []) {
         const pp = p as { id: string; email_contato: string | null };
         emailMap.set(pp.id, pp.email_contato ?? null);
+        actionableIds.add(pp.id);
       }
     }
-    const flat = (rows ?? []).map((r) => {
+    const flat = (rows ?? []).filter((r) => actionableIds.has(String((r as { pedido_id?: string }).pedido_id ?? ""))).map((r) => {
       const rr = r as { pedido_id?: string } & Record<string, unknown>;
       return { ...rr, email: rr.pedido_id ? emailMap.get(rr.pedido_id) ?? null : null };
     });
@@ -837,7 +841,7 @@ export const getRecoveryStats = createServerFn({ method: "POST" })
       .select("status, valor")
       .gte("created_at", since);
     if (error) return { ok: false as const, error: error.message };
-    const stats = { novo: 0, contatado: 0, recuperado: 0, descartado: 0, valor_recuperado: 0 };
+    const stats = { novo: 0, contatado: 0, recuperado: 0, perdido: 0, descartado: 0, valor_recuperado: 0 };
     for (const r of rows ?? []) {
       const s = String((r as { status?: string }).status ?? "");
       const v = Number((r as { valor?: number }).valor ?? 0);

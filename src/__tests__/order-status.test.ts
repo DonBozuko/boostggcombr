@@ -34,8 +34,26 @@ describe("v325 — mapa canônico de status", () => {
     expect(toCanonicalStatus("processing")).toBe("EM_ENTREGA");
     expect(toCanonicalStatus("completed")).toBe("CONCLUIDO");
     expect(toCanonicalStatus("expired")).toBe("CANCELADO");
+    expect(toCanonicalStatus("mp_expired")).toBe("CANCELADO");
+    expect(toCanonicalStatus("mp_rejected_insufficient")).toBe("CANCELADO");
+    expect(toCanonicalStatus("mp_charged_back")).toBe("CANCELADO");
     expect(toCanonicalStatus("mp_refunded")).toBe("CANCELADO");
     expect(toCanonicalStatus("SMM_FAILED")).toBe("ERRO");
+  });
+
+  it("todo estado final produzido pelo pagamento está no mapa", () => {
+    for (const status of [
+      "mp_authorized",
+      "mp_rejected",
+      "mp_rejected_insufficient",
+      "mp_cancelled",
+      "mp_refunded",
+      "mp_charged_back",
+      "mp_expired",
+      "mp_unknown",
+    ]) {
+      expect(isKnownInternalStatus(status), status).toBe(true);
+    }
   });
 
   it("status desconhecido nunca some: cai em ERRO", () => {

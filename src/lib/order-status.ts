@@ -34,16 +34,20 @@ const MAP: Record<string, CanonicalStatus> = {
   pending: "PENDENTE",
   mp_pending: "PENDENTE",
   mp_in_process: "PENDENTE",
+  mp_authorized: "PENDENTE",
   novo: "PENDENTE",
 
   // pago, ainda não despachado
   paid: "PAGO",
+  approved: "PAGO",
   aprovado: "PAGO",
   mp_approved: "PAGO",
   recuperado: "PAGO",
 
   // pago e na fila interna (aguardando rota/saldo/margem)
   waiting_provision: "EM_PROCESSAMENTO",
+  provisioning: "EM_PROCESSAMENTO",
+  provisioned: "EM_PROCESSAMENTO",
   MARGIN_HOLD: "EM_PROCESSAMENTO",
   contingency_hold: "EM_PROCESSAMENTO",
   crediting: "EM_PROCESSAMENTO",
@@ -67,9 +71,13 @@ const MAP: Record<string, CanonicalStatus> = {
   cancelled: "CANCELADO",
   canceled: "CANCELADO",
   expired: "CANCELADO",
+  rejected: "CANCELADO",
   mp_cancelled: "CANCELADO",
+  mp_expired: "CANCELADO",
   mp_rejected: "CANCELADO",
+  mp_rejected_insufficient: "CANCELADO",
   mp_refunded: "CANCELADO",
+  mp_charged_back: "CANCELADO",
   refunded: "CANCELADO",
   descartado: "CANCELADO",
 
@@ -79,10 +87,19 @@ const MAP: Record<string, CanonicalStatus> = {
   AWAITING_REFUND_APPROVAL: "ERRO",
   error: "ERRO",
   amount_mismatch: "ERRO",
+  mp_unknown: "ERRO",
 };
 
 /** Estados internos que o sistema reconhece hoje. Usado pelo teste-trava. */
 export const KNOWN_INTERNAL_STATUSES = Object.keys(MAP);
+
+/** Consulta de banco sem listas paralelas: deriva os estados internos do mapa canônico. */
+export function internalStatusesFor(...canonical: CanonicalStatus[]): string[] {
+  const accepted = new Set<CanonicalStatus>(canonical);
+  return Object.entries(MAP)
+    .filter(([, status]) => accepted.has(status))
+    .map(([internal]) => internal);
+}
 
 export function toCanonicalStatus(internal: string | null | undefined): CanonicalStatus {
   if (!internal) return "PENDENTE";

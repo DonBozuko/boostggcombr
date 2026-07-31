@@ -100,7 +100,7 @@ function buildEmailUrl(r: Row): string | null {
 export function RecoveryPanel({ token }: { token: string }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [totalValor, setTotalValor] = useState(0);
-  const [stats, setStats] = useState<{ novo: number; contatado: number; recuperado: number; descartado: number; valor_recuperado: number } | null>(null);
+  const [stats, setStats] = useState<{ novo: number; contatado: number; recuperado: number; perdido: number; descartado: number; valor_recuperado: number } | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function load() {
