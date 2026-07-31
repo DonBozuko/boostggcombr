@@ -6,6 +6,7 @@ import { getLastBenchRun } from "@/lib/bench-autonomo.functions";
 import { summarizeBench, type BenchRow } from "@/lib/bench-sweep";
 import { Loader2, ShieldCheck, AlertTriangle, Bot } from "lucide-react";
 import { toast } from "sonner";
+import { RecargaFornecedor } from "@/components/RecargaFornecedorButton";
 
 
 const LABEL: Record<string, string> = {
@@ -70,7 +71,16 @@ export function BenchPanel({ token }: { token: string }) {
   };
 
   const s = summarizeBench(rows);
-  const travados = rows.filter((r) => r.verdict !== "entregavel");
+  // v384 — saldo NÃO é bloqueio (v350/v352): sai da tabela de problemas e vira
+  // lista de recarga agrupada por fornecedor. A tabela guarda só o que impede
+  // de verdade a entrega (catálogo, margem, sem fornecedor).
+  const esperandoRecarga = rows.filter((r) => r.verdict === "saldo");
+  const travados = rows.filter((r) => r.verdict !== "entregavel" && r.verdict !== "saldo");
+  const porSaldo: Record<string, BenchRow[]> = {};
+  for (const r of esperandoRecarga) {
+    const k = r.faltaEm ?? "fornecedor";
+    (porSaldo[k] ??= []).push(r);
+  }
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   return (
@@ -140,18 +150,37 @@ export function BenchPanel({ token }: { token: string }) {
           {Object.keys(s.recargaPorFornecedor).length > 0 && (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
               <div className="mb-1 flex items-center gap-2 text-xs font-bold text-amber-400">
-                <AlertTriangle className="h-3.5 w-3.5" /> Recarregue isto para liberar os pacotes grandes
+                <AlertTriangle className="h-3.5 w-3.5" /> Recarregue aqui — a venda continua liberada
               </div>
-              <ul className="text-xs text-muted-foreground">
-                {Object.entries(s.recargaPorFornecedor).map(([slug, falta]) => (
-                  <li key={slug}>
-                    <b>{slug}</b>: falta {brl(falta)} para cobrir o maior pacote travado.
-                  </li>
-                ))}
+              <p className="mb-2 text-[11px] text-muted-foreground">
+                Nada aqui está fora do ar. Só falta dinheiro no fornecedor: o cliente compra, o pedido
+                espera e sai sozinho assim que a recarga entra.
+              </p>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                {Object.entries(s.recargaPorFornecedor).map(([slug, falta]) => {
+                  const pacotes = porSaldo[slug]?.length ?? 0;
+                  return (
+                    <li key={slug} className="flex items-center justify-between gap-2">
+                      <span>
+                        <b className="text-foreground">{slug}</b>: recarregue {brl(falta)} para liberar o maior
+                        pacote {pacotes > 0 ? `(${pacotes} pacote(s) esperando)` : ""}
+                      </span>
+                      <RecargaFornecedor
+                        slug={slug}
+                        nome={slug}
+                        token={token}
+                        label={`💳 Recarregar ${slug}`}
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
 
+          {travados.length > 0 && (
+            <div className="text-xs font-bold text-red-400">Bloqueio real de entrega ({travados.length})</div>
+          )}
           {travados.length > 0 && (
             <div className="max-h-80 overflow-auto rounded-lg border border-border/50">
               <table className="w-full text-left text-[11px]">
@@ -179,7 +208,7 @@ export function BenchPanel({ token }: { token: string }) {
 
           {travados.length === 0 && !running && (
             <div className="rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3 text-xs text-emerald-300">
-              Todos os {rows.length} pacotes passariam agora: pequeno e grande, em todas as rotas.
+              Nenhum pacote bloqueado: todos entregam ou saem sozinhos na recarga.
             </div>
           )}
         </div>
