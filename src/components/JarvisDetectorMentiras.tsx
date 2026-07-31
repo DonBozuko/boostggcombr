@@ -58,6 +58,14 @@ export function JarvisDetectorMentiras() {
         </Button>
       </div>
 
+      {erro && (
+        <div className="mt-3 rounded-md border border-amber-500/50 bg-amber-900/30 p-2 text-xs text-amber-200">
+          {erro}
+        </div>
+      )}
+
+
+
       {report && (
         <div className="mt-4 space-y-2">
           <div
