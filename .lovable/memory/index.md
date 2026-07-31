@@ -36,6 +36,8 @@ Medidor antes do remédio: antes de caçar bug, checar se o instrumento não é 
 Preço tem dono único: só `price-authority.server.ts` grava `price_brl`; teste barra qualquer segundo escritor. Ver [Preço dono único](mem://preferences/preco-dono-unico).
 Modo Torre (Clean Code): antes de codar, listar arquivos que vou criar/alterar/deletar. Arquivo pequeno, lógica em hook, feature em `src/features/`. Pedido vago ou grande = parar e fazer as 4 perguntas. Fechar ciclo perguntando sobre limpeza de lixo. Ver [Modo Torre](mem://preferences/modo-torre-clean-code).
 Detector sem remédio é dívida: toda falha declara nível 1/2/3 em `src/lib/autonomy-ladder.ts`. Ver [Escada de Autonomia](mem://preferences/escada-de-autonomia).
+Portão de Risco (v393): todo pedido passa por triagem ANTES de executar — zona vermelha/amarela/verde, travas atravessadas e resposta no formato PEDIU / QUEBRARIA / VERSÃO SEGURA. Ver [Portão de Risco](mem://preferences/portao-de-risco) e `.lovable/risk-gate.md`.
+Reposição automática (nível 2) está LIGADA desde 31/07/2026 (v393): teto 10/dia e 10% do pedido. Desligar em Admin → Auditoria → Autonomia.
 
 ## Memories
 - [Moeda única BRL](mem://constraints/moeda-unica-brl) — Dinheiro sempre em BRL. `monitoramento_saldo.saldo` é USD legado; usar `saldo_brl`/`fornecedores.saldo_atual`. Conferir moeda antes de afirmar número.
