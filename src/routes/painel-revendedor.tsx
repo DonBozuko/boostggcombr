@@ -60,6 +60,9 @@ function PainelRevendedor() {
   const [services, setServices] = useState<PortalService[]>([]);
   const [service, setService] = useState("");
   const [link, setLink] = useState("");
+  const [rede, setRede] = useState("todas");
+  const [busca, setBusca] = useState("");
+  const [catalogoErro, setCatalogoErro] = useState("");
 
   const [valor, setValor] = useState(100);
   const [pix, setPix] = useState<{ topupId: string; qrCode: string; qrCodeBase64: string; valor: number } | null>(null);
@@ -74,11 +77,18 @@ function PainelRevendedor() {
       }
       setData(r);
       const c = await fnCatalog({ data: { apiKey: key } });
-      if (c.ok) setServices(c.services);
+      if (c.ok) {
+        setServices(c.services);
+        setCatalogoErro(c.services.length === 0 ? "Nenhum pacote disponível no momento." : "");
+      } else {
+        setServices([]);
+        setCatalogoErro(c.error ?? "Não consegui carregar os pacotes. Toque em Atualizar.");
+      }
       return true;
     },
     [fnMe, fnCatalog],
   );
+
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.sessionStorage.getItem(STORAGE_KEY) : null;
@@ -160,6 +170,17 @@ function PainelRevendedor() {
     }
   };
 
+  const redes = Array.from(new Set(services.map((s) => s.category.split(":")[0]))).sort();
+  const termo = busca.trim().toLowerCase();
+  const filtrados = services.filter(
+    (s) =>
+      (rede === "todas" || s.category.startsWith(`${rede}:`)) &&
+      (termo === "" || s.name.toLowerCase().includes(termo) || s.category.toLowerCase().includes(termo)),
+  );
+  const escolhido = services.find((s) => s.service === service) ?? null;
+  const saldoOk = !escolhido || (data?.saldo ?? 0) >= escolhido.price;
+
+
   if (!data) {
     return (
       <main className="mx-auto max-w-md px-4 py-14">
@@ -231,7 +252,12 @@ function PainelRevendedor() {
             <Link to="/api-revenda" className="text-primary underline">documentação da API</Link>
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={sair}>Sair</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" disabled={busy} onClick={() => { void load(apiKey); }}>
+            {busy ? "Atualizando..." : "Atualizar"}
+          </Button>
+          <Button variant="outline" size="sm" onClick={sair}>Sair</Button>
+        </div>
       </div>
 
       <Card className="border-primary/40 bg-primary/5">
@@ -283,29 +309,79 @@ function PainelRevendedor() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Novo pedido</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle className="text-base">Novo pedido</CardTitle>
+          <span className="text-xs text-muted-foreground">
+            {services.length > 0 ? `${services.length} pacotes disponíveis` : "catálogo vazio"}
+          </span>
+        </CardHeader>
         <CardContent className="space-y-3">
+          {catalogoErro && (
+            <p className="rounded border border-destructive/40 bg-destructive/10 p-2 text-sm text-destructive">
+              {catalogoErro}
+            </p>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            {["todas", ...redes].map((r) => (
+              <Button
+                key={r}
+                size="sm"
+                variant={rede === r ? "default" : "outline"}
+                onClick={() => { setRede(r); setService(""); }}
+              >
+                {r === "todas" ? "Todas as redes" : r}
+              </Button>
+            ))}
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2">
+            <Input
+              placeholder="Buscar pacote (ex.: seguidores, 1000)"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              maxLength={40}
+            />
             <select
               value={service}
               onChange={(e) => setService(e.target.value)}
               className="h-10 rounded-md border border-input bg-background px-3 text-sm"
             >
-              <option value="">Escolha o pacote…</option>
-              {services.map((s) => (
+              <option value="">
+                {filtrados.length > 0 ? `Escolha o pacote… (${filtrados.length})` : "Nenhum pacote nesse filtro"}
+              </option>
+              {filtrados.map((s) => (
                 <option key={s.service} value={s.service}>
                   {s.name} — {brl(s.price)} (varejo {brl(s.retail)}){s.refill ? " · com reposição" : ""}
                 </option>
               ))}
             </select>
-            <Input placeholder="@usuario ou link do post" value={link} onChange={(e) => setLink(e.target.value)} maxLength={200} />
           </div>
-          <Button onClick={enviarPedido} disabled={busy}>Enviar pedido</Button>
+
+          <Input placeholder="@usuario ou link do post" value={link} onChange={(e) => setLink(e.target.value)} maxLength={200} />
+
+          {escolhido && (
+            <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm">
+              <p className="font-semibold">{escolhido.name}</p>
+              <p className="text-muted-foreground">
+                Seu preço {brl(escolhido.price)} · varejo {brl(escolhido.retail)} · economia{" "}
+                {brl(Math.max(0, escolhido.retail - escolhido.price))}
+              </p>
+              {!saldoOk && (
+                <p className="mt-1 text-destructive">
+                  Saldo insuficiente: faltam {brl(escolhido.price - (data.saldo ?? 0))}. Recarregue acima.
+                </p>
+              )}
+            </div>
+          )}
+
+          <Button onClick={enviarPedido} disabled={busy || !service || !saldoOk}>Enviar pedido</Button>
           <p className="text-xs text-muted-foreground">
             O valor é debitado do seu saldo na hora e o pedido entra direto na fila de entrega.
           </p>
         </CardContent>
       </Card>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
