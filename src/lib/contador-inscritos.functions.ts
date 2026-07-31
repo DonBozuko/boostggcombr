@@ -22,21 +22,39 @@ const input = z.object({
 
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36";
 
-/** Acha o texto da contagem no HTML público do canal. */
-export function extrairInscritosTexto(html: string): string | null {
-  const paths = [
-    /"subscriberCountText":\{"simpleText":"([^"]+)"/,
-    /"subscriberCountText":\{"accessibility":\{"accessibilityData":\{"label":"([^"]+)"/,
-    /"subscriberCountText":"([^"]+)"/,
-    /"content":"([\d.,]+\s*(?:mi|mil|k|m|b)?\s*(?:de\s*)?(?:inscritos|subscribers))"/i,
-    /([\d.,]+\s*(?:mi|mil|k|m|b)?\s*(?:de\s*)?(?:inscritos|subscribers))/i,
-  ];
-  for (const re of paths) {
-    const m = html.match(re)?.[1];
+/**
+ * Acha a contagem DO CANAL PEDIDO no HTML público.
+ *
+ * Cuidado que custou caro: a página traz a contagem de vários canais
+ * (sugestões da lateral). Pegar "o primeiro número que aparece" devolvia o
+ * canal errado — número real, canal errado, ou seja: mentira. Por isso a busca
+ * é ancorada no @ do canal e, se não achar, no cabeçalho da página. Se nenhuma
+ * âncora bater, devolvemos null em vez de chutar.
+ */
+const RE_CONTAGEM =
+  /"(?:content|simpleText|label)":"([\d.,]+\s*(?:mil|mi|milh(?:ão|ões)|k|m|b)?\s*(?:de\s*)?(?:inscritos|subscribers)[^"]*)"/i;
+
+export function extrairInscritosTexto(html: string, handle?: string): string | null {
+  const low = html.toLowerCase();
+
+  if (handle) {
+    const i = low.indexOf(`"content":"@${handle.toLowerCase()}"`);
+    if (i >= 0) {
+      const m = html.slice(i, i + 800).match(RE_CONTAGEM)?.[1];
+      if (m) return m.trim();
+    }
+  }
+
+  const j = low.indexOf('"pageheaderrenderer"');
+  if (j >= 0) {
+    const m = html.slice(j, j + 8000).match(RE_CONTAGEM)?.[1];
     if (m) return m.trim();
   }
-  return null;
+
+  const legado = html.match(/"subscriberCountText":\{"simpleText":"([^"]+)"/)?.[1];
+  return legado ? legado.trim() : null;
 }
+
 
 /** "30,1 mi" / "1,38 mi" / "980 mil" → número aproximado. */
 export function parseInscritos(txt: string): number | null {
