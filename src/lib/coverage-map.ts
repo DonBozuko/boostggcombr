@@ -202,6 +202,12 @@ export const FAMILIAS: Familia[] = [
     detector: "autonomy-ladder (escada de níveis 1/2/3 com executor real)",
     provas: ["autonomy-ladder.test.ts"],
   },
+  {
+    id: "memoria-de-regras",
+    nome: "Memória de regras — regra não pode sumir do índice nem apontar pro arquivo errado",
+    detector: "integridade de .lovable/memory (link quebrado, regra órfã, Core inchado)",
+    provas: ["memory-index-integrity.test.ts"],
+  },
 ];
 
 /** Rotas públicas já declaradas como cobertas pela varredura de superfície. */
