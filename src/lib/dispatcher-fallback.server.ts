@@ -103,26 +103,24 @@ export async function dispatchSmmV2(opts: {
       const text = await res.text();
       let json: unknown = null;
       try { json = JSON.parse(text); } catch { /* */ }
-      const apiError = (json as { error?: string } | null)?.error;
-      if (!res.ok || apiError) {
-        const detail = apiError ? String(apiError) : text.slice(0, 200);
-        void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: detail });
-        return { ok: false, error: `${opts.fornecedor} falhou: ${detail}`, status: res.status, body: json ?? text };
+      // v383 — leitor único de resposta (erro escondido em HTTP 200, envelope
+      // alternativo, orderId inválido tipo 0/"error").
+      const { interpretProviderResponse } = await import("./dispatch-response");
+      const read = interpretProviderResponse(text, res.status);
+      if (!read.ok) {
+        await logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: read.error });
+        return { ok: false, error: `${opts.fornecedor} falhou: ${read.error}`, status: res.status, body: json ?? text };
       }
-      const orderId = (json as { order?: string | number } | null)?.order;
-      if (orderId == null || orderId === "") {
-        void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: "resposta sem orderId" });
-        return { ok: false, error: `${opts.fornecedor}: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
-      }
-      void logDispatchAttempt({ ...base, ok: true, http_status: res.status, raw_response: text, order_id: orderId });
-      return { ok: true, orderId, body: json ?? text };
+      await logDispatchAttempt({ ...base, ok: true, http_status: res.status, raw_response: text, order_id: read.orderId });
+      return { ok: true, orderId: read.orderId, body: json ?? text };
     } finally {
       clearTimeout(timer);
     }
   } catch (err) {
     const msg = (err as Error).name === "AbortError" ? "timeout 15s" : (err as Error).message;
-    void logDispatchAttempt({ ...base, ok: false, error_text: `rede ${msg}` });
+    await logDispatchAttempt({ ...base, ok: false, error_text: `rede ${msg}` });
     return { ok: false, error: `${opts.fornecedor}: rede ${msg}` };
+
   }
 }
 
@@ -197,13 +195,18 @@ export async function dispatchByFornecedor(slug: string, args: {
   }
 
   // v245 — lê config do fornecedor do banco (genérico, funciona para provider4)
+  // v383 — SMMhype tem endpoint próprio: não gasta ida ao banco por pedido.
+  const isNative = slug === "smmhype";
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: f } = await supabaseAdmin
-    .from("fornecedores")
-    .select("nome, api_url, api_key_secret")
-    .eq("slug", slug)
-    .maybeSingle();
+  const { data: f } = isNative
+    ? { data: null as any }
+    : await supabaseAdmin
+        .from("fornecedores")
+        .select("nome, api_url, api_key_secret")
+        .eq("slug", slug)
+        .maybeSingle();
   const apiKey = f ? process.env[(f as any).api_key_secret] : undefined;
+
 
   const doOne = async (): Promise<SmmDispatchResult> => {
     if (slug === "smmhype") {
@@ -282,7 +285,11 @@ export async function cancelAtProvider(
     .eq("slug", slug)
     .maybeSingle();
   if (!f) return { ok: false, detail: `fornecedor desconhecido: ${slug}`, recoverable: false };
-  const endpoint = (f as any).api_url as string;
+  // v383 — mesma normalização do envio (v288). Antes o cancelamento usava a
+  // URL crua do banco e quebrava com "Failed to parse URL" justamente na hora
+  // de recuperar dinheiro.
+  const endpoint = normalizeEndpoint((f as any).api_url as string);
+
   const apiKey = process.env[(f as any).api_key_secret];
   if (!apiKey) return { ok: false, detail: `${slug}: API key ausente`, recoverable: false };
   if (!providerOrderId) return { ok: true, detail: "sem provider_order_id (nada a cancelar)", recoverable: true };
