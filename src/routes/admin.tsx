@@ -320,13 +320,13 @@ export const Route = createFileRoute("/admin")({
 function AdminGate() {
   const [mounted, setMounted] = useState(false);
   const [authed, setAuthed] = useState(false);
-  const [adminToken, setAdminToken] = useState("");
+  const [adminToken, setAdminTokenState] = useState("");
   const fetchAdminToken = useServerFn(getAdminTokenForSession);
 
   const hardLogout = useCallback(async () => {
     clearAdminToken();
     clearAdminActivity();
-    setAdminToken("");
+    setAdminTokenState("");
     setAuthed(false);
     try { await supabase.auth.signOut(); } catch {}
   }, []);
@@ -342,7 +342,7 @@ function AdminGate() {
     const email = data.session?.user?.email?.toLowerCase() ?? null;
     if (!data.session || email !== ADMIN_EMAIL) {
       clearAdminToken();
-      setAdminToken("");
+      setAdminTokenState("");
       setAuthed(false);
       return false;
     }
@@ -354,23 +354,24 @@ function AdminGate() {
       const res = await fetchAdminToken({ data: {} as never });
       if (res.ok && res.token) {
         setAdminToken(res.token);
+        setAdminTokenState(res.token);
         setAuthed(true);
         return true;
       } else {
         await supabase.auth.signOut();
         clearAdminToken();
-        setAdminToken("");
+        setAdminTokenState("");
         setAuthed(false);
         return false;
       }
     } catch {
       const cached = getAdminToken();
       if (cached && cached.length >= 8) {
-        setAdminToken(cached);
+        setAdminTokenState(cached);
         setAuthed(true);
         return true;
       }
-      setAdminToken("");
+      setAdminTokenState("");
       setAuthed(false);
       return false;
     }
@@ -390,7 +391,7 @@ function AdminGate() {
       if (evt === "SIGNED_OUT") {
         clearAdminToken();
         clearAdminActivity();
-        setAdminToken("");
+        setAdminTokenState("");
         setAuthed(false);
       }
       if (evt === "SIGNED_IN" || evt === "TOKEN_REFRESHED") void hydrate();
