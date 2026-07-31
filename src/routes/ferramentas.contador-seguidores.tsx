@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Users, UserPlus, Image as ImageIcon, BadgeCheck, Lock } from "lucide-react";
+import { EmbedSnippet } from "@/components/EmbedSnippet";
 
 const CANON = "https://www.boostgg.com.br/ferramentas/contador-seguidores";
 

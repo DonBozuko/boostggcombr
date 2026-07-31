@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Users, Youtube } from "lucide-react";
+import { EmbedSnippet } from "@/components/EmbedSnippet";
 
 const CANON = "https://www.boostgg.com.br/ferramentas/contador-inscritos-youtube";
 
