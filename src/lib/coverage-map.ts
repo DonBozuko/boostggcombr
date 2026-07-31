@@ -169,7 +169,12 @@ export const FAMILIAS: Familia[] = [
     id: "nao_convergencia",
     nome: "Alarme que se repete e nunca resolve",
     detector: "convergence + bench-autonomo",
-    provas: ["alert-severity.test.ts", "money-alert-force.test.ts", "canary-link-pool.test.ts"],
+    provas: [
+      "alert-severity.test.ts",
+      "money-alert-force.test.ts",
+      "canary-link-pool.test.ts",
+      "http-failure-shape.test.ts",
+    ],
   },
   {
     id: "funil",
