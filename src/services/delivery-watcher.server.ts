@@ -30,6 +30,11 @@ const STUCK_ALERT_HOURS = 24;
 // Só é "travado" se o contador de faltantes não se mexe há esse tempo.
 const STALLED_HOURS = 12;
 
+// v390 — Pedido já despachado e ainda não fechado.
+// "Enviado" é o status legado que a rota de revenda (v261) grava; sem ele aqui,
+// pedido de revendedor era despachado e NUNCA acompanhado até a entrega.
+export const STATUS_EM_ENTREGA = ["processing", "Enviado"] as const;
+
 async function fetchStatus(slug: string, orderId: string): Promise<ProviderStatus | null> {
   const cfg = ENDPOINTS[slug];
   if (!cfg || !cfg.key) return null;
@@ -83,13 +88,14 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
     ts: new Date().toISOString(),
   };
 
-  // Últimas 48h — janela ampla o suficiente pra pegar tudo em processing
-  const since = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
+  // v390 — janela de 7 dias. Com 48h, pedido despachado e não confirmado
+  // saía do radar pra sempre (ninguém fechava, ninguém alertava).
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const { data: pedidos, error } = await supabaseAdmin
     .from("pedidos")
     .select("id, status, provider_slug, provider_order_id, dispatched_at, instagram_user, pacote, quantidade, valor, alerted_at, last_remains, last_remains_at")
-    .eq("status", "processing")
+    .in("status", STATUS_EM_ENTREGA)
     .not("provider_order_id", "is", null)
     .not("provider_slug", "is", null)
     .gte("dispatched_at", since)
