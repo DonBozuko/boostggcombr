@@ -21,6 +21,7 @@ Custo que julga margem sai do MESMO ID vinculado que o despacho vai usar — nun
 Toda pausa precisa de rampa de saída automática e motivo reescrito a cada ciclo — teto por ciclo é limite de velocidade, nunca sentença. Ver [Regra que não anda](mem://constraints/regra-que-nao-anda).
 ID de fornecedor é descartável: se sumir/mudar, o vínculo é refeito por impressão digital (rede+produto) + faixa de quantidade + custo. Nunca por nome parecido. Ver [ID descartável](mem://constraints/id-descartavel).
 ID de fornecedor gravado no banco vence o ID chumbado no código; a sincronização nunca desfaz vínculo bom. Ver [Vínculo do banco vence o código](mem://constraints/vinculo-banco-vence-codigo).
+Projeto único: o painel de revenda separado foi EXCLUÍDO (31/07/2026). Revenda vive só aqui (`/revenda`, `/painel-revendedor`, `/api-revenda`). Proibido recriar em outro projeto/banco. Ver [Projeto de revenda único](mem://constraints/projeto-revenda-unico).
 
 
 
