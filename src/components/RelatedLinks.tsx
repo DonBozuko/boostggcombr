@@ -62,6 +62,7 @@ const RELATED: Record<string, Link[]> = {
     { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Compre agora com Pix." },
     { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Pacotes maiores mix internacional." },
     { href: "/ferramentas/contador-seguidores", title: "Contador de seguidores", desc: "Confira seu número antes e depois, grátis." },
+    { href: "/ferramentas/contador-inscritos-youtube", title: "Contador de inscritos", desc: "Veja os inscritos de qualquer canal do YouTube." },
   ],
   "/engajamento-instagram": [
     { href: "/comprar-curtidas-instagram", title: "Comprar Curtidas Instagram", desc: "Empurre posts específicos." },

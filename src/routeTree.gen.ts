@@ -62,6 +62,7 @@ import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
+import { Route as FerramentasContadorInscritosYoutubeRouteImport } from './routes/ferramentas.contador-inscritos-youtube'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
 import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
@@ -387,6 +388,12 @@ const FerramentasCalculadoraEngajamentoInstagramRoute =
   FerramentasCalculadoraEngajamentoInstagramRouteImport.update({
     id: '/ferramentas/calculadora-engajamento-instagram',
     path: '/ferramentas/calculadora-engajamento-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FerramentasContadorInscritosYoutubeRoute =
+  FerramentasContadorInscritosYoutubeRouteImport.update({
+    id: '/ferramentas/contador-inscritos-youtube',
+    path: '/ferramentas/contador-inscritos-youtube',
     getParentRoute: () => rootRouteImport,
   } as any)
 const FerramentasContadorSeguidoresRoute =
@@ -739,6 +746,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
@@ -847,6 +855,7 @@ export interface FileRoutesByTo {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
@@ -956,6 +965,7 @@ export interface FileRoutesById {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
@@ -1066,6 +1076,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
@@ -1174,6 +1185,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
@@ -1282,6 +1294,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
@@ -1389,6 +1402,7 @@ export interface RootRouteChildren {
   DashboardSeoRoute: typeof DashboardSeoRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  FerramentasContadorInscritosYoutubeRoute: typeof FerramentasContadorInscritosYoutubeRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
   Char126apiBeatRoute: typeof Char126apiBeatRoute
@@ -1817,6 +1831,13 @@ declare module '@tanstack/react-router' {
       path: '/ferramentas/calculadora-engajamento-instagram'
       fullPath: '/ferramentas/calculadora-engajamento-instagram'
       preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ferramentas/contador-inscritos-youtube': {
+      id: '/ferramentas/contador-inscritos-youtube'
+      path: '/ferramentas/contador-inscritos-youtube'
+      fullPath: '/ferramentas/contador-inscritos-youtube'
+      preLoaderRoute: typeof FerramentasContadorInscritosYoutubeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ferramentas/contador-seguidores': {
@@ -2257,6 +2278,8 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FerramentasCalculadoraEngajamentoInstagramRoute:
     FerramentasCalculadoraEngajamentoInstagramRoute,
+  FerramentasContadorInscritosYoutubeRoute:
+    FerramentasContadorInscritosYoutubeRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
   FerramentasGeradorLegendaInstagramRoute:
     FerramentasGeradorLegendaInstagramRoute,

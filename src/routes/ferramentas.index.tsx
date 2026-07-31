@@ -21,6 +21,12 @@ const TOOLS = [
     desc: "Veja em tempo real quantos seguidores qualquer perfil público tem. Atualiza na hora, sem login.",
   },
   {
+    to: "/ferramentas/contador-inscritos-youtube",
+    icon: Users,
+    title: "Contador de Inscritos do YouTube",
+    desc: "Veja quantos inscritos qualquer canal público tem, em tempo real. Grátis e sem login.",
+  },
+  {
     to: "/ferramentas/calculadora-engajamento-instagram",
     icon: Calculator,
     title: "Calculadora de Engajamento",
