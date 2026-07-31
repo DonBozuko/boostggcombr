@@ -1,29 +1,40 @@
 // v380 — Trava do contador de inscritos.
 //
-// O contador quebrou calado porque o YouTube trocou o formato do HTML.
-// Estes testes travam a leitura em todos os formatos já vistos: se um novo
-// formato aparecer e nenhum caminho casar, o teste falha antes de ir pro ar.
+// Dois defeitos reais que estes testes travam para sempre:
+// 1) O YouTube trocou o formato do HTML e o contador parou de ler (quebrou calado).
+// 2) A página traz a contagem de VÁRIOS canais (sugestões). Pegar o primeiro
+//    número devolvia o canal errado — número real, canal errado = mentira.
 
 import { describe, it, expect } from "vitest";
 import { extrairInscritosTexto, parseInscritos } from "@/lib/contador-inscritos.functions";
 
-describe("contador de inscritos — leitura resiliente", () => {
-  it("lê o formato antigo (simpleText)", () => {
-    const html = `x"subscriberCountText":{"simpleText":"30,1 mi de inscritos"}y`;
-    expect(extrairInscritosTexto(html)).toContain("30,1 mi");
+const HEADER = (handle: string, txt: string) =>
+  `{"pageHeaderRenderer":{"content":{"metadataParts":[{"text":{"content":"@${handle}"}},{"text":{"content":"${txt}"}}]}}}`;
+
+const SUGESTOES = `"subscriberCountText":{"simpleText":"847 mil de inscritos"}`;
+
+describe("contador de inscritos — número certo do canal certo", () => {
+  it("pega a contagem do canal pedido, não a da lateral", () => {
+    const html = SUGESTOES + HEADER("felipeneto", "48 mi de inscritos");
+    expect(extrairInscritosTexto(html, "felipeneto")).toContain("48 mi");
   });
 
-  it("lê o formato novo (texto solto na página)", () => {
-    const html = `<div>Canal oficial</div><span>30,1 mi de inscritos</span>`;
-    expect(extrairInscritosTexto(html)).toContain("30,1 mi");
+  it("não depende de maiúscula/minúscula no @ do canal", () => {
+    const html = HEADER("NatGeo", "26,3 mi de inscritos");
+    expect(extrairInscritosTexto(html, "natgeo")).toContain("26,3 mi");
+  });
+
+  it("cai no cabeçalho quando o @ não bate exatamente", () => {
+    const html = HEADER("outronome", "14,4 mi de inscritos");
+    expect(extrairInscritosTexto(html, "google")).toContain("14,4 mi");
   });
 
   it("lê canal em inglês", () => {
-    expect(extrairInscritosTexto(`<span>442M subscribers</span>`)).toContain("442M");
+    expect(extrairInscritosTexto(HEADER("mrbeast", "510M subscribers"), "mrbeast")).toContain("510M");
   });
 
-  it("não inventa número quando o canal esconde a contagem", () => {
-    expect(extrairInscritosTexto(`<html><body>sem contagem aqui</body></html>`)).toBeNull();
+  it("não inventa número quando não há contagem na página", () => {
+    expect(extrairInscritosTexto("<html><body>sem contagem</body></html>", "alguem")).toBeNull();
   });
 
   it("converte as abreviações do YouTube", () => {
