@@ -19,17 +19,21 @@ export function DispatchForensicsPanel({ token }: { token: string }) {
   const [open, setOpen] = useState<string | null>(null);
 
   const fetchRows = useCallback(async () => {
+    // v382 — sem token válido não adianta chamar: o servidor recusa e o painel
+    // mostrava um erro técnico feio na tela do admin.
+    if (!token || token.length < 8) return;
     setLoading(true);
     try {
       const r = await load({ data: { token, onlyFail, limit: 60 } });
       if (!r.ok) { toast.error("Acesso negado"); return; }
       setRows(r.rows as DispatchLogRow[]);
-    } catch (e) {
-      toast.error(`Erro ao ler trilha: ${(e as Error).message}`);
+    } catch {
+      toast.error("Não foi possível carregar a trilha de envios. Tente Atualizar.");
     } finally {
       setLoading(false);
     }
   }, [load, token, onlyFail]);
+
 
   useEffect(() => { void fetchRows(); }, [fetchRows]);
 
