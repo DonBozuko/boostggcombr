@@ -242,6 +242,13 @@ function ContadorInscritosPage() {
             retenção dos primeiros 30 segundos — não a quantidade de vídeos publicados.
           </p>
 
+          <EmbedSnippet
+            tipo="yt"
+            toolPath="/ferramentas/contador-inscritos-youtube"
+            toolTitle="Contador de inscritos do YouTube"
+            placeholder="@nomedocanal"
+          />
+
           <h2 className="text-2xl font-bold text-foreground">Perguntas frequentes</h2>
           <div className="space-y-4">
             {FAQ.map((f) => (
