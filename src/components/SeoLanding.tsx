@@ -39,6 +39,9 @@ export function SeoLanding(p: SeoLandingProps) {
     p.pricingCategories ?? [],
     p.pricing.map((r) => ({ ...r, id: r.id ?? "" })),
   );
+  // v378 — landing de busca também marca topo de funil (antes só a home marcava).
+  useEffect(() => { trackFunnel("abriu_vitrine"); }, []);
+
 
   return (
     <MobileFrame bg="#0a0a0a">
