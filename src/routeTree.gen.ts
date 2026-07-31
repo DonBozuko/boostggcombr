@@ -67,6 +67,7 @@ import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferr
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
 import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as ApiPublicBadgeRouteImport } from './routes/api/public/badge'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
 import { Route as ApiPublicCheckoutAttemptRouteImport } from './routes/api/public/checkout-attempt'
 import { Route as ApiPublicFunnelRouteImport } from './routes/api/public/funnel'
@@ -419,6 +420,11 @@ const Char91DotmcpChar93InvokeToolToolRoute =
     path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicBadgeRoute = ApiPublicBadgeRouteImport.update({
+  id: '/api/public/badge',
+  path: '/api/public/badge',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCheckSaldoRoute = ApiPublicCheckSaldoRouteImport.update({
   id: '/api/public/check-saldo',
   path: '/api/public/check-saldo',
@@ -753,6 +759,7 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/checkout-attempt': typeof ApiPublicCheckoutAttemptRoute
   '/api/public/funnel': typeof ApiPublicFunnelRoute
@@ -862,6 +869,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/ferramentas': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/checkout-attempt': typeof ApiPublicCheckoutAttemptRoute
   '/api/public/funnel': typeof ApiPublicFunnelRoute
@@ -972,6 +980,7 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
   '/api/public/checkout-attempt': typeof ApiPublicCheckoutAttemptRoute
   '/api/public/funnel': typeof ApiPublicFunnelRoute
@@ -1083,6 +1092,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/ferramentas/'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/public/badge'
     | '/api/public/check-saldo'
     | '/api/public/checkout-attempt'
     | '/api/public/funnel'
@@ -1192,6 +1202,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/ferramentas'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/public/badge'
     | '/api/public/check-saldo'
     | '/api/public/checkout-attempt'
     | '/api/public/funnel'
@@ -1301,6 +1312,7 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/ferramentas/'
     | '/.mcp/invoke-tool/$tool'
+    | '/api/public/badge'
     | '/api/public/check-saldo'
     | '/api/public/checkout-attempt'
     | '/api/public/funnel'
@@ -1409,6 +1421,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
   ApiPublicCheckoutAttemptRoute: typeof ApiPublicCheckoutAttemptRoute
   ApiPublicFunnelRoute: typeof ApiPublicFunnelRoute
@@ -1868,6 +1881,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/badge': {
+      id: '/api/public/badge'
+      path: '/api/public/badge'
+      fullPath: '/api/public/badge'
+      preLoaderRoute: typeof ApiPublicBadgeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/check-saldo': {
       id: '/api/public/check-saldo'
       path: '/api/public/check-saldo'
@@ -2287,6 +2307,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicBadgeRoute: ApiPublicBadgeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
   ApiPublicCheckoutAttemptRoute: ApiPublicCheckoutAttemptRoute,
   ApiPublicFunnelRoute: ApiPublicFunnelRoute,
