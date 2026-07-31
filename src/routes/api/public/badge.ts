@@ -84,43 +84,20 @@ async function youtube(canal: string) {
   });
 }
 
-async function instagram(user: string) {
-  const res = await fetch(
-    `https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(user)}`,
-    {
-      headers: {
-        "x-ig-app-id": "936619743392459",
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15",
-        Accept: "*/*",
-      },
-      signal: AbortSignal.timeout(10_000),
-    },
-  );
-  if (!res.ok) return erro("perfil não encontrado");
-  const j = (await res.json()) as {
-    data?: { user?: { full_name?: string; profile_pic_url?: string; edge_followed_by?: { count?: number } } };
-  };
-  const u = j?.data?.user;
-  if (!u) return erro("perfil não encontrado");
-  return card({
-    href: `${SITE}/ferramentas/contador-seguidores?ref=badge`,
-    avatar: u.profile_pic_url ?? "",
-    nome: u.full_name || `@${user}`,
-    contagem: `${(u.edge_followed_by?.count ?? 0).toLocaleString("pt-BR")} seguidores`,
-    rotulo: "Contador de seguidores",
-  });
-}
+// Instagram fora do badge de propósito: a Meta bloqueia leitura por servidor,
+// então qualquer número aqui seria cache velho ou erro na cara de quem incorpora.
 
 export const Route = createFileRoute("/api/public/badge")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const tipo = url.searchParams.get("tipo") === "yt" ? "yt" : "ig";
+        const tipo = url.searchParams.get("tipo") ?? "yt";
+        if (tipo !== "yt") return erro("badge disponível para canais do YouTube");
         const alvo = (url.searchParams.get("alvo") ?? "").trim().replace(/^@/, "").slice(0, 80);
         if (!/^[A-Za-z0-9._-]+$/.test(alvo)) return erro("informe um perfil válido");
         try {
-          return tipo === "yt" ? await youtube(alvo) : await instagram(alvo.toLowerCase());
+          return await youtube(alvo);
         } catch (e) {
           console.error("[badge] erro:", e);
           return erro("tente de novo em instantes");
@@ -129,3 +106,4 @@ export const Route = createFileRoute("/api/public/badge")({
     },
   },
 });
+

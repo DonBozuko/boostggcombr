@@ -17,7 +17,7 @@ export function EmbedSnippet({
   toolTitle,
   placeholder,
 }: {
-  tipo: "ig" | "yt";
+  tipo: "yt";
   toolPath: string;
   toolTitle: string;
   placeholder: string;
