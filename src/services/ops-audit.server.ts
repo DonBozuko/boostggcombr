@@ -115,16 +115,23 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   // v341 — 5xx só vira alerta se AINDA está falhando AGORA (15min), mesma
   // régua do 404/401. Antes olhava 1h: uma rajada durante deploy, já curada,
   // mantinha "robô batendo em erro" tocando por uma hora inteira.
+  // v388 — agora também olha o FORMATO: erro concentrado num único instante é
+  // troca de versão do site (o robô repete sozinho em ≤5min); erro espalhado
+  // por minutos diferentes é rota quebrada de verdade.
   const erro5xxAgora = Number(now15.erro_servidor_5xx ?? 0);
   const erro5xxHora = Number(h.erro_servidor_5xx ?? 0);
-  if (erro5xxAgora >= 1 && erro5xxHora >= 3) {
+  const veredito = classifyHttpFailures({
+    erros: Number(shape15.erros_5xx ?? erro5xxAgora),
+    minutosDistintos: Number(shape15.minutos_distintos ?? 0),
+  });
+  if (erro5xxAgora >= 1 && erro5xxHora >= 3 && veredito === "falha_continua") {
     findings.push({
       code: "ROBO_ERRO_SERVIDOR",
       severity: "critical",
       titulo: "Robô batendo em erro do servidor",
-      problema: `${erro5xxHora} chamadas retornaram erro de servidor na última hora (${erro5xxAgora} ainda agora).`,
+      problema: `${erro5xxHora} chamadas retornaram erro de servidor na última hora (${erro5xxAgora} ainda agora), espalhadas por ${shape15.minutos_distintos} minutos diferentes.`,
       o_que_fazer: "Me avise para investigar o log da rota que está quebrando.",
-      evidencia: { agora: now15, ultima_hora: h },
+      evidencia: { agora: now15, formato: shape15, ultima_hora: h },
     });
   }
 
