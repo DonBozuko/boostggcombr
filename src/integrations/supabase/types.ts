@@ -2144,6 +2144,7 @@ export type Database = {
         Returns: number
       }
       ops_forensics: { Args: never; Returns: Json }
+      ops_http_failure_shape: { Args: { _minutes?: number }; Returns: Json }
       ops_http_health: { Args: { _hours?: number }; Returns: Json }
       ops_http_recent_failures: { Args: { _minutes?: number }; Returns: Json }
       purge_catalog_changes: { Args: never; Returns: undefined }

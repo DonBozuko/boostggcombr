@@ -3,6 +3,8 @@
 // (HTTP do endpoint, pedido entregue, caixa lançado, e-mail entregue).
 // Só alerta quando existe impacto real (dinheiro ou cliente). Ruído é registrado, não enviado.
 
+import { classifyHttpFailures } from "@/lib/http-failure-shape";
+
 // v319 — Silêncio inteligente: mesma lista de problemas só reavisa a cada 12h.
 const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
@@ -84,15 +86,17 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   // v238 — janela de 1h: erro antigo já corrigido não pode manter alerta vermelho.
   // v250 — só alerta se AINDA está falhando agora (últimos 15min). Rajada isolada
   // durante deploy que já se curou sozinha não vira alerta crítico.
-  const [{ data: snap }, { data: http }, { data: agora }] = await Promise.all([
+  const [{ data: snap }, { data: http }, { data: agora }, { data: forma }] = await Promise.all([
     (supabaseAdmin as any).rpc("ops_forensics"),
     (supabaseAdmin as any).rpc("ops_http_health", { _hours: 1 }),
     (supabaseAdmin as any).rpc("ops_http_recent_failures", { _minutes: 15 }),
+    (supabaseAdmin as any).rpc("ops_http_failure_shape", { _minutes: 15 }),
   ]);
 
   const s = (snap ?? {}) as any;
   const h = (http ?? {}) as any;
   const now15 = (agora ?? {}) as any;
+  const shape15 = (forma ?? {}) as any;
   const findings: OpsFinding[] = [];
 
   // 1) Robôs que dispararam mas o destino recusou (404/401) — falso "verde"
@@ -113,16 +117,23 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   // v341 — 5xx só vira alerta se AINDA está falhando AGORA (15min), mesma
   // régua do 404/401. Antes olhava 1h: uma rajada durante deploy, já curada,
   // mantinha "robô batendo em erro" tocando por uma hora inteira.
+  // v388 — agora também olha o FORMATO: erro concentrado num único instante é
+  // troca de versão do site (o robô repete sozinho em ≤5min); erro espalhado
+  // por minutos diferentes é rota quebrada de verdade.
   const erro5xxAgora = Number(now15.erro_servidor_5xx ?? 0);
   const erro5xxHora = Number(h.erro_servidor_5xx ?? 0);
-  if (erro5xxAgora >= 1 && erro5xxHora >= 3) {
+  const veredito = classifyHttpFailures({
+    erros: Number(shape15.erros_5xx ?? erro5xxAgora),
+    minutosDistintos: Number(shape15.minutos_distintos ?? 0),
+  });
+  if (erro5xxAgora >= 1 && erro5xxHora >= 3 && veredito === "falha_continua") {
     findings.push({
       code: "ROBO_ERRO_SERVIDOR",
       severity: "critical",
       titulo: "Robô batendo em erro do servidor",
-      problema: `${erro5xxHora} chamadas retornaram erro de servidor na última hora (${erro5xxAgora} ainda agora).`,
+      problema: `${erro5xxHora} chamadas retornaram erro de servidor na última hora (${erro5xxAgora} ainda agora), espalhadas por ${shape15.minutos_distintos} minutos diferentes.`,
       o_que_fazer: "Me avise para investigar o log da rota que está quebrando.",
-      evidencia: { agora: now15, ultima_hora: h },
+      evidencia: { agora: now15, formato: shape15, ultima_hora: h },
     });
   }
 
