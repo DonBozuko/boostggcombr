@@ -170,6 +170,17 @@ function PainelRevendedor() {
     }
   };
 
+  const redes = Array.from(new Set(services.map((s) => s.category.split(":")[0]))).sort();
+  const termo = busca.trim().toLowerCase();
+  const filtrados = services.filter(
+    (s) =>
+      (rede === "todas" || s.category.startsWith(`${rede}:`)) &&
+      (termo === "" || s.name.toLowerCase().includes(termo) || s.category.toLowerCase().includes(termo)),
+  );
+  const escolhido = services.find((s) => s.service === service) ?? null;
+  const saldoOk = !escolhido || (data?.saldo ?? 0) >= escolhido.price;
+
+
   if (!data) {
     return (
       <main className="mx-auto max-w-md px-4 py-14">
