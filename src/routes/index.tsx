@@ -438,6 +438,8 @@ function Landing() {
   // esconder pacote; antes disso o estático evita vitrine em branco no SSR.
   const [gridLoaded, setGridLoaded] = useState(false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
+  // v378 — topo do funil deixou de ser cego: sem esta etapa não dá pra medir conversão.
+  useEffect(() => { trackFunnel("abriu_vitrine"); }, []);
   useEffect(() => {
     let cancelled = false;
     try { window.localStorage.removeItem("ebp_pricing_overrides_v1"); } catch {}

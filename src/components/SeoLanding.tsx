@@ -1,5 +1,7 @@
 // v200 — Componente reutilizável para landing pages SEO (keyword-alvo → CTA no checkout real).
 
+import { useEffect } from "react";
+import { trackFunnel } from "@/lib/funnel-beacon";
 import { BrandHeader } from "@/components/BrandHeader";
 import { MobileFrame } from "@/components/MobileFrame";
 import { RelatedLinks } from "@/components/RelatedLinks";
@@ -39,6 +41,9 @@ export function SeoLanding(p: SeoLandingProps) {
     p.pricingCategories ?? [],
     p.pricing.map((r) => ({ ...r, id: r.id ?? "" })),
   );
+  // v378 — landing de busca também marca topo de funil (antes só a home marcava).
+  useEffect(() => { trackFunnel("abriu_vitrine"); }, []);
+
 
   return (
     <MobileFrame bg="#0a0a0a">
