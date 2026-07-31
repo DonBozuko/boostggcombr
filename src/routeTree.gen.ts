@@ -41,6 +41,7 @@ import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as RastrearRouteImport } from './routes/rastrear'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as RevendaRouteImport } from './routes/revenda'
+import { Route as RevenderSeguidoresRouteImport } from './routes/revender-seguidores'
 import { Route as SeguidoresPixRouteImport } from './routes/seguidores-pix'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StatusRouteImport } from './routes/status'
@@ -282,6 +283,11 @@ const ReembolsoRoute = ReembolsoRouteImport.update({
 const RevendaRoute = RevendaRouteImport.update({
   id: '/revenda',
   path: '/revenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevenderSeguidoresRoute = RevenderSeguidoresRouteImport.update({
+  id: '/revender-seguidores',
+  path: '/revender-seguidores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SeguidoresPixRoute = SeguidoresPixRouteImport.update({
@@ -739,6 +745,7 @@ export interface FileRoutesByFullPath {
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
+  '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -850,6 +857,7 @@ export interface FileRoutesByTo {
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
+  '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -962,6 +970,7 @@ export interface FileRoutesById {
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
+  '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -1075,6 +1084,7 @@ export interface FileRouteTypes {
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
+    | '/revender-seguidores'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1186,6 +1196,7 @@ export interface FileRouteTypes {
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
+    | '/revender-seguidores'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1297,6 +1308,7 @@ export interface FileRouteTypes {
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
+    | '/revender-seguidores'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1409,6 +1421,7 @@ export interface RootRouteChildren {
   RastrearRoute: typeof RastrearRoute
   ReembolsoRoute: typeof ReembolsoRoute
   RevendaRoute: typeof RevendaRoute
+  RevenderSeguidoresRoute: typeof RevenderSeguidoresRoute
   SeguidoresPixRoute: typeof SeguidoresPixRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -1710,6 +1723,13 @@ declare module '@tanstack/react-router' {
       path: '/revenda'
       fullPath: '/revenda'
       preLoaderRoute: typeof RevendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revender-seguidores': {
+      id: '/revender-seguidores'
+      path: '/revender-seguidores'
+      fullPath: '/revender-seguidores'
+      preLoaderRoute: typeof RevenderSeguidoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seguidores-pix': {
@@ -2299,6 +2319,7 @@ const rootRouteChildren: RootRouteChildren = {
   RastrearRoute: RastrearRoute,
   ReembolsoRoute: ReembolsoRoute,
   RevendaRoute: RevendaRoute,
+  RevenderSeguidoresRoute: RevenderSeguidoresRoute,
   SeguidoresPixRoute: SeguidoresPixRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,

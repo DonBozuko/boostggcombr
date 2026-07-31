@@ -76,7 +76,7 @@ export const Route = createFileRoute("/revender-seguidores")({
       },
     ],
   }),
-  component: RevenderSeguidores;
+  component: RevenderSeguidores,
 });
 
 function RevenderSeguidores() {
