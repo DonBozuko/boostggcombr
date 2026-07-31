@@ -35,6 +35,7 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
 import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
+import { Route as PainelSmmRouteImport } from './routes/painel-smm'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as RastrearRouteImport } from './routes/rastrear'
@@ -251,6 +252,11 @@ const PainelAfiliadoRoute = PainelAfiliadoRouteImport.update({
 const PainelRevendedorRoute = PainelRevendedorRouteImport.update({
   id: '/painel-revendedor',
   path: '/painel-revendedor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelSmmRoute = PainelSmmRouteImport.update({
+  id: '/painel-smm',
+  path: '/painel-smm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -727,6 +733,7 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -837,6 +844,7 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -948,6 +956,7 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -1060,6 +1069,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/painel-afiliado'
     | '/painel-revendedor'
+    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1170,6 +1180,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/painel-afiliado'
     | '/painel-revendedor'
+    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1280,6 +1291,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/painel-afiliado'
     | '/painel-revendedor'
+    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1391,6 +1403,7 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   PainelAfiliadoRoute: typeof PainelAfiliadoRoute
   PainelRevendedorRoute: typeof PainelRevendedorRoute
+  PainelSmmRoute: typeof PainelSmmRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
   RastrearRoute: typeof RastrearRoute
@@ -1655,6 +1668,13 @@ declare module '@tanstack/react-router' {
       path: '/painel-revendedor'
       fullPath: '/painel-revendedor'
       preLoaderRoute: typeof PainelRevendedorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel-smm': {
+      id: '/painel-smm'
+      path: '/painel-smm'
+      fullPath: '/painel-smm'
+      preLoaderRoute: typeof PainelSmmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -2273,6 +2293,7 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   PainelAfiliadoRoute: PainelAfiliadoRoute,
   PainelRevendedorRoute: PainelRevendedorRoute,
+  PainelSmmRoute: PainelSmmRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
   RastrearRoute: RastrearRoute,
