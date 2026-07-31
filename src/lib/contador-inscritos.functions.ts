@@ -40,7 +40,8 @@ export function extrairInscritosTexto(html: string): string | null {
 
 /** "30,1 mi" / "1,38 mi" / "980 mil" → número aproximado. */
 export function parseInscritos(txt: string): number | null {
-  const m = txt.match(/([\d.,]+)\s*(mi|mil|k|m|b)?/i);
+  // "mil" antes de "mi": senão "980 mil" seria lido como 980 milhões.
+  const m = txt.match(/([\d.,]+)\s*(mil|mi|k|m|b)?/i);
   if (!m) return null;
   const base = Number(m[1]!.replace(/\./g, "").replace(",", "."));
   if (!Number.isFinite(base)) return null;
