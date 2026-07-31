@@ -346,12 +346,12 @@ function AdminGate() {
       return false;
     }
     // Sessão Supabase ativa é a credencial mestre do shell; o token legado é só ponte para funções internas.
-    setAuthed(true);
+    // v382 — NÃO liberar o painel antes do token chegar: montar com token vazio
+    // faz todo painel disparar server fn com token "" e estourar erro de zod.
     markAdminActivity();
     try {
       const res = await fetchAdminToken({ data: {} as never });
-      if (res.ok) {
-        setAdminToken(res.token);
+      if (res.ok && res.token) {
         setAdminToken(res.token);
         setAuthed(true);
         return true;
@@ -364,9 +364,16 @@ function AdminGate() {
       }
     } catch {
       const cached = getAdminToken();
-      setAdminToken(cached);
-      return true;
+      if (cached && cached.length >= 8) {
+        setAdminToken(cached);
+        setAuthed(true);
+        return true;
+      }
+      setAdminToken("");
+      setAuthed(false);
+      return false;
     }
+
   }, [fetchAdminToken, hardLogout]);
 
   const onIdleExpire = useCallback(() => {
