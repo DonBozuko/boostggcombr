@@ -293,29 +293,79 @@ function PainelRevendedor() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Novo pedido</CardTitle></CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between gap-2">
+          <CardTitle className="text-base">Novo pedido</CardTitle>
+          <span className="text-xs text-muted-foreground">
+            {services.length > 0 ? `${services.length} pacotes disponíveis` : "catálogo vazio"}
+          </span>
+        </CardHeader>
         <CardContent className="space-y-3">
+          {catalogoErro && (
+            <p className="rounded border border-destructive/40 bg-destructive/10 p-2 text-sm text-destructive">
+              {catalogoErro}
+            </p>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            {["todas", ...redes].map((r) => (
+              <Button
+                key={r}
+                size="sm"
+                variant={rede === r ? "default" : "outline"}
+                onClick={() => { setRede(r); setService(""); }}
+              >
+                {r === "todas" ? "Todas as redes" : r}
+              </Button>
+            ))}
+          </div>
+
           <div className="grid gap-3 sm:grid-cols-2">
+            <Input
+              placeholder="Buscar pacote (ex.: seguidores, 1000)"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              maxLength={40}
+            />
             <select
               value={service}
               onChange={(e) => setService(e.target.value)}
               className="h-10 rounded-md border border-input bg-background px-3 text-sm"
             >
-              <option value="">Escolha o pacote…</option>
-              {services.map((s) => (
+              <option value="">
+                {filtrados.length > 0 ? `Escolha o pacote… (${filtrados.length})` : "Nenhum pacote nesse filtro"}
+              </option>
+              {filtrados.map((s) => (
                 <option key={s.service} value={s.service}>
                   {s.name} — {brl(s.price)} (varejo {brl(s.retail)}){s.refill ? " · com reposição" : ""}
                 </option>
               ))}
             </select>
-            <Input placeholder="@usuario ou link do post" value={link} onChange={(e) => setLink(e.target.value)} maxLength={200} />
           </div>
-          <Button onClick={enviarPedido} disabled={busy}>Enviar pedido</Button>
+
+          <Input placeholder="@usuario ou link do post" value={link} onChange={(e) => setLink(e.target.value)} maxLength={200} />
+
+          {escolhido && (
+            <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm">
+              <p className="font-semibold">{escolhido.name}</p>
+              <p className="text-muted-foreground">
+                Seu preço {brl(escolhido.price)} · varejo {brl(escolhido.retail)} · economia{" "}
+                {brl(Math.max(0, escolhido.retail - escolhido.price))}
+              </p>
+              {!saldoOk && (
+                <p className="mt-1 text-destructive">
+                  Saldo insuficiente: faltam {brl(escolhido.price - (data.saldo ?? 0))}. Recarregue acima.
+                </p>
+              )}
+            </div>
+          )}
+
+          <Button onClick={enviarPedido} disabled={busy || !service || !saldoOk}>Enviar pedido</Button>
           <p className="text-xs text-muted-foreground">
             O valor é debitado do seu saldo na hora e o pedido entra direto na fila de entrega.
           </p>
         </CardContent>
       </Card>
+
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
