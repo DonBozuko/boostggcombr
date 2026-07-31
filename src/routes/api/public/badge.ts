@@ -70,7 +70,7 @@ async function youtube(canal: string) {
   });
   if (!res.ok) return erro("canal não encontrado");
   const h = await res.text();
-  const sub = h.match(/"subscriberCountText":\{"simpleText":"([^"]+)"/)?.[1] ?? null;
+  const sub = extrairInscritosTexto(h);
   const nome = h.match(/"title":"([^"]+)","description"/)?.[1] ?? canal;
   const avatar = h.match(/"avatar":\{"thumbnails":\[\{"url":"([^"]+)"/)?.[1] ?? "";
   if (!sub) return erro("o canal não mostra a contagem");
