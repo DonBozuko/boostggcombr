@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Users, UserPlus, Image as ImageIcon, BadgeCheck, Lock } from "lucide-react";
+import { EmbedSnippet } from "@/components/EmbedSnippet";
 
 const CANON = "https://www.boostgg.com.br/ferramentas/contador-seguidores";
 
@@ -274,6 +275,13 @@ function ContadorPage() {
           </div>
 
 
+
+          <EmbedSnippet
+            tipo="ig"
+            toolPath="/ferramentas/contador-seguidores"
+            toolTitle="Contador de seguidores do Instagram"
+            placeholder="@seuperfil"
+          />
 
           <h2 className="pt-6 text-2xl font-bold text-foreground">Perguntas frequentes</h2>
           <div className="space-y-4">

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Loader2, Users, Youtube } from "lucide-react";
+import { EmbedSnippet } from "@/components/EmbedSnippet";
 
 const CANON = "https://www.boostgg.com.br/ferramentas/contador-inscritos-youtube";
 
@@ -241,6 +242,13 @@ function ContadorInscritosPage() {
             realmente acelerando. Se o seu canal cresce mais devagar que a média do nicho, o gargalo costuma ser CTR da capa ou
             retenção dos primeiros 30 segundos — não a quantidade de vídeos publicados.
           </p>
+
+          <EmbedSnippet
+            tipo="yt"
+            toolPath="/ferramentas/contador-inscritos-youtube"
+            toolTitle="Contador de inscritos do YouTube"
+            placeholder="@nomedocanal"
+          />
 
           <h2 className="text-2xl font-bold text-foreground">Perguntas frequentes</h2>
           <div className="space-y-4">
