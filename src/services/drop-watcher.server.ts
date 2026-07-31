@@ -31,9 +31,9 @@ function normalizeApiUrl(raw: string): string {
   return /\/api\//i.test(u) ? u : `${u}/api/v2`;
 }
 
-type ProviderCfg = { url: string; key: string | undefined };
+export type ProviderCfg = { url: string; key: string | undefined };
 
-async function loadProviderConfigs(): Promise<Record<string, ProviderCfg>> {
+export async function loadProviderConfigs(): Promise<Record<string, ProviderCfg>> {
   const cfgs: Record<string, ProviderCfg> = {};
   for (const [slug, url] of Object.entries(FALLBACK_ENDPOINTS)) {
     cfgs[slug] = { url, key: process.env[FALLBACK_SECRETS[slug]] };
@@ -58,7 +58,7 @@ async function loadProviderConfigs(): Promise<Record<string, ProviderCfg>> {
 
 type RefillResp = { refill?: string | number; error?: string };
 
-async function requestRefill(cfgs: Record<string, ProviderCfg>, slug: string, orderId: string): Promise<{ ok: boolean; detail: string }> {
+export async function requestRefill(cfgs: Record<string, ProviderCfg>, slug: string, orderId: string): Promise<{ ok: boolean; detail: string }> {
   const cfg = cfgs[slug];
   if (!cfg?.url) return { ok: false, detail: `${slug}: fornecedor não cadastrado` };
   if (!cfg.key) return { ok: false, detail: `${slug}: API key ausente` };
