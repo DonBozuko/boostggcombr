@@ -140,14 +140,30 @@ export function BenchPanel({ token }: { token: string }) {
           {Object.keys(s.recargaPorFornecedor).length > 0 && (
             <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
               <div className="mb-1 flex items-center gap-2 text-xs font-bold text-amber-400">
-                <AlertTriangle className="h-3.5 w-3.5" /> Recarregue isto para liberar os pacotes grandes
+                <AlertTriangle className="h-3.5 w-3.5" /> Recarregue aqui — a venda continua liberada
               </div>
-              <ul className="text-xs text-muted-foreground">
-                {Object.entries(s.recargaPorFornecedor).map(([slug, falta]) => (
-                  <li key={slug}>
-                    <b>{slug}</b>: falta {brl(falta)} para cobrir o maior pacote travado.
-                  </li>
-                ))}
+              <p className="mb-2 text-[11px] text-muted-foreground">
+                Nada aqui está fora do ar. Só falta dinheiro no fornecedor: o cliente compra, o pedido
+                espera e sai sozinho assim que a recarga entra.
+              </p>
+              <ul className="space-y-2 text-xs text-muted-foreground">
+                {Object.entries(s.recargaPorFornecedor).map(([slug, falta]) => {
+                  const pacotes = porSaldo[slug]?.length ?? 0;
+                  return (
+                    <li key={slug} className="flex items-center justify-between gap-2">
+                      <span>
+                        <b className="text-foreground">{slug}</b>: recarregue {brl(falta)} para liberar o maior
+                        pacote {pacotes > 0 ? `(${pacotes} pacote(s) esperando)` : ""}
+                      </span>
+                      <RecargaFornecedor
+                        slug={slug}
+                        nome={slug}
+                        token={token}
+                        label={`💳 Recarregar ${slug}`}
+                      />
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
