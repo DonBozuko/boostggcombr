@@ -64,6 +64,7 @@ import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
+import { Route as FerramentasCalculadoraLucroRevendaRouteImport } from './routes/ferramentas.calculadora-lucro-revenda'
 import { Route as FerramentasContadorInscritosYoutubeRouteImport } from './routes/ferramentas.contador-inscritos-youtube'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
@@ -401,6 +402,12 @@ const FerramentasCalculadoraEngajamentoInstagramRoute =
   FerramentasCalculadoraEngajamentoInstagramRouteImport.update({
     id: '/ferramentas/calculadora-engajamento-instagram',
     path: '/ferramentas/calculadora-engajamento-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FerramentasCalculadoraLucroRevendaRoute =
+  FerramentasCalculadoraLucroRevendaRouteImport.update({
+    id: '/ferramentas/calculadora-lucro-revenda',
+    path: '/ferramentas/calculadora-lucro-revenda',
     getParentRoute: () => rootRouteImport,
   } as any)
 const FerramentasContadorInscritosYoutubeRoute =
@@ -766,6 +773,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
   '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -878,6 +886,7 @@ export interface FileRoutesByTo {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
   '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -991,6 +1000,7 @@ export interface FileRoutesById {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
   '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -1105,6 +1115,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/calculadora-lucro-revenda'
     | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -1217,6 +1228,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/calculadora-lucro-revenda'
     | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -1329,6 +1341,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/calculadora-lucro-revenda'
     | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -1440,6 +1453,7 @@ export interface RootRouteChildren {
   DashboardSeoRoute: typeof DashboardSeoRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  FerramentasCalculadoraLucroRevendaRoute: typeof FerramentasCalculadoraLucroRevendaRoute
   FerramentasContadorInscritosYoutubeRoute: typeof FerramentasContadorInscritosYoutubeRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
@@ -1884,6 +1898,13 @@ declare module '@tanstack/react-router' {
       path: '/ferramentas/calculadora-engajamento-instagram'
       fullPath: '/ferramentas/calculadora-engajamento-instagram'
       preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ferramentas/calculadora-lucro-revenda': {
+      id: '/ferramentas/calculadora-lucro-revenda'
+      path: '/ferramentas/calculadora-lucro-revenda'
+      fullPath: '/ferramentas/calculadora-lucro-revenda'
+      preLoaderRoute: typeof FerramentasCalculadoraLucroRevendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ferramentas/contador-inscritos-youtube': {
@@ -2340,6 +2361,8 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FerramentasCalculadoraEngajamentoInstagramRoute:
     FerramentasCalculadoraEngajamentoInstagramRoute,
+  FerramentasCalculadoraLucroRevendaRoute:
+    FerramentasCalculadoraLucroRevendaRoute,
   FerramentasContadorInscritosYoutubeRoute:
     FerramentasContadorInscritosYoutubeRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,
