@@ -79,15 +79,17 @@ export const FAMILIAS: Familia[] = [
   {
     id: "entrega",
     nome: "Pago sem entrega",
-    detector: "pedido-reconciler / delivery-watcher",
+    detector: "pedido-reconciler / delivery-watcher / dispatch-orquestrado (v383)",
     provas: [
       "order-status.test.ts",
       "queue-policy.test.ts",
       "retry-policy.test.ts",
       "dispatch-br-guard.test.ts",
+      "dispatch-harmony.test.ts",
       "failure-classifier.test.ts",
       "no-trafego-br.test.ts",
     ],
+
   },
   {
     id: "preflight",
