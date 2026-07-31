@@ -39,6 +39,9 @@ const buildSitemapXml = () => {
     { path: "/revenda", changefreq: "monthly", priority: "0.8" },
     { path: "/afiliados", changefreq: "monthly", priority: "0.8" },
     { path: "/api-revenda", changefreq: "monthly", priority: "0.6" },
+    { path: "/painel-smm", changefreq: "monthly", priority: "0.8" },
+    { path: "/revender-seguidores", changefreq: "monthly", priority: "0.7" },
+    { path: "/ferramentas/calculadora-lucro-revenda", changefreq: "monthly", priority: "0.6" },
     
     { path: "/ferramentas/contador-seguidores", changefreq: "weekly", priority: "0.7" },
     { path: "/ferramentas/contador-inscritos-youtube", changefreq: "weekly", priority: "0.7" },
