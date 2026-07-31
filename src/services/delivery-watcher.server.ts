@@ -131,7 +131,7 @@ export async function runDeliveryWatcher(): Promise<DeliveryReport> {
           error_detail: `Entrega confirmada · ${slug} (order ${orderId}) · remains=${s.remains ?? 0}`,
         } as any)
         .eq("id", p.id)
-        .eq("status", "processing");
+        .in("status", STATUS_EM_ENTREGA);
       report.concluidos++;
       report.detalhes.push({ id: p.id, provider: slug, order: orderId, result: `DELIVERED (remains=${s.remains})` });
       continue;
