@@ -81,7 +81,7 @@ export const contarInscritos = createServerFn({ method: "POST" })
       if (!res.ok) return { ok: false as const, error: "NOT_FOUND" as const };
       const html = await res.text();
 
-      const subTxt = extrairInscritosTexto(html);
+      const subTxt = extrairInscritosTexto(html, data.canal);
       const nome =
         html.match(/"title":"([^"]+)","description"/)?.[1] ??
         html.match(/<meta property="og:title" content="([^"]+)"/)?.[1] ??
