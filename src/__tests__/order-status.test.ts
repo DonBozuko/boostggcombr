@@ -77,6 +77,9 @@ describe("v325 — mapa canônico de status", () => {
       let janela = 0;
       for (const l of linhas) {
         if (/\.from\(["']pedidos["']\)/.test(l)) janela = 20;
+        // outra tabela dentro da janela encerra o escopo de "pedidos":
+        // update em pix_recovery_queue não é status de pedido.
+        else if (/\.from\(["'][a-z_]+["']\)/.test(l)) janela = 0;
         else if (janela > 0) janela -= 1;
         if (janela === 0) continue;
         const m = l.match(/status:\s*"([A-Za-z_]+)"/);
