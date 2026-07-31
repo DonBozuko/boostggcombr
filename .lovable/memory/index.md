@@ -15,7 +15,8 @@ Motor forte, não motor novo: proibido detector novo se um existente cobre. Ver 
 Ordem sagrada do dinheiro: preflight de rota → preflight de alvo → cobrança → despacho. Ver [Preflight](mem://preferences/nunca-cobrar-sem-preflight) e [Alvo](mem://preferences/nunca-cobrar-sem-validar-alvo).
 Pedido pago nunca espera clique humano, e o cliente só vê 8 status públicos. Ver [Fila e status canônico](mem://features/fila-e-status-canonico).
 Falta de saldo nunca tira da vitrine nem recusa venda — vira aviso e o pedido sai após a recarga. Ver [Saldo nunca pausa](mem://constraints/saldo-nunca-pausa) e [Saldo nunca bloqueia venda](mem://constraints/saldo-nunca-bloqueia-venda).
-Custo vem do fornecedor que aceita a quantidade e do MESMO ID que vai despachar. Ver [Custo só de quem entrega](mem://constraints/custo-so-de-quem-entrega), [Recusto](mem://constraints/recusto-respeita-faixa) e [Custo do serviço despachado](mem://constraints/custo-do-servico-despachado).
+Custo só vem de fornecedor que aceita a quantidade do pacote. Ver [Custo só de quem entrega](mem://constraints/custo-so-de-quem-entrega) e [Recusto](mem://constraints/recusto-respeita-faixa).
+Custo que julga margem sai do MESMO ID que vai despachar. Ver [Custo do serviço despachado](mem://constraints/custo-do-servico-despachado).
 Pausar por margem exige as duas leituras de custo reprovando (≤5% é ruído). Ver [Dupla leitura de custo](mem://constraints/dupla-leitura-de-custo).
 Toda pausa precisa de rampa de saída automática — teto por ciclo é velocidade, nunca sentença. Ver [Regra que não anda](mem://constraints/regra-que-nao-anda).
 ID de fornecedor é descartável e o vínculo do banco vence o código. Ver [ID descartável](mem://constraints/id-descartavel) e [Vínculo do banco vence](mem://constraints/vinculo-banco-vence-codigo).
