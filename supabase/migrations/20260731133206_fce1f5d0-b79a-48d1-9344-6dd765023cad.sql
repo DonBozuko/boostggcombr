@@ -1,0 +1,1 @@
+update public.admin_settings set value = jsonb_set(value::jsonb, '{budget_brl_month}', '50'::jsonb), updated_at = now() where key = 'canary_config';
