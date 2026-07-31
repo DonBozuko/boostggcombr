@@ -175,6 +175,12 @@ export const FAMILIAS: Familia[] = [
     detector: "reseller-pricing / reseller-refund / affiliate-commission",
     provas: ["reseller-pricing.test.ts", "reseller-refund.test.ts", "affiliate-commission.test.ts"],
   },
+  {
+    id: "ferramentas-publicas",
+    nome: "Ferramentas grátis (contadores) — número real ou erro honesto",
+    detector: "extrairInscritosTexto + parseInscritos",
+    provas: ["contador-inscritos.test.ts"],
+  },
 ];
 
 /** Rotas públicas já declaradas como cobertas pela varredura de superfície. */
