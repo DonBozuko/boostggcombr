@@ -41,6 +41,7 @@ const buildSitemapXml = () => {
     { path: "/api-revenda", changefreq: "monthly", priority: "0.6" },
     
     { path: "/ferramentas/contador-seguidores", changefreq: "weekly", priority: "0.7" },
+    { path: "/ferramentas/contador-inscritos-youtube", changefreq: "weekly", priority: "0.7" },
     { path: "/ferramentas/calculadora-engajamento-instagram", changefreq: "weekly", priority: "0.7" },
     { path: "/ferramentas/gerador-legenda-instagram", changefreq: "weekly", priority: "0.8" },
     { path: "/kit-creator", changefreq: "weekly", priority: "0.9" },
