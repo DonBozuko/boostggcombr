@@ -398,8 +398,9 @@ function AdminGate() {
   }, [hydrate]);
 
   if (!mounted) return null;
-  if (!authed) return <AdminLogin onSuccess={hydrate} />;
+  if (!authed || adminToken.length < 8) return <AdminLogin onSuccess={hydrate} />;
   return <AdminPage initialToken={adminToken} />;
+
 }
 
 
