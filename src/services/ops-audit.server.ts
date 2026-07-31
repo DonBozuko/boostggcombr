@@ -3,6 +3,8 @@
 // (HTTP do endpoint, pedido entregue, caixa lançado, e-mail entregue).
 // Só alerta quando existe impacto real (dinheiro ou cliente). Ruído é registrado, não enviado.
 
+import { classifyHttpFailures } from "@/lib/http-failure-shape";
+
 // v319 — Silêncio inteligente: mesma lista de problemas só reavisa a cada 12h.
 const ALERTA_COOLDOWN_MS = 12 * 60 * 60 * 1000;
 
