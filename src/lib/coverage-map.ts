@@ -88,6 +88,7 @@ export const FAMILIAS: Familia[] = [
       "dispatch-harmony.test.ts",
       "failure-classifier.test.ts",
       "no-trafego-br.test.ts",
+      "delivery-followup.test.ts",
     ],
 
   },
