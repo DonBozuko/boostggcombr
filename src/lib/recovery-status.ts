@@ -1,26 +1,17 @@
-export const RECOVERY_PENDING_ORDER_STATUSES = ["pending", "mp_pending", "mp_in_process"] as const;
+import { internalStatusesFor, toCanonicalStatus } from "@/lib/order-status";
 
-export const RECOVERY_PAID_ORDER_STATUSES = [
-  "approved",
-  "paid",
-  "provisioning",
-  "provisioned",
-  "completed",
-] as const;
+export const RECOVERY_PENDING_ORDER_STATUSES = internalStatusesFor("PENDENTE");
 
-export const RECOVERY_DEAD_ORDER_STATUSES = [
-  "expired",
-  "cancelled",
-  "canceled",
-  "mp_cancelled",
-  "mp_refunded",
-  "refunded",
-  "rejected",
-  "mp_rejected",
-] as const;
+export const RECOVERY_PAID_ORDER_STATUSES = internalStatusesFor(
+  "PAGO",
+  "EM_PROCESSAMENTO",
+  "ENVIADO_AO_FORNECEDOR",
+  "EM_ENTREGA",
+  "CONCLUIDO",
+);
+
+export const RECOVERY_DEAD_ORDER_STATUSES = internalStatusesFor("CANCELADO");
 
 export function isActionableRecoveryOrder(status: unknown): boolean {
-  return RECOVERY_PENDING_ORDER_STATUSES.includes(
-    String(status) as (typeof RECOVERY_PENDING_ORDER_STATUSES)[number],
-  );
+  return toCanonicalStatus(String(status)) === "PENDENTE";
 }

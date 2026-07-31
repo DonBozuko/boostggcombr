@@ -10,6 +10,9 @@ describe("v386 — Pix fantasma nunca vira alerta", () => {
   it("somente status realmente pendente é recuperável", () => {
     expect(isActionableRecoveryOrder("pending")).toBe(true);
     expect(isActionableRecoveryOrder("mp_in_process")).toBe(true);
+    expect(RECOVERY_DEAD_ORDER_STATUSES).toContain("mp_expired");
+    expect(RECOVERY_DEAD_ORDER_STATUSES).toContain("mp_rejected_insufficient");
+    expect(RECOVERY_DEAD_ORDER_STATUSES).toContain("mp_charged_back");
     for (const status of RECOVERY_DEAD_ORDER_STATUSES) {
       expect(isActionableRecoveryOrder(status)).toBe(false);
     }
