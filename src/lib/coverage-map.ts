@@ -154,6 +154,12 @@ export const FAMILIAS: Familia[] = [
     provas: ["checkout-email.test.ts"],
   },
   {
+    id: "recuperacao_pix",
+    nome: "Pix recuperável sem fantasma histórico",
+    detector: "recovery-scan + triagem por estado real do pedido",
+    provas: ["recovery-queue-invariant.test.ts"],
+  },
+  {
     id: "regra_duplicada",
     nome: "Mesma regra escrita em 2 lugares (margem, preço, limiar)",
     detector: "convergence.test (varredura de limiar duplicado)",
