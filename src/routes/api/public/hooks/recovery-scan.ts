@@ -2,6 +2,11 @@
 // Varre pedidos com Pix pendente entre 15min–24h e enfileira em pix_recovery_queue.
 // Envia alerta Telegram pro admin se novos pedidos entram na fila.
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  RECOVERY_DEAD_ORDER_STATUSES,
+  RECOVERY_PAID_ORDER_STATUSES,
+  RECOVERY_PENDING_ORDER_STATUSES,
+} from "@/lib/recovery-status";
 
 export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
   server: {
@@ -22,7 +27,7 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
           const { data: pendentes, error } = await supabaseAdmin
             .from("pedidos")
             .select("id, mercado_pago_id, valor, rede_social, pacote, instagram_user, created_at, status")
-            .in("status", ["pending", "mp_pending", "mp_in_process"])
+            .in("status", [...RECOVERY_PENDING_ORDER_STATUSES])
             .gte("created_at", from)
             .lte("created_at", to)
             .limit(500);
@@ -30,7 +35,6 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
           if (error) return Response.json({ ok: false, error: error.message }, { status: 500 });
 
           const rows = pendentes ?? [];
-          if (rows.length === 0) return Response.json({ ok: true, scanned: 0, enqueued: 0 });
 
           // Já enfileirados?
           const ids = rows.map((r) => r.id as string);
@@ -89,7 +93,7 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
               .from("pedidos")
               .select("id")
               .in("id", ativosIds)
-              .in("status", ["approved", "paid", "provisioning", "provisioned", "completed"]);
+              .in("status", [...RECOVERY_PAID_ORDER_STATUSES]);
             const idsPagos = (pagos ?? []).map((p) => p.id as string);
             if (idsPagos.length > 0) {
               await supabaseAdmin
@@ -106,7 +110,7 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
               .from("pedidos")
               .select("id")
               .in("id", ativosIds)
-              .in("status", ["expired", "cancelled", "canceled", "mp_cancelled", "mp_refunded", "refunded", "rejected", "mp_rejected"]);
+              .in("status", [...RECOVERY_DEAD_ORDER_STATUSES]);
             const idsMortos = (mortos ?? []).map((p) => p.id as string);
             if (idsMortos.length > 0) {
               await supabaseAdmin
