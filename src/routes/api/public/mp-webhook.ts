@@ -598,6 +598,9 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
           const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
           const { respectsMinMargin } = await import("@/lib/margin-guardian");
+          const { evaluateProviderGate } = await import("@/lib/dispatch-gates");
+          const { commitDispatch } = await import("@/lib/dispatch-commit.server");
+
           const tentativas: string[] = [];
           let sucesso = false;
           let margemBloqueada = 0;
@@ -634,28 +637,14 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
                 });
               } catch (e) { console.warn("[mp-webhook] audit failover fail", e); }
             }
-            // v134 — saldo zerado bloqueia dispatch mesmo se a API não devolver rate/custo.
-            if (Number(f.saldo_atual) <= 0) {
-              const det = `Saldo zerado/indisponível: R$ ${Number(f.saldo_atual).toFixed(2)}`;
-              tentativas.push(`${f.nome}: ${det}`);
-              console.warn("[mp-webhook] v134 skip saldo zerado", { pedidoId: pedido.id, fornecedor: f.slug, saldo: f.saldo_atual, provider_service_id: f.provider_service_id });
-              await markProviderUnstable(f.slug, det);
-              continue;
-            }
-            // v84 — saldo BRL insuficiente
-            if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
-              const det = `Saldo insuficiente: R$ ${Number(f.saldo_atual).toFixed(2)} < custo R$ ${f.cost_brl.toFixed(2)}`;
-              tentativas.push(`${f.nome}: ${det}`);
-              console.warn("[mp-webhook] v84 skip saldo zerado", { pedidoId: pedido.id, fornecedor: f.slug, saldo: f.saldo_atual, custo: f.cost_brl });
-              await markProviderUnstable(f.slug, det);
-              continue;
-            }
-            // v91 — Strict Margin Guardian: pula fornecedor se custo violar 300% de lucro líquido
-            if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
-              const det = `Margem <300%: venda R$ ${Number(pedido.valor).toFixed(2)} vs custo R$ ${f.cost_brl.toFixed(2)}`;
-              tentativas.push(`${f.nome}: ${det}`);
-              margemBloqueada++;
-              console.warn("[mp-webhook] v91 skip margem", { pedidoId: pedido.id, fornecedor: f.slug, custo: f.cost_brl, venda: pedido.valor });
+            // v383 — portão único (saldo zero, saldo<custo, margem) compartilhado
+            // com reprocessamento e redispatch de órfão. Sem cópias divergentes.
+            const gate = evaluateProviderGate(f as any, Number(pedido.valor), respectsMinMargin);
+            if (!gate.allow) {
+              tentativas.push(gate.reason);
+              console.warn("[mp-webhook] fornecedor barrado", { pedidoId: pedido.id, fornecedor: f.slug, motivo: gate.reason });
+              if (gate.kind === "margem") margemBloqueada++;
+              else await markProviderUnstable(f.slug, gate.reason);
               continue;
             }
             const r = await dispatchByFornecedor(f.slug, {
@@ -672,20 +661,21 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               // ===== Custo real: pré-computado pelo smart-routing (rate × cotacao_brl × qty/1000) =====
               const custoReal: number | null = f.cost_brl;
 
-              await supabaseAdmin
-                .from("pedidos")
-                .update({
-                  status: "paid",
-                  error_detail: `${mysteryBonus > 0 ? `MB:${mysteryBonus} · ` : ""}Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
-                  ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
-                  // v179 Reconciliador: colunas estruturadas p/ auditoria contínua
-                  provider_slug: f.slug,
-                  provider_order_id: r.orderId != null ? String(r.orderId) : null,
-                  dispatched_at: new Date().toISOString(),
-                  last_reconciled_at: new Date().toISOString(),
-                } as any)
-                .eq("id", pedido.id)
-                .is("provider_order_id", null); // idempotency: só grava se ainda não despachado
+              // v383 — escrita atômica: se a corrida foi perdida, NÃO lança
+              // caixa/ledger em cima de um pedido que outro processo já fechou.
+              const gravado = await commitDispatch(supabaseAdmin as any, String(pedido.id), {
+                status: "paid",
+                provider_slug: f.slug,
+                provider_order_id: r.orderId != null ? String(r.orderId) : null,
+                error_detail: `${mysteryBonus > 0 ? `MB:${mysteryBonus} · ` : ""}Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+                custo_real: custoReal,
+              });
+              if (!gravado) {
+                console.warn("[mp-webhook] v383 corrida perdida: pedido já fechado por outro processo", { pedidoId: pedido.id });
+                sucesso = true;
+                break;
+              }
+
 
               // ===== Tesouraria: registra ledger idempotente =====
               try {

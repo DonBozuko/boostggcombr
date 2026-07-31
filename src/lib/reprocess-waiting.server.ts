@@ -182,21 +182,18 @@ export async function reprocessWaitingProvision(
     return { ok: false, error: "ENVIO_EM_ANDAMENTO" };
   }
 
+  // v383 — portão único de elegibilidade + escrita atômica de desfecho.
+  const { evaluateProviderGate } = await import("@/lib/dispatch-gates");
+  const { commitDispatch } = await import("@/lib/dispatch-commit.server");
+
   const tentativas: string[] = [];
   for (const f of cadeia) {
-
-    if (Number(f.saldo_atual) <= 0) {
-      tentativas.push(`${f.nome}: saldo zerado`);
-      await markProviderUnstable(f.slug, "saldo zerado");
-      continue;
-    }
-    if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) {
-      tentativas.push(`${f.nome}: saldo insuf.`);
-      await markProviderUnstable(f.slug, "saldo insuficiente");
-      continue;
-    }
-    if (f.cost_brl != null && !(opts?.marginCheck ?? respectsMinMargin)(Number(pedido.valor), f.cost_brl)) {
-      tentativas.push(`${f.nome}: margem <300%`);
+    const gate = evaluateProviderGate(f as any, Number(pedido.valor), opts?.marginCheck ?? respectsMinMargin);
+    if (!gate.allow) {
+      tentativas.push(gate.reason);
+      if (gate.kind === "saldo_zero" || gate.kind === "saldo_insuficiente") {
+        await markProviderUnstable(f.slug, gate.reason);
+      }
       continue;
     }
     const r = await dispatchByFornecedor(f.slug, {
@@ -208,24 +205,24 @@ export async function reprocessWaitingProvision(
     });
     if (r.ok) {
       await clearProviderUnstable(f.slug);
-      await supabaseAdmin
-        .from("pedidos")
-        .update({
-          status: "Enviado",
-          error_detail: `${opts?.tag ?? "v151 recarga manual"} · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
-          ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
-          provider_slug: f.slug,
-          provider_order_id: r.orderId != null ? String(r.orderId) : null,
-          dispatched_at: new Date().toISOString(),
-          last_reconciled_at: new Date().toISOString(),
-        } as any)
-        .eq("id", pedido.id)
-        .is("provider_order_id", null);
+      const gravado = await commitDispatch(supabaseAdmin as any, String(pedido.id), {
+        status: "Enviado",
+        provider_slug: f.slug,
+        provider_order_id: r.orderId != null ? String(r.orderId) : null,
+        error_detail: `${opts?.tag ?? "v151 recarga manual"} · Enviado via ${f.nome} (order ${r.orderId ?? "?"})`,
+        custo_real: f.cost_brl ?? null,
+      });
+      if (!gravado) {
+        // v383 — corrida perdida: outro caminho já registrou este pedido.
+        // Não lança ledger nem debita caixa duas vezes.
+        return { ok: false, error: "CORRIDA_JA_DESPACHOU", tentativas };
+      }
       // Registra ledger de auditoria PROVIDER_RECHARGE_MANUAL
       try {
         if (f.cost_brl != null && f.cost_brl > 0) {
           await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "reservado", _amount: -Number(f.cost_brl.toFixed(4)) });
         }
+
         await supabaseAdmin.from("financial_ledger" as any).insert({
           valor_brl: f.cost_brl != null ? Number(f.cost_brl.toFixed(4)) : 0,
           origem: "wallet:reservado",

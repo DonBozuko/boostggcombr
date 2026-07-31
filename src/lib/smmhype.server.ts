@@ -313,26 +313,26 @@ export async function dispatchSmmhype(args: {
       signal: ctrl.signal,
     });
     const text = await res.text();
+    // v383 — leitor único: pega erro escondido em HTTP 200, envelope diferente
+    // e orderId inválido (0/"error"). Antes só olhava `json.error`.
+    const { interpretProviderResponse } = await import("./dispatch-response");
+    const read = interpretProviderResponse(text, res.status);
     let json: unknown = null;
     try { json = JSON.parse(text); } catch { /* não-JSON */ }
 
-    const apiError = (json as { error?: string } | null)?.error;
-    if (!res.ok || apiError) {
-      const detail = apiError ? String(apiError) : text.slice(0, 200);
-      void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: `SMMhype falhou: ${detail}` });
-      return { ok: false, error: `SMMhype falhou: ${detail}`, status: res.status, body: json ?? text };
+    if (!read.ok) {
+      // v383 — trilha forense é prova: aguarda a gravação (worker pode ser
+      // encerrado logo após a resposta e matar promessa solta).
+      await logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: `SMMhype falhou: ${read.error}` });
+      return { ok: false, error: `SMMhype falhou: ${read.error}`, status: res.status, body: json ?? text };
     }
-    const orderId = (json as { order?: string | number } | null)?.order;
-    if (orderId == null || orderId === "") {
-      void logDispatchAttempt({ ...base, ok: false, http_status: res.status, raw_response: text, error_text: "resposta sem orderId" });
-      return { ok: false, error: `SMMhype: resposta sem orderId (${text.slice(0, 200)})`, status: res.status, body: json ?? text };
-    }
-    void logDispatchAttempt({ ...base, ok: true, http_status: res.status, raw_response: text, order_id: orderId });
-    return { ok: true, orderId, body: json ?? text };
+    await logDispatchAttempt({ ...base, ok: true, http_status: res.status, raw_response: text, order_id: read.orderId });
+    return { ok: true, orderId: read.orderId, body: json ?? text };
   } catch (err) {
     const msg = (err as Error).name === "AbortError" ? "timeout 15s" : (err as Error).message;
-    void logDispatchAttempt({ ...base, ok: false, raw_response: null, error_text: `rede ${msg}` });
+    await logDispatchAttempt({ ...base, ok: false, raw_response: null, error_text: `rede ${msg}` });
     return { ok: false, error: `SMMhype: rede ${msg}` };
+
   } finally {
     clearTimeout(timer);
   }

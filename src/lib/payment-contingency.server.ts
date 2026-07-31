@@ -423,15 +423,14 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
     return { ok: false, error: "ENVIO_EM_ANDAMENTO", tentativas: [] };
   }
 
+  // v383 — mesmo portão e mesma escrita atômica dos demais caminhos.
+  const { evaluateProviderGate } = await import("@/lib/dispatch-gates");
+  const { commitDispatch } = await import("@/lib/dispatch-commit.server");
+
   const tentativas: string[] = [];
   for (const f of ranked as any[]) {
-
-    if (f.unstable) { tentativas.push(`${f.slug}: instável`); continue; }
-    if (Number(f.saldo_atual) <= 0) { tentativas.push(`${f.slug}: saldo zero`); continue; }
-    if (f.cost_brl != null && Number(f.saldo_atual) < f.cost_brl) { tentativas.push(`${f.slug}: saldo<custo`); continue; }
-    if (f.cost_brl != null && !respectsMinMargin(Number(pedido.valor), f.cost_brl)) {
-      tentativas.push(`${f.slug}: margem<300%`); continue;
-    }
+    const gate = evaluateProviderGate(f, Number(pedido.valor), respectsMinMargin, { skipUnstable: true });
+    if (!gate.allow) { tentativas.push(gate.reason); continue; }
     const r = await dispatchByFornecedor(f.slug, {
       pacote: pedido.pacote,
       quantidade: Number(pedido.quantidade),
@@ -440,28 +439,20 @@ export async function redispatchPaidOrphan(pedidoId: string): Promise<OrphanRedi
       pedidoId: pedido.id,
     });
     if (r.ok) {
-      // Idempotency: só grava se ainda for órfão. Se outro processo despachou paralelo, aborta.
-      const { data: gravado } = await supabaseAdmin
-        .from("pedidos")
-        .update({
-          status: "processing",
-          provider_slug: f.slug,
-          provider_order_id: r.orderId != null ? String(r.orderId) : null,
-          dispatched_at: new Date().toISOString(),
-          last_reconciled_at: new Date().toISOString(),
-          error_detail: `Reconciliador redispatch OK · ${f.nome ?? f.slug} (order ${r.orderId ?? "?"})`,
-          ...(f.cost_brl != null ? { custo_real: Number(f.cost_brl.toFixed(4)) } : {}),
-        } as any)
-        .eq("id", pedido.id)
-        .is("provider_order_id", null)
-        .select("id")
-        .maybeSingle();
+      const gravado = await commitDispatch(supabaseAdmin as any, String(pedido.id), {
+        status: "processing",
+        provider_slug: f.slug,
+        provider_order_id: r.orderId != null ? String(r.orderId) : null,
+        error_detail: `Reconciliador redispatch OK · ${f.nome ?? f.slug} (order ${r.orderId ?? "?"})`,
+        custo_real: f.cost_brl ?? null,
+      });
       if (!gravado) {
         // Corrida perdida: outro caminho já despachou. Não é erro.
         return { ok: false, error: "CORRIDA_JA_DESPACHOU", tentativas };
       }
       return { ok: true, fornecedor: f.slug, orderId: r.orderId != null ? String(r.orderId) : null };
     }
+
     tentativas.push(`${f.slug}: ${r.error ?? "falha"}`);
     // v218 — Circuit breaker no redispatch órfão: mesma regra do fallback.
     try {
