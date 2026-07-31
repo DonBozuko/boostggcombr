@@ -276,6 +276,13 @@ function ContadorPage() {
 
 
 
+          <EmbedSnippet
+            tipo="ig"
+            toolPath="/ferramentas/contador-seguidores"
+            toolTitle="Contador de seguidores do Instagram"
+            placeholder="@seuperfil"
+          />
+
           <h2 className="pt-6 text-2xl font-bold text-foreground">Perguntas frequentes</h2>
           <div className="space-y-4">
             {FAQ.map((f) => (
