@@ -121,7 +121,7 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "BoostGG — Crescimento Social para Instagram, TikTok e YouTube";
+    const title = "Comprar Seguidores Instagram — Elite Boost Prime | BoostGG";
     const ogTitle = "Elite Boost Prime — Seguidores no Instagram via Pix";
     const description =
       "Comprar seguidores Instagram reais, brasileiros e com entrega rápida via Pix. Alta retenção, reposição nos pacotes brasileiros e 100% seguro. Comece em minutos.";
