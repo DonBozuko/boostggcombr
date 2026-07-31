@@ -98,7 +98,25 @@ export const Route = createFileRoute("/api/public/hooks/recovery-scan")({
                 .in("pedido_id", idsPagos)
                 .neq("status", "recuperado");
             }
+
+            // v385 — fantasma zero: pedido que já morreu (expirou, cancelou,
+            // estornou) não pode continuar contando como "Pix abandonado" no
+            // semáforo. Fecha como perdido para o alerta refletir a realidade.
+            const { data: mortos } = await supabaseAdmin
+              .from("pedidos")
+              .select("id")
+              .in("id", ativosIds)
+              .in("status", ["expired", "cancelled", "canceled", "mp_cancelled", "mp_refunded", "refunded", "rejected", "mp_rejected"]);
+            const idsMortos = (mortos ?? []).map((p) => p.id as string);
+            if (idsMortos.length > 0) {
+              await supabaseAdmin
+                .from("pix_recovery_queue")
+                .update({ status: "perdido" })
+                .in("pedido_id", idsMortos)
+                .in("status", ["novo", "contatado"]);
+            }
           }
+
 
           return Response.json({ ok: true, scanned: rows.length, enqueued, valor_em_risco: valorEmRisco });
         } catch (e) {
