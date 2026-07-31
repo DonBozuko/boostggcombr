@@ -32,6 +32,12 @@ const TOOLS = [
     title: "Calculadora de Engajamento",
     desc: "Descubra se um perfil tem engajamento real ou inflado. Cálculo instantâneo.",
   },
+  {
+    to: "/ferramentas/calculadora-lucro-revenda",
+    icon: Calculator,
+    title: "Calculadora de Lucro de Revenda",
+    desc: "Quanto sobra ao revender seguidores e curtidas: lucro por pedido, margem e total no mês.",
+  },
 ];
 
 const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";

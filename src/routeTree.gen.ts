@@ -35,11 +35,13 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
 import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
+import { Route as PainelSmmRouteImport } from './routes/painel-smm'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as RastrearRouteImport } from './routes/rastrear'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as RevendaRouteImport } from './routes/revenda'
+import { Route as RevenderSeguidoresRouteImport } from './routes/revender-seguidores'
 import { Route as SeguidoresPixRouteImport } from './routes/seguidores-pix'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StatusRouteImport } from './routes/status'
@@ -62,6 +64,7 @@ import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
+import { Route as FerramentasCalculadoraLucroRevendaRouteImport } from './routes/ferramentas.calculadora-lucro-revenda'
 import { Route as FerramentasContadorInscritosYoutubeRouteImport } from './routes/ferramentas.contador-inscritos-youtube'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
@@ -253,6 +256,11 @@ const PainelRevendedorRoute = PainelRevendedorRouteImport.update({
   path: '/painel-revendedor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelSmmRoute = PainelSmmRouteImport.update({
+  id: '/painel-smm',
+  path: '/painel-smm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
@@ -276,6 +284,11 @@ const ReembolsoRoute = ReembolsoRouteImport.update({
 const RevendaRoute = RevendaRouteImport.update({
   id: '/revenda',
   path: '/revenda',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevenderSeguidoresRoute = RevenderSeguidoresRouteImport.update({
+  id: '/revender-seguidores',
+  path: '/revender-seguidores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SeguidoresPixRoute = SeguidoresPixRouteImport.update({
@@ -389,6 +402,12 @@ const FerramentasCalculadoraEngajamentoInstagramRoute =
   FerramentasCalculadoraEngajamentoInstagramRouteImport.update({
     id: '/ferramentas/calculadora-engajamento-instagram',
     path: '/ferramentas/calculadora-engajamento-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const FerramentasCalculadoraLucroRevendaRoute =
+  FerramentasCalculadoraLucroRevendaRouteImport.update({
+    id: '/ferramentas/calculadora-lucro-revenda',
+    path: '/ferramentas/calculadora-lucro-revenda',
     getParentRoute: () => rootRouteImport,
   } as any)
 const FerramentasContadorInscritosYoutubeRoute =
@@ -727,11 +746,13 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
+  '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -752,6 +773,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
   '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -837,11 +859,13 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
+  '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -862,6 +886,7 @@ export interface FileRoutesByTo {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
   '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -948,11 +973,13 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
+  '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
@@ -973,6 +1000,7 @@ export interface FileRoutesById {
   '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
   '/ferramentas/contador-inscritos-youtube': typeof FerramentasContadorInscritosYoutubeRoute
   '/ferramentas/contador-seguidores': typeof FerramentasContadorSeguidoresRoute
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
@@ -1060,11 +1088,13 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/painel-afiliado'
     | '/painel-revendedor'
+    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
+    | '/revender-seguidores'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1085,6 +1115,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/calculadora-lucro-revenda'
     | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -1170,11 +1201,13 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/painel-afiliado'
     | '/painel-revendedor'
+    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
+    | '/revender-seguidores'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1195,6 +1228,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/calculadora-lucro-revenda'
     | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -1280,11 +1314,13 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/painel-afiliado'
     | '/painel-revendedor'
+    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
+    | '/revender-seguidores'
     | '/seguidores-pix'
     | '/sitemap.xml'
     | '/status'
@@ -1305,6 +1341,7 @@ export interface FileRouteTypes {
     | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
+    | '/ferramentas/calculadora-lucro-revenda'
     | '/ferramentas/contador-inscritos-youtube'
     | '/ferramentas/contador-seguidores'
     | '/ferramentas/gerador-legenda-instagram'
@@ -1391,11 +1428,13 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   PainelAfiliadoRoute: typeof PainelAfiliadoRoute
   PainelRevendedorRoute: typeof PainelRevendedorRoute
+  PainelSmmRoute: typeof PainelSmmRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
   RastrearRoute: typeof RastrearRoute
   ReembolsoRoute: typeof ReembolsoRoute
   RevendaRoute: typeof RevendaRoute
+  RevenderSeguidoresRoute: typeof RevenderSeguidoresRoute
   SeguidoresPixRoute: typeof SeguidoresPixRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
@@ -1414,6 +1453,7 @@ export interface RootRouteChildren {
   DashboardSeoRoute: typeof DashboardSeoRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
+  FerramentasCalculadoraLucroRevendaRoute: typeof FerramentasCalculadoraLucroRevendaRoute
   FerramentasContadorInscritosYoutubeRoute: typeof FerramentasContadorInscritosYoutubeRoute
   FerramentasContadorSeguidoresRoute: typeof FerramentasContadorSeguidoresRoute
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
@@ -1657,6 +1697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelRevendedorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel-smm': {
+      id: '/painel-smm'
+      path: '/painel-smm'
+      fullPath: '/painel-smm'
+      preLoaderRoute: typeof PainelSmmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacidade': {
       id: '/privacidade'
       path: '/privacidade'
@@ -1690,6 +1737,13 @@ declare module '@tanstack/react-router' {
       path: '/revenda'
       fullPath: '/revenda'
       preLoaderRoute: typeof RevendaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revender-seguidores': {
+      id: '/revender-seguidores'
+      path: '/revender-seguidores'
+      fullPath: '/revender-seguidores'
+      preLoaderRoute: typeof RevenderSeguidoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seguidores-pix': {
@@ -1844,6 +1898,13 @@ declare module '@tanstack/react-router' {
       path: '/ferramentas/calculadora-engajamento-instagram'
       fullPath: '/ferramentas/calculadora-engajamento-instagram'
       preLoaderRoute: typeof FerramentasCalculadoraEngajamentoInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ferramentas/calculadora-lucro-revenda': {
+      id: '/ferramentas/calculadora-lucro-revenda'
+      path: '/ferramentas/calculadora-lucro-revenda'
+      fullPath: '/ferramentas/calculadora-lucro-revenda'
+      preLoaderRoute: typeof FerramentasCalculadoraLucroRevendaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ferramentas/contador-inscritos-youtube': {
@@ -2273,11 +2334,13 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   PainelAfiliadoRoute: PainelAfiliadoRoute,
   PainelRevendedorRoute: PainelRevendedorRoute,
+  PainelSmmRoute: PainelSmmRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
   RastrearRoute: RastrearRoute,
   ReembolsoRoute: ReembolsoRoute,
   RevendaRoute: RevendaRoute,
+  RevenderSeguidoresRoute: RevenderSeguidoresRoute,
   SeguidoresPixRoute: SeguidoresPixRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
@@ -2298,6 +2361,8 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FerramentasCalculadoraEngajamentoInstagramRoute:
     FerramentasCalculadoraEngajamentoInstagramRoute,
+  FerramentasCalculadoraLucroRevendaRoute:
+    FerramentasCalculadoraLucroRevendaRoute,
   FerramentasContadorInscritosYoutubeRoute:
     FerramentasContadorInscritosYoutubeRoute,
   FerramentasContadorSeguidoresRoute: FerramentasContadorSeguidoresRoute,

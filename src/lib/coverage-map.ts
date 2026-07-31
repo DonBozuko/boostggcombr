@@ -239,6 +239,9 @@ export const ROTAS_DECLARADAS = new Set<string>([
   "termos",
   "privacidade",
   "api-revenda",
+  "painel-smm",
+  "revender-seguidores",
+  "ferramentas.calculadora-lucro-revenda",
 ]);
 
 /** Rotas públicas encontradas no código que ninguém declarou = ponto cego. */

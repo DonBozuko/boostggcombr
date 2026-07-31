@@ -88,6 +88,17 @@ function Revenda() {
       </p>
 
 
+      <p className="mt-2 text-sm text-muted-foreground">
+        Antes de decidir:{" "}
+        <Link to="/painel-smm" className="text-primary underline">o que vem no painel SMM</Link>,{" "}
+        <Link to="/revender-seguidores" className="text-primary underline">como revender seguidores</Link>{" "}
+        e a{" "}
+        <Link to="/ferramentas/calculadora-lucro-revenda" className="text-primary underline">
+          calculadora de lucro
+        </Link>
+        .
+      </p>
+
       <h2 className="mt-8 text-lg font-semibold">Como funciona</h2>
       <ol className="mt-3 space-y-3">
         <Step n={1} title="Você pede acesso">
