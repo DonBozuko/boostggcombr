@@ -80,6 +80,7 @@ Sim. Afiliados ganham comissão por indicação (/afiliados) e revendedores têm
 ## Ferramentas gratuitas
 
 - [Contador de Seguidores em Tempo Real](/ferramentas/contador-seguidores): consulta pública de qualquer perfil do Instagram.
+- [Contador de Inscritos do YouTube](/ferramentas/contador-inscritos-youtube): consulta pública de inscritos de qualquer canal.
 - [Calculadora de Engajamento Instagram](/ferramentas/calculadora-engajamento-instagram): mede taxa de engajamento de qualquer conta.
 - [Gerador de Legendas com IA](/ferramentas/gerador-legenda-instagram): cria legendas otimizadas grátis.
 
