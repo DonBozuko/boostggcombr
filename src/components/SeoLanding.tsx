@@ -1,5 +1,7 @@
 // v200 — Componente reutilizável para landing pages SEO (keyword-alvo → CTA no checkout real).
 
+import { useEffect } from "react";
+import { trackFunnel } from "@/lib/funnel-beacon";
 import { BrandHeader } from "@/components/BrandHeader";
 import { MobileFrame } from "@/components/MobileFrame";
 import { RelatedLinks } from "@/components/RelatedLinks";
