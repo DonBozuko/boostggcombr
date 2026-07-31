@@ -195,6 +195,12 @@ export const FAMILIAS: Familia[] = [
     detector: "extrairInscritosTexto + parseInscritos",
     provas: ["contador-inscritos.test.ts"],
   },
+  {
+    id: "autonomia",
+    nome: "Autonomia — detector sem remédio é dívida transferida ao dono",
+    detector: "autonomy-ladder (escada de níveis 1/2/3 com executor real)",
+    provas: ["autonomy-ladder.test.ts"],
+  },
 ];
 
 /** Rotas públicas já declaradas como cobertas pela varredura de superfície. */

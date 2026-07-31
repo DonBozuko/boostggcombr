@@ -425,6 +425,29 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
     console.warn("[ops-audit] coerência falhou", e);
   }
 
+  // v391 — Escada de autonomia: detector sem remédio é defeito nosso, não do
+  // fornecedor. Se alguma ação de nível 1 ficou sem quem execute, o dono vira
+  // o robô — e isso precisa aparecer como problema, não como silêncio.
+  try {
+    const { nivel1SemExecutor, contratosQuebrados } = await import("@/lib/autonomy-ladder");
+    const semRemedio = nivel1SemExecutor();
+    const quebrados = contratosQuebrados();
+    if (semRemedio.length > 0 || quebrados.length > 0) {
+      findings.push({
+        code: "AUTONOMIA_INCOMPLETA",
+        severity: "warning",
+        titulo: "Tem conserto automático faltando",
+        problema:
+          `${semRemedio.length} conserto(s) que deveriam ser automáticos ainda dependem de alguém clicar` +
+          (quebrados.length > 0 ? ` e ${quebrados.length} regra(s) de segurança estão sem teto ou sem botão de desligar.` : "."),
+        o_que_fazer: "Me avise para ligar o conserto automático dessas etapas.",
+        evidencia: { sem_remedio: semRemedio.map((a) => a.nome), contratos: quebrados },
+      });
+    }
+  } catch (e) {
+    console.warn("[ops-audit] escada de autonomia falhou", e);
+  }
+
   const critical = findings.filter((f) => f.severity === "critical");
 
   let telegramEnviado = false;
