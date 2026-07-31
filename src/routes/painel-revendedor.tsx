@@ -60,6 +60,9 @@ function PainelRevendedor() {
   const [services, setServices] = useState<PortalService[]>([]);
   const [service, setService] = useState("");
   const [link, setLink] = useState("");
+  const [rede, setRede] = useState("todas");
+  const [busca, setBusca] = useState("");
+  const [catalogoErro, setCatalogoErro] = useState("");
 
   const [valor, setValor] = useState(100);
   const [pix, setPix] = useState<{ topupId: string; qrCode: string; qrCodeBase64: string; valor: number } | null>(null);
@@ -74,11 +77,18 @@ function PainelRevendedor() {
       }
       setData(r);
       const c = await fnCatalog({ data: { apiKey: key } });
-      if (c.ok) setServices(c.services);
+      if (c.ok) {
+        setServices(c.services);
+        setCatalogoErro(c.services.length === 0 ? "Nenhum pacote disponível no momento." : "");
+      } else {
+        setServices([]);
+        setCatalogoErro(c.error ?? "Não consegui carregar os pacotes. Toque em Atualizar.");
+      }
       return true;
     },
     [fnMe, fnCatalog],
   );
+
 
   useEffect(() => {
     const saved = typeof window !== "undefined" ? window.sessionStorage.getItem(STORAGE_KEY) : null;
