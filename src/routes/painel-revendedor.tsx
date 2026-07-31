@@ -252,7 +252,12 @@ function PainelRevendedor() {
             <Link to="/api-revenda" className="text-primary underline">documentação da API</Link>
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={sair}>Sair</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" disabled={busy} onClick={() => { void load(apiKey); }}>
+            {busy ? "Atualizando..." : "Atualizar"}
+          </Button>
+          <Button variant="outline" size="sm" onClick={sair}>Sair</Button>
+        </div>
       </div>
 
       <Card className="border-primary/40 bg-primary/5">
