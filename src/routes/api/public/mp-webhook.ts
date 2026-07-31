@@ -598,6 +598,9 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
           const { dispatchByFornecedor } = await import("@/lib/dispatcher-fallback.server");
           const { respectsMinMargin } = await import("@/lib/margin-guardian");
+          const { evaluateProviderGate } = await import("@/lib/dispatch-gates");
+          const { commitDispatch } = await import("@/lib/dispatch-commit.server");
+
           const tentativas: string[] = [];
           let sucesso = false;
           let margemBloqueada = 0;
