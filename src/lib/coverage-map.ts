@@ -215,7 +215,14 @@ export const FAMILIAS: Familia[] = [
     detector: "integridade de .lovable/memory (link quebrado, regra órfã, Core inchado)",
     provas: ["memory-index-integrity.test.ts"],
   },
+  {
+    id: "anti-alucinacao",
+    nome: "Motor Anti-Alucinação — auditoria de ponta a ponta é executável, não opinião",
+    detector: "npm run audit (scripts/audit.mjs) varre src/ e grava .lovable/audit-report.md",
+    provas: ["anti-hallucination-engine.test.ts"],
+  },
 ];
+
 
 /** Rotas públicas já declaradas como cobertas pela varredura de superfície. */
 export const ROTAS_DECLARADAS = new Set<string>([
