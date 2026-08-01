@@ -380,8 +380,13 @@ export async function runBenchAutonomo(
         linhas.push(`Tirei da vitrine sozinho agora: ${pausados.length} pacote(s) que não entregariam.`);
       }
       if (margem > 0) {
+        const nomes = avaliadosVitrine
+          .filter((r) => r.verdict === "margem")
+          .map((r) => String(r.pacote));
         linhas.push("");
-        linhas.push(`Custo alto demais: ${margem} pacote(s) da vitrine venderiam no prejuízo.`);
+        linhas.push(
+          `Custo alto demais: ${margem} pacote(s) da vitrine venderiam no prejuízo (${nomes.slice(0, 8).join(", ")}${nomes.length > 8 ? "..." : ""}).`,
+        );
       }
       if (religados.length > 0) {
         linhas.push("");
@@ -393,12 +398,31 @@ export async function runBenchAutonomo(
         linhas.push("");
         linhas.push(`Não consegui testar agora: ${naoAvaliados} pacote(s) (nada foi pausado por isso).`);
       }
+
+      // v398 — "já corrigi o que dava" era vago. Agora o alerta diz, em
+      // português, exatamente o que o sistema mexeu sozinho neste ciclo.
+      linhas.push("");
+      linhas.push("O QUE JÁ FIZ SOZINHO AGORA:");
+      linhas.push("• Recalculei o preço de todos os pacotes com o custo mais novo do fornecedor.");
+      linhas.push(
+        pausados.length > 0
+          ? `• Tirei da vitrine ${pausados.length} pacote(s) que não têm fornecedor nem ID válido (não é saldo).`
+          : "• Não tirei nenhum pacote da vitrine.",
+      );
+      linhas.push(
+        religados.length > 0
+          ? `• Devolvi ${religados.length} pacote(s) à vitrine.`
+          : "• Nada precisou voltar à vitrine.",
+      );
+      linhas.push("• Falta de saldo NUNCA tira pacote da venda — pacote grande continua vendendo.");
+
       linhas.push("");
       linhas.push(
         precisaRecarga.length > 0
           ? "O QUE FAZER: recarregar os valores acima no fornecedor. O resto o sistema resolve sozinho na próxima varredura."
-          : "O QUE FAZER: nada agora — já corrigi o que dava. Confira no painel (aba Auditoria) se quiser ver pacote por pacote.",
+          : "O QUE FAZER: nada agora. Confira no painel (aba Auditoria) se quiser ver pacote por pacote.",
       );
+
 
       const texto = linhas.join("\n");
       const sig = await assinatura(
