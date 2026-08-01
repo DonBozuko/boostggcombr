@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://www.boostgg.com.br/comprar-seguidores-brasileiros";
 const TITLE = "Seguidores Brasileiros — Elite Boost Prime | BoostGG";
 const DESC =
-  "Seguidores brasileiros reais para Instagram, com foto e postagens. Entrega gradual, pagamento via Pix e reposição nos pacotes brasileiros. Ideal para vender no Brasil.";
+  "Seguidores brasileiros reais para Instagram, com foto e postagens. Entrega gradual via Pix e reposição nos pacotes BR.";
 
 const FAQ = [
   {

@@ -44,7 +44,7 @@ import { BrandHeader } from "@/components/BrandHeader";
 
 export const Route = createFileRoute("/facebook")({
   head: () => {
-    const title = "Impulsionar Facebook — Curtidas e Seguidores — Elite Boost Prime | BoostGG";
+    const title = "Curtidas e Seguidores no Facebook via Pix | BoostGG";
     const description =
       "Impulsione seu Facebook com curtidas, seguidores e views via Pix. Entrega gradual e automática, sem pedir senha. Pacotes 🌎 Global.";
     const url = "https://www.boostgg.com.br/facebook";

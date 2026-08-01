@@ -3,9 +3,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const CANON = "https://www.boostgg.com.br/revender-seguidores";
-const TITLE = "Como Revender Seguidores e Curtidas em 2026 — Elite Boost Prime | BoostGG";
+const TITLE = "Como Revender Seguidores e Curtidas em 2026 | BoostGG";
 const DESC =
-  "Passo a passo real para revender seguidores, curtidas e visualizações no Brasil: onde comprar no atacado, como precificar, como entregar automático e quanto sobra de lucro.";
+  "Passo a passo para revender seguidores e curtidas no Brasil: onde comprar no atacado, como precificar e quanto sobra de lucro.";
 
 const PASSOS = [
   {

@@ -13,11 +13,11 @@ import { submitResellerApplication } from "@/lib/reseller-apply.functions";
 export const Route = createFileRoute("/revenda")({
   head: () => ({
     meta: [
-      { title: "Seja Revendedor de Seguidores e Curtidas — Elite Boost Prime | BoostGG" },
+      { title: "Seja Revendedor de Seguidores e Curtidas | BoostGG" },
       {
         name: "description",
         content:
-          "Programa de revenda BoostGG: preço de revenda com desconto real, saldo pré-pago via Pix, API pronta e entrega automática. Você vende com sua marca e fica com o lucro.",
+          "Revenda BoostGG: desconto real, saldo pré-pago via Pix, API pronta e entrega automática. Venda com sua marca e fique com o lucro.",
       },
       { property: "og:title", content: "Programa de Revenda — BoostGG" },
       {

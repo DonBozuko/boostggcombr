@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-visualizacoes-tiktok";
-const TITLE = "Comprar Visualizações TikTok — Views Rápidas e Baratas via Pix — Elite Boost Prime | BoostGG";
+const TITLE = "Comprar Visualizações no TikTok via Pix | BoostGG";
 const DESC =
   "Compre visualizações para vídeos do TikTok a partir de R$ 3,90 por 1.000. Entrega em minutos, sem senha, com Pix. Impulsione o algoritmo do TikTok.";
 

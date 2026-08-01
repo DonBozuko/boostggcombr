@@ -37,11 +37,11 @@ const FAQ = [
 export const Route = createFileRoute("/ferramentas/contador-seguidores")({
   head: () => ({
     meta: [
-      { title: "Contador de Seguidores Instagram Grátis — Análise de Perfil 2026" },
+      { title: "Contador de Seguidores Instagram Grátis | BoostGG" },
       {
         name: "description",
         content:
-          "Contador e analisador de seguidores do Instagram grátis. Descubra se o perfil tem base real ou inflada, razão seguidores/seguindo e projeção de crescimento. Sem login.",
+          "Contador e analisador de seguidores do Instagram grátis. Veja se o perfil tem base real ou inflada e a projeção de crescimento.",
       },
       {
         name: "keywords",

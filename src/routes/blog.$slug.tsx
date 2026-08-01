@@ -20,7 +20,7 @@ const POSTS: Record<string, Post> = {
     title: "Como Ganhar Seguidores no Instagram em 2026 (Guia Completo)",
     seoTitle: "Como Ganhar Seguidores no Instagram em 2026",
     description:
-      "Como ganhar seguidores no Instagram em 2026: método passo a passo testado, o que o algoritmo premia hoje, quanto tempo leva de verdade e como conseguir seguidores de graça (e quando pagar compensa).",
+      "Como ganhar seguidores no Instagram em 2026: passo a passo testado, o que o algoritmo premia hoje e quando pagar compensa.",
     subtitle:
       "O método real, em ordem — do perfil ao algoritmo. Sem hashtag mágica e sem promessa vazia.",
     datePublished: "2026-01-15",

@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/engajamento-instagram";
-const TITLE = "Engajamento Instagram — Boost de Curtidas e Interação — Elite Boost Prime | BoostGG";
+const TITLE = "Engajamento Instagram — Curtidas e Interação | BoostGG";
 const DESC =
   "Boost de engajamento profissional para posts do Instagram. Aumente curtidas, sinal para o algoritmo e alcance orgânico com pagamento via Pix.";
 

@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/views-tiktok";
-const TITLE = "Views TikTok — Amplifique o Alcance dos Seus Vídeos — Elite Boost Prime | BoostGG";
+const TITLE = "Views TikTok — Amplifique o Alcance dos Vídeos | BoostGG";
 const DESC =
   "Amplifique o alcance dos seus vídeos no TikTok. Boost profissional de views para acelerar o For You com pagamento via Pix.";
 

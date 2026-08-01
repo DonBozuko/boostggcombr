@@ -4,7 +4,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 const CANON = "https://www.boostgg.com.br/painel-smm";
-const TITLE = "Painel SMM Brasileiro para Revenda — Elite Boost Prime | BoostGG";
+const TITLE = "Painel SMM Brasileiro para Revenda | BoostGG";
 const DESC =
   "Painel SMM brasileiro com API pronta, saldo pré-pago em Pix e entrega automática. Revenda seguidores, curtidas e views com sua marca e fique com o lucro.";
 
