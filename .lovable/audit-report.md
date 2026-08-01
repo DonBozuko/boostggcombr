@@ -1,35 +1,14 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-01T11:26:01.899Z
+Gerado por `npm run audit` — 2026-08-01T11:26:31.232Z
 
 Arquivos lidos: 431
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 44 |
+| atencao | 26 |
 | nota | 515 |
-
-## seo-head (18)
-
-- **atencao** `src/routes/admin-health-catalog.tsx` — head() sem description
-- **atencao** `src/routes/admin-health-catalog.tsx` — head() sem og:title
-- **atencao** `src/routes/admin-health-catalog.tsx` — head() sem og:description
-- **atencao** `src/routes/admin.catalog.tsx` — head() sem description
-- **atencao** `src/routes/admin.catalog.tsx` — head() sem og:title
-- **atencao** `src/routes/admin.catalog.tsx` — head() sem og:description
-- **atencao** `src/routes/admin.scripts.tsx` — head() sem description
-- **atencao** `src/routes/admin.scripts.tsx` — head() sem og:title
-- **atencao** `src/routes/admin.scripts.tsx` — head() sem og:description
-- **atencao** `src/routes/admin.tsx` — head() sem og:title
-- **atencao** `src/routes/admin.tsx` — head() sem og:description
-- **atencao** `src/routes/dashboard.seo.tsx` — head() sem og:title
-- **atencao** `src/routes/dashboard.seo.tsx` — head() sem og:description
-- **atencao** `src/routes/diagnostico.tsx` — head() sem og:title
-- **atencao** `src/routes/diagnostico.tsx` — head() sem og:description
-- **atencao** `src/routes/unsubscribe.tsx` — head() sem description
-- **atencao** `src/routes/unsubscribe.tsx` — head() sem og:title
-- **atencao** `src/routes/unsubscribe.tsx` — head() sem og:description
 
 ## serverfn-modulo-fino (87)
 

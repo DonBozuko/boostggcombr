@@ -86,7 +86,11 @@ for (const f of contentRoutes) {
     add("atencao", "seo-head", f, "rota de conteúdo sem head()");
     continue;
   }
-  for (const needle of ["title", "description", "og:title", "og:description"]) {
+  // Página interna (noindex) não precisa de card social — exigir seria alarme falso.
+  const exigidos = /noindex/.test(src)
+    ? ["title"]
+    : ["title", "description", "og:title", "og:description"];
+  for (const needle of exigidos) {
     if (!src.includes(needle)) add("atencao", "seo-head", f, `head() sem ${needle}`);
   }
 }
