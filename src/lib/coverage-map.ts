@@ -141,6 +141,13 @@ export const FAMILIAS: Familia[] = [
     provas: ["landing-price-truth.test.ts", "live-product-guard.test.ts"],
   },
   {
+    id: "caminho_compra",
+    nome: "Caminho da busca até o pagamento (deep-link de pacote)",
+    detector: "landing-deep-link (atalho landing → formulário com pacote pronto)",
+    provas: ["landing-deep-link.test.ts"],
+  },
+
+  {
     id: "prateleira",
     nome: "Vitrine honesta (só mostra o que entrega)",
     detector: "shelf-authority (escritor único) / shelf-availability / honest-shelf-fallback",

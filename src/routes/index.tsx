@@ -549,6 +549,31 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
   const dynViewsPlans = useMemo(() => buildDyn(gridBy.visualizacoes, viewsPlans, "Views"),         [gridBy.visualizacoes, gridLoaded, bestsellers]);
   const dynAllPlans   = useMemo(() => [...dynPlans, ...dynLikesPlans, ...dynViewsPlans], [dynPlans, dynLikesPlans, dynViewsPlans]);
 
+  // v403 — DEEP-LINK DE PACOTE (?plan=p500).
+  // O tráfego do Google cai nas landings de busca e precisava de 2 saltos até
+  // o formulário. Agora a linha de preço da landing entrega o cliente já com o
+  // pacote escolhido e o funil marcado — sem lógica de preço nova (o pacote só
+  // é aceito se existir no catálogo vivo).
+  const deepLinkDone = useRef(false);
+  useEffect(() => {
+    if (deepLinkDone.current || dynAllPlans.length === 0) return;
+    let wanted = "";
+    try { wanted = new URLSearchParams(window.location.search).get("plan") ?? ""; } catch { return; }
+    if (!wanted) { deepLinkDone.current = true; return; }
+    const chosen = dynAllPlans.find((p) => p.id === wanted);
+    if (!chosen) { deepLinkDone.current = true; return; }
+    deepLinkDone.current = true;
+    setCategoria(chosen.id.startsWith("v") ? "visualizacoes" : chosen.id.startsWith("l") ? "curtidas" : "seguidores");
+    setForm((f) => ({ ...f, plan: chosen.id }));
+    trackFunnel("escolheu_pacote", { plan_id: chosen.id, valor: chosen.valor ?? null });
+    setTimeout(() => {
+      (document.getElementById("form-pedido") ?? document.getElementById("pedido"))
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 350);
+  }, [dynAllPlans]);
+
+
+
   // Polling: a cada 5s consulta o status do pedido até detectar 'paid' ou rejeição.
   useEffect(() => {
     if (!modalOpen || !pedidoInfo?.pedidoId || paid || rejectionMsg) return;
