@@ -95,6 +95,17 @@ const RELATED: Record<string, Link[]> = {
     { href: "/seguidores-pix", title: "Seguidores no Pix", desc: "Pagou, entregou. Sem cadastro." },
     { href: "/avaliacoes", title: "Avaliações reais", desc: "Veja quem já comprou e recebeu." },
   ],
+  // v401
+  "/comprar-curtidas-tiktok": [
+    { href: "/comprar-visualizacoes-tiktok", title: "Visualizações TikTok", desc: "Curtida sem view não sustenta entrega." },
+    { href: "/comprar-seguidores-tiktok", title: "Seguidores TikTok", desc: "Base fiel pros próximos vídeos." },
+    { href: "/turbinar-tiktok", title: "Turbinar TikTok", desc: "Combo completo pra criadores." },
+  ],
+  "/seguidores-reais-instagram": [
+    { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Mesma base BR, foco em volume." },
+    { href: "/comprar-curtidas-instagram", title: "Curtidas Instagram", desc: "Engajamento nos posts que importam." },
+    { href: "/ferramentas/calculadora-engajamento-instagram", title: "Calculadora de engajamento", desc: "Veja se sua base está saudável." },
+  ],
 };
 
 
