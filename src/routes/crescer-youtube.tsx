@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/crescer-youtube";
-const TITLE = "Crescer no YouTube — Gestão de Audiência para Canais — Elite Boost Prime | BoostGG";
+const TITLE = "Crescer no YouTube — Gestão de Audiência | BoostGG";
 const DESC =
   "Gestão profissional de crescimento para canais YouTube. Amplie audiência, monetização e alcance com pagamento via Pix.";
 

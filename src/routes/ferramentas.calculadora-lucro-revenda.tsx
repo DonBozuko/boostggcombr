@@ -5,7 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 
 const CANON = "https://www.boostgg.com.br/ferramentas/calculadora-lucro-revenda";
-const TITLE = "Calculadora de Lucro de Revenda SMM — Elite Boost Prime | BoostGG";
+const TITLE = "Calculadora de Lucro de Revenda SMM | BoostGG";
 const DESC =
   "Calcule grátis quanto sobra ao revender seguidores e curtidas: custo de revenda, preço de venda, lucro por pedido e lucro no mês. Sem cadastro.";
 

@@ -19,6 +19,7 @@ export const Route = createFileRoute("/rastrear")({
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },
       ],
+      links: [{ rel: "canonical", href: "https://www.boostgg.com.br/rastrear" }],
     };
   },
   component: RastrearPage,

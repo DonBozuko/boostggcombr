@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-seguidores-instagram";
-const TITLE = "Comprar Seguidores Instagram — Elite Boost Prime | BoostGG";
+const TITLE = "Comprar Seguidores Instagram — Preços e Pacotes | BoostGG";
 const DESC =
   "Compre seguidores para Instagram com entrega em minutos, pagamento via Pix e reposição nos pacotes brasileiros. Perfis brasileiros, sem senha, 100% seguro.";
 

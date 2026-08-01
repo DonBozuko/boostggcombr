@@ -6,7 +6,7 @@ import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib
 const URL = "https://www.boostgg.com.br/comprar-seguidores-instagram-barato";
 const TITLE = "Seguidores Instagram Barato — Elite Boost Prime | BoostGG";
 const DESC =
-  "Seguidores Instagram barato de verdade: pacote inicial a partir de R$5 no Pix, entrega em minutos e reposição de 30 dias nos pacotes brasileiros. Sem senha, sem enrolação.";
+  "Seguidores Instagram barato de verdade: a partir de R$5 no Pix, entrega em minutos e reposição de 30 dias nos pacotes BR.";
 
 const FAQ = [
   {
