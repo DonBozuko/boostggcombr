@@ -102,8 +102,23 @@ export async function runBenchAutonomo(
   const runId: string | null = run?.id ?? null;
 
   try {
+    // v396 — CONSERTA ANTES DE MEDIR.
+    // Causa raiz do alerta "4 pacotes venderiam no prejuízo": a Bancada media o
+    // preço ANTES de a Autoridade de Preço rodar a rampa do ciclo. O motor já
+    // tinha o conserto na mão (tl50k..tl500k subiram para o preço justo minutos
+    // depois), mas o dono recebia no celular um número já vencido — e um alerta
+    // que nunca zera é um alerta que se aprende a ignorar.
+    // A autoridade é idempotente: rodar aqui não muda preço saudável.
+    try {
+      const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+      await enforcePriceAuthority("pre-bancada");
+    } catch (e) {
+      console.error("[bancada] v396 autoridade de preço falhou antes da medição", e);
+    }
+
     // Catálogo inteiro, paginado (v308: nunca confiar no limite padrão).
     const items: any[] = [];
+
     for (let from = 0; ; from += 1000) {
       const { data } = await supabaseAdmin
         .from("pricing_items" as any)
