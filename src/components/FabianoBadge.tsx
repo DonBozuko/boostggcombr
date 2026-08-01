@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
-import fabiano from "@/assets/fabiano.png.asset.json";
+import fabiano from "@/assets/fabiano.webp";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego" | "kwai";
 
@@ -88,7 +88,7 @@ export function FabianoBadge({ variant = "instagram", inline = false }: { varian
       >
         {imgOk ? (
           <img
-            src={fabiano.url}
+            src={fabiano}
             alt="Fabiano Santiago"
             onError={() => setImgOk(false)}
             className="h-full w-full object-cover"
