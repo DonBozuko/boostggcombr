@@ -74,14 +74,11 @@ export type ResellerApplication = {
 };
 
 const tokenOnly = z.object({ token: z.string().min(8) });
-function auth(token: string): boolean {
-  return !!process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
 
 export const listResellerApplications = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; rows: ResellerApplication[] }> => {
-    if (!auth(data.token)) return { ok: false, error: "UNAUTHORIZED", rows: [] };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED", rows: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("reseller_applications" as any)
@@ -103,7 +100,7 @@ export const setResellerApplicationStatus = createServerFn({ method: "POST" })
       .parse(i),
   )
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!auth(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("reseller_applications" as any)
@@ -127,7 +124,7 @@ export const approveAndProvisionReseller = createServerFn({ method: "POST" })
   )
   .handler(
     async ({ data }): Promise<{ ok: boolean; error?: string; apiKey?: string; emailed?: boolean }> => {
-      if (!auth(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+      if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { data: app } = await supabaseAdmin
         .from("reseller_applications" as any)

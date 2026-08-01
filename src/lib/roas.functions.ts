@@ -1,12 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { group, type RoasRow } from "@/lib/roas-group";
 
-export type RoasRow = {
-  key: string;
-  pedidos: number;
-  receitaBrl: number;
-  ticketMedio: number;
-};
+export type { RoasRow } from "@/lib/roas-group";
 
 export type RoasReport = {
   ok: true;
@@ -23,29 +19,6 @@ const inputSchema = z.object({
   janelaDias: z.number().int().min(1).max(90).default(30),
 });
 
-function group(
-  rows: Array<{ key: string | null; valor: number | null }>,
-  fallback: string,
-): RoasRow[] {
-  const map = new Map<string, { pedidos: number; receita: number }>();
-  for (const r of rows) {
-    const k = (r.key ?? fallback) || fallback;
-    const v = Number(r.valor ?? 0);
-    const cur = map.get(k) ?? { pedidos: 0, receita: 0 };
-    cur.pedidos += 1;
-    cur.receita += v;
-    map.set(k, cur);
-  }
-  return [...map.entries()]
-    .map(([key, v]) => ({
-      key,
-      pedidos: v.pedidos,
-      receitaBrl: Math.round(v.receita * 100) / 100,
-      ticketMedio: v.pedidos ? Math.round((v.receita / v.pedidos) * 100) / 100 : 0,
-    }))
-    .sort((a, b) => b.receitaBrl - a.receitaBrl)
-    .slice(0, 30);
-}
 
 export const getRoasReport = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => inputSchema.parse(data))

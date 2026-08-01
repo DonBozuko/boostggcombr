@@ -8,7 +8,7 @@
 // Nada de número inventado.
 
 import { createFileRoute } from "@tanstack/react-router";
-import { parseInscritos, extrairInscritosTexto } from "@/lib/contador-inscritos.functions";
+import { parseInscritos, extrairInscritosTexto } from "@/lib/contador-inscritos-parse";
 
 const UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36";

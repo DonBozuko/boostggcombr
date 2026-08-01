@@ -16,14 +16,11 @@ const input = z.object({
   limit: z.number().int().min(1).max(40).default(20),
 });
 
-function authorized(token: string): boolean {
-  return !!process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
 
 export const benchCount = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ token: z.string().min(8) }).parse(i))
   .handler(async ({ data }) => {
-    if (!authorized(data.token)) return { ok: false as const, error: "UNAUTHORIZED", total: 0 };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED", total: 0 };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { count } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -34,7 +31,7 @@ export const benchCount = createServerFn({ method: "POST" })
 export const benchBatch = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!authorized(data.token)) return { ok: false as const, error: "UNAUTHORIZED", rows: [] as BenchRow[] };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED", rows: [] as BenchRow[] };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { rankProvidersByCost } = await import("@/lib/smart-routing.server");

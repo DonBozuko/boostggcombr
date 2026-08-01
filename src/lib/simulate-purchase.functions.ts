@@ -4,6 +4,7 @@
 // Fluxo real de compra permanece inalterado — este arquivo só descreve a simulação.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { fmtBrl } from "@/lib/fmt-brl";
 
 const input = z.object({
   token: z.string().min(8),
@@ -14,9 +15,6 @@ const input = z.object({
 
 type Step = { key: string; ok: boolean; ms: number; detail: string };
 
-function fmtBrl(v: number): string {
-  return `R$ ${Number(v).toFixed(2).replace(".", ",")}`;
-}
 
 export const listSimulatablePackages = createServerFn({ method: "POST" })
   .inputValidator((i) => z.object({ token: z.string().min(8) }).parse(i))

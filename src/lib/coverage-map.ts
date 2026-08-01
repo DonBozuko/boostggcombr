@@ -221,7 +221,14 @@ export const FAMILIAS: Familia[] = [
     detector: "npm run audit (scripts/audit.mjs) varre src/ e grava .lovable/audit-report.md",
     provas: ["anti-hallucination-engine.test.ts"],
   },
+  {
+    id: "serverfn-modulo-fino",
+    nome: "Server functions finas — helper solto no arquivo pode sumir no bundle e derrubar admin/despacho",
+    detector: "teste lê todos os src/lib/*.functions.ts e barra função declarada no escopo de módulo",
+    provas: ["serverfn-modulo-fino.test.ts"],
+  },
 ];
+
 
 
 /** Rotas públicas já declaradas como cobertas pela varredura de superfície. */

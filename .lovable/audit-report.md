@@ -1,63 +1,19 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-01T11:29:26.882Z
+Gerado por `npm run audit` — 2026-08-01T11:40:26.833Z
 
-Arquivos lidos: 432
+Arquivos lidos: 442
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 26 |
-| nota | 515 |
-
-## serverfn-modulo-fino (87)
-
-- **atencao** `src/lib/admin.functions.ts` — linha 36: function checkToken(token: string) {
-- **atencao** `src/lib/affiliates-admin.functions.ts` — linha 7: function auth(token: string): boolean {
-- **atencao** `src/lib/audit.functions.ts` — linha 34: async function buildContingencyAuditRows(): Promise<AuditRow[]> {
-- **atencao** `src/lib/bench-autonomo.functions.ts` — linha 8: function authorized(token: string): boolean {
-- **atencao** `src/lib/bench.functions.ts` — linha 19: function authorized(token: string): boolean {
-- **atencao** `src/lib/canary.functions.ts` — linha 4: function checkToken(token: string) {
-- **atencao** `src/lib/catalog-raiox.functions.ts` — linha 27: function classifica(campo: string): MudancaLinha["tipo"] {
-- **atencao** `src/lib/catalog-telemetry.functions.ts` — linha 8: function checkToken(token: string) {
-- **atencao** `src/lib/contador-inscritos.functions.ts` — linha 37: export function extrairInscritosTexto(html: string, handle?: string): string | null {
-- **atencao** `src/lib/contador-inscritos.functions.ts` — linha 60: export function parseInscritos(txt: string): number | null {
-- **atencao** `src/lib/dispatch-log.functions.ts` — linha 15: function authorized(token: string): boolean {
-- **atencao** `src/lib/fornecedores.functions.ts` — linha 6: function checkToken(token: string) {
-- **atencao** `src/lib/fornecedores.functions.ts` — linha 65: function painelFromApiUrl(apiUrl: string | null | undefined): string | null {
-- **atencao** `src/lib/fornecedores.functions.ts` — linha 77: function pixFor(slug: string): string | null {
-- **atencao** `src/lib/gerador-legenda.functions.ts` — linha 20: function localFallback(tema: string): Legenda {
-- **atencao** `src/lib/gsc-inspect.functions.ts` — linha 26: async function inspectOne(path: string): Promise<InspectRow> {
-- **atencao** `src/lib/jarvis-noc.functions.ts` — linha 5: function checkToken(token: string) {
-- **atencao** `src/lib/jarvis.functions.ts` — linha 13: function checkToken(token: string | undefined) {
-- **atencao** `src/lib/monitor.functions.ts` — linha 6: function checkToken(token: string) {
-- **atencao** `src/lib/reseller-apply.functions.ts` — linha 77: function auth(token: string): boolean {
-- **atencao** `src/lib/reseller-portal.functions.ts` — linha 15: async function ip(): Promise<string> {
-- **atencao** `src/lib/reseller-portal.functions.ts` — linha 25: async function limited(bucket: string, max: number, windowSec: number): Promise<boolean> {
-- **atencao** `src/lib/resellers.functions.ts` — linha 9: function auth(token: string): boolean {
-- **atencao** `src/lib/roas.functions.ts` — linha 26: function group(
-- **atencao** `src/lib/services-cache.functions.ts` — linha 6: function checkToken(token: string) {
-- **atencao** `src/lib/simulate-purchase.functions.ts` — linha 17: function fmtBrl(v: number): string {
-- **nota** `src/lib/admin-session.functions.ts` — linha 4: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
-- **nota** `src/lib/admin.functions.ts` — linha 34: const adminInput = z.object({ token: z.string().min(8) });
-- **nota** `src/lib/admin.functions.ts` — linha 438: const MARGEM_MINIMA_PCT = 20;
-- **nota** `src/lib/affiliate.functions.ts` — linha 8: const signupSchema = z.object({
-- **nota** `src/lib/affiliate.functions.ts` — linha 19: const SITE = "https://www.boostgg.com.br";
-- **nota** `src/lib/affiliate.functions.ts` — linha 101: const loginSchema = z.object({
-- **nota** `src/lib/affiliates-admin.functions.ts` — linha 5: const tokenOnly = z.object({ token: z.string().min(8) });
-- **nota** `src/lib/audit.functions.ts` — linha 9: const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
-- **nota** `src/lib/audit.functions.ts` — linha 10: const tokenOnlyInput = z.object({ token: z.string().min(8) });
-- **nota** `src/lib/audit.functions.ts` — linha 32: const PIX_RATE = 0.0099; // 0,99% MP PIX aprox.
-- **nota** `src/lib/audit.functions.ts` — linha 63: const USED_IDS = new Set<number>([
-- **nota** `src/lib/autonomia-flags.functions.ts` — linha 8: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
-- **nota** `src/lib/autonomia-flags.functions.ts` — linha 10: const FLAGS = ACOES.filter((a) => a.flag).map((a) => ({
-- **nota** `src/lib/backup-drill.functions.ts` — linha 8: const CRITICAL_TABLES = [
-- … e mais 47
+| atencao | 0 |
+| nota | 498 |
 
 ## arquivo-gigante (10)
 
 - **nota** `src/integrations/supabase/types.ts` — 2336 linhas (> 600)
-- **nota** `src/lib/admin.functions.ts` — 857 linhas (> 600)
+- **nota** `src/lib/admin.functions.ts` — 852 linhas (> 600)
 - **nota** `src/lib/pedidos.functions.ts` — 728 linhas (> 600)
 - **nota** `src/lib/pricing-cache.server.ts` — 779 linhas (> 600)
 - **nota** `src/lib/pricing-engine.server.ts` — 911 linhas (> 600)
@@ -66,21 +22,6 @@ Arquivos lidos: 432
 - **nota** `src/routes/blog.$slug.tsx` — 723 linhas (> 600)
 - **nota** `src/routes/index.tsx` — 1421 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
-
-## console-log (12)
-
-- **nota** `src/lib/admin.functions.ts` — 1 ocorrência(s)
-- **nota** `src/lib/jivo-scripts.ts` — 1 ocorrência(s)
-- **nota** `src/lib/pedidos.functions.ts` — 3 ocorrência(s)
-- **nota** `src/lib/pricing-cache.server.ts` — 3 ocorrência(s)
-- **nota** `src/lib/pricing-engine.server.ts` — 7 ocorrência(s)
-- **nota** `src/lib/smmhype.server.ts` — 1 ocorrência(s)
-- **nota** `src/lib/tiktok-events-api.server.ts` — 1 ocorrência(s)
-- **nota** `src/routes/api/public/mp-webhook.ts` — 9 ocorrência(s)
-- **nota** `src/routes/api/public/telegram/webhook.ts` — 1 ocorrência(s)
-- **nota** `src/routes/email/unsubscribe.ts` — 1 ocorrência(s)
-- **nota** `src/routes/lovable/email/suppression.ts` — 1 ocorrência(s)
-- **nota** `src/routes/lovable/email/transactional/send.ts` — 2 ocorrência(s)
 
 ## cor-hardcoded (432)
 
@@ -125,4 +66,48 @@ Arquivos lidos: 432
 - **nota** `src/components/CanaryPanel.tsx` — linha 174
 - **nota** `src/components/CanaryPanel.tsx` — linha 177
 - … e mais 392
+
+## serverfn-modulo-fino (56)
+
+- **nota** `src/lib/admin-session.functions.ts` — linha 4: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
+- **nota** `src/lib/admin.functions.ts` — linha 34: const adminInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/admin.functions.ts` — linha 433: const MARGEM_MINIMA_PCT = 20;
+- **nota** `src/lib/affiliate.functions.ts` — linha 8: const signupSchema = z.object({
+- **nota** `src/lib/affiliate.functions.ts` — linha 19: const SITE = "https://www.boostgg.com.br";
+- **nota** `src/lib/affiliate.functions.ts` — linha 101: const loginSchema = z.object({
+- **nota** `src/lib/affiliates-admin.functions.ts` — linha 5: const tokenOnly = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/audit.functions.ts` — linha 9: const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
+- **nota** `src/lib/audit.functions.ts` — linha 10: const tokenOnlyInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/audit.functions.ts` — linha 25: const USED_IDS = new Set<number>([
+- **nota** `src/lib/autonomia-flags.functions.ts` — linha 8: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
+- **nota** `src/lib/autonomia-flags.functions.ts` — linha 10: const FLAGS = ACOES.filter((a) => a.flag).map((a) => ({
+- **nota** `src/lib/backup-drill.functions.ts` — linha 8: const CRITICAL_TABLES = [
+- **nota** `src/lib/bench-autonomo.functions.ts` — linha 6: const tokenInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/bench.functions.ts` — linha 13: const input = z.object({
+- **nota** `src/lib/canary.functions.ts` — linha 5: const tokenIn = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/catalog-raiox.functions.ts` — linha 7: const input = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/catalog-telemetry.functions.ts` — linha 6: const input = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/claude-inspect.functions.ts` — linha 12: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
+- **nota** `src/lib/consulta-pedido.functions.ts` — linha 6: const input = z.object({ pedidoId: z.string().min(4).max(60) });
+- **nota** `src/lib/contador-inscritos.functions.ts` — linha 15: const input = z.object({
+- **nota** `src/lib/contador-inscritos.functions.ts` — linha 24: const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/
+- **nota** `src/lib/dispatch-log.functions.ts` — linha 7: const input = z.object({
+- **nota** `src/lib/fornecedores.functions.ts` — linha 4: const tokenInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/gerador-legenda.functions.ts` — linha 5: const TONES = ["persuasivo", "engracado", "inspirador", "profissional", "polemico", "romantico"] as 
+- **nota** `src/lib/gerador-legenda.functions.ts` — linha 6: const OBJETIVOS = ["engajamento", "vendas", "seguidores", "autoridade", "trafego"] as const;
+- **nota** `src/lib/gerador-legenda.functions.ts` — linha 8: const input = z.object({
+- **nota** `src/lib/insights.functions.ts` — linha 4: const adminInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/jarvis-noc.functions.ts` — linha 4: const adminInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/jarvis-noc.functions.ts` — linha 6: const TABLES = [
+- **nota** `src/lib/jarvis-noc.functions.ts` — linha 134: const CRITICAL_KEYWORDS = ["deletar","delete","drop","apagar","remover api","trocar chave","alterar 
+- **nota** `src/lib/jarvis-script-gen.functions.ts` — linha 4: const NETWORKS = ["instagram", "tiktok", "facebook", "youtube", "telegram"] as const;
+- **nota** `src/lib/jarvis-script-gen.functions.ts` — linha 24: const HOOKS_MATRIX = [
+- **nota** `src/lib/jarvis-script-gen.functions.ts` — linha 77: const genInput = z.object({
+- **nota** `src/lib/monitor.functions.ts` — linha 4: const adminInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/mystery-box.functions.ts` — linha 7: const MIN_QTY = 200; // v190 — alinhado à UI (Bônus Especial promete "acima de 200 unidades")
+- **nota** `src/lib/mystery-box.functions.ts` — linha 8: const MB_MARKER = /MB_REDEEMED:(\d+)/i;
+- **nota** `src/lib/mystery-box.functions.ts` — linha 10: const input = z.object({
+- **nota** `src/lib/pedidos.functions.ts` — linha 4: const pedidoSchema = z.object({
+- **nota** `src/lib/pedidos.functions.ts` — linha 23: const utmClean = (v: string | null | undefined) =>
+- … e mais 16
 

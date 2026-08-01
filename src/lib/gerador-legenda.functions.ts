@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { localFallback, FALLBACK_HASHTAGS, type Legenda } from "@/lib/gerador-legenda-fallback";
 
 const TONES = ["persuasivo", "engracado", "inspirador", "profissional", "polemico", "romantico"] as const;
 const OBJETIVOS = ["engajamento", "vendas", "seguidores", "autoridade", "trafego"] as const;
@@ -12,19 +13,8 @@ const input = z.object({
   incluirHashtags: z.boolean().default(true),
 });
 
-type Legenda = { titulo: string; texto: string; cta: string; hashtags: string };
 
-const FALLBACK_HASHTAGS =
-  "#instagram #reels #creator #marketingdigital #dicasdeinstagram #crescernoinsta #engajamento #contentcreator";
 
-function localFallback(tema: string): Legenda {
-  return {
-    titulo: "Para aí 👀",
-    texto: `${tema}\n\nSalva esse post pra não perder. Marca alguém que precisa ver.`,
-    cta: "Curte, compartilha e comenta 🔥",
-    hashtags: FALLBACK_HASHTAGS,
-  };
-}
 
 export const gerarLegenda = createServerFn({ method: "POST" })
   .inputValidator((data) => input.parse(data))

@@ -5,10 +5,6 @@ import { z } from "zod";
 
 const input = z.object({ token: z.string().min(8) });
 
-function checkToken(token: string) {
-  const expected = process.env.ADMIN_TOKEN;
-  return !!expected && token === expected;
-}
 
 export type ProviderTelemetry = {
   slug: "smmhype" | "smmpainel" | "verified";
@@ -24,7 +20,7 @@ export type ProviderTelemetry = {
 export const getCatalogTelemetry = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const [{ data: forn }, { data: items }, { data: cache }] = await Promise.all([

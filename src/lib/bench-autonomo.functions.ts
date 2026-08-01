@@ -5,14 +5,11 @@ import { z } from "zod";
 
 const tokenInput = z.object({ token: z.string().min(8) });
 
-function authorized(token: string): boolean {
-  return !!process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
 
 export const getLastBenchRun = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenInput.parse(i))
   .handler(async ({ data }) => {
-    if (!authorized(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: run } = await (supabaseAdmin as any)
@@ -38,7 +35,7 @@ export const getLastBenchRun = createServerFn({ method: "POST" })
 export const runBenchNow = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenInput.parse(i))
   .handler(async ({ data }) => {
-    if (!authorized(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { runBenchAutonomo } = await import("@/services/bench-autonomo.server");
     return await runBenchAutonomo({ notify: true, origem: "manual" });
   });
