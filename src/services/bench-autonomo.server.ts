@@ -326,7 +326,7 @@ export async function runBenchAutonomo(
     const precisaRecarga = Object.entries(sVitrine.recargaPorFornecedor);
     const margem = avaliadosVitrine.filter((r) => r.verdict === "margem").length;
     const naoAvaliados = rows.length - avaliados.length;
-    const travadosVitrine = avaliadosVitrine.length - sVitrine.entregavel;
+    const travadosVitrine = sVitrine.travadosAgora;
 
     if (options.notify !== false && (precisaRecarga.length > 0 || pausados.length > 0 || margem > 0)) {
       const linhas: string[] = [];
@@ -335,6 +335,12 @@ export async function runBenchAutonomo(
       linhas.push(
         `PROBLEMA: ${travadosVitrine} de ${avaliadosVitrine.length} pacotes da vitrine não teriam entrega garantida agora.`,
       );
+      if (sVitrine.travadosSobEncomenda > 0) {
+        linhas.push(
+          `(fora da conta: ${sVitrine.travadosSobEncomenda} pacote(s) grandes que ninguém comprou nos últimos 90 dias — só entram na conta se alguém pedir)`,
+        );
+      }
+
       if (precisaRecarga.length > 0) {
         linhas.push("");
         linhas.push(

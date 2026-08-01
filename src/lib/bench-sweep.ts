@@ -235,9 +235,14 @@ export type BenchSummary = {
   recargaPorFornecedor: Record<string, number>;
   /** Recarga de pacote gigante sem venda: só sob encomenda, não é urgência. */
   recargaSobDemanda: Record<string, number>;
+  /** v395 — travados que EXIGEM ação hoje (margem + saldo de pacote que vende). */
+  travadosAgora: number;
+  /** v395 — travados só por saldo de pacote sem venda em 90 dias (sob encomenda). */
+  travadosSobEncomenda: number;
   /** Rotas (categorias) com pelo menos 1 pacote travado. */
   rotasComProblema: string[];
 };
+
 
 /**
  * v335 — a recarga pedida tem que caber na realidade.
@@ -261,18 +266,24 @@ export function summarizeBench(
   const recargaSobDemanda: Record<string, number> = {};
   const rotas = new Set<string>();
   const demanda = opts.demanda;
+  let travadosAgora = 0;
+  let travadosSobEncomenda = 0;
 
   for (const r of rows) {
     porVeredito[r.verdict] += 1;
     if (r.verdict !== "entregavel") rotas.add(r.category ?? "sem-rota");
+    // Sem histórico de demanda informado, tudo conta como demanda (não
+    // esconder problema por falta de dado).
+    const vende = !demanda || demanda.has(r.pacote);
     if (r.verdict === "saldo" && r.faltaEm && r.faltaRecarregar != null) {
-      // Sem histórico de demanda informado, tudo conta como demanda (não
-      // esconder problema por falta de dado).
-      const vende = !demanda || demanda.has(r.pacote);
       const balde = vende ? recargaPorFornecedor : recargaSobDemanda;
       // O maior buraco cobre os menores no mesmo fornecedor — recarregar o
       // maior destrava todos os pacotes abaixo dele.
       balde[r.faltaEm] = Math.max(balde[r.faltaEm] ?? 0, r.faltaRecarregar);
+    }
+    if (r.verdict !== "entregavel") {
+      if (r.verdict === "saldo" && !vende) travadosSobEncomenda += 1;
+      else travadosAgora += 1;
     }
   }
 
@@ -282,7 +293,10 @@ export function summarizeBench(
     porVeredito,
     recargaPorFornecedor,
     recargaSobDemanda,
+    travadosAgora,
+    travadosSobEncomenda,
     rotasComProblema: [...rotas].sort(),
   };
 }
+
 
