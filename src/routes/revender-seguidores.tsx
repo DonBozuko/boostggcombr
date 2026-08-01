@@ -1,6 +1,7 @@
 // v389 — Conteúdo de topo de funil da área de revenda: "como revender
 // seguidores". Sem promessa fantasia: só o que o sistema realmente faz.
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageGuide } from "@/components/PageGuide";
 
 const CANON = "https://www.boostgg.com.br/revender-seguidores";
 const TITLE = "Como Revender Seguidores e Curtidas em 2026 | BoostGG";
@@ -143,6 +144,7 @@ function RevenderSeguidores() {
         </Link>
         .
       </p>
+      <PageGuide page="revender-seguidores" />
     </main>
   );
 }

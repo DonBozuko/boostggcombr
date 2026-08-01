@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageGuide } from "@/components/PageGuide";
 
 export const Route = createFileRoute("/api-revenda")({
   head: () => ({
@@ -118,6 +119,7 @@ Content-Type: application/json`}</Code>
       <p className="mt-8 text-sm">
         <Link to="/" className="underline">Voltar para a loja</Link>
       </p>
+      <PageGuide page="api-revenda" />
     </main>
   );
 }

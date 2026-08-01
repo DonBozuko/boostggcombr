@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signupAffiliate } from "@/lib/affiliate.functions";
+import { PageGuide } from "@/components/PageGuide";
 
 export const Route = createFileRoute("/afiliados")({
   head: () => ({
@@ -183,6 +184,7 @@ function Afiliados() {
         </Link>
         .
       </p>
+      <PageGuide page="afiliados" />
     </main>
   );
 }

@@ -1,6 +1,7 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { FaqSection, FAQS } from "@/components/FaqSection";
+import { NetworkGuide } from "@/components/NetworkGuide";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -573,6 +574,7 @@ function YoutubeLanding() {
       />
       </ShowcaseShell>
       </PlansShowcaseProvider>
+          <NetworkGuide network="youtube" accent="#FF0000" />
           <FaqSection network="youtube" />
       </MobileFrame>
   );

@@ -1,6 +1,7 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { normalizeCheckoutEmail, checkoutEmailError } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
+import { NetworkGuide } from "@/components/NetworkGuide";
 import { CHECKOUT_SUCCESS_TITLE, CHECKOUT_SUCCESS_MESSAGE_CLEAN } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { supabase } from "@/integrations/supabase/client";
@@ -370,6 +371,7 @@ function TrafegoLanding() {
       </Dialog>
       </ShowcaseShell>
       </PlansShowcaseProvider>
+          <NetworkGuide network="trafego" accent="#B026FF" />
           <FaqSection network="trafego" />
       </MobileFrame>
   );

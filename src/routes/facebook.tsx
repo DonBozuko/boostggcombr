@@ -2,6 +2,7 @@ import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { normalizeCheckoutEmail, checkoutEmailError } from "@/lib/checkout-email";
 import { FaqSection, FAQS } from "@/components/FaqSection";
+import { NetworkGuide } from "@/components/NetworkGuide";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -559,6 +560,7 @@ function FacebookLanding() {
       />
       </ShowcaseShell>
       </PlansShowcaseProvider>
+          <NetworkGuide network="facebook" accent="#1877F2" />
           <FaqSection network="facebook" />
       </MobileFrame>
   );
