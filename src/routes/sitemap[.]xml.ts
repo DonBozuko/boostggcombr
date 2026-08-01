@@ -58,6 +58,9 @@ const buildSitemapXml = () => {
     { path: "/comprar-seguidores-tiktok", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-brasileiros", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-visualizacoes-tiktok", changefreq: "weekly", priority: "0.9" },
+    // v401 — landings novas (Semrush BR: 5.400/mês KDI 20 e 1.900/mês KDI 21)
+    { path: "/comprar-curtidas-tiktok", changefreq: "weekly", priority: "0.9" },
+    { path: "/seguidores-reais-instagram", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-inscritos-youtube", changefreq: "weekly", priority: "0.9" },
     { path: "/audiencia-brasileira", changefreq: "weekly", priority: "0.8" },
     { path: "/crescer-youtube", changefreq: "weekly", priority: "0.8" },

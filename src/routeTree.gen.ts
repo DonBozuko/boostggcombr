@@ -17,6 +17,7 @@ import { Route as ApiRevendaRouteImport } from './routes/api-revenda'
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
+import { Route as ComprarCurtidasTiktokRouteImport } from './routes/comprar-curtidas-tiktok'
 import { Route as ComprarInscritosYoutubeRouteImport } from './routes/comprar-inscritos-youtube'
 import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/comprar-seguidores-brasileiros'
 import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
@@ -43,6 +44,7 @@ import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as RevendaRouteImport } from './routes/revenda'
 import { Route as RevenderSeguidoresRouteImport } from './routes/revender-seguidores'
 import { Route as SeguidoresPixRouteImport } from './routes/seguidores-pix'
+import { Route as SeguidoresReaisInstagramRouteImport } from './routes/seguidores-reais-instagram'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as TelegramRouteImport } from './routes/telegram'
@@ -162,6 +164,11 @@ const ComprarCurtidasInstagramRoute =
     path: '/comprar-curtidas-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ComprarCurtidasTiktokRoute = ComprarCurtidasTiktokRouteImport.update({
+  id: '/comprar-curtidas-tiktok',
+  path: '/comprar-curtidas-tiktok',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ComprarInscritosYoutubeRoute = ComprarInscritosYoutubeRouteImport.update({
   id: '/comprar-inscritos-youtube',
   path: '/comprar-inscritos-youtube',
@@ -296,6 +303,12 @@ const SeguidoresPixRoute = SeguidoresPixRouteImport.update({
   path: '/seguidores-pix',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SeguidoresReaisInstagramRoute =
+  SeguidoresReaisInstagramRouteImport.update({
+    id: '/seguidores-reais-instagram',
+    path: '/seguidores-reais-instagram',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -728,6 +741,7 @@ export interface FileRoutesByFullPath {
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
+  '/comprar-curtidas-tiktok': typeof ComprarCurtidasTiktokRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
@@ -754,6 +768,7 @@ export interface FileRoutesByFullPath {
   '/revenda': typeof RevendaRoute
   '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
+  '/seguidores-reais-instagram': typeof SeguidoresReaisInstagramRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
@@ -841,6 +856,7 @@ export interface FileRoutesByTo {
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
+  '/comprar-curtidas-tiktok': typeof ComprarCurtidasTiktokRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
@@ -867,6 +883,7 @@ export interface FileRoutesByTo {
   '/revenda': typeof RevendaRoute
   '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
+  '/seguidores-reais-instagram': typeof SeguidoresReaisInstagramRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
@@ -955,6 +972,7 @@ export interface FileRoutesById {
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
+  '/comprar-curtidas-tiktok': typeof ComprarCurtidasTiktokRoute
   '/comprar-inscritos-youtube': typeof ComprarInscritosYoutubeRoute
   '/comprar-seguidores-brasileiros': typeof ComprarSeguidoresBrasileirosRoute
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
@@ -981,6 +999,7 @@ export interface FileRoutesById {
   '/revenda': typeof RevendaRoute
   '/revender-seguidores': typeof RevenderSeguidoresRoute
   '/seguidores-pix': typeof SeguidoresPixRoute
+  '/seguidores-reais-instagram': typeof SeguidoresReaisInstagramRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/status': typeof StatusRoute
   '/telegram': typeof TelegramRoute
@@ -1070,6 +1089,7 @@ export interface FileRouteTypes {
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
+    | '/comprar-curtidas-tiktok'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
@@ -1096,6 +1116,7 @@ export interface FileRouteTypes {
     | '/revenda'
     | '/revender-seguidores'
     | '/seguidores-pix'
+    | '/seguidores-reais-instagram'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
@@ -1183,6 +1204,7 @@ export interface FileRouteTypes {
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
+    | '/comprar-curtidas-tiktok'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
@@ -1209,6 +1231,7 @@ export interface FileRouteTypes {
     | '/revenda'
     | '/revender-seguidores'
     | '/seguidores-pix'
+    | '/seguidores-reais-instagram'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
@@ -1296,6 +1319,7 @@ export interface FileRouteTypes {
     | '/audiencia-brasileira'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
+    | '/comprar-curtidas-tiktok'
     | '/comprar-inscritos-youtube'
     | '/comprar-seguidores-brasileiros'
     | '/comprar-seguidores-instagram'
@@ -1322,6 +1346,7 @@ export interface FileRouteTypes {
     | '/revenda'
     | '/revender-seguidores'
     | '/seguidores-pix'
+    | '/seguidores-reais-instagram'
     | '/sitemap.xml'
     | '/status'
     | '/telegram'
@@ -1410,6 +1435,7 @@ export interface RootRouteChildren {
   AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
   AvaliacoesRoute: typeof AvaliacoesRoute
   ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
+  ComprarCurtidasTiktokRoute: typeof ComprarCurtidasTiktokRoute
   ComprarInscritosYoutubeRoute: typeof ComprarInscritosYoutubeRoute
   ComprarSeguidoresBrasileirosRoute: typeof ComprarSeguidoresBrasileirosRoute
   ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
@@ -1436,6 +1462,7 @@ export interface RootRouteChildren {
   RevendaRoute: typeof RevendaRoute
   RevenderSeguidoresRoute: typeof RevenderSeguidoresRoute
   SeguidoresPixRoute: typeof SeguidoresPixRoute
+  SeguidoresReaisInstagramRoute: typeof SeguidoresReaisInstagramRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StatusRoute: typeof StatusRoute
   TelegramRoute: typeof TelegramRoute
@@ -1569,6 +1596,13 @@ declare module '@tanstack/react-router' {
       path: '/comprar-curtidas-instagram'
       fullPath: '/comprar-curtidas-instagram'
       preLoaderRoute: typeof ComprarCurtidasInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-curtidas-tiktok': {
+      id: '/comprar-curtidas-tiktok'
+      path: '/comprar-curtidas-tiktok'
+      fullPath: '/comprar-curtidas-tiktok'
+      preLoaderRoute: typeof ComprarCurtidasTiktokRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comprar-inscritos-youtube': {
@@ -1751,6 +1785,13 @@ declare module '@tanstack/react-router' {
       path: '/seguidores-pix'
       fullPath: '/seguidores-pix'
       preLoaderRoute: typeof SeguidoresPixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seguidores-reais-instagram': {
+      id: '/seguidores-reais-instagram'
+      path: '/seguidores-reais-instagram'
+      fullPath: '/seguidores-reais-instagram'
+      preLoaderRoute: typeof SeguidoresReaisInstagramRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2316,6 +2357,7 @@ const rootRouteChildren: RootRouteChildren = {
   AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
   AvaliacoesRoute: AvaliacoesRoute,
   ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
+  ComprarCurtidasTiktokRoute: ComprarCurtidasTiktokRoute,
   ComprarInscritosYoutubeRoute: ComprarInscritosYoutubeRoute,
   ComprarSeguidoresBrasileirosRoute: ComprarSeguidoresBrasileirosRoute,
   ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
@@ -2342,6 +2384,7 @@ const rootRouteChildren: RootRouteChildren = {
   RevendaRoute: RevendaRoute,
   RevenderSeguidoresRoute: RevenderSeguidoresRoute,
   SeguidoresPixRoute: SeguidoresPixRoute,
+  SeguidoresReaisInstagramRoute: SeguidoresReaisInstagramRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StatusRoute: StatusRoute,
   TelegramRoute: TelegramRoute,

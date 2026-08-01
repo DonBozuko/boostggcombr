@@ -3,12 +3,12 @@
 Fonte única do que existe hoje em busca orgânica. **O código vence o documento**:
 se divergir de `src/routes/sitemap[.]xml.ts`, corrigir este arquivo no mesmo turno.
 
-## 1. Ativos publicados (46 URLs no sitemap)
+## 1. Ativos publicados (53 URLs no sitemap)
 
 | Bloco | URLs | Papel |
 |---|---|---|
 | Home + redes | `/`, `/tiktok`, `/youtube`, `/kwai`, `/facebook`, `/telegram` | Catálogo/checkout por rede |
-| Dinheiro (bottom funnel) | `/comprar-seguidores-instagram`, `-barato`, `/comprar-seguidores-brasileiros`, `/comprar-curtidas-instagram`, `/comprar-seguidores-tiktok`, `/comprar-visualizacoes-tiktok`, `/comprar-inscritos-youtube`, `/comprar-seguidores-kwai`, `/seguidores-pix`, `/promo-5reais`, `/kit-creator` | Conversão direta |
+| Dinheiro (bottom funnel) | `/comprar-seguidores-instagram`, `-barato`, `/comprar-seguidores-brasileiros`, `/comprar-curtidas-instagram`, `/comprar-seguidores-tiktok`, `/comprar-visualizacoes-tiktok`, `/comprar-curtidas-tiktok`, `/seguidores-reais-instagram`, `/comprar-inscritos-youtube`, `/comprar-seguidores-kwai`, `/seguidores-pix`, `/promo-5reais`, `/kit-creator` | Conversão direta |
 | Intenção/meio de funil | `/audiencia-brasileira`, `/crescer-youtube`, `/engajamento-instagram`, `/impulsionar-instagram`, `/turbinar-tiktok`, `/views-tiktok` | Captura de cauda longa |
 | Ferramentas grátis | `/ferramentas` + `contador-seguidores`, `calculadora-engajamento-instagram`, `gerador-legenda-instagram` | Volume de busca + isca de backlink |
 | Blog (8 artigos) | `/blog` + 8 slugs | Autoridade tópica |
