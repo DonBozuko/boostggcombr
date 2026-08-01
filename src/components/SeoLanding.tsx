@@ -105,31 +105,48 @@ export function SeoLanding(p: SeoLandingProps) {
           })}
         </section>
 
-        {/* Tabela de preços */}
+        {/* v403 — Preço clicável: leva direto ao formulário com o pacote já escolhido. */}
         <section className="mt-10">
-          <h2 className="text-xl font-bold text-white mb-4">{p.pricingTitle}</h2>
-          <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${p.accent}44` }}>
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ background: `${p.accent}22` }}>
-                  <th className="text-left px-4 py-3 text-white">Pacote</th>
-                  <th className="text-right px-4 py-3 text-white">Preço</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pricingRows.map((r, i) => (
-                  <tr key={i} className="border-t" style={{ borderColor: `${p.accent}22` }}>
-                    <td className="px-4 py-3">
-                      <div className="text-white font-semibold">{r.qty}</div>
-                      {r.note && <div className="text-xs text-zinc-500">{r.note}</div>}
-                    </td>
-                    <td className="px-4 py-3 text-right font-bold" style={{ color: p.accent }}>
-                      {r.price}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <h2 className="text-xl font-bold text-white mb-1">{p.pricingTitle}</h2>
+          <p className="text-zinc-400 text-xs mb-4">
+            Toque no pacote para ir direto ao pagamento com ele já selecionado.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {pricingRows.map((r, i) => {
+              const inner = (
+                <>
+                  <div className="min-w-0">
+                    <div className="text-white font-bold text-sm">{r.qty}</div>
+                    {r.note && <div className="text-[11px] text-zinc-500">{r.note}</div>}
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="font-black text-base" style={{ color: p.accent }}>{r.price}</span>
+                    {r.id && (
+                      <span
+                        className="rounded-lg px-2.5 py-1 text-[11px] font-black uppercase"
+                        style={{ background: p.accent, color: "#000" }}
+                      >
+                        Comprar
+                      </span>
+                    )}
+                  </div>
+                </>
+              );
+              const cls = "rounded-xl px-4 py-3 flex items-center justify-between gap-3";
+              const style = { background: "#111", border: `1px solid ${p.accent}44` };
+              return r.id ? (
+                <a
+                  key={i}
+                  href={`/?plan=${encodeURIComponent(r.id)}#pedido`}
+                  className={`${cls} transition-transform hover:scale-[1.02]`}
+                  style={style}
+                >
+                  {inner}
+                </a>
+              ) : (
+                <div key={i} className={cls} style={style}>{inner}</div>
+              );
+            })}
           </div>
           <div className="mt-4 flex justify-center">
             <a
@@ -141,6 +158,7 @@ export function SeoLanding(p: SeoLandingProps) {
             </a>
           </div>
         </section>
+
 
         {/* v220 — Prazos reais de entrega (transparência anti-chargeback) */}
         <DeliveryTimes

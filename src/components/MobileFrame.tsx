@@ -175,12 +175,23 @@ function Billboard({
 
 function BodyCharacters({ data, chars }: { data: (typeof billboards)[RouteKey]; chars?: { left: string; right: string } }) {
   const [mounted, setMounted] = useState(false);
+  // v403 — no celular os personagens ficam escondidos por CSS, mas o navegador
+  // baixava as duas imagens mesmo assim (~150 KB à toa na página que o Google
+  // mede). Agora só montam de verdade a partir de 1280px, mantendo a regra
+  // visual intacta no desktop.
+  const [wide, setWide] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const sync = () => setWide(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
-  if (!mounted || !chars || typeof document === "undefined") return null;
+  if (!mounted || !wide || !chars || typeof document === "undefined") return null;
+
 
   return createPortal(
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 hidden xl:block overflow-hidden">
