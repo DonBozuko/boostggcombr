@@ -122,9 +122,13 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
   // por minutos diferentes é rota quebrada de verdade.
   const erro5xxAgora = Number(now15.erro_servidor_5xx ?? 0);
   const erro5xxHora = Number(h.erro_servidor_5xx ?? 0);
+  // v402 — além dos minutos distintos, olha a FAIXA (1º ao último erro):
+  // rajada de publicação acontece em segundos; rota quebrada erra por minutos.
+  const faixaMin = spreadInMinutes(shape15.primeiro, shape15.ultimo);
   const veredito = classifyHttpFailures({
     erros: Number(shape15.erros_5xx ?? erro5xxAgora),
     minutosDistintos: Number(shape15.minutos_distintos ?? 0),
+    ...(faixaMin != null ? { duracaoMinutos: faixaMin } : {}),
   });
   if (erro5xxAgora >= 1 && erro5xxHora >= 3 && veredito === "falha_continua") {
     findings.push({
@@ -136,6 +140,7 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       evidencia: { agora: now15, formato: shape15, ultima_hora: h },
     });
   }
+
 
 
 
