@@ -6,7 +6,7 @@
 //    número devolvia o canal errado — número real, canal errado = mentira.
 
 import { describe, it, expect } from "vitest";
-import { extrairInscritosTexto, parseInscritos } from "@/lib/contador-inscritos.functions";
+import { extrairInscritosTexto, parseInscritos } from "@/lib/contador-inscritos-parse";
 
 const HEADER = (handle: string, txt: string) =>
   `{"pageHeaderRenderer":{"content":{"metadataParts":[{"text":{"content":"@${handle}"}},{"text":{"content":"${txt}"}}]}}}`;

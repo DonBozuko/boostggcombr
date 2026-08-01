@@ -2,6 +2,7 @@
 // Só leitura do banco (catalog_changes + service_fingerprints). Nada de HTTP.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { classifica } from "@/lib/catalog-raiox-helpers";
 
 const input = z.object({ token: z.string().min(8) });
 
@@ -24,13 +25,6 @@ export type RaioXPayload = {
   generated_at: string;
 };
 
-function classifica(campo: string): MudancaLinha["tipo"] {
-  const c = campo.toLowerCase();
-  if (c.includes("service_id")) return "id";
-  if (c.includes("price")) return "preco";
-  if (c.includes("cost") || c.includes("rate")) return "custo";
-  return "outro";
-}
 
 export const getCatalogRaioX = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))

@@ -36,7 +36,9 @@ Reposição automática (nível 2) LIGADA desde 31/07/2026, teto 10/dia e 10% do
 Escopo FECHADO em 01/08/2026: pedido fora da lista dispara alerta de fora-de-escopo antes de codar. Ver [Escopo Fechado](mem://features/escopo-fechado).
 
 ## Memories
+- [Dívidas aceitas](mem://preferences/dividas-aceitas) — Cores hardcoded, arquivos gigantes e console.log de servidor: decidido NÃO consertar. Não reabrir sem motivo de negócio.
 - [Motor Anti-Alucinação](mem://preferences/motor-anti-alucinacao) — `npm run audit` lê src/ inteiro e grava .lovable/audit-report.md; gravidades bloqueante/atenção/nota.
+
 - [Moeda única BRL](mem://constraints/moeda-unica-brl) — Dinheiro sempre em BRL. `monitoramento_saldo.saldo` é USD legado; usar `saldo_brl`/`fornecedores.saldo_atual`.
 - [Markup por custo](mem://features/markup-por-custo) — Múltiplo de lucro cai conforme o custo sobe (5x→2x), teto de vitrine, piso de revenda. Consultar antes de mexer em preço.
 - [Fonte única de ID de fornecedor](mem://constraints/fonte-unica-id-fornecedor) — Catálogo vivo manda; toda escrita passa pelo portão bind-guard.

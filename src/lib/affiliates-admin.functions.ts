@@ -4,9 +4,6 @@ import { z } from "zod";
 // v265 — Gestão de afiliados no admin. Mesmo padrão dos outros painéis: ADMIN_TOKEN.
 const tokenOnly = z.object({ token: z.string().min(8) });
 
-function auth(token: string): boolean {
-  return !!process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
 
 export type AfiliadoRow = {
   id: string;
@@ -26,7 +23,7 @@ export type AfiliadoRow = {
 export const listAffiliates = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; afiliados: AfiliadoRow[] }> => {
-    if (!auth(data.token)) return { ok: false, error: "UNAUTHORIZED", afiliados: [] };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED", afiliados: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: rows }, { data: com }] = await Promise.all([
       supabaseAdmin.from("afiliados" as any).select("*").order("total_ganho", { ascending: false }),
@@ -60,7 +57,7 @@ export const listAffiliates = createServerFn({ method: "POST" })
 export const payAffiliate = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenOnly.extend({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!auth(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: a } = await supabaseAdmin
       .from("afiliados" as any)
@@ -90,7 +87,7 @@ export const payAffiliate = createServerFn({ method: "POST" })
 export const toggleAffiliate = createServerFn({ method: "POST" })
   .inputValidator((i) => tokenOnly.extend({ id: z.string().uuid(), ativo: z.boolean() }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!auth(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("afiliados" as any)

@@ -33,16 +33,11 @@ export const getPedidoStatus = createServerFn({ method: "GET" })
 // === ADMIN: listar pedidos pagos e reprocessar ===
 const adminInput = z.object({ token: z.string().min(8) });
 
-function checkToken(token: string) {
-  const expected = process.env.ADMIN_TOKEN;
-  if (!expected) return false;
-  return token === expected;
-}
 
 export const listarPedidosPagos = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
@@ -59,7 +54,7 @@ export const listarPedidosPagos = createServerFn({ method: "POST" })
 export const listarPedidosFalhos = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
@@ -77,7 +72,7 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
     adminInput.extend({ pedidoId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: pedido, error } = await supabaseAdmin
       .from("pedidos")
@@ -127,7 +122,7 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
 export const listarPedidosPendentes = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
@@ -144,7 +139,7 @@ export const listarPedidosPendentes = createServerFn({ method: "POST" })
 export const getFaturamentoPorRede = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
@@ -170,7 +165,7 @@ export const getFaturamentoPorRede = createServerFn({ method: "POST" })
 export const pingSmmhype = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const key = process.env.SMMHYPE_API_KEY;
     if (!key) return { ok: false as const, error: "SMMHYPE_API_KEY ausente" };
     try {
@@ -201,7 +196,7 @@ export const pingSmmhype = createServerFn({ method: "POST" })
 export const pingAllProviders = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const providers = [
       { slug: "smmhype", nome: "SMMHype", url: "https://smmhype.com/api/v2", key: process.env.SMMHYPE_API_KEY },
       { slug: "smmpainel", nome: "SMMPainel", url: "https://smmpainel.com/api/v2", key: process.env.SMMPAINEL_API_KEY },
@@ -241,7 +236,7 @@ export const pingAllProviders = createServerFn({ method: "POST" })
 export const sincronizarIdsApi = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const key = process.env.SMMHYPE_API_KEY;
     if (!key) return { ok: false as const, error: "SMMHYPE_API_KEY ausente" };
 
@@ -354,7 +349,7 @@ const VENDA_BRL_POR_MIL: Record<string, number> = {
 export const getGrowthCentral = createServerFn({ method: "POST" })
   .inputValidator((i) => adminInput.parse(i))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: pedidos } = await supabaseAdmin
@@ -440,7 +435,7 @@ const MARGEM_MINIMA_PCT = 20;
 export const smartApproveIds = createServerFn({ method: "POST" })
   .inputValidator((i) => adminInput.parse(i))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     // 1) Snapshot do cache (todos os candidatos por nome/categoria)
@@ -649,7 +644,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
     days: z.number().int().min(1).max(90).default(30),
   }).parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const since = new Date(Date.now() - data.days * 24 * 60 * 60 * 1000).toISOString();
 
@@ -752,7 +747,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
 export const getRecoveryQueue = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("pix_recovery_queue")
@@ -792,7 +787,7 @@ export const markRecoveryContacted = createServerFn({ method: "POST" })
     id: z.number().int(),
   }).parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: cur } = await supabaseAdmin
       .from("pix_recovery_queue")
@@ -820,7 +815,7 @@ export const dismissRecovery = createServerFn({ method: "POST" })
     reason: z.string().max(200).optional(),
   }).parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("pix_recovery_queue")
@@ -833,7 +828,7 @@ export const dismissRecovery = createServerFn({ method: "POST" })
 export const getRecoveryStats = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const { data: rows, error } = await supabaseAdmin

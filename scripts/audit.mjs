@@ -105,12 +105,17 @@ for (const f of files) {
   });
 }
 
-/* ---------------------------------------------- 4. console.log em produção */
+/* ---------------------------------------------- 4. console.log no navegador
+   Calibragem v399: log no servidor (webhook, despacho, preço) é trilha forense
+   — apagar isso PIORA a investigação de pedido perdido. Só é ruído quando roda
+   no navegador do cliente (componente ou rota .tsx). */
+const isBrowserFile = (f) => f.endsWith(".tsx") || f.includes("/components/");
 for (const f of files) {
-  if (isTest(f)) continue;
+  if (isTest(f) || f.endsWith(".server.ts") || !isBrowserFile(f)) continue;
   const n = (cache.get(f).match(/console\.log\(/g) || []).length;
-  if (n > 0) add("nota", "console-log", f, `${n} ocorrência(s)`);
+  if (n > 0) add("nota", "console-log", f, `${n} ocorrência(s) no navegador`);
 }
+
 
 /* ---------------------------------------------- 5. Arquivos órfãos */
 const importedNames = new Set();

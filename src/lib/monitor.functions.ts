@@ -3,16 +3,11 @@ import { z } from "zod";
 
 const adminInput = z.object({ token: z.string().min(8) });
 
-function checkToken(token: string) {
-  const expected = process.env.ADMIN_TOKEN;
-  if (!expected) return false;
-  return token === expected;
-}
 
 export const getMonitorSaldo = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { USD_TO_BRL_DEFAULT, classifyBalance } = await import("@/lib/monitor-saldo.server");
 
@@ -72,7 +67,7 @@ export const atualizarCotacaoFornecedor = createServerFn({ method: "POST" })
     z.object({ token: z.string().min(8), id: z.string().uuid(), cotacao_brl: z.number().positive().max(100) }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("fornecedores")
@@ -85,7 +80,7 @@ export const atualizarCotacaoFornecedor = createServerFn({ method: "POST" })
 export const verificarSaldoAgora = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
     const res = await checkAllProvidersBalance();
     return { ok: true as const, result: res };
@@ -94,7 +89,7 @@ export const verificarSaldoAgora = createServerFn({ method: "POST" })
 export const getCronStatus = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await (supabaseAdmin as any).rpc("get_cron_status", {
       _jobname: "check-smmhype-saldo",
@@ -107,7 +102,7 @@ export const getCronStatus = createServerFn({ method: "POST" })
 export const testarCron = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const url = `${process.env.SUPABASE_URL?.includes("localhost") ? "" : ""}https://project--c88c4437-6c11-4710-b369-9cb46d021440.lovable.app/api/public/check-saldo`;
     const t0 = Date.now();
     try {
@@ -135,7 +130,7 @@ export const testarCron = createServerFn({ method: "POST" })
 export const getCaixaAssistente = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const [{ data: supplier }, { data: bank }, { data: alerts }] = await Promise.all([

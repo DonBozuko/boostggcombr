@@ -12,25 +12,7 @@ import { getRequest } from "@tanstack/react-start/server";
 
 const keySchema = z.object({ apiKey: z.string().trim().min(8).max(80) });
 
-async function ip(): Promise<string> {
-  try {
-    const req = getRequest();
-    const { clientIpFrom } = await import("@/lib/rate-limit.server");
-    return req?.headers ? clientIpFrom(req.headers) : "unknown";
-  } catch {
-    return "unknown";
-  }
-}
 
-async function limited(bucket: string, max: number, windowSec: number): Promise<boolean> {
-  try {
-    const { checkRateLimit } = await import("@/lib/rate-limit.server");
-    const rl = await checkRateLimit(bucket, await ip(), max, windowSec);
-    return !rl.allowed;
-  } catch {
-    return false; // fail-open, igual ao resto do sistema
-  }
-}
 
 export type PortalLedgerRow = {
   created_at: string;
@@ -63,7 +45,7 @@ export type PortalData = {
 export const resellerMe = createServerFn({ method: "POST" })
   .inputValidator((i) => keySchema.parse(i))
   .handler(async ({ data }): Promise<PortalData> => {
-    if (await limited("reseller-portal", 60, 300)) {
+    if (await (await import("@/lib/reseller-portal-limits.server")).portalLimited("reseller-portal", 60, 300)) {
       return { ok: false, error: "Muitas tentativas. Aguarde alguns minutos." };
     }
     const { authReseller } = await import("@/lib/reseller-api.server");
@@ -124,7 +106,7 @@ export const resellerTopup = createServerFn({ method: "POST" })
     z.object({ apiKey: z.string().trim().min(8).max(80), valor: z.number().min(20).max(20000) }).parse(i),
   )
   .handler(async ({ data }): Promise<TopupResult> => {
-    if (await limited("reseller-topup", 10, 600)) {
+    if (await (await import("@/lib/reseller-portal-limits.server")).portalLimited("reseller-topup", 10, 600)) {
       return { ok: false, error: "Muitas recargas seguidas. Aguarde alguns minutos." };
     }
     const { authReseller } = await import("@/lib/reseller-api.server");

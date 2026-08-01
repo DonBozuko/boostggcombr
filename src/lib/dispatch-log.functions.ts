@@ -12,9 +12,6 @@ const input = z.object({
   limit: z.number().int().min(1).max(200).optional(),
 });
 
-function authorized(token: string): boolean {
-  return !!process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
 
 export type DispatchLogRow = {
   id: string;
@@ -36,7 +33,7 @@ export type DispatchLogRow = {
 export const getDispatchLogs = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!authorized(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let q = (supabaseAdmin as any)

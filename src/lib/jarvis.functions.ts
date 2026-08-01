@@ -10,10 +10,6 @@ export type JarvisAlertRow = {
   created_at: string;
 };
 
-function checkToken(token: string | undefined) {
-  const expected = process.env.ADMIN_TOKEN;
-  return !!expected && token === expected;
-}
 
 export const logJarvisAlert = createServerFn({ method: "POST" })
   .inputValidator((input: { token: string; severidade: string; origem?: string; mensagem: string; detalhe?: string }) =>
@@ -26,7 +22,7 @@ export const logJarvisAlert = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("jarvis_alerts").insert({
       severidade: data.severidade,
@@ -48,7 +44,7 @@ export const listJarvisAlerts = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data }): Promise<{ rows: JarvisAlertRow[]; error?: string }> => {
-    if (!checkToken(data.token)) return { rows: [], error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { rows: [], error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("jarvis_alerts")

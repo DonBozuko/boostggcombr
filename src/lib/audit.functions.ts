@@ -9,18 +9,8 @@ import { z } from "zod";
 const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
 const tokenOnlyInput = z.object({ token: z.string().min(8) });
 
-export type AuditRow = {
-  serviceId: number;
-  name: string;
-  category: string | null;
-  status: "ATIVO" | "INATIVO" | "REVISAO";
-  costUsdPer1k: number;
-  costBrlPer1k: number;
-  vendaBrlPer1k: number;
-  taxaPix: number;
-  lucroBrl: number;
-  margemPct: number;
-};
+import type { AuditRow } from "@/lib/audit-contingency.server";
+export type { AuditRow };
 
 export type AuditResp =
   | { ok: true; fornecedor: string; cotacao: number; rows: AuditRow[]; scannedAt: string }
@@ -29,35 +19,7 @@ export type AuditResp =
 // v307 — a auditoria de fornecedor NÃO tem fórmula própria. Ela simula o preço
 // exatamente como a Autoridade Única faria, senão o painel mostra margem que
 // não existe na vitrine.
-const PIX_RATE = 0.0099; // 0,99% MP PIX aprox.
 
-async function buildContingencyAuditRows(): Promise<AuditRow[]> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin
-    .from("pricing_items" as any)
-    .select("pacote, category, quantidade, provider_service_id, cost_brl, price_brl, source")
-    .order("category", { ascending: true })
-    .order("quantidade", { ascending: true });
-
-  return ((data ?? []) as any[]).map((r, idx) => {
-    const cost = Number(r.cost_brl || 0);
-    const price = Number(r.price_brl || 0);
-    const pix = price * PIX_RATE;
-    const lucro = price - cost - pix;
-    return {
-      serviceId: Number(r.provider_service_id) || idx + 1,
-      name: `${String(r.category ?? "contingencia")} · ${String(r.pacote)} · ${Number(r.quantidade || 0).toLocaleString("pt-BR")}`,
-      category: String(r.category ?? "contingencia"),
-      status: "ATIVO" as const,
-      costUsdPer1k: 0,
-      costBrlPer1k: Number(cost.toFixed(2)),
-      vendaBrlPer1k: Number(price.toFixed(2)),
-      taxaPix: Number(pix.toFixed(2)),
-      lucroBrl: Number(lucro.toFixed(2)),
-      margemPct: price > 0 ? Number(((lucro / price) * 100).toFixed(1)) : 0,
-    };
-  });
-}
 
 // IDs que efetivamente usamos no dispatcher (mantém alinhado com smmhype.server.ts)
 const USED_IDS = new Set<number>([
@@ -110,10 +72,11 @@ export const auditarFornecedor = createServerFn({ method: "POST" })
       const j = JSON.parse(txt);
       services = Array.isArray(j) ? j : [];
     } catch (e: any) {
-      const rows = await buildContingencyAuditRows();
+      const rows = await (await import("@/lib/audit-contingency.server")).buildContingencyAuditRows();
       return { ok: true, fornecedor: `${(f as any).nome} · CONTINGÊNCIA LOCAL`, cotacao, rows, scannedAt: new Date().toISOString() };
     }
 
+    const { PIX_RATE } = await import("@/lib/audit-contingency.server");
     const rows: AuditRow[] = [];
     for (const s of services) {
       const sid = Number(s.service ?? s.id);
@@ -153,7 +116,7 @@ export const auditoriaContingenciaLocal = createServerFn({ method: "POST" })
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
-    const rows = await buildContingencyAuditRows();
+    const rows = await (await import("@/lib/audit-contingency.server")).buildContingencyAuditRows();
     return {
       ok: true,
       fornecedor: "MATRIZ LOCAL DE CONTINGÊNCIA v50-Patch",

@@ -3,15 +3,11 @@ import { z } from "zod";
 
 const input = z.object({ token: z.string().min(8) });
 
-function checkToken(token: string) {
-  const expected = process.env.ADMIN_TOKEN;
-  return !!expected && token === expected;
-}
 
 export const getServicesCacheStatus = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { SERVICOS_MONITORADOS } = await import("@/lib/sync-services.server");
 
@@ -41,7 +37,7 @@ export const getServicesCacheStatus = createServerFn({ method: "POST" })
 export const sincronizarServicosAgora = createServerFn({ method: "POST" })
   .inputValidator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { syncSmmhypeServices } = await import("@/lib/sync-services.server");
     try {
       const res = await syncSmmhypeServices();

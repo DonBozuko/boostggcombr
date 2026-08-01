@@ -2,9 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const adminInput = z.object({ token: z.string().min(8) });
-function checkToken(token: string) {
-  return !!process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN;
-}
 
 const TABLES = [
   "pedidos", "fornecedores", "monitoramento_saldo", "service_id_overrides",
@@ -30,7 +27,7 @@ export type NocSnapshot = {
 export const jarvisNocSnapshot = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }): Promise<NocSnapshot> => {
-    if (!checkToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
 
@@ -144,7 +141,7 @@ export type JarvisChatResp =
 export const jarvisChat = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ token: z.string().min(8), question: z.string().min(2).max(500) }).parse(input))
   .handler(async ({ data }): Promise<JarvisChatResp> => {
-    if (!checkToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
 
     const qLower = data.question.toLowerCase();
     if (CRITICAL_KEYWORDS.some((k) => qLower.includes(k))) {
@@ -237,7 +234,7 @@ export const jarvisChat = createServerFn({ method: "POST" })
 export const jarvisFailoverAtivo = createServerFn({ method: "POST" })
   .inputValidator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!checkToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: forns } = await supabaseAdmin
       .from("fornecedores")
