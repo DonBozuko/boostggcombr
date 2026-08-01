@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { submitResellerApplication } from "@/lib/reseller-apply.functions";
+import { PageGuide } from "@/components/PageGuide";
 
 export const Route = createFileRoute("/revenda")({
   head: () => ({
@@ -193,6 +194,7 @@ function Revenda() {
           </p>
         </form>
       )}
+      <PageGuide page="revenda" />
     </main>
   );
 }

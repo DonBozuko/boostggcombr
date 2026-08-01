@@ -2,6 +2,7 @@
 // brasileiro" é revendedor pronto, não cliente final. Conteúdo 100% real:
 // tudo citado aqui existe (API v1, painel, saldo Pix, reposição BR).
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { PageGuide } from "@/components/PageGuide";
 
 const CANON = "https://www.boostgg.com.br/painel-smm";
 const TITLE = "Painel SMM Brasileiro para Revenda | BoostGG";
@@ -165,6 +166,7 @@ function PainelSmm() {
           Solicitar acesso
         </Link>
       </div>
+      <PageGuide page="painel-smm" />
     </main>
   );
 }
