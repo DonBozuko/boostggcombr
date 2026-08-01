@@ -79,6 +79,7 @@ export const FAMILIAS: Familia[] = [
       "saldo-nao-pausa.test.ts",
       "provider-topup.test.ts",
       "bench-fix-before-measure.test.ts",
+      "smoke-fix-before-measure.test.ts",
     ],
 
   },
