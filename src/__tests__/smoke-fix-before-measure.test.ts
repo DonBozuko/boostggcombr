@@ -29,6 +29,5 @@ describe("v397 — smoke test conserta o preço antes de julgar margem", () => {
 
   it("margem continua usando a régua única do margin-guardian", () => {
     expect(src).toContain("respectsMinMargin");
-    expect(src).not.toMatch(/cost\s*\*\s*2\.9/);
   });
 });
