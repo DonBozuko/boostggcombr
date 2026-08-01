@@ -141,6 +141,19 @@ export async function runSmokeTest(): Promise<SmokeReport> {
   // "erro de servidor" e a auditoria gritava "robô batendo em erro" — sem
   // nenhum problema real por trás. Pacote fora da vitrine não vende, logo não
   // pode reprovar o teste. O que estiver pausado é assunto da Bancada.
+  // v397 — CONSERTA ANTES DE MEDIR (mesmo invariante da v396, agora no teste
+  // de 15 min). Caso real 01:30: o teste leu o catálogo às 01:30:01, o sync de
+  // custo gravou às 01:30:21 e a Autoridade de Preço reajustou depois — o dono
+  // recebeu "tl200k vendendo com prejuízo" de um estado que já não existia
+  // (custo R$ 308 × preço R$ 971,65 = margem saudável). A autoridade é
+  // idempotente: preço saudável não se mexe.
+  try {
+    const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+    await enforcePriceAuthority("pre-smoke");
+  } catch (e) {
+    console.error("[smoke] v397 autoridade de preço falhou antes da medição", e);
+  }
+
   const { data: items } = await supabaseAdmin
     .from("pricing_items" as any)
     .select("pacote, cost_brl, price_brl, is_sellable, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id");
