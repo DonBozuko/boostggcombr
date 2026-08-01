@@ -1,9 +1,9 @@
 ---
 name: Escopo Fechado (linha de chegada v397+)
-description: Escopo oficial validado pelo dono em 01/08/2026. Nada fora desta lista entra sem alerta de fora-de-escopo.
+description: Escopo oficial 100% concluído em 01/08/2026. Projeto em modo manutenção. Nada fora da lista entra sem alerta de fora-de-escopo.
 type: feature
 ---
-Escopo fechado e aprovado. Projeto tem desfecho — não é infinito.
+Escopo fechado, aprovado e **100% concluído**. Projeto entrou em modo manutenção em 01/08/2026 — só correção de bug real, nada de feature nova sem ciclo próprio.
 
 ## Dentro do escopo (entregue)
 1. Vitrine e venda: landings por rede, catálogo com prateleira honesta, checkout Pix (Mercado Pago), cartão (Checkout Pro, teto R$300), cupom, order bump, recuperação de carrinho.
