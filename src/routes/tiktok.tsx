@@ -1,6 +1,7 @@
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { FaqSection, FAQS } from "@/components/FaqSection";
+import { NetworkGuide } from "@/components/NetworkGuide";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -626,6 +627,7 @@ function TiktokLanding() {
       />
       </ShowcaseShell>
       </PlansShowcaseProvider>
+          <NetworkGuide network="tiktok" accent="#00f2fe" />
           <FaqSection network="tiktok" />
       </MobileFrame>
   );

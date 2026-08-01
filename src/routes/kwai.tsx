@@ -10,6 +10,7 @@ import CardPayOption from "@/components/CardPayOption";
 
 import { buildProductJsonLd, buildFaqJsonLd } from "@/lib/seo-jsonld";
 import { FaqSection, FAQS } from "@/components/FaqSection";
+import { NetworkGuide } from "@/components/NetworkGuide";
 import { CHECKOUT_SUCCESS_TITLE, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
@@ -411,6 +412,7 @@ function KwaiLanding() {
       />
       </ShowcaseShell>
       </PlansShowcaseProvider>
+      <NetworkGuide network="kwai" accent="#ff6600" />
       <FaqSection network="kwai" />
     </MobileFrame>
   );
