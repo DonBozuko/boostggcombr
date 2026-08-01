@@ -1,8 +1,8 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-01T12:35:45.134Z
+Gerado por `npm run audit` — 2026-08-01T14:19:22.471Z
 
-Arquivos lidos: 446
+Arquivos lidos: 448
 
 | Gravidade | Qtd |
 |---|---|
