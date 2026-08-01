@@ -74,7 +74,13 @@ export const FAMILIAS: Familia[] = [
     id: "saldo",
     nome: "Saldo vs custo real",
     detector: "bench-sweep",
-    provas: ["bench-sweep.test.ts", "saldo-nao-pausa.test.ts", "provider-topup.test.ts"],
+    provas: [
+      "bench-sweep.test.ts",
+      "saldo-nao-pausa.test.ts",
+      "provider-topup.test.ts",
+      "bench-fix-before-measure.test.ts",
+    ],
+
   },
   {
     id: "entrega",
