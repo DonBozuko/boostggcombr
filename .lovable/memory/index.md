@@ -33,6 +33,7 @@ Modo Torre: listar arquivos antes de codar, arquivo pequeno, lixo deletado na ho
 Detector sem remédio é dívida: toda falha declara nível 1/2/3. Ver [Escada de Autonomia](mem://preferences/escada-de-autonomia).
 Mudança em zona vermelha sobe `APP_VERSION` e a resposta diz "precisa publicar". Ver [Alerta repete = versão velha](mem://constraints/alerta-repete-versao-publicada).
 Reposição automática (nível 2) LIGADA desde 31/07/2026, teto 10/dia e 10% do pedido. Desliga em Admin → Auditoria → Autonomia.
+Escopo FECHADO em 01/08/2026: pedido fora da lista dispara alerta de fora-de-escopo antes de codar. Ver [Escopo Fechado](mem://features/escopo-fechado).
 
 ## Memories
 - [Moeda única BRL](mem://constraints/moeda-unica-brl) — Dinheiro sempre em BRL. `monitoramento_saldo.saldo` é USD legado; usar `saldo_brl`/`fornecedores.saldo_atual`.
