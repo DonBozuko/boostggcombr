@@ -6,20 +6,20 @@ import { TrustBadges } from "./TrustBadges";
 import { BenefitsGrid } from "./BenefitsGrid";
 
 import { TopNetworksNav } from "./TopNetworksNav";
-import igLeft from "@/assets/char-ig-left.png";
-import igRight from "@/assets/char-ig-right.png";
-import ttLeft from "@/assets/char-tt-left.png";
-import ttRight from "@/assets/char-tt-right.png";
-import ytLeft from "@/assets/char-yt-left.png";
-import ytRight from "@/assets/char-yt-right.png";
-import tfLeft from "@/assets/char-tf-left.png";
-import tfRight from "@/assets/char-tf-right.png";
-import fbLeft from "@/assets/char-fb-left.png";
-import fbRight from "@/assets/char-fb-right.png";
-import tgLeft from "@/assets/char-tg-left.png";
-import tgRight from "@/assets/char-tg-right.png";
-import kwLeft from "@/assets/char-kw-left.png";
-import kwRight from "@/assets/char-kw-right.png";
+import igLeft from "@/assets/char-ig-left.webp";
+import igRight from "@/assets/char-ig-right.webp";
+import ttLeft from "@/assets/char-tt-left.webp";
+import ttRight from "@/assets/char-tt-right.webp";
+import ytLeft from "@/assets/char-yt-left.webp";
+import ytRight from "@/assets/char-yt-right.webp";
+import tfLeft from "@/assets/char-tf-left.webp";
+import tfRight from "@/assets/char-tf-right.webp";
+import fbLeft from "@/assets/char-fb-left.webp";
+import fbRight from "@/assets/char-fb-right.webp";
+import tgLeft from "@/assets/char-tg-left.webp";
+import tgRight from "@/assets/char-tg-right.webp";
+import kwLeft from "@/assets/char-kw-left.webp";
+import kwRight from "@/assets/char-kw-right.webp";
 
 type RouteKey = "/" | "/tiktok" | "/youtube" | "/facebook" | "/telegram" | "/trafego" | "/kwai";
 

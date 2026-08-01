@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Volume2, VolumeX } from "lucide-react";
 
 import type { FabianoVariant } from "./FabianoBadge";
-import armorAsset from "@/assets/jarvis-armor.png.asset.json";
+import armorAsset from "@/assets/jarvis-armor.webp";
 import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
 import { registerJarvisAudio, setJarvisMuted, stopAllJarvis, useJarvisMuted } from "@/hooks/useJarvis";
 
@@ -298,7 +298,7 @@ export function JarvisBadge({ variant = "instagram", inline = false }: { variant
           style={{ boxShadow: t.ring, animation: "jb-float 3.4s ease-in-out infinite" }}
         >
           <img
-            src={armorAsset.url}
+            src={armorAsset}
             alt="J.A.R.V.I.S. Armor"
             draggable={false}
             loading="lazy"
