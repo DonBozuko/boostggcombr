@@ -1,14 +1,14 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-01T11:40:26.833Z
+Gerado por `npm run audit` — 2026-08-01T12:35:45.134Z
 
-Arquivos lidos: 442
+Arquivos lidos: 446
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
 | atencao | 0 |
-| nota | 498 |
+| nota | 508 |
 
 ## arquivo-gigante (10)
 
@@ -23,7 +23,7 @@ Arquivos lidos: 442
 - **nota** `src/routes/index.tsx` — 1421 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
 
-## cor-hardcoded (432)
+## cor-hardcoded (440)
 
 - **nota** `src/components/AdminAuditLog.tsx` — linha 38
 - **nota** `src/components/AdminAuditLog.tsx` — linha 53
@@ -65,9 +65,9 @@ Arquivos lidos: 442
 - **nota** `src/components/CanaryPanel.tsx` — linha 170
 - **nota** `src/components/CanaryPanel.tsx` — linha 174
 - **nota** `src/components/CanaryPanel.tsx` — linha 177
-- … e mais 392
+- … e mais 400
 
-## serverfn-modulo-fino (56)
+## serverfn-modulo-fino (58)
 
 - **nota** `src/lib/admin-session.functions.ts` — linha 4: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 - **nota** `src/lib/admin.functions.ts` — linha 34: const adminInput = z.object({ token: z.string().min(8) });
@@ -103,11 +103,11 @@ Arquivos lidos: 442
 - **nota** `src/lib/jarvis-script-gen.functions.ts` — linha 4: const NETWORKS = ["instagram", "tiktok", "facebook", "youtube", "telegram"] as const;
 - **nota** `src/lib/jarvis-script-gen.functions.ts` — linha 24: const HOOKS_MATRIX = [
 - **nota** `src/lib/jarvis-script-gen.functions.ts` — linha 77: const genInput = z.object({
+- **nota** `src/lib/jarvis-tts.functions.ts` — linha 6: const VOZES = ["onyx", "ash", "alloy", "nova", "shimmer", "echo"] as const;
+- **nota** `src/lib/jarvis-tts.functions.ts` — linha 8: const input = z.object({
 - **nota** `src/lib/monitor.functions.ts` — linha 4: const adminInput = z.object({ token: z.string().min(8) });
 - **nota** `src/lib/mystery-box.functions.ts` — linha 7: const MIN_QTY = 200; // v190 — alinhado à UI (Bônus Especial promete "acima de 200 unidades")
 - **nota** `src/lib/mystery-box.functions.ts` — linha 8: const MB_MARKER = /MB_REDEEMED:(\d+)/i;
 - **nota** `src/lib/mystery-box.functions.ts` — linha 10: const input = z.object({
-- **nota** `src/lib/pedidos.functions.ts` — linha 4: const pedidoSchema = z.object({
-- **nota** `src/lib/pedidos.functions.ts` — linha 23: const utmClean = (v: string | null | undefined) =>
-- … e mais 16
+- … e mais 18
 
