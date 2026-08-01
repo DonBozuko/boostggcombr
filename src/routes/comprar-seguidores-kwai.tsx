@@ -16,7 +16,7 @@ const faq = [
 
 export const Route = createFileRoute("/comprar-seguidores-kwai")({
   head: () => {
-    const title = "Comprar Seguidores no Kwai via Pix — Elite Boost Prime | BoostGG";
+    const title = "Comprar Seguidores Kwai Baratos via Pix | BoostGG";
     const description =
       "Compre seguidores no Kwai via Pix. Entrega gradual em minutos, sem senha e com acompanhamento do pedido. A partir de R$ 5.";
 

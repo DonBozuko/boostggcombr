@@ -333,7 +333,7 @@ const POSTS: Record<string, Post> = {
   },
   "comprar-seguidores-cai": {
     title: "Comprar Seguidores no Instagram Cai? O Que Acontece Depois",
-    seoTitle: "Comprar Seguidores no Instagram Cai? Retenção e Reposição",
+    seoTitle: "Comprar Seguidores Cai? Retenção e Reposição",
     description:
       "Comprar seguidores no Instagram cai depois? Entenda retenção, reposição, como identificar bots e o que esperar nos primeiros 30 dias após a compra.",
     subtitle:
@@ -635,6 +635,9 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:description", content: post.description },
         { property: "og:type", content: "article" },
         { property: "og:url", content: url },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: post.title },
+        { name: "twitter:description", content: post.description },
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [

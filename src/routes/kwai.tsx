@@ -40,7 +40,7 @@ import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/kwai")({
   head: () => {
-    const title = "Comprar Seguidores no Kwai via Pix — Elite Boost Prime | BoostGG";
+    const title = "Comprar Seguidores no Kwai via Pix | BoostGG";
     const description =
       "Compre seguidores, curtidas e views no Kwai com Pix. Entrega gradual em minutos, sem senha, com acompanhamento do pedido e suporte no WhatsApp.";
 
