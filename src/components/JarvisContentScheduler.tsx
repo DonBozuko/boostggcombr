@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { generateFacelessScript as genScriptFn } from "@/lib/jarvis-script-gen.functions";
 import jarvisBgAsset from "@/assets/jarvis-bg.mp4.asset.json";
+import { FacelessVideoStudio } from "@/components/FacelessVideoStudio";
 
 type Network = "instagram" | "tiktok" | "facebook" | "youtube" | "telegram";
 type Format = "1:1" | "9:16";
@@ -291,6 +292,8 @@ export function JarvisContentScheduler() {
               className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-xs"
             />
           </div>
+          <FacelessVideoStudio script={script} format={format} bgVideoUrl={bgVideo || undefined} />
+
           <div className="text-xs uppercase tracking-wider text-muted-foreground">
             📱 Preview visual ({format})
           </div>
