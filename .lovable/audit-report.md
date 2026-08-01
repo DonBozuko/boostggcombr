@@ -1,25 +1,14 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-01T11:25:43.022Z
+Gerado por `npm run audit` — 2026-08-01T11:26:01.899Z
 
 Arquivos lidos: 431
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 110 |
-| nota | 454 |
-
-## arquivo-orfao (2)
-
-- **atencao** `src/router.tsx` — ninguém importa este arquivo
-- **atencao** `src/start.ts` — ninguém importa este arquivo
-
-## nada-fake (3)
-
-- **atencao** `src/lib/whatsapp-admin.server.ts` — linha 108: /** Alerta universal: TODO pedido pago (com sucesso ou aguardando provisão). */
-- **atencao** `src/lib/whatsapp-admin.server.ts` — linha 193: /** Alerta universal em TODO pedido pago (sem PIX, sem botão). Não lança. */
-- **atencao** `src/routes/api/public/mp-webhook.ts` — linha 245: // pedido para que TODO o fluxo abaixo (que busca por mercado_pago_id)
+| atencao | 44 |
+| nota | 515 |
 
 ## seo-head (18)
 
@@ -44,46 +33,46 @@ Arquivos lidos: 431
 
 ## serverfn-modulo-fino (87)
 
-- **atencao** `src/lib/admin-session.functions.ts` — linha 4: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
-- **atencao** `src/lib/admin.functions.ts` — linha 34: const adminInput = z.object({ token: z.string().min(8) });
 - **atencao** `src/lib/admin.functions.ts` — linha 36: function checkToken(token: string) {
-- **atencao** `src/lib/admin.functions.ts` — linha 438: const MARGEM_MINIMA_PCT = 20;
-- **atencao** `src/lib/affiliate.functions.ts` — linha 8: const signupSchema = z.object({
-- **atencao** `src/lib/affiliate.functions.ts` — linha 19: const SITE = "https://www.boostgg.com.br";
-- **atencao** `src/lib/affiliate.functions.ts` — linha 101: const loginSchema = z.object({
-- **atencao** `src/lib/affiliates-admin.functions.ts` — linha 5: const tokenOnly = z.object({ token: z.string().min(8) });
 - **atencao** `src/lib/affiliates-admin.functions.ts` — linha 7: function auth(token: string): boolean {
-- **atencao** `src/lib/audit.functions.ts` — linha 9: const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
-- **atencao** `src/lib/audit.functions.ts` — linha 10: const tokenOnlyInput = z.object({ token: z.string().min(8) });
-- **atencao** `src/lib/audit.functions.ts` — linha 32: const PIX_RATE = 0.0099; // 0,99% MP PIX aprox.
 - **atencao** `src/lib/audit.functions.ts` — linha 34: async function buildContingencyAuditRows(): Promise<AuditRow[]> {
-- **atencao** `src/lib/audit.functions.ts` — linha 63: const USED_IDS = new Set<number>([
-- **atencao** `src/lib/autonomia-flags.functions.ts` — linha 8: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
-- **atencao** `src/lib/autonomia-flags.functions.ts` — linha 10: const FLAGS = ACOES.filter((a) => a.flag).map((a) => ({
-- **atencao** `src/lib/backup-drill.functions.ts` — linha 8: const CRITICAL_TABLES = [
-- **atencao** `src/lib/bench-autonomo.functions.ts` — linha 6: const tokenInput = z.object({ token: z.string().min(8) });
 - **atencao** `src/lib/bench-autonomo.functions.ts` — linha 8: function authorized(token: string): boolean {
-- **atencao** `src/lib/bench.functions.ts` — linha 13: const input = z.object({
 - **atencao** `src/lib/bench.functions.ts` — linha 19: function authorized(token: string): boolean {
 - **atencao** `src/lib/canary.functions.ts` — linha 4: function checkToken(token: string) {
-- **atencao** `src/lib/canary.functions.ts` — linha 9: const tokenIn = z.object({ token: z.string().min(8) });
-- **atencao** `src/lib/catalog-raiox.functions.ts` — linha 6: const input = z.object({ token: z.string().min(8) });
 - **atencao** `src/lib/catalog-raiox.functions.ts` — linha 27: function classifica(campo: string): MudancaLinha["tipo"] {
-- **atencao** `src/lib/catalog-telemetry.functions.ts` — linha 6: const input = z.object({ token: z.string().min(8) });
 - **atencao** `src/lib/catalog-telemetry.functions.ts` — linha 8: function checkToken(token: string) {
-- **atencao** `src/lib/claude-inspect.functions.ts` — linha 12: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
-- **atencao** `src/lib/consulta-pedido.functions.ts` — linha 6: const input = z.object({ pedidoId: z.string().min(4).max(60) });
-- **atencao** `src/lib/contador-inscritos.functions.ts` — linha 14: const input = z.object({
-- **atencao** `src/lib/contador-inscritos.functions.ts` — linha 23: const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/
-- **atencao** `src/lib/contador-inscritos.functions.ts` — linha 34: const RE_CONTAGEM =
 - **atencao** `src/lib/contador-inscritos.functions.ts` — linha 37: export function extrairInscritosTexto(html: string, handle?: string): string | null {
 - **atencao** `src/lib/contador-inscritos.functions.ts` — linha 60: export function parseInscritos(txt: string): number | null {
-- **atencao** `src/lib/dispatch-log.functions.ts` — linha 7: const input = z.object({
 - **atencao** `src/lib/dispatch-log.functions.ts` — linha 15: function authorized(token: string): boolean {
-- **atencao** `src/lib/fornecedores.functions.ts` — linha 4: const tokenInput = z.object({ token: z.string().min(8) });
 - **atencao** `src/lib/fornecedores.functions.ts` — linha 6: function checkToken(token: string) {
 - **atencao** `src/lib/fornecedores.functions.ts` — linha 65: function painelFromApiUrl(apiUrl: string | null | undefined): string | null {
 - **atencao** `src/lib/fornecedores.functions.ts` — linha 77: function pixFor(slug: string): string | null {
+- **atencao** `src/lib/gerador-legenda.functions.ts` — linha 20: function localFallback(tema: string): Legenda {
+- **atencao** `src/lib/gsc-inspect.functions.ts` — linha 26: async function inspectOne(path: string): Promise<InspectRow> {
+- **atencao** `src/lib/jarvis-noc.functions.ts` — linha 5: function checkToken(token: string) {
+- **atencao** `src/lib/jarvis.functions.ts` — linha 13: function checkToken(token: string | undefined) {
+- **atencao** `src/lib/monitor.functions.ts` — linha 6: function checkToken(token: string) {
+- **atencao** `src/lib/reseller-apply.functions.ts` — linha 77: function auth(token: string): boolean {
+- **atencao** `src/lib/reseller-portal.functions.ts` — linha 15: async function ip(): Promise<string> {
+- **atencao** `src/lib/reseller-portal.functions.ts` — linha 25: async function limited(bucket: string, max: number, windowSec: number): Promise<boolean> {
+- **atencao** `src/lib/resellers.functions.ts` — linha 9: function auth(token: string): boolean {
+- **atencao** `src/lib/roas.functions.ts` — linha 26: function group(
+- **atencao** `src/lib/services-cache.functions.ts` — linha 6: function checkToken(token: string) {
+- **atencao** `src/lib/simulate-purchase.functions.ts` — linha 17: function fmtBrl(v: number): string {
+- **nota** `src/lib/admin-session.functions.ts` — linha 4: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
+- **nota** `src/lib/admin.functions.ts` — linha 34: const adminInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/admin.functions.ts` — linha 438: const MARGEM_MINIMA_PCT = 20;
+- **nota** `src/lib/affiliate.functions.ts` — linha 8: const signupSchema = z.object({
+- **nota** `src/lib/affiliate.functions.ts` — linha 19: const SITE = "https://www.boostgg.com.br";
+- **nota** `src/lib/affiliate.functions.ts` — linha 101: const loginSchema = z.object({
+- **nota** `src/lib/affiliates-admin.functions.ts` — linha 5: const tokenOnly = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/audit.functions.ts` — linha 9: const input = z.object({ token: z.string().min(8), fornecedorId: z.string().min(1) });
+- **nota** `src/lib/audit.functions.ts` — linha 10: const tokenOnlyInput = z.object({ token: z.string().min(8) });
+- **nota** `src/lib/audit.functions.ts` — linha 32: const PIX_RATE = 0.0099; // 0,99% MP PIX aprox.
+- **nota** `src/lib/audit.functions.ts` — linha 63: const USED_IDS = new Set<number>([
+- **nota** `src/lib/autonomia-flags.functions.ts` — linha 8: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
+- **nota** `src/lib/autonomia-flags.functions.ts` — linha 10: const FLAGS = ACOES.filter((a) => a.flag).map((a) => ({
+- **nota** `src/lib/backup-drill.functions.ts` — linha 8: const CRITICAL_TABLES = [
 - … e mais 47
 
 ## arquivo-gigante (10)

@@ -47,7 +47,8 @@ const FAKE = [
   /coming soon/i,
   /lorem ipsum/i,
   /placeholder de/i,
-  /\bTODO\b/,
+  /\bTODO:/,
+  /\/\/\s*TODO\b/,
   /\bFIXME\b/,
   /em desenvolvimento/i,
 ];
@@ -116,9 +117,11 @@ for (const f of files) {
 const importedTails = new Set(
   [...importedNames].map((s) => s.replace(/^.*\//, "").replace(/\.(ts|tsx|js)$/, "")),
 );
+const ENTRYPOINTS = ["router", "start", "server", "styles"];
 for (const f of files) {
   if (isTest(f) || isRoute(f)) continue;
   const base = f.replace(/^.*\//, "").replace(/\.(ts|tsx)$/, "");
+  if (ENTRYPOINTS.includes(base)) continue;
   if (!importedTails.has(base)) add("atencao", "arquivo-orfao", f, "ninguém importa este arquivo");
 }
 
@@ -158,7 +161,8 @@ for (const f of files) {
     )
     .filter(([l]) => !/^export\s+const\s+\w+\s*=\s*createServerFn/.test(l));
   for (const [l, i] of bad) {
-    add("atencao", "serverfn-modulo-fino", f, `linha ${i + 1}: ${l.trim().slice(0, 100)}`);
+    const ehFuncao = /^(export\s+)?(async\s+)?function\s/.test(l);
+    add(ehFuncao ? "atencao" : "nota", "serverfn-modulo-fino", f, `linha ${i + 1}: ${l.trim().slice(0, 100)}`);
   }
 }
 
