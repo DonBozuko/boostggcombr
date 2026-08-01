@@ -112,3 +112,21 @@ describe("v335 diagnóstico honesto e recarga realista", () => {
     expect(s.recargaSobDemanda).toEqual({});
   });
 });
+
+// v395 — o número do alerta não pode contar pacote sob encomenda.
+import { describe as d2, it as i2, expect as e2 } from "vitest";
+d2("v395 — contagem de travados separa sob encomenda", () => {
+  i2("saldo de pacote sem venda não entra em travadosAgora", () => {
+    const s = summarizeBench(
+      [
+        { pacote: "a", category: "ig", verdict: "entregavel", motivo: "", fornecedor: "x", custoBrl: 1, faltaRecarregar: null, faltaEm: null },
+        { pacote: "gig", category: "yt", verdict: "saldo", motivo: "", fornecedor: "verified", custoBrl: 10, faltaRecarregar: 4083, faltaEm: "verified" },
+        { pacote: "vende", category: "ig", verdict: "saldo", motivo: "", fornecedor: "smmhype", custoBrl: 10, faltaRecarregar: 50, faltaEm: "smmhype" },
+        { pacote: "caro", category: "ig", verdict: "margem", motivo: "", fornecedor: "smmhype", custoBrl: 99, faltaRecarregar: null, faltaEm: null },
+      ] as BenchRow[],
+      { demanda: new Set(["a", "vende", "caro"]) },
+    );
+    e2(s.travadosSobEncomenda).toBe(1);
+    e2(s.travadosAgora).toBe(2);
+  });
+});
