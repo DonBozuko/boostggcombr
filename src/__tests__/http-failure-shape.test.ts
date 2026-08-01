@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { classifyHttpFailures } from "@/lib/http-failure-shape";
+import { classifyHttpFailures, spreadInMinutes } from "@/lib/http-failure-shape";
 
 describe("v388 — pico de atualização não vira alarme de rota quebrada", () => {
   it("o caso real de 31/07: 20 erros em 3 instantes = troca de versão", () => {
