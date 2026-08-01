@@ -235,9 +235,14 @@ export type BenchSummary = {
   recargaPorFornecedor: Record<string, number>;
   /** Recarga de pacote gigante sem venda: só sob encomenda, não é urgência. */
   recargaSobDemanda: Record<string, number>;
+  /** v395 — travados que EXIGEM ação hoje (margem + saldo de pacote que vende). */
+  travadosAgora: number;
+  /** v395 — travados só por saldo de pacote sem venda em 90 dias (sob encomenda). */
+  travadosSobEncomenda: number;
   /** Rotas (categorias) com pelo menos 1 pacote travado. */
   rotasComProblema: string[];
 };
+
 
 /**
  * v335 — a recarga pedida tem que caber na realidade.
