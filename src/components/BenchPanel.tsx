@@ -81,7 +81,13 @@ export function BenchPanel({ token }: { token: string }) {
     const k = r.faltaEm ?? "fornecedor";
     (porSaldo[k] ??= []).push(r);
   }
+  // v406 — rota reserva quente: pacote entregável hoje mas sem plano B é risco
+  // silencioso (se o fornecedor tropeçar, trava e ninguém sabe antes do pedido).
+  const semReserva = rows.filter(
+    (r) => r.verdict === "entregavel" && (r.redundancia === "unica" || r.redundancia === "nenhuma"),
+  );
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
 
   return (
     <div className="rounded-xl border border-emerald-500/40 bg-black/60 p-4 backdrop-blur">
