@@ -109,6 +109,8 @@ export const FAMILIAS: Familia[] = [
       "target-preflight.test.ts",
       "preflight-fail-open-limite.test.ts",
       "link-sanitize.test.ts",
+      // v406 — plano B pré-validado faz parte de "posso cobrar por isso?"
+      "hot-standby.test.ts",
     ],
   },
   {

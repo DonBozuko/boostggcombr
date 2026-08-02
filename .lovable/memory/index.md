@@ -37,6 +37,7 @@ Escopo FECHADO em 01/08/2026: pedido fora da lista dispara alerta de fora-de-esc
 Tolerância ≤1% de falha/semana (zero só para cobrar-sem-entregar); conflito de regra resolve na ordem Margem > Vitrine > Receita; revisão semanal sexta 15 min. Ver [Tolerância e hierarquia](mem://preferences/tolerancia-e-hierarquia).
 
 ## Memories
+- [Rota Reserva Quente v406](mem://features/rota-reserva-quente) — Plano B pré-validado por pacote (quente/morna/única); dono único `hot-standby.ts`; aviso amarelo na Bancada, nunca bloqueio.
 - [Dívidas aceitas](mem://preferences/dividas-aceitas) — Cores hardcoded, arquivos gigantes e console.log de servidor: decidido NÃO consertar. Não reabrir sem motivo de negócio.
 - [Motor Anti-Alucinação](mem://preferences/motor-anti-alucinacao) — `npm run audit` lê src/ inteiro e grava .lovable/audit-report.md; gravidades bloqueante/atenção/nota.
 

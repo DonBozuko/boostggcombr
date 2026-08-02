@@ -81,7 +81,13 @@ export function BenchPanel({ token }: { token: string }) {
     const k = r.faltaEm ?? "fornecedor";
     (porSaldo[k] ??= []).push(r);
   }
+  // v406 — rota reserva quente: pacote entregável hoje mas sem plano B é risco
+  // silencioso (se o fornecedor tropeçar, trava e ninguém sabe antes do pedido).
+  const semReserva = rows.filter(
+    (r) => r.verdict === "entregavel" && (r.redundancia === "unica" || r.redundancia === "nenhuma"),
+  );
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
 
   return (
     <div className="rounded-xl border border-emerald-500/40 bg-black/60 p-4 backdrop-blur">
@@ -178,9 +184,22 @@ export function BenchPanel({ token }: { token: string }) {
             </div>
           )}
 
+          {semReserva.length > 0 && (
+            <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3 text-xs text-amber-300">
+              <b>{semReserva.length} pacote(s) sem fornecedor reserva.</b> Eles entregam agora, mas
+              dependem de um único fornecedor: se ele trocar o ID ou cair, o pedido trava até alguém
+              religar o vínculo. Vale vincular um segundo fornecedor para esses pacotes.
+              <div className="mt-1 font-mono text-[10px] text-amber-200/80">
+                {semReserva.slice(0, 12).map((r) => r.pacote).join(", ")}
+                {semReserva.length > 12 ? ` … +${semReserva.length - 12}` : ""}
+              </div>
+            </div>
+          )}
+
           {travados.length > 0 && (
             <div className="text-xs font-bold text-red-400">Bloqueio real de entrega ({travados.length})</div>
           )}
+
           {travados.length > 0 && (
             <div className="max-h-80 overflow-auto rounded-lg border border-border/50">
               <table className="w-full text-left text-[11px]">

@@ -1,8 +1,8 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-02T15:30:13.477Z
+Gerado por `npm run audit` — 2026-08-02T16:56:19.076Z
 
-Arquivos lidos: 449
+Arquivos lidos: 451
 
 | Gravidade | Qtd |
 |---|---|
@@ -20,7 +20,7 @@ Arquivos lidos: 449
 - **nota** `src/routes/admin.tsx` — 2474 linhas (> 600)
 - **nota** `src/routes/api/public/mp-webhook.ts` — 840 linhas (> 600)
 - **nota** `src/routes/blog.$slug.tsx` — 723 linhas (> 600)
-- **nota** `src/routes/index.tsx` — 1446 linhas (> 600)
+- **nota** `src/routes/index.tsx` — 1472 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
 
 ## cor-hardcoded (438)
@@ -53,7 +53,7 @@ Arquivos lidos: 449
 - **nota** `src/components/AutonomiaPanel.tsx` — linha 48
 - **nota** `src/components/AutonomiaPanel.tsx` — linha 51
 - **nota** `src/components/AutonomiaPanel.tsx` — linha 65
-- **nota** `src/components/BenchPanel.tsx` — linha 87
+- **nota** `src/components/BenchPanel.tsx` — linha 93
 - **nota** `src/components/BenefitsGrid.tsx` — linha 61
 - **nota** `src/components/BrandHeader.tsx` — linha 12
 - **nota** `src/components/CanaryPanel.tsx` — linha 119
