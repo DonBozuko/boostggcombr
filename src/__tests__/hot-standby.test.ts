@@ -41,9 +41,21 @@ describe("v406 — rota reserva quente", () => {
     expect(v.nivel).toBe("unica");
   });
 
-  it("reserva sem saldo é morna, não quente", () => {
+  it("reserva sem saldo não conta como reserva pronta", () => {
+    // evaluateRoute já degrada quem não tem saldo quando existe alguém com
+    // saldo: o pacote fica com rota única — e é isso que o painel precisa dizer.
     const v = classifyRedundancy(
       evaluateRoute([P({ slug: "smmhype" }), P({ slug: "verified", saldo_atual: 0 })], PRECO),
+    );
+    expect(v.nivel).toBe("unica");
+  });
+
+  it("todos sem saldo: rota morna (sai depois da recarga)", () => {
+    const v = classifyRedundancy(
+      evaluateRoute(
+        [P({ slug: "smmhype", saldo_atual: 0 }), P({ slug: "verified", saldo_atual: 0 })],
+        PRECO,
+      ),
     );
     expect(v.nivel).toBe("morna");
     expect(v.reserva).toBe("verified");
