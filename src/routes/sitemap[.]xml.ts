@@ -71,8 +71,7 @@ const buildSitemapXml = () => {
     { path: "/kwai", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-kwai", changefreq: "weekly", priority: "0.9" },
     { path: "/avaliacoes", changefreq: "weekly", priority: "0.7" },
-    { path: "/termos", changefreq: "yearly", priority: "0.3" },
-    { path: "/reembolso", changefreq: "yearly", priority: "0.3" },
+    // v404 — /privacidade, /termos, /reembolso agora noindex (páginas legais competiam com a home na busca de marca)
     // v207 — removidos: /admin, /login, /mcp, /diagnostico (todos noindex — sitemap contraditório desperdiça crawl budget)
   ];
 
