@@ -36,6 +36,8 @@ export const benchBatch = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { rankProvidersByCost } = await import("@/lib/smart-routing.server");
     const { evaluateRoute } = await import("@/lib/route-preflight");
+    // v406 — rota reserva quente: mede, no mesmo passe, se o pacote tem plano B.
+    const { classifyRedundancy } = await import("@/lib/hot-standby");
 
     const { data: items } = await supabaseAdmin
       .from("pricing_items" as any)
@@ -56,7 +58,10 @@ export const benchBatch = createServerFn({ method: "POST" })
           quantidade,
         })) as any[];
         const res = evaluateRoute(ranked as any, price);
+        const red = classifyRedundancy(res);
         rows.push({
+          redundancia: red.nivel,
+          reserva: red.reserva,
           pacote: String(it.pacote),
           category: it.category ?? null,
           quantidade,

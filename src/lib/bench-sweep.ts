@@ -35,6 +35,10 @@ export type BenchRow = {
   faltaRecarregar: number | null;
   /** Em qual fornecedor falta esse dinheiro. */
   faltaEm: string | null;
+  /** v406 — redundância de rota: tem plano B pré-validado? */
+  redundancia?: import("./hot-standby").RedundanciaNivel;
+  /** v406 — fornecedor de reserva pré-validado. */
+  reserva?: string | null;
 };
 
 function fmt(v: number): string {
