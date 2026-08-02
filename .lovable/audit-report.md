@@ -1,29 +1,29 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-01T14:19:22.471Z
+Gerado por `npm run audit` — 2026-08-02T15:30:13.477Z
 
-Arquivos lidos: 448
+Arquivos lidos: 449
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
 | atencao | 0 |
-| nota | 508 |
+| nota | 506 |
 
 ## arquivo-gigante (10)
 
 - **nota** `src/integrations/supabase/types.ts` — 2336 linhas (> 600)
 - **nota** `src/lib/admin.functions.ts` — 852 linhas (> 600)
 - **nota** `src/lib/pedidos.functions.ts` — 728 linhas (> 600)
-- **nota** `src/lib/pricing-cache.server.ts` — 779 linhas (> 600)
+- **nota** `src/lib/pricing-cache.server.ts` — 780 linhas (> 600)
 - **nota** `src/lib/pricing-engine.server.ts` — 911 linhas (> 600)
 - **nota** `src/routes/admin.tsx` — 2474 linhas (> 600)
 - **nota** `src/routes/api/public/mp-webhook.ts` — 840 linhas (> 600)
 - **nota** `src/routes/blog.$slug.tsx` — 723 linhas (> 600)
-- **nota** `src/routes/index.tsx` — 1421 linhas (> 600)
+- **nota** `src/routes/index.tsx` — 1446 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
 
-## cor-hardcoded (440)
+## cor-hardcoded (438)
 
 - **nota** `src/components/AdminAuditLog.tsx` — linha 38
 - **nota** `src/components/AdminAuditLog.tsx` — linha 53
@@ -65,7 +65,7 @@ Arquivos lidos: 448
 - **nota** `src/components/CanaryPanel.tsx` — linha 170
 - **nota** `src/components/CanaryPanel.tsx` — linha 174
 - **nota** `src/components/CanaryPanel.tsx` — linha 177
-- … e mais 400
+- … e mais 398
 
 ## serverfn-modulo-fino (58)
 
