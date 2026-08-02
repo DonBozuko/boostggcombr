@@ -34,6 +34,7 @@ Detector sem remédio é dívida: toda falha declara nível 1/2/3. Ver [Escada d
 Mudança em zona vermelha sobe `APP_VERSION` e a resposta diz "precisa publicar". Ver [Alerta repete = versão velha](mem://constraints/alerta-repete-versao-publicada).
 Reposição automática (nível 2) LIGADA desde 31/07/2026, teto 10/dia e 10% do pedido. Desliga em Admin → Auditoria → Autonomia.
 Escopo FECHADO em 01/08/2026: pedido fora da lista dispara alerta de fora-de-escopo antes de codar. Ver [Escopo Fechado](mem://features/escopo-fechado).
+Tolerância ≤1% de falha/semana (zero só para cobrar-sem-entregar); conflito de regra resolve na ordem Margem > Vitrine > Receita; revisão semanal sexta 15 min. Ver [Tolerância e hierarquia](mem://preferences/tolerancia-e-hierarquia).
 
 ## Memories
 - [Dívidas aceitas](mem://preferences/dividas-aceitas) — Cores hardcoded, arquivos gigantes e console.log de servidor: decidido NÃO consertar. Não reabrir sem motivo de negócio.

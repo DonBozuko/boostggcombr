@@ -48,3 +48,13 @@ e a resposta diz explicitamente "precisa publicar".
 - desligar teste que está vermelho (a trava está certa até prova em contrário)
 - placeholder, botão decorativo, texto que mente sobre capacidade real
 - automação de nível 3 (dinheiro saindo) ligada sem o dedo do dono
+
+## Hierarquia de desempate (02/08/2026)
+
+Quando duas regras brigam, vale a ordem: **Margem > Vitrine > Receita**.
+- Margem: nunca vender no prejuízo, mesmo derrubando pacote da vitrine.
+- Vitrine: prateleira honesta vence vontade de exibir mais produto.
+- Receita: só decide quando as duas acima empatam.
+
+Tolerância operacional: ≤1% de falha de entrega por semana (vermelho acima disso).
+Zero absoluto só para cobrar sem entregar.
