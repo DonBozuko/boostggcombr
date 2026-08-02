@@ -365,29 +365,55 @@ const faqs = [
   },
 ];
 
-const orderSchema = z.object({
-  plan: z.string().min(1, "Selecione um pacote"),
-  profile: z
-    .string()
-    .trim()
-    .min(2, "Informe o link ou @ do Instagram")
-    .max(200, "Máximo 200 caracteres")
-    .refine(
-      (v) => v.startsWith("@") || /^https?:\/\//i.test(v),
-      "Por favor, insira o link completo do perfil, vídeo ou publicação.",
-    ),
+const orderSchema = z
+  .object({
+    plan: z.string().min(1, "Selecione um pacote"),
+    profile: z
+      .string()
+      .trim()
+      .min(2, "Informe o link ou @ do Instagram")
+      .max(200, "Máximo 200 caracteres"),
 
-  email: z
-    .string()
-    .trim()
-    .email("Informe um e-mail válido")
-    .max(120, "Máximo 120 caracteres"),
-  contact: z
-    .string()
-    .trim()
-    .min(5, "Informe seu WhatsApp")
-    .max(120, "Máximo 120 caracteres"),
-});
+    email: z
+      .string()
+      .trim()
+      .email("Informe um e-mail válido")
+      .max(120, "Máximo 120 caracteres"),
+    contact: z
+      .string()
+      .trim()
+      .min(5, "Informe seu WhatsApp")
+      .max(120, "Máximo 120 caracteres"),
+  })
+  // v405 — Portão de entrada honesto: aceita @usuario, usuario, instagram.com/usuario e link completo.
+  // Views/Reels continuam exigindo link do post (o fornecedor precisa da URL da publicação).
+  .superRefine((val, ctx) => {
+    const isViews = val.plan.startsWith("v");
+    const p = val.profile.trim();
+    if (isViews && !/^https?:\/\//i.test(p) && !/instagram\.com\//i.test(p)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["profile"],
+        message: "Para visualizações, cole o link do vídeo/Reels (ex.: instagram.com/reel/...).",
+      });
+      return;
+    }
+    if (!isViews && !/^[A-Za-z0-9._@/:%-]+$/.test(p)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["profile"],
+        message: "Informe seu @usuario do Instagram (sem espaços) ou o link do perfil.",
+      });
+    }
+  })
+  .transform((val) => {
+    if (val.plan.startsWith("v")) return val;
+    let p = val.profile.trim();
+    if (/^https?:\/\//i.test(p) || /instagram\.com\//i.test(p)) return { ...val, profile: p };
+    p = p.replace(/^@+/, "");
+    return { ...val, profile: `@${p}` };
+  });
+
 
 type PedidoInfo = {
   price: string;
