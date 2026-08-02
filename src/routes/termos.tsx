@@ -11,7 +11,7 @@ export const Route = createFileRoute("/termos")({
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "robots", content: "index, follow" },
+        { name: "robots", content: "noindex, follow" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: "https://www.boostgg.com.br/termos" },
