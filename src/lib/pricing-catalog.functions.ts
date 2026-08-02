@@ -103,7 +103,6 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
       category: data.category.trim(),
       quantidade: data.quantidade,
       cost_brl: Number(data.cost_brl.toFixed(4)),
-      price_brl: Number(data.price_brl.toFixed(2)),
       smmhype_service_id: hype,
       smmpanel_service_id: panel,
       verified_service_id: verified,
@@ -123,9 +122,19 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
         error: `⛔ Vínculo recusado: o ID ${r.id} no fornecedor é "${r.nome}", que não combina com "${row.category}". Confira o número no painel do fornecedor.`,
       };
     }
+    const existing = await supabaseAdmin
+      .from("pricing_items" as any)
+      .select("pacote")
+      .eq("pacote", row.pacote)
+      .maybeSingle();
+    const guardedRow = guarded.rows[0];
+    if (!guardedRow) return { ok: false, error: "Vínculo inválido" };
+    const writeRow = existing.data
+      ? guardedRow
+      : { ...guardedRow, price_brl: Number(data.price_brl.toFixed(2)) };
     const { error } = await supabaseAdmin
       .from("pricing_items" as any)
-      .upsert(guarded.rows[0], { onConflict: "pacote" });
+      .upsert(writeRow, { onConflict: "pacote" });
 
     if (error) {
       // Traduz erro do CHECK CONSTRAINT do banco
@@ -134,6 +143,8 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
       }
       return { ok: false, error: error.message };
     }
+    const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
+    await enforcePriceAuthority("admin-catalog");
     return { ok: true };
   });
 

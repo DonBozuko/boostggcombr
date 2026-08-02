@@ -103,4 +103,13 @@ describe("moeda nativa do fornecedor", () => {
     expect(effectiveFx("verified", 5.0781)).toBe(1);
     expect(effectiveFx("smmhype", 5.0781)).toBe(5.0781);
   });
+
+  it("roteamento vivo consulta a coluna moeda, igual ao sincronismo de preço", async () => {
+    const { readFileSync } = await import("node:fs");
+    const routing = readFileSync("src/lib/smart-routing.server.ts", "utf8");
+    const pricing = readFileSync("src/lib/pricing-cache.server.ts", "utf8");
+    expect(routing).toContain("cotacao_brl, moeda,");
+    expect(routing).toContain('String(f.moeda ?? "").toUpperCase() === "USD"');
+    expect(pricing).toContain('moeda === "USD" ? cot : 1');
+  });
 });

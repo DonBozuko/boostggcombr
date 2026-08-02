@@ -278,8 +278,9 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
       column: SLUG_TO_COLUMN[String(f.slug)] ?? String(f.slug),
       endpoint: normalizeEndpoint(f.api_url),
       apiKey: process.env[String(f.api_key_secret ?? "")] ?? null,
-      // v266 — só converte quando o fornecedor cobra em USD. Moeda ausente = trata
-      // como BRL (fx=1) para NUNCA subestimar custo por conversão inventada.
+      // v404 — a coluna `moeda` do banco é a autoridade. O slug não decide
+      // câmbio: o mesmo fornecedor pode mudar a moeda contratual sem mudar o
+      // nome. Esta é a mesma regra usada pelo roteamento vivo abaixo.
       fx: moeda === "USD" ? cot : 1,
     };
   }).filter((p) => p.endpoint);

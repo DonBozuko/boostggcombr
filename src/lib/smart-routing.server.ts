@@ -103,7 +103,7 @@ export async function rankProvidersByCost(opts: {
   const [{ data: forn }, { data: svc }, { data: health }, pricingItem, { data: autoIds }] = await Promise.all([
     supabaseAdmin
       .from("fornecedores")
-      .select("slug, nome, ativo, saldo_atual, cotacao_brl, prioridade, api_url, api_key_secret")
+      .select("slug, nome, ativo, saldo_atual, cotacao_brl, moeda, prioridade, api_url, api_key_secret")
       .eq("ativo", true),
     serviceId != null
       ? supabaseAdmin.from("services_cache").select("rate").eq("provider_service_id", serviceId).maybeSingle()
@@ -302,11 +302,13 @@ export async function rankProvidersByCost(opts: {
   ((health as any[]) ?? []).forEach((h) => healthMap.set(h.slug, h.unstable_until));
 
   const now = Date.now();
-  const { effectiveFx } = await import("./critical-guards");
   const ranked: RankedProvider[] = ((forn as any[]) ?? []).map((f) => {
     const cotRaw = Number(f.cotacao_brl ?? 7.0) || 7.0;
-    // v246 — painéis BR cobram em BRL: não multiplicar pela cotação USD.
-    const cot = effectiveFx(f.slug, cotRaw);
+    // v404 — moeda vem do cadastro do fornecedor, nunca do nome/slug. Antes o
+    // sync de preço respeitava `fornecedores.moeda`, mas o preflight vivo usava
+    // regex do slug. Se o cadastro dizia USD, os dois motores liam custos
+    // diferentes e quatro pacotes oscilavam entre preço saudável e prejuízo.
+    const cot = String(f.moeda ?? "").toUpperCase() === "USD" ? cotRaw : 1;
     const providerRate = providerRateMap[f.slug] ?? null;
     const cost = providerRate != null
       ? Number(((opts.quantidade / 1000) * providerRate * cot).toFixed(4))

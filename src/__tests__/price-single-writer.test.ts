@@ -41,4 +41,12 @@ describe("v305 — ponto único de gravação de preço", () => {
     }
     expect(infratores).toEqual([]);
   });
+
+  it("edição manual preserva preço existente e entrega a decisão à autoridade", () => {
+    const src = readFileSync("src/lib/pricing-catalog.functions.ts", "utf8");
+    const rowStart = src.indexOf("const row = {");
+    const rowEnd = src.indexOf("};", rowStart);
+    expect(src.slice(rowStart, rowEnd)).not.toMatch(/price_brl\s*:/);
+    expect(src).toContain('enforcePriceAuthority("admin-catalog")');
+  });
 });
