@@ -551,8 +551,15 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
   };
   await supabaseAdmin.from("canary_runs").insert({ ...base, status: "failed", detail: `[${rede}] TODOS falharam: ${tentativas.join(" | ")}` } as any);
   report.ok = false;
-  const m = `🚨 ENTREGA REAL QUEBRADA\n\nPROBLEMA: o teste de compra real (${rede} · ${alvo.pacote}) falhou em TODOS os ${cadeia.length} fornecedores:\n${tentativas.map((t) => `• ${t}`).join("\n")}\n\nO QUE FAZER: cliente que comprar esse pacote agora NÃO vai receber. Abrir /admin e conferir fornecedores antes de qualquer venda.`;
-  if (await alert(`entrega:${alvo.pacote}`, m)) report.alertas.push(m);
+  // v408 — Só alerta "QUEBRADA" se ao menos um erro for estrutural.
+  // Se todos forem colisão de link, é "AVISO: LINK OCUPADO".
+  const todosOcupados = tentativas.every(t => /active order|duplicate|mesmo link/i.test(t));
+  
+  const m = todosOcupados
+    ? `⚠️ CANÁRIO OCUPADO (${rede} · ${alvo.pacote})\n\nPROBLEMA: o teste não rodou porque o link de teste já possui pedidos em andamento nos ${cadeia.length} fornecedores.\n\nO QUE FAZER: nada agora. O sistema tentará novamente mais tarde. Se persistir, rotacione os links de teste no /admin.`
+    : `🚨 ENTREGA REAL QUEBRADA\n\nPROBLEMA: o teste de compra real (${rede} · ${alvo.pacote}) falhou em TODOS os ${cadeia.length} fornecedores:\n${tentativas.map((t) => `• ${t}`).join("\n")}\n\nO QUE FAZER: cliente que comprar esse pacote agora NÃO vai receber. Abrir /admin e conferir fornecedores antes de qualquer venda.`;
+  
+  if (await alert(`entrega:${alvo.pacote}`, m, todosOcupados ? 24 : 6)) report.alertas.push(m);
 }
 
 
