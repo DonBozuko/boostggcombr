@@ -304,7 +304,9 @@ const plans: Plan[] = [
 
 const likesPlans: Plan[] = [
   { id: "l100", tier: "100 Curtidas",   tag: "+ MINI",    qty: "100",   quantidade: 100,  valor: 3.0,  price: "R$ 3,00",  benefit: "Entrega rápida em qualquer post" },
-  { id: "l500", tier: "500 Curtidas",   tag: "+ STARTER", qty: "500",   quantidade: 500,  valor: 7.0,  price: "R$ 7,00",  benefit: "Engajamento real e seguro" },
+  { id: "l100_v2", tier: "100 Curtidas",   tag: "IMPULSO",   qty: "100",   quantidade: 100,  valor: 9.9,  price: "R$ 9,90",  benefit: "Entrega relâmpago" },
+  { id: "l250_v2", tier: "250 Curtidas",   tag: "POPULAR",   qty: "250",   quantidade: 250,  valor: 14.9, price: "R$ 14,90", benefit: "Melhor custo-benefício" },
+  { id: "l500_v2", tier: "500 Curtidas",   tag: "STARTER",   qty: "500",   quantidade: 500,  valor: 19.9, price: "R$ 19,90", benefit: "Engajamento real" },
   { id: "l1k",  tier: "1.000 Curtidas", tag: "+ BASIC",   qty: "1.000", quantidade: 1000, valor: 12.0, price: "R$ 12,00", benefit: "Mais recomendado", highlight: true },
   { id: "l2k",  tier: "2.000 Curtidas", tag: "+ GROWTH",  qty: "2.000", quantidade: 2000, valor: 19.0, price: "R$ 19,00", benefit: "Boost rápido no alcance" },
   { id: "l5k",  tier: "5.000 Curtidas", tag: "+ PRO",     qty: "5.000", quantidade: 5000, valor: 39.0, price: "R$ 39,00", benefit: "Máximo impacto no post" },
