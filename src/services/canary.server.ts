@@ -400,6 +400,10 @@ async function checkOpenRuns(cfg: CanaryConfig, report: CanaryReport): Promise<v
 
 
 /** Fase 2 — dispara um novo canário na rede que está há mais tempo sem teste.
+ *  v408 — Melhoria industrial: detecção inteligente de colisão de link.
+ *  Se o fornecedor retornar "active order with this link", o canário não grita
+ *  "entrega quebrada", ele rotaciona o link imediatamente ou silencia o alarme
+ *  falso, pois o problema é no link de teste, não na capacidade de entrega.
  *  v285 — exercita o MESMO failover de um pedido real.
  *  v289 — rotaciona o POOL de links de teste da rede e respeita a quarentena
  *  por pacote+fornecedor. Só alerta quando NÃO existe rota segura. */
