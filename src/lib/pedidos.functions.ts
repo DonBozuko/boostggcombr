@@ -41,6 +41,10 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   // Instagram — Curtidas (service 18860)
   l100:   { quantidade: 100,  valor: 3.0 },
   l500:   { quantidade: 500,  valor: 7.0 },
+  // v407 - Prateleira de Impulso
+  l100_v2: { quantidade: 100, valor: 9.90 },
+  l250_v2: { quantidade: 250, valor: 14.90 },
+  l500_v2: { quantidade: 500, valor: 19.90 },
   l1k:    { quantidade: 1000, valor: 12.0 },
   l2k:    { quantidade: 2000, valor: 19.0 },
   l5k:    { quantidade: 5000, valor: 39.0 },
