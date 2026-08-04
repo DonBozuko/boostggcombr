@@ -428,6 +428,8 @@ type PedidoInfo = {
 };
 
 function Landing() {
+  /* Modo Torre,nesse modo vc ta muito rapido, isso me preocupa,nao tem um modo universal(orquestrador, modo fechamendo de projeto(mp), senior,desainer,etc)? */
+
   const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("seguidores");
   const [form, setForm] = useState({ plan: "", profile: "", email: "", contact: "" });
