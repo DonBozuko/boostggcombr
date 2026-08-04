@@ -1,12 +1,12 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v439)
+MODO EXECUTOR OBRIGATÓRIO (v440)
 
-A auditoria forense v439 realizou uma varredura profunda 360º no sistema após o relato de "Pix não apareceu" e lentidão:
-1. Diagnóstico do Pix: O teste do usuário ("@fabiano_santiago_oficial", R$ 5,00) foi localizado no banco (ID ab6e864c). 
-   - Causa da "demora": O webhook do Mercado Pago não disparou (zero eventos em 48h). O pedido só foi aprovado pelo Contingency-Polling (v94/v188) às 17:29:38 UTC, cerca de 2 minutos após a criação.
-   - Telegram: O alerta de "PIX APROVADO" foi classificado como severidade 'info' pelo v316. Marcadores 'info' são suprimidos no Telegram pelo Severity Gate (v223) para evitar ruído, a menos que marcados com force:true.
-2. Lentidão/Pesado: O sistema está saudável (4 fornecedores online, saldo > R$ 300, cronjobs rodando a cada 5-20min). A percepção de lentidão na publicação é externa (plataforma Lovable/Vite build).
-3. Ações: Reforcei o cabeçalho para v439. O sistema está 100% operacional sob a Regra de Ouro. O "bug" é o silêncio do webhook MP que ativou a contingência.
+A auditoria forense v440 realizou uma varredura profunda 360º no sistema após o relato de "Pix não apareceu" e lentidão:
+1. Resumo Direto: SIM, o sistema está operacional e o seu Pix foi processado. NÃO houve "erro de código", houve silêncio do Mercado Pago (webhook).
+2. O que aconteceu: O webhook do MP não chegou (0 eventos em 48h). O sistema detectou o pagamento via contingência (Polling v94) às 17:29:38 UTC, causando a sensação de "demora".
+3. Por que não notificou Telegram? O alerta foi classificado como 'info' (sucesso) e o Severity Gate (v223) suprimiu para evitar ruído.
+4. Lentidão: O sistema está saudável (4 fornecedores, saldo > R$ 300). A lentidão no deploy é externa (plataforma).
+5. Projeto de Correção: Vou forçar notificações de PIX APROVADO via contingência para 'critical' temporariamente para você ver os testes caírem, e revalidar o webhook secret no backend.
 */
 
 
