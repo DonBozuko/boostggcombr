@@ -1,4 +1,4 @@
-// v200 — SEO landing: "comprar seguidores instagram" (12.100/mês, KDI 27)
+// v414 — SEO landing: "comprar seguidores instagram" (Landing Principal de Conversão)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
@@ -10,28 +10,24 @@ const DESC =
 
 const FAQ = [
   {
-    q: "É seguro comprar seguidores para Instagram?",
-    a: "Sim. Não pedimos sua senha nem acesso ao perfil — apenas o @ público. Usamos entrega gradual para simular crescimento orgânico e não disparar filtros do Instagram.",
+    q: "Comprar seguidores é permitido?",
+    a: "Cada rede social possui seus próprios termos de uso e políticas para interação na plataforma. Por esse motivo, é importante conhecer as regras da rede social utilizada antes de contratar qualquer serviço. Neste conteúdo, o termo plataforma refere-se exclusivamente às redes sociais, como Instagram, TikTok, YouTube, Facebook, X, Twitch, Telegram e Kwai.",
   },
   {
-    q: "Em quanto tempo os seguidores entram?",
-    a: "Após o Pix aprovado, os primeiros seguidores começam a entrar em 1 a 5 minutos. Pedidos grandes (10k+) são entregues de forma escalonada em algumas horas para segurança da conta.",
+    q: "Preciso informar minha senha?",
+    a: "Os serviços de compra de seguidores normalmente solicitam apenas o nome de usuário ou o link do perfil público para identificar o destino da entrega. Nunca compartilhe sua senha ou códigos de autenticação com terceiros durante o processo de contratação.",
   },
   {
-    q: "Os seguidores são reais ou robôs?",
-    a: "Oferecemos duas linhas: mix internacional (mais barato, alta velocidade) e brasileiros reais (perfis com foto e postagens, valor um pouco maior). Você escolhe no checkout.",
+    q: "Quanto tempo demora para receber os seguidores?",
+    a: "O prazo varia conforme o serviço contratado, a plataforma escolhida e a demanda existente no momento da compra. Alguns pedidos iniciam rapidamente, enquanto outros seguem uma entrega distribuída ao longo do tempo. Verifique sempre as informações apresentadas na página do serviço antes de finalizar o pedido.",
   },
   {
-    q: "Se cair seguidor, tem reposição?",
-    a: "Nos pacotes 🇧🇷 Brasileiro Real, sim: reposição garantida por 30 dias sem custo. Nos pacotes 🌎 Global a reposição é solicitada ao fornecedor automaticamente; se o serviço não tiver garantia, avaliamos reenvio ou estorno no WhatsApp.",
+    q: "Posso comprar seguidores para qualquer rede social?",
+    a: "Isso depende da disponibilidade de serviços para cada plataforma. Muitas empresas oferecem soluções para Instagram, TikTok, YouTube, Facebook, X, Telegram, Twitch, Kwai e outras redes sociais. Antes da contratação, confirme se a rede desejada faz parte do catálogo disponível.",
   },
   {
-    q: "Preciso deixar o perfil público?",
-    a: "Sim, apenas durante a entrega. Perfis privados não permitem que a entrega processe. Depois de recebido, você pode fechar de novo.",
-  },
-  {
-    q: "Aceita quais formas de pagamento?",
-    a: "Trabalhamos exclusivamente com Pix — aprovação instantânea, sem taxa e disponível 24 horas por dia, inclusive fins de semana e feriados.",
+    q: "Comprar seguidores substitui uma estratégia de marketing?",
+    a: "Não. Comprar seguidores funciona como um recurso complementar dentro de uma estratégia de crescimento digital. Resultados mais consistentes costumam ser alcançados quando essa ação é combinada com produção de conteúdo relevante, SEO, identidade visual, anúncios, gestão de redes sociais e relacionamento com a audiência.",
   },
 ];
 
@@ -49,7 +45,14 @@ export const Route = createFileRoute("/comprar-seguidores-instagram")({
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: URL }],
-    scripts: [buildFaqJsonLd(FAQ), buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }), buildBreadcrumbJsonLd([{ name: "Início", url: "https://www.boostgg.com.br/" }, { name: "Seguidores Instagram", url: URL }])],
+    scripts: [
+      buildFaqJsonLd(FAQ),
+      buildProductJsonLd({ network: "Instagram", url: URL, description: DESC }),
+      buildBreadcrumbJsonLd([
+        { name: "Início", url: "https://www.boostgg.com.br/" },
+        { name: "Seguidores Instagram", url: URL },
+      ]),
+    ],
   }),
   component: Page,
 });
@@ -66,7 +69,7 @@ function Page() {
       benefits={[
         { icon: "zap", title: "Entrega em minutos", text: "Primeiros seguidores em 1-5 min após Pix aprovado." },
         { icon: "shield", title: "100% seguro", text: "Não pedimos sua senha. Só precisamos do @ público." },
-        { icon: "check", title: "Reposição 30 dias (BR)", text: "Pacotes 🇧🇷 Brasileiro Real têm reposição garantida; nos Global pedimos ao fornecedor." },
+        { icon: "check", title: "Reposição 30 dias (BR)", text: "Pacotes 🇧🇷 Brasileiro Real têm reposição garantida." },
         { icon: "clock", title: "Pix 24 horas", text: "Aprovação instantânea, funciona madrugada e feriado." },
       ]}
       pricingTitle="Tabela de preços — seguidores Instagram"
@@ -80,16 +83,12 @@ function Page() {
       ]}
       bodySections={[
         {
-          h2: "Por que comprar seguidores Instagram vale a pena",
-          body: "Perfil pequeno perde antes mesmo de ser lido. Ninguém segue quem tem 40 seguidores — é prova social invertida. Comprar seguidores no Instagram é um empurrão inicial que quebra essa barreira: sua conta passa a parecer confiável, o algoritmo começa a distribuir mais, e cada novo Reels chega em mais gente. Não substitui conteúdo bom, mas acelera o efeito.",
+          h2: "Por que Escolher a BoostGG para Comprar Seguidores",
+          body: "Plataforma especializada em crescimento para redes sociais\n\nA BoostGG reúne serviços voltados ao fortalecimento da presença digital em diferentes redes sociais. O catálogo contempla soluções para Instagram, TikTok, YouTube, Facebook, X, Twitch, Telegram, Kwai e outras plataformas. Isso permite concentrar diferentes estratégias de crescimento em um único ambiente.\n\nProcesso de compra simples e rápido\n\nO fluxo de compra foi desenvolvido para facilitar a contratação dos serviços. O usuário escolhe o pacote desejado, informa o nome de usuário ou o link do perfil público, realiza o pagamento e acompanha o processamento do pedido. Esse procedimento reduz etapas desnecessárias e melhora a experiência durante a compra.\n\nDiversidade de serviços para diferentes objetivos\n\nAlém de seguidores, a plataforma disponibiliza opções relacionadas a curtidas, visualizações, inscritos, comentários, compartilhamentos, horas de exibição e outras métricas específicas de cada rede social. Cada serviço atende um objetivo diferente dentro da estratégia de crescimento digital.\n\nSuporte e transparência durante a contratação\n\nTer acesso a informações claras sobre cada serviço ajuda o cliente a tomar decisões mais conscientes. Descrições completas, especificações do serviço e canais de atendimento contribuem para uma experiência mais segura durante todo o processo de compra.\n\nSolução para criadores, empresas e profissionais\n\nA BoostGG atende diferentes perfis de usuários. Criadores de conteúdo buscam ampliar o alcance das publicações. Empresas fortalecem sua presença digital para aumentar reconhecimento da marca. Profissionais utilizam as redes sociais para desenvolver autoridade em seus nichos e ampliar oportunidades de negócios.",
         },
         {
-          h2: "Como funciona a compra na BoostGG",
-          body: "1. Escolha o pacote (100 a 100.000 seguidores).\n2. Cole o @ do seu Instagram (sem senha).\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos os primeiros seguidores começam a entrar.\n5. Reposição automática por 30 dias se cair qualquer coisa.",
-        },
-        {
-          h2: "Diferença entre seguidores brasileiros e mix internacional",
-          body: "Mix internacional: mais barato, entrega mais rápida, ideal pra quem quer números altos rápido (viralizar, brand deal, etc). Brasileiros reais: perfis com foto, postagens e engajamento real, mais caros mas dão engajamento genuíno. Se seu objetivo é vender no Brasil, escolha brasileiros.",
+          h2: "Conclusão",
+          body: "Comprar seguidores pode fazer parte da sua estratégia digital\n\nComprar seguidores é uma alternativa para quem deseja fortalecer a presença nas redes sociais e acelerar o desenvolvimento de um perfil. Quando integrada a uma estratégia de marketing digital, essa ação pode contribuir para ampliar a visibilidade da marca, aumentar o reconhecimento e gerar mais oportunidades de crescimento.\n\nO crescimento sustentável depende de uma estratégia completa\n\nOs melhores resultados acontecem quando diferentes ações trabalham em conjunto. Produção de conteúdo de qualidade, SEO, gestão de redes sociais, anúncios, identidade visual, interação com a audiência e análise de métricas formam uma base sólida para o crescimento contínuo de um perfil.\n\nEscolha uma plataforma especializada\n\nAo selecionar um serviço para comprar seguidores, priorize plataformas que apresentem informações claras, variedade de serviços, suporte ao cliente e um processo de compra simples. Avaliar esses fatores ajuda a tomar uma decisão mais consciente e alinhada aos seus objetivos.\n\nInvista no fortalecimento da sua presença digital\n\nSe você procura uma plataforma especializada para comprar seguidores, curtidas, visualizações, inscritos e outros serviços para redes sociais, a BoostGG oferece soluções para diferentes plataformas e objetivos. Escolher o serviço adequado para sua estratégia pode ajudar a fortalecer sua presença digital e ampliar o potencial de crescimento do seu perfil.",
         },
       ]}
       faq={FAQ}
