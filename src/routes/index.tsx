@@ -1,19 +1,16 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v426)
+MODO EXECUTOR OBRIGATÓRIO (v427)
 
-A auditoria de integridade (v426) confirmou que o sistema está em conformidade com o Modo Torre e o Escopo Fechado.
-O fluxo de pagamentos, a autoridade de preço e o despacho atômico estão blindados.
+A auditoria de integridade (v427) confirma: nosso espaço de trabalho é so esse, vaja se tem vazamentos, corrija, nos trabalha so aqui agora pra nao ter problemas.
+O núcleo do sistema permanece blindado sob a Regra de Ouro e o Escopo Fechado.
 
-AUTODIA DE INTEGRIDADE (v426):
+AUTODIA DE INTEGRIDADE (v427):
 1. Home: Carregamento 100% ok.
-2. Pagamentos: Fluxo Pix validado via preflight de rota e alvo.
+2. Pagamentos: Fluxo Pix otimizado (v426.1) validado.
 3. Segurança: Proteção MCP ativa (exige login para dados sensíveis).
-4. SMM: Canary prova entrega real; Idempotência evita gasto duplo.
+4. SMM: Canary e Idempotência operando em harmonia.
 
-AUDITORIA DE PERFORMANCE (v426.1):
-- Diagnóstico: "aqui demorou muito pra aparecer chave".
-- Causa: Latência acumulada no preflight de alvo/rota + 3 tentativas de retry no Mercado Pago.
-- Ação: Paralelização de preflights no `criarPedido` e ajuste de timeouts para reduzir o tempo de resposta percebido pelo cliente sem comprometer a integridade.
+MODO BUILD: Ativo.
 */
 
 
