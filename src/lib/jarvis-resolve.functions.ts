@@ -19,30 +19,31 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    let query = supabaseAdmin
-      .from("jarvis_alerts")
-      .update({ mensagem: supabaseAdmin.rpc('resolve_alert_msg', { msg: 'mensagem' }) as any }) // Placeholder logic
-      // Simplificando: vamos apenas prepend "✅ RESOLVIDO " na mensagem
-      
-    // Como RPC de update dinâmico é complexo via query builder sem rpc customizado,
-    // vamos buscar os alertas e atualizar um por um ou via rpc se existir.
+    // Filtro de tempo para evitar processamento massivo de alertas antigos
+    const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
     
-    const { data: alerts } = await supabaseAdmin
+    // Busca alertas não resolvidos recentes
+    let q = supabaseAdmin
       .from("jarvis_alerts")
       .select("id, mensagem")
       .not("mensagem", "ilike", "✅ RESOLVIDO%")
-      .in("id", data.ids ?? [])
-      .gte("created_at", new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString());
+      .gte("created_at", since);
+      
+    if (data.ids && data.ids.length > 0) {
+      q = q.in("id", data.ids);
+    }
 
+    const { data: alerts, error: fetchError } = await q;
+    if (fetchError) return { ok: false, error: fetchError.message };
     if (!alerts || alerts.length === 0) return { ok: true, resolved: 0 };
 
     let resolvedCount = 0;
     for (const alert of alerts) {
-      const { error } = await supabaseAdmin
+      const { error: updateError } = await supabaseAdmin
         .from("jarvis_alerts")
         .update({ mensagem: `✅ RESOLVIDO ${alert.mensagem}` })
         .eq("id", alert.id);
-      if (!error) resolvedCount++;
+      if (!updateError) resolvedCount++;
     }
 
     return { ok: true, resolved: resolvedCount };
