@@ -186,8 +186,10 @@ function RootComponent() {
 
   // v265 — marca a indicação de afiliado (?ref=CODIGO) por 30 dias, first-touch.
   useEffect(() => {
+    // v417 — Hydration-safe: movemos lógica de persistência para pós-montagem para evitar CLS/re-rastreio JS
     import("@/lib/affiliate").then((m) => m.captureAffiliateRef()).catch(() => {});
   }, []);
+
 
 
   useEffect(() => {
