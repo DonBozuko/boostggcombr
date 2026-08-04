@@ -93,7 +93,7 @@ function AdminSettingsButton() {
         <DialogHeader>
           <DialogTitle>⚙️ Configurações Gerais</DialogTitle>
           <DialogDescription>
-            Preferências do painel Elite Boost Prime · sessão atual.
+            Preferências do painel BOOSTGG · sessão atual.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3 text-sm">
@@ -341,7 +341,8 @@ function AdminGate() {
     const { data } = await supabase.auth.getSession();
     const email = data.session?.user?.email?.toLowerCase() ?? null;
     
-    // v433: Se não há sessão, não redireciona, apenas mostra o login interno.
+    // v434: Blindagem total. Se não há sessão ou o e-mail não é o do administrador-mestre,
+    // o sistema exige autenticação interna do Jarvis em vez de login público.
     if (!data.session || email !== ADMIN_EMAIL) {
       setAdminTokenState("");
       setAuthed(false);
@@ -395,7 +396,8 @@ function AdminGate() {
   }, [hydrate]);
 
   if (!mounted) return null;
-  // v433: Mantém o usuário no AdminGate em vez de deixar o middleware redirecionar para fora
+  // v434: Blindagem de rota administrativa. O AdminGate renderiza o AdminLogin HUD
+  // em vez de redirecionar para a página de login de clientes.
   if (!authed || adminToken.length < 8) return <AdminLogin onSuccess={hydrate} />;
   return <AdminPage initialToken={adminToken} />;
 }
@@ -523,11 +525,11 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
           className="rounded-2xl border border-red-500/40 bg-gradient-to-b from-zinc-950 to-black p-8 shadow-[0_0_60px_rgba(255,0,40,0.35)] space-y-5"
         >
           <div className="text-center space-y-2">
-            <div className="text-4xl">🔐</div>
+            <div className="text-4xl">🤖</div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
               Painel J.A.R.V.I.S.
             </h1>
-            <p className="text-xs text-zinc-400">Supabase Auth · Administrador-Mestre</p>
+            <p className="text-xs text-zinc-400">Jarvis OS · Administrador-Mestre</p>
           </div>
           <Input
             type="email"
