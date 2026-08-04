@@ -1,15 +1,24 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v445) - HISTÓRICO REFINADO
+MODO EXECUTOR OBRIGATÓRIO (v446) — AUDITORIA VENDA × ENTREGA × CLIENTE
 
-A auditoria forense v445 redefiniu o histórico de análise para focar na integridade operacional absoluta. 
+Regra: nenhuma conclusão de “corrigido” ou “100% operacional” sem evidência
+cruzada de código, banco, cron, fornecedor e recibo de notificação.
 
-1. Redefinição de Contexto: Limpeza de resíduos de análises anteriores para garantir que o motor Jarvis opere com 100% de clareza sobre o estado atual do banco e integrações.
-2. Validação de Fluxo: Testes reais de Pix, Cartão e Cupons são executados via rede de contingência (Polling v94) para garantir que nenhuma venda seja perdida por falha de webhook externo (Mercado Pago).
-3. Transparência de Dados: O banco de dados (pedidos, alerts, funnel_events) é consultado em tempo real para verificar disparos de notificações e estados de erro.
-4. Blindagem Operacional: Políticas RLS e variáveis de ambiente (MP_TOKEN, TELEGRAM_ID) são verificadas para manter a integridade da "máquina de vendas".
+Evidência real auditada em 04/08/2026:
+1. O Pix do pedido ab6e864c foi criado às 17:27, confirmado pela contingência
+   às 17:29, despachado ao SMMhype às 17:40 e concluído com remains=0 às 18:00.
+2. O caminho primário de webhook NÃO foi comprovado nesse pedido; quem salvou a
+   venda foi o polling. Portanto, não declarar o webhook saudável sem novo evento.
+3. Os crons de reconciliação, abandono, SLA e entrega estão ativos e concluindo.
+4. Os quatro fornecedores estavam online e com saldo no instante da auditoria.
+5. Não havia pedido pago ativo órfão, em espera ou pendente no banco.
+6. A contingência tinha uma lacuna de atomicidade antes da chamada externa;
+   v446 passou a usar claimDispatch + commitDispatch + releaseDispatch.
+7. Cartão, cupom, estorno e falha real de fornecedor foram auditados em código,
+   mas não receberam nova transação financeira destrutiva nesta auditoria.
 
-EVITANDO RESPOSTAS SUPERFICIAIS: Cada alteração é baseada em evidência de log ou estado de banco.
-ESTADO ATUAL: 100% OPERACIONAL E MONITORADO.
+Estado honesto: fluxo Pix comprovado ponta a ponta pela contingência; entrega
+comprovada; webhook primário e recibo Telegram exigem nova prova de produção.
 */
 
 

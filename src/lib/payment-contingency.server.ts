@@ -211,6 +211,16 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   );
 
   const { respectsMinMargin } = await import("@/lib/margin-guardian");
+  // v446 — a contingência também precisa reservar o efeito externo ANTES de
+  // chamar qualquer fornecedor. O webhook, o reconciliador e o reprocessamento
+  // já usavam esta trava, mas este caminho ainda fazia apenas o UPDATE
+  // condicional depois do envio — tarde demais para impedir dupla-entrega.
+  const { claimDispatch, releaseDispatch } = await import("@/lib/dispatch-claim.server");
+  const { commitDispatch } = await import("@/lib/dispatch-commit.server");
+  if (!(await claimDispatch(supabaseAdmin as any, pedido.id))) {
+    return { ok: true, status: "paid", recovered: false, note: "Despacho já reivindicado por outro processo" };
+  }
+
   for (const f of cadeia) {
     // v216 — trava anti-prejuízo: se custo do fallback quebra margem mínima,
     // pula e vai pro próximo. Sem isso, SMMPainel (11x mais caro que SMMHype)
@@ -228,23 +238,24 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       pedidoId: pedido.id,
     });
     if (r.ok) {
+      const custoReal = costMap.get(f.slug) ?? null;
+      const gravado = await commitDispatch(supabaseAdmin as any, String(pedido.id), {
+          status: "processing",
+          error_detail: `Contingência OK · ${f.nome} (order ${r.orderId ?? "?"})`,
+          provider_slug: f.slug,
+          provider_order_id: r.orderId != null ? String(r.orderId) : null,
+          custo_real: custoReal,
+      });
+      if (!gravado) {
+        // Fail-closed contábil: nunca lança tesouraria/ledger se este processo
+        // não foi o dono da escrita final do pedido.
+        console.warn("[contingency] v446 corrida perdida após resposta do fornecedor", { pedidoId: pedido.id });
+        return { ok: true, status: "paid", recovered: false, note: "Outro processo concluiu o despacho" };
+      }
+
       sucesso = true;
       fornecedorOk = f.nome;
       orderIdOk = r.orderId ?? null;
-      const custoReal = costMap.get(f.slug) ?? null;
-      await supabaseAdmin
-        .from("pedidos")
-        .update({
-          status: "processing",
-          error_detail: `Contingência OK · ${f.nome} (order ${r.orderId ?? "?"})`,
-          ...(custoReal != null ? { custo_real: Number(custoReal.toFixed(4)) } : {}),
-          provider_slug: f.slug,
-          provider_order_id: r.orderId != null ? String(r.orderId) : null,
-          dispatched_at: new Date().toISOString(),
-          last_reconciled_at: new Date().toISOString(),
-        } as any)
-        .eq("id", pedido.id)
-        .is("provider_order_id", null);
 
       // v174 — ledger + treasury: fecha o buraco de auditoria do path legado
       try {
@@ -294,6 +305,8 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
       }
     } catch { /* noop */ }
   }
+
+  if (!sucesso) await releaseDispatch(supabaseAdmin as any, pedido.id);
 
   // 5) Log de auditoria — TI consome via jarvis_alerts
   try {
