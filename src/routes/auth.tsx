@@ -47,8 +47,8 @@ function AuthPage() {
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-yellow-200 via-yellow-400 to-amber-600 shadow-glow">
             <LogIn className="size-8 text-black" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Área do Cliente</h1>
-          <p className="mt-2 text-zinc-400">Entre para gerenciar seus pedidos e ferramentas.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Painel de Controle</h1>
+          <p className="mt-2 text-zinc-400">Acesso restrito para administradores e suporte.</p>
         </div>
 
         <div className="mt-8">
