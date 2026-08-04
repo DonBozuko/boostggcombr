@@ -1373,7 +1373,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             Diferente de outros sites, nosso processo é 100% transparente: você escolhe o plano, paga via <Link to="/pix-seguidores-instagram" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">Pix com aprovação instantânea</Link> e o sistema inicia a entrega automática. Sem necessidade de senha ou cadastros complexos, garantindo a total privacidade da sua conta.
           </p>
           <p>
-            Se você busca o <Link to="/comprar-seguidores-instagram-barato" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">melhor site para comprar seguidores</Link>, a Elite Boost Prime combina tecnologia de ponta com suporte dedicado para assegurar que seu investimento traga resultados reais para o seu engajamento.
+            Se você busca o <Link to="/comprar-seguidores-instagram-barato" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">melhor site para comprar seguidores</Link>, a <strong>BoostGG</strong> combina tecnologia de ponta com suporte dedicado para assegurar que seu investimento traga resultados reais para o seu engajamento.
           </p>
           <h3 className="text-lg font-bold text-white pt-4">Como comprar seguidores no Pix</h3>
           <ol className="list-decimal pl-5 space-y-3">
@@ -1381,7 +1381,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             <li><strong>Identifique o perfil:</strong> Informe o @usuário ou link do perfil público (não pedimos senha).</li>
             <li><strong>Pague no Pix:</strong> Gere o QR Code, pague no seu banco e a entrega inicia sozinha.</li>
           </ol>
-          <h3 className="text-lg font-semibold text-foreground pt-2">Diferenciais Elite Boost Prime</h3>
+          <h3 className="text-lg font-bold text-white pt-2">Diferenciais BoostGG</h3>
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Seguidores reais</strong> — perfis ativos, sem bots ou contas vazias.</li>
             <li><strong>Entrega via Pix</strong> — confirmação instantânea e início rápido.</li>
