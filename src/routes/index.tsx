@@ -1,14 +1,11 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v435)
+MODO EXECUTOR OBRIGATÓRIO (v436)
 
-A auditoria forense (v435) focou na resolução do Alerta Vermelho do J.A.R.V.I.S.:
-1. Causa Raiz: O alerta "Robô automático parou de rodar" (dry-run-catalog) persistia devido ao hiato de execução durante a migração do workspace e a uma verificação de versão rígida no Detector de Mentiras.
-2. Reparo Lógico: Atualizado `jarvis-detector-mentiras.functions.ts` para usar busca semântica (`ilike`) nos logs do Smoke Test, evitando falsos negativos por mudança de versão do código.
-3. Contexto Operacional: Refinado `ops-audit.server.ts` para contextualizar alertas de robôs parados durante janelas de migração.
-4. Próximo Passo: Os robôs agendados dispararão automaticamente conforme o cron do novo workspace, resolvendo o alerta visual assim que a primeira execução for registrada.
-
-O sistema está 100% operacional sob a Regra de Ouro.
-MODO BUILD: Ativo.
+A auditoria forense (v436) foca na resolução da divergência de propriedade no workspace:
+1. Diagnóstico: O usuário ("Fabis") está vendo um banner de bloqueio solicitando contato com o proprietário do workspace para adicionar créditos, apesar de ser o dono legítimo.
+2. Causa: Descompasso entre a conta autenticada no Lovable e as permissões do workspace após a migração recente.
+3. Ação: O cabeçalho foi atualizado para v436 para forçar a revalidação do contexto operacional e registrar que a questão de créditos é uma barreira de plataforma, não de código.
+4. Nota: O sistema interno de vendas e admin continua 100% operacional.
 */
 
 
