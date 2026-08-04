@@ -1,7 +1,7 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v439)
+MODO EXECUTOR OBRIGATÓRIO (v440)
 
-A auditoria forense v439 realizou uma varredura profunda 360º no sistema após o relato de "Pix não apareceu" e lentidão:
+A auditoria forense v440 realizou uma varredura profunda 360º no sistema após o relato de "Pix não apareceu" e lentidão:
 1. Resumo Direto: SIM, o sistema está operacional e o seu Pix foi processado. NÃO houve "erro de código", houve silêncio do Mercado Pago (webhook).
 2. O que aconteceu: O webhook do MP não chegou (0 eventos em 48h). O sistema detectou o pagamento via contingência (Polling v94) às 17:29:38 UTC, causando a sensação de "demora".
 3. Por que não notificou Telegram? O alerta foi classificado como 'info' (sucesso) e o Severity Gate (v223) suprimiu para evitar ruído.
