@@ -763,8 +763,8 @@ const POSTS: Record<string, Post> = {
         <p>Agora que você tem o 'número', precisa da 'retenção'. Poste pelo menos 3 Reels por semana para aproveitar a autoridade que o novo volume de seguidores traz.</p>
         <h3>Estratégias para aumentar o engajamento</h3>
         <p>Use os Stories para interagir. Seguidores novos são curiosos; mostre os bastidores e use enquetes para 'esquentar' a base.</p>
-        <h3>Crescimento pago e orgânico</h3>
-        <p>A compra de seguidores é a base da <strong>Prova Social</strong>. Combine isso com tráfego pago ou parcerias para que o visitante novo sinta confiança ao ver seu perfil robusto.</p>
+        <h3>Combinação entre crescimento pago e orgânico</h3>
+        <p>A compra de seguidores é a base da <strong>Prova Social</strong>. Combine isso com tráfego pago ou parcerias para que o visitante novo sinta confiança ao ver seu perfil robusto. Termos como "comprar seguidores gram" são atalhos para encontrar volume, mas a retenção vem da qualidade do seu post.</p>
         <h3>Métricas que realmente importam</h3>
         <p>Não foque só no número total. Olhe para o <em>alcance de contas não seguidores</em> e <em>salvamentos</em>. Esses são os dados que o Instagram usa para viralizar seus posts.</p>
       </>
