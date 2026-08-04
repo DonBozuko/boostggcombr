@@ -23,7 +23,6 @@ import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/compr
 import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
 import { Route as ComprarSeguidoresInstagramBaratoRouteImport } from './routes/comprar-seguidores-instagram-barato'
 import { Route as ComprarSeguidoresKwaiRouteImport } from './routes/comprar-seguidores-kwai'
-import { Route as ComprarSeguidoresReaisBrasilRouteImport } from './routes/comprar-seguidores-reais-brasil'
 import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
 import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
 import { Route as CrescerYoutubeRouteImport } from './routes/crescer-youtube'
@@ -38,10 +37,8 @@ import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
 import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
 import { Route as PainelSmmRouteImport } from './routes/painel-smm'
-import { Route as PixSeguidoresInstagramRouteImport } from './routes/pix-seguidores-instagram'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
-import { Route as QuemSomosRouteImport } from './routes/quem-somos'
 import { Route as RastrearRouteImport } from './routes/rastrear'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as RevendaRouteImport } from './routes/revenda'
@@ -203,12 +200,6 @@ const ComprarSeguidoresKwaiRoute = ComprarSeguidoresKwaiRouteImport.update({
   path: '/comprar-seguidores-kwai',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComprarSeguidoresReaisBrasilRoute =
-  ComprarSeguidoresReaisBrasilRouteImport.update({
-    id: '/comprar-seguidores-reais-brasil',
-    path: '/comprar-seguidores-reais-brasil',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ComprarSeguidoresTiktokRoute = ComprarSeguidoresTiktokRouteImport.update({
   id: '/comprar-seguidores-tiktok',
   path: '/comprar-seguidores-tiktok',
@@ -280,11 +271,6 @@ const PainelSmmRoute = PainelSmmRouteImport.update({
   path: '/painel-smm',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PixSeguidoresInstagramRoute = PixSeguidoresInstagramRouteImport.update({
-  id: '/pix-seguidores-instagram',
-  path: '/pix-seguidores-instagram',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
@@ -293,11 +279,6 @@ const PrivacidadeRoute = PrivacidadeRouteImport.update({
 const Promo5reaisRoute = Promo5reaisRouteImport.update({
   id: '/promo-5reais',
   path: '/promo-5reais',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const QuemSomosRoute = QuemSomosRouteImport.update({
-  id: '/quem-somos',
-  path: '/quem-somos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RastrearRoute = RastrearRouteImport.update({
@@ -420,9 +401,9 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 } as any)
 const ComprarSeguidoresReaisBrasilIndexRoute =
   ComprarSeguidoresReaisBrasilIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => ComprarSeguidoresReaisBrasilRoute,
+    id: '/comprar-seguidores-reais-brasil/',
+    path: '/comprar-seguidores-reais-brasil/',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
   id: '/dashboard/seo',
@@ -471,14 +452,14 @@ const FerramentasGeradorLegendaInstagramRoute =
   } as any)
 const PixSeguidoresInstagramIndexRoute =
   PixSeguidoresInstagramIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => PixSeguidoresInstagramRoute,
+    id: '/pix-seguidores-instagram/',
+    path: '/pix-seguidores-instagram/',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const QuemSomosIndexRoute = QuemSomosIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => QuemSomosRoute,
+  id: '/quem-somos/',
+  path: '/quem-somos/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
   id: '/~api/beat',
@@ -786,7 +767,6 @@ export interface FileRoutesByFullPath {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
-  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRouteWithChildren
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -801,10 +781,8 @@ export interface FileRoutesByFullPath {
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/painel-smm': typeof PainelSmmRoute
-  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
-  '/quem-somos': typeof QuemSomosRouteWithChildren
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
@@ -1026,7 +1004,6 @@ export interface FileRoutesById {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
-  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRouteWithChildren
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -1041,10 +1018,8 @@ export interface FileRoutesById {
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/painel-smm': typeof PainelSmmRoute
-  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
-  '/quem-somos': typeof QuemSomosRouteWithChildren
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
@@ -1149,7 +1124,6 @@ export interface FileRouteTypes {
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-kwai'
-    | '/comprar-seguidores-reais-brasil'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -1164,10 +1138,8 @@ export interface FileRouteTypes {
     | '/painel-afiliado'
     | '/painel-revendedor'
     | '/painel-smm'
-    | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
-    | '/quem-somos'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
@@ -1388,7 +1360,6 @@ export interface FileRouteTypes {
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-kwai'
-    | '/comprar-seguidores-reais-brasil'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -1403,10 +1374,8 @@ export interface FileRouteTypes {
     | '/painel-afiliado'
     | '/painel-revendedor'
     | '/painel-smm'
-    | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
-    | '/quem-somos'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
@@ -1510,7 +1479,6 @@ export interface RootRouteChildren {
   ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
   ComprarSeguidoresInstagramBaratoRoute: typeof ComprarSeguidoresInstagramBaratoRoute
   ComprarSeguidoresKwaiRoute: typeof ComprarSeguidoresKwaiRoute
-  ComprarSeguidoresReaisBrasilRoute: typeof ComprarSeguidoresReaisBrasilRouteWithChildren
   ComprarSeguidoresTiktokRoute: typeof ComprarSeguidoresTiktokRoute
   ComprarVisualizacoesTiktokRoute: typeof ComprarVisualizacoesTiktokRoute
   CrescerYoutubeRoute: typeof CrescerYoutubeRoute
@@ -1525,10 +1493,8 @@ export interface RootRouteChildren {
   PainelAfiliadoRoute: typeof PainelAfiliadoRoute
   PainelRevendedorRoute: typeof PainelRevendedorRoute
   PainelSmmRoute: typeof PainelSmmRoute
-  PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
-  QuemSomosRoute: typeof QuemSomosRouteWithChildren
   RastrearRoute: typeof RastrearRoute
   ReembolsoRoute: typeof ReembolsoRoute
   RevendaRoute: typeof RevendaRoute
@@ -1558,7 +1524,10 @@ export interface RootRouteChildren {
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
   Char126apiBeatRoute: typeof Char126apiBeatRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
+  PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
+  QuemSomosIndexRoute: typeof QuemSomosIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
@@ -1712,13 +1681,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ComprarSeguidoresKwaiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/comprar-seguidores-reais-brasil': {
-      id: '/comprar-seguidores-reais-brasil'
-      path: '/comprar-seguidores-reais-brasil'
-      fullPath: '/comprar-seguidores-reais-brasil'
-      preLoaderRoute: typeof ComprarSeguidoresReaisBrasilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/comprar-seguidores-tiktok': {
       id: '/comprar-seguidores-tiktok'
       path: '/comprar-seguidores-tiktok'
@@ -1817,13 +1779,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelSmmRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/pix-seguidores-instagram': {
-      id: '/pix-seguidores-instagram'
-      path: '/pix-seguidores-instagram'
-      fullPath: '/pix-seguidores-instagram'
-      preLoaderRoute: typeof PixSeguidoresInstagramRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/privacidade': {
       id: '/privacidade'
       path: '/privacidade'
@@ -1836,13 +1791,6 @@ declare module '@tanstack/react-router' {
       path: '/promo-5reais'
       fullPath: '/promo-5reais'
       preLoaderRoute: typeof Promo5reaisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quem-somos': {
-      id: '/quem-somos'
-      path: '/quem-somos'
-      fullPath: '/quem-somos'
-      preLoaderRoute: typeof QuemSomosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/rastrear': {
@@ -2008,10 +1956,10 @@ declare module '@tanstack/react-router' {
     }
     '/comprar-seguidores-reais-brasil/': {
       id: '/comprar-seguidores-reais-brasil/'
-      path: '/'
+      path: '/comprar-seguidores-reais-brasil'
       fullPath: '/comprar-seguidores-reais-brasil/'
       preLoaderRoute: typeof ComprarSeguidoresReaisBrasilIndexRouteImport
-      parentRoute: typeof ComprarSeguidoresReaisBrasilRoute
+      parentRoute: typeof rootRouteImport
     }
     '/dashboard/seo': {
       id: '/dashboard/seo'
@@ -2071,17 +2019,17 @@ declare module '@tanstack/react-router' {
     }
     '/pix-seguidores-instagram/': {
       id: '/pix-seguidores-instagram/'
-      path: '/'
+      path: '/pix-seguidores-instagram'
       fullPath: '/pix-seguidores-instagram/'
       preLoaderRoute: typeof PixSeguidoresInstagramIndexRouteImport
-      parentRoute: typeof PixSeguidoresInstagramRoute
+      parentRoute: typeof rootRouteImport
     }
     '/quem-somos/': {
       id: '/quem-somos/'
-      path: '/'
+      path: '/quem-somos'
       fullPath: '/quem-somos/'
       preLoaderRoute: typeof QuemSomosIndexRouteImport
-      parentRoute: typeof QuemSomosRoute
+      parentRoute: typeof rootRouteImport
     }
     '/~api/beat': {
       id: '/~api/beat'
@@ -2462,47 +2410,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface ComprarSeguidoresReaisBrasilRouteChildren {
-  ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
-}
-
-const ComprarSeguidoresReaisBrasilRouteChildren: ComprarSeguidoresReaisBrasilRouteChildren =
-  {
-    ComprarSeguidoresReaisBrasilIndexRoute:
-      ComprarSeguidoresReaisBrasilIndexRoute,
-  }
-
-const ComprarSeguidoresReaisBrasilRouteWithChildren =
-  ComprarSeguidoresReaisBrasilRoute._addFileChildren(
-    ComprarSeguidoresReaisBrasilRouteChildren,
-  )
-
-interface PixSeguidoresInstagramRouteChildren {
-  PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
-}
-
-const PixSeguidoresInstagramRouteChildren: PixSeguidoresInstagramRouteChildren =
-  {
-    PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
-  }
-
-const PixSeguidoresInstagramRouteWithChildren =
-  PixSeguidoresInstagramRoute._addFileChildren(
-    PixSeguidoresInstagramRouteChildren,
-  )
-
-interface QuemSomosRouteChildren {
-  QuemSomosIndexRoute: typeof QuemSomosIndexRoute
-}
-
-const QuemSomosRouteChildren: QuemSomosRouteChildren = {
-  QuemSomosIndexRoute: QuemSomosIndexRoute,
-}
-
-const QuemSomosRouteWithChildren = QuemSomosRoute._addFileChildren(
-  QuemSomosRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -2518,8 +2425,6 @@ const rootRouteChildren: RootRouteChildren = {
   ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
   ComprarSeguidoresInstagramBaratoRoute: ComprarSeguidoresInstagramBaratoRoute,
   ComprarSeguidoresKwaiRoute: ComprarSeguidoresKwaiRoute,
-  ComprarSeguidoresReaisBrasilRoute:
-    ComprarSeguidoresReaisBrasilRouteWithChildren,
   ComprarSeguidoresTiktokRoute: ComprarSeguidoresTiktokRoute,
   ComprarVisualizacoesTiktokRoute: ComprarVisualizacoesTiktokRoute,
   CrescerYoutubeRoute: CrescerYoutubeRoute,
@@ -2534,10 +2439,8 @@ const rootRouteChildren: RootRouteChildren = {
   PainelAfiliadoRoute: PainelAfiliadoRoute,
   PainelRevendedorRoute: PainelRevendedorRoute,
   PainelSmmRoute: PainelSmmRoute,
-  PixSeguidoresInstagramRoute: PixSeguidoresInstagramRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
-  QuemSomosRoute: QuemSomosRouteWithChildren,
   RastrearRoute: RastrearRoute,
   ReembolsoRoute: ReembolsoRoute,
   RevendaRoute: RevendaRoute,
@@ -2572,7 +2475,11 @@ const rootRouteChildren: RootRouteChildren = {
     FerramentasGeradorLegendaInstagramRoute,
   Char126apiBeatRoute: Char126apiBeatRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ComprarSeguidoresReaisBrasilIndexRoute:
+    ComprarSeguidoresReaisBrasilIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
+  PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
+  QuemSomosIndexRoute: QuemSomosIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBadgeRoute: ApiPublicBadgeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
