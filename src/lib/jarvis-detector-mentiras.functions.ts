@@ -117,7 +117,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
           ? warns.length > 0
             ? `sem erros — último aviso: ${warns[0]?.mensagem?.slice(0, 60)}`
             : "silêncio total, tudo saudável"
-          : `⚠️ ${errors[0]?.mensagem?.slice(0, 80)}`,
+          : `⚠️ <b>${errors[0]?.origem?.toUpperCase()}</b>: ${errors[0]?.mensagem?.slice(0, 80)}`,
       });
       if (!alertOk) blockDeploy = true;
 
