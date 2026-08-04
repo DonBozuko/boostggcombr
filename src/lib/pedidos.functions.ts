@@ -327,41 +327,33 @@ export const criarPedido = createServerFn({ method: "POST" })
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
-    // v297 — PREFLIGHT DE ROTA AO VIVO. Última porta antes de cobrar.
-    // Roda os MESMOS filtros do despacho (ID fantasma, faixa, BR/refill,
-    // sanidade de custo, saldo e margem). Se nenhum fornecedor consegue
-    // entregar agora, não geramos cobrança — cobrar e estornar depois destrói
-    // confiança (casos p15k R$283,44 e kf2k R$18,00).
-    // Fail-open: erro/timeout do próprio preflight libera a venda.
+    // v297/v301 — PREFLIGHTS PARALELOS (Otimização v426.1).
+    // Antes eram sequenciais, adicionando ~2-4s de latência. Agora rodam juntos.
+    // Prova de ROTA + Prova de ALVO. Se algum falhar, bloqueia antes de cobrar.
     try {
-      const { preflightRouteOrBlock } = await import("./route-preflight.server");
-      const pre = await preflightRouteOrBlock({
-        pacote: pacoteEfetivo,
-        quantidade: quantidadeEfetiva,
-        valorBrl: valorCobrar,
-      });
-      if (!pre.ok) {
-        console.error("[criarPedido] v297 cobrança bloqueada:", pacoteEfetivo, pre.reason);
+      const [preflightRoute, preflightTarget] = await Promise.all([
+        import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
+          pacote: pacoteEfetivo,
+          quantidade: quantidadeEfetiva,
+          valorBrl: valorCobrar,
+        })),
+        import("./target-preflight.server").then(m => m.preflightTargetOrBlock({
+          rede: data.rede_social ?? "instagram",
+          pacote: pacoteEfetivo,
+          alvo: data.instagram_user,
+        }))
+      ]);
+
+      if (!preflightRoute.ok) {
+        console.error("[criarPedido] v297 cobrança bloqueada (rota):", pacoteEfetivo, preflightRoute.reason);
         return { ok: false as const, error: "INVALID_PACKAGE" as const };
       }
+      if (!preflightTarget.ok) {
+        console.error("[criarPedido] v301 cobrança bloqueada (alvo):", data.instagram_user, preflightTarget.code);
+        return { ok: false as const, error: preflightTarget.code };
+      }
     } catch (err) {
-      console.warn("[criarPedido] v297 preflight falhou (venda liberada):", err);
-    }
-
-    // v301 — PREFLIGHT DE ALVO. A v297 prova que existe ROTA; esta prova que o
-    // ALVO é aceitável. Perfil inexistente/privado é recusado por todo painel
-    // SMM ("Unable to verify your domain submission") — foi a causa real do
-    // estorno de R$ 283,44 (p15k, 26/07). Fail-open em instabilidade.
-    try {
-      const { preflightTargetOrBlock } = await import("./target-preflight.server");
-      const alvo = await preflightTargetOrBlock({
-        rede: data.rede_social ?? "instagram",
-        pacote: pacoteEfetivo,
-        alvo: data.instagram_user,
-      });
-      if (!alvo.ok) return { ok: false as const, error: alvo.code };
-    } catch (err) {
-      console.warn("[criarPedido] v301 preflight de alvo falhou (venda liberada):", err);
+      console.warn("[criarPedido] Preflights falharam (venda liberada por fail-open):", err);
     }
 
 
@@ -596,7 +588,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       payer: { email: data.email.trim().toLowerCase() },
       notification_url: "https://boostgg.com.br/api/public/mp-webhook",
     });
-    const backoffs = [0, 500, 1500];
+    const backoffs = [0, 200, 800]; // v426.1 — Reduzido backoff (antes 0, 500, 1500) para acelerar aparição do Pix
     let mpErrLast = "";
     for (let attempt = 0; attempt < backoffs.length; attempt++) {
       if (backoffs[attempt] > 0) await new Promise((r) => setTimeout(r, backoffs[attempt]));
