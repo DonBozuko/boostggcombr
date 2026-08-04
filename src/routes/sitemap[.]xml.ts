@@ -19,7 +19,8 @@ const sitemapHeaders = () => {
 
 const buildSitemapXml = () => {
   const entries: SitemapEntry[] = [
-    { path: "/", changefreq: "weekly", priority: "1.0" },
+    { path: "/", changefreq: "daily", priority: "1.0" },
+    { path: "/comprar-seguidores-instagram", changefreq: "daily", priority: "1.0" },
     { path: "/tiktok", changefreq: "weekly", priority: "0.9" },
     { path: "/youtube", changefreq: "weekly", priority: "0.9" },
     { path: "/facebook", changefreq: "weekly", priority: "0.9" },
