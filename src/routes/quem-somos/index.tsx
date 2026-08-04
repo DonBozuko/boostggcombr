@@ -26,7 +26,7 @@ export const Route = createFileRoute("/quem-somos/")({
 function Page() {
   return (
     <div className="min-h-screen bg-background">
-      <BrandHeader />
+      <BrandHeader subtitle="Conheça nossa agência" />
       
       <main className="mx-auto max-w-4xl px-4 py-16 sm:py-24">
         <div className="text-center">
