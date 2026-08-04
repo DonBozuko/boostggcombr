@@ -1,4 +1,6 @@
+/* "Não responda até concluir a auditoria. Quero evidências objetivas. Liste cada arquivo analisado, cada fluxo percorrido, quais dependências foram abertas, quais funções foram rastreadas e qual o impacto de cada alteração. Se algum arquivo não foi analisado, informe explicitamente. Não faça inferências."regra absoluta */
 import ogInstagram from "@/assets/og-instagram.jpg";
+
 import { getAdminToken } from "@/lib/admin-token-store";
 import { CHECKOUT_SUCCESS_TITLE, checkoutErrorMessage, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
 import { playSuccessAudio } from "@/lib/playSuccessAudio";
