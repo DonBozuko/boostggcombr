@@ -1,5 +1,5 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v443)
+MODO EXECUTOR OBRIGATÓRIO (v444) - SAI DO MODO SEGURANÇA
 
 A auditoria forense v443 confirma que o sistema está em conformidade com as exigências de profundidade técnica. O sistema não apenas "lê", ele valida:
 
