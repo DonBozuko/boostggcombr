@@ -12,7 +12,7 @@ interface SitemapEntry {
 const sitemapHeaders = () => {
   const headers = new Headers();
   headers.set("Content-Type", "application/xml; charset=utf-8");
-  headers.set("Cache-Control", "public, max-age=86400, s-maxage=86400"); // v417 — 24h para poupar orçamento de rastreio de infra
+  headers.set("Cache-Control", "public, max-age=86400, s-maxage=86400, stale-while-revalidate=43200"); // v417+ — Cache 24h + 12h SWR para economia de infra
   headers.set("X-Content-Type-Options", "nosniff");
   return headers;
 };

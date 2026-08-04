@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 
+# v417 — Proteção de Crawl Budget e Áreas Privadas
 Disallow: /admin
 Disallow: /api/
 Disallow: /diagnostico
@@ -10,6 +11,7 @@ Disallow: /dashboard
 Disallow: /~beat.js
 Disallow: /mcp
 Disallow: /obrigado
+Disallow: /rastrear
 
 # AI crawlers — permitidos explicitamente (AEO / GEO)
 User-agent: GPTBot
@@ -48,4 +50,5 @@ Allow: /
 User-agent: Meta-ExternalAgent
 Allow: /
 
+# Sitemap Canônico v302
 Sitemap: https://www.boostgg.com.br/sitemap.xml
