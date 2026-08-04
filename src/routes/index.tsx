@@ -1108,8 +1108,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 };
               }}
             />
-            <p className="text-xs text-center text-zinc-300">
-              Pagamento seguro · Pedido processado em segundos após o Pix
+            <p className="text-xs text-center text-zinc-400 mt-2">
+              Pagamento 100% seguro · Pedido processado automaticamente via Pix
             </p>
 
           </form>
@@ -1375,11 +1375,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           <p>
             Se você busca o <Link to="/comprar-seguidores-instagram-barato" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">melhor site para comprar seguidores</Link>, a Elite Boost Prime combina tecnologia de ponta com suporte dedicado para assegurar que seu investimento traga resultados reais para o seu engajamento.
           </p>
-          <h3 className="text-lg font-semibold text-foreground pt-2">Como funciona</h3>
-          <ol className="list-decimal pl-5 space-y-1">
-            <li>Escolha o pacote de seguidores (100 a 100.000) e selecione a opção Brasil ou Mix Global.</li>
-            <li>Informe o @ do perfil público do Instagram que receberá os seguidores.</li>
-            <li>Pague via Pix e acompanhe o crescimento em tempo real.</li>
+          <h3 className="text-lg font-bold text-white pt-4">Como comprar seguidores no Pix</h3>
+          <ol className="list-decimal pl-5 space-y-3">
+            <li><strong>Escolha o pacote:</strong> Selecione a quantidade (100 a 100.000) e a categoria (Brasil ou Global).</li>
+            <li><strong>Identifique o perfil:</strong> Informe o @usuário ou link do perfil público (não pedimos senha).</li>
+            <li><strong>Pague no Pix:</strong> Gere o QR Code, pague no seu banco e a entrega inicia sozinha.</li>
           </ol>
           <h3 className="text-lg font-semibold text-foreground pt-2">Diferenciais Elite Boost Prime</h3>
           <ul className="list-disc pl-5 space-y-1">
