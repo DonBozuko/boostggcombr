@@ -20,7 +20,7 @@ export const Route = createFileRoute("/quem-somos")({
 function Page() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <BrandHeader />
+      <BrandHeader subtitle="Líder em Crescimento Digital" />
       
       <main className="container mx-auto px-6 py-20">
         <motion.div 
