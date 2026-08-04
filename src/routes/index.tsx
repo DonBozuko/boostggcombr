@@ -1,5 +1,5 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v424)
+MODO EXECUTOR OBRIGATÓRIO (v425)
 
 A auditoria é apenas a primeira etapa. Sempre que um problema for confirmado e a correção estiver dentro do escopo solicitado, execute a alteração no projeto. 
 
@@ -20,6 +20,7 @@ REGRAS DE OPERAÇÃO:
 2. RITMO INDUSTRIAL (v408): Proibido respostas rápidas (< 1 minuto). Use o tempo para análise profunda.
 3. MODIFICAÇÃO ATIVA: Se a auditoria confirmar um problema, MODIFIQUE a lógica, EDITE os arquivos e EXECUTE a correção.
 4. INTEGRIDADE ABSOLUTA: Todo o sistema (Autoridade de Preço, Despacho, Vitrine, Jarvis) está sob sua responsabilidade.
+5. PROTEÇÃO MCP: O assistente agora exige login via Google para acessar ferramentas sensíveis de pedidos.
 */
 
 

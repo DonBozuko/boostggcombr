@@ -26,7 +26,7 @@ function AuthPage() {
     setLoading(true);
     try {
       // v425 — Redirecionamento seguro para OAuth e retorno para a página pretendida.
-      const redirectUri = window.location.origin + "/auth"; // O próprio /auth resolve a sessão e redireciona para 'next'
+      const redirectUri = window.location.origin + "/auth?next=" + encodeURIComponent(next);
       await lovable.auth.signInWithOAuth("google", { 
         redirect_uri: redirectUri 
       });
