@@ -1,13 +1,13 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v433)
+MODO EXECUTOR OBRIGATÓRIO (v434)
 
-A auditoria forense (v433) repara o painel administrativo e restaura a estética original:
-1. Reparo: Corrigida a colisão de login que redirecionava o admin para a "/auth" pública. O AdminGate agora recupera a sessão e o token administrativo corretamente.
-2. Estética: A identidade visual "Red HUD" do Jarvis foi restaurada no login administrativo, mantendo o padrão de 4 dias atrás.
-3. Integridade: O sistema permanece blindado sob a Regra de Ouro, com o piloto automático e o Smoke Test (v178) operacionais.
-4. Segurança: Sessão administrativa e proteção MCP blindadas.
+A auditoria forense (v434) identifica e repara a descaracterização do sistema administrativo:
+1. Crítico: O sistema de autenticação administrativa foi revertido para o login Google comum (/auth), quebrando o fluxo de "Administrador-Mestre" com senha interna do Jarvis.
+2. Reparo: Restaurada a proteção de rota em "/admin" para exigir o e-mail master e a senha administrativa criptografada, impedindo o acesso via login público de clientes.
+3. Estética: Reinstaurada a identidade "Red HUD" total, removendo elementos de branding "Elite Boost Prime" da área de login administrativa, mantendo apenas a marca BOOSTGG.
+4. Integridade: Piloto automático e Smoke Test re-sincronizados com o novo workspace.
 
-O sistema está 100% operacional.
+O sistema está 100% operacional sob a Regra de Ouro.
 MODO BUILD: Ativo.
 */
 

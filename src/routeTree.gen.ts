@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
 import { Route as AfiliadosRouteImport } from './routes/afiliados'
 import { Route as ApiRevendaRouteImport } from './routes/api-revenda'
@@ -58,7 +59,6 @@ import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as Char126beatDotjsRouteImport } from './routes/~beat[.]js'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPainelAfiliadoRouteImport } from './routes/_authenticated/painel-afiliado'
 import { Route as AuthenticatedPainelRevendedorRouteImport } from './routes/_authenticated/painel-revendedor'
@@ -138,6 +138,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
@@ -384,11 +389,6 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -412,14 +412,14 @@ const AuthenticatedPainelSmmRoute = AuthenticatedPainelSmmRouteImport.update({
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
-  id: '/admin/catalog',
-  path: '/admin/catalog',
-  getParentRoute: () => rootRouteImport,
+  id: '/catalog',
+  path: '/catalog',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminScriptsRoute = AdminScriptsRouteImport.update({
-  id: '/admin/scripts',
-  path: '/admin/scripts',
-  getParentRoute: () => rootRouteImport,
+  id: '/scripts',
+  path: '/scripts',
+  getParentRoute: () => AdminRoute,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
@@ -786,6 +786,7 @@ const LovableEmailTransactionalSendRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
@@ -833,7 +834,6 @@ export interface FileRoutesByFullPath {
   '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
   '/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
@@ -908,6 +908,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
@@ -953,7 +954,6 @@ export interface FileRoutesByTo {
   '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
   '/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
@@ -1030,6 +1030,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
@@ -1077,7 +1078,6 @@ export interface FileRoutesById {
   '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
   '/_authenticated/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
@@ -1154,6 +1154,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/admin-health-catalog'
     | '/afiliados'
     | '/api-revenda'
@@ -1201,7 +1202,6 @@ export interface FileRouteTypes {
     | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/admin'
     | '/dashboard'
     | '/painel-afiliado'
     | '/painel-revendedor'
@@ -1276,6 +1276,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/admin-health-catalog'
     | '/afiliados'
     | '/api-revenda'
@@ -1321,7 +1322,6 @@ export interface FileRouteTypes {
     | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/admin'
     | '/dashboard'
     | '/painel-afiliado'
     | '/painel-revendedor'
@@ -1397,6 +1397,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/admin-health-catalog'
     | '/afiliados'
     | '/api-revenda'
@@ -1444,7 +1445,6 @@ export interface FileRouteTypes {
     | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
-    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/painel-afiliado'
     | '/_authenticated/painel-revendedor'
@@ -1521,6 +1521,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
   AfiliadosRoute: typeof AfiliadosRoute
   ApiRevendaRoute: typeof ApiRevendaRoute
@@ -1568,8 +1569,6 @@ export interface RootRouteChildren {
   Char126beatDotjsRoute: typeof Char126beatDotjsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  AdminCatalogRoute: typeof AdminCatalogRoute
-  AdminScriptsRoute: typeof AdminScriptsRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
@@ -1649,6 +1648,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-health-catalog': {
@@ -1980,13 +1986,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -2017,17 +2016,17 @@ declare module '@tanstack/react-router' {
     }
     '/admin/catalog': {
       id: '/admin/catalog'
-      path: '/admin/catalog'
+      path: '/catalog'
       fullPath: '/admin/catalog'
       preLoaderRoute: typeof AdminCatalogRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/scripts': {
       id: '/admin/scripts'
-      path: '/admin/scripts'
+      path: '/scripts'
       fullPath: '/admin/scripts'
       preLoaderRoute: typeof AdminScriptsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/blog/': {
       id: '/blog/'
@@ -2488,7 +2487,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPainelAfiliadoRoute: typeof AuthenticatedPainelAfiliadoRoute
   AuthenticatedPainelRevendedorRoute: typeof AuthenticatedPainelRevendedorRoute
@@ -2496,7 +2494,6 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPainelAfiliadoRoute: AuthenticatedPainelAfiliadoRoute,
   AuthenticatedPainelRevendedorRoute: AuthenticatedPainelRevendedorRoute,
@@ -2505,6 +2502,18 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface AdminRouteChildren {
+  AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminScriptsRoute: typeof AdminScriptsRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCatalogRoute: AdminCatalogRoute,
+  AdminScriptsRoute: AdminScriptsRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface ComprarSeguidoresReaisBrasilRouteChildren {
   ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
@@ -2538,6 +2547,7 @@ const PixSeguidoresInstagramRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   AdminHealthCatalogRoute: AdminHealthCatalogRoute,
   AfiliadosRoute: AfiliadosRoute,
   ApiRevendaRoute: ApiRevendaRoute,
@@ -2587,8 +2597,6 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
-  AdminCatalogRoute: AdminCatalogRoute,
-  AdminScriptsRoute: AdminScriptsRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FerramentasCalculadoraEngajamentoInstagramRoute:
