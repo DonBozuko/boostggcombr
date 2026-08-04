@@ -44,6 +44,31 @@ const POSTS = [
     title: "Como Tirar o Instagram do Privado: Passo a Passo (iOS e Android)",
     excerpt: "Guia rápido para deixar seu perfil público — requisito obrigatório para receber seguidores e aparecer no Explorar.",
   },
+  {
+    slug: "como-instagram-detecta-seguidores",
+    title: "Como o Instagram Detecta Seguidores em 2026",
+    excerpt: "Entenda os padrões que a Meta usa para identificar crescimento artificial e como se proteger.",
+  },
+  {
+    slug: "shadowban-mito-ou-realidade",
+    title: "Shadowban: Mito ou Realidade ao Comprar Seguidores?",
+    excerpt: "Sua conta corre risco? Analisamos o que realmente causa o bloqueio de alcance.",
+  },
+  {
+    slug: "guia-bio-perfeita-instagram",
+    title: "O Guia da Bio Perfeita: Converta Visitantes em Vendas",
+    excerpt: "Não adianta ter seguidores se o perfil não converte. Aprenda a estruturar sua bio.",
+  },
+  {
+    slug: "instagram-vs-tiktok-onde-crescer",
+    title: "Instagram vs TikTok: Onde é mais rápido crescer do zero?",
+    excerpt: "Comparamos os algoritmos para você decidir onde focar seu esforço e investimento.",
+  },
+  {
+    slug: "por-que-entrega-gradual-e-segura",
+    title: "Por que a Entrega Gradual é o Único Caminho Seguro",
+    excerpt: "A diferença entre um perfil banido e um perfil de autoridade está na velocidade.",
+  },
 ];
 
 const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
@@ -116,7 +141,7 @@ function BlogIndex() {
 
       <footer className="border-t border-border py-10 mt-8">
         <div className="container mx-auto px-6 text-center text-sm text-muted-foreground">
-          © 2026 Elite Boost Prime.
+          © 2026 BoostGG. Todos os direitos reservados.
         </div>
       </footer>
     </div>
