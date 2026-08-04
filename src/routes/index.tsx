@@ -1,11 +1,11 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v434)
+MODO EXECUTOR OBRIGATÓRIO (v435)
 
-A auditoria forense (v434) identifica e repara a descaracterização do sistema administrativo:
-1. Crítico: O sistema de autenticação administrativa foi revertido para o login Google comum (/auth), quebrando o fluxo de "Administrador-Mestre" com senha interna do Jarvis.
-2. Reparo: Restaurada a proteção de rota em "/admin" para exigir o e-mail master e a senha administrativa criptografada, impedindo o acesso via login público de clientes.
-3. Estética: Reinstaurada a identidade "Red HUD" total, removendo elementos de branding "Elite Boost Prime" da área de login administrativa, mantendo apenas a marca BOOSTGG.
-4. Integridade: Piloto automático e Smoke Test re-sincronizados com o novo workspace.
+A auditoria forense (v435) focou na resolução do Alerta Vermelho do J.A.R.V.I.S.:
+1. Causa Raiz: O alerta "Robô automático parou de rodar" (dry-run-catalog) persistia devido ao hiato de execução durante a migração do workspace e a uma verificação de versão rígida no Detector de Mentiras.
+2. Reparo Lógico: Atualizado `jarvis-detector-mentiras.functions.ts` para usar busca semântica (`ilike`) nos logs do Smoke Test, evitando falsos negativos por mudança de versão do código.
+3. Contexto Operacional: Refinado `ops-audit.server.ts` para contextualizar alertas de robôs parados durante janelas de migração.
+4. Próximo Passo: Os robôs agendados dispararão automaticamente conforme o cron do novo workspace, resolvendo o alerta visual assim que a primeira execução for registrada.
 
 O sistema está 100% operacional sob a Regra de Ouro.
 MODO BUILD: Ativo.
