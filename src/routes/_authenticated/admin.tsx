@@ -312,7 +312,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
   );
 }
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Admin · Elite Boost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: AdminGate,
