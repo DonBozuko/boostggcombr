@@ -1,12 +1,13 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v437)
+MODO EXECUTOR OBRIGATÓRIO (v438)
 
-A auditoria forense (v437) consolida a limpeza de contexto do workspace:
-1. Diagnóstico: O usuário confirmou que removeu espaços de trabalho extras e manteve apenas a conta fabiano.magestic@gmail.com.
-2. Causa: Existiam múltiplos workspaces ou contas vinculadas que geravam confusão de faturamento/permissão na plataforma Lovable.
-3. Ação: O cabeçalho foi atualizado para v437 para registrar a limpeza de infraestrutura realizada pelo usuário.
-4. Nota: A unificação da conta sob fabiano.magestic@gmail.com é a ação definitiva para estabilizar os créditos e o acesso de proprietário. O sistema BoostGG segue operacional.
+A auditoria forense (v438) corrige o identificador de conta mestre:
+1. Diagnóstico: O usuário corrigiu o e-mail da conta proprietária de "magestic" para "majestic".
+2. Causa: Erro de digitação no registro de auditoria anterior (v437).
+3. Ação: O cabeçalho foi atualizado para v438 com o e-mail correto: fabiano.majestic@gmail.com.
+4. Nota: A autoridade administrativa e o login do Jarvis em /admin permanecem vinculados ao e-mail correto fabiano.majestic@gmail.com.
 */
+
 
 
 
