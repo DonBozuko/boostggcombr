@@ -69,6 +69,21 @@ const POSTS = [
     title: "Por que a Entrega Gradual é o Único Caminho Seguro",
     excerpt: "A diferença entre um perfil banido e um perfil de autoridade está na velocidade.",
   },
+  {
+    slug: "guia-seguranca-comprar-seguidores",
+    title: "Guia Completo: Como Comprar Seguidores com Segurança",
+    excerpt: "Tudo o que você precisa saber sobre segurança, métodos de pagamento e como proteger seu perfil.",
+  },
+  {
+    slug: "como-escolher-site-confiavel-seguidores",
+    title: "Como Escolher um Site Confiável para Comprar Seguidores",
+    excerpt: "Critérios de credibilidade, suporte e garantias que separam os profissionais dos amadores.",
+  },
+  {
+    slug: "potencializar-resultados-pos-compra",
+    title: "Como Potencializar Resultados após Comprar Seguidores",
+    excerpt: "Estratégias de conteúdo e engajamento para transformar números em autoridade real.",
+  },
 ];
 
 const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
