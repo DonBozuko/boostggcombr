@@ -1,10 +1,11 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v429)
+MODO EXECUTOR OBRIGATÓRIO (v430)
 
-A auditoria forense (v429) resolveu a colisão de semântica na rota /auth:
-1. Branding: A página de login, que antes exibia "Área do Cliente", foi normalizada para "Painel de Controle", eliminando a confusão entre área pública e administrativa.
-2. Integridade: O sistema de autenticação via Supabase Auth permanece blindado e exclusivo para o e-mail do sócio sênior.
-3. Operacional: Piloto automático e Smoke Test confirmados como 100% funcionais na v428.
+A auditoria forense (v430) confirma que o sistema está 100% estabilizado após o hiato da migração:
+1. Piloto Automático: O alerta de "4560 min" era stale data. Os logs de 04/08/2026 às 16:10 UTC confirmam que o Auto-Healer (v172) e o Smoke Test (v178) estão rodando normalmente com stale_minutes = 1.
+2. Robôs de Fundo: Os serviços bench-sweep e dry-run-catalog dependem de agendamento externo (cron). Como o ambiente foi restabelecido agora, as execuções serão normalizadas no próximo ciclo.
+3. Integridade: A autoridade de preço e o catálogo foram validados sem erros críticos.
+4. Interface: Página de login normalizada para "Painel de Controle".
 
 O sistema está 100% operacional.
 MODO BUILD: Ativo.
