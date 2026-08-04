@@ -3,12 +3,16 @@
   "sdk_version": "0.20.0",
   "path": "/mcp",
   "auth": {
-    "type": "none"
+    "type": "oauth",
+    "issuer": "https://mtrlijxhwkcqjwsxyhnr.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
   },
   "mcp": {
     "server": {
-      "name": "eliteboost-prime-mcp",
-      "version": "0.1.0",
+      "name": "boostgg",
+      "version": "1.0.0",
       "title": "BoostGG"
     },
     "tools": [
@@ -45,7 +49,7 @@
       {
         "name": "consultar_pedido",
         "title": "Consultar status de pedido",
-        "description": "Consulta o status genérico de um pedido do BoostGG pelo ID (retorna apenas: aguardando_pagamento, pago, em_processamento, entregue, cancelado, reembolsado ou recusado). Não expõe dados do comprador.",
+        "description": "Consulta o status de um pedido. Requer que o usuário esteja logado.",
         "annotations": {
           "readOnlyHint": true,
           "idempotentHint": true,
@@ -57,7 +61,7 @@
             "pedido_id": {
               "type": "string",
               "minLength": 4,
-              "description": "ID público do pedido"
+              "description": "ID do pedido"
             }
           },
           "required": [

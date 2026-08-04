@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { affiliateDashboard, type AffiliateDashboard } from "@/lib/affiliate.functions";
 
-export const Route = createFileRoute("/painel-afiliado")({
+export const Route = createFileRoute("/_authenticated/painel-afiliado")({
   head: () => ({
     meta: [
       { title: "Painel do Afiliado — BoostGG" },

@@ -21,7 +21,7 @@ import { forgotResellerKey } from "@/lib/reseller-apply.functions";
 
 const STORAGE_KEY = "bgg_reseller_key";
 
-export const Route = createFileRoute("/painel-revendedor")({
+export const Route = createFileRoute("/_authenticated/painel-revendedor")({
   head: () => ({
     meta: [
       { title: "Painel do Revendedor — Elite Boost Prime | BoostGG" },

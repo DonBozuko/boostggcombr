@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { inspectAllRoutes, type InspectRow } from "@/lib/gsc-inspect.functions";
 
-export const Route = createFileRoute("/dashboard/seo")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "SEO Dashboard | BoostGG" },

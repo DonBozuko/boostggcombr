@@ -166,7 +166,7 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
             await supabase.auth.signOut();
             clearAdminToken();
             toast.success("Sessão encerrada");
-            window.location.href = "/admin";
+            window.location.href = "/auth";
           }}
           className="bg-gradient-to-r from-red-700 to-red-500 hover:from-red-600 hover:to-red-400 text-white font-bold shadow-[0_0_20px_rgba(255,0,40,0.5)]"
         >
@@ -298,7 +298,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
           await supabase.auth.signOut();
           clearAdminToken();
           toast.success("Sessão encerrada");
-          window.location.href = "/admin";
+          window.location.href = "/auth";
         }}
         className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-red-500/10 transition-colors text-left"
       >
@@ -312,7 +312,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
   );
 }
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Admin · Elite Boost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: AdminGate,

@@ -1,10 +1,7 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
+import { supabaseForUser } from "../supabase";
 
-// v244: sanitizado (finding mcp_consultar_pedido_pii_leak).
-// Não retorna mais instagram_user, valor_brl, quantidade nem network — só status
-// genérico. Order IDs são adivinháveis por terceiros (ficam em URLs/e-mails),
-// então PII do comprador não pode sair por essa porta pública.
 const STATUS_PUBLICO: Record<string, string> = {
   pending: "aguardando_pagamento",
   mp_pending: "aguardando_pagamento",
@@ -24,36 +21,29 @@ const STATUS_PUBLICO: Record<string, string> = {
 export default defineTool({
   name: "consultar_pedido",
   title: "Consultar status de pedido",
-  description:
-    "Consulta o status genérico de um pedido do BoostGG pelo ID (retorna apenas: aguardando_pagamento, pago, em_processamento, entregue, cancelado, reembolsado ou recusado). Não expõe dados do comprador.",
+  description: "Consulta o status de um pedido. Requer que o usuário esteja logado.",
   inputSchema: {
-    pedido_id: z.string().min(4).describe("ID público do pedido"),
+    pedido_id: z.string().min(4).describe("ID do pedido"),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
-  handler: async ({ pedido_id }) => {
-    const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY;
-    if (!url || !key) {
-      return { content: [{ type: "text", text: "Backend indisponível." }], isError: true };
+  handler: async ({ pedido_id }, ctx) => {
+    if (!ctx.isAuthenticated()) {
+      return { content: [{ type: "text", text: "Autenticação necessária para consultar pedidos." }], isError: true };
     }
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+    const sb = supabaseForUser(ctx);
     const { data, error } = await sb
       .from("pedidos")
       .select("id, status")
       .eq("id", pedido_id)
       .maybeSingle();
-    if (error) {
-      return { content: [{ type: "text", text: `Erro: ${error.message}` }], isError: true };
-    }
-    if (!data) {
-      return { content: [{ type: "text", text: "Pedido não encontrado." }], isError: true };
-    }
-    const statusPublico = STATUS_PUBLICO[String((data as { status: string }).status)] ?? "desconhecido";
-    const payload = { id: (data as { id: string }).id, status: statusPublico };
+
+    if (error) return { content: [{ type: "text", text: `Erro no banco: ${error.message}` }], isError: true };
+    if (!data) return { content: [{ type: "text", text: "Pedido não encontrado ou acesso negado." }], isError: true };
+
+    const statusPublico = STATUS_PUBLICO[String(data.status)] ?? "desconhecido";
     return {
-      content: [{ type: "text", text: JSON.stringify(payload) }],
-      structuredContent: payload,
+      content: [{ type: "text", text: `Pedido ${data.id}: ${statusPublico}` }],
+      structuredContent: { id: data.id, status: statusPublico },
     };
   },
 });
