@@ -23,6 +23,7 @@ import { Route as ComprarSeguidoresBrasileirosRouteImport } from './routes/compr
 import { Route as ComprarSeguidoresInstagramRouteImport } from './routes/comprar-seguidores-instagram'
 import { Route as ComprarSeguidoresInstagramBaratoRouteImport } from './routes/comprar-seguidores-instagram-barato'
 import { Route as ComprarSeguidoresKwaiRouteImport } from './routes/comprar-seguidores-kwai'
+import { Route as ComprarSeguidoresReaisBrasilRouteImport } from './routes/comprar-seguidores-reais-brasil'
 import { Route as ComprarSeguidoresTiktokRouteImport } from './routes/comprar-seguidores-tiktok'
 import { Route as ComprarVisualizacoesTiktokRouteImport } from './routes/comprar-visualizacoes-tiktok'
 import { Route as CrescerYoutubeRouteImport } from './routes/crescer-youtube'
@@ -200,6 +201,12 @@ const ComprarSeguidoresKwaiRoute = ComprarSeguidoresKwaiRouteImport.update({
   path: '/comprar-seguidores-kwai',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComprarSeguidoresReaisBrasilRoute =
+  ComprarSeguidoresReaisBrasilRouteImport.update({
+    id: '/comprar-seguidores-reais-brasil',
+    path: '/comprar-seguidores-reais-brasil',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ComprarSeguidoresTiktokRoute = ComprarSeguidoresTiktokRouteImport.update({
   id: '/comprar-seguidores-tiktok',
   path: '/comprar-seguidores-tiktok',
@@ -401,9 +408,9 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
 } as any)
 const ComprarSeguidoresReaisBrasilIndexRoute =
   ComprarSeguidoresReaisBrasilIndexRouteImport.update({
-    id: '/comprar-seguidores-reais-brasil/',
-    path: '/comprar-seguidores-reais-brasil/',
-    getParentRoute: () => rootRouteImport,
+    id: '/',
+    path: '/',
+    getParentRoute: () => ComprarSeguidoresReaisBrasilRoute,
   } as any)
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
   id: '/dashboard/seo',
@@ -767,6 +774,7 @@ export interface FileRoutesByFullPath {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
+  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRouteWithChildren
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -1004,6 +1012,7 @@ export interface FileRoutesById {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
+  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRouteWithChildren
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -1124,6 +1133,7 @@ export interface FileRouteTypes {
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-kwai'
+    | '/comprar-seguidores-reais-brasil'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -1360,6 +1370,7 @@ export interface FileRouteTypes {
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-kwai'
+    | '/comprar-seguidores-reais-brasil'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -1479,6 +1490,7 @@ export interface RootRouteChildren {
   ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
   ComprarSeguidoresInstagramBaratoRoute: typeof ComprarSeguidoresInstagramBaratoRoute
   ComprarSeguidoresKwaiRoute: typeof ComprarSeguidoresKwaiRoute
+  ComprarSeguidoresReaisBrasilRoute: typeof ComprarSeguidoresReaisBrasilRouteWithChildren
   ComprarSeguidoresTiktokRoute: typeof ComprarSeguidoresTiktokRoute
   ComprarVisualizacoesTiktokRoute: typeof ComprarVisualizacoesTiktokRoute
   CrescerYoutubeRoute: typeof CrescerYoutubeRoute
@@ -1524,7 +1536,6 @@ export interface RootRouteChildren {
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
   Char126apiBeatRoute: typeof Char126apiBeatRoute
   BlogIndexRoute: typeof BlogIndexRoute
-  ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
   PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
   QuemSomosIndexRoute: typeof QuemSomosIndexRoute
@@ -1679,6 +1690,13 @@ declare module '@tanstack/react-router' {
       path: '/comprar-seguidores-kwai'
       fullPath: '/comprar-seguidores-kwai'
       preLoaderRoute: typeof ComprarSeguidoresKwaiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comprar-seguidores-reais-brasil': {
+      id: '/comprar-seguidores-reais-brasil'
+      path: '/comprar-seguidores-reais-brasil'
+      fullPath: '/comprar-seguidores-reais-brasil'
+      preLoaderRoute: typeof ComprarSeguidoresReaisBrasilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comprar-seguidores-tiktok': {
@@ -1956,10 +1974,10 @@ declare module '@tanstack/react-router' {
     }
     '/comprar-seguidores-reais-brasil/': {
       id: '/comprar-seguidores-reais-brasil/'
-      path: '/comprar-seguidores-reais-brasil'
+      path: '/'
       fullPath: '/comprar-seguidores-reais-brasil/'
       preLoaderRoute: typeof ComprarSeguidoresReaisBrasilIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof ComprarSeguidoresReaisBrasilRoute
     }
     '/dashboard/seo': {
       id: '/dashboard/seo'
@@ -2410,6 +2428,21 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface ComprarSeguidoresReaisBrasilRouteChildren {
+  ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
+}
+
+const ComprarSeguidoresReaisBrasilRouteChildren: ComprarSeguidoresReaisBrasilRouteChildren =
+  {
+    ComprarSeguidoresReaisBrasilIndexRoute:
+      ComprarSeguidoresReaisBrasilIndexRoute,
+  }
+
+const ComprarSeguidoresReaisBrasilRouteWithChildren =
+  ComprarSeguidoresReaisBrasilRoute._addFileChildren(
+    ComprarSeguidoresReaisBrasilRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -2425,6 +2458,8 @@ const rootRouteChildren: RootRouteChildren = {
   ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
   ComprarSeguidoresInstagramBaratoRoute: ComprarSeguidoresInstagramBaratoRoute,
   ComprarSeguidoresKwaiRoute: ComprarSeguidoresKwaiRoute,
+  ComprarSeguidoresReaisBrasilRoute:
+    ComprarSeguidoresReaisBrasilRouteWithChildren,
   ComprarSeguidoresTiktokRoute: ComprarSeguidoresTiktokRoute,
   ComprarVisualizacoesTiktokRoute: ComprarVisualizacoesTiktokRoute,
   CrescerYoutubeRoute: CrescerYoutubeRoute,
@@ -2475,8 +2510,6 @@ const rootRouteChildren: RootRouteChildren = {
     FerramentasGeradorLegendaInstagramRoute,
   Char126apiBeatRoute: Char126apiBeatRoute,
   BlogIndexRoute: BlogIndexRoute,
-  ComprarSeguidoresReaisBrasilIndexRoute:
-    ComprarSeguidoresReaisBrasilIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
   PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
   QuemSomosIndexRoute: QuemSomosIndexRoute,
