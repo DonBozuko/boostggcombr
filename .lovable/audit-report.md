@@ -1,8 +1,8 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-02T16:56:19.076Z
+Gerado por `npm run audit` — 2026-08-04T10:12:03.089Z
 
-Arquivos lidos: 451
+Arquivos lidos: 455
 
 | Gravidade | Qtd |
 |---|---|
@@ -14,13 +14,13 @@ Arquivos lidos: 451
 
 - **nota** `src/integrations/supabase/types.ts` — 2336 linhas (> 600)
 - **nota** `src/lib/admin.functions.ts` — 852 linhas (> 600)
-- **nota** `src/lib/pedidos.functions.ts` — 728 linhas (> 600)
+- **nota** `src/lib/pedidos.functions.ts` — 732 linhas (> 600)
 - **nota** `src/lib/pricing-cache.server.ts` — 780 linhas (> 600)
 - **nota** `src/lib/pricing-engine.server.ts` — 911 linhas (> 600)
 - **nota** `src/routes/admin.tsx` — 2474 linhas (> 600)
 - **nota** `src/routes/api/public/mp-webhook.ts` — 840 linhas (> 600)
 - **nota** `src/routes/blog.$slug.tsx` — 723 linhas (> 600)
-- **nota** `src/routes/index.tsx` — 1472 linhas (> 600)
+- **nota** `src/routes/index.tsx` — 1474 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
 
 ## cor-hardcoded (438)
