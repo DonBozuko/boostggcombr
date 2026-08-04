@@ -124,7 +124,7 @@ export const Route = createFileRoute("/")({
     const title = "Comprar Seguidores Instagram Reais via Pix — BoostGG";
     const ogTitle = "BoostGG — Seguidores no Instagram Reais e Brasileiros";
     const description =
-      "Comprar seguidores Instagram reais via Pix com entrega imediata. Seguidores brasileiros com alta retenção e reposição garantida. Elite Boost Prime: qualidade e segurança.";
+      "Comprar seguidores Instagram reais via Pix com entrega imediata. Seguidores brasileiros com alta retenção e reposição garantida. Elite Boost Prime: autoridade e segurança.";
     // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
     // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
     // marcação e usar a dele. Agora as duas batem.
@@ -852,11 +852,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           </div>
         </div>
       </header>
-      <h1 className="text-center text-2xl sm:text-3xl font-bold text-white mt-4 mb-2 px-4">
-        Comprar Seguidores no Instagram Reais via Pix — Brasileiros
+      <h1 className="text-center text-3xl sm:text-5xl font-black text-white mt-6 mb-4 px-4 leading-tight">
+        Comprar Seguidores Instagram Reais via Pix
       </h1>
-      <p className="text-center text-sm sm:text-base text-zinc-300 mt-1 mb-3 px-4 max-w-2xl mx-auto">
-        Crescimento real e autoridade no Instagram com entrega imediata via Pix. Seguidores brasileiros com alta retenção e reposição garantida.
+      <p className="text-center text-lg sm:text-xl text-zinc-300 mt-2 mb-6 px-4 max-w-3xl mx-auto leading-relaxed">
+        Aumente sua autoridade com <strong>seguidores brasileiros de alta retenção</strong>. Entrega automática em minutos, 100% seguro e sem necessidade de senha.
       </p>
       {/* v224 — CRO: prova social + selos acima da dobra pra reduzir bounce */}
       <div className="mx-auto w-full max-w-[720px] px-2 mb-2">
@@ -1108,8 +1108,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 };
               }}
             />
-            <p className="text-xs text-center text-zinc-300">
-              Pagamento seguro · Pedido processado em segundos após o Pix
+            <p className="text-xs text-center text-zinc-400 mt-2">
+              Pagamento 100% seguro · Pedido processado automaticamente via Pix
             </p>
 
           </form>
@@ -1365,18 +1365,21 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
           Vantagens de Comprar Seguidores Instagram no Pix
         </h2>
-        <div className="space-y-4 text-zinc-300 text-sm leading-relaxed">
+        <div className="space-y-6 text-zinc-300 text-base leading-relaxed">
           <p>
-            Ao <strong className="text-foreground">comprar seguidores Instagram reais via Pix</strong> na BoostGG, você garante o crescimento imediato do seu perfil com autoridade e segurança. Nossa plataforma é especializada em perfis brasileiros, permitindo que criadores de conteúdo e empresas aumentem sua credibilidade digital sem expor dados sensíveis como senhas. O processo é 100% automático e otimizado para entrega rápida.
+            A <strong>BoostGG</strong> é a plataforma líder para quem busca <Link to="/comprar-seguidores-instagram" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">comprar seguidores no Instagram</Link> com foco em qualidade e segurança. Oferecemos pacotes de <Link to="/comprar-seguidores-reais-brasil" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">seguidores brasileiros reais</Link> que ajudam a construir prova social imediata para perfis pessoais e profissionais.
           </p>
           <p>
-            Além do foco em seguidores brasileiros reais, oferecemos soluções completas: você pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link> para aumentar o engajamento ou adquirir visualizações para Reels. Todos os pacotes 🇧🇷 contam com o sistema de reposição automática de 30 dias, garantindo que sua autoridade permaneça sólida ao longo do tempo.
+            Diferente de outros sites, nosso processo é 100% transparente: você escolhe o plano, paga via <Link to="/pix-seguidores-instagram" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">Pix com aprovação instantânea</Link> e o sistema inicia a entrega automática. Sem necessidade de senha ou cadastros complexos, garantindo a total privacidade da sua conta.
           </p>
-          <h3 className="text-lg font-semibold text-foreground pt-2">Como funciona</h3>
-          <ol className="list-decimal pl-5 space-y-1">
-            <li>Escolha o pacote de seguidores (100 a 100.000) e selecione a opção Brasil ou Mix Global.</li>
-            <li>Informe o @ do perfil público do Instagram que receberá os seguidores.</li>
-            <li>Pague via Pix e acompanhe o crescimento em tempo real.</li>
+          <p>
+            Se você busca o <Link to="/comprar-seguidores-instagram-barato" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">melhor site para comprar seguidores</Link>, a Elite Boost Prime combina tecnologia de ponta com suporte dedicado para assegurar que seu investimento traga resultados reais para o seu engajamento.
+          </p>
+          <h3 className="text-lg font-bold text-white pt-4">Como comprar seguidores no Pix</h3>
+          <ol className="list-decimal pl-5 space-y-3">
+            <li><strong>Escolha o pacote:</strong> Selecione a quantidade (100 a 100.000) e a categoria (Brasil ou Global).</li>
+            <li><strong>Identifique o perfil:</strong> Informe o @usuário ou link do perfil público (não pedimos senha).</li>
+            <li><strong>Pague no Pix:</strong> Gere o QR Code, pague no seu banco e a entrega inicia sozinha.</li>
           </ol>
           <h3 className="text-lg font-semibold text-foreground pt-2">Diferenciais Elite Boost Prime</h3>
           <ul className="list-disc pl-5 space-y-1">

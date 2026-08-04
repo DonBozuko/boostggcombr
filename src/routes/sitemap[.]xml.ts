@@ -52,12 +52,14 @@ const buildSitemapXml = () => {
     { path: "/promo-5reais", changefreq: "weekly", priority: "0.8" },
     { path: "/rastrear", changefreq: "monthly", priority: "0.5" },
     // v200 — SEO landings (keyword-alvo)
-    { path: "/seguidores-pix", changefreq: "weekly", priority: "0.9" },
-    { path: "/comprar-seguidores-instagram", changefreq: "weekly", priority: "0.9" },
-    { path: "/comprar-seguidores-instagram-barato", changefreq: "weekly", priority: "0.9" },
+    { path: "/seguidores-pix", changefreq: "daily", priority: "0.9" },
+    { path: "/pix-seguidores-instagram", changefreq: "daily", priority: "0.9" },
+    { path: "/comprar-seguidores-instagram", changefreq: "daily", priority: "1.0" },
+    { path: "/comprar-seguidores-reais-brasil", changefreq: "daily", priority: "1.0" },
+    { path: "/comprar-seguidores-instagram-barato", changefreq: "daily", priority: "0.9" },
     { path: "/comprar-curtidas-instagram", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-tiktok", changefreq: "weekly", priority: "0.9" },
-    { path: "/comprar-seguidores-brasileiros", changefreq: "weekly", priority: "0.9" },
+    { path: "/comprar-seguidores-brasileiros", changefreq: "daily", priority: "1.0" },
     { path: "/comprar-visualizacoes-tiktok", changefreq: "weekly", priority: "0.9" },
     // v401 — landings novas (Semrush BR: 5.400/mês KDI 20 e 1.900/mês KDI 21)
     { path: "/comprar-curtidas-tiktok", changefreq: "weekly", priority: "0.9" },
