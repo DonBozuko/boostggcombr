@@ -38,6 +38,7 @@ import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
 import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
 import { Route as PainelSmmRouteImport } from './routes/painel-smm'
+import { Route as PixSeguidoresInstagramRouteImport } from './routes/pix-seguidores-instagram'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
 import { Route as RastrearRouteImport } from './routes/rastrear'
@@ -278,6 +279,11 @@ const PainelSmmRoute = PainelSmmRouteImport.update({
   path: '/painel-smm',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PixSeguidoresInstagramRoute = PixSeguidoresInstagramRouteImport.update({
+  id: '/pix-seguidores-instagram',
+  path: '/pix-seguidores-instagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
   id: '/privacidade',
   path: '/privacidade',
@@ -459,9 +465,9 @@ const FerramentasGeradorLegendaInstagramRoute =
   } as any)
 const PixSeguidoresInstagramIndexRoute =
   PixSeguidoresInstagramIndexRouteImport.update({
-    id: '/pix-seguidores-instagram/',
-    path: '/pix-seguidores-instagram/',
-    getParentRoute: () => rootRouteImport,
+    id: '/',
+    path: '/',
+    getParentRoute: () => PixSeguidoresInstagramRoute,
   } as any)
 const QuemSomosIndexRoute = QuemSomosIndexRouteImport.update({
   id: '/quem-somos/',
@@ -789,6 +795,7 @@ export interface FileRoutesByFullPath {
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/painel-smm': typeof PainelSmmRoute
+  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -1027,6 +1034,7 @@ export interface FileRoutesById {
   '/painel-afiliado': typeof PainelAfiliadoRoute
   '/painel-revendedor': typeof PainelRevendedorRoute
   '/painel-smm': typeof PainelSmmRoute
+  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -1148,6 +1156,7 @@ export interface FileRouteTypes {
     | '/painel-afiliado'
     | '/painel-revendedor'
     | '/painel-smm'
+    | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1385,6 +1394,7 @@ export interface FileRouteTypes {
     | '/painel-afiliado'
     | '/painel-revendedor'
     | '/painel-smm'
+    | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1505,6 +1515,7 @@ export interface RootRouteChildren {
   PainelAfiliadoRoute: typeof PainelAfiliadoRoute
   PainelRevendedorRoute: typeof PainelRevendedorRoute
   PainelSmmRoute: typeof PainelSmmRoute
+  PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
   RastrearRoute: typeof RastrearRoute
@@ -1537,7 +1548,6 @@ export interface RootRouteChildren {
   Char126apiBeatRoute: typeof Char126apiBeatRoute
   BlogIndexRoute: typeof BlogIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
-  PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
   QuemSomosIndexRoute: typeof QuemSomosIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
@@ -1797,6 +1807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelSmmRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pix-seguidores-instagram': {
+      id: '/pix-seguidores-instagram'
+      path: '/pix-seguidores-instagram'
+      fullPath: '/pix-seguidores-instagram'
+      preLoaderRoute: typeof PixSeguidoresInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacidade': {
       id: '/privacidade'
       path: '/privacidade'
@@ -2037,10 +2054,10 @@ declare module '@tanstack/react-router' {
     }
     '/pix-seguidores-instagram/': {
       id: '/pix-seguidores-instagram/'
-      path: '/pix-seguidores-instagram'
+      path: '/'
       fullPath: '/pix-seguidores-instagram/'
       preLoaderRoute: typeof PixSeguidoresInstagramIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof PixSeguidoresInstagramRoute
     }
     '/quem-somos/': {
       id: '/quem-somos/'
@@ -2443,6 +2460,20 @@ const ComprarSeguidoresReaisBrasilRouteWithChildren =
     ComprarSeguidoresReaisBrasilRouteChildren,
   )
 
+interface PixSeguidoresInstagramRouteChildren {
+  PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
+}
+
+const PixSeguidoresInstagramRouteChildren: PixSeguidoresInstagramRouteChildren =
+  {
+    PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
+  }
+
+const PixSeguidoresInstagramRouteWithChildren =
+  PixSeguidoresInstagramRoute._addFileChildren(
+    PixSeguidoresInstagramRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -2474,6 +2505,7 @@ const rootRouteChildren: RootRouteChildren = {
   PainelAfiliadoRoute: PainelAfiliadoRoute,
   PainelRevendedorRoute: PainelRevendedorRoute,
   PainelSmmRoute: PainelSmmRoute,
+  PixSeguidoresInstagramRoute: PixSeguidoresInstagramRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
   RastrearRoute: RastrearRoute,
@@ -2511,7 +2543,6 @@ const rootRouteChildren: RootRouteChildren = {
   Char126apiBeatRoute: Char126apiBeatRoute,
   BlogIndexRoute: BlogIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
-  PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
   QuemSomosIndexRoute: QuemSomosIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBadgeRoute: ApiPublicBadgeRoute,
