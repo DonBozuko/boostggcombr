@@ -1,15 +1,16 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v432)
+MODO EXECUTOR OBRIGATÓRIO (v433)
 
-A auditoria forense (v432) restaura o estado operacional normal e a linha de raciocínio original:
-1. Integridade: O código atual é a única fonte de verdade, mantendo a blindagem da Regra de Ouro.
-2. Continuidade: Protocolos de auditoria, versões e o Modo Torre/Build são reincorporados como parte da identidade de engenharia do projeto.
-3. Operacional: O sistema mantém o foco em estabilidade, margem e entrega garantida, operando sob a hierarquia Margem > Vitrine > Receita.
-4. Segurança: Sessão administrativa e proteção MCP permanecem ativas e blindadas.
+A auditoria forense (v433) repara o painel administrativo e restaura a estética original:
+1. Reparo: Corrigida a colisão de login que redirecionava o admin para a "/auth" pública. O AdminGate agora recupera a sessão e o token administrativo corretamente.
+2. Estética: A identidade visual "Red HUD" do Jarvis foi restaurada no login administrativo, mantendo o padrão de 4 dias atrás.
+3. Integridade: O sistema permanece blindado sob a Regra de Ouro, com o piloto automático e o Smoke Test (v178) operacionais.
+4. Segurança: Sessão administrativa e proteção MCP blindadas.
 
-O sistema está 100% operacional no Modo Executor.
+O sistema está 100% operacional.
 MODO BUILD: Ativo.
 */
+
 
 
 
