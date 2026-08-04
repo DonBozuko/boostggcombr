@@ -69,7 +69,7 @@ function Page() {
         { icon: "clock", title: "Crescimento Natural", text: "Entrega inteligente para não disparar filtros do algoritmo." },
       ]}
       pricingTitle="Tabela de preços — Seguidores Brasileiros"
-      pricingCategories={["instagram:seguidores_br"]}
+      pricingCategories={["instagram:seguidores:br"]}
       pricing={[
         { id: "p100_br", qty: "100 seguidores reais", price: "R$ 9,90" },
         { id: "p500_br", qty: "500 seguidores reais", price: "R$ 29,90", note: "Alta Conversão" },
