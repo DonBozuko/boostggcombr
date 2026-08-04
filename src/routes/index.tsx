@@ -1363,14 +1363,14 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       {/* SEO CONTENT — explica o serviço para ranquear em "comprar seguidores instagram" */}
       <section className="container mx-auto px-6 py-16 max-w-4xl">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-6 text-center">
-          Por que comprar seguidores Instagram na BoostGG
+          Vantagens de Comprar Seguidores Instagram no Pix
         </h2>
         <div className="space-y-4 text-zinc-300 text-sm leading-relaxed">
           <p>
-            Comprar seguidores Instagram é uma estratégia usada por criadores, empresas e influenciadores para acelerar a credibilidade do perfil. Na <strong className="text-foreground">BoostGG</strong>, você compra seguidores brasileiros com entrega automática no Pix, sem precisar informar senha. O processo é seguro, discreto e começa em poucos minutos após a confirmação do pagamento.
+            Ao <strong className="text-foreground">comprar seguidores Instagram reais via Pix</strong> na BoostGG, você garante o crescimento imediato do seu perfil com autoridade e segurança. Nossa plataforma é especializada em perfis brasileiros, permitindo que criadores de conteúdo e empresas aumentem sua credibilidade digital sem expor dados sensíveis como senhas. O processo é 100% automático e otimizado para entrega rápida.
           </p>
           <p>
-            Além de seguidores, você também pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link>, visualizações para Reels e seguidores brasileiros segmentados. Os pacotes com selo 🇧🇷 Brasileiro Real incluem reposição garantida de 30 dias; nos pacotes Global a reposição é solicitada ao fornecedor automaticamente. Suporte no WhatsApp em qualquer caso.
+            Além do foco em seguidores brasileiros reais, oferecemos soluções completas: você pode <Link to="/comprar-curtidas-instagram" className="text-primary underline">comprar curtidas Instagram</Link> para aumentar o engajamento ou adquirir visualizações para Reels. Todos os pacotes 🇧🇷 contam com o sistema de reposição automática de 30 dias, garantindo que sua autoridade permaneça sólida ao longo do tempo.
           </p>
           <h3 className="text-lg font-semibold text-foreground pt-2">Como funciona</h3>
           <ol className="list-decimal pl-5 space-y-1">
