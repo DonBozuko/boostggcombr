@@ -806,7 +806,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
   // preservando a linha privada do Diretor no WhatsApp (alertas backend v121).
   const telegramSupportBase =
     (import.meta.env.VITE_TELEGRAM_SUPPORT_URL as string | undefined)?.trim() ||
-    "https://t.me/boostgramseguidores_bot";
+    "https://t.me/Boostgg_bot";
   const supportHref = pedidoInfo
     ? `https://t.me/share/url?url=${encodeURIComponent(telegramSupportBase)}&text=${encodeURIComponent(
         `Olá, acabei de realizar o pagamento do Pix na BoostGG para o pedido #${pedidoInfo.pedidoId} e estou enviando o comprovante para acompanhamento de rede.`,

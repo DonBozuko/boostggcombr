@@ -4,7 +4,7 @@ import fabiano from "@/assets/fabiano.webp";
 
 export type FabianoVariant = "instagram" | "tiktok" | "youtube" | "facebook" | "telegram" | "trafego" | "kwai";
 
-const DEFAULT_BOT_USERNAME = "boostgramseguidores_bot";
+const DEFAULT_BOT_USERNAME = "Boostgg_bot";
 const BOT_USERNAME =
   (import.meta.env.VITE_TELEGRAM_BOT_USERNAME as string | undefined)?.trim() || DEFAULT_BOT_USERNAME;
 
