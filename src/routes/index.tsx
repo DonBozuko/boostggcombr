@@ -124,7 +124,7 @@ export const Route = createFileRoute("/")({
     const title = "Comprar Seguidores Instagram — Elite Boost Prime | BoostGG";
     const ogTitle = "Elite Boost Prime — Seguidores no Instagram via Pix";
     const description =
-      "Comprar seguidores Instagram reais, brasileiros e com entrega rápida via Pix. Alta retenção, reposição nos pacotes brasileiros e 100% seguro. Comece em minutos.";
+      "Comprar seguidores Instagram reais e brasileiros com entrega rápida via Pix. Seguidores reais Brasil com alta retenção, reposição e 100% seguro. Comece em minutos.";
     // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
     // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
     // marcação e usar a dele. Agora as duas batem.
@@ -291,9 +291,9 @@ type Plan = {
 type Categoria = "seguidores" | "curtidas" | "visualizacoes";
 
 const plans: Plan[] = [
-  { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Entrega rápida e segura" },
-  { id: "p500",   tier: "500 Seguidores",     tag: "+ STARTER",  qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00",  benefit: "Entrega rápida e segura" },
-  { id: "p1k",    tier: "1.000 Seguidores",   tag: "+ BASIC",    qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00",  benefit: "Entrega rápida e segura" },
+  { id: "p100",   tier: "100 Seguidores",     tag: "+ MINI",     qty: "100",     quantidade: 100,    valor: 5.0,   price: "R$ 5,00",   benefit: "Seguidores Reais via Pix" },
+  { id: "p500",   tier: "500 Seguidores",     tag: "+ STARTER",  qty: "500",     quantidade: 500,    valor: 12.0,  price: "R$ 12,00",  benefit: "Seguidores Reais Brasil" },
+  { id: "p1k",    tier: "1.000 Seguidores",   tag: "+ BASIC",    qty: "1.000",   quantidade: 1000,   valor: 18.0,  price: "R$ 18,00",  benefit: "Comprar Seguidores Reais" },
   { id: "p2k",    tier: "2.000 Seguidores",   tag: "+ GROWTH",   qty: "2.000",   quantidade: 2000,   valor: 30.0,  price: "R$ 30,00",  benefit: "Entrega rápida e segura" },
   { id: "p5k",    tier: "5.000 Seguidores",   tag: "+ PRO",      qty: "5.000",   quantidade: 5000,   valor: 65.0,  price: "R$ 65,00",  benefit: "Entrega rápida e segura" },
   { id: "p10k",   tier: "10.000 Seguidores",  tag: "+ VIP",      qty: "10.000",  quantidade: 10000,  valor: 120.0, price: "R$ 120,00", benefit: "Mais recomendado pelos clientes", highlight: true },
@@ -325,7 +325,7 @@ const allPlans: Plan[] = [...plans, ...likesPlans, ...viewsPlans];
 
 
 const trustBadges = [
-  { icon: Zap, title: "Entrega Automática e Segura", desc: "Processamento automático em minutos após a aprovação do Pix." },
+  { icon: Zap, title: "Entrega via Pix em Minutos", desc: "Processamento automático em minutos após a aprovação do Pix. Seguidores reais direto na sua conta." },
   { icon: ShieldCheck, title: "Sem Necessidade de Senha", desc: "Trabalhamos apenas com o @ público. Sua conta nunca é acessada." },
   { icon: RefreshCw, title: "Reposição 30 dias nos pacotes BR", desc: "Pacotes 🇧🇷 Brasileiro Real têm reposição nos pacotes brasileiros. Nos Global, pedimos reposição ao fornecedor automaticamente." },
 ];
@@ -362,8 +362,8 @@ const faqs = [
     a: "Start entrega em até 24h, Growth em até 12h e VIP em até 6h. Na prática, 90% dos pedidos começam em minutos.",
   },
   {
-    q: "Posso pagar de outra forma além do Pix?",
-    a: "Sim. Além do Pix, você pode pagar com cartão de crédito (acréscimo de 7% da taxa da operadora). O Pix é instantâneo e tem taxa zero, por isso continua sendo o melhor preço.",
+    q: "Posso comprar seguidores com Pix?",
+    a: "Sim! O Pix é a forma mais rápida e barata de comprar seguidores brasileiros. O envio começa em minutos após a confirmação.",
   },
 ];
 
