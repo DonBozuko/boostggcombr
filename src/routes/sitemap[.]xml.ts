@@ -12,7 +12,7 @@ interface SitemapEntry {
 const sitemapHeaders = () => {
   const headers = new Headers();
   headers.set("Content-Type", "application/xml; charset=utf-8");
-  headers.set("Cache-Control", "public, max-age=3600");
+  headers.set("Cache-Control", "public, max-age=86400, s-maxage=86400"); // v417 — 24h para poupar orçamento de rastreio de infra
   headers.set("X-Content-Type-Options", "nosniff");
   return headers;
 };
@@ -71,6 +71,11 @@ const buildSitemapXml = () => {
     { path: "/kwai", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-kwai", changefreq: "weekly", priority: "0.9" },
     { path: "/avaliacoes", changefreq: "weekly", priority: "0.7" },
+    // v417 — Inclusão de rotas de alta conversão pós-auditoria GSC
+    { path: "/comprar-seguidores-reais-brasil", changefreq: "weekly", priority: "1.0" },
+    { path: "/pix-seguidores-instagram", changefreq: "weekly", priority: "1.0" },
+    { path: "/quem-somos", changefreq: "monthly", priority: "0.5" },
+
     // v404 — /privacidade, /termos, /reembolso agora noindex (páginas legais competiam com a home na busca de marca)
     // v207 — removidos: /admin, /login, /mcp, /diagnostico (todos noindex — sitemap contraditório desperdiça crawl budget)
   ];

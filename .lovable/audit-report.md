@@ -1,6 +1,6 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-04T10:12:03.089Z
+Gerado por `npm run audit` — 2026-08-04T10:16:10.448Z
 
 Arquivos lidos: 455
 
