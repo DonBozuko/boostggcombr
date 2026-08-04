@@ -314,7 +314,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Admin · Elite Boost Prime" }, { name: "robots", content: "noindex,nofollow" }] }),
+  head: () => ({ meta: [{ title: "Painel J.A.R.V.I.S. · BOOSTGG" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: AdminGate,
 });
 
@@ -525,7 +525,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => Promise<boolean> }) {
           <div className="text-center space-y-2">
             <div className="text-4xl">🔐</div>
             <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
-              Painel Elite Boost Prime
+              Painel J.A.R.V.I.S.
             </h1>
             <p className="text-xs text-zinc-400">Supabase Auth · Administrador-Mestre</p>
           </div>
