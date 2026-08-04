@@ -1,24 +1,22 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO
+MODO EXECUTOR OBRIGATÓRIO (v423)
 
-A auditoria é apenas a primeira etapa.
+A auditoria é o alicerce, mas a execução é o objetivo final.
 
-Sempre que um problema for confirmado e a correção estiver dentro do escopo solicitado, execute a alteração no projeto.
+REGRAS DE OPERAÇÃO:
+1. DETALHAMENTO TOTAL: Não responda com resumos superficiais. Liste arquivos, linhas, dependências e a lógica de decisão.
+2. RITMO INDUSTRIAL (v408): Proibido respostas rápidas (< 1 minuto). Use o tempo para análise profunda.
+3. MODIFICAÇÃO ATIVA: Se a auditoria confirmar um problema, MODIFIQUE a lógica, EDITE os arquivos e EXECUTE a correção. Não apenas sugira.
+4. INTEGRIDADE ABSOLUTA: Todo o sistema (Autoridade de Preço, Despacho, Vitrine, Jarvis) está sob sua responsabilidade.
 
 Fluxo obrigatório:
+1. Identificar o problema (Causa Raiz).
+2. Localizar arquivos envolvidos e dependências (Grafo).
+3. Implementar a correção (Modificação de Lógica).
+4. Validar contra regressões (Regra de Ouro).
+5. Reportar detalhadamente cada bit alterado.
 
-1. Identificar o problema.
-2. Localizar a causa raiz.
-3. Mostrar os arquivos envolvidos.
-4. Implementar a correção.
-5. Atualizar todos os arquivos afetados.
-6. Validar que a correção não gerou regressões.
-7. Informar exatamente o que foi alterado.
-8. Encerrar somente após a implementação e a validação.
-
-Não pare na etapa de auditoria quando a tarefa for corrigir um problema.
-
-Se alguma limitação impedir a implementação, explique qual é a limitação e em que ponto ela ocorreu.
+Não pare na análise. Se está quebrado ou pode ser melhorado dentro do escopo, resolva.
 */
 
 
