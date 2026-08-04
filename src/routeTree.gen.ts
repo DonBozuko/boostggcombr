@@ -10,11 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminHealthCatalogRouteImport } from './routes/admin-health-catalog'
 import { Route as AfiliadosRouteImport } from './routes/afiliados'
 import { Route as ApiRevendaRouteImport } from './routes/api-revenda'
 import { Route as AudienciaBrasileiraRouteImport } from './routes/audiencia-brasileira'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AvaliacoesRouteImport } from './routes/avaliacoes'
 import { Route as ComprarCurtidasInstagramRouteImport } from './routes/comprar-curtidas-instagram'
 import { Route as ComprarCurtidasTiktokRouteImport } from './routes/comprar-curtidas-tiktok'
@@ -35,9 +36,6 @@ import { Route as KitCreatorRouteImport } from './routes/kit-creator'
 import { Route as KwaiRouteImport } from './routes/kwai'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
-import { Route as PainelAfiliadoRouteImport } from './routes/painel-afiliado'
-import { Route as PainelRevendedorRouteImport } from './routes/painel-revendedor'
-import { Route as PainelSmmRouteImport } from './routes/painel-smm'
 import { Route as PixSeguidoresInstagramRouteImport } from './routes/pix-seguidores-instagram'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
@@ -60,12 +58,16 @@ import { Route as YoutubeRouteImport } from './routes/youtube'
 import { Route as Char126beatDotjsRouteImport } from './routes/~beat[.]js'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPainelAfiliadoRouteImport } from './routes/_authenticated/painel-afiliado'
+import { Route as AuthenticatedPainelRevendedorRouteImport } from './routes/_authenticated/painel-revendedor'
+import { Route as AuthenticatedPainelSmmRouteImport } from './routes/_authenticated/painel-smm'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as ComprarSeguidoresReaisBrasilIndexRouteImport } from './routes/comprar-seguidores-reais-brasil/index'
-import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
@@ -76,6 +78,7 @@ import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes
 import { Route as PixSeguidoresInstagramIndexRouteImport } from './routes/pix-seguidores-instagram/index'
 import { Route as QuemSomosIndexRouteImport } from './routes/quem-somos/index'
 import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ApiPublicBadgeRouteImport } from './routes/api/public/badge'
 import { Route as ApiPublicCheckSaldoRouteImport } from './routes/api/public/check-saldo'
@@ -133,9 +136,8 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminHealthCatalogRoute = AdminHealthCatalogRouteImport.update({
@@ -156,6 +158,11 @@ const ApiRevendaRoute = ApiRevendaRouteImport.update({
 const AudienciaBrasileiraRoute = AudienciaBrasileiraRouteImport.update({
   id: '/audiencia-brasileira',
   path: '/audiencia-brasileira',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AvaliacoesRoute = AvaliacoesRouteImport.update({
@@ -262,21 +269,6 @@ const McpRoute = McpRouteImport.update({
 const ObrigadoRoute = ObrigadoRouteImport.update({
   id: '/obrigado',
   path: '/obrigado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PainelAfiliadoRoute = PainelAfiliadoRouteImport.update({
-  id: '/painel-afiliado',
-  path: '/painel-afiliado',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PainelRevendedorRoute = PainelRevendedorRouteImport.update({
-  id: '/painel-revendedor',
-  path: '/painel-revendedor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PainelSmmRoute = PainelSmmRouteImport.update({
-  id: '/painel-smm',
-  path: '/painel-smm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PixSeguidoresInstagramRoute = PixSeguidoresInstagramRouteImport.update({
@@ -392,15 +384,42 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPainelAfiliadoRoute =
+  AuthenticatedPainelAfiliadoRouteImport.update({
+    id: '/painel-afiliado',
+    path: '/painel-afiliado',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPainelRevendedorRoute =
+  AuthenticatedPainelRevendedorRouteImport.update({
+    id: '/painel-revendedor',
+    path: '/painel-revendedor',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPainelSmmRoute = AuthenticatedPainelSmmRouteImport.update({
+  id: '/painel-smm',
+  path: '/painel-smm',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
-  id: '/catalog',
-  path: '/catalog',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/catalog',
+  path: '/admin/catalog',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminScriptsRoute = AdminScriptsRouteImport.update({
-  id: '/scripts',
-  path: '/scripts',
-  getParentRoute: () => AdminRoute,
+  id: '/admin/scripts',
+  path: '/admin/scripts',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
@@ -418,11 +437,6 @@ const ComprarSeguidoresReaisBrasilIndexRoute =
     path: '/',
     getParentRoute: () => ComprarSeguidoresReaisBrasilRoute,
   } as any)
-const DashboardSeoRoute = DashboardSeoRouteImport.update({
-  id: '/dashboard/seo',
-  path: '/dashboard/seo',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -477,6 +491,11 @@ const QuemSomosIndexRoute = QuemSomosIndexRouteImport.update({
 const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
   id: '/~api/beat',
   path: '/~api/beat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
@@ -767,11 +786,11 @@ const LovableEmailTransactionalSendRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
+  '/auth': typeof AuthRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-curtidas-tiktok': typeof ComprarCurtidasTiktokRoute
@@ -792,9 +811,6 @@ export interface FileRoutesByFullPath {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
-  '/painel-afiliado': typeof PainelAfiliadoRoute
-  '/painel-revendedor': typeof PainelRevendedorRoute
-  '/painel-smm': typeof PainelSmmRoute
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -817,10 +833,14 @@ export interface FileRoutesByFullPath {
   '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
+  '/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
+  '/painel-smm': typeof AuthenticatedPainelSmmRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
@@ -833,6 +853,7 @@ export interface FileRoutesByFullPath {
   '/ferramentas/': typeof FerramentasIndexRoute
   '/pix-seguidores-instagram/': typeof PixSeguidoresInstagramIndexRoute
   '/quem-somos/': typeof QuemSomosIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -887,11 +908,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
+  '/auth': typeof AuthRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-curtidas-tiktok': typeof ComprarCurtidasTiktokRoute
@@ -911,9 +932,6 @@ export interface FileRoutesByTo {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
-  '/painel-afiliado': typeof PainelAfiliadoRoute
-  '/painel-revendedor': typeof PainelRevendedorRoute
-  '/painel-smm': typeof PainelSmmRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -935,10 +953,14 @@ export interface FileRoutesByTo {
   '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
+  '/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
+  '/painel-smm': typeof AuthenticatedPainelSmmRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
@@ -951,6 +973,7 @@ export interface FileRoutesByTo {
   '/ferramentas': typeof FerramentasIndexRoute
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramIndexRoute
   '/quem-somos': typeof QuemSomosIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -1006,11 +1029,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin-health-catalog': typeof AdminHealthCatalogRoute
   '/afiliados': typeof AfiliadosRoute
   '/api-revenda': typeof ApiRevendaRoute
   '/audiencia-brasileira': typeof AudienciaBrasileiraRoute
+  '/auth': typeof AuthRoute
   '/avaliacoes': typeof AvaliacoesRoute
   '/comprar-curtidas-instagram': typeof ComprarCurtidasInstagramRoute
   '/comprar-curtidas-tiktok': typeof ComprarCurtidasTiktokRoute
@@ -1031,9 +1055,6 @@ export interface FileRoutesById {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
-  '/painel-afiliado': typeof PainelAfiliadoRoute
-  '/painel-revendedor': typeof PainelRevendedorRoute
-  '/painel-smm': typeof PainelSmmRoute
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -1056,10 +1077,14 @@ export interface FileRoutesById {
   '/~beat.js': typeof Char126beatDotjsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
+  '/_authenticated/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
+  '/_authenticated/painel-smm': typeof AuthenticatedPainelSmmRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
-  '/dashboard/seo': typeof DashboardSeoRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ferramentas/calculadora-engajamento-instagram': typeof FerramentasCalculadoraEngajamentoInstagramRoute
   '/ferramentas/calculadora-lucro-revenda': typeof FerramentasCalculadoraLucroRevendaRoute
@@ -1072,6 +1097,7 @@ export interface FileRoutesById {
   '/ferramentas/': typeof FerramentasIndexRoute
   '/pix-seguidores-instagram/': typeof PixSeguidoresInstagramIndexRoute
   '/quem-somos/': typeof QuemSomosIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -1128,11 +1154,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/admin-health-catalog'
     | '/afiliados'
     | '/api-revenda'
     | '/audiencia-brasileira'
+    | '/auth'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
     | '/comprar-curtidas-tiktok'
@@ -1153,9 +1179,6 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
-    | '/painel-afiliado'
-    | '/painel-revendedor'
-    | '/painel-smm'
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
@@ -1178,10 +1201,14 @@ export interface FileRouteTypes {
     | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/admin'
+    | '/dashboard'
+    | '/painel-afiliado'
+    | '/painel-revendedor'
+    | '/painel-smm'
     | '/admin/catalog'
     | '/admin/scripts'
     | '/blog/$slug'
-    | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/calculadora-lucro-revenda'
@@ -1194,6 +1221,7 @@ export interface FileRouteTypes {
     | '/ferramentas/'
     | '/pix-seguidores-instagram/'
     | '/quem-somos/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/badge'
     | '/api/public/check-saldo'
@@ -1248,11 +1276,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/admin'
     | '/admin-health-catalog'
     | '/afiliados'
     | '/api-revenda'
     | '/audiencia-brasileira'
+    | '/auth'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
     | '/comprar-curtidas-tiktok'
@@ -1272,9 +1300,6 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
-    | '/painel-afiliado'
-    | '/painel-revendedor'
-    | '/painel-smm'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1296,10 +1321,14 @@ export interface FileRouteTypes {
     | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/admin'
+    | '/dashboard'
+    | '/painel-afiliado'
+    | '/painel-revendedor'
+    | '/painel-smm'
     | '/admin/catalog'
     | '/admin/scripts'
     | '/blog/$slug'
-    | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/calculadora-lucro-revenda'
@@ -1312,6 +1341,7 @@ export interface FileRouteTypes {
     | '/ferramentas'
     | '/pix-seguidores-instagram'
     | '/quem-somos'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/badge'
     | '/api/public/check-saldo'
@@ -1366,11 +1396,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/admin'
+    | '/_authenticated'
     | '/admin-health-catalog'
     | '/afiliados'
     | '/api-revenda'
     | '/audiencia-brasileira'
+    | '/auth'
     | '/avaliacoes'
     | '/comprar-curtidas-instagram'
     | '/comprar-curtidas-tiktok'
@@ -1391,9 +1422,6 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
-    | '/painel-afiliado'
-    | '/painel-revendedor'
-    | '/painel-smm'
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
@@ -1416,10 +1444,14 @@ export interface FileRouteTypes {
     | '/~beat.js'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/admin'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/painel-afiliado'
+    | '/_authenticated/painel-revendedor'
+    | '/_authenticated/painel-smm'
     | '/admin/catalog'
     | '/admin/scripts'
     | '/blog/$slug'
-    | '/dashboard/seo'
     | '/email/unsubscribe'
     | '/ferramentas/calculadora-engajamento-instagram'
     | '/ferramentas/calculadora-lucro-revenda'
@@ -1432,6 +1464,7 @@ export interface FileRouteTypes {
     | '/ferramentas/'
     | '/pix-seguidores-instagram/'
     | '/quem-somos/'
+    | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/badge'
     | '/api/public/check-saldo'
@@ -1487,11 +1520,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminHealthCatalogRoute: typeof AdminHealthCatalogRoute
   AfiliadosRoute: typeof AfiliadosRoute
   ApiRevendaRoute: typeof ApiRevendaRoute
   AudienciaBrasileiraRoute: typeof AudienciaBrasileiraRoute
+  AuthRoute: typeof AuthRoute
   AvaliacoesRoute: typeof AvaliacoesRoute
   ComprarCurtidasInstagramRoute: typeof ComprarCurtidasInstagramRoute
   ComprarCurtidasTiktokRoute: typeof ComprarCurtidasTiktokRoute
@@ -1512,9 +1546,6 @@ export interface RootRouteChildren {
   KwaiRoute: typeof KwaiRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
-  PainelAfiliadoRoute: typeof PainelAfiliadoRoute
-  PainelRevendedorRoute: typeof PainelRevendedorRoute
-  PainelSmmRoute: typeof PainelSmmRoute
   PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
@@ -1537,8 +1568,9 @@ export interface RootRouteChildren {
   Char126beatDotjsRoute: typeof Char126beatDotjsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  AdminCatalogRoute: typeof AdminCatalogRoute
+  AdminScriptsRoute: typeof AdminScriptsRoute
   BlogSlugRoute: typeof BlogSlugRoute
-  DashboardSeoRoute: typeof DashboardSeoRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FerramentasCalculadoraEngajamentoInstagramRoute: typeof FerramentasCalculadoraEngajamentoInstagramRoute
   FerramentasCalculadoraLucroRevendaRoute: typeof FerramentasCalculadoraLucroRevendaRoute
@@ -1549,6 +1581,7 @@ export interface RootRouteChildren {
   BlogIndexRoute: typeof BlogIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
   QuemSomosIndexRoute: typeof QuemSomosIndexRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
@@ -1611,11 +1644,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-health-catalog': {
@@ -1644,6 +1677,13 @@ declare module '@tanstack/react-router' {
       path: '/audiencia-brasileira'
       fullPath: '/audiencia-brasileira'
       preLoaderRoute: typeof AudienciaBrasileiraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/avaliacoes': {
@@ -1784,27 +1824,6 @@ declare module '@tanstack/react-router' {
       path: '/obrigado'
       fullPath: '/obrigado'
       preLoaderRoute: typeof ObrigadoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/painel-afiliado': {
-      id: '/painel-afiliado'
-      path: '/painel-afiliado'
-      fullPath: '/painel-afiliado'
-      preLoaderRoute: typeof PainelAfiliadoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/painel-revendedor': {
-      id: '/painel-revendedor'
-      path: '/painel-revendedor'
-      fullPath: '/painel-revendedor'
-      preLoaderRoute: typeof PainelRevendedorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/painel-smm': {
-      id: '/painel-smm'
-      path: '/painel-smm'
-      fullPath: '/painel-smm'
-      preLoaderRoute: typeof PainelSmmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pix-seguidores-instagram': {
@@ -1961,19 +1980,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel-afiliado': {
+      id: '/_authenticated/painel-afiliado'
+      path: '/painel-afiliado'
+      fullPath: '/painel-afiliado'
+      preLoaderRoute: typeof AuthenticatedPainelAfiliadoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel-revendedor': {
+      id: '/_authenticated/painel-revendedor'
+      path: '/painel-revendedor'
+      fullPath: '/painel-revendedor'
+      preLoaderRoute: typeof AuthenticatedPainelRevendedorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel-smm': {
+      id: '/_authenticated/painel-smm'
+      path: '/painel-smm'
+      fullPath: '/painel-smm'
+      preLoaderRoute: typeof AuthenticatedPainelSmmRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/admin/catalog': {
       id: '/admin/catalog'
-      path: '/catalog'
+      path: '/admin/catalog'
       fullPath: '/admin/catalog'
       preLoaderRoute: typeof AdminCatalogRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/admin/scripts': {
       id: '/admin/scripts'
-      path: '/scripts'
+      path: '/admin/scripts'
       fullPath: '/admin/scripts'
       preLoaderRoute: typeof AdminScriptsRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof rootRouteImport
     }
     '/blog/': {
       id: '/blog/'
@@ -1995,13 +2049,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/comprar-seguidores-reais-brasil/'
       preLoaderRoute: typeof ComprarSeguidoresReaisBrasilIndexRouteImport
       parentRoute: typeof ComprarSeguidoresReaisBrasilRoute
-    }
-    '/dashboard/seo': {
-      id: '/dashboard/seo'
-      path: '/dashboard/seo'
-      fullPath: '/dashboard/seo'
-      preLoaderRoute: typeof DashboardSeoRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -2071,6 +2118,13 @@ declare module '@tanstack/react-router' {
       path: '/~api/beat'
       fullPath: '/~api/beat'
       preLoaderRoute: typeof Char126apiBeatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/invoke-tool/$tool': {
@@ -2433,17 +2487,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AdminRouteChildren {
-  AdminCatalogRoute: typeof AdminCatalogRoute
-  AdminScriptsRoute: typeof AdminScriptsRoute
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedPainelAfiliadoRoute: typeof AuthenticatedPainelAfiliadoRoute
+  AuthenticatedPainelRevendedorRoute: typeof AuthenticatedPainelRevendedorRoute
+  AuthenticatedPainelSmmRoute: typeof AuthenticatedPainelSmmRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminCatalogRoute: AdminCatalogRoute,
-  AdminScriptsRoute: AdminScriptsRoute,
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedPainelAfiliadoRoute: AuthenticatedPainelAfiliadoRoute,
+  AuthenticatedPainelRevendedorRoute: AuthenticatedPainelRevendedorRoute,
+  AuthenticatedPainelSmmRoute: AuthenticatedPainelSmmRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface ComprarSeguidoresReaisBrasilRouteChildren {
   ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
@@ -2476,11 +2537,12 @@ const PixSeguidoresInstagramRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminHealthCatalogRoute: AdminHealthCatalogRoute,
   AfiliadosRoute: AfiliadosRoute,
   ApiRevendaRoute: ApiRevendaRoute,
   AudienciaBrasileiraRoute: AudienciaBrasileiraRoute,
+  AuthRoute: AuthRoute,
   AvaliacoesRoute: AvaliacoesRoute,
   ComprarCurtidasInstagramRoute: ComprarCurtidasInstagramRoute,
   ComprarCurtidasTiktokRoute: ComprarCurtidasTiktokRoute,
@@ -2502,9 +2564,6 @@ const rootRouteChildren: RootRouteChildren = {
   KwaiRoute: KwaiRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
-  PainelAfiliadoRoute: PainelAfiliadoRoute,
-  PainelRevendedorRoute: PainelRevendedorRoute,
-  PainelSmmRoute: PainelSmmRoute,
   PixSeguidoresInstagramRoute: PixSeguidoresInstagramRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
@@ -2528,8 +2587,9 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  AdminCatalogRoute: AdminCatalogRoute,
+  AdminScriptsRoute: AdminScriptsRoute,
   BlogSlugRoute: BlogSlugRoute,
-  DashboardSeoRoute: DashboardSeoRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FerramentasCalculadoraEngajamentoInstagramRoute:
     FerramentasCalculadoraEngajamentoInstagramRoute,
@@ -2544,6 +2604,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogIndexRoute: BlogIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
   QuemSomosIndexRoute: QuemSomosIndexRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBadgeRoute: ApiPublicBadgeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
