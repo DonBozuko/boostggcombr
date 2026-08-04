@@ -742,13 +742,13 @@ const POSTS: Record<string, Post> = {
     body: (
       <>
         <h2>Sinais de credibilidade antes da compra</h2>
-        <p>Um site confiável deve exibir claramente seu CNPJ, ter termos de serviço acessíveis e um canal de suporte humano visível.</p>
+        <p>Um site confiável deve exibir claramente seu CNPJ, ter termos de serviço acessíveis e um canal de suporte humano visível. Para quem busca "seguidores instagram brasileiros", a procedência das contas é o maior selo de confiança.</p>
         <h3>Garantia de reposição e suporte</h3>
         <p>A queda natural existe. O que diferencia um site bom é a <strong>Política de Reposição</strong>. A BoostGG oferece 30 dias de garantia nos pacotes brasileiros.</p>
         <h3>Métodos de pagamento seguros</h3>
         <p>O Pix é o método mais seguro pois oferece rastreabilidade imediata e comprovante com dados da empresa (Elite Boost Prime).</p>
-        <h3>O que evitar</h3>
-        <p>Evite sites que pedem sua senha, sites sem SSL (o cadeado no navegador) e preços absurdamente baixos (ex: R$ 1,00 por mil seguidores), que são sinais claros de bots que serão deletados em 24h.</p>
+        <h3>O que evitar ao contratar</h3>
+        <p>Evite sites que pedem sua senha, sites sem SSL e preços absurdamente baixos. Plataformas como "Decola Total" ou "Smikky" são citadas no mercado; nossa recomendação é sempre verificar se o suporte é via WhatsApp real e se o CNPJ é validado antes de qualquer transação.</p>
       </>
     ),
   },
