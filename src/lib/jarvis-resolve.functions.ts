@@ -38,6 +38,8 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
     if (!alerts || alerts.length === 0) return { ok: true, resolved: 0 };
 
     let resolvedCount = 0;
+    
+    // Processamento individual para garantir o prefixo de mensagem e evitar erros de RPC
     for (const alert of alerts) {
       const { error: updateError } = await supabaseAdmin
         .from("jarvis_alerts")
