@@ -19,13 +19,13 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     
-    // Filtro de tempo para evitar processamento massivo de alertas antigos
-    const since = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    // v416: Aumentado para 6h para garantir que alertas persistentes sejam capturados
+    const since = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
     
     // Busca alertas não resolvidos recentes
     let q = supabaseAdmin
       .from("jarvis_alerts")
-      .select("id, mensagem")
+      .select("id, mensagem, severidade, origem")
       .not("mensagem", "ilike", "✅ RESOLVIDO%")
       .gte("created_at", since);
       
@@ -41,11 +41,24 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
     
     // Processamento individual para garantir o prefixo de mensagem e evitar erros de RPC
     for (const alert of alerts) {
+      // v416: Auditoria Forense — prefixamos com RESOLVIDO e registramos metadados do evento
       const { error: updateError } = await supabaseAdmin
         .from("jarvis_alerts")
-        .update({ mensagem: `✅ RESOLVIDO ${alert.mensagem}` })
+        .update({ 
+          mensagem: `✅ RESOLVIDO ${alert.mensagem}`,
+          detalhe: `Resolução manual via Console TI em ${new Date().toISOString()}`
+        })
         .eq("id", alert.id);
-      if (!updateError) resolvedCount++;
+        
+      if (!updateError) {
+        resolvedCount++;
+        // Log de auditoria para cada resolução
+        await supabaseAdmin.from("admin_audit_logs").insert({
+          action: "jarvis_alert_resolved",
+          admin_email: "system@jarvis.manual",
+          detail: `Alerta [${alert.origem}] id:${alert.id} resolvido manualmente.`,
+        });
+      }
     }
 
     return { ok: true, resolved: resolvedCount };

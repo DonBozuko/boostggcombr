@@ -122,7 +122,7 @@ export function JarvisDetectorMentiras() {
                   <AlertTriangle className="h-3.5 w-3.5 text-red-400 mt-0.5" />
                 )}
                 <span className="font-medium">{c.label}</span>
-                <span className="text-white/40">— {c.detail}</span>
+                <span className="text-white/40" dangerouslySetInnerHTML={{ __html: `— ${c.detail}` }} />
               </li>
             ))}
           </ul>
