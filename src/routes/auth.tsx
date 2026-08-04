@@ -9,7 +9,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({
     next: typeof search.next === "string" ? search.next : "/",
   }),
-  beforeLoad: async ({ context, search }) => {
+  beforeLoad: async ({ search }) => {
     const { data } = await supabase.auth.getSession();
     if (data.session) {
       throw redirect({ to: search.next });

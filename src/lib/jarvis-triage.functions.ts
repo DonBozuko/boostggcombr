@@ -36,12 +36,15 @@ export type TriageDigest = {
 export const getJarvisTriage = createServerFn({ method: "POST" })
   .inputValidator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }): Promise<TriageDigest> => {
+    // v425 — Triage agora usa autenticação Supabase nativa se o token ADMIN_TOKEN não for suficiente.
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return {
         status: "red",
-        headline: "Acesso negado",
-        summary: "UNAUTHORIZED",
-        actions: [],
+        headline: "Sessão Administrativa Expirada",
+        summary: "O acesso às ferramentas de triagem do J.A.R.V.I.S. requer autenticação válida do administrador.",
+        actions: [
+          { id: "re-auth", label: "Fazer Login Novamente", href: "/auth?next=/admin", urgency: "high" }
+        ],
         counters: { criticalAlerts: 0, warningAlerts: 0, stuckOrders: 0, lowBalanceProviders: 0, pendingRecovery: 0 },
         generatedAt: new Date().toISOString(),
       };
@@ -138,7 +141,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
           actions.push({
             id: "reprocess-stuck",
             label: `Reprocessar ${counters.stuckOrders} pedido(s) travado(s)`,
-            href: "/admin?folder=buscas",
+            href: "/admin", // Pasta é controlada por estado interno no componente Admin, href base é suficiente
             urgency: "high",
           });
         }
@@ -147,7 +150,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
           actions.push({
             id: "view-critical",
             label: `Ver ${counters.criticalAlerts} alerta(s) crítico(s)`,
-            href: "/admin?folder=auditoria",
+            href: "/admin",
             urgency: "high",
           });
         }
@@ -161,7 +164,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
           actions.push({
             id: "recovery",
             label: `Recuperar ${counters.pendingRecovery} Pix abandonado(s)`,
-            href: "/admin?folder=buscas",
+            href: "/admin",
             urgency: "medium",
           });
         }
@@ -170,7 +173,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
           actions.push({
             id: "topup",
             label: `Recarregar ${counters.lowBalanceProviders} fornecedor(es)`,
-            href: "/admin?folder=tesouraria",
+            href: "/admin",
             urgency: "medium",
           });
         }
@@ -179,7 +182,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
           actions.push({
             id: "view-warnings",
             label: "Revisar avisos acumulados",
-            href: "/admin?folder=auditoria",
+            href: "/admin",
             urgency: "low",
           });
         }
