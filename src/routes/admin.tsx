@@ -312,7 +312,7 @@ function LuxuryMenuList({ active, onChange }: { active: AdminTab; onChange: (t: 
   );
 }
 
-export const Route = createFileRoute("/_authenticated/admin")({
+export const Route = createFileRoute("/admin")({
   ssr: false,
   head: () => ({ meta: [{ title: "Painel J.A.R.V.I.S. · BOOSTGG" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: AdminGate,
