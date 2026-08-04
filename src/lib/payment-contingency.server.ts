@@ -111,6 +111,12 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
 
   // v154 — Live Webhook Heartbeat + Telegram universal (paridade com mp-webhook.ts)
   try {
+    const { dispatchTelegramAlert } = await import("@/lib/messaging");
+    await dispatchTelegramAlert(
+      `🚨 <b>PIX APROVADO VIA CONTINGÊNCIA (v440)</b>\n\nPROBLEMA: o webhook do Mercado Pago falhou/atrasou, mas a rede de segurança detectou o pagamento e processou o pedido.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nComprador: ${pedido.instagram_user}\n\nO QUE FAZER: o sistema corrigiu sozinho, mas verifique o Webhook Secret no painel MP para normalizar a velocidade.`,
+      { force: true, severity: "critical" }
+    );
+
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
       admin_email: "system@contingency",
       action: "PIX_APPROVED",
@@ -126,7 +132,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         message: `🟢 [contingency] PIX aprovado via polling · pedido ${pedido.id}`,
       },
     } as any);
-  } catch (e) { console.warn("[contingency] v154 audit PIX_APPROVED fail", e); }
+  } catch (e) { console.warn("[contingency] v154 audit/telegram fail", e); }
 
   // v173 — paridade com mp-webhook: credita Carteira Geral + ledger imutável.
   try {
