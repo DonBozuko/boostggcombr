@@ -2,15 +2,18 @@ import { getAdminToken } from "@/lib/admin-token-store";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { runJarvisLieDetector } from "@/lib/jarvis-detector-mentiras.functions";
+import { resolveJarvisAlerts } from "@/lib/jarvis-resolve.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, CheckCircle2, ShieldAlert, Loader2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ShieldAlert, Loader2, Check } from "lucide-react";
 
 type Report = Awaited<ReturnType<typeof runJarvisLieDetector>>;
 
 export function JarvisDetectorMentiras() {
   const run = useServerFn(runJarvisLieDetector);
+  const resolve = useServerFn(resolveJarvisAlerts);
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);
+  const [resolving, setResolving] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   const onRun = async () => {
@@ -30,6 +33,20 @@ export function JarvisDetectorMentiras() {
       setErro("Não deu para auditar agora. Tente de novo em alguns segundos.");
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const onResolve = async () => {
+    setResolving(true);
+    try {
+      const token = getAdminToken();
+      if (!token) return;
+      await resolve({ data: { token } });
+      await onRun();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setResolving(false);
     }
   };
 
@@ -69,15 +86,29 @@ export function JarvisDetectorMentiras() {
       {report && (
         <div className="mt-4 space-y-2">
           <div
-            className={`rounded-md p-2 text-xs font-mono ${
+            className={`flex items-center justify-between rounded-md p-2 text-xs font-mono ${
               blocked
                 ? "bg-red-900/40 text-red-300 border border-red-500/60 animate-pulse"
                 : "bg-emerald-900/30 text-emerald-300 border border-emerald-500/40"
             }`}
           >
-            {blocked
-              ? `🔴 ALERTA VERMELHO — DEPLOY BLOQUEADO (${report.passed}/${report.total})`
-              : `✅ INTEGRIDADE OK ${report.passed}/${report.total} • ${report.version}`}
+            <span>
+              {blocked
+                ? `🔴 ALERTA VERMELHO — DEPLOY BLOQUEADO (${report.passed}/${report.total})`
+                : `✅ INTEGRIDADE OK ${report.passed}/${report.total} • ${report.version}`}
+            </span>
+            {blocked && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-red-300 hover:bg-red-500/20"
+                onClick={onResolve}
+                disabled={resolving}
+                title="Marcar todos como resolvidos"
+              >
+                {resolving ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
+              </Button>
+            )}
           </div>
           <ul className="space-y-1">
             {report.checks.map((c) => (
