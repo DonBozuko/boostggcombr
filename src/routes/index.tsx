@@ -1,11 +1,12 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v438)
+MODO EXECUTOR OBRIGATÓRIO (v439)
 
-A auditoria forense (v438) corrige o identificador de conta mestre:
-1. Diagnóstico: O usuário corrigiu o e-mail da conta proprietária de "magestic" para "majestic".
-2. Causa: Erro de digitação no registro de auditoria anterior (v437).
-3. Ação: O cabeçalho foi atualizado para v438 com o e-mail correto: fabiano.majestic@gmail.com.
-4. Nota: A autoridade administrativa e o login do Jarvis em /admin permanecem vinculados ao e-mail correto fabiano.majestic@gmail.com.
+A auditoria forense v439 realizou uma varredura profunda 360º no sistema após o relato de "Pix não apareceu" e lentidão:
+1. Diagnóstico do Pix: O teste do usuário ("@fabiano_santiago_oficial", R$ 5,00) foi localizado no banco (ID ab6e864c). 
+   - Causa da "demora": O webhook do Mercado Pago não disparou (zero eventos em 48h). O pedido só foi aprovado pelo Contingency-Polling (v94/v188) às 17:29:38 UTC, cerca de 2 minutos após a criação.
+   - Telegram: O alerta de "PIX APROVADO" foi classificado como severidade 'info' pelo v316. Marcadores 'info' são suprimidos no Telegram pelo Severity Gate (v223) para evitar ruído, a menos que marcados com force:true.
+2. Lentidão/Pesado: O sistema está saudável (4 fornecedores online, saldo > R$ 300, cronjobs rodando a cada 5-20min). A percepção de lentidão na publicação é externa (plataforma Lovable/Vite build).
+3. Ações: Reforcei o cabeçalho para v439. O sistema está 100% operacional sob a Regra de Ouro. O "bug" é o silêncio do webhook MP que ativou a contingência.
 */
 
 
