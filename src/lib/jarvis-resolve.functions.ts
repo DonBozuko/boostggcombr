@@ -38,18 +38,14 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
     if (!alerts || alerts.length === 0) return { ok: true, resolved: 0 };
 
     let resolvedCount = 0;
-    const { error: updateError } = await supabaseAdmin
-      .from("jarvis_alerts")
-      .update({ mensagem: supabaseAdmin.rpc('concat', { a: '✅ RESOLVIDO ', b: 'mensagem' }) as any }) // Note: supabase-js doesn't support complex SET expressions easily, falling back to individual updates for precision.
-      .in("id", alerts.map(a => a.id));
-
-    // Refined individual update strategy for safety if batch fails or for precise message prefixing
+    
+    // Processamento individual para garantir o prefixo de mensagem e evitar erros de RPC
     for (const alert of alerts) {
-      const { error } = await supabaseAdmin
+      const { error: updateError } = await supabaseAdmin
         .from("jarvis_alerts")
         .update({ mensagem: `✅ RESOLVIDO ${alert.mensagem}` })
         .eq("id", alert.id);
-      if (!error) resolvedCount++;
+      if (!updateError) resolvedCount++;
     }
 
     return { ok: true, resolved: resolvedCount };
