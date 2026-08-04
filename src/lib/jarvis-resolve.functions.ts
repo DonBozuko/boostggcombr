@@ -55,6 +55,7 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
         // Log de auditoria para cada resolução
         await supabaseAdmin.from("admin_audit_logs").insert({
           action: "jarvis_alert_resolved",
+          admin_email: "system@jarvis.manual",
           detail: `Alerta [${alert.origem}] id:${alert.id} resolvido manualmente.`,
         });
       }
