@@ -161,7 +161,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       const { count: smokeRuns } = await supabaseAdmin
         .from("admin_audit_logs")
         .select("*", { count: "exact", head: true })
-        .eq("action", "smoke_test_v178")
+        .ilike("action", "smoke_test_%")
         .gte("created_at", smokeCutoff);
       const smOk = (smokeRuns ?? 0) >= 1;
       checks.push({

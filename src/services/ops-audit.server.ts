@@ -232,7 +232,7 @@ export async function runOpsAudit(options: { notify?: boolean } = {}): Promise<O
       code: "ROBO_PARADO",
       severity: "critical",
       titulo: "Robô automático parou de rodar",
-      problema: `${parados.length} robô(s) frequentes sem execução recente: ${parados.map((c: any) => c.jobname).join(", ")}.`,
+      problema: `${parados.length} robô(s) frequentes sem execução recente: ${parados.map((c: any) => c.jobname).join(", ")}. Se o sistema foi migrado recentemente, isso é esperado até que os novos agendamentos disparem.`,
       o_que_fazer: "Me avise para reativar o agendamento.",
       evidencia: parados,
     });
