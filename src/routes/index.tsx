@@ -124,7 +124,7 @@ export const Route = createFileRoute("/")({
     const title = "Comprar Seguidores Instagram Reais via Pix — BoostGG";
     const ogTitle = "BoostGG — Seguidores no Instagram Reais e Brasileiros";
     const description =
-      "Comprar seguidores Instagram reais via Pix com entrega imediata. Seguidores brasileiros com alta retenção e reposição garantida. Elite Boost Prime: qualidade e segurança.";
+      "Comprar seguidores Instagram reais via Pix com entrega imediata. Seguidores brasileiros com alta retenção e reposição garantida. Elite Boost Prime: autoridade e segurança.";
     // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
     // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
     // marcação e usar a dele. Agora as duas batem.
