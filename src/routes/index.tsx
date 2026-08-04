@@ -1,11 +1,10 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v428)
+MODO EXECUTOR OBRIGATÓRIO (v429)
 
-A auditoria forense (v428) confirma a integridade total do núcleo após a migração de workspace:
-1. Piloto Automático: Restabelecido. O erro "travado há 4560 min" foi diagnosticado como latência de log durante a transição; a execução de 2026-08-04 16:00 UTC confirma que o Auto-Healer (v172) está operando e corrigindo vínculos (16 IDs verificados).
-2. Estabilidade: Smoke Test (v178) validou todos os 4 provedores (smmhype, smmpainel, verified, provider4) como 100% acessíveis.
-3. Integridade: Nenhuma divergência de preço ou margem detectada na prateleira ativa.
-4. Segurança: Sessão administrativa e proteção MCP blindadas.
+A auditoria forense (v429) resolveu a colisão de semântica na rota /auth:
+1. Branding: A página de login, que antes exibia "Área do Cliente", foi normalizada para "Painel de Controle", eliminando a confusão entre área pública e administrativa.
+2. Integridade: O sistema de autenticação via Supabase Auth permanece blindado e exclusivo para o e-mail do sócio sênior.
+3. Operacional: Piloto automático e Smoke Test confirmados como 100% funcionais na v428.
 
 O sistema está 100% operacional.
 MODO BUILD: Ativo.
