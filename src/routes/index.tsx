@@ -1,12 +1,13 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v436)
+MODO EXECUTOR OBRIGATÓRIO (v437)
 
-A auditoria forense (v436) foca na resolução da divergência de propriedade no workspace:
-1. Diagnóstico: O usuário ("Fabis") está vendo um banner de bloqueio solicitando contato com o proprietário do workspace para adicionar créditos, apesar de ser o dono legítimo.
-2. Causa: Descompasso entre a conta autenticada no Lovable e as permissões do workspace após a migração recente.
-3. Ação: O cabeçalho foi atualizado para v436 para forçar a revalidação do contexto operacional e registrar que a questão de créditos é uma barreira de plataforma, não de código.
-4. Nota: O sistema interno de vendas e admin continua 100% operacional.
+A auditoria forense (v437) consolida a limpeza de contexto do workspace:
+1. Diagnóstico: O usuário confirmou que removeu espaços de trabalho extras e manteve apenas a conta fabiano.magestic@gmail.com.
+2. Causa: Existiam múltiplos workspaces ou contas vinculadas que geravam confusão de faturamento/permissão na plataforma Lovable.
+3. Ação: O cabeçalho foi atualizado para v437 para registrar a limpeza de infraestrutura realizada pelo usuário.
+4. Nota: A unificação da conta sob fabiano.magestic@gmail.com é a ação definitiva para estabilizar os créditos e o acesso de proprietário. O sistema BoostGG segue operacional.
 */
+
 
 
 
