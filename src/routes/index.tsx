@@ -9,6 +9,11 @@ AUTODIA DE INTEGRIDADE (v426):
 2. Pagamentos: Fluxo Pix validado via preflight de rota e alvo.
 3. Segurança: Proteção MCP ativa (exige login para dados sensíveis).
 4. SMM: Canary prova entrega real; Idempotência evita gasto duplo.
+
+AUDITORIA DE PERFORMANCE (v426.1):
+- Diagnóstico: "aqui demorou muito pra aparecer chave".
+- Causa: Latência acumulada no preflight de alvo/rota + 3 tentativas de retry no Mercado Pago.
+- Ação: Paralelização de preflights no `criarPedido` e ajuste de timeouts para reduzir o tempo de resposta percebido pelo cliente sem comprometer a integridade.
 */
 
 
