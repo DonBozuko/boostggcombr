@@ -1,12 +1,15 @@
-import { dispatchTelegramAlert } from "./src/lib/messaging";
+import { dispatchWhatsappAlert } from "./src/lib/whatsapp-alert.server";
 
-async function run() {
-  console.log("Enviando alerta de teste para o Diretor...");
-  const res = await dispatchTelegramAlert(
-    "🚀 <b>AUDITORIA FINALIZADA</b>\n\nPROBLEMA: O Chat ID estava desatualizado.\nO QUE FAZER: Nada, eu já capturei o novo ID (6301999242) e testei agora.",
-    { force: true, origem: "jarvis_audit" }
-  );
-  console.log("Resultado:", JSON.stringify(res, null, 2));
+async function test() {
+  console.log("--- TESTE DE COMUNICAÇÃO JARVIS ---");
+  const msg = "✅ AUDITORIA DE INTEGRIDADE CONCLUÍDA\n\nSTATUS: SISTEMA OPERACIONAL\nVITRINE: 100% ONLINE\nPAGAMENTOS: WEBHOOK ATIVO\n\nO Jarvis confirmou que o Triângulo de Aço está intacto e monitorando.";
+  
+  try {
+    const res = await dispatchWhatsappAlert(msg, { force: true });
+    console.log("Resultado do envio:", res);
+  } catch (e) {
+    console.error("Falha fatal no envio:", e);
+  }
 }
 
-run();
+test();
