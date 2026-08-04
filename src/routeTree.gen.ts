@@ -41,6 +41,7 @@ import { Route as PainelSmmRouteImport } from './routes/painel-smm'
 import { Route as PixSeguidoresInstagramRouteImport } from './routes/pix-seguidores-instagram'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
+import { Route as QuemSomosRouteImport } from './routes/quem-somos'
 import { Route as RastrearRouteImport } from './routes/rastrear'
 import { Route as ReembolsoRouteImport } from './routes/reembolso'
 import { Route as RevendaRouteImport } from './routes/revenda'
@@ -294,6 +295,11 @@ const Promo5reaisRoute = Promo5reaisRouteImport.update({
   path: '/promo-5reais',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuemSomosRoute = QuemSomosRouteImport.update({
+  id: '/quem-somos',
+  path: '/quem-somos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RastrearRoute = RastrearRouteImport.update({
   id: '/rastrear',
   path: '/rastrear',
@@ -470,9 +476,9 @@ const PixSeguidoresInstagramIndexRoute =
     getParentRoute: () => PixSeguidoresInstagramRoute,
   } as any)
 const QuemSomosIndexRoute = QuemSomosIndexRouteImport.update({
-  id: '/quem-somos/',
-  path: '/quem-somos/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => QuemSomosRoute,
 } as any)
 const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
   id: '/~api/beat',
@@ -798,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
+  '/quem-somos': typeof QuemSomosRouteWithChildren
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
@@ -1037,6 +1044,7 @@ export interface FileRoutesById {
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
+  '/quem-somos': typeof QuemSomosRouteWithChildren
   '/rastrear': typeof RastrearRoute
   '/reembolso': typeof ReembolsoRoute
   '/revenda': typeof RevendaRoute
@@ -1159,6 +1167,7 @@ export interface FileRouteTypes {
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
+    | '/quem-somos'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
@@ -1397,6 +1406,7 @@ export interface FileRouteTypes {
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
+    | '/quem-somos'
     | '/rastrear'
     | '/reembolso'
     | '/revenda'
@@ -1518,6 +1528,7 @@ export interface RootRouteChildren {
   PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRouteWithChildren
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
+  QuemSomosRoute: typeof QuemSomosRouteWithChildren
   RastrearRoute: typeof RastrearRoute
   ReembolsoRoute: typeof ReembolsoRoute
   RevendaRoute: typeof RevendaRoute
@@ -1548,7 +1559,6 @@ export interface RootRouteChildren {
   Char126apiBeatRoute: typeof Char126apiBeatRoute
   BlogIndexRoute: typeof BlogIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
-  QuemSomosIndexRoute: typeof QuemSomosIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
@@ -1828,6 +1838,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Promo5reaisRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quem-somos': {
+      id: '/quem-somos'
+      path: '/quem-somos'
+      fullPath: '/quem-somos'
+      preLoaderRoute: typeof QuemSomosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rastrear': {
       id: '/rastrear'
       path: '/rastrear'
@@ -2061,10 +2078,10 @@ declare module '@tanstack/react-router' {
     }
     '/quem-somos/': {
       id: '/quem-somos/'
-      path: '/quem-somos'
+      path: '/'
       fullPath: '/quem-somos/'
       preLoaderRoute: typeof QuemSomosIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof QuemSomosRoute
     }
     '/~api/beat': {
       id: '/~api/beat'
@@ -2474,6 +2491,18 @@ const PixSeguidoresInstagramRouteWithChildren =
     PixSeguidoresInstagramRouteChildren,
   )
 
+interface QuemSomosRouteChildren {
+  QuemSomosIndexRoute: typeof QuemSomosIndexRoute
+}
+
+const QuemSomosRouteChildren: QuemSomosRouteChildren = {
+  QuemSomosIndexRoute: QuemSomosIndexRoute,
+}
+
+const QuemSomosRouteWithChildren = QuemSomosRoute._addFileChildren(
+  QuemSomosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
@@ -2508,6 +2537,7 @@ const rootRouteChildren: RootRouteChildren = {
   PixSeguidoresInstagramRoute: PixSeguidoresInstagramRouteWithChildren,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
+  QuemSomosRoute: QuemSomosRouteWithChildren,
   RastrearRoute: RastrearRoute,
   ReembolsoRoute: ReembolsoRoute,
   RevendaRoute: RevendaRoute,
@@ -2543,7 +2573,6 @@ const rootRouteChildren: RootRouteChildren = {
   Char126apiBeatRoute: Char126apiBeatRoute,
   BlogIndexRoute: BlogIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
-  QuemSomosIndexRoute: QuemSomosIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBadgeRoute: ApiPublicBadgeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
