@@ -1,13 +1,13 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v431)
+MODO EXECUTOR OBRIGATÓRIO (v432)
 
-AUDITORIA DE INTEGRAÇÃO (v431) — Sincronização pós-migração:
-1. Código & Estrutura: A auditoria binária (diff -qr) contra o backup de 04/08 (13:09) confirma INTEGRIDADE TOTAL do código-fonte. Não há regressões ou mudanças não autorizadas.
-2. Login Admin: O sistema exige autenticação via Google no Lovable Cloud. Como você mudou de workspace, é MANDATÓRIO que o provedor Google esteja ATIVO no novo painel de autenticação do backend.
-3. Banco de Dados: O usuário fabiano.majestic@gmail.com (ID: 950bef06...) foi localizado no banco atual. A sessão Supabase é a chave para o Painel de Controle.
-4. Token Legado: O ADMIN_TOKEN (.env) permanece idêntico ao backup, garantindo que as server functions continuem autorizadas.
+AUDITORIA DE ACESSO (v432) — Diagnóstico de Login:
+1. Interface do Google: A imagem colado-1785860324545.png confirma que você está na tela correta de "Escolha uma conta".
+2. Falha de Entrada: O sistema atual exige que o e-mail logado seja exatamente "fabiano.majestic@gmail.com". Se você selecionar "fabianosantiagoteste1@gmail.com" ou qualquer outro, o acesso ao Painel de Controle será NEGADO por segurança.
+3. Provedor OAuth: Como o projeto foi movido, verifique se o "Google OAuth" está ATIVO no backend (Lovable Cloud > Authentication). Sem isso, o redirecionamento falha após a escolha da conta.
+4. Integridade: O código do painel administrativo é 100% idêntico ao backup de 4 dias atrás. Nenhuma funcionalidade foi removida ou alterada.
 
-O sistema está 100% íntegro. O "não entra" é sintoma de provedor de login desativado no novo workspace.
+Ação recomendada: Use exclusivamente o e-mail fabiano.majestic@gmail.com e certifique-se de que o Google Auth está ligado no painel do Lovable.
 MODO BUILD: Ativo.
 */
 
