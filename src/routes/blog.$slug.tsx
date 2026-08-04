@@ -611,6 +611,82 @@ const POSTS: Record<string, Post> = {
       </>
     ),
   },
+  "como-instagram-detecta-seguidores": {
+    title: "Como o Instagram Detecta Seguidores em 2026",
+    description: "Entenda como a Meta identifica automação e o que diferencia serviços seguros de bots descartáveis.",
+    subtitle: "A ciência por trás dos filtros do Instagram.",
+    datePublished: "2026-08-04",
+    body: (
+      <>
+        <p>A Meta (dona do Instagram) investe bilhões em IA para detectar padrões não humanos. Mas como isso funciona na prática e por que alguns perfis crescem com ajuda e outros são punidos?</p>
+        <h2>O Padrão de Velocidade</h2>
+        <p>O sinal mais óbvio é a aceleração súbita. Se um perfil que ganha 2 seguidores por dia ganha 5.000 em 5 minutos, o alerta é disparado. Por isso a BoostGG foca em <strong>entrega gradual</strong>.</p>
+        <h2>Qualidade do Perfil (Fingerprinting)</h2>
+        <p>O algoritmo olha para quem te segue. Se os seguidores não têm foto, postagens ou seguidores próprios, são marcados como bots. Seguidores reais brasileiros têm "histórico de vida" digital, o que os torna indetectáveis para filtros de spam.</p>
+      </>
+    ),
+  },
+  "shadowban-mito-ou-realidade": {
+    title: "Shadowban: Mito ou Realidade ao Comprar Seguidores?",
+    description: "Análise técnica sobre o bloqueio de alcance no Instagram e se a compra de seguidores é a causa real.",
+    subtitle: "O que realmente trava o seu alcance.",
+    datePublished: "2026-08-04",
+    body: (
+      <>
+        <p>O termo 'Shadowban' assombra criadores de conteúdo. Mas será que comprar seguidores causa isso? A resposta é: <strong>não diretamente</strong>.</p>
+        <h2>A Causa Real da Queda de Alcance</h2>
+        <p>O Instagram reduz o alcance quando o conteúdo tem <em>baixa retenção</em>. Se você compra seguidores e para de postar conteúdo bom, o algoritmo entende que seu perfil não é mais interessante. O problema é a falta de estratégia, não o número em si.</p>
+        <h2>Como Evitar</h2>
+        <p>A regra de ouro é: impulsione o número para gerar confiança (prova social) enquanto mantém uma frequência de postagem agressiva de Reels.</p>
+      </>
+    ),
+  },
+  "guia-bio-perfeita-instagram": {
+    title: "O Guia da Bio Perfeita: Converta Visitantes em Vendas",
+    description: "Aprenda a estruturar sua biografia do Instagram para transformar seguidores em clientes reais.",
+    subtitle: "Sua bio é seu cartão de visitas e sua página de vendas.",
+    datePublished: "2026-08-04",
+    body: (
+      <>
+        <p>Não adianta ter 10 mil seguidores se ninguém clica no seu link. A biografia é o que decide se o visitante fica ou vai embora.</p>
+        <h2>A Estrutura de 4 Linhas</h2>
+        <ol>
+          <li><strong>O que você faz:</strong> Seja direto. "Ajudo mulheres a..."</li>
+          <li><strong>Autoridade/Prova:</strong> "+500 alunas satisfeitas".</li>
+          <li><strong>Humanização:</strong> Um hobby ou localização.</li>
+          <li><strong>CTA (Chamada para ação):</strong> "Toque aqui para agendar".</li>
+        </ol>
+      </>
+    ),
+  },
+  "instagram-vs-tiktok-onde-crescer": {
+    title: "Instagram vs TikTok: Onde é mais rápido crescer do zero?",
+    description: "Comparativo entre as duas maiores redes sociais de 2026 para quem quer começar um negócio digital.",
+    subtitle: "Escolha a rede certa para o seu tipo de conteúdo.",
+    datePublished: "2026-08-04",
+    body: (
+      <>
+        <p>O TikTok ainda é a rede do 'viral fácil', mas o Instagram é a rede da 'venda de alto ticket'.</p>
+        <h2>Vantagens do TikTok</h2>
+        <p>Alcance orgânico massivo para quem não tem nenhum seguidor. Ótimo para testar formatos de vídeo.</p>
+        <h2>Vantagens do Instagram</h2>
+        <p>Ferramentas de venda (Shopping) e Story (engajamento profundo) superiores. É onde o dinheiro realmente circula.</p>
+      </>
+    ),
+  },
+  "por-que-entrega-gradual-e-segura": {
+    title: "Por que a Entrega Gradual é o Único Caminho Seguro",
+    description: "Entenda por que a velocidade da entrega de seguidores define a saúde da sua conta a longo prazo.",
+    subtitle: "Qualidade sobre pressa: a filosofia BoostGG.",
+    datePublished: "2026-08-04",
+    body: (
+      <>
+        <p>Ninguém ganha 10 mil seguidores em um segundo de forma orgânica. Se um serviço oferece isso, ele está te entregando um risco.</p>
+        <h2>Mimetismo Algorítmico</h2>
+        <p>Nossa tecnologia distribui os seguidores ao longo do dia, imitando o comportamento de um post que viralizou. Isso mantém sua conta sob o radar dos robôs de limpeza da Meta.</p>
+      </>
+    ),
+  },
 };
 
 export const Route = createFileRoute("/blog/$slug")({
