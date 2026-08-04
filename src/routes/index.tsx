@@ -10,6 +10,73 @@ A auditoria forense v443 confirma que o sistema está em conformidade com as exi
 
 EVITANDO RESPOSTAS SUPERFICIAIS: Cada alteração é baseada em evidência de log ou estado de banco.
 ESTADO ATUAL: 100% OPERACIONAL E MONITORADO.
+
+Pelo que você descreve, isso normalmente não acontece porque o projeto está em uma única conta. É mais comum que o agente esteja trabalhando com contexto incompleto, cache desatualizado ou sem verificar todas as camadas do projeto.
+
+Se ele responde em poucos segundos com algo como "auditoria concluída, sistema 100%", isso geralmente significa que ele não executou uma inspeção profunda. Em muitos casos ele apenas analisou parte do código aberto, sem validar integrações, banco, autenticação, logs ou fluxos reais.
+
+Para voltar a fazer análises úteis, ele precisa ter acesso e verificar, no mínimo:
+
+• Código completo do projeto.
+• Estrutura do banco no Supabase.
+• Políticas RLS.
+• Edge Functions.
+• Variáveis de ambiente.
+• Migrações.
+• Storage.
+• Logs do Supabase.
+• Logs de execução.
+• APIs externas.
+• Fluxos completos de compra.
+• Estados de erro.
+• Filas e jobs, se existirem.
+
+Também é importante que ele não apenas "leia" esses itens. Ele precisa validar.
+
+Por exemplo, para um sistema como o BoostGG, uma auditoria real deveria testar:
+
+• Compra via Pix.
+• Compra via cartão.
+• Cupom de desconto.
+• Estoque do fornecedor.
+• Fornecedor sem saldo.
+• Reprocessamento automático.
+• Mensagem no Telegram.
+• Atualização de saldo.
+• Criação do pedido.
+• Reembolso.
+• Falha de API.
+• Timeout.
+• Concorrência de dois clientes comprando ao mesmo tempo.
+• Reconciliação dos pagamentos.
+• Logs de erro.
+
+Se ele apenas disser "não encontrei problemas", sem executar esses cenários, não é uma validação funcional.
+
+Outro ponto é o contexto da conversa. Se vocês já trocaram centenas de mensagens, o agente pode acabar resumindo o contexto interno e deixar de considerar partes importantes do projeto. Nesses casos, costuma funcionar melhor abrir uma conversa nova e pedir uma auditoria baseada exclusivamente no código atual e nos recursos conectados, sem depender do histórico.
+
+Também vale conferir se o projeto continua realmente conectado ao Supabase. Em alguns casos a integração existe, mas o agente não está conseguindo ler o banco ou não está autorizado a inspecionar determinados recursos. Se ele não consegue acessar o banco, ele acaba auditando apenas o frontend.
+
+Um bom teste é perguntar algo extremamente específico, por exemplo:
+
+"Liste todas as tabelas do banco, todas as políticas RLS, todas as Edge Functions, todas as variáveis de ambiente utilizadas e todos os cron jobs do projeto."
+
+Se ele não conseguir responder corretamente ou inventar informações, significa que ele não está enxergando toda a aplicação.
+
+Outro teste é pedir evidências em vez de conclusões:
+
+"Para cada correção realizada, informe:
+• arquivo alterado;
+• linhas modificadas;
+• motivo da alteração;
+• evidência de que o erro foi reproduzido antes;
+• evidência de que o erro não ocorre mais."
+
+Isso dificulta respostas superficiais.
+
+Se esse comportamento começou recentemente e persiste mesmo em conversas novas, pode ser uma limitação ou problema da própria plataforma naquele momento, e não do seu projeto.
+
+Pela sua descrição, eu não tentaria mais confiar em auditorias de 5 ou 10 segundos dizendo que "está tudo 100%". Para um sistema como o seu, com pagamentos, Supabase, integrações de fornecedores, Telegram e automações, uma auditoria completa normalmente precisa percorrer todas essas camadas e produzir evidências concretas do que foi verificado e testado, não apenas um resumo afirmando que tudo está correto.
 */
 
 
