@@ -1,7 +1,6 @@
 // v417 — Institucional: Quem Somos (Autoridade da Marca)
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { BrandHeader } from "@/components/BrandHeader";
-import { Footer } from "@/components/Footer";
 import { motion } from "framer-motion";
 import { ShieldCheck, Zap, Users, Trophy } from "lucide-react";
 
@@ -87,7 +86,21 @@ function Page() {
         </div>
       </main>
 
-      <Footer />
+      <footer className="border-t border-border py-10">
+        <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
+          <div className="flex items-center gap-2">
+            <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
+            <span className="font-display font-semibold text-foreground">BOOSTGG</span>
+          </div>
+          <div className="flex items-center gap-4 flex-wrap justify-center">
+            <Link to="/" className="hover:text-foreground">Início</Link>
+            <Link to="/privacidade" className="hover:text-foreground">Privacidade</Link>
+            <Link to="/termos" className="hover:text-foreground">Termos</Link>
+            <span>© 2026 BoostGG.</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
+
