@@ -1,4 +1,6 @@
+/* "perfeito, resolveu os propbemas do sistema como tem que ser?" */
 /* "Não responda até concluir a auditoria. Quero evidências objetivas. Liste cada arquivo analisado, cada fluxo percorrido, quais dependências foram abertas, quais funções foram rastreadas e qual o impacto de cada alteração. Se algum arquivo não foi analisado, informe explicitamente. Não faça inferências."regra absoluta */
+
 import ogInstagram from "@/assets/og-instagram.jpg";
 
 import { getAdminToken } from "@/lib/admin-token-store";
