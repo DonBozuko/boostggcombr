@@ -62,6 +62,7 @@ import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as ComprarSeguidoresReaisBrasilIndexRouteImport } from './routes/comprar-seguidores-reais-brasil/index'
 import { Route as DashboardSeoRouteImport } from './routes/dashboard.seo'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
@@ -70,6 +71,8 @@ import { Route as FerramentasCalculadoraLucroRevendaRouteImport } from './routes
 import { Route as FerramentasContadorInscritosYoutubeRouteImport } from './routes/ferramentas.contador-inscritos-youtube'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
+import { Route as PixSeguidoresInstagramIndexRouteImport } from './routes/pix-seguidores-instagram/index'
+import { Route as QuemSomosIndexRouteImport } from './routes/quem-somos/index'
 import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as ApiPublicBadgeRouteImport } from './routes/api/public/badge'
@@ -396,6 +399,12 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComprarSeguidoresReaisBrasilIndexRoute =
+  ComprarSeguidoresReaisBrasilIndexRouteImport.update({
+    id: '/comprar-seguidores-reais-brasil/',
+    path: '/comprar-seguidores-reais-brasil/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DashboardSeoRoute = DashboardSeoRouteImport.update({
   id: '/dashboard/seo',
   path: '/dashboard/seo',
@@ -441,6 +450,17 @@ const FerramentasGeradorLegendaInstagramRoute =
     path: '/ferramentas/gerador-legenda-instagram',
     getParentRoute: () => rootRouteImport,
   } as any)
+const PixSeguidoresInstagramIndexRoute =
+  PixSeguidoresInstagramIndexRouteImport.update({
+    id: '/pix-seguidores-instagram/',
+    path: '/pix-seguidores-instagram/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const QuemSomosIndexRoute = QuemSomosIndexRouteImport.update({
+  id: '/quem-somos/',
+  path: '/quem-somos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char126apiBeatRoute = Char126apiBeatRouteImport.update({
   id: '/~api/beat',
   path: '/~api/beat',
@@ -794,7 +814,10 @@ export interface FileRoutesByFullPath {
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
   '/blog/': typeof BlogIndexRoute
+  '/comprar-seguidores-reais-brasil/': typeof ComprarSeguidoresReaisBrasilIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
+  '/pix-seguidores-instagram/': typeof PixSeguidoresInstagramIndexRoute
+  '/quem-somos/': typeof QuemSomosIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -909,7 +932,10 @@ export interface FileRoutesByTo {
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
   '/blog': typeof BlogIndexRoute
+  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilIndexRoute
   '/ferramentas': typeof FerramentasIndexRoute
+  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramIndexRoute
+  '/quem-somos': typeof QuemSomosIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -1025,7 +1051,10 @@ export interface FileRoutesById {
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
   '/blog/': typeof BlogIndexRoute
+  '/comprar-seguidores-reais-brasil/': typeof ComprarSeguidoresReaisBrasilIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
+  '/pix-seguidores-instagram/': typeof PixSeguidoresInstagramIndexRoute
+  '/quem-somos/': typeof QuemSomosIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/api/public/badge': typeof ApiPublicBadgeRoute
   '/api/public/check-saldo': typeof ApiPublicCheckSaldoRoute
@@ -1142,7 +1171,10 @@ export interface FileRouteTypes {
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
     | '/blog/'
+    | '/comprar-seguidores-reais-brasil/'
     | '/ferramentas/'
+    | '/pix-seguidores-instagram/'
+    | '/quem-somos/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/badge'
     | '/api/public/check-saldo'
@@ -1257,7 +1289,10 @@ export interface FileRouteTypes {
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
     | '/blog'
+    | '/comprar-seguidores-reais-brasil'
     | '/ferramentas'
+    | '/pix-seguidores-instagram'
+    | '/quem-somos'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/badge'
     | '/api/public/check-saldo'
@@ -1372,7 +1407,10 @@ export interface FileRouteTypes {
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
     | '/blog/'
+    | '/comprar-seguidores-reais-brasil/'
     | '/ferramentas/'
+    | '/pix-seguidores-instagram/'
+    | '/quem-somos/'
     | '/.mcp/invoke-tool/$tool'
     | '/api/public/badge'
     | '/api/public/check-saldo'
@@ -1486,7 +1524,10 @@ export interface RootRouteChildren {
   FerramentasGeradorLegendaInstagramRoute: typeof FerramentasGeradorLegendaInstagramRoute
   Char126apiBeatRoute: typeof Char126apiBeatRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
   FerramentasIndexRoute: typeof FerramentasIndexRoute
+  PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
+  QuemSomosIndexRoute: typeof QuemSomosIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicBadgeRoute: typeof ApiPublicBadgeRoute
   ApiPublicCheckSaldoRoute: typeof ApiPublicCheckSaldoRoute
@@ -1913,6 +1954,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comprar-seguidores-reais-brasil/': {
+      id: '/comprar-seguidores-reais-brasil/'
+      path: '/comprar-seguidores-reais-brasil'
+      fullPath: '/comprar-seguidores-reais-brasil/'
+      preLoaderRoute: typeof ComprarSeguidoresReaisBrasilIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/seo': {
       id: '/dashboard/seo'
       path: '/dashboard/seo'
@@ -1967,6 +2015,20 @@ declare module '@tanstack/react-router' {
       path: '/ferramentas/gerador-legenda-instagram'
       fullPath: '/ferramentas/gerador-legenda-instagram'
       preLoaderRoute: typeof FerramentasGeradorLegendaInstagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pix-seguidores-instagram/': {
+      id: '/pix-seguidores-instagram/'
+      path: '/pix-seguidores-instagram'
+      fullPath: '/pix-seguidores-instagram/'
+      preLoaderRoute: typeof PixSeguidoresInstagramIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quem-somos/': {
+      id: '/quem-somos/'
+      path: '/quem-somos'
+      fullPath: '/quem-somos/'
+      preLoaderRoute: typeof QuemSomosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/~api/beat': {
@@ -2413,7 +2475,11 @@ const rootRouteChildren: RootRouteChildren = {
     FerramentasGeradorLegendaInstagramRoute,
   Char126apiBeatRoute: Char126apiBeatRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ComprarSeguidoresReaisBrasilIndexRoute:
+    ComprarSeguidoresReaisBrasilIndexRoute,
   FerramentasIndexRoute: FerramentasIndexRoute,
+  PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
+  QuemSomosIndexRoute: QuemSomosIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicBadgeRoute: ApiPublicBadgeRoute,
   ApiPublicCheckSaldoRoute: ApiPublicCheckSaldoRoute,
