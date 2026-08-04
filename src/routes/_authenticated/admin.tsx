@@ -333,7 +333,6 @@ function AdminGate() {
   }, []);
 
   const hydrate = useCallback(async (): Promise<boolean> => {
-    // Expiração por inatividade (30 min) vale também entre recargas de página.
     if (isAdminSessionExpired()) {
       await hardLogout();
       toast.info("Sessão encerrada por inatividade");
@@ -341,15 +340,14 @@ function AdminGate() {
     }
     const { data } = await supabase.auth.getSession();
     const email = data.session?.user?.email?.toLowerCase() ?? null;
+    
+    // v433: Se não há sessão, não redireciona, apenas mostra o login interno.
     if (!data.session || email !== ADMIN_EMAIL) {
-      clearAdminToken();
       setAdminTokenState("");
       setAuthed(false);
       return false;
     }
-    // Sessão Supabase ativa é a credencial mestre do shell; o token legado é só ponte para funções internas.
-    // v382 — NÃO liberar o painel antes do token chegar: montar com token vazio
-    // faz todo painel disparar server fn com token "" e estourar erro de zod.
+
     markAdminActivity();
     try {
       const res = await fetchAdminToken({ data: {} as never });
@@ -359,8 +357,7 @@ function AdminGate() {
         setAuthed(true);
         return true;
       } else {
-        await supabase.auth.signOut();
-        clearAdminToken();
+        // Se a sessão existe mas o token falhou, limpa e pede login
         setAdminTokenState("");
         setAuthed(false);
         return false;
@@ -376,7 +373,6 @@ function AdminGate() {
       setAuthed(false);
       return false;
     }
-
   }, [fetchAdminToken, hardLogout]);
 
   const onIdleExpire = useCallback(() => {
@@ -390,8 +386,6 @@ function AdminGate() {
     void hydrate();
     const { data: sub } = supabase.auth.onAuthStateChange((evt) => {
       if (evt === "SIGNED_OUT") {
-        clearAdminToken();
-        clearAdminActivity();
         setAdminTokenState("");
         setAuthed(false);
       }
@@ -401,10 +395,11 @@ function AdminGate() {
   }, [hydrate]);
 
   if (!mounted) return null;
+  // v433: Mantém o usuário no AdminGate em vez de deixar o middleware redirecionar para fora
   if (!authed || adminToken.length < 8) return <AdminLogin onSuccess={hydrate} />;
   return <AdminPage initialToken={adminToken} />;
-
 }
+
 
 
 const REMEMBER_KEY = "eliteboost_remember_me";
