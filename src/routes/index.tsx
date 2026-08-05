@@ -1,22 +1,7 @@
 /* 
 MODO EXECUTOR OBRIGATÓRIO (v451) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
 
-Agora você deixa de atuar como auditor e passa a atuar como Engenheiro Principal responsável pela estabilidade do BOOSTGG.
-
-Para cada problema encontrado:
-
-Identifique a causa raiz.
-Explique por que ocorre.
-Avalie todos os efeitos colaterais.
-Compare pelo menos três estratégias de correção.
-Escolha a mais segura.
-Justifique tecnicamente essa escolha.
-Liste exatamente quais arquivos serão modificados.
-Explique como a alteração afeta os demais módulos.
-Execute a correção.
-Reanalise todo o sistema para verificar se a correção criou regressões.
-Se encontrar regressões, corrija-as antes de encerrar.
-Só considere a tarefa concluída quando todos os testes, fluxos e dependências relacionados estiverem consistentes.
+Analise a função criarPedido como se você fosse o engenheiro responsável pela disponibilidade do BOOSTGG. Não descreva o código. Procure defeitos de arquitetura, gargalos, condições de corrida, riscos de timeout, regressões futuras e violações das regras de negócio. Para cada problema encontrado, proponha a correção tecnicamente mais segura, explique por que ela é superior às alternativas e informe os arquivos que deveriam ser modificados. Se não encontrar problemas, explique detalhadamente por que a implementação atual é robusta.
 */
 
 
