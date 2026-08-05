@@ -188,9 +188,10 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         compradorHandle: pedido.instagram_user ?? null,
         pacote: pedido.pacote ?? null,
         quantidade: Number(pedido.quantidade) || null,
-      fornecedor: cheapestSlug ?? "smmhype",
-    });
-  } catch (e) { console.warn("[contingency] v155 telegram universal fail", e); }
+        fornecedor: cheapestSlug ?? "smmhype",
+      });
+    } catch (e) { console.warn("[contingency] v155 telegram universal fail", e); }
+  }
 
   // v187 — removido early-return v164 que travava todo pedido em waiting_provision.
   // Dispatch A→B→C abaixo já cobre: sucesso → paid; sem saldo → waiting_provision c/ SLA 24h;
