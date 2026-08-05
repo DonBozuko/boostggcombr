@@ -2,6 +2,10 @@
 MODO EXECUTOR OBRIGATÓRIO (v451) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
 
 Analise a função criarPedido como se você fosse o engenheiro responsável pela disponibilidade do BOOSTGG. Não descreva o código. Procure defeitos de arquitetura, gargalos, condições de corrida, riscos de timeout, regressões futuras e violações das regras de negócio. Para cada problema encontrado, proponha a correção tecnicamente mais segura, explique por que ela é superior às alternativas e informe os arquivos que deveriam ser modificados. Se não encontrar problemas, explique detalhadamente por que a implementação atual é robusta.
+
+"Mostre exatamente qual alteração foi feita nesse arquivo e por que ela era necessária."
+
+Se ele não conseguir mostrar um diff ou um trecho alterado, pode estar usando uma frase padrão ("foi atualizado") sem que tenha havido uma mudança real.
 */
 
 
