@@ -109,17 +109,43 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     return { ok: true, status: fresh?.status ?? "paid", recovered: false };
   }
 
-  // v154 — Live Webhook Heartbeat + Telegram universal (paridade com mp-webhook.ts)
+  // v450 — ANTI DOUBLE-PROCESSING: o SLA watcher vira o pedido pra "pending" e
+  // chama esta função a cada 15min. Sem este guard, cada retentativa:
+  //   (a) creditava R$ extra na carteira geral (double-credit)
+  //   (b) mandava Telegram/WhatsApp duplicado (spam ao admin)
+  // O webhook (mp-webhook.ts) já tem guard equivalente na linha 329-338; aqui era a lacuna.
+  let isFirstProcessing = true;
   try {
-    const { dispatchTelegramAlert } = await import("@/lib/messaging");
-    await dispatchTelegramAlert(
-      `🚨 <b>PIX APROVADO VIA CONTINGÊNCIA (v440)</b>\n\nPROBLEMA: o webhook do Mercado Pago falhou/atrasou, mas a rede de segurança detectou o pagamento e processou o pedido.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nComprador: ${pedido.instagram_user}\n\nO QUE FAZER: o sistema corrigiu sozinho, mas verifique o Webhook Secret no painel MP para normalizar a velocidade.`,
-      { force: true, severity: "critical" }
-    );
+    const { data: existingLedger } = await supabaseAdmin
+      .from("financial_ledger" as any)
+      .select("id")
+      .eq("pedido_id", pedido.id)
+      .eq("destino", "wallet:geral")
+      .eq("origem", "mercado_pago")
+      .maybeSingle();
+    if (existingLedger) {
+      isFirstProcessing = false;
+      console.log("[contingency] v450 ledger já existe — pulando crédito e alertas", { pedidoId: pedido.id });
+    }
+  } catch (e) { console.warn("[contingency] v450 ledger check fail", e); }
 
+  // v154 — Live Webhook Heartbeat + Telegram universal (paridade com mp-webhook.ts)
+  // Só dispara na PRIMEIRA processamento. Retentativas do SLA watcher não spammam.
+  if (isFirstProcessing) {
+    try {
+      const { dispatchTelegramAlert } = await import("@/lib/messaging");
+      await dispatchTelegramAlert(
+        `🚨 <b>PIX APROVADO VIA CONTINGÊNCIA (v440)</b>\n\nPROBLEMA: o webhook do Mercado Pago falhou/atrasou, mas a rede de segurança detectou o pagamento e processou o pedido.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nComprador: ${pedido.instagram_user}\n\nO QUE FAZER: o sistema corrigiu sozinho, mas verifique o Webhook Secret no painel MP para normalizar a velocidade.`,
+        { force: true, severity: "critical" }
+      );
+    } catch (e) { console.warn("[contingency] v154 telegram fail", e); }
+  }
+
+  // Audit log sempre (rastro de cada retentativa), mas sem spam de Telegram.
+  try {
     await supabaseAdmin.from("admin_audit_logs" as any).insert({
       admin_email: "system@contingency",
-      action: "PIX_APPROVED",
+      action: isFirstProcessing ? "PIX_APPROVED" : "PIX_RETRY_DISPATCH",
       detail: {
         ts: new Date().toISOString(),
         payment_id: String(pedido.mercado_pago_id),
@@ -129,38 +155,43 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         valor_brl: Number(pedido.valor),
         buyer: pedido.instagram_user,
         source: "contingency-polling",
-        message: `🟢 [contingency] PIX aprovado via polling · pedido ${pedido.id}`,
+        message: isFirstProcessing
+          ? `🟢 [contingency] PIX aprovado via polling · pedido ${pedido.id}`
+          : `🔁 [contingency] Retentativa de dispatch via SLA watcher · pedido ${pedido.id}`,
       },
     } as any);
-  } catch (e) { console.warn("[contingency] v154 audit/telegram fail", e); }
+  } catch (e) { console.warn("[contingency] v154 audit fail", e); }
 
-  // v173 — paridade com mp-webhook: credita Carteira Geral + ledger imutável.
-  try {
-    await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
-    await supabaseAdmin.from("financial_ledger" as any).insert({
-      valor_brl: Number(pedido.valor),
-      origem: "mercado_pago",
-      destino: "wallet:geral",
-      pedido_id: pedido.id,
-      telemetry: { payment_id: String(pedido.mercado_pago_id), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED", source: "contingency" },
-    } as any);
-  } catch (e) { console.warn("[contingency] v173 credit geral fail", e); }
+  // v173 — credita Carteira Geral + ledger imutável (só na primeira vez).
+  if (isFirstProcessing) {
+    try {
+      await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
+      await supabaseAdmin.from("financial_ledger" as any).insert({
+        valor_brl: Number(pedido.valor),
+        origem: "mercado_pago",
+        destino: "wallet:geral",
+        pedido_id: pedido.id,
+        telemetry: { payment_id: String(pedido.mercado_pago_id), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED", source: "contingency" },
+      } as any);
+    } catch (e) { console.warn("[contingency] v173 credit geral fail", e); }
+  }
 
-
-
-  try {
-    const { pickCheapestFornecedorSlug } = await import("@/lib/smart-routing.server");
-    const cheapestSlug = await pickCheapestFornecedorSlug(pedido.pacote, Number(pedido.quantidade)).catch(() => null);
-    const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");
-    await notifyAdminUniversalPaid({
-      pedidoId: String(pedido.id),
-      vendaBrl: Number(pedido.valor),
-      compradorHandle: pedido.instagram_user ?? null,
-      pacote: pedido.pacote ?? null,
-      quantidade: Number(pedido.quantidade) || null,
-      fornecedor: cheapestSlug ?? "smmhype",
-    });
-  } catch (e) { console.warn("[contingency] v155 telegram universal fail", e); }
+  // Notificação de admin só na primeira vez (evita spam a cada 15min do SLA watcher).
+  if (isFirstProcessing) {
+    try {
+      const { pickCheapestFornecedorSlug } = await import("@/lib/smart-routing.server");
+      const cheapestSlug = await pickCheapestFornecedorSlug(pedido.pacote, Number(pedido.quantidade)).catch(() => null);
+      const { notifyAdminUniversalPaid } = await import("@/lib/whatsapp-admin.server");
+      await notifyAdminUniversalPaid({
+        pedidoId: String(pedido.id),
+        vendaBrl: Number(pedido.valor),
+        compradorHandle: pedido.instagram_user ?? null,
+        pacote: pedido.pacote ?? null,
+        quantidade: Number(pedido.quantidade) || null,
+        fornecedor: cheapestSlug ?? "smmhype",
+      });
+    } catch (e) { console.warn("[contingency] v155 telegram universal fail", e); }
+  }
 
   // v187 — removido early-return v164 que travava todo pedido em waiting_provision.
   // Dispatch A→B→C abaixo já cobre: sucesso → paid; sem saldo → waiting_provision c/ SLA 24h;
