@@ -14,14 +14,13 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     if (!data.session) throw redirect({ to: "/auth", search: { next } });
   },
   loader: async ({ location }) => {
-    const authorizationId = new URLSearchParams(location.search).get("authorization_id")!;
+    const authorizationId = new URLSearchParams(location.search).get("authorization_id");
+    if (!authorizationId) throw new Error("Missing authorization_id");
     // @ts-ignore - Supabase oauth namespace is beta
     const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId);
     if (error) throw error;
-    // @ts-ignore
-    const immediate = data?.redirect_url ?? data?.redirect_to;
-    // @ts-ignore
-    if (immediate && !data?.client) throw redirect({ href: immediate });
+    if (!data) throw new Error("Authorization details unavailable");
+    if ("redirect_url" in data) throw redirect({ href: data.redirect_url });
     return data;
   },
   component: Consent,

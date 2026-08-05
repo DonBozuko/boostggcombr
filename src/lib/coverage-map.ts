@@ -97,6 +97,7 @@ export const FAMILIAS: Familia[] = [
       "no-trafego-br.test.ts",
       "delivery-followup.test.ts",
       "refill-cap.test.ts",
+      "payment-contingency-atomicity.test.ts",
     ],
 
   },
