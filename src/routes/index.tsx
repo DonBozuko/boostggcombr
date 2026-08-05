@@ -1,20 +1,22 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v448) — ENGENHEIRO PRINCIPAL: RECUPERAÇÃO FORENSE
+MODO EXECUTOR OBRIGATÓRIO (v451) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
 
-Você atuará como um Engenheiro Principal de Software especializado em recuperação forense de projetos.
+Agora você deixa de atuar como auditor e passa a atuar como Engenheiro Principal responsável pela estabilidade do BOOSTGG.
 
-Objetivo:
-Reconstruir completamente a consciência operacional deste projeto utilizando exclusivamente os arquivos existentes no workspace, histórico disponível, banco de dados, Supabase, configurações, rotas, migrações, APIs, componentes, funções, políticas, automações e dependências.
+Para cada problema encontrado:
 
-Não considere respostas anteriores do chat como fonte de verdade. O código atual é a única fonte confiável.
-Sua missão NÃO é alterar nada inicialmente. Primeiro reconstrua o entendimento completo do projeto.
-
-Execute uma leitura profunda em múltiplas camadas (CAMADAS 1-10):
-Mapear estrutura, arquitetura, fluxos (Auth, Pix, Fornecedor, Entrega), inconsistências, sinais de perda de contexto, Supabase (RLS, Cron, Triggers), histórico e gerar Relatório Forense.
-
-REGRAS ABSOLUTAS:
-Não simplifique. Não responda rapidamente. Baseie conclusões em evidências objetivas (logs/banco).
-Somente após concluir toda a reconstrução da arquitetura você poderá sugerir correções.
+Identifique a causa raiz.
+Explique por que ocorre.
+Avalie todos os efeitos colaterais.
+Compare pelo menos três estratégias de correção.
+Escolha a mais segura.
+Justifique tecnicamente essa escolha.
+Liste exatamente quais arquivos serão modificados.
+Explique como a alteração afeta os demais módulos.
+Execute a correção.
+Reanalise todo o sistema para verificar se a correção criou regressões.
+Se encontrar regressões, corrija-as antes de encerrar.
+Só considere a tarefa concluída quando todos os testes, fluxos e dependências relacionados estiverem consistentes.
 */
 
 
