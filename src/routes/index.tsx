@@ -1,10 +1,10 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v446) — AUDITORIA VENDA × ENTREGA × CLIENTE
+MODO EXECUTOR OBRIGATÓRIO (v447) — AUDITORIA VENDA × ENTREGA × CLIENTE
 
 Regra: nenhuma conclusão de “corrigido” ou “100% operacional” sem evidência
 cruzada de código, banco, cron, fornecedor e recibo de notificação.
 
-Evidência real auditada em 04/08/2026:
+Evidência real auditada em 05/08/2026:
 1. O Pix do pedido ab6e864c foi criado às 17:27, confirmado pela contingência
    às 17:29, despachado ao SMMhype às 17:40 e concluído com remains=0 às 18:00.
 2. O caminho primário de webhook NÃO foi comprovado nesse pedido; quem salvou a
