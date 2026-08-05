@@ -134,16 +134,31 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     } as any);
   } catch (e) { console.warn("[contingency] v154 audit/telegram fail", e); }
 
-  // v173 — paridade com mp-webhook: credita Carteira Geral + ledger imutável.
+  // v173/v450 — paridade com mp-webhook: credita Carteira Geral + ledger imutável.
+  // ANTI DOUBLE-CREDIT: o SLA watcher vira o pedido pra "pending" e chama esta
+  // função a cada 15min. Sem o check de ledger, cada retentativa creditava
+  // R$ extra na carteira geral — inflando o saldo interno do sistema.
+  // O webhook (mp-webhook.ts) já tem este guard na linha 329-338; aqui era a lacuna.
   try {
-    await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
-    await supabaseAdmin.from("financial_ledger" as any).insert({
-      valor_brl: Number(pedido.valor),
-      origem: "mercado_pago",
-      destino: "wallet:geral",
-      pedido_id: pedido.id,
-      telemetry: { payment_id: String(pedido.mercado_pago_id), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED", source: "contingency" },
-    } as any);
+    const { data: existingLedger } = await supabaseAdmin
+      .from("financial_ledger" as any)
+      .select("id")
+      .eq("pedido_id", pedido.id)
+      .eq("destino", "wallet:geral")
+      .eq("origem", "mercado_pago")
+      .maybeSingle();
+    if (existingLedger) {
+      console.log("[contingency] v450 ledger já existe — pulando crédito de carteira", { pedidoId: pedido.id });
+    } else {
+      await supabaseAdmin.rpc("wallet_credit" as any, { _wallet_key: "geral", _amount: Number(pedido.valor) });
+      await supabaseAdmin.from("financial_ledger" as any).insert({
+        valor_brl: Number(pedido.valor),
+        origem: "mercado_pago",
+        destino: "wallet:geral",
+        pedido_id: pedido.id,
+        telemetry: { payment_id: String(pedido.mercado_pago_id), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED", source: "contingency" },
+      } as any);
+    }
   } catch (e) { console.warn("[contingency] v173 credit geral fail", e); }
 
 
