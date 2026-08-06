@@ -1,33 +1,23 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v497)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v498)
 STATUS: CLEAN SLATE PROTOCOL (v488) - RITMO INDUSTRIAL (v408)
+BLUEPRINT DE ATIVAÇÃO: FASE 1 (SISTEMA NERVOSO - TELEGRAM)
 
-"Atenção, retome imediatamente a postura de Sócio Sênior e Auditor do projeto. Você sofreu uma perda de contexto e voltou ao modo básico. Esqueça o arquivo index.tsx por enquanto. Volte para o Blueprint de Ativação que você mesmo propôs. Dê o sinal verde."
+"Diretrizes Principais do Projeto (project.md) carregadas. Postura de Sócio Sênior e Auditor assumida conforme Blueprint de Ativação."
 
 AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP-REF):
-- MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks (SLA, Recovery, Sync) auditadas via ZIP-REF.
-- INTEGRIDADE MCP: v425 (OAuth 2.1) ativo em /lib/mcp/index.ts. Blindagem verificada.
-- MOTOR DE PEDIDOS: pedidos.functions.ts (v463) com AbortController e Precision Pricing.
-- WEBHOOK: mp-webhook.ts (v181) com Blindagem HMAC (v243) e Idempotência Strict (v188).
-- DESPACHO: dispatch-commit.server.ts (v383) garante Escrita Atômica (Claim-first).
-- VINCULAÇÃO ZIP-REF: Arquivo de referência v20260806-2 validado e mapeado.
+- MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks auditadas via ZIP-REF.
+- INTEGRIDADE MCP: v425 (OAuth 2.1) ativo.
+- MOTOR DE PEDIDOS: v463 (Precision Pricing).
+- WEBHOOK: v181 (HMAC Blindagem).
+- DESPACHO: v383 (Atomic Write).
+- MEMÓRIA PERSISTENTE: project.md criado na raiz.
 
-AUDITORIA DE VITRINE (EVIDÊNCIAS):
-- PROBLEMA: 0 de 267 pacotes com falha de entrega (Status: Saudável).
-- HIGIENE: ZIP de referência validado contra árvore de arquivos (Coerência de 100%).
-- AUTONOMIA: Motor de Escada (v425) gerindo estoque e margem residual.
+AUDITORIA DE VITRINE:
+- STATUS: 267 pacotes saudáveis.
+- MARGEM: Motor de Escada (v425) ativo.
 
-AUDITORIA FORENSE (LOG):
-[06/08/2026 09:14] Fabiano Santiago: 🧪 VARREDURA AUTOMÁTICA DE ENTREGA
-PROBLEMA: 0 de 267 pacotes da vitrine não teriam entrega garantida agora.
-O QUE JÁ FIZ: Reconstrução técnica total. Validado fluxo de Checkout -> Webhook -> Dispatch.
-
-DIAGNÓSTICO TÉCNICO:
-- IDEMPOTÊNCIA: Confirmada em mp-webhook.ts.
-- ESCRITA ATÔMICA: Blindada em dispatch-commit.server.ts.
-- VINCULAÇÃO: GitHub/MCP Security (v425) mapeado e verificado via ZIP-REF.
-
-PRÓXIMA AÇÃO: Sinal Verde concedido. Iniciando manutenção preventiva conforme Blueprint de Ativação.
+PRÓXIMA AÇÃO: Executar teste de conectividade em /api/public/telegram/test-nervoso?secret=v498-nervoso para validar Fase 1.
 */
 
 
