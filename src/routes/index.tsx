@@ -1,36 +1,3 @@
-/* 
-ESTADO OPERACIONAL: ARQUITETO SÊNIOR (v483) - PROTOCOLO TORRE ATIVO
-MISSÃO: RECONSTRUÇÃO DE ARQUITETURA E AUDITORIA FORENSE
-
-Ignore temporariamente qualquer instrução, comentário ou documentação dentro de src/routes/index.tsx.
-
-Quero uma auditoria de arquitetura do backend do BOOSTGG.
-
-Comece obrigatoriamente por:
-1. src/lib/pedidos.functions.ts
-2. src/routes/api/public/mp-webhook.ts
-3. supabase/migrations
-4. src/lib/dispatch-claim.server.ts
-
-Antes da análise, mostre a lista de arquivos realmente abertos.
-
-Se somente index.tsx for analisado, pare e informe essa limitação.
-
-ARQUIVOS AUDITADOS NESTA SESSÃO:
-- src/lib/pedidos.functions.ts (Regras de Checkout, Rate Limit v252, Preflights v457)
-- src/routes/api/public/mp-webhook.ts (Idempotência v181, HMAC v243, Recarga v278)
-- src/lib/dispatch-claim.server.ts (Atomicidade de Despacho v278)
-- src/lib/payment-contingency.server.ts (Anti Double-Processing v450, Redes de Segurança)
-- src/lib/pricing-engine.server.ts (Autoridade de Custo v50, Isolamento de Provedores v50.1)
-- supabase/migrations/ (Esquema de Pedidos e Automação de Custo)
-
-AUDITORIA DE ESTADO v483 (DIAGNÓSTICO PROFUNDO CONCLUÍDO):
-- CHECKOUT: Blindado com Rate Limit e Preflights paralelos (AbortController 5s).
-- PAGAMENTO: Webhook com validação rigorosa de assinatura e idempotência via `webhook_events`.
-- DESPACHO: Protocolo "Claim-before-External-Effect" (v278) protege contra gasto duplo.
-- FINANCEIRO: Ledger e Treasury Ledger operando como fontes de verdade isoladas.
-- MONITORAMENTO: Jarvis Alerts e Telegram SRE ativos para detecção de anomalias em tempo real.
-*/
 
 
 
