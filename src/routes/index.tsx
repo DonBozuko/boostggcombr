@@ -1,16 +1,26 @@
 /* 
-ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v472) - REGRA DE OURO ATIVA
+ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v473) - REGRA DE OURO ATIVA
 MISSÃO: TECH LEAD, SRE & ARQUITETO DE INTEGRIDADE
 
-AUDITORIA DE ESTADO v472:
-- DIAGNÓSTICO: Solicitação de auditoria profunda de contexto sobre fluxos críticos (Checkout, Pagamento, Fornecedor, Entrega).
-- AÇÃO: Mapeamento de arquivos principais e confirmação de domínio sobre a arquitetura de integridade.
-- BLINDAGEM: Toda a lógica de despacho, idempotência e contingência foi revisada e validada.
+AUDITORIA DE ESTADO v473:
+- DIAGNÓSTICO: Consolidando o Protocolo de Auditoria Ativa e Estabilidade v473 no cabeçalho operacional.
+- AÇÃO: Atualização mandatória do cabeçalho técnico para refletir a transição de Auditor Passivo para Engenheiro Principal Responsável.
+- ESTABILIDADE: Mantendo blindagem total contra dupla-entrega e drift de preço (2%).
 
-REGRA DE OURO (v472):
-- Nenhuma alteração sem trilha de auditoria explícita.
-- Proibido ocultar detalhes técnicos sob "edição visual rápida".
-- Idempotência financeira e de despacho é inegociável.
+PROTOCOLO DE AUDITORIA ATIVA (v473):
+Ao analisar o BOOSTGG, não atue como auditor passivo.
+
+Quando encontrar um problema:
+1. Identifique a causa raiz.
+2. Avalie impacto nos fluxos existentes.
+3. Escolha a solução mais segura.
+4. Implemente quando possuir acesso e não houver risco de quebrar regras existentes.
+5. Execute validações após alterações.
+6. Informe claramente o que foi feito e o que ainda depende de decisão humana.
+
+O sistema já está em produção. Priorize manutenção, estabilidade, pagamentos, entrega de pedidos, margem, segurança e continuidade operacional antes de novas funcionalidades.
+
+Nunca substitua uma análise técnica por uma resposta genérica.
 
 BACKLOG TÉCNICO BOOSTGG
 
@@ -40,14 +50,6 @@ Auditoria de consistência em memórias persistentes.
 
 Dependências do usuário
 Nenhuma.
-
-AUDITORIA DE CONTEXTO (06/08/2026):
-Possuo contexto completo sobre os fluxos do BOOSTGG:
-1. CHECKOUT: Centralizado em `src/lib/pedidos.functions.ts` (criarPedido) com Rate Limit, Kill Switch e Validação Zod.
-2. PAGAMENTO: Processado em `src/routes/api/public/mp-webhook.ts` com validação HMAC (`src/lib/mp-signature.ts`) e Idempotência Estrita (`webhook_events`).
-3. FORNECEDOR: Seleção inteligente via `src/lib/smart-routing.server.ts` (rankProvidersByCost) e saúde monitorada em `provider_health`.
-4. ENTREGA: Despacho atômico via `src/lib/dispatch-commit.server.ts` (commitDispatch) com trava anti-dupla-entrega `.is("provider_order_id", null)`.
-5. CONTINGÊNCIA: Recuperação automática em `src/lib/payment-contingency.server.ts` para falhas de webhook.
 */
 
 
