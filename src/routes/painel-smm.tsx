@@ -32,7 +32,7 @@ const FAQ = [
   },
 ];
 
-export const Route = createFileRoute("/_authenticated/painel-smm")({
+export const Route = createFileRoute("/painel-smm")({
   head: () => ({
     meta: [
       { title: TITLE },
