@@ -77,10 +77,10 @@ function Page() {
       pricingTitle="Tabela de preços — seguidores brasileiros"
       pricingCategories={["instagram:seguidores:br"]}
       pricing={[
-        { id: "br-p100", qty: "100 brasileiros", price: "R$ 5,89" },
-        { id: "br-p500", qty: "500 brasileiros", price: "R$ 57,00", note: "Mais vendido" },
-        { id: "br-p1k", qty: "1.000 brasileiros", price: "R$ 113,00" },
-        { id: "br-p5k", qty: "5.000 brasileiros", price: "R$ 342,00" },
+        { id: "br-p100", qty: "100 brasileiros", price: "R$ 25,82" },
+        { id: "br-p500", qty: "500 brasileiros", price: "R$ 113,00", note: "Mais vendido" },
+        { id: "br-p1k", qty: "1.000 brasileiros", price: "R$ 212,50" },
+        { id: "br-p5k", qty: "5.000 brasileiros", price: "R$ 494,86" },
       ]}
       bodySections={[
         {
