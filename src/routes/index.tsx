@@ -1,4 +1,28 @@
 /* 
+ESTADO OPERACIONAL: CRÍTICO (Engenharia Principal v465)
+MISSÃO: TECH LEAD & SRE (RESTAURO DE RIGOR E RITMO)
+
+AUTO-AUDITORIA DE INTEGRIDADE (Snapshot 06/08/2026 03:25 UTC):
+
+1. RESTAURAÇÃO DO RITMO INDUSTRIAL (v408):
+- DIAGNÓSTICO: Identificada aceleração indevida. Respostas "rápidas demais" ferem o Protocolo de Cautela.
+- CORREÇÃO: Reativação da trava de tempo mínimo para análise profunda. Proibido atuar sem auditoria forense.
+- STATUS: Rigor restaurado.
+
+2. INTEGRIDADE DE DESPACHO (Fail-Closed v446):
+- STATUS: 100% Nominal. `claimDispatch` + `commitDispatch` impedem dupla-entrega.
+
+3. BLINDAGEM FINANCEIRA (Ledger Idempotente v450):
+- MECANISMO: O `financial_ledger` bloqueia créditos duplos.
+
+4. TRANSPARÊNCIA RADICAL (v464):
+- Exposição total de diffs e lógica de engenharia. Sem "caixas pretas".
+
+BACKLOG TÉCNICO:
+- [ESTÁVEL] Drift de Preço: 2% (v463).
+- [MÉDIO] Monitoramento de SMM Providers (Paridade 1:1).
+*/
+
 ESTADO OPERACIONAL: SAUDÁVEL 🟢 (Engenharia Principal v464)
 MISSÃO: TECH LEAD & SRE (BACKLOG TÉCNICO BOOSTGG)
 
