@@ -1,5 +1,5 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v492)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v493)
 STATUS: VARREDURA AUTOMÁTICA CONCLUÍDA (09:14) - RITMO INDUSTRIAL (v408)
 
 AUDITORIA DE VITRINE (EVIDÊNCIAS):
@@ -8,6 +8,27 @@ AUDITORIA DE VITRINE (EVIDÊNCIAS):
 - HIGIENE: 4 pacotes removidos por ausência de ID válido/rota de fornecedor.
 - PRECIFICAÇÃO: Recálculo atômico de 271 -> 267 pacotes concluído.
 - SALDO: Monitoramento de "Sob Encomenda" (smmpainel, smmhype, verified) estável.
+
+AUDITORIA FORENSE (LOG):
+[06/08/2026 05:14] Fabiano Santiago: 🧪 VARREDURA AUTOMÁTICA DE ENTREGA
+PROBLEMA: 4 de 271 pacotes da vitrine não teriam entrega garantida agora.
+(fora da conta: 57 pacote(s) grandes que ninguém comprou nos últimos 90 dias — só entram na conta se alguém pedir)
+Só sob encomenda (pacote grande que ninguém comprou — não precisa recarregar agora):
+• smmpainel: precisaria R$ 4645,69 se alguém comprar
+• smmhype: precisaria R$ 22406,35 se alguém comprar
+• verified: precisaria R$ 4090,68 se alguém comprar
+Tirei da vitrine sozinho agora: 4 pacote(s) que não entregariam.
+Custo alto demais: 4 pacote(s) da vitrine venderiam no prejuízo (tl50k, tl100k, tl200k, tl500k).
+O QUE JÁ FIZ SOZINHO AGORA: Recalculei preços, removi órfãos.
+
+[06/08/2026 09:14] Fabiano Santiago: 🧪 VARREDURA AUTOMÁTICA DE ENTREGA
+PROBLEMA: 0 de 267 pacotes da vitrine não teriam entrega garantida agora.
+(fora da conta: 57 pacote(s) grandes que ninguém comprou nos últimos 90 dias — só entram na conta se alguém pedir)
+Só sob encomenda (pacote grande que ninguém comprou — não precisa recarregar agora):
+• smmpainel: precisaria R$ 4645,55 se alguém comprar
+• smmhype: precisaria R$ 22406,45 se alguém comprar
+• verified: precisaria R$ 4090,68 se alguém comprar
+Tirei da vitrine sozinho agora: 4 pacote(s) que não entregariam.
 
 DIAGNÓSTICO TÉCNICO:
 - IDEMPOTÊNCIA: Confirmada em mp-webhook.ts (v181).
