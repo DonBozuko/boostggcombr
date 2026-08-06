@@ -1,13 +1,13 @@
 /* 
-ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v471) - REGRA DE OURO ATIVA
+ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v472) - REGRA DE OURO ATIVA
 MISSÃO: TECH LEAD, SRE & ARQUITETO DE INTEGRIDADE
 
-AUDITORIA DE ESTADO v471:
-- DIAGNÓSTICO: Solicitação de "torne regra" para elevar protocolo de transparência e auditoria.
-- AÇÃO: Consolidando o Protocolo de Transparência Radical como REGRA MANDATÓRIA do sistema.
-- BLINDAGEM: O regime de cautela máxima (v408) e auditoria forense agora é a norma padrão.
+AUDITORIA DE ESTADO v472:
+- DIAGNÓSTICO: Solicitação de auditoria profunda de contexto sobre fluxos críticos (Checkout, Pagamento, Fornecedor, Entrega).
+- AÇÃO: Mapeamento de arquivos principais e confirmação de domínio sobre a arquitetura de integridade.
+- BLINDAGEM: Toda a lógica de despacho, idempotência e contingência foi revisada e validada.
 
-REGRA DE OURO (v471):
+REGRA DE OURO (v472):
 - Nenhuma alteração sem trilha de auditoria explícita.
 - Proibido ocultar detalhes técnicos sob "edição visual rápida".
 - Idempotência financeira e de despacho é inegociável.
@@ -15,31 +15,39 @@ REGRA DE OURO (v471):
 BACKLOG TÉCNICO BOOSTGG
 
 Estado geral
-🟢 Saudável (Regra de Ouro Aplicada)
+🟢 Saudável (Auditoria de Contexto Concluída)
 
 Problemas críticos
 Nenhum
 
 Problemas médios
-- Drift de preço (Fixado em 2%)
+- Drift de preço (Monitorado em 2%)
 - Latência do fornecedor X
 
 Problemas baixos
 - Refatoração do módulo Y
 
 Em monitoramento
-- Mercado Pago
-- Telegram
-- Cron
-- Estoque
-- Ledger
-- SEO
+- Mercado Pago (Webhook e Assinatura HMAC)
+- Telegram (Alertas SRE)
+- Cron (Limpeza de Órfãos e Reconciliação)
+- Estoque (Provider Health)
+- Ledger (Fonte da Verdade Financeira)
+- SEO (Google Search Console)
 
 Próxima ação automática
 Auditoria de consistência em memórias persistentes.
 
 Dependências do usuário
 Nenhuma.
+
+AUDITORIA DE CONTEXTO (06/08/2026):
+Possuo contexto completo sobre os fluxos do BOOSTGG:
+1. CHECKOUT: Centralizado em `src/lib/pedidos.functions.ts` (criarPedido) com Rate Limit, Kill Switch e Validação Zod.
+2. PAGAMENTO: Processado em `src/routes/api/public/mp-webhook.ts` com validação HMAC (`src/lib/mp-signature.ts`) e Idempotência Estrita (`webhook_events`).
+3. FORNECEDOR: Seleção inteligente via `src/lib/smart-routing.server.ts` (rankProvidersByCost) e saúde monitorada em `provider_health`.
+4. ENTREGA: Despacho atômico via `src/lib/dispatch-commit.server.ts` (commitDispatch) com trava anti-dupla-entrega `.is("provider_order_id", null)`.
+5. CONTINGÊNCIA: Recuperação automática em `src/lib/payment-contingency.server.ts` para falhas de webhook.
 */
 
 
