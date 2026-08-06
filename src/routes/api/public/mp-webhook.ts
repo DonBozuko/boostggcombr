@@ -425,7 +425,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               destino: "wallet:geral",
               pedido_id: pedido.id,
               buyer_ip: clientIp,
-              telemetry: { payment_id: String(paymentId), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED" },
+              // v522 — `source` identifica QUEM fechou a venda. A contingência já
+              // gravava source:"contingency"; sem o par aqui era impossível saber
+              // se o webhook ainda é o caminho principal ou só a rede de segurança.
+              telemetry: { payment_id: String(paymentId), pacote: pedido.pacote, quantidade: pedido.quantidade, event: "PIX_APPROVED", source: "webhook" },
             } as any);
           } catch (e) { console.warn("[mp-webhook] v116 ledger PIX_APPROVED fail", e); }
 
