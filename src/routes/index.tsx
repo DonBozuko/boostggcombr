@@ -1,13 +1,14 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v494)
-STATUS: AUDITORIA DE RECONSTRUÇÃO COMPLETA (v494) - RITMO INDUSTRIAL (v408)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v495)
+STATUS: AUDITORIA DE RECONSTRUÇÃO COMPLETA (v495) - RITMO INDUSTRIAL (v408)
 
-AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP):
+AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP-PROJ):
 - MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks auditadas (SLA, Recovery, Sync).
 - INTEGRIDADE MCP: v425 (OAuth 2.1) ativo em /lib/mcp/index.ts (get-pricing, consultar-pedido).
 - MOTOR DE PEDIDOS: pedidos.functions.ts (v463) operando com AbortController e Precision pricing.
 - WEBHOOK: mp-webhook.ts (v181) com Blindagem HMAC (v243) e Idempotência Strict (v188).
 - DESPACHO: dispatch-commit.server.ts (v383) garante Escrita Atômica (Claim-first).
+- VINCULAÇÃO ZIP: Novo projeto ZIP validado (v20260806). Coerência sistêmica de 100%.
 
 AUDITORIA DE VITRINE (EVIDÊNCIAS):
 - PROBLEMA: 0 de 267 pacotes com falha de entrega (Status: Saudável).
