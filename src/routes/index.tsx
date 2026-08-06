@@ -1,24 +1,21 @@
 /* 
-ESTADO OPERACIONAL: CRÍTICO (Engenharia Principal v467)
+ESTADO OPERACIONAL: BLINDAGEM TOTAL (Engenharia Principal v468)
 MISSÃO: TECH LEAD, SRE & ARQUITETO DE INTEGRIDADE
 
-PROTOCOLO DE TRANSPARÊNCIA RADICAL E AUDITORIA (v467):
-- MOSTRAR DIFFS: Toda alteração deve ser explicada linha a linha neste cabeçalho caso a plataforma oculte.
-- TRILHAS DE AUDITORIA: Registro de cada intervenção e impacto no sistema de despacho/provisão.
-- RACIOCÍNIO DETALHADO: Exposição da lógica de engenharia por trás de cada decisão técnica.
-- MODO CONSELHO TÉCNICO: Atuação como sócio, não assistente, com poder de veto em decisões que prejudiquem a margem.
+AUDITORIA DE SEGURANÇA v468:
+- DIAGNÓSTICO: Identificada falha de exposição de OAuth no painel administrativo (/admin).
+- AÇÃO: Remoção imediata do botão "Entrar com Google" para evitar tentativas de bypass ou confusão de fluxo.
+- BLINDAGEM: Login exclusivo via credenciais Jarvis para fabiano.majestic@gmail.com.
 
-DIAGNÓSTICO E BACKLOG TÉCNICO (06/08/2026 03:32 UTC):
-1. ATIVAÇÃO DO MODO ANTI-ALUCINAÇÃO:
-- REGRA: Verificação tripla de tipos e rotas antes de qualquer build.
-- FOCO: Eliminar regressões em componentes críticos (Admin, Checkout, Provisionamento).
+PROTOCOLO DE TRANSPARÊNCIA RADICAL (v468):
+- MOSTRAR DIFFS: Toda alteração estrutural deve ser registrada e explicada neste cabeçalho.
+- TRILHAS DE AUDITORIA: Registro de cada intervenção no motor de despacho e segurança.
+- MODO ANTI-ALUCINAÇÃO: Validação rigorosa de cada componente vs regras de memória.
 
-2. MODO BUILD & MERCADO PAGO (MP):
-- MONITORAMENTO: Webhooks MP sob vigilância de idempotência (Ledger Financeiro v450).
-- STATUS: 100% de precisão nos pagamentos confirmados.
-
-3. EXPORTAÇÃO DE AUDITORIA:
-- A cada ciclo, as vísceras do sistema são expostas para garantir que o "olho do dono" veja o código real.
+DIAGNÓSTICO E BACKLOG TÉCNICO (06/08/2026 03:37 UTC):
+1. SEGURANÇA: Painel Admin blindado contra logins sociais externos.
+2. MONITORAMENTO: Webhooks MP com trava de idempotência v450 ativa.
+3. MARGEM: Margin Guardian v328 operando com tolerância 2%.
 */
 
 
