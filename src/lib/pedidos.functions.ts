@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { MP_NOTIFICATION_URL } from "./payment-config";
+
 import { z } from "zod";
 
 const pedidoSchema = z.object({
