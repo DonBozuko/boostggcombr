@@ -61,7 +61,11 @@ export function trackPageView(path: string) {
     const p = path || window.location.pathname;
     // Bastidor: marca o aparelho como interno e nunca envia.
     if (isInternalPath(p)) { markInternalDevice(); return; }
-    if (isOptedOut()) return;
+    if (isOptedOut()) {
+      // v456 — se for a home e estiver em optout (dono), ainda assim loga no console para debug
+      if (p === "/" && import.meta.env.DEV) console.debug("[beacon] optout active (owner)");
+      return;
+    }
     const device_id = getOrCreate(localStorage, DEVICE_KEY);
     const session_id = getOrCreate(sessionStorage, SESSION_KEY);
     const utm = readUTM();

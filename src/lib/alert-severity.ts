@@ -30,6 +30,8 @@ const INFO_MARKERS = [
   "entrega automática",
   "concluído",
   "concluida",
+  "PIX APROVADO",
+  "RECARGA DE REVENDEDOR APROVADA",
 ];
 
 /** Aviso: uma trava funcionou e impediu o dano. Registra, não acorda ninguém. */
@@ -90,6 +92,9 @@ function norm(s: string): string {
 export function classifyAlertSeverity(message: string): AlertSeverity {
   const m = norm(message);
   const cabeca = m.slice(0, 120);
+
+  // v456 — DINHEIRO ENTRANDO é sempre alta prioridade no Telegram.
+  if (m.includes("PIX APROVADO") || m.includes("RECARGA DE REVENDEDOR APROVADA")) return "critical";
 
   if (INFO_MARKERS.some((k) => cabeca.includes(k))) return "info";
   if (CRITICAL_MARKERS.some((k) => m.includes(k))) return "critical";
