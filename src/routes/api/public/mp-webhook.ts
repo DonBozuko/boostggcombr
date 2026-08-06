@@ -82,6 +82,12 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
+        // v522 — Auditoria de canal: marca o evento como processado no fim do fluxo.
+        // Antes, webhook_events nascia com processed_ok=false e NUNCA era atualizado,
+        // então o monitor de canal morto não distinguia "recebido e ok" de "falhou".
+        let auditPaymentId: string | null = null;
+        let auditError: string | null = null;
+
         const backgroundJob = Promise.resolve().then(async () => {
           // Sempre 200 — MP reenvia se for !=2xx. Logamos erros e seguimos.
           try {
