@@ -11,6 +11,8 @@ Disallow: /dashboard
 Disallow: /~beat.js
 Disallow: /mcp
 Disallow: /obrigado
+Disallow: /painel-revendedor
+Disallow: /painel-afiliado
 Disallow: /rastrear
 
 # AI crawlers — permitidos explicitamente (AEO / GEO)
