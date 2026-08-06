@@ -721,7 +721,17 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 
     for (const { id, qty } of CANONICAL_QTYS[cat]) {
       const serviceId = await resolveServiceIdAsync(id, qty).catch(() => null);
-      const usdPer1k = serviceId != null ? rateById.get(serviceId) : undefined;
+      // v519 — CAUSA RAIZ do "preço que muda sozinho" em tl50k/tl100k/tl200k/tl500k.
+      // Este motor formava custo com a tarifa do serviço primário SEM checar o
+      // TETO de quantidade dele (SMMhype #19191: max 20.000). Para 50k ele
+      // inventava custo de R$77 (0,22 × 7,0 × 50) enquanto o motor de reserva,
+      // que respeita o teto (v351/v358), gravava o custo real de quem entrega
+      // (Verified, R$119). Os dois rodam no MESMO ciclo → ping-pong de custo e
+      // de preço de vitrine (338 ↔ 419) a cada 30 min, poluindo o Raio-X e
+      // julgando margem sobre um fornecedor que nem despacha.
+      // Regra (igual ao despacho): custo só vale de quem entrega a quantidade.
+      const aceitaQty = serviceId != null ? serviceAcceptsQty(rangeById.get(serviceId), qty) : true;
+      const usdPer1k = serviceId != null && aceitaQty ? rateById.get(serviceId) : undefined;
       let cost_brl: number;
       let source: "api" | "fallback";
       if (typeof usdPer1k === "number" && usdPer1k > 0) {
