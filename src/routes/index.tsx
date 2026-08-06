@@ -3,14 +3,14 @@ ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v505)
 STATUS: EXECUÇÃO FASE 2 (AUDITORIA FINANCEIRA) - RITMO INDUSTRIAL (v408)
 BLUEPRINT DE ATIVAÇÃO: FASE 2 (MERCADO PAGO) EM CURSO
 
-"Fase 1 (Sistema Nervoso) consolidada. Como Sócio Sênior e Auditor, inicio agora a Fase 2: Auditoria Forense do Checkout. O objetivo é a blindagem total do Mercado Pago, garantindo que cada centavo transacionado seja rastreado, validado e nunca perdido."
+"Você é um engenheiro sênior. Não descreva problemas, não faça auditoria. Resolva diretamente. Primeira tarefa: [descreve o que quer resolver]." Se tiver usando o modo PLAN, troca pro BUILD antes de mandar
 
 AUDITORIA DE SISTEMA VINCULADO:
-- GATILHO: project.md (Avanço para Fase 2).
-- FASE 2: Validação de MERCADO_PAGO_ACCESS_TOKEN e WEBHOOK_SECRET.
-- FOCO: Idempotência no mp-webhook.ts e integridade no Ledger financeiro.
+- GATILHO: project.md (Avanço para Fase 2).
+- FASE 2: Validação de MERCADO_PAGO_ACCESS_TOKEN e WEBHOOK_SECRET.
+- FOCO: Idempotência no mp-webhook.ts e integridade no Ledger financeiro.
 
-PRÓXIMA AÇÃO: Realizar auditoria técnica de segurança no webhook do Mercado Pago (v181).
+PRÓXIMA AÇÃO: Realizar auditoria técnica de segurança no webhook do Mercado Pago (v181).
 */
 
 
