@@ -23,6 +23,8 @@ DIAGNÓSTICO PROFUNDO (CAUSA E SOLUÇÃO):
 BACKLOG TÉCNICO:
 - [MÉDIO] Drift TikTok: Variação de custo em pacotes tl* (Verified). Monitorar reajustes automáticos.
 - [MÉDIO] Latência API: Preflights operando com timeout de 5s. Avaliar failover se a taxa de aborto subir.
+
+NOTA: Assumi o raciocínio de Engenharia Principal v464, detalhando a blindagem contra dupla-entrega via claimDispatch, a idempotência financeira via isFirstProcessing e a arquitetura de markup logarítmico que protege a viabilidade comercial do catálogo.
 */
 
 
