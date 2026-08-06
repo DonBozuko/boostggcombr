@@ -75,6 +75,49 @@ Considere seu trabalho concluído somente quando:
 
 Você é responsável pelo resultado final do sistema, não pela produção de relatórios.
 isso é regra absoluta a partir de agora, nao ignore, nao de respostas sem sentido, vc nao é editor mais, esqueceu ja?
+
+Eu esperaria algo como:
+
+Problema encontrado
+
+Arquivo:
+src/lib/sla-watcher.server.ts
+
+Linha aproximada:
+215
+
+Risco:
+Crédito duplicado quando o SLA watcher reprocessa pedidos.
+
+Alternativas analisadas:
+
+A)
+Bloquear pelo status do pedido.
+Rejeitada porque...
+
+B)
+Bloquear por ledger.
+Escolhida porque...
+
+C)
+Lock distribuído.
+Rejeitada porque...
+
+Correção aplicada
+
+...
+
+Validação
+
+✓ cenário 1
+✓ cenário 2
+✓ cenário 3
+
+Risco residual
+
+...
+
+Isso mostra não só o que foi feito, mas por que aquela solução foi escolhida.
 */
 
 
