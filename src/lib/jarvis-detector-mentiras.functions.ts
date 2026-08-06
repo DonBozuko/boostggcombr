@@ -204,6 +204,37 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       });
       if (!wOk) blockDeploy = true;
 
+      // 8b. v522 — Autoria da aprovação: o webhook ainda é o caminho principal?
+      // Um canal "vivo" que só recebe payment.created e nunca fecha a venda é
+      // degradação silenciosa: a contingência (polling) segura a operação e
+      // ninguém percebe até ela também falhar. NÃO bloqueia deploy — não há
+      // perda de dinheiro, apenas latência maior e dependência da rede de segurança.
+      {
+        const { data: aprovacoes } = await supabaseAdmin
+          .from("financial_ledger")
+          .select("telemetry")
+          .eq("origem", "mercado_pago")
+          .gte("created_at", dayCutoff)
+          .limit(200);
+        const linhas = (aprovacoes ?? []) as Array<{ telemetry: Record<string, unknown> | null }>;
+        const aprovadas = linhas.filter((l) => l.telemetry?.["event"] === "PIX_APPROVED");
+        const porWebhook = aprovadas.filter((l) => l.telemetry?.["source"] === "webhook").length;
+        const porContingencia = aprovadas.filter((l) => l.telemetry?.["source"] === "contingency").length;
+        const degradado = aprovadas.length > 0 && porWebhook === 0;
+        checks.push({
+          id: "webhook_autoria",
+          label: `Autoria das aprovações 24h — webhook ${porWebhook} / contingência ${porContingencia}`,
+          ok: !degradado,
+          detail: degradado
+            ? "⚠️ Nenhuma venda foi fechada pelo webhook: quem está salvando é a contingência. Revisar notification_url e assinatura no Mercado Pago."
+            : aprovadas.length === 0
+              ? "sem aprovações nas últimas 24h para avaliar"
+              : "webhook é o caminho principal",
+        });
+      }
+
+
+
       // 9. Tesouraria acessível
       const { error: trErr } = await supabaseAdmin
         .from("admin_treasury")
