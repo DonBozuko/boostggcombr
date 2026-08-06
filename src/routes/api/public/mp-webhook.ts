@@ -122,6 +122,9 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.warn("[mp-webhook] sem payment id", { topic, rawBody });
             return;
           }
+          auditPaymentId = String(paymentId);
+
+
 
           // Só nos importam eventos de payment
           if (topic && !/payment/i.test(topic)) {
