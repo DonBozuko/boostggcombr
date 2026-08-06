@@ -1,13 +1,13 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v487)
-STATUS: RITMO INDUSTRIAL (v408) ATIVO - MODO BUILD RESTAURADO
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v488)
+STATUS: RITMO INDUSTRIAL (v408) ATIVO - PROTOCOLO CLEAN SLATE
 
 DIAGNÓSTICO SISTÊMICO E EVIDÊNCIAS TÉCNICAS:
-- IDEMPOTÊNCIA: Confirmada em mp-webhook.ts (v181) via webhook_events (unique provider/event_id).
-- DESPACHO ATÔMICO: Blindado em dispatch-claim.server.ts (v278) - Claim-before-External-Effect.
-- AUTORIDADE DE PREÇO: Centralizada em pricing-engine.server.ts com drift lock de 2% (v463).
-- SEGURANÇA: Acesso Admin restrito e blindagem MCP v425 via OAuth.
-- AUDITORIA FORENSE: Pente-fino concluído em todas as camadas (Checkout, Webhook, Dispatch, Ledger).
+- IDEMPOTÊNCIA: Confirmada em mp-webhook.ts (v181).
+- DESPACHO ATÔMICO: Blindado em dispatch-claim.server.ts (v278).
+- AUTORIDADE DE PREÇO: Centralizada em pricing-engine.server.ts (v463).
+- SEGURANÇA: Acesso Admin restrito e blindagem MCP v425.
+- PROTOCOLO: "Clean Slate" ativado para análise de integridade absoluta.
 
 PRÓXIMA AÇÃO: Monitoramento de integridade e estabilidade operacional contínua.
 */
