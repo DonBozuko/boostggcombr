@@ -330,7 +330,13 @@ export const criarPedido = createServerFn({ method: "POST" })
     // v297/v301 — PREFLIGHTS PARALELOS (Otimização v426.1).
     // Antes eram sequenciais, adicionando ~2-4s de latência. Agora rodam juntos.
     // Prova de ROTA + Prova de ALVO. Se algum falhar, bloqueia antes de cobrar.
+    // v297/v301 — PREFLIGHTS PARALELOS COM TIMEOUT (Otimização v457).
+    // Preflights rodam juntos com AbortSignal.timeout de 5s para evitar
+    // travamento do checkout por lentidão de APIs externas.
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const [preflightRoute, preflightTarget] = await Promise.all([
         import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
           pacote: pacoteEfetivo,
@@ -342,7 +348,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           pacote: pacoteEfetivo,
           alvo: data.instagram_user,
         }))
-      ]);
+      ]).finally(() => clearTimeout(timeoutId));
 
       if (!preflightRoute.ok) {
         console.error("[criarPedido] v297 cobrança bloqueada (rota):", pacoteEfetivo, preflightRoute.reason);
@@ -352,8 +358,12 @@ export const criarPedido = createServerFn({ method: "POST" })
         console.error("[criarPedido] v301 cobrança bloqueada (alvo):", data.instagram_user, preflightTarget.code);
         return { ok: false as const, error: preflightTarget.code };
       }
-    } catch (err) {
-      console.warn("[criarPedido] Preflights falharam (venda liberada por fail-open):", err);
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.warn("[criarPedido] Preflights abortados por TIMEOUT (5s) - Seguindo via fail-open");
+      } else {
+        console.warn("[criarPedido] Preflights falharam (venda liberada por fail-open):", err);
+      }
     }
 
 
