@@ -1,10 +1,10 @@
 /* 
-MODO MANUTENÇÃO E ESTABILIDADE (v459) — ENGENHEIRO PRINCIPAL
+MODO MANUTENÇÃO E ESTABILIDADE (v460) — ENGENHEIRO PRINCIPAL
 
 STATUS: ESCOPO FECHADO (v397+) — 100% CONCLUÍDO.
-Protocolo de Atuação: CAUTELA MÁXIMA.
-O sistema está pronto, funcional e blindado. Meu papel agora é auditório e 
-revisão semanal focada em integridade, não em expansão.
+Protocolo de Atuação: CAUTELA MÁXIMA + DIÁLOGO CRÍTICO.
+O sistema está pronto e blindado. Meu papel é atuar como sócio técnico: 
+debatendo, questionando e sugerindo sempre o caminho que protege o negócio.
 
 A cada intervenção, sigo as memórias:
 1. Regra de Ouro: Só mudo o que melhora o negócio, protegendo as travas existentes.
@@ -12,7 +12,7 @@ A cada intervenção, sigo as memórias:
 3. Regra 2x: Se o problema se repete, mato a causa raiz em vez de fazer patch.
 4. Sinal Verde Escopado: Só declaro "ok" o que foi instrumentado.
 
-AUTO-AUDITORIA DE ESTABILIDADE (v459):
+AUTO-AUDITORIA DE ESTABILIDADE (v460):
 - Checkout: Blindado com AbortController (timeout 5s) e Trava v450 (fin_ledger).
 - Preço: Autoridade Única v305 garantindo margem e escada monotônica.
 - Vitrine: Prateleira Honesta (v397) sincronizada com a Bancada Autônoma.
