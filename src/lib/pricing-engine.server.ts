@@ -780,10 +780,14 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       }
       // Markup v42 aplicado item-a-item sobre o custo real BRL
       const price_brl = seedPriceFromCost(qty, cost_brl);
-      const sidStr = serviceId != null ? String(serviceId) : null;
+      // v521 — VÍNCULO FANTASMA NÃO É GRAVADO. Se o serviço semente não entrega
+      // a quantidade (SMMhype #19191: max 20.000 vs tl50k), gravar o ID só
+      // polui o banco e confunde auditoria/roteamento. Sem vínculo, o motor de
+      // reserva (v130/v274) escolhe quem realmente entrega.
+      const sidStr = serviceId != null && aceitaQty ? String(serviceId) : null;
       itemRows.push({
         pacote: id, category: cat, quantidade: qty,
-        provider_service_id: serviceId ?? null,
+        provider_service_id: serviceId != null && aceitaQty ? serviceId : null,
         // v111 — Não duplica o ID do SMMhype nas colunas de reserva.
         smmhype_service_id: sidStr,
         smmpanel_service_id: null,
