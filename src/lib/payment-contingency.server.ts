@@ -20,7 +20,8 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
   if (error || !pedido) return { ok: false, status: null, error: "PEDIDO_NOT_FOUND" };
 
   // Already advanced — nothing to do.
-  const recoverableStatuses = ["pending", "mp_pending", "mp_in_process"];
+  // v456 — waiting_provision incluído como recuperável para suportar retentativas do SLA watcher sem side-effects.
+  const recoverableStatuses = ["pending", "mp_pending", "mp_in_process", "waiting_provision"];
   if (!recoverableStatuses.includes(String(pedido.status))) {
     return { ok: true, status: pedido.status, recovered: false };
   }
