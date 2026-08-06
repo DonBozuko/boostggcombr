@@ -44,25 +44,14 @@ export async function runSlaWatcher(): Promise<SlaReport> {
     const expired = deadline < now;
 
     if (!expired) {
-      // Tenta redispatch — se saldo foi recarregado, entra no dispatch normal
+      // Tenta redispatch — se saldo foi recarregado, entra no dispatch normal.
+      // v456 — ANTI-SPAM & ANTI-DOUBLE-CREDIT: Não altera o status para 'pending' antes de chamar a contingência.
+      // A confirmAndDispatchIfPaid já lida com o status 'waiting_provision' no recoverableStatuses.
+      // Mudar para 'pending' causava spams de alertas e riscos contábeis.
       try {
-        // Volta pra pending temporariamente pra confirmAndDispatch reprocessar
-        await supabaseAdmin
-          .from("pedidos")
-          .update({ status: "pending" } as any)
-          .eq("id", p.id)
-          .eq("status", "waiting_provision");
-
         const r = await confirmAndDispatchIfPaid(p.id);
-        if (r.ok && r.status === "paid") {
+        if (r.ok && (r.status === "paid" || r.status === "processing" || r.status === "Enviado")) {
           report.redispatched++;
-        } else {
-          // Não conseguiu — volta pra waiting_provision preservando deadline
-          await supabaseAdmin
-            .from("pedidos")
-            .update({ status: "waiting_provision" } as any)
-            .eq("id", p.id)
-            .eq("status", "pending");
         }
       } catch (e: any) {
         report.errors.push(`retry ${p.id}: ${e?.message ?? "unknown"}`);
