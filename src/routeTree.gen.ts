@@ -67,7 +67,6 @@ import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as ComprarSeguidoresReaisBrasilIndexRouteImport } from './routes/comprar-seguidores-reais-brasil/index'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as FerramentasIndexRouteImport } from './routes/ferramentas.index'
 import { Route as FerramentasCalculadoraEngajamentoInstagramRouteImport } from './routes/ferramentas.calculadora-engajamento-instagram'
@@ -75,7 +74,6 @@ import { Route as FerramentasCalculadoraLucroRevendaRouteImport } from './routes
 import { Route as FerramentasContadorInscritosYoutubeRouteImport } from './routes/ferramentas.contador-inscritos-youtube'
 import { Route as FerramentasContadorSeguidoresRouteImport } from './routes/ferramentas.contador-seguidores'
 import { Route as FerramentasGeradorLegendaInstagramRouteImport } from './routes/ferramentas.gerador-legenda-instagram'
-import { Route as PixSeguidoresInstagramIndexRouteImport } from './routes/pix-seguidores-instagram/index'
 import { Route as QuemSomosIndexRouteImport } from './routes/quem-somos/index'
 import { Route as Char126apiBeatRouteImport } from './routes/~api.beat'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -432,12 +430,6 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ComprarSeguidoresReaisBrasilIndexRoute =
-  ComprarSeguidoresReaisBrasilIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => ComprarSeguidoresReaisBrasilRoute,
-  } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -477,12 +469,6 @@ const FerramentasGeradorLegendaInstagramRoute =
     id: '/ferramentas/gerador-legenda-instagram',
     path: '/ferramentas/gerador-legenda-instagram',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const PixSeguidoresInstagramIndexRoute =
-  PixSeguidoresInstagramIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => PixSeguidoresInstagramRoute,
   } as any)
 const QuemSomosIndexRoute = QuemSomosIndexRouteImport.update({
   id: '/quem-somos/',
@@ -807,7 +793,7 @@ export interface FileRoutesByFullPath {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
-  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRouteWithChildren
+  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -819,7 +805,7 @@ export interface FileRoutesByFullPath {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
-  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
+  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -856,9 +842,7 @@ export interface FileRoutesByFullPath {
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
   '/blog/': typeof BlogIndexRoute
-  '/comprar-seguidores-reais-brasil/': typeof ComprarSeguidoresReaisBrasilIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
-  '/pix-seguidores-instagram/': typeof PixSeguidoresInstagramIndexRoute
   '/quem-somos/': typeof QuemSomosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -930,6 +914,7 @@ export interface FileRoutesByTo {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
+  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -941,6 +926,7 @@ export interface FileRoutesByTo {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -977,9 +963,7 @@ export interface FileRoutesByTo {
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
   '/blog': typeof BlogIndexRoute
-  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilIndexRoute
   '/ferramentas': typeof FerramentasIndexRoute
-  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramIndexRoute
   '/quem-somos': typeof QuemSomosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1053,7 +1037,7 @@ export interface FileRoutesById {
   '/comprar-seguidores-instagram': typeof ComprarSeguidoresInstagramRoute
   '/comprar-seguidores-instagram-barato': typeof ComprarSeguidoresInstagramBaratoRoute
   '/comprar-seguidores-kwai': typeof ComprarSeguidoresKwaiRoute
-  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRouteWithChildren
+  '/comprar-seguidores-reais-brasil': typeof ComprarSeguidoresReaisBrasilRoute
   '/comprar-seguidores-tiktok': typeof ComprarSeguidoresTiktokRoute
   '/comprar-visualizacoes-tiktok': typeof ComprarVisualizacoesTiktokRoute
   '/crescer-youtube': typeof CrescerYoutubeRoute
@@ -1065,7 +1049,7 @@ export interface FileRoutesById {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
-  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRouteWithChildren
+  '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
   '/rastrear': typeof RastrearRoute
@@ -1102,9 +1086,7 @@ export interface FileRoutesById {
   '/ferramentas/gerador-legenda-instagram': typeof FerramentasGeradorLegendaInstagramRoute
   '/~api/beat': typeof Char126apiBeatRoute
   '/blog/': typeof BlogIndexRoute
-  '/comprar-seguidores-reais-brasil/': typeof ComprarSeguidoresReaisBrasilIndexRoute
   '/ferramentas/': typeof FerramentasIndexRoute
-  '/pix-seguidores-instagram/': typeof PixSeguidoresInstagramIndexRoute
   '/quem-somos/': typeof QuemSomosIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
@@ -1227,9 +1209,7 @@ export interface FileRouteTypes {
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
     | '/blog/'
-    | '/comprar-seguidores-reais-brasil/'
     | '/ferramentas/'
-    | '/pix-seguidores-instagram/'
     | '/quem-somos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1301,6 +1281,7 @@ export interface FileRouteTypes {
     | '/comprar-seguidores-instagram'
     | '/comprar-seguidores-instagram-barato'
     | '/comprar-seguidores-kwai'
+    | '/comprar-seguidores-reais-brasil'
     | '/comprar-seguidores-tiktok'
     | '/comprar-visualizacoes-tiktok'
     | '/crescer-youtube'
@@ -1312,6 +1293,7 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
+    | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
     | '/rastrear'
@@ -1348,9 +1330,7 @@ export interface FileRouteTypes {
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
     | '/blog'
-    | '/comprar-seguidores-reais-brasil'
     | '/ferramentas'
-    | '/pix-seguidores-instagram'
     | '/quem-somos'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1472,9 +1452,7 @@ export interface FileRouteTypes {
     | '/ferramentas/gerador-legenda-instagram'
     | '/~api/beat'
     | '/blog/'
-    | '/comprar-seguidores-reais-brasil/'
     | '/ferramentas/'
-    | '/pix-seguidores-instagram/'
     | '/quem-somos/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
@@ -1548,7 +1526,7 @@ export interface RootRouteChildren {
   ComprarSeguidoresInstagramRoute: typeof ComprarSeguidoresInstagramRoute
   ComprarSeguidoresInstagramBaratoRoute: typeof ComprarSeguidoresInstagramBaratoRoute
   ComprarSeguidoresKwaiRoute: typeof ComprarSeguidoresKwaiRoute
-  ComprarSeguidoresReaisBrasilRoute: typeof ComprarSeguidoresReaisBrasilRouteWithChildren
+  ComprarSeguidoresReaisBrasilRoute: typeof ComprarSeguidoresReaisBrasilRoute
   ComprarSeguidoresTiktokRoute: typeof ComprarSeguidoresTiktokRoute
   ComprarVisualizacoesTiktokRoute: typeof ComprarVisualizacoesTiktokRoute
   CrescerYoutubeRoute: typeof CrescerYoutubeRoute
@@ -1560,7 +1538,7 @@ export interface RootRouteChildren {
   KwaiRoute: typeof KwaiRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
-  PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRouteWithChildren
+  PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
   RastrearRoute: typeof RastrearRoute
@@ -2056,13 +2034,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/comprar-seguidores-reais-brasil/': {
-      id: '/comprar-seguidores-reais-brasil/'
-      path: '/'
-      fullPath: '/comprar-seguidores-reais-brasil/'
-      preLoaderRoute: typeof ComprarSeguidoresReaisBrasilIndexRouteImport
-      parentRoute: typeof ComprarSeguidoresReaisBrasilRoute
-    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -2111,13 +2082,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/ferramentas/gerador-legenda-instagram'
       preLoaderRoute: typeof FerramentasGeradorLegendaInstagramRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/pix-seguidores-instagram/': {
-      id: '/pix-seguidores-instagram/'
-      path: '/'
-      fullPath: '/pix-seguidores-instagram/'
-      preLoaderRoute: typeof PixSeguidoresInstagramIndexRouteImport
-      parentRoute: typeof PixSeguidoresInstagramRoute
     }
     '/quem-somos/': {
       id: '/quem-somos/'
@@ -2536,35 +2500,6 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface ComprarSeguidoresReaisBrasilRouteChildren {
-  ComprarSeguidoresReaisBrasilIndexRoute: typeof ComprarSeguidoresReaisBrasilIndexRoute
-}
-
-const ComprarSeguidoresReaisBrasilRouteChildren: ComprarSeguidoresReaisBrasilRouteChildren =
-  {
-    ComprarSeguidoresReaisBrasilIndexRoute:
-      ComprarSeguidoresReaisBrasilIndexRoute,
-  }
-
-const ComprarSeguidoresReaisBrasilRouteWithChildren =
-  ComprarSeguidoresReaisBrasilRoute._addFileChildren(
-    ComprarSeguidoresReaisBrasilRouteChildren,
-  )
-
-interface PixSeguidoresInstagramRouteChildren {
-  PixSeguidoresInstagramIndexRoute: typeof PixSeguidoresInstagramIndexRoute
-}
-
-const PixSeguidoresInstagramRouteChildren: PixSeguidoresInstagramRouteChildren =
-  {
-    PixSeguidoresInstagramIndexRoute: PixSeguidoresInstagramIndexRoute,
-  }
-
-const PixSeguidoresInstagramRouteWithChildren =
-  PixSeguidoresInstagramRoute._addFileChildren(
-    PixSeguidoresInstagramRouteChildren,
-  )
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -2582,8 +2517,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComprarSeguidoresInstagramRoute: ComprarSeguidoresInstagramRoute,
   ComprarSeguidoresInstagramBaratoRoute: ComprarSeguidoresInstagramBaratoRoute,
   ComprarSeguidoresKwaiRoute: ComprarSeguidoresKwaiRoute,
-  ComprarSeguidoresReaisBrasilRoute:
-    ComprarSeguidoresReaisBrasilRouteWithChildren,
+  ComprarSeguidoresReaisBrasilRoute: ComprarSeguidoresReaisBrasilRoute,
   ComprarSeguidoresTiktokRoute: ComprarSeguidoresTiktokRoute,
   ComprarVisualizacoesTiktokRoute: ComprarVisualizacoesTiktokRoute,
   CrescerYoutubeRoute: CrescerYoutubeRoute,
@@ -2595,7 +2529,7 @@ const rootRouteChildren: RootRouteChildren = {
   KwaiRoute: KwaiRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
-  PixSeguidoresInstagramRoute: PixSeguidoresInstagramRouteWithChildren,
+  PixSeguidoresInstagramRoute: PixSeguidoresInstagramRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
   RastrearRoute: RastrearRoute,
