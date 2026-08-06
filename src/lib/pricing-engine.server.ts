@@ -137,7 +137,30 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
   "kwai:visualizacoes":       2.7,
 };
 
-const USD_TO_BRL = 7.0;
+// v520 — Câmbio real por fornecedor. Este 7,0 chumbado inflava TODO custo vindo
+// do SMMhype em ~37% frente ao câmbio que o resto do sistema usa
+// (fornecedores.cotacao_brl = 5,1211), distorcendo margem e vitrine. Agora é
+// apenas o PISO DE SEGURANÇA: só vale se o banco não responder.
+const USD_TO_BRL_FALLBACK = 7.0;
+
+/** Câmbio vivo do fornecedor. moeda BRL ⇒ 1 (tarifa já está em real). */
+async function fxForProvider(slug: string): Promise<number> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("fornecedores")
+      .select("moeda, cotacao_brl")
+      .eq("slug", slug)
+      .maybeSingle();
+    const moeda = String((data as any)?.moeda ?? "USD").toUpperCase();
+    if (moeda === "BRL") return 1;
+    const cot = Number((data as any)?.cotacao_brl);
+    // Guarda de sanidade: câmbio absurdo (drift/typo no admin) não vira preço.
+    if (Number.isFinite(cot) && cot >= 3 && cot <= 12) return cot;
+  } catch { /* noop */ }
+  return USD_TO_BRL_FALLBACK;
+}
+
 const CONTINGENCY_SOURCE = "fallback" as const;
 
 // v173 — Equação Fabiano Tiered. Fórmula:
