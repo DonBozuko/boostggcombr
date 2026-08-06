@@ -23,16 +23,12 @@ export const runAutoAudit = createServerFn({ method: "POST" })
 
     try {
       // 1. Auditoria de Fluxo de Pacotes (Ativos vs Não Ativos)
-      const { data: pricing } = await supabaseAdmin
-        .from("pricing_items")
-        .select("is_sellable, count", { count: "exact" });
-      
-      const { data: sellableCount } = await supabaseAdmin
+      const { count: sellableCount } = await supabaseAdmin
         .from("pricing_items")
         .select("*", { count: "exact", head: true })
         .eq("is_sellable", true);
 
-      const { data: unsellableCount } = await supabaseAdmin
+      const { count: unsellableCount } = await supabaseAdmin
         .from("pricing_items")
         .select("*", { count: "exact", head: true })
         .eq("is_sellable", false);
