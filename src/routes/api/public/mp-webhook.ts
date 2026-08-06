@@ -82,6 +82,12 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
+        // v522 — Auditoria de canal: marca o evento como processado no fim do fluxo.
+        // Antes, webhook_events nascia com processed_ok=false e NUNCA era atualizado,
+        // então o monitor de canal morto não distinguia "recebido e ok" de "falhou".
+        let auditPaymentId: string | null = null;
+        let auditError: string | null = null;
+
         const backgroundJob = Promise.resolve().then(async () => {
           // Sempre 200 — MP reenvia se for !=2xx. Logamos erros e seguimos.
           try {
@@ -116,6 +122,9 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.warn("[mp-webhook] sem payment id", { topic, rawBody });
             return;
           }
+          auditPaymentId = String(paymentId);
+
+
 
           // Só nos importam eventos de payment
           if (topic && !/payment/i.test(topic)) {
@@ -821,13 +830,32 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           }
 
         } catch (err) {
+          auditError = String((err as Error)?.message ?? err).slice(0, 500);
           console.error("[mp-webhook] erro inesperado", err);
         }
         });
 
         // v144 — Dispatch síncrono: aguarda backgroundJob completar antes de responder MP,
         // garantindo que notifyAdminProvisioning entregue o Pix Copia e Cola ao WhatsApp.
-        try { await backgroundJob; } catch (err) { console.error("[mp-webhook] v144 sync fail", err); }
+        try { await backgroundJob; } catch (err) { auditError = String((err as Error)?.message ?? err).slice(0, 500); console.error("[mp-webhook] v144 sync fail", err); }
+
+        // v522 — carimba resultado no evento (best-effort, nunca bloqueia a resposta ao MP)
+        if (auditPaymentId) {
+          try {
+            const { supabaseAdmin: admAudit } = await import("@/integrations/supabase/client.server");
+            await admAudit
+              .from("webhook_events" as any)
+              .update({
+                processed_ok: !auditError,
+                processed_at: new Date().toISOString(),
+                error_detail: auditError,
+              } as any)
+              .eq("provider", "mercado_pago")
+              .eq("event_id", auditPaymentId);
+          } catch (e) { console.warn("[mp-webhook] v522 audit stamp fail", e); }
+        }
+
+
         
         return Response.json({ received: true }, {
           status: 200,
