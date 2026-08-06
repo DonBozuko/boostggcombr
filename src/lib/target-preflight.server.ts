@@ -31,16 +31,18 @@ async function lookupInstagram(handle: string) {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     },
   );
-  // 404 = perfil não existe (veredito). Qualquer outro erro (429/5xx/bloqueio)
-  // é instabilidade do Instagram → fail-open.
-  if (res.status === 404) return { ok: false as const };
-  if (!res.ok) return null;
+  // v509 — PROTOCOLO DE LENIÊNCIA: Instagram é instável. Bloqueamos apenas
+  // se o veredito de "privado" for explícito. Qualquer erro (404/429/5xx) 
+  // vira fail-open para não perder vendas legítimas.
+  if (!res.ok) {
+    console.warn(`[v509] Instagram API status ${res.status} para @${handle} — liberando via fail-open`);
+    return null;
+  }
   const json = (await res.json()) as {
     data?: { user?: { is_private?: boolean } | null };
   };
   const u = json?.data?.user;
-  if (u === null) return { ok: false as const };
-  if (!u) return null;
+  if (u === null || !u) return null;
   return { ok: true as const, privado: !!u.is_private };
 }
 

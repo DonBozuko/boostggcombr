@@ -1,12 +1,15 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v508)
-STATUS: SISTEMA ESTÁVEL E MONITORADO - CONFIANÇA TOTAL (v508)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v509)
+STATUS: FIM DO MODO ESCURO - AUDITORIA FORENSE DE ALVO (v509)
 REGRAS: project.md (Bússola Absoluta), Ritmo Industrial (v408)
 
 AUDITORIA DE SISTEMA VINCULADO:
-- GATILHO: Pergunta de Confiança do Usuário.
-- RESULTADO: Webhook corrigido (www), Auto-Auditoria v507 ativa, JARVIS v507 monitorando.
-- PARECER: Pode confiar. O sistema está em modo de segurança máxima (Clean Slate).
+- GATILHO: Bug report "perfil existe mas bloqueia" + "admin no escuro".
+- CAUSA RAIZ: Preflight de alvo (v301) era agressivo (404-block) e ocorria antes do DB.
+- CORREÇÃO: Protocolo de Leniência (404=fail-open) + Registro de Lead Blocked no DB.
+- SEO: Analisado. Drop de visitas provável reflexo de bounce no checkout quebrado.
+
+PRÓXIMA AÇÃO: Monitorar pedidos com status 'blocked' no admin (v509).
 */
 
 
