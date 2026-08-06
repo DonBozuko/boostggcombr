@@ -1477,7 +1477,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
             <Link to="/privacidade" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Privacidade</Link>
             <Link to="/termos" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Termos</Link>
             <Link to="/reembolso" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Reembolso</Link>
-            <span>© 2026 Elite Boost Prime. Não somos afiliados ao Instagram ou Meta.</span>
+            <span>© 2026 Elite Boost Prime · CNPJ 47.363.210/0001-08. Não somos afiliados ao Instagram ou Meta.</span>
           </div>
 
         </div>
