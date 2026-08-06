@@ -143,18 +143,26 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
 // apenas o PISO DE SEGURANÇA: só vale se o banco não responder.
 const USD_TO_BRL_FALLBACK = 7.0;
 
+/** Nome interno do provedor → slug real em `fornecedores` (divergem em smmpanel/smmpainel). */
+const PROVIDER_SLUG: Record<string, string> = {
+  smmhype: "smmhype",
+  smmpanel: "smmpainel",
+  verified: "verified",
+};
+
 /** Câmbio vivo do fornecedor. moeda BRL ⇒ 1 (tarifa já está em real). */
-async function fxForProvider(slug: string): Promise<number> {
+async function fxForProvider(name: string): Promise<number> {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
       .from("fornecedores")
       .select("moeda, cotacao_brl")
-      .eq("slug", slug)
+      .eq("slug", PROVIDER_SLUG[name] ?? name)
       .maybeSingle();
-    const moeda = String((data as any)?.moeda ?? "USD").toUpperCase();
+    if (!data) return USD_TO_BRL_FALLBACK;
+    const moeda = String((data as any).moeda ?? "USD").toUpperCase();
     if (moeda === "BRL") return 1;
-    const cot = Number((data as any)?.cotacao_brl);
+    const cot = Number((data as any).cotacao_brl);
     // Guarda de sanidade: câmbio absurdo (drift/typo no admin) não vira preço.
     if (Number.isFinite(cot) && cot >= 3 && cot <= 12) return cot;
   } catch { /* noop */ }
