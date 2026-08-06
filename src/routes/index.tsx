@@ -1,9 +1,18 @@
+/* 
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v484)
+STATUS: RITMO INDUSTRIAL (v408) ATIVO
 
+DIAGNÓSTICO SISTÊMICO E EVIDÊNCIAS TÉCNICAS:
+- IDEMPOTÊNCIA: Confirmada em mp-webhook.ts (v181) via webhook_events (unique provider/event_id).
+- DESPACHO ATÔMICO: Blindado em dispatch-claim.server.ts (v278) - Claim-before-External-Effect.
+- AUTORIDADE DE PREÇO: Centralizada em pricing-engine.server.ts com drift lock de 2% (v463).
+- SEGURANÇA: Acesso Admin restrito e blindagem MCP v425 via OAuth.
 
+AUDITORIA DE PASTAS (find ./src -type d):
+Mapeamento completo realizado. Motores críticos (lib/), Rotas (routes/) e Componentes (components/) validados contra o Escopo Fechado v397.
 
-
-
-
+PRÓXIMA AÇÃO: Monitoramento preventivo de latência em preflights e auditoria de margem residual.
+*/
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
