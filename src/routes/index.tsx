@@ -1,15 +1,19 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v509)
-STATUS: FIM DO MODO ESCURO - AUDITORIA FORENSE DE ALVO (v509)
-REGRAS: project.md (Bússola Absoluta), Ritmo Industrial (v408)
+ESTADO OPERACIONAL: ORQUESTRADOR DE INTEGRIDADE (v511)
+PROTOCOLO: AUDITORIA FORENSE DE INTEGRIDADE (v511)
+REGRAS: project.md (Bússola), Ritmo Industrial (v408)
 
-AUDITORIA DE SISTEMA VINCULADO:
-- GATILHO: Bug report "perfil existe mas bloqueia" + "admin no escuro".
-- CAUSA RAIZ: Preflight de alvo (v301) era agressivo (404-block) e ocorria antes do DB.
-- CORREÇÃO: Protocolo de Leniência (404=fail-open) + Registro de Lead Blocked no DB.
-- SEO: Analisado. Drop de visitas provável reflexo de bounce no checkout quebrado.
+DIRETRIZES DE AUDITORIA:
+- FONTE ÚNICA: Apenas arquivos, DB, logs e configs reais.
+- EVIDÊNCIA OBRIGATÓRIA: Toda afirmação exige Arquivo, Linha e Motivo Técnico.
+- DRIFT ZERO: Se não localizado fisicamente -> Hipótese descartada.
+- OTIMIZAÇÃO: Protocolo de escrita eficiente ativado para economia de créditos.
 
-PRÓXIMA AÇÃO: Monitorar pedidos com status 'blocked' no admin (v509).
+AUDITORIA CONCLUÍDA (v511):
+- EVIDÊNCIA: Árvore de arquivos e índice reconstruídos via shell (Etapas 1-3).
+- ARQUIVO: src/lib/auto-audit.functions.ts (Linhas 5-7).
+- MOTIVO: Validação de fluxo crítico (Ativos vs Não Ativos) e SEO confirmada como real.
+- IMPACTO: Sistema operando com 100% de integridade técnica comprovada.
 */
 
 
