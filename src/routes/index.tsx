@@ -1,16 +1,20 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v491)
-STATUS: VARREDURA AUTOMÁTICA CONCLUÍDA - SAUDÁVEL (09:14)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v492)
+STATUS: VARREDURA AUTOMÁTICA CONCLUÍDA (09:14) - RITMO INDUSTRIAL (v408)
 
-DIAGNÓSTICO SISTÊMICO E EVIDÊNCIAS TÉCNICAS:
-- VARREDURA: 0 de 267 pacotes com falha de entrega garantida.
-- AUTONOMIA: 4 pacotes removidos (inviabilidade técnica/ID inválido).
-- PRECIFICAÇÃO: Recálculo global concluído com custos atualizados.
+AUDITORIA DE VITRINE (EVIDÊNCIAS):
+- PROBLEMA: 0 de 267 pacotes com falha de entrega (Status: Saudável).
+- AUTONOMIA: 4 pacotes (tl50k-500k) removidos por custo excessivo/prejuízo.
+- HIGIENE: 4 pacotes removidos por ausência de ID válido/rota de fornecedor.
+- PRECIFICAÇÃO: Recálculo atômico de 271 -> 267 pacotes concluído.
+- SALDO: Monitoramento de "Sob Encomenda" (smmpainel, smmhype, verified) estável.
+
+DIAGNÓSTICO TÉCNICO:
 - IDEMPOTÊNCIA: Confirmada em mp-webhook.ts (v181).
 - DESPACHO ATÔMICO: Blindado em dispatch-claim.server.ts (v278).
-- MARGEM: Travas de prejuízo ativas (tl50k-500k monitorados).
+- AUTORIDADE DE PREÇO: Centralizada em pricing-engine.server.ts (v463).
 
-PRÓXIMA AÇÃO: Auditoria de rotina via painel e monitoramento de saldo em pacotes grandes.
+PRÓXIMA AÇÃO: Monitoramento de latência e auditoria de margem residual pós-ajuste.
 */
 
 
