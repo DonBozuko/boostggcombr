@@ -25,6 +25,8 @@ export const Route = createFileRoute("/_authenticated/painel-revendedor")({
   head: () => ({
     meta: [
       { title: "Painel do Revendedor — Elite Boost Prime | BoostGG" },
+      // v524 — área privada: nunca indexar (evita URL vazia no índice e desperdício de crawl budget)
+      { name: "robots", content: "noindex, nofollow" },
       {
         name: "description",
         content:

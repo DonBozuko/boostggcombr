@@ -37,6 +37,7 @@ import { Route as KitCreatorRouteImport } from './routes/kit-creator'
 import { Route as KwaiRouteImport } from './routes/kwai'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ObrigadoRouteImport } from './routes/obrigado'
+import { Route as PainelSmmRouteImport } from './routes/painel-smm'
 import { Route as PixSeguidoresInstagramRouteImport } from './routes/pix-seguidores-instagram'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as Promo5reaisRouteImport } from './routes/promo-5reais'
@@ -62,7 +63,6 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPainelAfiliadoRouteImport } from './routes/_authenticated/painel-afiliado'
 import { Route as AuthenticatedPainelRevendedorRouteImport } from './routes/_authenticated/painel-revendedor'
-import { Route as AuthenticatedPainelSmmRouteImport } from './routes/_authenticated/painel-smm'
 import { Route as AdminCatalogRouteImport } from './routes/admin.catalog'
 import { Route as AdminScriptsRouteImport } from './routes/admin.scripts'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
@@ -274,6 +274,11 @@ const ObrigadoRoute = ObrigadoRouteImport.update({
   path: '/obrigado',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelSmmRoute = PainelSmmRouteImport.update({
+  id: '/painel-smm',
+  path: '/painel-smm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PixSeguidoresInstagramRoute = PixSeguidoresInstagramRouteImport.update({
   id: '/pix-seguidores-instagram',
   path: '/pix-seguidores-instagram',
@@ -404,11 +409,6 @@ const AuthenticatedPainelRevendedorRoute =
     path: '/painel-revendedor',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedPainelSmmRoute = AuthenticatedPainelSmmRouteImport.update({
-  id: '/painel-smm',
-  path: '/painel-smm',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AdminCatalogRoute = AdminCatalogRouteImport.update({
   id: '/catalog',
   path: '/catalog',
@@ -798,6 +798,7 @@ export interface FileRoutesByFullPath {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -823,7 +824,6 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
   '/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
-  '/painel-smm': typeof AuthenticatedPainelSmmRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -918,6 +918,7 @@ export interface FileRoutesByTo {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -943,7 +944,6 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
   '/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
-  '/painel-smm': typeof AuthenticatedPainelSmmRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1040,6 +1040,7 @@ export interface FileRoutesById {
   '/kwai': typeof KwaiRoute
   '/mcp': typeof McpRoute
   '/obrigado': typeof ObrigadoRoute
+  '/painel-smm': typeof PainelSmmRoute
   '/pix-seguidores-instagram': typeof PixSeguidoresInstagramRoute
   '/privacidade': typeof PrivacidadeRoute
   '/promo-5reais': typeof Promo5reaisRoute
@@ -1065,7 +1066,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/painel-afiliado': typeof AuthenticatedPainelAfiliadoRoute
   '/_authenticated/painel-revendedor': typeof AuthenticatedPainelRevendedorRoute
-  '/_authenticated/painel-smm': typeof AuthenticatedPainelSmmRoute
   '/admin/catalog': typeof AdminCatalogRoute
   '/admin/scripts': typeof AdminScriptsRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -1162,6 +1162,7 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
+    | '/painel-smm'
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
@@ -1187,7 +1188,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/painel-afiliado'
     | '/painel-revendedor'
-    | '/painel-smm'
     | '/admin/catalog'
     | '/admin/scripts'
     | '/blog/$slug'
@@ -1282,6 +1282,7 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
+    | '/painel-smm'
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
@@ -1307,7 +1308,6 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/painel-afiliado'
     | '/painel-revendedor'
-    | '/painel-smm'
     | '/admin/catalog'
     | '/admin/scripts'
     | '/blog/$slug'
@@ -1403,6 +1403,7 @@ export interface FileRouteTypes {
     | '/kwai'
     | '/mcp'
     | '/obrigado'
+    | '/painel-smm'
     | '/pix-seguidores-instagram'
     | '/privacidade'
     | '/promo-5reais'
@@ -1428,7 +1429,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/painel-afiliado'
     | '/_authenticated/painel-revendedor'
-    | '/_authenticated/painel-smm'
     | '/admin/catalog'
     | '/admin/scripts'
     | '/blog/$slug'
@@ -1525,6 +1525,7 @@ export interface RootRouteChildren {
   KwaiRoute: typeof KwaiRoute
   McpRoute: typeof McpRoute
   ObrigadoRoute: typeof ObrigadoRoute
+  PainelSmmRoute: typeof PainelSmmRoute
   PixSeguidoresInstagramRoute: typeof PixSeguidoresInstagramRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   Promo5reaisRoute: typeof Promo5reaisRoute
@@ -1810,6 +1811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ObrigadoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel-smm': {
+      id: '/painel-smm'
+      path: '/painel-smm'
+      fullPath: '/painel-smm'
+      preLoaderRoute: typeof PainelSmmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pix-seguidores-instagram': {
       id: '/pix-seguidores-instagram'
       path: '/pix-seguidores-instagram'
@@ -1983,13 +1991,6 @@ declare module '@tanstack/react-router' {
       path: '/painel-revendedor'
       fullPath: '/painel-revendedor'
       preLoaderRoute: typeof AuthenticatedPainelRevendedorRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/painel-smm': {
-      id: '/_authenticated/painel-smm'
-      path: '/painel-smm'
-      fullPath: '/painel-smm'
-      preLoaderRoute: typeof AuthenticatedPainelSmmRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/admin/catalog': {
@@ -2454,14 +2455,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPainelAfiliadoRoute: typeof AuthenticatedPainelAfiliadoRoute
   AuthenticatedPainelRevendedorRoute: typeof AuthenticatedPainelRevendedorRoute
-  AuthenticatedPainelSmmRoute: typeof AuthenticatedPainelSmmRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPainelAfiliadoRoute: AuthenticatedPainelAfiliadoRoute,
   AuthenticatedPainelRevendedorRoute: AuthenticatedPainelRevendedorRoute,
-  AuthenticatedPainelSmmRoute: AuthenticatedPainelSmmRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -2508,6 +2507,7 @@ const rootRouteChildren: RootRouteChildren = {
   KwaiRoute: KwaiRoute,
   McpRoute: McpRoute,
   ObrigadoRoute: ObrigadoRoute,
+  PainelSmmRoute: PainelSmmRoute,
   PixSeguidoresInstagramRoute: PixSeguidoresInstagramRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   Promo5reaisRoute: Promo5reaisRoute,
