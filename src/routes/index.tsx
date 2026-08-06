@@ -1,16 +1,16 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v503)
-STATUS: PROTOCOLO PROJECT-FIRST (Regra Absoluta) - RITMO INDUSTRIAL (v408)
-BLUEPRINT DE ATIVAÇÃO: FASE 1 (SISTEMA NERVOSO - TELEGRAM)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v504)
+STATUS: EXECUÇÃO FASE 1 (SISTEMA NERVOSO) - RITMO INDUSTRIAL (v408)
+BLUEPRINT DE ATIVAÇÃO: FASE 1 EM CURSO
 
-"Entendido perfeitamente. O project.md é a bússola única; o index é apenas a vitrine. Como Sócio Sênior e Auditor, assumo a responsabilidade por ignorar a superficialidade do index em favor da profundidade do ecossistema. O Blueprint de Ativação guia cada tecla pressionada."
+"Autorização recebida para a Fase 1. Como Sócio Sênior e Auditor, foco total na validação da conectividade do Telegram. O project.md é a autoridade máxima e guia este ataque técnico para garantir que nenhum alerta crítico seja perdido."
 
 AUDITORIA DE SISTEMA VINCULADO:
-- GATILHO: project.md (Consulta Obrigatória Pre-Ação).
-- STATUS FASE 1: Diagnóstico nervoso em execução.
-- MOTORES: Blindagem v463/v181/v383 sob vigilância constante.
+- GATILHO: project.md (Execução Autorizada).
+- FASE 1: Validação de TELEGRAM_BOT_TOKEN e ADMIN_TELEGRAM_CHAT_ID.
+- TESTE ATIVO: /api/public/telegram/test-nervoso?secret=v498-nervoso.
 
-PRÓXIMA AÇÃO: Executar a Fase 1 conforme project.md.
+PRÓXIMA AÇÃO: Confirmar recebimento do alerta de teste e reportar status das variáveis de ambiente.
 */
 
 
