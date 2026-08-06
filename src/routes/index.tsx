@@ -35,7 +35,7 @@ AUTO-AUDITORIA DE ESTABILIDADE (v458) — RESULTADO:
    Impacto: Checkout blindado contra lentidão de APIs externas (Telegram/Fornecedores).
 2. Estabilidade: Notificações e Analytics operando em 100% de paridade.
 3. Decisão: "Faça o recomendado" executado (Plano A).
-4. Correção Visual: Ajustado log de impacto de "Instagram" para "Telegram" no cabeçalho v458 para refletir a realidade técnica dos fornecedores.
+4. Próxima Prioridade: Auditoria de Drift de Preço (v459).
 */
 
 
