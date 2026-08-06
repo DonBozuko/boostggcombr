@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { MP_NOTIFICATION_URL } from "./payment-config";
+
 import { z } from "zod";
 
 const pedidoSchema = z.object({
@@ -477,7 +479,7 @@ export const criarPedido = createServerFn({ method: "POST" })
             }],
             payer: { email: data.email.trim().toLowerCase() },
             external_reference: `pedido:${pedidoCard.id}`,
-            notification_url: "https://boostgg.com.br/api/public/mp-webhook",
+            notification_url: MP_NOTIFICATION_URL,
             statement_descriptor: "BOOSTGG",
             binary_mode: true,
             payment_methods: {
@@ -596,7 +598,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       description: `BoostGG - ${rede.toUpperCase()} pacote ${clean(pacoteEfetivo)} (${quantidadeEfetiva} ${categoria}) para ${clean(data.instagram_user)}${bumpAplicado ? " [UPGRADE]" : ""}`,
       payment_method_id: "pix",
       payer: { email: data.email.trim().toLowerCase() },
-      notification_url: "https://boostgg.com.br/api/public/mp-webhook",
+      notification_url: MP_NOTIFICATION_URL,
     });
     const backoffs = [0, 200, 800]; // v426.1 — Reduzido backoff (antes 0, 500, 1500) para acelerar aparição do Pix
     let mpErrLast = "";

@@ -7,6 +7,7 @@
 //    Quem credita o saldo é o webhook (fonte da verdade = MP aprovou), nunca o front.
 //  - Crédito é idempotente: o webhook só credita se a recarga ainda estiver 'pending'.
 import { createServerFn } from "@tanstack/react-start";
+import { MP_NOTIFICATION_URL } from "./payment-config";
 import { z } from "zod";
 import { getRequest } from "@tanstack/react-start/server";
 
@@ -143,7 +144,7 @@ export const resellerTopup = createServerFn({ method: "POST" })
           payment_method_id: "pix",
           payer: { email: r.email },
           external_reference: `reseller-topup:${topupId}`,
-          notification_url: "https://boostgg.com.br/api/public/mp-webhook",
+          notification_url: MP_NOTIFICATION_URL,
         }),
         signal: AbortSignal.timeout(20_000),
       });
