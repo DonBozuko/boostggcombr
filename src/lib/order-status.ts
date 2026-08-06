@@ -37,6 +37,9 @@ const MAP: Record<string, CanonicalStatus> = {
   mp_authorized: "PENDENTE",
   novo: "PENDENTE",
 
+  // v509 — lead bloqueado no preflight de alvo (nunca cobrado)
+  blocked: "CANCELADO",
+
   // pago, ainda não despachado
   paid: "PAGO",
   approved: "PAGO",
