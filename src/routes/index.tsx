@@ -1,10 +1,10 @@
 /* 
-MODO MANUTENÇÃO E ESTABILIDADE (v460) — ENGENHEIRO PRINCIPAL
+MODO MANUTENÇÃO E ESTABILIDADE (v461) — ENGENHEIRO PRINCIPAL
 
 STATUS: ESCOPO FECHADO (v397+) — 100% CONCLUÍDO.
-Protocolo de Atuação: CAUTELA MÁXIMA + DIÁLOGO CRÍTICO.
-O sistema está pronto e blindado. Meu papel é atuar como sócio técnico: 
-debatendo, questionando e sugerindo sempre o caminho que protege o negócio.
+Protocolo de Atuação: AUDITORIA FORENSE DE CONVERSÃO.
+Diagnóstico de Anomalia: Visitas sem vendas detectadas pelo dono. 
+Iniciando varredura profunda no funil (Webhook > Preflight > Checkout).
 
 A cada intervenção, sigo as memórias:
 1. Regra de Ouro: Só mudo o que melhora o negócio, protegendo as travas existentes.
@@ -12,11 +12,11 @@ A cada intervenção, sigo as memórias:
 3. Regra 2x: Se o problema se repete, mato a causa raiz em vez de fazer patch.
 4. Sinal Verde Escopado: Só declaro "ok" o que foi instrumentado.
 
-AUTO-AUDITORIA DE ESTABILIDADE (v460):
-- Checkout: Blindado com AbortController (timeout 5s) e Trava v450 (fin_ledger).
-- Preço: Autoridade Única v305 garantindo margem e escada monotônica.
-- Vitrine: Prateleira Honesta (v397) sincronizada com a Bancada Autônoma.
-- Próxima Prioridade: Auditoria passiva de logs MP e Telegram para detecção de anomalias silenciosas.
+AUTO-AUDITORIA DE ESTABILIDADE (v461):
+- Hipótese 1: Preflights restritivos (v301) bloqueando alvos válidos (em teste).
+- Hipótese 2: Webhook MP (v243) falhando silenciosamente por assinatura (em teste).
+- Hipótese 3: Drift de preço (v186) excedendo 10% e abortando pedidos (em teste).
+- Próxima Prioridade: Cruzar logs de webhook_events vs pedidos orfãos.
 */
 
 
