@@ -317,6 +317,8 @@ async function loadProviderRateMap(): Promise<{
   // entrega a quantidade do pacote.
   rangeById: Map<number, { min?: number; max?: number }>;
   provider: "smmhype" | "smmpanel" | "verified" | "none";
+  // v520 — câmbio do fornecedor que efetivamente forneceu as tarifas.
+  fx: number;
 }> {
 
   const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
