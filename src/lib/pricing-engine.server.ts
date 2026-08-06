@@ -762,9 +762,9 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       let cost_brl: number;
       let source: "api" | "fallback";
       if (typeof usdPer1k === "number" && usdPer1k > 0) {
-        cost_brl = (qty / 1000) * usdPer1k * USD_TO_BRL;
+        cost_brl = (qty / 1000) * usdPer1k * fx;
         source = "api";
-        catCostPer1k = usdPer1k * USD_TO_BRL;
+        catCostPer1k = usdPer1k * fx;
         catSource = "api";
       } else {
         cost_brl = (qty / 1000) * FALLBACK_RATES_PER_1K[cat];
