@@ -56,6 +56,9 @@ const buildSitemapXml = () => {
     { path: "/pix-seguidores-instagram", changefreq: "daily", priority: "0.9" },
     
     { path: "/comprar-seguidores-instagram-barato", changefreq: "daily", priority: "0.9" },
+    // v525 — intenção de preço-âncora (12.100/mês). Sem SKU de R$1: página honesta que converte pro piso R$5.
+    { path: "/comprar-seguidores-1-real", changefreq: "daily", priority: "0.9" },
+
     { path: "/comprar-curtidas-instagram", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-tiktok", changefreq: "weekly", priority: "0.9" },
     { path: "/comprar-seguidores-brasileiros", changefreq: "daily", priority: "1.0" },
