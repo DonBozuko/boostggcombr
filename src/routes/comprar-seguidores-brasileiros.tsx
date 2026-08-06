@@ -29,6 +29,15 @@ const FAQ = [
     q: "Vem com reposição?",
     a: "Sim, 30 dias de reposição gratuita para qualquer queda.",
   },
+  // v524 — absorvido da landing /comprar-seguidores-reais-brasil (consolidada aqui).
+  {
+    q: "Qual a diferença entre seguidores brasileiros e globais?",
+    a: "Seguidores globais são um mix internacional, ótimos para volume e prova social barata. Já os seguidores brasileiros são focados em autoridade nacional. Para o algoritmo do Instagram, ter seguidores do seu próprio país ajuda a recomendar seu conteúdo para mais pessoas na sua região.",
+  },
+  {
+    q: "Preciso seguir ninguém de volta?",
+    a: "Não. Você não precisa seguir ninguém, curtir fotos ou realizar qualquer ação. A entrega é unilateral para o seu perfil.",
+  },
 ];
 
 export const Route = createFileRoute("/comprar-seguidores-brasileiros")({
@@ -68,10 +77,10 @@ function Page() {
       pricingTitle="Tabela de preços — seguidores brasileiros"
       pricingCategories={["instagram:seguidores:br"]}
       pricing={[
-        { id: "br-p100", qty: "100 brasileiros", price: "R$ 5,89" },
-        { id: "br-p500", qty: "500 brasileiros", price: "R$ 57,00", note: "Mais vendido" },
-        { id: "br-p1k", qty: "1.000 brasileiros", price: "R$ 113,00" },
-        { id: "br-p5k", qty: "5.000 brasileiros", price: "R$ 342,00" },
+        { id: "br-p100", qty: "100 brasileiros", price: "R$ 25,82" },
+        { id: "br-p500", qty: "500 brasileiros", price: "R$ 113,00", note: "Mais vendido" },
+        { id: "br-p1k", qty: "1.000 brasileiros", price: "R$ 212,50" },
+        { id: "br-p5k", qty: "5.000 brasileiros", price: "R$ 494,86" },
       ]}
       bodySections={[
         {
