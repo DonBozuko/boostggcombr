@@ -1390,7 +1390,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </h2>
         <div className="space-y-6 text-zinc-300 text-base leading-relaxed">
           <p>
-            A <strong>BoostGG</strong> é a plataforma líder para quem busca <Link to="/comprar-seguidores-instagram" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">comprar seguidores no Instagram</Link> com foco em qualidade e segurança. Oferecemos pacotes de <Link to="/comprar-seguidores-reais-brasil" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">seguidores brasileiros reais</Link> que ajudam a construir prova social imediata para perfis pessoais e profissionais.
+            A <strong>BoostGG</strong> é a plataforma líder para quem busca <Link to="/comprar-seguidores-instagram" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">comprar seguidores no Instagram</Link> com foco em qualidade e segurança. Oferecemos pacotes de <Link to="/comprar-seguidores-brasileiros" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">seguidores brasileiros reais</Link> que ajudam a construir prova social imediata para perfis pessoais e profissionais.
           </p>
           <p>
             Diferente de outros sites, nosso processo é 100% transparente: você escolhe o plano, paga via <Link to="/pix-seguidores-instagram" className="text-white underline decoration-zinc-700 hover:decoration-white transition-colors">Pix com aprovação instantânea</Link> e o sistema inicia a entrega automática. Sem necessidade de senha ou cadastros complexos, garantindo a total privacidade da sua conta.
