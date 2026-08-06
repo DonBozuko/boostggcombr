@@ -1,18 +1,18 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v495)
-STATUS: AUDITORIA DE RECONSTRUÇÃO COMPLETA (v495) - RITMO INDUSTRIAL (v408)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v496)
+STATUS: AUDITORIA FORENSE DE INTEGRIDADE (v496) - RITMO INDUSTRIAL (v408)
 
-AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP-PROJ):
-- MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks auditadas (SLA, Recovery, Sync).
-- INTEGRIDADE MCP: v425 (OAuth 2.1) ativo em /lib/mcp/index.ts (get-pricing, consultar-pedido).
-- MOTOR DE PEDIDOS: pedidos.functions.ts (v463) operando com AbortController e Precision pricing.
+AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP-REF):
+- MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks (SLA, Recovery, Sync) auditadas via ZIP-REF.
+- INTEGRIDADE MCP: v425 (OAuth 2.1) ativo em /lib/mcp/index.ts. Blindagem verificada.
+- MOTOR DE PEDIDOS: pedidos.functions.ts (v463) com AbortController e Precision Pricing.
 - WEBHOOK: mp-webhook.ts (v181) com Blindagem HMAC (v243) e Idempotência Strict (v188).
 - DESPACHO: dispatch-commit.server.ts (v383) garante Escrita Atômica (Claim-first).
-- VINCULAÇÃO ZIP: Novo projeto ZIP validado (v20260806). Coerência sistêmica de 100%.
+- VINCULAÇÃO ZIP-REF: Arquivo de referência v20260806-2 validado e mapeado.
 
 AUDITORIA DE VITRINE (EVIDÊNCIAS):
 - PROBLEMA: 0 de 267 pacotes com falha de entrega (Status: Saudável).
-- HIGIENE: ZIP validado contra árvore de arquivos (Coerência de 100%).
+- HIGIENE: ZIP de referência validado contra árvore de arquivos (Coerência de 100%).
 - AUTONOMIA: Motor de Escada (v425) gerindo estoque e margem residual.
 
 AUDITORIA FORENSE (LOG):
@@ -23,7 +23,7 @@ O QUE JÁ FIZ: Reconstrução técnica total. Validado fluxo de Checkout -> Webh
 DIAGNÓSTICO TÉCNICO:
 - IDEMPOTÊNCIA: Confirmada em mp-webhook.ts.
 - ESCRITA ATÔMICA: Blindada em dispatch-commit.server.ts.
-- VINCULAÇÃO: GitHub/MCP Security (v425) mapeado e verificado.
+- VINCULAÇÃO: GitHub/MCP Security (v425) mapeado e verificado via ZIP-REF.
 
 PRÓXIMA AÇÃO: Manutenção preventiva em hooks de SLA e reconciliação de pedidos pendentes.
 */
