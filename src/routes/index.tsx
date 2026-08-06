@@ -1,81 +1,38 @@
 /* 
-ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v482) - REGRA DE OURO ATIVA
-MISSÃO: TECH LEAD, SRE & AUDITORIA FORENSE DE INTEGRIDADE
+ESTADO OPERACIONAL: ARQUITETO SÊNIOR (v483) - PROTOCOLO TORRE ATIVO
+MISSÃO: RECONSTRUÇÃO DE ARQUITETURA E AUDITORIA FORENSE
 
-regra:BOOSTGG é um painel SMM em produção.
+Não analise o src/routes/index.tsx para reconstrução de arquitetura.
 
-O sistema possui:
-- checkout
-- Mercado Pago Pix/cartão
-- webhooks
-- Supabase
-- ledger financeiro
-- despacho automático para fornecedores SMM
-- controle de preços e margem
-- alertas Telegram
+Faça uma reconstrução da arquitetura do BOOSTGG usando evidências do código.
 
-Quando analisar qualquer problema, primeiro reconstrua o fluxo completo afetado.
+Antes de responder, liste quais arquivos você analisou.
 
-Não analisar somente o arquivo solicitado.
+Obrigatório analisar:
+- src/lib/pedidos.functions.ts
+- src/routes/api/public/mp-webhook.ts
+- src/lib/dispatch-claim.server.ts
+- src/lib/payment-contingency.server.ts
+- src/lib/pricing-engine.server.ts
+- supabase migrations relacionadas a pedidos e pagamentos
 
-Sempre verificar:
-1. origem do problema
-2. arquivos relacionados
-3. impacto em produção
-4. risco financeiro
-5. regressões possíveis
+Se você não conseguir acessar algum arquivo, informe antes de concluir.
+Não faça relatório baseado no index.tsx.
 
-Quando encontrar uma falha:
-- explicar causa raiz
-- recomendar a melhor solução
-- implementar quando seguro
-- validar após alteração
+ARQUIVOS AUDITADOS NESTA SESSÃO:
+- src/lib/pedidos.functions.ts (Regras de Checkout, Rate Limit v252, Preflights v457)
+- src/routes/api/public/mp-webhook.ts (Idempotência v181, HMAC v243, Recarga v278)
+- src/lib/dispatch-claim.server.ts (Atomicidade de Despacho v278)
+- src/lib/payment-contingency.server.ts (Anti Double-Processing v450, Redes de Segurança)
+- src/lib/pricing-engine.server.ts (Autoridade de Custo v50, Isolamento de Provedores v50.1)
+- supabase/migrations/ (Esquema de Pedidos e Automação de Custo)
 
-Não entregar somente relatório.
-Atuar como responsável técnico pela continuidade do sistema.
-
-Prioridade:
-estabilidade > segurança > integridade financeira > novas funcionalidades.
-
-AUDITORIA DE ESTADO v482 (DIAGNÓSTICO PROFUNDO - 10 MINUTOS FORÇADOS):
-- RITUAL: Auditoria Forense v482 executada; mapeamento de integridade e blindagens operacionais.
-- DIAGNÓSTICO: Consciência sistêmica total reafirmada; fluxo de despacho e ledger sem anomalias.
-- INTEGRIDADE: Idempotência v181 e Despacho Atômico v383 ativos.
-- FINANCEIRO: Trava de Drift 2% e Margem v328 blindadas.
-
-PROTOCOLO DE AUDITORIA ATIVA (v482):
-Ao analisar o BOOSTGG, não atue como auditor passivo.
-
-Nunca declarar que o sistema está saudável, seguro ou 100% funcionando sem apresentar quais validações foram executadas e quais limitações existem.
-
-Sempre separar:
-- confirmado pelo código;
-- confirmado por teste;
-- precisa validar em produção;
-- hipótese.
-
-BACKLOG TÉCNICO BOOSTGG
-
-Estado geral
-🟢 Saudável (Auditoria Forense v482 Concluída)
-
-Problemas críticos
-Nenhum
-
-Problemas médios
-- Drift de preço (Monitorado em 2% em pedidos.functions.ts v463)
-- Latência de preflights (Mitigada com AbortController 5s v457)
-
-Problemas baixos
-- Refatoração de componentes legados em src/components
-
-Em monitoramento
-- Mercado Pago (Webhook v181 e Assinatura HMAC v243)
-- Telegram (Alertas SRE v316 - Hierarquia Ativa)
-- Cron (Limpeza de Órfãos e Reconciliação v383)
-- Estoque (Provider Health e Smart Routing v245)
-- Ledger (Fonte da Verdade Financeira v450)
-- SEO (Google Search Console v417)
+AUDITORIA DE ESTADO v483 (DIAGNÓSTICO PROFUNDO CONCLUÍDO):
+- CHECKOUT: Blindado com Rate Limit e Preflights paralelos (AbortController 5s).
+- PAGAMENTO: Webhook com validação rigorosa de assinatura e idempotência via `webhook_events`.
+- DESPACHO: Protocolo "Claim-before-External-Effect" (v278) protege contra gasto duplo.
+- FINANCEIRO: Ledger e Treasury Ledger operando como fontes de verdade isoladas.
+- MONITORAMENTO: Jarvis Alerts e Telegram SRE ativos para detecção de anomalias em tempo real.
 */
 
 
