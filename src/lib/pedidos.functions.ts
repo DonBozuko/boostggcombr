@@ -358,6 +358,30 @@ export const criarPedido = createServerFn({ method: "POST" })
       }
       if (!preflightTarget.ok) {
         console.error("[criarPedido] v301 cobrança bloqueada (alvo):", data.instagram_user, preflightTarget.code);
+        // v509 — Registro de Alvo Inválido no Banco (Anti-Escuro).
+        // Mesmo sem cobrar, gravamos o pedido com status 'blocked' para que o 
+        // administrador veja o lead e o motivo real do abandono.
+        try {
+          const { supabaseAdmin: sbLog } = await import("@/integrations/supabase/client.server");
+          await sbLog.from("pedidos").insert({
+            instagram_user: clean(data.instagram_user),
+            pacote: clean(pacoteEfetivo),
+            quantidade: quantidadeEfetiva,
+            valor: valorCobrar,
+            status: "blocked",
+            error_detail: `Bloqueio Preflight: ${preflightTarget.code}`,
+            email_contato: data.email.trim().toLowerCase(),
+            whatsapp_contato: data.whatsapp_contato?.trim() || null,
+            rede_social: rede,
+            utm_source: utmClean(data.utm_source),
+            utm_medium: utmClean(data.utm_medium),
+            utm_campaign: utmClean(data.utm_campaign),
+            utm_content: utmClean(data.utm_content),
+            utm_term: utmClean(data.utm_term),
+            cupom: cupom || null,
+          } as any);
+        } catch (e) { console.warn("[criarPedido] v509 falha ao registrar bloqueio:", e); }
+
         return { ok: false as const, error: preflightTarget.code };
       }
     } catch (err: any) {
