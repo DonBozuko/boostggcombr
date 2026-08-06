@@ -381,9 +381,9 @@ async function loadProviderRateMap(): Promise<{
       continue;
     }
     console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
-    return { rateById: map, rangeById: ranges, provider: p.name };
+    return { rateById: map, rangeById: ranges, provider: p.name, fx: await fxForProvider(p.name) };
   }
-  return { rateById: new Map(), rangeById: new Map(), provider: "none" };
+  return { rateById: new Map(), rangeById: new Map(), provider: "none", fx: USD_TO_BRL_FALLBACK };
 
 }
 
@@ -391,10 +391,10 @@ async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> 
   const probe = PROBE[category];
   const serviceId = await resolveServiceIdAsync(probe.pacote, probe.qty).catch(() => null);
   if (!serviceId) return null;
-  const { rateById } = await loadProviderRateMap();
+  const { rateById, fx } = await loadProviderRateMap();
   const rateUsd = rateById.get(serviceId);
   if (!Number.isFinite(rateUsd) || !rateUsd || rateUsd <= 0) return null;
-  return rateUsd * USD_TO_BRL;
+  return rateUsd * fx;
 }
 
 
