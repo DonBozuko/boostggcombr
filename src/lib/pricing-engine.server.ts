@@ -710,7 +710,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
+    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById, rateById, fx), existingReserveIds), existingReserveIds);
     // v320 — a contingência escreve IDs chumbados no código. Se o fornecedor
     // reaproveitou o número para outro produto, o portão zera antes de gravar.
     itemRows = (await guardBindings(itemRows)).rows;
