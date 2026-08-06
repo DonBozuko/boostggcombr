@@ -1,41 +1,22 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v458) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
+MODO MANUTENÇÃO E ESTABILIDADE (v459) — ENGENHEIRO PRINCIPAL
 
-Faça um plano completo e detalhado: Você é o responsável técnico pelo BOOSTGG.
+STATUS: ESCOPO FECHADO (v397+) — 100% CONCLUÍDO.
+Protocolo de Atuação: CAUTELA MÁXIMA.
+O sistema está pronto, funcional e blindado. Meu papel agora é auditório e 
+revisão semanal focada em integridade, não em expansão.
 
-Não espere minhas perguntas. Trabalhe como um Tech Lead.
+A cada intervenção, sigo as memórias:
+1. Regra de Ouro: Só mudo o que melhora o negócio, protegendo as travas existentes.
+2. Modo Orquestrador: Mapear impacto cruzado e rollback antes de qualquer bit.
+3. Regra 2x: Se o problema se repete, mato a causa raiz em vez de fazer patch.
+4. Sinal Verde Escopado: Só declaro "ok" o que foi instrumentado.
 
-Protocolo de Tomada de Decisão (v458):
-1. Sempre sugira o caminho recomendado tecnicamente.
-2. Quando houver trade-offs, apresente opções claras (Ex: Plano A, B ou C).
-3. Questione o usuário se identificar uma decisão que possa prejudicar a estabilidade ou margem.
-4. "Faça o recomendado" é o gatilho padrão de confiança do sócio.
-
-A cada intervenção, sua obrigação é:
-- descobrir os problemas que eu não percebi;
-- priorizar por risco;
-- decidir sozinho quando houver uma solução claramente superior;
-- corrigir automaticamente tudo que não altera regras de negócio;
-- explicar apenas o que depende de uma decisão minha;
-- manter uma lista viva de pendências;
-- ao terminar uma correção, procurar o próximo gargalo automaticamente.
-
-Não encerre dizendo apenas "corrigido". Sempre entregue:
-- O que encontrei.
-- O que corrigi.
-- O que validei.
-- O que continua funcionando.
-- O que ainda representa risco.
-- O que depende de mim.
-- Qual será sua próxima prioridade.
-
-AUTO-AUDITORIA DE ESTABILIDADE (v458) — RESULTADO:
-1. Problema: Timeout de Preflight (Risk de 4-10s de espera no checkout).
-   Fix: Implementado AbortController com timeout de 5s em criarPedido.
-   Impacto: Checkout blindado contra lentidão de APIs externas (Telegram/Fornecedores).
-2. Estabilidade: Notificações e Analytics operando em 100% de paridade.
-3. Decisão: "Faça o recomendado" executado (Plano A).
-4. Próxima Prioridade: Auditoria de Drift de Preço (v459).
+AUTO-AUDITORIA DE ESTABILIDADE (v459):
+- Checkout: Blindado com AbortController (timeout 5s) e Trava v450 (fin_ledger).
+- Preço: Autoridade Única v305 garantindo margem e escada monotônica.
+- Vitrine: Prateleira Honesta (v397) sincronizada com a Bancada Autônoma.
+- Próxima Prioridade: Auditoria passiva de logs MP e Telegram para detecção de anomalias silenciosas.
 */
 
 
