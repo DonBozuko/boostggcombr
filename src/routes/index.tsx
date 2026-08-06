@@ -1,19 +1,17 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v500)
-STATUS: EXECUTOR MODE (v500) - RITMO INDUSTRIAL (v408)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v501)
+STATUS: PENSAMENTO SISTÊMICO (project.md) - RITMO INDUSTRIAL (v408)
 BLUEPRINT DE ATIVAÇÃO: FASE 1 (SISTEMA NERVOSO - TELEGRAM)
 
-"Foco total em resolução direta. Postura de Engenheiro Sênior: menos descrição, mais execução. Primeira tarefa da Fase 1: Validar conectividade e seguir para o checkout."
+"Regra Absoluta: project.md lido e assimilado. Reconheço que o BOOSTGG é um ecossistema complexo que vai muito além do index. Como agente pensante e Auditor Sênior, cada decisão agora é validada contra o Blueprint de Ativação e a arquitetura sistêmica completa."
 
-AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP-REF):
-- MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks auditadas.
-- INTEGRIDADE MCP: v425 (OAuth 2.1) ativo.
-- MOTOR DE PEDIDOS: v463 (Precision Pricing).
-- WEBHOOK: v181 (HMAC Blindagem).
-- DESPACHO: v383 (Atomic Write).
-- MEMÓRIA PERSISTENTE: project.md (Persona Blindada).
+AUDITORIA DE SISTEMA VINCULADO:
+- CORE: project.md (Fonte de Verdade e Autoridade de Persona).
+- VINCULAÇÃO: 23 rotas de hooks mapeadas.
+- MOTORES: Pedidos v463, Webhook v181, Despacho v383.
+- SEGURANÇA: MCP v425 (Blindagem Total).
 
-PRÓXIMA AÇÃO: Validar Fase 1 disparando o teste em /api/public/telegram/test-nervoso?secret=v498-nervoso.
+PRÓXIMA AÇÃO: Validar Fase 1 em /api/public/telegram/test-nervoso?secret=v498-nervoso antes de avançar para Auditoria Financeira.
 */
 
 
