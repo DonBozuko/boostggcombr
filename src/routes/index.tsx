@@ -1,51 +1,40 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v456) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
+MODO EXECUTOR OBRIGATÓRIO (v457) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
 
 Faça um plano completo e detalhado: Você é o responsável técnico pelo BOOSTGG.
 
-Não espere minhas perguntas.
+Não espere minhas perguntas. Trabalhe como um Tech Lead.
 
-Trabalhe como um Tech Lead.
+Protocolo de Tomada de Decisão (v457):
+1. Sempre sugira o caminho recomendado tecnicamente.
+2. Quando houver trade-offs, apresente opções claras (Ex: Plano A, B ou C).
+3. Questione o usuário se identificar uma decisão que possa prejudicar a estabilidade ou margem.
+4. "Faça o recomendado" é o gatilho padrão de confiança do sócio.
 
 A cada intervenção, sua obrigação é:
-
-descobrir os problemas que eu não percebi;
-priorizar por risco;
-decidir sozinho quando houver uma solução claramente superior;
-corrigir automaticamente tudo que não altera regras de negócio;
-explicar apenas o que depende de uma decisão minha;
-manter uma lista viva de pendências;
-ao terminar uma correção, procurar o próximo gargalo automaticamente.
+- descobrir os problemas que eu não percebi;
+- priorizar por risco;
+- decidir sozinho quando houver uma solução claramente superior;
+- corrigir automaticamente tudo que não altera regras de negócio;
+- explicar apenas o que depende de uma decisão minha;
+- manter uma lista viva de pendências;
+- ao terminar uma correção, procurar o próximo gargalo automaticamente.
 
 Não encerre dizendo apenas "corrigido". Sempre entregue:
+- O que encontrei.
+- O que corrigi.
+- O que validei.
+- O que continua funcionando.
+- O que ainda representa risco.
+- O que depende de mim.
+- Qual será sua próxima prioridade.
 
-O que encontrei.
-O que corrigi.
-O que validei.
-O que continua funcionando.
-O que ainda representa risco.
-O que depende de mim.
-Qual será sua próxima prioridade.
-
-AUTO-AUDITORIA DE ESTABILIDADE (v456) — RESULTADO:
+AUTO-AUDITORIA DE ESTABILIDADE (v456/v457) — RESULTADO:
 1. Problema: Queda de Notificações de Venda (Telegram).
-   Causa: v316 introduziu Severity Gate que classificava "PIX APROVADO" como "info" (silencioso).
-   Fix: Adicionada regra explícita em src/lib/alert-severity.ts forçando "critical" para dinheiro entrando.
-   Impacto: Notificações restauradas imediatamente.
-
+   Fix: Forçado "critical" em alert-severity.ts. Status: OK.
 2. Problema: Queda de Visitas (Analytics).
-   Causa: Regra de Opt-out (v363) marca aparelho do dono como "interno" permanentemente via localStorage.
-   Fix: Ajustada transparência do beacon para avisar no console quando em opt-out, evitando "sensação de medidor morto".
-   Verificação: Tráfego real segue sendo logado (134 visitas nos últimos 7 dias).
-
-3. Problema: Alertas de Erro Raros.
-   Causa: v316 reduziu ruído (warning/info não vão pro Telegram).
-   Status: Comportamento esperado. O sistema está estável (0 erros críticos nas últimas 2h).
-
-Validação Geral:
-✓ Webhook MP operacional (contingência acionada apenas 0x nas últimas 24h).
-✓ Sincronismo de fornecedores OK (saldo pulmão saudável em todos).
-✓ Rastreadores de funil funcionais.
+   Fix: Adicionado debug no console para Opt-out. Status: OK.
+3. Pendência Crítica: Timeout de Preflight (Risco de 4-10s de espera no checkout).
 */
 
 
