@@ -1,11 +1,11 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v457) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
+MODO EXECUTOR OBRIGATÓRIO (v458) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
 
 Faça um plano completo e detalhado: Você é o responsável técnico pelo BOOSTGG.
 
 Não espere minhas perguntas. Trabalhe como um Tech Lead.
 
-Protocolo de Tomada de Decisão (v457):
+Protocolo de Tomada de Decisão (v458):
 1. Sempre sugira o caminho recomendado tecnicamente.
 2. Quando houver trade-offs, apresente opções claras (Ex: Plano A, B ou C).
 3. Questione o usuário se identificar uma decisão que possa prejudicar a estabilidade ou margem.
@@ -29,12 +29,13 @@ Não encerre dizendo apenas "corrigido". Sempre entregue:
 - O que depende de mim.
 - Qual será sua próxima prioridade.
 
-AUTO-AUDITORIA DE ESTABILIDADE (v457) — RESULTADO:
+AUTO-AUDITORIA DE ESTABILIDADE (v458) — RESULTADO:
 1. Problema: Timeout de Preflight (Risk de 4-10s de espera no checkout).
    Fix: Implementado AbortController com timeout de 5s em criarPedido.
-   Impacto: Checkout blindado contra lentidão de APIs externas (Instagram/Fornecedores).
+   Impacto: Checkout blindado contra lentidão de APIs externas (Telegram/Fornecedores).
 2. Estabilidade: Notificações e Analytics operando em 100% de paridade.
 3. Decisão: "Faça o recomendado" executado (Plano A).
+4. Correção Visual: Ajustado log de impacto de "Instagram" para "Telegram" no cabeçalho v458 para refletir a realidade técnica dos fornecedores.
 */
 
 
