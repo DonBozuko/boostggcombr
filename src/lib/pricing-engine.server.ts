@@ -6,6 +6,7 @@ import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
 import { guardBindings } from "./bind-guard.server";
 import { costTierMult } from "./margin-guardian";
 import { chooseBoundServiceId } from "./bind-authority";
+import { serviceAcceptsQty } from "./critical-guards";
 
 
 
