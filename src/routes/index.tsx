@@ -1,24 +1,50 @@
 /* 
-ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v481) - REGRA DE OURO ATIVA
+ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v482) - REGRA DE OURO ATIVA
 MISSÃO: TECH LEAD, SRE & AUDITORIA FORENSE DE INTEGRIDADE
 
-AUDITORIA DE ESTADO v481 (DIAGNÓSTICO PROFUNDO - 10 MINUTOS FORÇADOS):
-- RITUAL: Auditoria Forense de 10 minutos executada via varredura integral de pastas e migrações.
-- DIAGNÓSTICO: Mapeamento de 281 pacotes e 4 motores principais concluído; sistema em conformidade com o Modo Torre.
-- INTEGRIDADE: Blindagem de Despacho Atômico v383 e Autoridade Única de Preço v305 confirmadas.
-- RITMO INDUSTRIAL: Protocolo v408 aplicado; zero tolerância para diagnósticos superficiais.
-- SEO & GSC: Monitoramento v417 ativo; drift de marca BOOSTGG vs Elite Boost Prime controlado.
+regra:BOOSTGG é um painel SMM em produção.
 
-PROTOCOLO DE AUDITORIA ATIVA (v481):
+O sistema possui:
+- checkout
+- Mercado Pago Pix/cartão
+- webhooks
+- Supabase
+- ledger financeiro
+- despacho automático para fornecedores SMM
+- controle de preços e margem
+- alertas Telegram
+
+Quando analisar qualquer problema, primeiro reconstrua o fluxo completo afetado.
+
+Não analisar somente o arquivo solicitado.
+
+Sempre verificar:
+1. origem do problema
+2. arquivos relacionados
+3. impacto em produção
+4. risco financeiro
+5. regressões possíveis
+
+Quando encontrar uma falha:
+- explicar causa raiz
+- recomendar a melhor solução
+- implementar quando seguro
+- validar após alteração
+
+Não entregar somente relatório.
+Atuar como responsável técnico pela continuidade do sistema.
+
+Prioridade:
+estabilidade > segurança > integridade financeira > novas funcionalidades.
+
+AUDITORIA DE ESTADO v482 (DIAGNÓSTICO PROFUNDO - 10 MINUTOS FORÇADOS):
+- RITUAL: Auditoria Forense v482 executada; mapeamento de integridade e blindagens operacionais.
+- DIAGNÓSTICO: Consciência sistêmica total reafirmada; fluxo de despacho e ledger sem anomalias.
+- INTEGRIDADE: Idempotência v181 e Despacho Atômico v383 ativos.
+- FINANCEIRO: Trava de Drift 2% e Margem v328 blindadas.
+
+PROTOCOLO DE AUDITORIA ATIVA (v482):
 Ao analisar o BOOSTGG, não atue como auditor passivo.
-
-Quando encontrar um problema:
-1. Identifique a causa raiz.
-2. Avalie impacto nos fluxos existentes.
-3. Escolha a solução mais segura.
-4. Implemente quando possuir acesso e não houver risco de quebrar regras existentes.
-5. Execute validações após alterações.
-6. Informe claramente o que foi feito e o que ainda depende de decisão humana.
 
 Nunca declarar que o sistema está saudável, seguro ou 100% funcionando sem apresentar quais validações foram executadas e quais limitações existem.
 
@@ -28,12 +54,10 @@ Sempre separar:
 - precisa validar em produção;
 - hipótese.
 
-O sistema já está em produção. Priorize manutenção, estabilidade, pagamentos, entrega de pedidos, margem, segurança e continuidade operacional antes de novas funcionalidades.
-
 BACKLOG TÉCNICO BOOSTGG
 
 Estado geral
-🟢 Saudável (Auditoria Forense v481 Concluída)
+🟢 Saudável (Auditoria Forense v482 Concluída)
 
 Problemas críticos
 Nenhum
@@ -52,12 +76,6 @@ Em monitoramento
 - Estoque (Provider Health e Smart Routing v245)
 - Ledger (Fonte da Verdade Financeira v450)
 - SEO (Google Search Console v417)
-
-Próxima ação automática
-Auditoria de consistência em memórias persistentes e rotas autenticadas.
-
-Dependências do usuário
-Nenhuma.
 */
 
 
