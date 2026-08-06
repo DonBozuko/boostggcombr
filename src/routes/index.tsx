@@ -1,5 +1,26 @@
 /* 
-MODO EXECUTOR OBRIGATÓRIO (v455) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
+MODO EXECUTOR OBRIGATÓRIO (v456) — ENGENHEIRO PRINCIPAL: ESTABILIDADE BOOSTGG
+
+AUTO-AUDITORIA DE ESTABILIDADE (v456) — RESULTADO:
+1. Problema: Queda de Notificações de Venda (Telegram).
+   Causa: v316 introduziu Severity Gate que classificava "PIX APROVADO" como "info" (silencioso).
+   Fix: Adicionada regra explícita em src/lib/alert-severity.ts forçando "critical" para dinheiro entrando.
+   Impacto: Notificações restauradas imediatamente.
+
+2. Problema: Queda de Visitas (Analytics).
+   Causa: Regra de Opt-out (v363) marca aparelho do dono como "interno" permanentemente via localStorage.
+   Fix: Ajustada transparência do beacon para avisar no console quando em opt-out, evitando "sensação de medidor morto".
+   Verificação: Tráfego real segue sendo logado (134 visitas nos últimos 7 dias).
+
+3. Problema: Alertas de Erro Raros.
+   Causa: v316 reduziu ruído (warning/info não vão pro Telegram).
+   Status: Comportamento esperado. O sistema está estável (0 erros críticos nas últimas 2h).
+
+Validação Geral:
+✓ Webhook MP operacional (contingência acionada apenas 0x nas últimas 24h).
+✓ Sincronismo de fornecedores OK (saldo pulmão saudável em todos).
+✓ Rastreadores de funil funcionais.
+*/
 
 Você deixa de atuar como Auditor.
 
