@@ -137,7 +137,38 @@ const FALLBACK_RATES_PER_1K: Record<Category, number> = {
   "kwai:visualizacoes":       2.7,
 };
 
-const USD_TO_BRL = 7.0;
+// v520 — Câmbio real por fornecedor. Este 7,0 chumbado inflava TODO custo vindo
+// do SMMhype em ~37% frente ao câmbio que o resto do sistema usa
+// (fornecedores.cotacao_brl = 5,1211), distorcendo margem e vitrine. Agora é
+// apenas o PISO DE SEGURANÇA: só vale se o banco não responder.
+const USD_TO_BRL_FALLBACK = 7.0;
+
+/** Nome interno do provedor → slug real em `fornecedores` (divergem em smmpanel/smmpainel). */
+const PROVIDER_SLUG: Record<string, string> = {
+  smmhype: "smmhype",
+  smmpanel: "smmpainel",
+  verified: "verified",
+};
+
+/** Câmbio vivo do fornecedor. moeda BRL ⇒ 1 (tarifa já está em real). */
+async function fxForProvider(name: string): Promise<number> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("fornecedores")
+      .select("moeda, cotacao_brl")
+      .eq("slug", PROVIDER_SLUG[name] ?? name)
+      .maybeSingle();
+    if (!data) return USD_TO_BRL_FALLBACK;
+    const moeda = String((data as any).moeda ?? "USD").toUpperCase();
+    if (moeda === "BRL") return 1;
+    const cot = Number((data as any).cotacao_brl);
+    // Guarda de sanidade: câmbio absurdo (drift/typo no admin) não vira preço.
+    if (Number.isFinite(cot) && cot >= 3 && cot <= 12) return cot;
+  } catch { /* noop */ }
+  return USD_TO_BRL_FALLBACK;
+}
+
 const CONTINGENCY_SOURCE = "fallback" as const;
 
 // v173 — Equação Fabiano Tiered. Fórmula:
@@ -294,6 +325,8 @@ async function loadProviderRateMap(): Promise<{
   // entrega a quantidade do pacote.
   rangeById: Map<number, { min?: number; max?: number }>;
   provider: "smmhype" | "smmpanel" | "verified" | "none";
+  // v520 — câmbio do fornecedor que efetivamente forneceu as tarifas.
+  fx: number;
 }> {
 
   const providers: Array<{ name: "smmhype" | "smmpanel" | "verified"; url: string; key: string | undefined }> = [
@@ -356,9 +389,9 @@ async function loadProviderRateMap(): Promise<{
       continue;
     }
     console.log(`[pricing] provider ativo: ${p.name} (${map.size} serviços)`);
-    return { rateById: map, rangeById: ranges, provider: p.name };
+    return { rateById: map, rangeById: ranges, provider: p.name, fx: await fxForProvider(p.name) };
   }
-  return { rateById: new Map(), rangeById: new Map(), provider: "none" };
+  return { rateById: new Map(), rangeById: new Map(), provider: "none", fx: USD_TO_BRL_FALLBACK };
 
 }
 
@@ -366,10 +399,10 @@ async function fetchSmmRatePer1kBRL(category: Category): Promise<number | null> 
   const probe = PROBE[category];
   const serviceId = await resolveServiceIdAsync(probe.pacote, probe.qty).catch(() => null);
   if (!serviceId) return null;
-  const { rateById } = await loadProviderRateMap();
+  const { rateById, fx } = await loadProviderRateMap();
   const rateUsd = rateById.get(serviceId);
   if (!Number.isFinite(rateUsd) || !rateUsd || rateUsd <= 0) return null;
-  return rateUsd * USD_TO_BRL;
+  return rateUsd * fx;
 }
 
 
@@ -544,6 +577,7 @@ function preserveLiveBoundId(
   existing: Map<string, ExistingItem>,
   rangeById: Map<number, { min?: number; max?: number }>,
   rateById: Map<number, number>,
+  fx: number,
 ): PricingItemRow[] {
   return rows.map((r) => {
     const old = existing.get(r.pacote);
@@ -564,7 +598,7 @@ function preserveLiveBoundId(
     // O custo tem de vir de QUEM entrega: trocou o ID, recalcula a tarifa.
     const usdPer1k = Number.isFinite(n) ? rateById.get(n) : undefined;
     if (typeof usdPer1k === "number" && usdPer1k > 0) {
-      const cost = (Number(r.quantidade) / 1000) * usdPer1k * USD_TO_BRL;
+      const cost = (Number(r.quantidade) / 1000) * usdPer1k * fx;
       out.cost_brl = Number(cost.toFixed(4));
       out.price_brl = Number(seedPriceFromCost(Number(r.quantidade), cost).toFixed(2));
       out.source = "api";
@@ -668,8 +702,8 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 
   // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático.
   // v50-Patch: forceContingency ignora rede e popula tudo pela matriz local.
-  const { rateById, rangeById, provider } = options.forceContingency
-    ? { rateById: new Map<number, number>(), rangeById: new Map<number, { min?: number; max?: number }>(), provider: "none" as const }
+  const { rateById, rangeById, provider, fx } = options.forceContingency
+    ? { rateById: new Map<number, number>(), rangeById: new Map<number, { min?: number; max?: number }>(), provider: "none" as const, fx: USD_TO_BRL_FALLBACK }
     : await loadProviderRateMap();
 
   console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
@@ -684,7 +718,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   if (provider === "none" || rateById.size === 0) {
     console.warn("[pricing] todos os provedores externos falharam; ativando contingência local hermética");
     const contingency = buildContingencyPricingRows(now);
-    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
+    itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(contingency.itemRows, existingReserveIds), existingReserveIds, rangeById, rateById, fx), existingReserveIds), existingReserveIds);
     // v320 — a contingência escreve IDs chumbados no código. Se o fornecedor
     // reaproveitou o número para outro produto, o portão zera antes de gravar.
     itemRows = (await guardBindings(itemRows)).rows;
@@ -736,9 +770,9 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
       let cost_brl: number;
       let source: "api" | "fallback";
       if (typeof usdPer1k === "number" && usdPer1k > 0) {
-        cost_brl = (qty / 1000) * usdPer1k * USD_TO_BRL;
+        cost_brl = (qty / 1000) * usdPer1k * fx;
         source = "api";
-        catCostPer1k = usdPer1k * USD_TO_BRL;
+        catCostPer1k = usdPer1k * fx;
         catSource = "api";
       } else {
         cost_brl = (qty / 1000) * FALLBACK_RATES_PER_1K[cat];
@@ -763,7 +797,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   }
 
   // Upsert em pricing_items (1:1) + pricing_cache (resumo por categoria, retrocompat)
-  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds, rangeById, rateById), existingReserveIds), existingReserveIds);
+  itemRows = preserveAuthorityPrice(preserveCheaperRealCost(preserveLiveBoundId(preserveReserveIds(itemRows, existingReserveIds), existingReserveIds, rangeById, rateById, fx), existingReserveIds), existingReserveIds);
   // v320 — portão único de vínculo antes de qualquer escrita de ID.
   itemRows = (await guardBindings(itemRows)).rows;
   const { error: e1 } = await supabaseAdmin
