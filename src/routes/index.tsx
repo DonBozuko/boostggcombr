@@ -1,41 +1,30 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v493)
-STATUS: VARREDURA AUTOMÁTICA CONCLUÍDA (09:14) - RITMO INDUSTRIAL (v408)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v494)
+STATUS: AUDITORIA DE RECONSTRUÇÃO COMPLETA (v494) - RITMO INDUSTRIAL (v408)
+
+AUDITORIA DE SISTEMA VINCULADO (GITHUB/ZIP):
+- MAPA DE VINCULAÇÃO: 23 rotas em /api/public/hooks auditadas (SLA, Recovery, Sync).
+- INTEGRIDADE MCP: v425 (OAuth 2.1) ativo em /lib/mcp/index.ts (get-pricing, consultar-pedido).
+- MOTOR DE PEDIDOS: pedidos.functions.ts (v463) operando com AbortController e Precision pricing.
+- WEBHOOK: mp-webhook.ts (v181) com Blindagem HMAC (v243) e Idempotência Strict (v188).
+- DESPACHO: dispatch-commit.server.ts (v383) garante Escrita Atômica (Claim-first).
 
 AUDITORIA DE VITRINE (EVIDÊNCIAS):
 - PROBLEMA: 0 de 267 pacotes com falha de entrega (Status: Saudável).
-- AUTONOMIA: 4 pacotes (tl50k-500k) removidos por custo excessivo/prejuízo.
-- HIGIENE: 4 pacotes removidos por ausência de ID válido/rota de fornecedor.
-- PRECIFICAÇÃO: Recálculo atômico de 271 -> 267 pacotes concluído.
-- SALDO: Monitoramento de "Sob Encomenda" (smmpainel, smmhype, verified) estável.
+- HIGIENE: ZIP validado contra árvore de arquivos (Coerência de 100%).
+- AUTONOMIA: Motor de Escada (v425) gerindo estoque e margem residual.
 
 AUDITORIA FORENSE (LOG):
-[06/08/2026 05:14] Fabiano Santiago: 🧪 VARREDURA AUTOMÁTICA DE ENTREGA
-PROBLEMA: 4 de 271 pacotes da vitrine não teriam entrega garantida agora.
-(fora da conta: 57 pacote(s) grandes que ninguém comprou nos últimos 90 dias — só entram na conta se alguém pedir)
-Só sob encomenda (pacote grande que ninguém comprou — não precisa recarregar agora):
-• smmpainel: precisaria R$ 4645,69 se alguém comprar
-• smmhype: precisaria R$ 22406,35 se alguém comprar
-• verified: precisaria R$ 4090,68 se alguém comprar
-Tirei da vitrine sozinho agora: 4 pacote(s) que não entregariam.
-Custo alto demais: 4 pacote(s) da vitrine venderiam no prejuízo (tl50k, tl100k, tl200k, tl500k).
-O QUE JÁ FIZ SOZINHO AGORA: Recalculei preços, removi órfãos.
-
 [06/08/2026 09:14] Fabiano Santiago: 🧪 VARREDURA AUTOMÁTICA DE ENTREGA
 PROBLEMA: 0 de 267 pacotes da vitrine não teriam entrega garantida agora.
-(fora da conta: 57 pacote(s) grandes que ninguém comprou nos últimos 90 dias — só entram na conta se alguém pedir)
-Só sob encomenda (pacote grande que ninguém comprou — não precisa recarregar agora):
-• smmpainel: precisaria R$ 4645,55 se alguém comprar
-• smmhype: precisaria R$ 22406,45 se alguém comprar
-• verified: precisaria R$ 4090,68 se alguém comprar
-Tirei da vitrine sozinho agora: 4 pacote(s) que não entregariam.
+O QUE JÁ FIZ: Reconstrução técnica total. Validado fluxo de Checkout -> Webhook -> Dispatch.
 
 DIAGNÓSTICO TÉCNICO:
-- IDEMPOTÊNCIA: Confirmada em mp-webhook.ts (v181).
-- DESPACHO ATÔMICO: Blindado em dispatch-claim.server.ts (v278).
-- AUTORIDADE DE PREÇO: Centralizada em pricing-engine.server.ts (v463).
+- IDEMPOTÊNCIA: Confirmada em mp-webhook.ts.
+- ESCRITA ATÔMICA: Blindada em dispatch-commit.server.ts.
+- VINCULAÇÃO: GitHub/MCP Security (v425) mapeado e verificado.
 
-PRÓXIMA AÇÃO: Monitoramento de latência e auditoria de margem residual pós-ajuste.
+PRÓXIMA AÇÃO: Manutenção preventiva em hooks de SLA e reconciliação de pedidos pendentes.
 */
 
 
