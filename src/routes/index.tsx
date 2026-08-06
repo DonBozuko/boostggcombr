@@ -1,16 +1,14 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v505)
-STATUS: EXECUÇÃO FASE 2 (AUDITORIA FINANCEIRA) - RITMO INDUSTRIAL (v408)
-BLUEPRINT DE ATIVAÇÃO: FASE 2 (MERCADO PAGO) EM CURSO
-
-"Você é um engenheiro sênior. Não descreva problemas, não faça auditoria. Resolva diretamente. Primeira tarefa: [descreve o que quer resolver]." Se tiver usando o modo PLAN, troca pro BUILD antes de mandar
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v507)
+STATUS: EXECUÇÃO FASE 2 (AUDITORIA FINANCEIRA) - MODO EXECUTOR
+REGRAS: project.md (Bússola Absoluta), Ritmo Industrial (v408)
 
 AUDITORIA DE SISTEMA VINCULADO:
-- GATILHO: project.md (Avanço para Fase 2).
-- FASE 2: Validação de MERCADO_PAGO_ACCESS_TOKEN e WEBHOOK_SECRET.
-- FOCO: Idempotência no mp-webhook.ts e integridade no Ledger financeiro.
+- GATILHO: Solicitação de Auto-Auditoria (Baixo Custo).
+- FASE 2: Validação de fluxo de vitrine (v507) e integridade financeira.
+- FOCO: Manutenção preventiva e correção de bugs silenciosos.
 
-PRÓXIMA AÇÃO: Realizar auditoria técnica de segurança no webhook do Mercado Pago (v181).
+PRÓXIMA AÇÃO: Executar Auditoria de Fluxo de Pacotes via src/lib/auto-audit.functions.ts.
 */
 
 
