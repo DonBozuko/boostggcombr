@@ -694,8 +694,8 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 
   // v50 — Multi-Provider Fallback Core. JSON-sanitizado, com failover automático.
   // v50-Patch: forceContingency ignora rede e popula tudo pela matriz local.
-  const { rateById, rangeById, provider } = options.forceContingency
-    ? { rateById: new Map<number, number>(), rangeById: new Map<number, { min?: number; max?: number }>(), provider: "none" as const }
+  const { rateById, rangeById, provider, fx } = options.forceContingency
+    ? { rateById: new Map<number, number>(), rangeById: new Map<number, { min?: number; max?: number }>(), provider: "none" as const, fx: USD_TO_BRL_FALLBACK }
     : await loadProviderRateMap();
 
   console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
