@@ -10,7 +10,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return {
-        version: "v49",
+        version: "v50",
         timestamp: new Date().toISOString(),
         passed: 0,
         total: 0,
@@ -172,27 +172,39 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       });
       if (!smOk) blockDeploy = true;
 
-      // 7. Webhook MP: quantas vezes o pooling teve que salvar nas últimas 24h
+      // 8. Webhook MP: monitor de canal morto (v506)
       const dayCutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const [{ count: evtsCount }, { count: paymentsCount }] = await Promise.all([
+        supabaseAdmin.from("webhook_events").select("*", { count: "exact", head: true }).eq("provider", "mercado_pago").gte("received_at", dayCutoff),
+        supabaseAdmin.from("pedidos").select("*", { count: "exact", head: true }).eq("status", "completed").gte("created_at", dayCutoff)
+      ]);
+
       const { count: contingencias } = await supabaseAdmin
         .from("jarvis_alerts")
         .select("*", { count: "exact", head: true })
         .eq("origem", "contingency-pooling")
         .gte("created_at", dayCutoff);
+      
       const cn = contingencias ?? 0;
-      // >5 em 24h = webhook está falhando de verdade
-      const wOk = cn <= 5;
+      const totalEvts = evtsCount ?? 0;
+      const totalPaid = paymentsCount ?? 0;
+
+      // Se teve venda mas zero webhooks em 24h, o canal está morto
+      const channelDead = totalPaid > 0 && totalEvts === 0;
+      const wOk = !channelDead && cn <= 5;
+      
       checks.push({
         id: "webhook_mp",
-        label: `Webhook MP — pooling salvou ${cn}x em 24h`,
+        label: `Webhook MP — ${totalEvts} eventos / ${cn} contingências (24h)`,
         ok: wOk,
-        detail: wOk
-          ? cn === 0 ? "webhook 100%" : `${cn} salvamentos — dentro do aceitável`
-          : `🚨 ${cn} salvamentos — assinatura do webhook está falhando`,
+        detail: channelDead 
+          ? "🚨 CANAL MORTO: teve venda mas zero webhooks recebidos. Checar URL de notificação."
+          : cn > 5 ? `🚨 ${cn} salvamentos — instabilidade alta ou erro de assinatura`
+          : "webhook operando (ou sem vendas recentes para validar)"
       });
       if (!wOk) blockDeploy = true;
 
-      // 8. Tesouraria acessível
+      // 9. Tesouraria acessível
       const { error: trErr } = await supabaseAdmin
         .from("admin_treasury")
         .select("id", { count: "exact", head: true });
@@ -215,7 +227,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
 
     const passed = checks.filter((c) => c.ok).length;
     return {
-      version: "v49",
+      version: "v50",
       timestamp: new Date().toISOString(),
       passed,
       total: checks.length,

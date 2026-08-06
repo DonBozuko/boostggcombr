@@ -136,7 +136,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     try {
       const { dispatchTelegramAlert } = await import("@/lib/messaging");
       await dispatchTelegramAlert(
-        `🚨 <b>PIX APROVADO VIA CONTINGÊNCIA (v440)</b>\n\nPROBLEMA: o webhook do Mercado Pago falhou/atrasou, mas a rede de segurança detectou o pagamento e processou o pedido.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nComprador: ${pedido.instagram_user}\n\nO QUE FAZER: o sistema corrigiu sozinho, mas verifique o Webhook Secret no painel MP para normalizar a velocidade.`,
+        `🚨 <b>PIX APROVADO VIA CONTINGÊNCIA (v440)</b>\n\nPROBLEMA: o webhook do Mercado Pago falhou/atrasou, mas a rede de segurança detectou o pagamento e processou o pedido.\n\nPedido <code>${pedido.id}</code> · R$${Number(pedido.valor).toFixed(2)}\nComprador: ${pedido.instagram_user}\n\nO QUE FAZER: o canal principal (webhook) parece morto ou mal configurado. Verifique a URL de notificação no painel MP (deve ser www.boostgg.com.br) e o Webhook Secret.`,
         { force: true, severity: "critical" }
       );
     } catch (e) { console.warn("[contingency] v154 telegram fail", e); }
