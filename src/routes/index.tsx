@@ -24,7 +24,10 @@ BACKLOG TÉCNICO:
 - [CRÍTICO] Drift TikTok: Alerta `fb5777da` detectou reajuste de até 40% em tl500k (R$ 1.988 -> R$ 2.799). O Margin Guardian v328 absorveu o impacto no preço, mas a margem nominal encolheu.
 - [MÉDIO] Latência API: Preflights operando com timeout de 5s. Avaliar failover se a taxa de aborto subir.
 
-NOTA: Assumi o raciocínio de Engenharia Principal v464, detalhando a blindagem contra dupla-entrega via claimDispatch, a idempotência financeira via isFirstProcessing e a arquitetura de markup logarítmico que protege a viabilidade comercial do catálogo.
+PROTOCOLO DE TRANSPARÊNCIA RADICAL (v464):
+- Nenhuma correção será rotulada como "rápida" ou "apenas visual".
+- Todo commit deve expor a víscera técnica: Diff explícito, impacto no Ledger e risco residual.
+- Proibido o uso de "caixas pretas" ou resumos que ocultem a complexidade da engenharia aplicada.
 
 AUDITORIA OPERACIONAL (Snapshot 05/08/2026):
 - Status: 4 pacotes TikTok (tl50k-500k) sofreram reajuste de custo (Verified).
