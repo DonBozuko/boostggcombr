@@ -1,62 +1,59 @@
-## Diagnóstico (verificado no código, não no chute)
+# Correção: webhook do Mercado Pago está morto há 28 dias
 
-Não é "sistema quebrado". É **duas matemáticas de preço vivas ao mesmo tempo**, e a segunda nunca foi desligada quando a Autoridade Única (v305/v306) nasceu.
+## O que o alerta vermelho realmente significa
+
+O J.A.R.V.I.S. está certo, mas o texto do alerta subestima o problema. Ele diz "webhook falhou/atrasou". A verdade medida agora é pior: **o webhook do Mercado Pago não chega ao BoostGG desde 09/07/2026**. Todas as vendas desde então foram salvas pela rede de contingência (polling), não pelo caminho principal.
+
+Evidências coletadas (não é hipótese):
+
+- Tabela `webhook_events`: 24 eventos no total, o último em `2026-07-09 19:54`. Zero eventos nos últimos 14 dias, apesar de vendas aprovadas em 30/07, 04/08 e 06/08.
+- O pedido `0bf8b0d5` (06/08, R$ 6,40) foi confirmado às 15:15 por `contingency-pooling`, não pelo webhook.
+- Teste HTTP real na URL cadastrada no Mercado Pago:
 
 ```text
-FONTE 1 (correta, servidor)      FONTE 2 (fantasma, cliente)
-price-authority.ts               profit-markup.ts  ← v173
- margem real 4x líquido           tierMultiplier 5x/8x/12x
- rampa +40%/ciclo                 scaledFloor R$5→R$20
- escada monotônica                costPer1k CHUMBADO no .tsx
-        ↓                                 ↓
-   pricing_items.price_brl        applyProfitFormula(buildPlans(...))
-        ↓                                 ↓
-   useDynamicPlans (15s)   ←—— sobrescreve ——   render inicial
+POST https://boostgg.com.br/api/public/mp-webhook   -> 307 redirect para www
+GET  https://boostgg.com.br/api/public/mp-webhook   -> 302 redirect para www
+POST https://www.boostgg.com.br/api/public/mp-webhook -> 401 "Invalid signature" (rota viva e validando)
 ```
 
-Achados concretos:
-- `src/lib/profit-markup.ts` é uma segunda fórmula completa de preço, importada por **6 rotas de venda**: youtube, facebook, tiktok, telegram, kwai, trafego.
-- Essas rotas geram os pacotes com **custo chumbado no arquivo** (`costPer1k: 25`, `10`, `5`, `1`), ignorando o custo real do fornecedor.
-- O cliente vê o preço fantasma primeiro; `useDynamicPlans` só corrige depois do fetch. Se o fetch falhar, o fallback fantasma **fica na tela e é comprável**.
-- É exatamente essa a origem do "conserta e volta": a Autoridade arruma o banco, a UI continua desenhando a matemática de 2024.
+## Causa raiz
 
-O teste `price-single-writer` não pega isso — ele vigia escrita em `price_brl`, não cálculo de preço em memória.
+O código manda para o Mercado Pago a `notification_url` no domínio **sem www** (`https://boostgg.com.br/api/public/mp-webhook`). O domínio apex hoje responde **redirect 301/307 para o www**. O Mercado Pago **não segue redirects** em notificação: ele vê uma resposta não-2xx, marca a entrega como falha, retenta e depois desiste. Por isso o webhook nunca executa e a contingência precisa salvar toda venda.
 
-## Plano — Operação Faxina (v307)
+Isso explica, de uma vez só:
+- o alerta vermelho de contingência a cada venda;
+- a demora entre o Pix cair e a notificação chegar no Telegram (a contingência só roda no polling/cron, não no instante do pagamento);
+- o item "Webhook MP — pooling salvou 1x em 24h" no console de integridade.
 
-Sem "chamar ajuda", sem refactor de risco. Aditivo, em 4 fases, com prova real no fim de cada uma.
+Não é problema de Webhook Secret. A assinatura está funcionando (a rota respondeu 401 corretamente para uma requisição sem assinatura).
 
-### Fase 1 — Congelar o fantasma (banco → servidor)
-Garantir que as 6 categorias órfãs existem no banco com preço da Autoridade. Auditoria: para cada `id` de pacote das 6 rotas, conferir se há linha em `pricing_items`. Faltando linha = a rota depende do fantasma para existir. Essas linhas são criadas antes de qualquer coisa ser removida da UI.
+## O que será feito
 
-### Fase 2 — Fallback honesto (UI)
-`applyProfitFormula` e `buildPlans` saem das 6 rotas. Enquanto o banco não responde, a vitrine mostra **skeleton de carregamento** (já existe em `PremiumPricingGrid`), não preço inventado. Regra: sem preço do banco, não existe botão de compra.
+1. **Apontar a notificação para o domínio canônico (www)**
+   Trocar `https://boostgg.com.br/api/public/mp-webhook` por `https://www.boostgg.com.br/api/public/mp-webhook` nos três pontos que criam cobrança:
+   - `src/lib/pedidos.functions.ts` (Pix e cartão)
+   - `src/lib/reseller-portal.functions.ts` (recarga de revendedor)
+   Em vez de repetir a string, criar uma constante única `MP_NOTIFICATION_URL` em um módulo compartilhado, para que nunca mais existam três verdades diferentes sobre a URL do webhook.
 
-### Fase 3 — Trava estrutural permanente
-Novo teste `src/__tests__/price-single-math.test.ts`, irmão do `price-single-writer`:
-- nenhum arquivo fora de `price-authority*` e `margin-guardian.ts` pode conter fórmula de preço (multiplicador de margem, piso escalonado, buffer de cupom);
-- nenhum `.tsx` de rota pode conter `costPer1k`;
-- `profit-markup.ts` fica reduzido a `formatBRL` (formatação pura) ou é deletado.
+2. **Sentinela de webhook morto (nova, e é o que faltava)**
+   Hoje o sistema só percebe o problema indiretamente, uma venda por vez. Adicionar uma verificação no J.A.R.V.I.S. (mesmo motor que já lista os 9 checks) que compara: houve pagamento aprovado nas últimas 24h **e** nenhum registro em `webhook_events` no mesmo período? Se sim, alerta crítico único no Telegram dizendo que o canal principal está morto — não um alerta por venda.
 
-Deploy quebra se alguém reintroduzir. É isso que impede o loop de voltar em três semanas — igual à v305, que segurou.
+3. **Corrigir o texto do alerta de contingência**
+   O alerta atual manda "verifique o Webhook Secret", conselho errado que custou tempo. Passa a orientar a checar a URL de notificação e o status do canal.
 
-### Fase 4 — Varredura dos vizinhos
-Auditar (sem mexer no que estiver correto) os outros pontos que citei na auditoria anterior: `pedidos.functions.ts`, `pricing-engine.server.ts`, `reseller-pricing.ts`, `card-pricing.ts`. Cada um deve **ler** `price_brl`, nunca recalcular. Card +7% e desconto de revenda são transformações *sobre* o preço oficial — isso é legítimo e fica.
+4. **Validação pós-correção**
+   - Criar um pedido de teste real de valor mínimo, pagar, e confirmar que aparece linha nova em `webhook_events` com `processed_ok = true` e que a notificação do Telegram chega em segundos, sem o alerta de contingência.
+   - Reexecutar o Detector de Mentiras e confirmar que o alerta vermelho (8/9) apaga.
 
-## Prova real exigida antes de qualquer "sinal verde"
+## Garantias de não-regressão
 
-Não declaro pronto com teste verde. Só com:
-1. As 6 rotas renderizando preço do banco em produção, com o fantasma fisicamente removido do bundle.
-2. 0 inversões de escada no banco após 3 ciclos de sync (as 7 inversões atuais precisam zerar).
-3. 1 pedido canário real entregue numa das 6 redes órfãs.
+- A contingência **não será desligada**. Ela continua como rede de segurança; a diferença é que voltará a ser exceção em vez de regra.
+- A idempotência permanece intacta: com o webhook voltando a funcionar, o guard `webhook_events` + a trava de ledger + o `claimDispatch` continuam impedindo cobrança dupla e entrega dupla. O caminho webhook e o caminho contingência já convergem para o mesmo commit atômico.
+- Nenhuma mudança em preço, roteamento de fornecedor, RLS ou SEO.
+- O apex continua redirecionando para www normalmente para visitantes — só a chamada máquina-a-máquina deixa de depender do redirect.
 
-## Detalhes técnicos
+## Detalhe técnico
 
-- Arquivos tocados: 6 rotas `.tsx`, `src/lib/profit-markup.ts`, 1 teste novo, `src/__tests__/margin-guard.test.ts` (importa `applyProfitFormula`), possivelmente 1 migração para popular categorias faltantes.
-- Risco de regressão: a vitrine dessas 6 redes fica dependente do banco. Mitigado pela Fase 1 (popular antes de remover) e pelo skeleton da Fase 2.
-- Rollback: as fases são independentes; reverter a Fase 2 restaura o fallback estático sem tocar em banco.
-- `OrderBumpDialog.tsx` só usa `formatBRL` — não é infrator.
-
-## O que eu recomendo cortar do escopo
-
-Nada de reescrever o motor de pricing agora. O motor está certo desde a v306. O problema é sujeira ao redor dele. Refatorar o que já funciona seria trocar um risco conhecido por um desconhecido — exatamente o padrão que gerou esta bagunça.
+- Arquivos alterados: `src/lib/pedidos.functions.ts` (2 ocorrências), `src/lib/reseller-portal.functions.ts` (1), novo módulo de constante, `src/lib/payment-contingency.server.ts` (texto do alerta), e o módulo do detector J.A.R.V.I.S. para o novo check.
+- Após o deploy, pagamentos novos passam a chegar por webhook. Pagamentos antigos já processados não são afetados (idempotência por `pedido_id` no ledger).
+- Se o Mercado Pago também tiver a URL antiga cadastrada manualmente no painel dele, a `notification_url` enviada por pedido tem prioridade — mas vale conferir depois para deixar os dois iguais.
