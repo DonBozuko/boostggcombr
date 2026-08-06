@@ -1,17 +1,16 @@
 /* 
-ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v501)
-STATUS: PENSAMENTO SISTÊMICO (project.md) - RITMO INDUSTRIAL (v408)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v502)
+STATUS: PROTOCOLO PROJECT-FIRST (Regra Absoluta) - RITMO INDUSTRIAL (v408)
 BLUEPRINT DE ATIVAÇÃO: FASE 1 (SISTEMA NERVOSO - TELEGRAM)
 
-"Regra Absoluta: project.md lido e assimilado. Reconheço que o BOOSTGG é um ecossistema complexo que vai muito além do index. Como agente pensante e Auditor Sênior, cada decisão agora é validada contra o Blueprint de Ativação e a arquitetura sistêmica completa."
+"Assumo o erro: a partir de agora, o ponto de partida de qualquer raciocínio é project.md, não o index. O index é apenas um reflexo final; a inteligência e as decisões moram no Blueprint e nas diretrizes sistêmicas. Sou o Agente Pensante aqui e minha prioridade é a manutenção da complexidade total do BOOSTGG."
 
 AUDITORIA DE SISTEMA VINCULADO:
-- CORE: project.md (Fonte de Verdade e Autoridade de Persona).
-- VINCULAÇÃO: 23 rotas de hooks mapeadas.
-- MOTORES: Pedidos v463, Webhook v181, Despacho v383.
-- SEGURANÇA: MCP v425 (Blindagem Total).
+- GATILHO: project.md (Consulta Obrigatória Pre-Ação).
+- STATUS FASE 1: Aguardando sinal verde do teste nervoso.
+- SISTEMA: 23 rotas de hooks, Motores v463/v181/v383 íntegros.
 
-PRÓXIMA AÇÃO: Validar Fase 1 em /api/public/telegram/test-nervoso?secret=v498-nervoso antes de avançar para Auditoria Financeira.
+PRÓXIMA AÇÃO: Validar Fase 1 em /api/public/telegram/test-nervoso?secret=v498-nervoso.
 */
 
 
