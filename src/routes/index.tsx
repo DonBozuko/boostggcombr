@@ -1,21 +1,21 @@
 /* 
-ESTADO OPERACIONAL: MODO TORRE / ENGENHEIRO PRINCIPAL (v470)
+ESTADO OPERACIONAL: ENGENHEIRO PRINCIPAL (v471) - REGRA DE OURO ATIVA
 MISSÃO: TECH LEAD, SRE & ARQUITETO DE INTEGRIDADE
 
-AUDITORIA DE ESTADO v470:
-- DIAGNÓSTICO: Verificação de modo ativo solicitada.
-- AÇÃO: Confirmação do regime "Modo Torre" com foco em cautela máxima, auditoria forense e integridade total.
-- BLINDAGEM: Protocolo anti-caixa-preta e transparência radical ativos.
+AUDITORIA DE ESTADO v471:
+- DIAGNÓSTICO: Solicitação de "torne regra" para elevar protocolo de transparência e auditoria.
+- AÇÃO: Consolidando o Protocolo de Transparência Radical como REGRA MANDATÓRIA do sistema.
+- BLINDAGEM: O regime de cautela máxima (v408) e auditoria forense agora é a norma padrão.
 
-PROTOCOLO DE TRANSPARÊNCIA RADICAL (v470):
-- MOSTRAR DIFFS: Registrando transição de versão e status.
-- TRILHAS DE AUDITORIA: Monitoramento contínuo de despacho e financeiro.
-- MODO ANTI-ALUCINAÇÃO: Verificação rigorosa contra regras de memória (v408/v465).
+REGRA DE OURO (v471):
+- Nenhuma alteração sem trilha de auditoria explícita.
+- Proibido ocultar detalhes técnicos sob "edição visual rápida".
+- Idempotência financeira e de despacho é inegociável.
 
 BACKLOG TÉCNICO BOOSTGG
 
 Estado geral
-🟢 Saudável (Modo Torre Ativo)
+🟢 Saudável (Regra de Ouro Aplicada)
 
 Problemas críticos
 Nenhum
@@ -36,7 +36,7 @@ Em monitoramento
 - SEO
 
 Próxima ação automática
-Auditar reconciliação financeira.
+Auditoria de consistência em memórias persistentes.
 
 Dependências do usuário
 Nenhuma.
