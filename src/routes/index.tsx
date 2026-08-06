@@ -1,22 +1,28 @@
 /* 
-ESTADO OPERACIONAL: SAUDÁVEL 🟢 (Auditoria Forense v464)
-MISSÃO: ENGENHEIRO RESPONSÁVEL (BACKLOG TÉCNICO BOOSTGG)
+ESTADO OPERACIONAL: SAUDÁVEL 🟢 (Engenharia Principal v464)
+MISSÃO: TECH LEAD & SRE (BACKLOG TÉCNICO BOOSTGG)
 
-SAÚDE DO SISTEMA (PROVA DE OPERAÇÃO):
-- Reconciliação Financeira: Ledger íntegro. R$ 455,95 faturados (30d) sem furos de caixa.
-- Integridade de Despacho: 100% de sucesso nos últimos 5 pedidos processados (SMMHype/SMMPainel).
-- Margem de Segurança: Bloqueio ativo para drift > 2%. Proteção contra tampering validada.
-- Alertas Jarvis: Monitorando reajuste automático em pacotes TikTok (Verified) para preservar lucro.
+DIAGNÓSTICO PROFUNDO (CAUSA E SOLUÇÃO):
+
+1. IDEMPOTÊNCIA FINANCEIRA (Por que não duplica crédito?):
+- PROBLEMA: Webhooks duplicados ou retentativas do SLA Watcher podiam gerar créditos infinitos na carteira.
+- SOLUÇÃO v450: Implementado guard `isFirstProcessing` em `payment-contingency.server.ts`. Antes de creditar, o sistema consulta o `financial_ledger`. Se a transação vinculada ao `pedido_id` já existe, o crédito é abortado silenciosamente.
+- RESULTADO: Blindagem absoluta contra inflação artificial de saldo.
+
+2. PREVENÇÃO DE ENTREGA DUPLA (Corrida de Processos):
+- PROBLEMA: Se o webhook e o polling de contingência batessem no mesmo milissegundo, ambos podiam disparar a ordem no fornecedor.
+- ENGENHARIA v446: Protocolo `claimDispatch` + `commitDispatch`. O sistema realiza um UPDATE condicional no Postgres reivindicando o pedido ANTES de qualquer efeito externo (chamada de API). Só o processo que carimba o banco primeiro recebe permissão para gastar saldo.
+
+3. PROTEÇÃO DE MARGEM (Margin Guardian v328):
+- POR QUE DAVA PROBLEMA: Categorias caras (YouTube/Telegram) usavam markup fixo, gerando preços irreais e "prateleira morta".
+- SOLUÇÃO: `lerpLog` (Interpolação Logarítmica). O multiplicador cai de 5.0x para 2.0x conforme o custo absoluto sobe, garantindo que o preço final seja competitivo sem nunca sangrar o lucro líquido (mínimo 4x custo).
+
+4. SLA WATCHER (O Motor de Continuidade):
+- ESTRATÉGIA: Monitora pedidos em `waiting_provision`. Se o saldo do fornecedor acaba, o pedido é "parqueado" com SLA de 24h. Se não recuperado em 24h, o motor executa `refundMercadoPago` automático (até R$ 50) ou alerta o Admin para intervenção humana.
 
 BACKLOG TÉCNICO:
-- [MÉDIO] Oscilação TikTok: Pacotes tl50k/100k/200k/500k com custo instável no fornecedor. 
-- [BAIXO] SEO: GSC integrado. Tráfego orgânico é o limitador de volume, não a técnica de checkout.
-
-EM MONITORAMENTO:
-- Mercado Pago (Webhooks 100%) | Telegram (SLA 24/7) | Reajuste Automático (Nível de Risco: Baixo)
-
-PRÓXIMA AÇÃO AUTOMÁTICA:
-- Simular checkout assistido (Canário) para validar latência de preflight sob carga nominal.
+- [MÉDIO] Drift TikTok: Variação de custo em pacotes tl* (Verified). Monitorar reajustes automáticos.
+- [MÉDIO] Latência API: Preflights operando com timeout de 5s. Avaliar failover se a taxa de aborto subir.
 */
 
 
