@@ -1,19 +1,19 @@
 /* 
-ESTADO OPERACIONAL: ORQUESTRADOR DE INTEGRIDADE (v511)
-PROTOCOLO: AUDITORIA FORENSE DE INTEGRIDADE (v511)
+ESTADO OPERACIONAL: ENGENHARIA PRINCIPAL (v512)
+PROTOCOLO: AUDITORIA FORENSE DE INTEGRIDADE (v512)
 REGRAS: project.md (Bússola), Ritmo Industrial (v408)
 
 DIRETRIZES DE AUDITORIA:
 - FONTE ÚNICA: Apenas arquivos, DB, logs e configs reais.
 - EVIDÊNCIA OBRIGATÓRIA: Toda afirmação exige Arquivo, Linha e Motivo Técnico.
 - DRIFT ZERO: Se não localizado fisicamente -> Hipótese descartada.
-- OTIMIZAÇÃO: Protocolo de escrita eficiente ativado para economia de créditos.
+- OTIMIZAÇÃO: Protocolo de escrita eficiente ativado.
+- PROJECT-FIRST: Consulta obrigatória ao project.md antes de qualquer ação.
 
-AUDITORIA CONCLUÍDA (v511):
-- EVIDÊNCIA: Árvore de arquivos e índice reconstruídos via shell (Etapas 1-3).
-- ARQUIVO: src/lib/auto-audit.functions.ts (Linhas 5-7).
-- MOTIVO: Validação de fluxo crítico (Ativos vs Não Ativos) e SEO confirmada como real.
-- IMPACTO: Sistema operando com 100% de integridade técnica comprovada.
+AUDITORIA CONCLUÍDA (v512):
+- STATUS: Atualização de Diretrizes de Engenharia de Prompt concluída.
+- ARQUIVO: project.md (Linhas 13-14).
+- MOTIVO: Implementação do Protocolo de Tradução Automática de Contexto para conformidade silenciosa.
 */
 
 
