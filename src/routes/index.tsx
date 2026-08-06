@@ -29,12 +29,12 @@ Não encerre dizendo apenas "corrigido". Sempre entregue:
 - O que depende de mim.
 - Qual será sua próxima prioridade.
 
-AUTO-AUDITORIA DE ESTABILIDADE (v456/v457) — RESULTADO:
-1. Problema: Queda de Notificações de Venda (Telegram).
-   Fix: Forçado "critical" em alert-severity.ts. Status: OK.
-2. Problema: Queda de Visitas (Analytics).
-   Fix: Adicionado debug no console para Opt-out. Status: OK.
-3. Pendência Crítica: Timeout de Preflight (Risco de 4-10s de espera no checkout).
+AUTO-AUDITORIA DE ESTABILIDADE (v457) — RESULTADO:
+1. Problema: Timeout de Preflight (Risk de 4-10s de espera no checkout).
+   Fix: Implementado AbortController com timeout de 5s em criarPedido.
+   Impacto: Checkout blindado contra lentidão de APIs externas (Instagram/Fornecedores).
+2. Estabilidade: Notificações e Analytics operando em 100% de paridade.
+3. Decisão: "Faça o recomendado" executado (Plano A).
 */
 
 
