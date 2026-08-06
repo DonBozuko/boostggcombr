@@ -17,7 +17,7 @@ AUDITORIA DE VITRINE:
 - STATUS: 267 pacotes saudáveis.
 - MARGEM: Motor de Escada (v425) ativo.
 
-PRÓXIMA AÇÃO: Validar conectividade e integridade do Sistema Nervoso (Fase 1).
+PRÓXIMA AÇÃO: Executar teste de conectividade em /api/public/telegram/test-nervoso?secret=v498-nervoso para validar Fase 1.
 */
 
 

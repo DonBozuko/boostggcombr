@@ -126,6 +126,7 @@ import { Route as ApiPublicQueueReprocessRouteImport } from './routes/api/public
 import { Route as ApiPublicQueueWaitingRouteImport } from './routes/api/public/queue/waiting'
 import { Route as ApiPublicResellerV1RouteImport } from './routes/api/public/reseller/v1'
 import { Route as ApiPublicSfxNameRouteImport } from './routes/api/public/sfx.$name'
+import { Route as ApiPublicTelegramTestNervosoRouteImport } from './routes/api/public/telegram/test-nervoso'
 import { Route as ApiPublicTelegramWebhookRouteImport } from './routes/api/public/telegram/webhook'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -759,6 +760,12 @@ const ApiPublicSfxNameRoute = ApiPublicSfxNameRouteImport.update({
   path: '/api/public/sfx/$name',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTelegramTestNervosoRoute =
+  ApiPublicTelegramTestNervosoRouteImport.update({
+    id: '/api/public/telegram/test-nervoso',
+    path: '/api/public/telegram/test-nervoso',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTelegramWebhookRoute =
   ApiPublicTelegramWebhookRouteImport.update({
     id: '/api/public/telegram/webhook',
@@ -901,6 +908,7 @@ export interface FileRoutesByFullPath {
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/reseller/v1': typeof ApiPublicResellerV1Route
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
+  '/api/public/telegram/test-nervoso': typeof ApiPublicTelegramTestNervosoRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -1021,6 +1029,7 @@ export interface FileRoutesByTo {
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/reseller/v1': typeof ApiPublicResellerV1Route
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
+  '/api/public/telegram/test-nervoso': typeof ApiPublicTelegramTestNervosoRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -1145,6 +1154,7 @@ export interface FileRoutesById {
   '/api/public/queue/waiting': typeof ApiPublicQueueWaitingRoute
   '/api/public/reseller/v1': typeof ApiPublicResellerV1Route
   '/api/public/sfx/$name': typeof ApiPublicSfxNameRoute
+  '/api/public/telegram/test-nervoso': typeof ApiPublicTelegramTestNervosoRoute
   '/api/public/telegram/webhook': typeof ApiPublicTelegramWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -1269,6 +1279,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/waiting'
     | '/api/public/reseller/v1'
     | '/api/public/sfx/$name'
+    | '/api/public/telegram/test-nervoso'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -1389,6 +1400,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/waiting'
     | '/api/public/reseller/v1'
     | '/api/public/sfx/$name'
+    | '/api/public/telegram/test-nervoso'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -1512,6 +1524,7 @@ export interface FileRouteTypes {
     | '/api/public/queue/waiting'
     | '/api/public/reseller/v1'
     | '/api/public/sfx/$name'
+    | '/api/public/telegram/test-nervoso'
     | '/api/public/telegram/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -1628,6 +1641,7 @@ export interface RootRouteChildren {
   ApiPublicQueueWaitingRoute: typeof ApiPublicQueueWaitingRoute
   ApiPublicResellerV1Route: typeof ApiPublicResellerV1Route
   ApiPublicSfxNameRoute: typeof ApiPublicSfxNameRoute
+  ApiPublicTelegramTestNervosoRoute: typeof ApiPublicTelegramTestNervosoRoute
   ApiPublicTelegramWebhookRoute: typeof ApiPublicTelegramWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -2455,6 +2469,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSfxNameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/telegram/test-nervoso': {
+      id: '/api/public/telegram/test-nervoso'
+      path: '/api/public/telegram/test-nervoso'
+      fullPath: '/api/public/telegram/test-nervoso'
+      preLoaderRoute: typeof ApiPublicTelegramTestNervosoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/telegram/webhook': {
       id: '/api/public/telegram/webhook'
       path: '/api/public/telegram/webhook'
@@ -2661,6 +2682,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicQueueWaitingRoute: ApiPublicQueueWaitingRoute,
   ApiPublicResellerV1Route: ApiPublicResellerV1Route,
   ApiPublicSfxNameRoute: ApiPublicSfxNameRoute,
+  ApiPublicTelegramTestNervosoRoute: ApiPublicTelegramTestNervosoRoute,
   ApiPublicTelegramWebhookRoute: ApiPublicTelegramWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
