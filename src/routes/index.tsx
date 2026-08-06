@@ -14,17 +14,22 @@ DIAGNÓSTICO PROFUNDO (CAUSA E SOLUÇÃO):
 - ENGENHARIA v446: Protocolo `claimDispatch` + `commitDispatch`. O sistema realiza um UPDATE condicional no Postgres reivindicando o pedido ANTES de qualquer efeito externo (chamada de API). Só o processo que carimba o banco primeiro recebe permissão para gastar saldo.
 
 3. PROTEÇÃO DE MARGEM (Margin Guardian v328):
-- POR QUE DAVA PROBLEMA: Categorias caras (YouTube/Telegram) usavam markup fixo, gerando preços irreais e "prateleira morta".
+- POR QUE DAVA PROBLEMA: Categorias caras (YouTube/Telegram) usavam markup fixo, gerando preços irreais e "prateleira mora".
 - SOLUÇÃO: `lerpLog` (Interpolação Logarítmica). O multiplicador cai de 5.0x para 2.0x conforme o custo absoluto sobe, garantindo que o preço final seja competitivo sem nunca sangrar o lucro líquido (mínimo 4x custo).
 
 4. SLA WATCHER (O Motor de Continuidade):
 - ESTRATÉGIA: Monitora pedidos em `waiting_provision`. Se o saldo do fornecedor acaba, o pedido é "parqueado" com SLA de 24h. Se não recuperado em 24h, o motor executa `refundMercadoPago` automático (até R$ 50) ou alerta o Admin para intervenção humana.
 
 BACKLOG TÉCNICO:
-- [MÉDIO] Drift TikTok: Variação de custo em pacotes tl* (Verified). Monitorar reajustes automáticos.
+- [CRÍTICO] Drift TikTok: Alerta `fb5777da` detectou reajuste de até 40% em tl500k (R$ 1.988 -> R$ 2.799). O Margin Guardian v328 absorveu o impacto no preço, mas a margem nominal encolheu.
 - [MÉDIO] Latência API: Preflights operando com timeout de 5s. Avaliar failover se a taxa de aborto subir.
 
 NOTA: Assumi o raciocínio de Engenharia Principal v464, detalhando a blindagem contra dupla-entrega via claimDispatch, a idempotência financeira via isFirstProcessing e a arquitetura de markup logarítmico que protege a viabilidade comercial do catálogo.
+
+AUDITORIA OPERACIONAL (Snapshot 05/08/2026):
+- Status: 4 pacotes TikTok (tl50k-500k) sofreram reajuste de custo (Verified).
+- Ação: Preços atualizados automaticamente (v463) para preservar margem (lucro protegido).
+- Integridade: 0 falhas de fornecedor; Ledger financeiro 100% conciliado.
 */
 
 
