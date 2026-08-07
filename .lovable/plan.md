@@ -1,59 +1,66 @@
-# Correção: webhook do Mercado Pago está morto há 28 dias
+# Autoauditoria de integridade e SEO — BoostGG
 
-## O que o alerta vermelho realmente significa
+## Diagnóstico inicial confirmado
 
-O J.A.R.V.I.S. está certo, mas o texto do alerta subestima o problema. Ele diz "webhook falhou/atrasou". A verdade medida agora é pior: **o webhook do Mercado Pago não chega ao BoostGG desde 09/07/2026**. Todas as vendas desde então foram salvas pela rede de contingência (polling), não pelo caminho principal.
+- O relatório interno disponível foi gerado em **04/08/2026**; portanto, não prova o estado atual. Naquela execução havia **0 bloqueantes, 0 atenções e 506 notas**.
+- Todos os scanners SEO armazenados estão **desatualizados** em relação ao código atual. O único achado ainda marcado como falha — a landing “seguidores por 1 real” — já possui rota, metadata, canonical, JSON-LD e entrada no sitemap, mas precisa de nova varredura para validação oficial.
+- Existe uma contradição objetiva: `/rastrear` aparece no sitemap como indexável, mas está bloqueada no `robots.txt`. Isso desperdiça crawl budget e exige decidir uma única política técnica com base no propósito da página.
+- O sitemap já segue a política correta de `lastmod`: não publica datas artificiais de build.
+- `/trafego` continua no sitemap apesar de o próprio código declarar que a categoria Brasil foi retirada e manter a lista estática de planos vazia; a auditoria deve provar se a página ainda oferece catálogo real antes de mantê-la indexável.
 
-Evidências coletadas (não é hipótese):
+## Execução
 
-- Tabela `webhook_events`: 24 eventos no total, o último em `2026-07-09 19:54`. Zero eventos nos últimos 14 dias, apesar de vendas aprovadas em 30/07, 04/08 e 06/08.
-- O pedido `0bf8b0d5` (06/08, R$ 6,40) foi confirmado às 15:15 por `contingency-pooling`, não pelo webhook.
-- Teste HTTP real na URL cadastrada no Mercado Pago:
+### 1. Medir o sistema antes de corrigir
 
-```text
-POST https://boostgg.com.br/api/public/mp-webhook   -> 307 redirect para www
-GET  https://boostgg.com.br/api/public/mp-webhook   -> 302 redirect para www
-POST https://www.boostgg.com.br/api/public/mp-webhook -> 401 "Invalid signature" (rota viva e validando)
-```
+- Rodar o auditor canônico do projeto e registrar o relatório atualizado.
+- Executar checagem de tipos, suíte completa de testes e lint, separando falha real de dívida estética já conhecida.
+- Rodar varreduras de segurança/dependências e consultar saúde do banco, linter, consultas lentas e erros operacionais recentes.
+- Inspecionar os fluxos críticos sem executar pagamento ou despacho real: checkout, Mercado Pago, webhook, contingência, ledger, claim/commit de despacho, fornecedores, cron, canary, Telegram e admin.
 
-## Causa raiz
+### 2. Auditoria SEO técnica completa
 
-O código manda para o Mercado Pago a `notification_url` no domínio **sem www** (`https://boostgg.com.br/api/public/mp-webhook`). O domínio apex hoje responde **redirect 301/307 para o www**. O Mercado Pago **não segue redirects** em notificação: ele vê uma resposta não-2xx, marca a entrega como falha, retenta e depois desiste. Por isso o webhook nunca executa e a contingência precisa salvar toda venda.
+- Iniciar uma nova revisão SEO para substituir os scanners vencidos.
+- Comparar todas as rotas públicas geradas com sitemap, `robots.txt`, canonicals e `noindex`; eliminar páginas órfãs, duplicadas, privadas ou contraditórias.
+- Verificar cada rota de conteúdo quanto a title, description, `og:*`, Twitter Card, canonical autorreferente, H1 único, alt text e JSON-LD adequado.
+- Testar respostas reais de home, landings, blog, `robots.txt`, `sitemap.xml` e redirecionamentos entre domínio apex e `www`, em desktop e mobile.
+- Validar links internos de landings e blog, além de coerência entre sitemap, `RelatedLinks`, navegação e `llms.txt`.
+- Auditar promessas, preços e prazos das páginas SEO contra catálogo e regras reais; remover ou tornar dinâmica qualquer afirmação sem lastro.
 
-Isso explica, de uma vez só:
-- o alerta vermelho de contingência a cada venda;
-- a demora entre o Pix cair e a notificação chegar no Telegram (a contingência só roda no polling/cron, não no instante do pagamento);
-- o item "Webhook MP — pooling salvou 1x em 24h" no console de integridade.
+### 3. Search Console e indexação real
 
-Não é problema de Webhook Secret. A assinatura está funcionando (a rota respondeu 401 corretamente para uma requisição sem assinatura).
+- Usar a conexão existente do Google Search Console para listar propriedades verificadas e selecionar somente a que cobre `https://www.boostgg.com.br`.
+- Ler status do sitemap, desempenho recente e inspeção das URLs prioritárias, distinguindo claramente dados do Google de hipóteses de código.
+- Priorizar: home, `/comprar-seguidores-instagram`, `/comprar-seguidores-1-real`, ferramentas e URLs com queda, exclusão ou canonical divergente.
+- Não alegar indexação, ranking ou correção concluída sem evidência atual do Google.
 
-## O que será feito
+### 4. Corrigir por causa raiz
 
-1. **Apontar a notificação para o domínio canônico (www)**
-   Trocar `https://boostgg.com.br/api/public/mp-webhook` por `https://www.boostgg.com.br/api/public/mp-webhook` nos três pontos que criam cobrança:
-   - `src/lib/pedidos.functions.ts` (Pix e cartão)
-   - `src/lib/reseller-portal.functions.ts` (recarga de revendedor)
-   Em vez de repetir a string, criar uma constante única `MP_NOTIFICATION_URL` em um módulo compartilhado, para que nunca mais existam três verdades diferentes sobre a URL do webhook.
+- Corrigir automaticamente falhas técnicas sem mudança de regra de negócio.
+- Resolver a contradição de `/rastrear` conforme a política já declarada no projeto: por conter consulta individual e não ser página de aquisição, retirar do sitemap e adicionar `noindex,nofollow`, preservando a funcionalidade e o bloqueio no robots.
+- Retirar `/trafego` do índice se a leitura real confirmar ausência de oferta vendável; se houver catálogo válido, manter a rota e remover apenas a inconsistência comprovada.
+- Confirmar a landing de R$1 como resposta honesta à intenção de busca, sem criar SKU fictício nem alterar preço; corrigir qualquer preço estático divergente do catálogo.
+- Marcar achados SEO como corrigidos somente após cada correção estar completa; achados compostos parcialmente tratados permanecem abertos.
 
-2. **Sentinela de webhook morto (nova, e é o que faltava)**
-   Hoje o sistema só percebe o problema indiretamente, uma venda por vez. Adicionar uma verificação no J.A.R.V.I.S. (mesmo motor que já lista os 9 checks) que compara: houve pagamento aprovado nas últimas 24h **e** nenhum registro em `webhook_events` no mesmo período? Se sim, alerta crítico único no Telegram dizendo que o canal principal está morto — não um alerta por venda.
+### 5. Regressão e fechamento
 
-3. **Corrigir o texto do alerta de contingência**
-   O alerta atual manda "verifique o Webhook Secret", conselho errado que custou tempo. Passa a orientar a checar a URL de notificação e o status do canal.
+- Reexecutar auditor, tipos, testes, lint e scans afetados.
+- Validar no navegador as rotas alteradas e comparar HTML renderizado, metadata, canonical, robots e sitemap.
+- Confirmar que nenhuma correção toca em autoridade de preço, cobrança, ledger, idempotência, despacho ou RLS sem necessidade comprovada.
+- Entregar quadro final em quatro grupos: **corrigido**, **com evidência saudável**, **risco residual** e **ação externa/pós-publicação**.
 
-4. **Validação pós-correção**
-   - Criar um pedido de teste real de valor mínimo, pagar, e confirmar que aparece linha nova em `webhook_events` com `processed_ok = true` e que a notificação do Telegram chega em segundos, sem o alerta de contingência.
-   - Reexecutar o Detector de Mentiras e confirmar que o alerta vermelho (8/9) apaga.
+## Portões de saída
 
-## Garantias de não-regressão
+O sistema só recebe sinal verde quando:
 
-- A contingência **não será desligada**. Ela continua como rede de segurança; a diferença é que voltará a ser exceção em vez de regra.
-- A idempotência permanece intacta: com o webhook voltando a funcionar, o guard `webhook_events` + a trava de ledger + o `claimDispatch` continuam impedindo cobrança dupla e entrega dupla. O caminho webhook e o caminho contingência já convergem para o mesmo commit atômico.
-- Nenhuma mudança em preço, roteamento de fornecedor, RLS ou SEO.
-- O apex continua redirecionando para www normalmente para visitantes — só a chamada máquina-a-máquina deixa de depender do redirect.
+1. não houver bloqueante no auditor, tipos, testes ou segurança;
+2. sitemap, robots, canonical e noindex não se contradisserem;
+3. rotas indexáveis responderem com conteúdo SSR real e metadata própria;
+4. preços e promessas SEO tiverem lastro no catálogo atual;
+5. Search Console e o novo scan forem reportados como evidência externa, sem confundir “corrigido no código” com “já recrawleado pelo Google”.
 
-## Detalhe técnico
+## Limites de segurança
 
-- Arquivos alterados: `src/lib/pedidos.functions.ts` (2 ocorrências), `src/lib/reseller-portal.functions.ts` (1), novo módulo de constante, `src/lib/payment-contingency.server.ts` (texto do alerta), e o módulo do detector J.A.R.V.I.S. para o novo check.
-- Após o deploy, pagamentos novos passam a chegar por webhook. Pagamentos antigos já processados não são afetados (idempotência por `pedido_id` no ledger).
-- Se o Mercado Pago também tiver a URL antiga cadastrada manualmente no painel dele, a `notification_url` enviada por pedido tem prioridade — mas vale conferir depois para deixar os dois iguais.
+- Nenhuma nova rota será criada nesta auditoria.
+- Nenhum pagamento, pedido ou despacho real será disparado automaticamente.
+- Nenhuma alteração de preço, margem, fornecedor ou regra comercial será feita sem causa comprovada e teste de regressão.
+- Correções que dependam do site publicado serão identificadas explicitamente como **precisa publicar**.
