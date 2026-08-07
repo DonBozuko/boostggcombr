@@ -3,26 +3,27 @@
 Fonte única do que existe hoje em busca orgânica. **O código vence o documento**:
 se divergir de `src/routes/sitemap[.]xml.ts`, corrigir este arquivo no mesmo turno.
 
-## 1. Ativos publicados (53 URLs no sitemap)
+## 1. Ativos no código (49 URLs no sitemap)
 
 | Bloco | URLs | Papel |
 |---|---|---|
 | Home + redes | `/`, `/tiktok`, `/youtube`, `/kwai`, `/facebook`, `/telegram` | Catálogo/checkout por rede |
-| Dinheiro (bottom funnel) | `/comprar-seguidores-instagram`, `-barato`, `/comprar-seguidores-brasileiros`, `/comprar-curtidas-instagram`, `/comprar-seguidores-tiktok`, `/comprar-visualizacoes-tiktok`, `/comprar-curtidas-tiktok`, `/seguidores-reais-instagram`, `/comprar-inscritos-youtube`, `/comprar-seguidores-kwai`, `/seguidores-pix`, `/promo-5reais`, `/kit-creator` | Conversão direta |
+| Dinheiro (bottom funnel) | `/comprar-seguidores-instagram`, `-barato`, `/comprar-seguidores-1-real`, `/comprar-seguidores-brasileiros`, `/comprar-curtidas-instagram`, `/comprar-seguidores-tiktok`, `/comprar-visualizacoes-tiktok`, `/comprar-curtidas-tiktok`, `/seguidores-reais-instagram`, `/comprar-inscritos-youtube`, `/comprar-seguidores-kwai`, `/seguidores-pix`, `/promo-5reais`, `/kit-creator` | Conversão direta |
 | Intenção/meio de funil | `/audiencia-brasileira`, `/crescer-youtube`, `/engajamento-instagram`, `/impulsionar-instagram`, `/turbinar-tiktok`, `/views-tiktok` | Captura de cauda longa |
 | Ferramentas grátis | `/ferramentas` + `contador-seguidores`, `calculadora-engajamento-instagram`, `gerador-legenda-instagram` | Volume de busca + isca de backlink |
 | Blog (8 artigos) | `/blog` + 8 slugs | Autoridade tópica |
-| Prova/transparência | `/avaliacoes`, `/rastrear`, `/status` | Confiança (E-E-A-T) |
+| Prova/transparência | `/avaliacoes` | Confiança (E-E-A-T) |
 | Parcerias | `/revenda`, `/api-revenda`, `/afiliados` | B2B |
 | Institucional | `/termos`, `/privacidade`, `/reembolso` | Compliance/E-E-A-T |
 
 Fora do índice de propósito: `/admin*`, `/painel-*`, `/diagnostico`, `/obrigado`,
-`/unsubscribe`, `/trafego`, `/dashboard/seo`.
+`/unsubscribe`, `/rastrear`, `/status`, `/dashboard/seo`.
 
 ## 2. Malha de links internos (v300)
 
-- `src/components/RelatedLinks.tsx` — 3 links de saída por landing. **Nenhuma
-  landing pode ficar sem entrada aqui** (regra: página órfã = página sem autoridade).
+- `src/components/RelatedLinks.tsx` — 3 links de saída por landing. A landing
+  `/comprar-seguidores-1-real` recebe link da principal página de Instagram e
+  também distribui autoridade para oferta real, catálogo e avaliações.
 - `src/components/BlogLayout.tsx` — bloco "Continue por aqui" em todo artigo.
 - `src/components/TopNetworksNav.tsx` — navegação global entre redes.
 
@@ -37,8 +38,9 @@ Fora do índice de propósito: `/admin*`, `/painel-*`, `/diagnostico`, `/obrigad
 ## 4. Posição atual (GSC/Semrush, última leitura)
 
 - `pix seguidores` — 11 → **9,6** (subindo).
-- `/ferramentas/contador-seguidores` — posição ~34 para termo de 6,6k buscas/mês:
-  maior alavanca de tráfego não explorada.
+- `/ferramentas/contador-seguidores` — posição média **19,9** (últimos 28 dias
+  encerrados em 05/08/2026; 92 impressões, 5 cliques). O Google ainda escolhe a
+  versão sem `www`; a versão canônica corrigida precisa ser publicada e recrawleada.
 
 ## 5. Lacuna real: autoridade externa
 

@@ -6,6 +6,13 @@ import { motion } from "framer-motion";
 import { LogIn, UserPlus } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Acesso Seguro | BoostGG" },
+      { name: "description", content: "Acesso seguro à área autenticada da BoostGG." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   validateSearch: (search: Record<string, unknown>) => ({
     next: typeof search.next === "string" ? search.next : "/",
   }),
