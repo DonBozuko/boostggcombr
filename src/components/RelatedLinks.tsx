@@ -8,7 +8,12 @@ const RELATED: Record<string, Link[]> = {
   "/comprar-seguidores-instagram": [
     { href: "/comprar-curtidas-instagram", title: "Comprar Curtidas Instagram", desc: "Boost em posts específicos com entrega em minutos." },
     { href: "/comprar-seguidores-brasileiros", title: "Seguidores Brasileiros", desc: "Perfis BR reais pra quem vende no Brasil." },
-    { href: "/kit-creator", title: "Kit Creator", desc: "Combo pra criador: seguidores + curtidas + views com desconto." },
+    { href: "/comprar-seguidores-1-real", title: "Seguidores por R$ 1 existem?", desc: "Entenda o custo real antes de cair em uma oferta impossível." },
+  ],
+  "/comprar-seguidores-1-real": [
+    { href: "/promo-5reais", title: "Pacote a partir de R$ 5", desc: "Conheça o menor ticket real disponível na BoostGG." },
+    { href: "/comprar-seguidores-instagram", title: "Seguidores Instagram", desc: "Compare os pacotes e preços atuais do catálogo." },
+    { href: "/avaliacoes", title: "Avaliações de clientes", desc: "Consulte experiências publicadas por quem já comprou." },
   ],
   "/comprar-curtidas-instagram": [
     { href: "/comprar-seguidores-instagram", title: "Comprar Seguidores Instagram", desc: "Cresça sua base — Pix + entrega em minutos." },

@@ -82,6 +82,11 @@ const contentRoutes = files.filter(
 );
 for (const f of contentRoutes) {
   const src = cache.get(f);
+  // Redirects permanentes e layouts pathless não renderizam conteúdo próprio.
+  // Exigir metadata neles cria alarme falso e, no layout, pode sobrescrever o head dos filhos.
+  const isRedirectOnly = /beforeLoad\s*:\s*[\s\S]*throw redirect\s*\(/.test(src) && !/component\s*:/.test(src);
+  const isOutletOnly = /component\s*:\s*\(\)\s*=>\s*<Outlet\s*\/>/.test(src);
+  if (isRedirectOnly || isOutletOnly) continue;
   if (!/head\s*:\s*\(/.test(src)) {
     add("atencao", "seo-head", f, "rota de conteúdo sem head()");
     continue;

@@ -50,7 +50,7 @@ const buildSitemapXml = () => {
     { path: "/ferramentas/gerador-legenda-instagram", changefreq: "weekly", priority: "0.8" },
     { path: "/kit-creator", changefreq: "weekly", priority: "0.9" },
     { path: "/promo-5reais", changefreq: "weekly", priority: "0.8" },
-    { path: "/rastrear", changefreq: "monthly", priority: "0.5" },
+    // /rastrear é transacional e recebe identificador de pedido: noindex + fora do sitemap.
     // v200 — SEO landings (keyword-alvo)
     { path: "/seguidores-pix", changefreq: "daily", priority: "0.9" },
     { path: "/pix-seguidores-instagram", changefreq: "daily", priority: "0.9" },
