@@ -4,6 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Autorizar Integração | BoostGG" },
+      { name: "description", content: "Confirmação segura de autorização de integração da BoostGG." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   validateSearch: (s: Record<string, unknown>) => ({
     authorization_id: typeof s.authorization_id === "string" ? s.authorization_id : "",
   }),
