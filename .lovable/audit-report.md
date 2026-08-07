@@ -1,22 +1,14 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-07T01:57:36.940Z
+Gerado por `npm run audit` — 2026-08-07T01:58:14.640Z
 
-Arquivos lidos: 464
+Arquivos lidos: 463
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 2 |
+| atencao | 0 |
 | nota | 522 |
-
-## arquivo-orfao (1)
-
-- **atencao** `src/lib/auto-audit.functions.ts` — ninguém importa este arquivo
-
-## seo-head (1)
-
-- **atencao** `src/routes/[.]lovable.oauth.consent.tsx` — rota de conteúdo sem head()
 
 ## arquivo-gigante (10)
 
