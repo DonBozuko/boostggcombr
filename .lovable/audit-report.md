@@ -1,25 +1,22 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-07T01:53:08.121Z
+Gerado por `npm run audit` — 2026-08-07T01:57:36.940Z
 
 Arquivos lidos: 464
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 5 |
+| atencao | 2 |
 | nota | 522 |
 
 ## arquivo-orfao (1)
 
 - **atencao** `src/lib/auto-audit.functions.ts` — ninguém importa este arquivo
 
-## seo-head (4)
+## seo-head (1)
 
 - **atencao** `src/routes/[.]lovable.oauth.consent.tsx` — rota de conteúdo sem head()
-- **atencao** `src/routes/_authenticated/route.tsx` — rota de conteúdo sem head()
-- **atencao** `src/routes/auth.tsx` — rota de conteúdo sem head()
-- **atencao** `src/routes/comprar-seguidores-reais-brasil.tsx` — rota de conteúdo sem head()
 
 ## arquivo-gigante (10)
 
