@@ -1,29 +1,40 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-04T10:16:10.448Z
+Gerado por `npm run audit` — 2026-08-07T01:53:08.121Z
 
-Arquivos lidos: 455
+Arquivos lidos: 464
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 0 |
-| nota | 506 |
+| atencao | 5 |
+| nota | 522 |
+
+## arquivo-orfao (1)
+
+- **atencao** `src/lib/auto-audit.functions.ts` — ninguém importa este arquivo
+
+## seo-head (4)
+
+- **atencao** `src/routes/[.]lovable.oauth.consent.tsx` — rota de conteúdo sem head()
+- **atencao** `src/routes/_authenticated/route.tsx` — rota de conteúdo sem head()
+- **atencao** `src/routes/auth.tsx` — rota de conteúdo sem head()
+- **atencao** `src/routes/comprar-seguidores-reais-brasil.tsx` — rota de conteúdo sem head()
 
 ## arquivo-gigante (10)
 
 - **nota** `src/integrations/supabase/types.ts` — 2336 linhas (> 600)
 - **nota** `src/lib/admin.functions.ts` — 852 linhas (> 600)
-- **nota** `src/lib/pedidos.functions.ts` — 732 linhas (> 600)
+- **nota** `src/lib/pedidos.functions.ts` — 760 linhas (> 600)
 - **nota** `src/lib/pricing-cache.server.ts` — 780 linhas (> 600)
-- **nota** `src/lib/pricing-engine.server.ts` — 911 linhas (> 600)
-- **nota** `src/routes/admin.tsx` — 2474 linhas (> 600)
-- **nota** `src/routes/api/public/mp-webhook.ts` — 840 linhas (> 600)
-- **nota** `src/routes/blog.$slug.tsx` — 723 linhas (> 600)
-- **nota** `src/routes/index.tsx` — 1474 linhas (> 600)
+- **nota** `src/lib/pricing-engine.server.ts` — 960 linhas (> 600)
+- **nota** `src/routes/admin.tsx` — 2482 linhas (> 600)
+- **nota** `src/routes/api/public/mp-webhook.ts` — 871 linhas (> 600)
+- **nota** `src/routes/blog.$slug.tsx` — 882 linhas (> 600)
+- **nota** `src/routes/index.tsx` — 1500 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
 
-## cor-hardcoded (438)
+## cor-hardcoded (454)
 
 - **nota** `src/components/AdminAuditLog.tsx` — linha 38
 - **nota** `src/components/AdminAuditLog.tsx` — linha 53
@@ -65,7 +76,7 @@ Arquivos lidos: 455
 - **nota** `src/components/CanaryPanel.tsx` — linha 170
 - **nota** `src/components/CanaryPanel.tsx` — linha 174
 - **nota** `src/components/CanaryPanel.tsx` — linha 177
-- … e mais 398
+- … e mais 414
 
 ## serverfn-modulo-fino (58)
 
