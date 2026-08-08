@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim,pode realizar prox passo se for melhor pra sistema */
+/* Faça um plano completo e detalhado: sim */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
