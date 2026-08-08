@@ -12,8 +12,9 @@
 // mesmo pagamento em vez de criar outro. Retries continuam funcionando
 // porque a chave é estável dentro da janela.
 
-/** Janela de agrupamento: cliques dentro do mesmo bucket compartilham a chave. */
-export const IDEMPOTENCY_WINDOW_MS = 90_000;
+/** Janela de agrupamento: cliques dentro do mesmo bucket compartilham a chave. 
+ * v587: Reduzido de 90s para 5s para não travar clientes legítimos que compram pacotes seguidos. */
+export const IDEMPOTENCY_WINDOW_MS = 5_000;
 
 function slug(v: string): string {
   return v.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

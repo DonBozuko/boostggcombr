@@ -119,15 +119,21 @@ export const prewarmPedido = createServerFn({ method: "POST" })
     quantidade: z.number().optional()
   }).parse(input))
   .handler(async ({ data }) => {
-    // v586 — Pre-warming Pix agressivo (< 800ms).
-    // 1. Aquece cache de Token MP.
-    // 2. Realiza lookup de pricing antecipado.
-    // 3. Verifica saúde do fornecedor primário.
-    const { getCachedToken } = await import("./mp-token.server");
-    const token = getCachedToken();
-    
-    console.log("[prewarmPedido] v586 Aqueceu token e infra para:", data.email);
-    return { ok: !!token };
+    // v587 — Pre-warming Pix agressivo (< 800ms).
+    // Implementa fallback silencioso caso a infraestrutura de token demore.
+    try {
+      const { getMpAccessToken } = await import("./mp-token.server");
+      // Timeout de 1500ms para o aquecimento não atrasar o preenchimento do email
+      const token = await Promise.race([
+        getMpAccessToken(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500))
+      ]);
+      console.log("[prewarmPedido] v587 Aqueceu token centralizado:", !!token);
+      return { ok: true };
+    } catch (err) {
+      console.warn("[prewarmPedido] v587 Fallback silencioso no aquecimento:", err);
+      return { ok: false };
+    }
   });
 
 export const criarPedido = createServerFn({ method: "POST" })
