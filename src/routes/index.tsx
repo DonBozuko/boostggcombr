@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim */
+/* Faça um plano completo e detalhado: sim (v543 - Auditoria Forense Financeira Ativada) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
