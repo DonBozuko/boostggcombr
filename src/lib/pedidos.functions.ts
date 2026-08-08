@@ -123,12 +123,17 @@ export const prewarmPedido = createServerFn({ method: "POST" })
     // Implementa fallback silencioso caso a infraestrutura de token demore.
     try {
       const { getMpAccessToken } = await import("./mp-token.server");
+      // v588 — corrige unhandled rejection se o token resolver/falhar depois do timeout.
+      const tokenPromise = getMpAccessToken().catch((err) => {
+        console.warn("[prewarmPedido] v588 Token falhou em background (ignorado):", err);
+        return null;
+      });
       // Timeout de 1500ms para o aquecimento não atrasar o preenchimento do email
       const token = await Promise.race([
-        getMpAccessToken(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500))
+        tokenPromise,
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500))
       ]);
-      console.log("[prewarmPedido] v587 Aqueceu token centralizado:", !!token);
+      console.log("[prewarmPedido] v588 Aqueceu token centralizado:", !!token);
       return { ok: true };
     } catch (err) {
       console.warn("[prewarmPedido] v587 Fallback silencioso no aquecimento:", err);
