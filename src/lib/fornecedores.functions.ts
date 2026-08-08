@@ -5,7 +5,7 @@ const tokenInput = z.object({ token: z.string().min(8) });
 
 
 export const listarFornecedores = createServerFn({ method: "POST" })
-  .inputValidator((input) => tokenInput.parse(input))
+  .validator((input) => tokenInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -30,7 +30,7 @@ export const listarFornecedores = createServerFn({ method: "POST" })
   });
 
 export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
-  .inputValidator((input) =>
+  .validator((input) =>
     z.object({ token: z.string().min(8), id: z.string().uuid(), ativo: z.boolean() }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -53,7 +53,7 @@ export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
 
 
 export const getRecargaFornecedores = createServerFn({ method: "POST" })
-  .inputValidator((input) => tokenInput.parse(input))
+  .validator((input) => tokenInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

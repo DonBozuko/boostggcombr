@@ -38,7 +38,7 @@ export type PricingCatalogList =
   | { ok: false; error: string };
 
 export const listPricingCatalog = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.parse(i))
+  .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<PricingCatalogList> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
@@ -67,7 +67,7 @@ export const listPricingCatalog = createServerFn({ method: "POST" })
 const DUP_ID_MSG = "⚠️ Erro Contábil: Os IDs das chaves reservas não podem ser idênticos ao ID da SMMHype. Digite os códigos específicos de cada painel.";
 
 export const upsertPricingCatalog = createServerFn({ method: "POST" })
-  .inputValidator((i) => upsertInput.parse(i))
+  .validator((i) => upsertInput.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
@@ -149,7 +149,7 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
   });
 
 export const deletePricingCatalog = createServerFn({ method: "POST" })
-  .inputValidator((i) => deleteInput.parse(i))
+  .validator((i) => deleteInput.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
@@ -181,7 +181,7 @@ export type QuarantineView =
   | { ok: false; error: string };
 
 export const getPriceQuarantine = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.parse(i))
+  .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<QuarantineView> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
@@ -206,7 +206,7 @@ export const getPriceQuarantine = createServerFn({ method: "POST" })
   });
 
 export const approvePriceQuarantine = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.parse(i))
+  .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; applied?: number }> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };

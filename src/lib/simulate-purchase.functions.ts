@@ -17,7 +17,7 @@ type Step = { key: string; ok: boolean; ms: number; detail: string };
 
 
 export const listSimulatablePackages = createServerFn({ method: "POST" })
-  .inputValidator((i) => z.object({ token: z.string().min(8) }).parse(i))
+  .validator((i) => z.object({ token: z.string().min(8) }).parse(i))
   .handler(async ({ data }) => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false as const, error: "UNAUTHORIZED" };
@@ -32,7 +32,7 @@ export const listSimulatablePackages = createServerFn({ method: "POST" })
   });
 
 export const simulatePurchase = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }) => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false as const, error: "UNAUTHORIZED", steps: [] as Step[] };

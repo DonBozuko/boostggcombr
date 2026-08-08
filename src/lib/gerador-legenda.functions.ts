@@ -17,7 +17,7 @@ const input = z.object({
 
 
 export const gerarLegenda = createServerFn({ method: "POST" })
-  .inputValidator((data) => input.parse(data))
+  .validator((data) => input.parse(data))
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { ok: true as const, source: "local" as const, legendas: [localFallback(data.tema)] };

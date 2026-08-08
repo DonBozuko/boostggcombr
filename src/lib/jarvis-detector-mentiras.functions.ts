@@ -6,7 +6,7 @@ import { z } from "zod";
  * v244: exige ADMIN_TOKEN (finding jarvis_ops_noauth).
  */
 export const runJarvisLieDetector = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
+  .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return {

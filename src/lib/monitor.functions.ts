@@ -5,7 +5,7 @@ const adminInput = z.object({ token: z.string().min(8) });
 
 
 export const getMonitorSaldo = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -63,7 +63,7 @@ export const getMonitorSaldo = createServerFn({ method: "POST" })
   });
 
 export const atualizarCotacaoFornecedor = createServerFn({ method: "POST" })
-  .inputValidator((input) =>
+  .validator((input) =>
     z.object({ token: z.string().min(8), id: z.string().uuid(), cotacao_brl: z.number().positive().max(100) }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -78,7 +78,7 @@ export const atualizarCotacaoFornecedor = createServerFn({ method: "POST" })
   });
 
 export const verificarSaldoAgora = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
@@ -87,7 +87,7 @@ export const verificarSaldoAgora = createServerFn({ method: "POST" })
   });
 
 export const getCronStatus = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -100,7 +100,7 @@ export const getCronStatus = createServerFn({ method: "POST" })
   });
 
 export const testarCron = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const url = `${process.env.SUPABASE_URL?.includes("localhost") ? "" : ""}https://project--c88c4437-6c11-4710-b369-9cb46d021440.lovable.app/api/public/check-saldo`;
@@ -128,7 +128,7 @@ export const testarCron = createServerFn({ method: "POST" })
   });
 
 export const getCaixaAssistente = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

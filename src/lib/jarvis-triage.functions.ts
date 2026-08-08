@@ -34,7 +34,7 @@ export type TriageDigest = {
 };
 
 export const getJarvisTriage = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
+  .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }): Promise<TriageDigest> => {
     // v425 — Triage agora usa autenticação Supabase nativa se o token ADMIN_TOKEN não for suficiente.
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {

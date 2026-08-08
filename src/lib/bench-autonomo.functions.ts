@@ -7,7 +7,7 @@ const tokenInput = z.object({ token: z.string().min(8) });
 
 
 export const getLastBenchRun = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenInput.parse(i))
+  .validator((i) => tokenInput.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -33,7 +33,7 @@ export const getLastBenchRun = createServerFn({ method: "POST" })
   });
 
 export const runBenchNow = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenInput.parse(i))
+  .validator((i) => tokenInput.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { runBenchAutonomo } = await import("@/services/bench-autonomo.server");

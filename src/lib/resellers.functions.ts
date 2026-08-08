@@ -21,7 +21,7 @@ export type Reseller = {
 };
 
 export const listResellers = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.parse(i))
+  .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; resellers: Reseller[] }> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED", resellers: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -55,7 +55,7 @@ export const listResellers = createServerFn({ method: "POST" })
   });
 
 export const createReseller = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         token: z.string().min(8),
@@ -84,7 +84,7 @@ export const createReseller = createServerFn({ method: "POST" })
   });
 
 export const updateReseller = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         token: z.string().min(8),
@@ -106,7 +106,7 @@ export const updateReseller = createServerFn({ method: "POST" })
   });
 
 export const creditReseller = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         token: z.string().min(8),
@@ -138,7 +138,7 @@ export const creditReseller = createServerFn({ method: "POST" })
   });
 
 export const resellerLedger = createServerFn({ method: "POST" })
-  .inputValidator((i) => z.object({ token: z.string().min(8), id: z.string().uuid() }).parse(i))
+  .validator((i) => z.object({ token: z.string().min(8), id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED", rows: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

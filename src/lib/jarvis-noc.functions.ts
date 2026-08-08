@@ -25,7 +25,7 @@ export type NocSnapshot = {
 
 
 export const jarvisNocSnapshot = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }): Promise<NocSnapshot> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -139,7 +139,7 @@ export type JarvisChatResp =
   | { ok: false; error: string };
 
 export const jarvisChat = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ token: z.string().min(8), question: z.string().min(2).max(500) }).parse(input))
+  .validator((input) => z.object({ token: z.string().min(8), question: z.string().min(2).max(500) }).parse(input))
   .handler(async ({ data }): Promise<JarvisChatResp> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
 
@@ -232,7 +232,7 @@ export const jarvisChat = createServerFn({ method: "POST" })
 
 
 export const jarvisFailoverAtivo = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

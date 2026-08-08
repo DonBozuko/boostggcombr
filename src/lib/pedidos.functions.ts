@@ -113,7 +113,7 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
 };
 
 export const prewarmPedido = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ email: z.string().email() }).parse(input))
+  .validator((input) => z.object({ email: z.string().email() }).parse(input))
   .handler(async ({ data }) => {
     // v541 — Pre-warming silencioso: apenas registra intenção ou aquece cache de pricing
     console.log("[prewarmPedido] Aquecendo checkout para:", data.email);
@@ -121,7 +121,7 @@ export const prewarmPedido = createServerFn({ method: "POST" })
   });
 
 export const criarPedido = createServerFn({ method: "POST" })
-  .inputValidator((input) => pedidoSchema.parse(input))
+  .validator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {
     // v252 — Rate limit: 8 pedidos / 5 min por IP (anti-spam de Pix/robô).
     {

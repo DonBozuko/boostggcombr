@@ -21,7 +21,7 @@ export type AfiliadoRow = {
 };
 
 export const listAffiliates = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.parse(i))
+  .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; afiliados: AfiliadoRow[] }> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED", afiliados: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -55,7 +55,7 @@ export const listAffiliates = createServerFn({ method: "POST" })
 
 /** Registra que você pagou o saldo do afiliado por Pix (zera saldo, soma em pago). */
 export const payAffiliate = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.extend({ id: z.string().uuid() }).parse(i))
+  .validator((i) => tokenOnly.extend({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -85,7 +85,7 @@ export const payAffiliate = createServerFn({ method: "POST" })
   });
 
 export const toggleAffiliate = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.extend({ id: z.string().uuid(), ativo: z.boolean() }).parse(i))
+  .validator((i) => tokenOnly.extend({ id: z.string().uuid(), ativo: z.boolean() }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

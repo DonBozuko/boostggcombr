@@ -30,7 +30,7 @@ type SloMetrics = {
 };
 
 export const getSloMetrics = createServerFn({ method: "POST" })
-  .inputValidator((d: { token: string }) => d)
+  .validator((d: { token: string }) => d)
   .handler(async ({ data }): Promise<SloMetrics> => {
     const admin = process.env.ADMIN_TOKEN;
     if (!admin || data.token !== admin) {

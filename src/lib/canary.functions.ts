@@ -5,7 +5,7 @@ import { z } from "zod";
 const tokenIn = z.object({ token: z.string().min(8) });
 
 export const getCanaryPanel = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenIn.parse(i))
+  .validator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -44,7 +44,7 @@ export const getCanaryPanel = createServerFn({ method: "POST" })
 
 
 export const saveCanaryConfig = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     tokenIn.extend({
       enabled: z.boolean(),
       alvos: z.array(z.object({
@@ -93,7 +93,7 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
 /** v284 — sugere o pacote real mais barato de cada rede para usar como canário.
  *  Não cria pacote fake: usa o catálogo que o cliente compra de verdade. */
 export const suggestCanaryTargets = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenIn.parse(i))
+  .validator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -123,7 +123,7 @@ export const suggestCanaryTargets = createServerFn({ method: "POST" })
 
 
 export const runCanaryNow = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenIn.parse(i))
+  .validator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
     const { runCanary } = await import("@/services/canary.server");

@@ -29,7 +29,7 @@ export type PricingLedgerSnapshot =
   | { ok: false; error: string };
 
 export const treasurySnapshot = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<TreasurySnapshot> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
@@ -69,7 +69,7 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
   });
 
 export const pricingLedgerSnapshot = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<PricingLedgerSnapshot> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };

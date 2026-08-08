@@ -25,7 +25,7 @@ const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
 
 
 export const contarInscritos = createServerFn({ method: "POST" })
-  .inputValidator((d) => input.parse(d))
+  .validator((d) => input.parse(d))
   .handler(async ({ data }) => {
     try {
       const res = await fetch(`https://www.youtube.com/@${encodeURIComponent(data.canal)}`, {

@@ -17,7 +17,7 @@ const applySchema = z.object({
 });
 
 export const submitResellerApplication = createServerFn({ method: "POST" })
-  .inputValidator((i) => applySchema.parse(i))
+  .validator((i) => applySchema.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
     const req = getRequest();
     const { clientIpFrom, checkRateLimit } = await import("@/lib/rate-limit.server");
@@ -76,7 +76,7 @@ export type ResellerApplication = {
 const tokenOnly = z.object({ token: z.string().min(8) });
 
 export const listResellerApplications = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnly.parse(i))
+  .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; rows: ResellerApplication[] }> => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED", rows: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -90,7 +90,7 @@ export const listResellerApplications = createServerFn({ method: "POST" })
   });
 
 export const setResellerApplicationStatus = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         token: z.string().min(8),
@@ -113,7 +113,7 @@ export const setResellerApplicationStatus = createServerFn({ method: "POST" })
 // v264 — Aprovação com liberação automática de acesso.
 // Um clique: cria o revendedor, gera a chave e envia por e-mail. Sem WhatsApp na mão.
 export const approveAndProvisionReseller = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         token: z.string().min(8),
@@ -155,7 +155,7 @@ export const approveAndProvisionReseller = createServerFn({ method: "POST" })
 // v264 — "Esqueci minha chave": reemite e invalida a antiga. Resposta sempre
 // genérica para não revelar quem é revendedor.
 export const forgotResellerKey = createServerFn({ method: "POST" })
-  .inputValidator((i) => z.object({ email: z.string().trim().email().max(160) }).parse(i))
+  .validator((i) => z.object({ email: z.string().trim().email().max(160) }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; message: string }> => {
     const req = getRequest();
     const { clientIpFrom, checkRateLimit } = await import("@/lib/rate-limit.server");

@@ -12,7 +12,7 @@ export type JarvisAlertRow = {
 
 
 export const logJarvisAlert = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string; severidade: string; origem?: string; mensagem: string; detalhe?: string }) =>
+  .validator((input: { token: string; severidade: string; origem?: string; mensagem: string; detalhe?: string }) =>
     z.object({
       token: z.string().min(8),
       severidade: z.string(),
@@ -35,7 +35,7 @@ export const logJarvisAlert = createServerFn({ method: "POST" })
   });
 
 export const listJarvisAlerts = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string; severidade?: string; origem?: string; limit?: number }) =>
+  .validator((input: { token: string; severidade?: string; origem?: string; limit?: number }) =>
     z.object({
       token: z.string().min(8),
       severidade: z.string().optional(),
