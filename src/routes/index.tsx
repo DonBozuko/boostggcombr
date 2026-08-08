@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim, tambem analise pra ver porq estou numa posiçao ruim (v546 - Sócio Sênior - Diagnóstico Estratégico de Performance SEO) */
+/* Faça um plano completo e detalhado: mas meu site nao é elite, Elite Boost Prime é nome fantasia, BoostGG é do site,lembra? (v547 - Auditoria de Identidade e Branding Consolidada) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
