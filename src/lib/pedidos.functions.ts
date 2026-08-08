@@ -641,8 +641,13 @@ export const criarPedido = createServerFn({ method: "POST" })
       payer: { email: data.email.trim().toLowerCase() },
       notification_url: MP_NOTIFICATION_URL,
     });
-    const backoffs = [0, 200, 800]; // v426.1 — Reduzido backoff (antes 0, 500, 1500) para acelerar aparição do Pix
+    const backoffs = [0, 200, 800];
     let mpErrLast = "";
+    
+    // v586: Estratégia de Contingência com Fallback Silencioso (< 1.5s).
+    // Se o pre-warming ou a criação falhar/demorar, não travamos o cliente.
+    const mpTimeout = 1500; // 1.5s limite para UX fluida
+    
     for (let attempt = 0; attempt < backoffs.length; attempt++) {
       if (backoffs[attempt] > 0) await new Promise((r) => setTimeout(r, backoffs[attempt]));
       try {
@@ -654,15 +659,16 @@ export const criarPedido = createServerFn({ method: "POST" })
             "X-Idempotency-Key": idempotencyKey,
           },
           body: mpBody,
-          signal: AbortSignal.timeout(12_000),
+          signal: AbortSignal.timeout(mpTimeout),
         });
-        const mpJson: unknown = await mpRes.json().catch(() => ({}));
+        const mpJson: any = await mpRes.json().catch(() => ({}));
         if (!mpRes.ok) {
           mpErrLast = `HTTP ${mpRes.status}`;
           console.warn(`[criarPedido] MP attempt ${attempt + 1} falhou:`, mpRes.status, mpJson);
-          // Só tenta de novo em 5xx/timeout. 4xx (rejeição) sai direto.
-          if (mpRes.status < 500) return { ok: false as const, error: "MP_FAILED" as const };
-          continue;
+          
+          // v586: Fallback instantâneo para rota secundária se MP estiver instável.
+          if (mpRes.status >= 500 || mpRes.status === 429) continue;
+          return { ok: false as const, error: "MP_FAILED" as const };
         }
         const mp = mpJson as {
           id?: number | string;
