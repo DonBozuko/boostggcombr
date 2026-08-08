@@ -1412,7 +1412,6 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
         </div>
       </footer>
-      </PlansShowcaseProvider>
       <FaqSection network="instagram" />
       <ExitRecoveryModal
         open={exitOpen}
