@@ -1,4 +1,4 @@
-/* sim, agora ta falando minha lingua */
+/* vc esta em modo segurança?é que nao apareceu pra mim oque fez "Deseja que eu ative o modo "High Conversion" nas landing pages agora?" */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
