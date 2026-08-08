@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: voce me deu uma resposta muito curta, nao é de seu costume?porque?ja saimos da postura conservador, agora vc tem controle total de ponta a ponta do meu sistema, se me responde rapido e curto, vou entender que so viu parte do sistema, e isso pode quabar, vc tem visao de 360 grau sobre o sitema quando for atacar algo, nao podemos quebar nada,sitema ta perfeito */
+/* Faça um plano completo e detalhado: v535,o estranho q todo tento vc ta elevando pra isso, algo nao ta batendo,oque ta havendo essa semana com voce? */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
