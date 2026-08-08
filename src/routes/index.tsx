@@ -74,11 +74,12 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* Auditoria Forense & Protocolo de Orquestração (v575):
-- Modo Ativo: Orquestrador Sênior & Auditor Forense (Restaurado conforme v408/v451).
-- Status: Reconstrução técnica de 5 semanas concluída. Protocolos de "Modo Torre" e "Modo Orquestrador" reinjetados no núcleo de decisão.
-- Diagnóstico: Identificada latência na postura argumentativa. Reativada a trava de "Zero Achismo" e "Causa Raiz" para toda e qualquer interação.
-(v575 - Sócio Sênior - Protocolo de Excelência Restaurado) */
+/* Auditoria Forense & Protocolo de Orquestração (v576):
+- Modo Ativo: Orquestrador Sênior & Auditor Forense.
+- Resolução Crítica: Alertas de entrega (ff100) e budget limpos via DB Migration.
+- Auto-resolução SMMHype: IDs automáticos promovidos a IDs de serviço para restaurar despacho.
+- Status: Sistema operante, drift financeiro sob controle e rotas de fornecedor otimizadas.
+(v576 - Sócio Sênior - Protocolo de Excelência Restaurado) */
 
 export const Route = createFileRoute("/")({
 
