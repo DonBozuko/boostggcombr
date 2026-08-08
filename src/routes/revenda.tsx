@@ -14,13 +14,13 @@ import { PageGuide } from "@/components/PageGuide";
 export const Route = createFileRoute("/revenda")({
   head: () => ({
     meta: [
-      { title: "Seja Revendedor de Seguidores e Curtidas | BoostGG" },
+      { title: "Seja Revendedor de Seguidores e Curtidas — BOOSTGG" },
       {
         name: "description",
         content:
           "Revenda BoostGG: desconto real, saldo pré-pago via Pix, API pronta e entrega automática. Venda com sua marca e fique com o lucro.",
       },
-      { property: "og:title", content: "Programa de Revenda — BoostGG" },
+      { property: "og:title", content: "Programa de Revenda — BOOSTGG" },
       {
         property: "og:description",
         content: "Compre com desconto de revenda, venda pelo preço que quiser e fique com a diferença. Saldo pré-pago em Pix e API pronta.",

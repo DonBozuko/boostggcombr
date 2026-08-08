@@ -4,7 +4,7 @@ import { BrandHeader } from "@/components/BrandHeader";
 import { ShieldCheck, Users, Zap, Award } from "lucide-react";
 
 const URL = "https://www.boostgg.com.br/quem-somos";
-const TITLE = "Sobre a BoostGG — A Agência de Crescimento Social Nº 1 | Elite Boost Prime";
+const TITLE = "Sobre a BoostGG — A Agência de Crescimento Social Nº 1 — BOOSTGG";
 const DESC =
   "Conheça a BoostGG (Elite Boost Prime), a maior agência de impulsionamento social do Brasil. Mais de 4 anos de operação e 12.000 clientes satisfeitos.";
 

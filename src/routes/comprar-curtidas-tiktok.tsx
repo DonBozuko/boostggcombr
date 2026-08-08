@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-tiktok";
-const TITLE = "Comprar Curtidas TikTok via Pix — Entrega em Minutos | BoostGG";
+const TITLE = "Comprar Curtidas TikTok via Pix — Entrega em Minutos — BOOSTGG";
 const DESC =
   "Compre curtidas para vídeos do TikTok a partir de R$ 5. Entrega em minutos, sem senha, pagamento via Pix. Reforce o sinal de qualidade do algoritmo.";
 

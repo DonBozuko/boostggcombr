@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 
 export const Route = createFileRoute("/admin/scripts")({
-  head: () => ({ meta: [{ title: "Scripts Jivo · Admin | BoostGG" }, { name: "robots", content: "noindex,nofollow" }] }),
+  head: () => ({ meta: [{ title: "Scripts Jivo · Admin — BOOSTGG" }, { name: "robots", content: "noindex,nofollow" }] }),
   component: ScriptsPage,
 });
 

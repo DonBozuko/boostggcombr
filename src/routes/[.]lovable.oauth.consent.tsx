@@ -6,7 +6,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Autorizar Integração | BoostGG" },
+      { title: "Autorizar Integração — BOOSTGG" },
       { name: "description", content: "Confirmação segura de autorização de integração da BoostGG." },
       { name: "robots", content: "noindex, nofollow" },
     ],

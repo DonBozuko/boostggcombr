@@ -5,7 +5,7 @@ const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/reembolso")({
   head: () => {
-    const title = "Reembolso e Reposição — BoostGG";
+    const title = "Reembolso e Reposição — BOOSTGG";
     const description = "Política de reembolso e reposição da BoostGG: quando pedir, prazos, cobertura de queda natural e como solicitar.";
     return {
       meta: [

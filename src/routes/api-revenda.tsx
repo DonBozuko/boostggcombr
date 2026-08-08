@@ -4,13 +4,13 @@ import { PageGuide } from "@/components/PageGuide";
 export const Route = createFileRoute("/api-revenda")({
   head: () => ({
     meta: [
-      { title: "API para Revendedores — Elite Boost Prime | BoostGG" },
+      { title: "API para Revendedores — BOOSTGG" },
       {
         name: "description",
         content:
           "API de revenda do BoostGG: consulte serviços, saldo e crie pedidos por integração. Saldo pré-pago em Pix, preço com desconto de revenda e rastreio por pedido.",
       },
-      { property: "og:title", content: "API para Revendedores — BoostGG" },
+      { property: "og:title", content: "API para Revendedores — BOOSTGG" },
       {
         property: "og:description",
         content: "Integre seu painel ou site ao catálogo do BoostGG. Saldo pré-pago, desconto de revenda e status por pedido.",

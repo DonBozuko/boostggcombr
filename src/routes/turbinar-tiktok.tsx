@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/turbinar-tiktok";
-const TITLE = "Turbinar TikTok — Gestão de Crescimento | BoostGG";
+const TITLE = "Turbinar TikTok — Gestão de Crescimento — BOOSTGG";
 const DESC =
   "Gestão profissional de crescimento para perfis TikTok. Amplie audiência, prova social e alcance com pagamento via Pix e resultado em minutos.";
 

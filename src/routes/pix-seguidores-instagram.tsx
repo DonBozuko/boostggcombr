@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/pix-seguidores-instagram";
-const TITLE = "Seguidores Instagram via Pix — Entrega Imediata | BoostGG";
+const TITLE = "Seguidores Instagram via Pix — Entrega Imediata — BOOSTGG";
 const DESC =
   "Compre seguidores no Instagram pagando via Pix. Aprovação instantânea, entrega automática e reposição nos pacotes brasileiros. Seguro e sem senha.";
 

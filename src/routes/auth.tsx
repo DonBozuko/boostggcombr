@@ -8,7 +8,7 @@ import { LogIn, UserPlus } from "lucide-react";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Acesso Seguro | BoostGG" },
+      { title: "Acesso Seguro — BOOSTGG" },
       { name: "description", content: "Acesso seguro à área autenticada da BoostGG." },
       { name: "robots", content: "noindex, nofollow" },
     ],

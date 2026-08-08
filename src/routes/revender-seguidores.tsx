@@ -4,7 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageGuide } from "@/components/PageGuide";
 
 const CANON = "https://www.boostgg.com.br/revender-seguidores";
-const TITLE = "Como Revender Seguidores e Curtidas em 2026 | BoostGG";
+const TITLE = "Como Revender Seguidores e Curtidas em 2026 — BOOSTGG";
 const DESC =
   "Passo a passo para revender seguidores e curtidas no Brasil: onde comprar no atacado, como precificar e quanto sobra de lucro.";
 
@@ -49,13 +49,13 @@ export const Route = createFileRoute("/revender-seguidores")({
       { title: TITLE },
       { name: "description", content: DESC },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Como Revender Seguidores e Curtidas — BoostGG" },
+      { property: "og:title", content: "Como Revender Seguidores e Curtidas — BOOSTGG" },
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANON },
       { property: "og:type", content: "article" },
       { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Como Revender Seguidores e Curtidas — BoostGG" },
+      { name: "twitter:title", content: "Como Revender Seguidores e Curtidas — BOOSTGG" },
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: CANON }],

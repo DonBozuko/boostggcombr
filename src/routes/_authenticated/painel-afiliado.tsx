@@ -11,9 +11,9 @@ import { affiliateDashboard, type AffiliateDashboard } from "@/lib/affiliate.fun
 export const Route = createFileRoute("/_authenticated/painel-afiliado")({
   head: () => ({
     meta: [
-      { title: "Painel do Afiliado — BoostGG" },
+      { title: "Painel do Afiliado — BOOSTGG" },
       { name: "description", content: "Acompanhe suas indicações, comissões e saldo do programa de afiliados BoostGG." },
-      { property: "og:title", content: "Painel do Afiliado — BoostGG" },
+      { property: "og:title", content: "Painel do Afiliado — BOOSTGG" },
       { property: "og:description", content: "Saldo, comissões e link de indicação em um só lugar." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

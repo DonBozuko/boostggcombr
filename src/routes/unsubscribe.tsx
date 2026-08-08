@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 export const Route = createFileRoute('/unsubscribe')({
   head: () => ({
     meta: [
-      { title: 'Cancelar inscrição — BoostGG' },
+      { title: 'Cancelar inscrição — BOOSTGG' },
       { name: 'robots', content: 'noindex,nofollow' },
     ],
   }),

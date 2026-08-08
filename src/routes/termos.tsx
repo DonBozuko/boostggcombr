@@ -5,7 +5,7 @@ const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/termos")({
   head: () => {
-    const title = "Termos de Uso — BoostGG";
+    const title = "Termos de Uso — BOOSTGG";
     const description = "Termos de uso da BoostGG: regras de contratação, entrega, responsabilidades do cliente e limites do serviço.";
     return {
       meta: [

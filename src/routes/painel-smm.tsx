@@ -5,7 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PageGuide } from "@/components/PageGuide";
 
 const CANON = "https://www.boostgg.com.br/painel-smm";
-const TITLE = "Painel SMM Brasileiro para Revenda | BoostGG";
+const TITLE = "Painel SMM Brasileiro para Revenda — BOOSTGG";
 const DESC =
   "Painel SMM brasileiro com API pronta, saldo pré-pago em Pix e entrega automática. Revenda seguidores, curtidas e views com sua marca e fique com o lucro.";
 
@@ -38,13 +38,13 @@ export const Route = createFileRoute("/painel-smm")({
       { title: TITLE },
       { name: "description", content: DESC },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Painel SMM Brasileiro para Revenda — BoostGG" },
+      { property: "og:title", content: "Painel SMM Brasileiro para Revenda — BOOSTGG" },
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANON },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Painel SMM Brasileiro para Revenda — BoostGG" },
+      { name: "twitter:title", content: "Painel SMM Brasileiro para Revenda — BOOSTGG" },
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: CANON }],

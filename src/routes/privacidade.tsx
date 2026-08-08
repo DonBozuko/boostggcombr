@@ -6,7 +6,7 @@ const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/privacidade")({
   head: () => {
-    const title = "Privacidade e Segurança — BoostGG";
+    const title = "Privacidade e Segurança — BOOSTGG";
     const description = "Como a BoostGG coleta, usa e protege seus dados. Página mantida pela BoostGG para esclarecer dúvidas sobre privacidade e segurança.";
     return {
       meta: [

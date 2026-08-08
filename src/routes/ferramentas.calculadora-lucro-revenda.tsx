@@ -5,7 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Input } from "@/components/ui/input";
 
 const CANON = "https://www.boostgg.com.br/ferramentas/calculadora-lucro-revenda";
-const TITLE = "Calculadora de Lucro de Revenda SMM | BoostGG";
+const TITLE = "Calculadora de Lucro de Revenda SMM — BOOSTGG";
 const DESC =
   "Calcule grátis quanto sobra ao revender seguidores e curtidas: custo de revenda, preço de venda, lucro por pedido e lucro no mês. Sem cadastro.";
 
@@ -15,13 +15,13 @@ export const Route = createFileRoute("/ferramentas/calculadora-lucro-revenda")({
       { title: TITLE },
       { name: "description", content: DESC },
       { name: "robots", content: "index, follow" },
-      { property: "og:title", content: "Calculadora de Lucro de Revenda SMM — BoostGG" },
+      { property: "og:title", content: "Calculadora de Lucro de Revenda SMM — BOOSTGG" },
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANON },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Calculadora de Lucro de Revenda SMM — BoostGG" },
+      { name: "twitter:title", content: "Calculadora de Lucro de Revenda SMM — BOOSTGG" },
       { name: "twitter:description", content: DESC },
     ],
     links: [{ rel: "canonical", href: CANON }],

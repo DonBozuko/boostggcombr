@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/seguidores-pix";
-const TITLE = "Seguidores no Pix — Elite Boost Prime | BoostGG";
+const TITLE = "Seguidores no Pix — BOOSTGG";
 const DESC =
   "Comprar seguidores pagando no Pix: aprovação na hora, entrega automática e reposição nos pacotes brasileiros. Sem cadastro, sem senha, sem cartão.";
 

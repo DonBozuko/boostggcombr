@@ -4,7 +4,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-seguidores-instagram-barato";
-const TITLE = "Seguidores Instagram Barato — Elite Boost Prime | BoostGG";
+const TITLE = "Seguidores Instagram Barato — BOOSTGG";
 const DESC =
   "Seguidores Instagram barato de verdade: a partir de R$5 no Pix, entrega em minutos e reposição de 30 dias nos pacotes BR.";
 

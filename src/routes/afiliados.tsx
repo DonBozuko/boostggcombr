@@ -13,13 +13,13 @@ import { PageGuide } from "@/components/PageGuide";
 export const Route = createFileRoute("/afiliados")({
   head: () => ({
     meta: [
-      { title: "Programa de Afiliados — Ganhe indicando | BoostGG" },
+      { title: "Programa de Afiliados — Ganhe indicando — BOOSTGG" },
       {
         name: "description",
         content:
           "Ganhe 10% de comissão indicando o BoostGG. Cadastro grátis e imediato, link exclusivo, comissão creditada quando o Pix do indicado é aprovado.",
       },
-      { property: "og:title", content: "Programa de Afiliados — BoostGG" },
+      { property: "og:title", content: "Programa de Afiliados — BOOSTGG" },
       {
         property: "og:description",
         content: "Indique com seu link e ganhe 10% de cada compra aprovada. Sem custo, sem estoque, sem suporte.",

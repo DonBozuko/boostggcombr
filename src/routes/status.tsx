@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 export const Route = createFileRoute("/status")({
   head: () => ({
     meta: [
-      { title: "Status do Sistema | BoostGG" },
+      { title: "Status do Sistema — BOOSTGG" },
       { name: "description", content: "Saúde em tempo real das rotas de entrega e do catálogo BoostGG." },
-      { property: "og:title", content: "Status do Sistema | BoostGG" },
+      { property: "og:title", content: "Status do Sistema — BOOSTGG" },
       { property: "og:description", content: "Rotas de entrega e catálogo em tempo real." },
       { name: "robots", content: "noindex,nofollow" },
     ],

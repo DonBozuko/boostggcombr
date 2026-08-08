@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Calculator, Users, Sparkles, ArrowRight } from "lucide-react";
 
 const CANON = "https://www.boostgg.com.br/ferramentas";
-const TITLE = "Ferramentas Grátis para Instagram | BoostGG";
+const TITLE = "Ferramentas Grátis para Instagram — BOOSTGG";
 const DESC =
   "Ferramentas 100% grátis para creators: gerador de legenda com IA, contador de seguidores em tempo real e calculadora de engajamento do Instagram. Sem login.";
 
