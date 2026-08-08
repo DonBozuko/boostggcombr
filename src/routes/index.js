@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
@@ -51,130 +51,142 @@ const getCheckoutSuccessMessage = (qty) => `Seu pedido de ${qty || ""} seguidore
 - Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
 - Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
 (v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
-name: "BOOSTGG",
-    inLanguage;
-"pt-BR",
-    publisher;
-{
-    "@id";
-    "https://www.boostgg.com.br/#organization";
-}
-// v302 — O nó Service foi REMOVIDO de propósito.
-// O Google reportou "Review snippets: tipo de objeto do campo
-// <parent_node> não é válido" apontando para o item
-// "Compra de Seguidores no Instagram". Causa: Service não é um
-// tipo que aceita nota/avaliação; como Service e Product
-// descreviam a MESMA página, o Google colava a nota do Product
-// no Service e invalidava o rich snippet inteiro.
-// Ponto único de verdade: só o Product carrega oferta + nota.
-{
-    "@type";
-    "FAQPage",
-        mainEntity;
-    [
-        {
-            "@type": "Question",
-            name: "Os seguidores são brasileiros?",
-            acceptedAnswer: {
-                "@type": "Answer",
-                text: "Sim. Entregamos seguidores com perfis brasileiros, com entrega imediata via Pix.",
-            },
-        },
-        {
-            "@type": "Question",
-            name: "Preciso fornecer minha senha?",
-            acceptedAnswer: {
-                "@type": "Answer",
-                text: "Não. Só precisamos do seu @usuário público do Instagram. Nunca pedimos senha.",
-            },
-        },
-        {
-            "@type": "Question",
-            name: "Em quanto tempo recebo os seguidores?",
-            acceptedAnswer: {
-                "@type": "Answer",
-                text: "A entrega começa em poucos minutos após a confirmação do Pix.",
-            },
-        },
-    ],
-    ;
-}
-{
-    "@type";
-    "Product",
-        "@id";
-    "https://www.boostgg.com.br/#product",
-        name;
-    "Seguidores para Instagram - BoostGG",
-        description,
-        brand;
-    {
-        "@type";
-        "Brand", name;
-        "BoostGG";
-    }
-    image: ogImage,
-        // Oferta herdada do antigo nó Service (v302): rich snippet de
-        // preço + nota agora vivem no mesmo item suportado.
-        offers;
-    {
-        "@type";
-        "AggregateOffer",
-            priceCurrency;
-        "BRL",
-            lowPrice;
-        "5.00",
-            highPrice;
-        "499.00",
-            offerCount;
-        "9",
-            availability;
-        "https://schema.org/InStock",
-            url;
-        "https://www.boostgg.com.br/",
-        ;
-    }
-    aggregateRating: {
-        "@type";
-        "AggregateRating",
-            ratingValue;
-        "4.9",
-            bestRating;
-        "5",
-            worstRating;
-        "1",
-            ratingCount;
-        "147",
-            reviewCount;
-        "147",
-        ;
-    }
-    review: [
-        {
-            "@type": "Review",
-            author: { "@type": "Person", name: "Larissa M." },
-            reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-            reviewBody: "Cheguei em 12k em uma semana. O engajamento dobrou e fechei 3 publis novas.",
-        },
-        {
-            "@type": "Review",
-            author: { "@type": "Person", name: "Rafael D." },
-            reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-            reviewBody: "Pix caiu, em 4 minutos já tinham começado a entregar. Surreal.",
-        },
-        {
-            "@type": "Review",
-            author: { "@type": "Person", name: "Camila S." },
-            reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
-            reviewBody: "Já testei vários sites e só aqui não caiu seguidor depois. Suporte responde rápido.",
-        },
-    ],
-    ;
-}
-;
-component: Landing,
-;
-;
+export const Route = createFileRoute("/")({
+    head: () => {
+        const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
+        const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
+        const description = "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
+        const url = "https://www.boostgg.com.br/";
+        const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
+        return {
+            meta: [
+                { title },
+                { name: "description", content: description },
+                { name: "robots", content: "index, follow" },
+                { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
+                { property: "og:type", content: "website" },
+                { property: "og:title", content: ogTitle },
+                { property: "og:description", content: description },
+                { property: "og:url", content: url },
+                { property: "og:image", content: ogImage },
+                { property: "og:image:width", content: "1216" },
+                { property: "og:image:height", content: "640" },
+                { property: "og:image:alt", content: "BOOSTGG — Seguidores Brasileiros no Instagram via Pix" },
+                { property: "og:site_name", content: "BOOSTGG" },
+                { property: "og:locale", content: "pt_BR" },
+                { name: "twitter:card", content: "summary_large_image" },
+                { name: "twitter:title", content: ogTitle },
+                { name: "twitter:description", content: description },
+                { name: "twitter:image", content: ogImage },
+            ],
+            links: [{ rel: "canonical", href: url }],
+            scripts: [
+                {
+                    type: "application/ld+json",
+                    children: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@graph": [
+                            {
+                                "@type": "Organization",
+                                "@id": "https://www.boostgg.com.br/#organization",
+                                name: "BOOSTGG",
+                                url: "https://www.boostgg.com.br/",
+                                logo: ogImage,
+                                description,
+                                sameAs: [],
+                                taxID: "47363210000108",
+                                identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47363210000108" },
+                            },
+                            {
+                                "@type": "WebSite",
+                                "@id": "https://www.boostgg.com.br/#website",
+                                url: "https://www.boostgg.com.br/",
+                                name: "BOOSTGG",
+                                inLanguage: "pt-BR",
+                                publisher: { "@id": "https://www.boostgg.com.br/#organization" },
+                            },
+                            {
+                                "@type": "FAQPage",
+                                mainEntity: [
+                                    {
+                                        "@type": "Question",
+                                        name: "Os seguidores são brasileiros?",
+                                        acceptedAnswer: {
+                                            "@type": "Answer",
+                                            text: "Sim. Entregamos seguidores com perfis brasileiros, com entrega imediata via Pix.",
+                                        },
+                                    },
+                                    {
+                                        "@type": "Question",
+                                        name: "Preciso fornecer minha senha?",
+                                        acceptedAnswer: {
+                                            "@type": "Answer",
+                                            text: "Não. Só precisamos do seu @usuário público do Instagram. Nunca pedimos senha.",
+                                        },
+                                    },
+                                    {
+                                        "@type": "Question",
+                                        name: "Em quanto tempo recebo os seguidores?",
+                                        acceptedAnswer: {
+                                            "@type": "Answer",
+                                            text: "A entrega começa em poucos minutos após a confirmação do Pix.",
+                                        },
+                                    },
+                                ],
+                            },
+                            {
+                                "@type": "Product",
+                                "@id": "https://www.boostgg.com.br/#product",
+                                name: "Seguidores para Instagram - BoostGG",
+                                description,
+                                brand: { "@type": "Brand", name: "BoostGG" },
+                                image: ogImage,
+                                offers: {
+                                    "@type": "AggregateOffer",
+                                    priceCurrency: "BRL",
+                                    lowPrice: "5.00",
+                                    highPrice: "499.00",
+                                    offerCount: "9",
+                                    availability: "https://schema.org/InStock",
+                                    url: "https://www.boostgg.com.br/",
+                                },
+                                aggregateRating: {
+                                    "@type": "AggregateRating",
+                                    ratingValue: "4.9",
+                                    bestRating: "5",
+                                    worstRating: "1",
+                                    ratingCount: "147",
+                                    reviewCount: "147",
+                                },
+                                review: [
+                                    {
+                                        "@type": "Review",
+                                        author: { "@type": "Person", name: "Larissa M." },
+                                        reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                                        reviewBody: "Cheguei em 12k em uma semana. O engajamento dobrou e fechei 3 publis novas.",
+                                    },
+                                    {
+                                        "@type": "Review",
+                                        author: { "@type": "Person", name: "Rafael D." },
+                                        reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                                        reviewBody: "Pix caiu, em 4 minutos já tinham começado a entregar. Surreal.",
+                                    },
+                                    {
+                                        "@type": "Review",
+                                        author: { "@type": "Person", name: "Camila S." },
+                                        reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                                        reviewBody: "Já testei vários sites e só aqui não caiu seguidor depois. Suporte responde rápido.",
+                                    },
+                                ],
+                            },
+                        ],
+                    }),
+                },
+            ],
+        };
+    },
+    component: Landing,
+});
 const plans = [
     { id: "p100", tier: "100 Seguidores", tag: "+ MINI", qty: "100", quantidade: 100, valor: 5.0, price: "R$ 5,00", benefit: "Seguidores Reais via Pix" },
     { id: "p500", tier: "500 Seguidores", tag: "+ STARTER", qty: "500", quantidade: 500, valor: 12.0, price: "R$ 12,00", benefit: "Seguidores Reais Brasil" },
