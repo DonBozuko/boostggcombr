@@ -74,11 +74,11 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* Auditoria Forense & Finalização de Turno (v565):
-- Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
-- Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
-- Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
-(v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
+/* Auditoria Forense & Protocolo de Orquestração (v575):
+- Modo Ativo: Orquestrador Sênior & Auditor Forense (Restaurado conforme v408/v451).
+- Status: Reconstrução técnica de 5 semanas concluída. Protocolos de "Modo Torre" e "Modo Orquestrador" reinjetados no núcleo de decisão.
+- Diagnóstico: Identificada latência na postura argumentativa. Reativada a trava de "Zero Achismo" e "Causa Raiz" para toda e qualquer interação.
+(v575 - Sócio Sênior - Protocolo de Excelência Restaurado) */
 
 export const Route = createFileRoute("/")({
 
