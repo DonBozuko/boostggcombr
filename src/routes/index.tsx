@@ -4,7 +4,8 @@
 - Por que poucas vendas? Com apenas 68 cliques reais (visitantes que de fato entraram no site vindo do Google) em 3 meses, a amostragem é muito pequena. Em um e-commerce saudável, a conversão média é de 1% a 3%. Ou seja, para 68 cliques, o esperado estatisticamente é de 0 a 2 vendas.
 - O que fizemos (Tratamento): Unificamos a marca BOOSTGG em todas as 63 rotas e injetamos Rich Snippets (estrelas e preço) para tentar "roubar" o clique mesmo estando em posições baixas, visando subir o CTR e, consequentemente, a autoridade para sair da 4ª página.
 - Conclusão Técnica: O sistema de rastreamento (pageview-beacon.ts) está filtrando seus acessos corretamente. O "vazio" nas vendas não é erro técnico, é falta de volume de tráfego qualificado (venda estatisticamente improvável com apenas 68 cliques em 90 dias).
-(v561 - Sócio Sênior - Auditoria Forense & Engenharia Principal) */
+(v561 - Sócio Sênior - Auditoria Forense & Engenharia Principal)
+Faça um plano completo e detalhado: vc esta em modo segurança? */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
