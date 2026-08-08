@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: oque vc me sugere? é vc que cuida de todo meu sistema, nao sou desenvolvedor, se vc nao me disser o melhor caominho, vou te guiar errado, e aqui é vc q me guia */
+/* Faça um plano completo e detalhado: pode sim e que essa postura seja regra absoluta */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
