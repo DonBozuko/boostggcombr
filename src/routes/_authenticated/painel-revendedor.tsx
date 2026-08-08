@@ -24,7 +24,7 @@ const STORAGE_KEY = "bgg_reseller_key";
 export const Route = createFileRoute("/_authenticated/painel-revendedor")({
   head: () => ({
     meta: [
-      { title: "Painel do Revendedor — Elite Boost Prime — BOOSTGG" },
+      { title: "Painel do Revendedor — BOOSTGG — BOOSTGG" },
       // v524 — área privada: nunca indexar (evita URL vazia no índice e desperdício de crawl budget)
       { name: "robots", content: "noindex, nofollow" },
       {
