@@ -73,19 +73,62 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
 - Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
 - Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
 (v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
+
+export const Route = createFileRoute("/")({
+  head: () => {
+    const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
+    const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
+    const description =
+      "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
+    const url = "https://www.boostgg.com.br/";
+    const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { name: "robots", content: "index, follow" },
+        { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
+        { property: "og:type", content: "website" },
+        { property: "og:title", content: ogTitle },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1216" },
+        { property: "og:image:height", content: "640" },
+        { property: "og:image:alt", content: "BOOSTGG — Seguidores Brasileiros no Instagram via Pix" },
+        { property: "og:site_name", content: "BOOSTGG" },
+        { property: "og:locale", content: "pt_BR" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: ogTitle },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: ogImage },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "Organization",
+                "@id": "https://www.boostgg.com.br/#organization",
+                name: "BOOSTGG",
+                url: "https://www.boostgg.com.br/",
+                logo: ogImage,
+                description,
+                sameAs: [],
+                taxID: "47363210000108",
+                identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47363210000108" },
+              },
+              {
+                "@type": "WebSite",
+                "@id": "https://www.boostgg.com.br/#website",
+                url: "https://www.boostgg.com.br/",
                 name: "BOOSTGG",
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://www.boostgg.com.br/#organization" },
               },
-              // v302 — O nó Service foi REMOVIDO de propósito.
-              // O Google reportou "Review snippets: tipo de objeto do campo
-              // <parent_node> não é válido" apontando para o item
-              // "Compra de Seguidores no Instagram". Causa: Service não é um
-              // tipo que aceita nota/avaliação; como Service e Product
-              // descreviam a MESMA página, o Google colava a nota do Product
-              // no Service e invalidava o rich snippet inteiro.
-              // Ponto único de verdade: só o Product carrega oferta + nota.
-
               {
                 "@type": "FAQPage",
                 mainEntity: [
@@ -122,8 +165,6 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
                 description,
                 brand: { "@type": "Brand", name: "BoostGG" },
                 image: ogImage,
-                // Oferta herdada do antigo nó Service (v302): rich snippet de
-                // preço + nota agora vivem no mesmo item suportado.
                 offers: {
                   "@type": "AggregateOffer",
                   priceCurrency: "BRL",
@@ -171,8 +212,6 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
       ],
     };
   },
-
-
   component: Landing,
 });
 
