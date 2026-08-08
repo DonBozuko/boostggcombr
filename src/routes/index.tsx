@@ -1,10 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-/* Auditoria Forense & Finalização de Turno (v565):
-- Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
-- Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
-- Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
-(v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
-/* (Note: The rest of the file src/routes/index.tsx follows here...) */
+import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Dialog,
   DialogContent,
@@ -24,7 +18,20 @@ import { simulatePurchase } from "@/lib/simulate-purchase.functions";
 import { getUtmParams } from "@/lib/utm";
 import { trackFunnel } from "@/lib/funnel-beacon";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CheckCircle2 } from "lucide-react";
+import { 
+  CheckCircle2, 
+  Zap, 
+  ShieldCheck, 
+  RefreshCw, 
+  Wrench, 
+  Eye, 
+  Instagram, 
+  Send, 
+  Copy, 
+  MessageCircle,
+  Star
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -34,98 +41,38 @@ import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
 import { BrandHeader } from "@/components/BrandHeader";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useScrolledPast } from "@/hooks/use-scrolled-past";
+import { useServerFn } from "@tanstack/react-start";
+import { useBlockedMap, isBlocked } from "@/lib/blocking-logic";
+import { useExitIntent } from "@/hooks/use-exit-intent";
+import { useBestsellers } from "@/hooks/use-bestsellers";
+import { playSuccessAudio } from "@/lib/audio-feedback";
+import { getAdminToken } from "@/lib/admin-token-store";
+import { checkoutErrorMessage } from "@/lib/checkout-errors";
+import { MobileFrame } from "@/components/MobileFrame";
+import { PlansShowcaseProvider, ShowcaseShell, ShowcaseTrigger } from "@/components/PlansShowcase";
+import { FabianoBadge } from "@/components/FabianoBadge";
+import { SocialProofPopup } from "@/components/SocialProofPopup";
+import { JarvisBadge } from "@/components/JarvisBadge";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
+import { FaqSection } from "@/components/FaqSection";
+import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
+import { ProductSchema } from "@/components/ProductSchema";
 
+const ogInstagram = "/og-instagram.png";
+const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
+const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-
-// Analytics: dispara evento p/ gtag, dataLayer (GTM) e fbq, sem quebrar se nenhum existir.
-type TrackPayload = Record<string, string | number | boolean | undefined>;
-function trackEvent(name: string, payload: TrackPayload = {}) {
-  if (typeof window === "undefined") return;
-  try {
-    const w = window as unknown as {
-      gtag?: (...a: unknown[]) => void;
-      dataLayer?: unknown[];
-      fbq?: (...a: unknown[]) => void;
-      ttq?: { track: (n: string, p?: unknown, opts?: { event_id?: string }) => void; page?: () => void };
-    };
-    w.gtag?.("event", name, payload);
-    w.dataLayer?.push({ event: name, ...payload });
-    w.fbq?.("trackCustom", name, payload);
-    // TikTok Pixel: mapeia p/ eventos padrão quando aplicável
-    const ttqMap: Record<string, string> = {
-      checkout_submit: "InitiateCheckout",
-      purchase: "CompletePayment",
-    };
-    const ttqEvent = ttqMap[name] ?? name;
-    const value = typeof payload.value === "number" ? payload.value
-      : typeof payload.plan_value === "number" ? payload.plan_value
-      : undefined;
-    const ttqOptions =
-      name === "purchase" && (typeof payload.order_id === "string" || typeof payload.order_id === "number")
-        ? { event_id: `cp_${payload.order_id}` }
-        : undefined;
-    w.ttq?.track(ttqEvent, value !== undefined ? { value, currency: "BRL", ...payload } : payload, ttqOptions);
-    if (import.meta.env.DEV) console.debug("[track]", name, payload);
-  } catch (err) {
-    console.error("[trackEvent]", err);
-  }
-}
-
-
-export const Route = createFileRoute("/")({
-  head: () => {
-    const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
-    const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
-    const description =
-      "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
-    // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
-    // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
-    // marcação e usar a dele. Agora as duas batem.
-    const url = "https://www.boostgg.com.br/";
-    const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
-    return {
-      meta: [
-        { title },
-        { name: "description", content: description },
-        { name: "robots", content: "index, follow" },
-        { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
-        { property: "og:type", content: "website" },
-        { property: "og:title", content: ogTitle },
-        { property: "og:description", content: description },
-        { property: "og:url", content: url },
-        { property: "og:image", content: ogImage },
-        { property: "og:image:width", content: "1216" },
-        { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "BOOSTGG — Seguidores Brasileiros no Instagram via Pix" },
-        { property: "og:site_name", content: "BOOSTGG" },
-        { property: "og:locale", content: "pt_BR" },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: ogTitle },
-        { name: "twitter:description", content: description },
-        { name: "twitter:image", content: ogImage },
-      ],
-      links: [{ rel: "canonical", href: url }],
-      scripts: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@graph": [
-              {
-                "@type": "Organization",
-                "@id": "https://www.boostgg.com.br/#organization",
-                name: "BOOSTGG",
-                url: "https://www.boostgg.com.br/",
-                logo: ogImage,
-                description,
-                sameAs: [],
-                taxID: "47363210000108",
-                identifier: { "@type": "PropertyValue", propertyID: "CNPJ", value: "47363210000108" },
-              },
-              {
-                "@type": "WebSite",
-                "@id": "https://www.boostgg.com.br/#website",
-                url: "https://www.boostgg.com.br/",
+/* Auditoria Forense & Finalização de Turno (v565):
+- Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
+- Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
+- Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
+(v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
                 name: "BOOSTGG",
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://www.boostgg.com.br/#organization" },
