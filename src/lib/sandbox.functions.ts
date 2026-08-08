@@ -30,7 +30,7 @@ export const getSandboxEnabled = createServerFn({ method: "GET" }).handler(async
  */
 export const toggleSandboxAllProviders = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { enable: boolean }) => input)
+  .validator((input: { enable: boolean }) => input)
   .handler(async ({ data, context }) => {
     const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
     if (email !== ADMIN_EMAIL) {

@@ -21,7 +21,7 @@ const inputSchema = z.object({
 
 
 export const getRoasReport = createServerFn({ method: "POST" })
-  .inputValidator((data: unknown) => inputSchema.parse(data))
+  .validator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }) => {
     if (data.adminToken !== process.env.ADMIN_TOKEN) {
       return { ok: false as const, error: "UNAUTHORIZED" as const };

@@ -24,7 +24,7 @@ const VALID: PricingCategory[] = [
 ];
 
 export const getPricingGrid = createServerFn({ method: "GET" })
-  .inputValidator((data: { category: PricingCategory }) => {
+  .validator((data: { category: PricingCategory }) => {
     if (!data || !VALID.includes(data.category)) {
       throw new Error("category inválida");
     }
@@ -49,7 +49,7 @@ export const getPricingGrid = createServerFn({ method: "GET" })
 // v202 — Grid BR curado (lê pricing_items direto, categoria 'x:y:br').
 // Usado pelo toggle "🇧🇷 Só brasileiros" nos cards IG/TikTok.
 export const getBrPricingGrid = createServerFn({ method: "GET" })
-  .inputValidator((data: { network: "instagram" | "tiktok"; kind: "seguidores" }) => {
+  .validator((data: { network: "instagram" | "tiktok"; kind: "seguidores" }) => {
     if (!data || !["instagram", "tiktok"].includes(data.network)) throw new Error("network inválida");
     if (data.kind !== "seguidores") throw new Error("kind inválido");
     return data;

@@ -36,7 +36,7 @@ export const getAutonomiaFlags = createServerFn({ method: "GET" }).handler(
 
 export const setAutonomiaFlag = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { key: string; enable: boolean }) => input)
+  .validator((input: { key: string; enable: boolean }) => input)
   .handler(async ({ data, context }) => {
     const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
     if (email !== ADMIN_EMAIL) throw new Error("Forbidden");

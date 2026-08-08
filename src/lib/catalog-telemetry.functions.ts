@@ -18,7 +18,7 @@ export type ProviderTelemetry = {
 };
 
 export const getCatalogTelemetry = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

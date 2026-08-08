@@ -7,7 +7,7 @@ const input = z.object({ pedidoId: z.string().min(4).max(60) });
 
 
 export const consultarPedidoPublico = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const raw = data.pedidoId.trim();

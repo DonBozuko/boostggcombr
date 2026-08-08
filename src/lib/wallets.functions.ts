@@ -17,7 +17,7 @@ export type WalletsSnapshot =
   | { ok: false; error: string };
 
 export const walletsSnapshot = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<WalletsSnapshot> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };

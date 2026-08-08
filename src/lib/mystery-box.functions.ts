@@ -13,7 +13,7 @@ const input = z.object({
 });
 
 export const redeemMysteryBox = createServerFn({ method: "POST" })
-  .inputValidator((v) => input.parse(v))
+  .validator((v) => input.parse(v))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 

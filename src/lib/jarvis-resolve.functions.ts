@@ -7,7 +7,7 @@ import { z } from "zod";
  * o problema já foi auditado ou é um teste de integridade conhecido.
  */
 export const resolveJarvisAlerts = createServerFn({ method: "POST" })
-  .inputValidator((input: { token: string; ids?: string[] }) => 
+  .validator((input: { token: string; ids?: string[] }) => 
     z.object({ 
       token: z.string().min(8),
       ids: z.array(z.string()).optional()

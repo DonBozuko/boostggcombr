@@ -28,7 +28,7 @@ const USED_IDS = new Set<number>([
 ]);
 
 export const auditarFornecedor = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<AuditResp> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };
@@ -111,7 +111,7 @@ export const auditarFornecedor = createServerFn({ method: "POST" })
   });
 
 export const auditoriaContingenciaLocal = createServerFn({ method: "POST" })
-  .inputValidator((i) => tokenOnlyInput.parse(i))
+  .validator((i) => tokenOnlyInput.parse(i))
   .handler(async ({ data }): Promise<AuditResp> => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return { ok: false, error: "UNAUTHORIZED" };

@@ -31,7 +31,7 @@ const ORDEM: { key: string; rotulo: string }[] = [
 ];
 
 export const getFunilEtapas = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z.object({ token: z.string().min(8), days: z.number().int().min(1).max(90).default(7) }).parse(i),
   )
   .handler(async ({ data }): Promise<FunilEtapasPayload> => {

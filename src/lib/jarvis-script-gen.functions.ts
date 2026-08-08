@@ -80,7 +80,7 @@ const genInput = z.object({
 });
 
 export const generateFacelessScript = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => genInput.parse(input))
+  .validator((input: unknown) => genInput.parse(input))
   .handler(async ({ data }) => {
     const info = ROUTE[data.network];
     const seedHook = HOOKS_MATRIX[Math.floor(Math.random() * HOOKS_MATRIX.length)];

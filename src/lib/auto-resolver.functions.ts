@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 
 export const runAutoResolveIds = createServerFn({ method: "POST" })
-  .inputValidator((d: { token: string }) => d)
+  .validator((d: { token: string }) => d)
   .handler(async ({ data }) => {
     const admin = process.env.ADMIN_TOKEN;
     const cron = process.env.CRON_ADMIN_TOKEN;

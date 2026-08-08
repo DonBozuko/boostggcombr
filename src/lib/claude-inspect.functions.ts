@@ -110,7 +110,7 @@ export const getClaudeInspect = createServerFn({ method: "GET" })
 // bypassando o Perpetual Balance Guard. Somente diretor.
 export const simulateProviderUnstable = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { slug: string; minutes?: number }) => data)
+  .validator((data: { slug: string; minutes?: number }) => data)
   .handler(async ({ data, context }) => {
     const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
     if (email !== ADMIN_EMAIL) throw new Error("Forbidden");
@@ -131,7 +131,7 @@ export const simulateProviderUnstable = createServerFn({ method: "POST" })
 
 export const clearProviderUnstableFn = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { slug: string }) => data)
+  .validator((data: { slug: string }) => data)
   .handler(async ({ data, context }) => {
     const email = (context.claims?.email as string | undefined)?.toLowerCase() ?? "";
     if (email !== ADMIN_EMAIL) throw new Error("Forbidden");

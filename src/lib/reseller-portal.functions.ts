@@ -44,7 +44,7 @@ export type PortalData = {
 
 /** Login + dados do painel. A chave nunca sai do navegador dele para outro lugar. */
 export const resellerMe = createServerFn({ method: "POST" })
-  .inputValidator((i) => keySchema.parse(i))
+  .validator((i) => keySchema.parse(i))
   .handler(async ({ data }): Promise<PortalData> => {
     if (await (await import("@/lib/reseller-portal-limits.server")).portalLimited("reseller-portal", 60, 300)) {
       return { ok: false, error: "Muitas tentativas. Aguarde alguns minutos." };
@@ -103,7 +103,7 @@ export type TopupResult = {
 
 /** Gera o Pix de recarga. O saldo só entra quando o MP confirmar (webhook). */
 export const resellerTopup = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z.object({ apiKey: z.string().trim().min(8).max(80), valor: z.number().min(20).max(20000) }).parse(i),
   )
   .handler(async ({ data }): Promise<TopupResult> => {
@@ -182,7 +182,7 @@ export const resellerTopup = createServerFn({ method: "POST" })
 
 /** Polling do front: a recarga já caiu? */
 export const resellerTopupStatus = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z.object({ apiKey: z.string().trim().min(8).max(80), topupId: z.string().uuid() }).parse(i),
   )
   .handler(async ({ data }): Promise<{ ok: boolean; status?: string; saldo?: number; error?: string }> => {
@@ -212,7 +212,7 @@ export type PortalService = {
 
 /** Catálogo com o preço dele (mesma cotação da API pública). */
 export const resellerCatalog = createServerFn({ method: "POST" })
-  .inputValidator((i) => keySchema.parse(i))
+  .validator((i) => keySchema.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; services: PortalService[] }> => {
     const { authReseller } = await import("@/lib/reseller-api.server");
     const r = await authReseller(data.apiKey);
@@ -247,7 +247,7 @@ export const resellerCatalog = createServerFn({ method: "POST" })
 
 /** Pedido feito pelo painel — passa exatamente pela mesma API/travas da revenda. */
 export const resellerPlaceOrder = createServerFn({ method: "POST" })
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         apiKey: z.string().trim().min(8).max(80),

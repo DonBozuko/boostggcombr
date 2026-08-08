@@ -19,7 +19,7 @@ export type AffiliateSignupResult =
 const SITE = "https://www.boostgg.com.br";
 
 export const signupAffiliate = createServerFn({ method: "POST" })
-  .inputValidator((i) => signupSchema.parse(i))
+  .validator((i) => signupSchema.parse(i))
   .handler(async ({ data }): Promise<AffiliateSignupResult> => {
     const req = getRequest();
     const { clientIpFrom, checkRateLimit } = await import("@/lib/rate-limit.server");
@@ -104,7 +104,7 @@ const loginSchema = z.object({
 });
 
 export const affiliateDashboard = createServerFn({ method: "POST" })
-  .inputValidator((i) => loginSchema.parse(i))
+  .validator((i) => loginSchema.parse(i))
   .handler(async ({ data }): Promise<AffiliateDashboard> => {
     const req = getRequest();
     const { clientIpFrom, checkRateLimit } = await import("@/lib/rate-limit.server");

@@ -18,7 +18,7 @@ const input = z.object({
 
 
 export const benchCount = createServerFn({ method: "POST" })
-  .inputValidator((i) => z.object({ token: z.string().min(8) }).parse(i))
+  .validator((i) => z.object({ token: z.string().min(8) }).parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED", total: 0 };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -29,7 +29,7 @@ export const benchCount = createServerFn({ method: "POST" })
   });
 
 export const benchBatch = createServerFn({ method: "POST" })
-  .inputValidator((i) => input.parse(i))
+  .validator((i) => input.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED", rows: [] as BenchRow[] };
 

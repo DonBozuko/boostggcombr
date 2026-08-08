@@ -18,7 +18,7 @@ export type InsightsPayload = {
 } | { ok: false; error: string };
 
 export const getInsightsIA = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }): Promise<InsightsPayload> => {
     if (data.token !== process.env.ADMIN_TOKEN) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
