@@ -17,8 +17,8 @@ export async function getMpAccessToken(): Promise<string> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   
   try {
-    // Busca na tabela de configuração centralizada
-    const { data: config } = await supabaseAdmin
+    // Busca na tabela de configuração centralizada usando cast para omitir erros de tipo se a tabela for nova
+    const { data: config } = await (supabaseAdmin as any)
       .from("app_config")
       .select("value")
       .eq("key", "mercado_pago_token")
@@ -39,7 +39,7 @@ export async function getMpAccessToken(): Promise<string> {
     }
 
     // Atualiza o banco para as próximas instâncias/requests
-    await supabaseAdmin
+    await (supabaseAdmin as any)
       .from("app_config")
       .upsert({
         key: "mercado_pago_token",
