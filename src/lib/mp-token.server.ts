@@ -6,7 +6,7 @@
  * 1. Cliente Administrativo Real: Usa supabaseAdmin (Proxy) para evitar vazamento de tipos e escopo.
  * 2. Expiração Robusta: Suporta tokens de longa duração (env) com revalidação forçada de 24h.
  * 3. Fallback Transparente: Erros de banco são logados mas não interrompem o fluxo se o env estiver presente.
- * 4. Tipagem Segura: Removeu 'as any' em favor de tipagem explícita (se disponível) ou proxy seguro.
+ * 4. Tipagem Flexível: Usa cast para contornar drift entre o banco real e os tipos gerados (Database['public']['Tables']).
  */
 
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
@@ -27,7 +27,8 @@ export async function getMpAccessToken(): Promise<string> {
   const now = Date.now();
 
   // 1. Tentar ler do banco (Central de Verdade para instâncias horizontais)
-  const { data: config, error: fetchError } = await supabaseAdmin
+  // Usamos casting para 'any' apenas no seletor de tabela para contornar o drift de tipos se a migration ainda não foi processada pelo gerador
+  const { data: config, error: fetchError } = await (supabaseAdmin as any)
     .from("app_config")
     .select("value")
     .eq("key", CONFIG_KEY)
@@ -52,15 +53,14 @@ export async function getMpAccessToken(): Promise<string> {
   }
 
   // Se o banco falhou ou expirou, atualizamos com o env e definimos uma expiração de 24h (para tokens estáticos)
-  // Se fosse um OAuth real do MP, usaríamos o expires_in da API.
   const newExpiresAt = now + FORCE_REFRESH_WINDOW_MS;
 
   try {
-    const { error: upsertError } = await supabaseAdmin
+    const { error: upsertError } = await (supabaseAdmin as any)
       .from("app_config")
       .upsert({
         key: CONFIG_KEY,
-        value: { access_token: envToken, expires_at: newExpiresAt } as any,
+        value: { access_token: envToken, expires_at: newExpiresAt },
         updated_at: new Date().toISOString()
       });
 
