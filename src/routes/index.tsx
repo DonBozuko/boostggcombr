@@ -69,7 +69,7 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import CardPayOption from "@/components/CardPayOption";
 import { z } from "zod";
-import { criarPedido } from "@/lib/pedidos.functions";
+import { criarPedido, prewarmPedido } from "@/lib/pedidos.functions";
 import { trackInitiateCheckout, trackViewContent, trackAddToCart } from "@/lib/tiktok-pixel";
 
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
@@ -452,6 +452,7 @@ function Landing() {
   const attemptLoggedRef = useRef(false);
   const profileInputRef = useRef<HTMLInputElement | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
+  const prewarmFn = useServerFn(prewarmPedido);
   const simulatePurchaseFn = useServerFn(simulatePurchase);
   const getStatusFn = useServerFn(getPedidoStatus);
   const blockedMap = useBlockedMap();
