@@ -59,7 +59,7 @@ export const Route = createFileRoute("/kwai")({
         { name: "twitter:description", content: description },
       ],
       links: [{ rel: "canonical", href: url }],
-      scripts: [buildProductJsonLd({ network: "Kwai", url, description }), buildFaqJsonLd(FAQS["kwai"])],
+      scripts: [buildProductJsonLd({ network: "Kwai", category: "Seguidores e Curtidas", url, description }), buildFaqJsonLd(FAQS["kwai"])],
     };
   },
   component: KwaiLanding,

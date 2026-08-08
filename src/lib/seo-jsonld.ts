@@ -1,18 +1,22 @@
-// v172 — JSON-LD Product + AggregateRating + AggregateOffer para rich snippets no SERP.
+// v172/v542 — JSON-LD Product + AggregateRating + AggregateOffer para rich snippets no SERP.
 // Google só renderiza estrelinhas + preço quando Product tem offers OU review válido.
 // AggregateOffer com lowPrice fixo (R$5 = piso real de /promo-5reais) resolve sem cache defasado.
 export function buildProductJsonLd(opts: {
   network: string;
+  category?: string; // v542: Dinamização de categoria (Curtidas, Seguidores, etc)
   url: string;
   description: string;
   priceFromBrl?: number; // deprecated, ignorado
 }) {
+  const categoryLabel = opts.category ? ` ${opts.category}` : "";
+  const productName = `Serviços de Engajamento${categoryLabel} ${opts.network} — BoostGG`;
+
   return {
     type: "application/ld+json" as const,
     children: JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Product",
-      name: `Serviços de Engajamento ${opts.network} — BoostGG`,
+      name: productName,
       description: opts.description,
       brand: { "@type": "Brand", name: "BoostGG" },
       url: opts.url,
