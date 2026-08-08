@@ -1,4 +1,4 @@
-/* nao, foi muito rapido, vc começou a ser limitado de novo, tem q ser detalhista */
+/* sim,perfeito, mas nao mude seu detalhismo, pois as veses do nada, vc nao explica coisa com coisa, dando sensaçao q nao fez, entao nunca venha com respostas curtas, vagas, sempre detalhado, com provas, com sugestoes, melhor caminho,etc. */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
