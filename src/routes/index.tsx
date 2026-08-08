@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: mas meu site nao é elite, Elite Boost Prime é nome fantasia, BoostGG é do site,lembra? (v547 - Auditoria de Identidade e Branding Consolidada) */
+/* Faça um plano completo e detalhado: mas meu site nao é elite, Elite Boost Prime é nome fantasia, BoostGG é do site,lembra? (v548 - Sócio Sênior - Hierarquia de Identidade Consolidada) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
@@ -149,7 +149,7 @@ export const Route = createFileRoute("/")({
         { property: "og:image", content: ogImage },
         { property: "og:image:width", content: "1216" },
         { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "Elite Boost Prime — Seguidores Brasileiros no Instagram via Pix" },
+        { property: "og:image:alt", content: "BOOSTGG — Seguidores Brasileiros no Instagram via Pix" },
         { property: "og:site_name", content: "BoostGG" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -1458,7 +1458,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">BOOSTGG</span>
+            <span className="font-display font-semibold text-foreground tracking-tighter">BOOSTGG</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link to="/rastrear" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Rastrear pedido</Link>
