@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim (v544 - Auditoria 360 e Reconciliação Financeira Concluída) */
+/* Faça um plano completo e detalhado: sim, tambem analise pra ver porq estou numa posiçao ruim (v546 - Sócio Sênior - Diagnóstico Estratégico de Performance SEO) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
