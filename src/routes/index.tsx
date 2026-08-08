@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: entao, mas vc fez sem me posicionar e me explicar o porque, como vou saber se fez certo? se nao vou tomar prejuizo?vc precisa me detalhar melhor,como fazia a 4 semanas, agora vc so diz q elevou, e eu nao sei extamente oq ta fazendo, se ta quebrando meu sistema, se ta cliando coisas que nao é pra criar, lembre que sistema estava em modo fechamento, oq nos faz é manuntençao, vereficar se apareceu erros,posicionar os erros, procurar soluçoes, posicionar as soluçoes e discutirmos juntos melhor saida, vc é responsavem por todo meu sistema, mas eu preciso saber essatamente oq faz,passo a passo. */
+/* Faça um plano completo e detalhado: me de sugestoes(recomendaçoes)por prioridade,tipo isso é(recomendado),depois fica b,c,d,etc,entendeu? */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
