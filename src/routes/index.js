@@ -22,14 +22,14 @@ import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
 import { BrandHeader } from "@/components/BrandHeader";
 import { useState, useEffect, useRef, useMemo } from "react";
-import { useScrolledPast } from "@/hooks/use-scrolled-past";
+import { useScrolledPast } from "@/hooks/useScroll";
 import { useServerFn } from "@tanstack/react-start";
-import { useBlockedMap, isBlocked } from "@/lib/blocking-logic";
-import { useExitIntent } from "@/hooks/use-exit-intent";
-import { useBestsellers } from "@/hooks/use-bestsellers";
-import { playSuccessAudio } from "@/lib/audio-feedback";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
+import { useExitIntent } from "@/hooks/useExitIntent";
+import { useBestsellers } from "@/hooks/useBestsellers";
+import { playSuccessAudio } from "@/lib/playSuccessAudio";
 import { getAdminToken } from "@/lib/admin-token-store";
-import { checkoutErrorMessage } from "@/lib/checkout-errors";
+import { checkoutErrorMessage } from "@/lib/checkout-messages";
 import { MobileFrame } from "@/components/MobileFrame";
 import { PlansShowcaseProvider, ShowcaseShell, ShowcaseTrigger } from "@/components/PlansShowcase";
 import { FabianoBadge } from "@/components/FabianoBadge";
@@ -43,7 +43,12 @@ import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { FaqSection } from "@/components/FaqSection";
 import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
 import { ProductSchema } from "@/components/ProductSchema";
-const ogInstagram = "/og-instagram.png";
+function trackEvent(name, data) {
+    if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', name, data);
+    }
+}
+import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 /* Auditoria Forense & Finalização de Turno (v565):

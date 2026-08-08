@@ -62,7 +62,7 @@ import { Button } from "@/components/ui/button";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { FaqSection } from "@/components/FaqSection";
 import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
-import { ProductSchema } from "@/components/ProductSchema";
+import { ProductSchema } from "@/components/seo-jsonld";
 
 function trackEvent(name: string, data?: any) {
   if (typeof window !== 'undefined' && (window as any).gtag) {
