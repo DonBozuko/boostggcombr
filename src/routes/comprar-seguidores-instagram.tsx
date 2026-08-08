@@ -1,4 +1,4 @@
-// v414 — SEO landing: "comprar seguidores instagram" (Landing Principal de Conversão)
+// v580 — SEO landing: "comprar seguidores instagram" (Landing Principal de Conversão)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
@@ -36,7 +36,7 @@ export const Route = createFileRoute("/comprar-seguidores-instagram")({
     meta: [
       { title: TITLE },
       { name: "description", content: DESC },
-      { name: "robots", content: "index, follow, max-image-preview:large" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:url", content: URL },
