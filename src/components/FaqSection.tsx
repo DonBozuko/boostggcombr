@@ -31,7 +31,7 @@ export const FAQS: Record<string, FaqItem[]> = {
     { q: "Aceita pagamento via boleto ou cartão?", a: "Cartão de crédito sim, com um acréscimo de 7% referente à taxa da operadora. Boleto não. O Pix continua sendo o melhor preço e libera a entrega em segundos." },
   ],
   telegram: [
-    { q: "Membros de Telegram entram no meu canal ou grupo?", a: "Ambos. No checkout você cola o link (t.me/seucanal) ou o @username. Funciona para canais broadcast e grupos abertos." },
+    { q: "Membros de Telegram entram no meu canal ou grupo?", a: "Ambas. No checkout você cola o link (t.me/seucanal) ou o @username. Funciona para canais broadcast e grupos abertos." },
     { q: "Membros comprados escrevem no grupo?", a: "Não. São membros silenciosos para prova social. Se você precisa de interação real, combine com um plano de mensagens." },
     { q: "Meu canal é privado, funciona?", a: "Sim, se você gerar um link de convite público (t.me/+xxx). Não conseguimos entrar em canais totalmente fechados sem convite." },
     { q: "Telegram bane canal por comprar membros?", a: "Não. O Telegram não tem política ativa contra crescimento pago como Instagram. É a rede mais permissiva do mercado." },
