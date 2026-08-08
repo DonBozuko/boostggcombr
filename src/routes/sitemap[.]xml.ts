@@ -79,7 +79,7 @@ const buildSitemapXml = () => {
 
 
     // v404 — /privacidade, /termos, /reembolso agora noindex (páginas legais competiam com a home na busca de marca)
-    // v527 — Inventário total: 63 rotas ativas. As 43 indexadas no GSC estão saudáveis.
+    // v578 — Inventário total sincronizado: 63 rotas. Validado mapeamento de rotas transacionais vs SEO.
     // v207 — removidos: /admin, /login, /mcp, /diagnostico (todos noindex — sitemap desperdiça crawl budget)
   ];
 
