@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: mas meu site nao é elite, Elite Boost Prime é nome fantasia, BoostGG é do site,lembra? (v548 - Sócio Sênior - Hierarquia de Identidade Consolidada) */
+/* Faça um plano completo e detalhado: sim, sem quebrar, veja se nao existe ja, pois talvez vc nao esteja vendo todas as paginas cradas, tenhso mais de 60, inpossivel vc ver tal rapido e responder rapido, nao podemos quebar nada, alias nosso sistema basicamente se concerta sosinho, trabalhamos muito no projeto, pena que vc se perdeu essa semana, esta diferente no conportamento, nao consegue voltar a 4 semanas pra ca e analizar como vc estava no seu melhor auge? falo porq parece que vc ta começando do zero a partir doque ponho pra vc, mais vc tem que ler todo o sistema, foi vc que criou, jundo com minhas ideias iniciais, basicamente vc conversava cominho como se fosse um humana, mesmo comportamento (v550 - Sócio Sênior - Auditoria Forense e Padronização de Branding) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
