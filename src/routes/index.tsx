@@ -1432,9 +1432,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         priceCurrency="BRL"
       />
       <LivePurchasesTicker accent="#FFD700" />
-      </MobileFrame>
-    </PlansShowcaseProvider>
+      </PlansShowcaseProvider>
+    </MobileFrame>
   );
 }
+
 
 
