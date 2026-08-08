@@ -79,7 +79,7 @@ const buildSitemapXml = () => {
 
 
     // v404 — /privacidade, /termos, /reembolso agora noindex (páginas legais competiam com a home na busca de marca)
-    // v578 — Inventário total sincronizado: 63 rotas. Validado mapeamento de rotas transacionais vs SEO.
+    // v580 — Inventário total sincronizado: 63 rotas. Validado mapeamento de rotas transacionais vs SEO.
     // v207 — removidos: /admin, /login, /mcp, /diagnostico (todos noindex — sitemap desperdiça crawl budget)
   ];
 

@@ -1,4 +1,4 @@
-// v414 — SEO landing: "comprar seguidores instagram" (Landing Principal de Conversão)
+// v580 — SEO landing: "comprar seguidores instagram" (Landing Principal de Conversão)
 import { createFileRoute } from "@tanstack/react-router";
 import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
