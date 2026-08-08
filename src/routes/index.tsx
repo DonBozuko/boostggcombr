@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim, começe pelo recomendado e pois vamos atacar por parte, mais uma coisa,por toda pergunta vc eleva a 517,518,519,etc) vc nao ta criando arquivos desnescessarios? */
+/* Faça um plano completo e detalhado: sim,pode realizar prox passo se for melhor pra sistema */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
