@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: pode sim e que essa postura seja regra absoluta */
+/* Faça um plano completo e detalhado: voce me deu uma resposta muito curta, nao é de seu costume?porque?ja saimos da postura conservador, agora vc tem controle total de ponta a ponta do meu sistema, se me responde rapido e curto, vou entender que so viu parte do sistema, e isso pode quabar, vc tem visao de 360 grau sobre o sitema quando for atacar algo, nao podemos quebar nada,sitema ta perfeito */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
