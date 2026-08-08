@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: oque vc me sugere? é vc que cuida de todo meu sistema, nao sou desenvolvedor, se vc nao me disser o melhor caominho, vou te guiar errado, e aqui é vc q me guia */
+/* Faça um plano completo e detalhado: pode sim e que essa postura seja regra absoluta */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
@@ -36,8 +36,10 @@ import {
   Star,
   Wrench,
 } from "lucide-react";
+import { ProductSchema } from "@/components/seo-jsonld";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { useBestsellers } from "@/hooks/useBestsellers";
+
 
 
 import { Button } from "@/components/ui/button";
@@ -1466,7 +1468,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </footer>
       </PlansShowcaseProvider>
-          <FaqSection network="instagram" />
+      <FaqSection network="instagram" />
       <ExitRecoveryModal
         open={exitOpen}
         onClose={() => { setExitOpen(false); resetExit(); }}
@@ -1477,6 +1479,15 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           setTimeout(() => profileInputRef.current?.focus(), 400);
         }}
       />
+      <SocialProofPopup />
+      <ProductSchema
+        name="Seguidores Reais para Instagram"
+        description="Aumente sua autoridade no Instagram com seguidores brasileiros e reais. Entrega automática e garantia de reposição."
+        price="5.00"
+        priceCurrency="BRL"
+      />
+      <LivePurchasesTicker accent="#FFD700" />
       </MobileFrame>
-  );
-}
+    );
+  }
+
