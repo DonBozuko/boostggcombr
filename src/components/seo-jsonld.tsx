@@ -1,5 +1,3 @@
-import { Helmet } from "@tanstack/react-router";
-
 interface ProductSchemaProps {
   name: string;
   description: string;
@@ -59,3 +57,4 @@ export function ProductSchema({
     />
   );
 }
+

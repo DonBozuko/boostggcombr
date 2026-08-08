@@ -36,8 +36,10 @@ import {
   Star,
   Wrench,
 } from "lucide-react";
+import { ProductSchema } from "@/components/seo-jsonld";
 import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
 import { useBestsellers } from "@/hooks/useBestsellers";
+
 
 
 import { Button } from "@/components/ui/button";
