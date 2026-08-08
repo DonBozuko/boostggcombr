@@ -4,7 +4,7 @@ import { classifyTrafficSource, isInternalTraffic } from "@/lib/traffic-source";
 
 // Leitura pública e mínima de status do pedido (id é UUID, difícil de adivinhar).
 export const getPedidoStatus = createServerFn({ method: "GET" })
-  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .validator((input) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
@@ -35,7 +35,7 @@ const adminInput = z.object({ token: z.string().min(8) });
 
 
 export const listarPedidosPagos = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -52,7 +52,7 @@ export const listarPedidosPagos = createServerFn({ method: "POST" })
 
 // Lista pedidos com falha (SMM_FAILED, amount_mismatch, mp_rejected, etc) p/ auditoria.
 export const listarPedidosFalhos = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -68,7 +68,7 @@ export const listarPedidosFalhos = createServerFn({ method: "POST" })
   });
 
 export const reprocessarPedido = createServerFn({ method: "POST" })
-  .inputValidator((input) =>
+  .validator((input) =>
     adminInput.extend({ pedidoId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -120,7 +120,7 @@ export const reprocessarPedido = createServerFn({ method: "POST" })
 
 // Lista pedidos pendentes (Pix gerado, ainda não pago) com flag de notificação de abandono.
 export const listarPedidosPendentes = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -137,7 +137,7 @@ export const listarPedidosPendentes = createServerFn({ method: "POST" })
 
 // Faturamento agregado por rede social (status=paid/Enviado).
 export const getFaturamentoPorRede = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -163,7 +163,7 @@ export const getFaturamentoPorRede = createServerFn({ method: "POST" })
 
 // Dry-run ping no SMMhype: valida que o token responde no endpoint /balance.
 export const pingSmmhype = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const key = process.env.SMMHYPE_API_KEY;
@@ -194,7 +194,7 @@ export const pingSmmhype = createServerFn({ method: "POST" })
 
 // v147 — Ping tri-provedor simultâneo + dry-run em cascata.
 export const pingAllProviders = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const providers = [
@@ -234,7 +234,7 @@ export const pingAllProviders = createServerFn({ method: "POST" })
 // para Instagram, TikTok, YouTube e Facebook, e devolve os MAIS BARATOS por rede/tipo.
 // Persiste candidatos em services_cache para auditoria futura.
 export const sincronizarIdsApi = createServerFn({ method: "POST" })
-  .inputValidator((input) => adminInput.parse(input))
+  .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const key = process.env.SMMHYPE_API_KEY;
@@ -347,7 +347,7 @@ const VENDA_BRL_POR_MIL: Record<string, number> = {
 };
 
 export const getGrowthCentral = createServerFn({ method: "POST" })
-  .inputValidator((i) => adminInput.parse(i))
+  .validator((i) => adminInput.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -433,7 +433,7 @@ const VENDA_BRL_POR_MIL_TIPO: Record<string, Record<string, number>> = {
 const MARGEM_MINIMA_PCT = 20;
 
 export const smartApproveIds = createServerFn({ method: "POST" })
-  .inputValidator((i) => adminInput.parse(i))
+  .validator((i) => adminInput.parse(i))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -639,7 +639,7 @@ export const getBlockedMap = createServerFn({ method: "GET" })
 // === FUNIL DE CONVERSÃO (Etapa 1 Growth) ===
 // Lê page_views + pedidos e retorna funil diário: visitas → pix gerado → pix pago.
 export const getFunnelDaily = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({
+  .validator((input) => z.object({
     token: z.string().min(8),
     days: z.number().int().min(1).max(90).default(30),
   }).parse(input))
@@ -745,7 +745,7 @@ export const getFunnelDaily = createServerFn({ method: "POST" })
 // === CENTRAL DE RECUPERAÇÃO DE PIX (Etapa 2 Growth) ===
 
 export const getRecoveryQueue = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ token: z.string().min(8) }).parse(input))
+  .validator((input) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -782,7 +782,7 @@ export const getRecoveryQueue = createServerFn({ method: "POST" })
 
 
 export const markRecoveryContacted = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({
+  .validator((input) => z.object({
     token: z.string().min(8),
     id: z.number().int(),
   }).parse(input))
@@ -809,7 +809,7 @@ export const markRecoveryContacted = createServerFn({ method: "POST" })
   });
 
 export const dismissRecovery = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({
+  .validator((input) => z.object({
     token: z.string().min(8),
     id: z.number().int(),
     reason: z.string().max(200).optional(),
@@ -826,7 +826,7 @@ export const dismissRecovery = createServerFn({ method: "POST" })
   });
 
 export const getRecoveryStats = createServerFn({ method: "POST" })
-  .inputValidator((input) => z.object({ token: z.string().min(8) }).parse(input))
+  .validator((input) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
     if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
