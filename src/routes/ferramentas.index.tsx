@@ -48,7 +48,7 @@ export const Route = createFileRoute("/ferramentas/")({
     meta: [
       { title: TITLE },
       { name: "description", content: DESC },
-      { name: "robots", content: "index, follow, max-image-preview:large" },
+      { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:url", content: CANON },

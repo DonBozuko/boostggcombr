@@ -97,7 +97,7 @@ export const Route = createFileRoute("/blog/")({
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "robots", content: "index, follow, max-image-preview:large" },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1" },
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:type", content: "website" },
