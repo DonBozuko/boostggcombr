@@ -1479,7 +1479,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           setTimeout(() => profileInputRef.current?.focus(), 400);
         }}
       />
-      <SocialProofPopup accent="#FFD700" />
+      <SocialProofPopup />
       <ProductSchema
         name="Seguidores Reais para Instagram"
         description="Aumente sua autoridade no Instagram com seguidores brasileiros e reais. Entrega automática e garantia de reposição."
