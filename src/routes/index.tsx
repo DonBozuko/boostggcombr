@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim (v543 - Auditoria Forense Financeira Ativada) */
+/* Faça um plano completo e detalhado: sim (v544 - Auditoria 360 e Reconciliação Financeira Concluída) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
