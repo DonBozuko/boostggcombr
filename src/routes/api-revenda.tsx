@@ -4,7 +4,7 @@ import { PageGuide } from "@/components/PageGuide";
 export const Route = createFileRoute("/api-revenda")({
   head: () => ({
     meta: [
-      { title: "API para Revendedores — Elite Boost Prime | BoostGG" },
+      { title: "API para Revendedores — BOOSTGG" },
       {
         name: "description",
         content:

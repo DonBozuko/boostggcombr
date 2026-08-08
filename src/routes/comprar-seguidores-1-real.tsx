@@ -6,7 +6,7 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-seguidores-1-real";
-const TITLE = "Comprar Seguidores por 1 Real: Existe? A Verdade | BoostGG";
+const TITLE = "Comprar Seguidores por 1 Real: Existe? A Verdade — BOOSTGG";
 const DESC =
   "Seguidor por R$1 não existe — só golpe ou bot que cai. O piso real é R$5 no Pix (50 seguidores, R$0,10 cada), entrega em minutos e sem senha.";
 
