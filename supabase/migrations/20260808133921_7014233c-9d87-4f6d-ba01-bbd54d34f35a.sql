@@ -1,0 +1,1 @@
+UPDATE canary_alert_state SET resolved_at = now() WHERE alert_key = 'entrega:ff100' AND resolved_at IS NULL;
