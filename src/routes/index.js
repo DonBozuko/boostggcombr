@@ -1,4 +1,3 @@
-/* @ts-nocheck */
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -1193,7 +1192,6 @@ function Landing() {
 
         </div>
       </footer>
-      </PlansShowcaseProvider>
       <FaqSection network="instagram"/>
       <ExitRecoveryModal open={exitOpen} onClose={() => { setExitOpen(false); resetExit(); }} onContinue={() => {
             setExitOpen(false);
@@ -1204,5 +1202,6 @@ function Landing() {
       <SocialProofPopup />
       <ProductSchema name="Seguidores Reais para Instagram" description="Aumente sua autoridade no Instagram com seguidores brasileiros e reais. Entrega automática e garantia de reposição." price="5.00" priceCurrency="BRL"/>
       <LivePurchasesTicker accent="#FFD700"/>
-      </MobileFrame>);
+      </PlansShowcaseProvider>
+    </MobileFrame>);
 }
