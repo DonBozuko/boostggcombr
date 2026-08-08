@@ -282,13 +282,13 @@ export const criarPedido = createServerFn({ method: "POST" })
 
 
     // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
-    // v462 — Redução de drift: Aceita apenas drift de 2% (anti-tampering rigoroso).
+    // v540 — Redução Drástica de Drift: Aceita apenas drift de 1% (anti-tampering máximo).
     // Proteger a margem em oscilações de câmbio/pricing sem quebrar checkout por delay de cache.
     const serverValor = valorBase!;
     const clientValor = Number(data.valor);
     if (Number.isFinite(clientValor) && clientValor > 0) {
       const drift = Math.abs(clientValor - serverValor) / serverValor;
-      if (drift <= 0.02 && clientValor >= serverValor * 0.98) {
+      if (drift <= 0.01 && clientValor >= serverValor * 0.99) {
         valorBase = Number(clientValor.toFixed(2));
       }
       // else: mantém serverValor (cliente tentou tamper ou preço mudou muito)
