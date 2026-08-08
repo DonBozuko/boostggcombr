@@ -80,12 +80,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
-      { title: "BoostGG — Seguidores Reais no Instagram, TikTok e YouTube" },
+      { title: "BOOSTGG — Seguidores Reais e Brasileiros" },
       { charSet: "utf-8" },
 
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "author", content: "BoostGG" },
-      { name: "description", content: "Comprar seguidores Instagram, TikTok e YouTube reais e brasileiros com entrega rápida via Pix. Reposição nos pacotes brasileiros e 100% seguro." },
+      { name: "description", content: "Comprar seguidores Instagram, TikTok e YouTube na BOOSTGG. Entrega rápida via Pix, perfis brasileiros e reposição garantida. 100% seguro." },
       { name: "robots", content: "index, follow" },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "BoostGG" },

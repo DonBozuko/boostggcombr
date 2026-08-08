@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim, tambem analise pra ver porq estou numa posiçao ruim (v546 - Sócio Sênior - Diagnóstico Estratégico de Performance SEO) */
+/* Faça um plano completo e detalhado: mas meu site nao é elite, Elite Boost Prime é nome fantasia, BoostGG é do site,lembra? (v548 - Sócio Sênior - Hierarquia de Identidade Consolidada) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
@@ -127,10 +127,10 @@ function trackEvent(name: string, payload: TrackPayload = {}) {
 
 export const Route = createFileRoute("/")({
   head: () => {
-    const title = "Comprar Seguidores Instagram Reais via Pix — BoostGG";
-    const ogTitle = "BoostGG — Seguidores no Instagram Reais e Brasileiros";
+    const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
+    const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
     const description =
-      "Comprar seguidores Instagram reais via Pix com entrega imediata. Seguidores brasileiros com alta retenção e reposição garantida. Elite Boost Prime: autoridade e segurança.";
+      "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
     // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
     // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
     // marcação e usar a dele. Agora as duas batem.
@@ -149,8 +149,8 @@ export const Route = createFileRoute("/")({
         { property: "og:image", content: ogImage },
         { property: "og:image:width", content: "1216" },
         { property: "og:image:height", content: "640" },
-        { property: "og:image:alt", content: "Elite Boost Prime — Seguidores Brasileiros no Instagram via Pix" },
-        { property: "og:site_name", content: "BoostGG" },
+        { property: "og:image:alt", content: "BOOSTGG — Seguidores Brasileiros no Instagram via Pix" },
+        { property: "og:site_name", content: "BOOSTGG" },
         { property: "og:locale", content: "pt_BR" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: ogTitle },
@@ -167,7 +167,7 @@ export const Route = createFileRoute("/")({
               {
                 "@type": "Organization",
                 "@id": "https://www.boostgg.com.br/#organization",
-                name: "BoostGG",
+                name: "BOOSTGG",
                 url: "https://www.boostgg.com.br/",
                 logo: ogImage,
                 description,
@@ -179,7 +179,7 @@ export const Route = createFileRoute("/")({
                 "@type": "WebSite",
                 "@id": "https://www.boostgg.com.br/#website",
                 url: "https://www.boostgg.com.br/",
-                name: "BoostGG",
+                name: "BOOSTGG",
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://www.boostgg.com.br/#organization" },
               },
@@ -1458,7 +1458,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         <div className="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-zinc-300">
           <div className="flex items-center gap-2">
             <div className="size-6 rounded-md bg-[image:var(--gradient-cta)]" />
-            <span className="font-display font-semibold text-foreground">BOOSTGG</span>
+            <span className="font-display font-semibold text-foreground tracking-tighter">BOOSTGG</span>
           </div>
           <div className="flex items-center gap-4 flex-wrap justify-center">
             <Link to="/rastrear" className="hover:text-foreground" activeProps={{ className: "text-foreground" }}>Rastrear pedido</Link>
