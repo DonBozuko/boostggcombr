@@ -1,4 +1,4 @@
-/* vc esta em modo segurança?é que nao apareceu pra mim oque fes(auditoria profunda) */
+/* nao, foi muito rapido, vc começou a ser limitado de novo, tem q ser detalhista */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
