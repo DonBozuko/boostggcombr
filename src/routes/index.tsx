@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: v535,o estranho q todo tento vc ta elevando pra isso, algo nao ta batendo,oque ta havendo essa semana com voce? */
+/* Faça um plano completo e detalhado: perfeito, aliaz cliente tem opçao de pagar em cartao tbm, veja se naoda mudou, pois era pra estar funcionando certinho tbm, sem mentir, analise, procure melhor resposta, faça melhor sugestao e depois execute, se precisar de meu aval, me posicione */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
