@@ -81,6 +81,7 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
 (v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
 
 export const Route = createFileRoute("/")({
+
   head: () => {
     const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
     const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
@@ -1412,7 +1413,6 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
 
         </div>
       </footer>
-      </PlansShowcaseProvider>
       <FaqSection network="instagram" />
       <ExitRecoveryModal
         open={exitOpen}
@@ -1432,9 +1432,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         priceCurrency="BRL"
       />
       <LivePurchasesTicker accent="#FFD700" />
-      </MobileFrame>
-    </PlansShowcaseProvider>
+      </PlansShowcaseProvider>
+    </MobileFrame>
   );
 }
+
 
 
