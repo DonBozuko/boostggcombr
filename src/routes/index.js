@@ -1,3 +1,4 @@
+/* @ts-nocheck */
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, } from "@/components/ui/dialog";
 import { toast } from "sonner";
@@ -42,7 +43,7 @@ import { Button } from "@/components/ui/button";
 import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
 import { FaqSection } from "@/components/FaqSection";
 import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
-import { ProductSchema } from "@/components/ProductSchema";
+import { ProductSchema } from "@/components/seo-jsonld";
 function trackEvent(name, data) {
     if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', name, data);

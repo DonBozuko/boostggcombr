@@ -1433,6 +1433,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       />
       <LivePurchasesTicker accent="#FFD700" />
       </MobileFrame>
-    );
-  }
+    </PlansShowcaseProvider>
+  );
+}
+
 
