@@ -1,10 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-/* Auditoria Forense & Finalização de Turno (v565):
-- Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
-- Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
-- Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
-(v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
-/* (Note: The rest of the file src/routes/index.tsx follows here...) */
+import { createFileRoute, Link } from '@tanstack/react-router'
 import {
   Dialog,
   DialogContent,
@@ -24,7 +18,20 @@ import { simulatePurchase } from "@/lib/simulate-purchase.functions";
 import { getUtmParams } from "@/lib/utm";
 import { trackFunnel } from "@/lib/funnel-beacon";
 import { getPedidoStatus } from "@/lib/admin.functions";
-import { CheckCircle2 } from "lucide-react";
+import { 
+  CheckCircle2, 
+  Zap, 
+  ShieldCheck, 
+  RefreshCw, 
+  Wrench, 
+  Eye, 
+  Instagram, 
+  Send, 
+  Copy, 
+  MessageCircle,
+  Star
+} from "lucide-react";
+import { motion } from "framer-motion";
 
 import { DelayedCouponField, getAppliedCoupon } from "@/components/CouponField";
 import { TrustBadges } from "@/components/TrustBadges";
@@ -34,43 +41,44 @@ import { PremiumCategorySelector } from "@/components/PremiumCategorySelector";
 import { PremiumPricingGrid } from "@/components/PremiumPricingGrid";
 import { getPricingGrid, getBrPricingGrid } from "@/lib/pricing.functions";
 import { BrandHeader } from "@/components/BrandHeader";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useScrolledPast } from "@/hooks/useScroll";
+import { useServerFn } from "@tanstack/react-start";
+import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
+import { useExitIntent } from "@/hooks/useExitIntent";
+import { useBestsellers } from "@/hooks/useBestsellers";
+import { playSuccessAudio } from "@/lib/playSuccessAudio";
+import { getAdminToken } from "@/lib/admin-token-store";
+import { checkoutErrorMessage } from "@/lib/checkout-messages";
+import { MobileFrame } from "@/components/MobileFrame";
+import { PlansShowcaseProvider, ShowcaseShell, ShowcaseTrigger } from "@/components/PlansShowcase";
+import { FabianoBadge } from "@/components/FabianoBadge";
+import { SocialProofPopup } from "@/components/SocialProofPopup";
+import { JarvisBadge } from "@/components/JarvisBadge";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
+import { FaqSection } from "@/components/FaqSection";
+import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
+import { ProductSchema } from "@/components/seo-jsonld";
 
-
-
-// Analytics: dispara evento p/ gtag, dataLayer (GTM) e fbq, sem quebrar se nenhum existir.
-type TrackPayload = Record<string, string | number | boolean | undefined>;
-function trackEvent(name: string, payload: TrackPayload = {}) {
-  if (typeof window === "undefined") return;
-  try {
-    const w = window as unknown as {
-      gtag?: (...a: unknown[]) => void;
-      dataLayer?: unknown[];
-      fbq?: (...a: unknown[]) => void;
-      ttq?: { track: (n: string, p?: unknown, opts?: { event_id?: string }) => void; page?: () => void };
-    };
-    w.gtag?.("event", name, payload);
-    w.dataLayer?.push({ event: name, ...payload });
-    w.fbq?.("trackCustom", name, payload);
-    // TikTok Pixel: mapeia p/ eventos padrão quando aplicável
-    const ttqMap: Record<string, string> = {
-      checkout_submit: "InitiateCheckout",
-      purchase: "CompletePayment",
-    };
-    const ttqEvent = ttqMap[name] ?? name;
-    const value = typeof payload.value === "number" ? payload.value
-      : typeof payload.plan_value === "number" ? payload.plan_value
-      : undefined;
-    const ttqOptions =
-      name === "purchase" && (typeof payload.order_id === "string" || typeof payload.order_id === "number")
-        ? { event_id: `cp_${payload.order_id}` }
-        : undefined;
-    w.ttq?.track(ttqEvent, value !== undefined ? { value, currency: "BRL", ...payload } : payload, ttqOptions);
-    if (import.meta.env.DEV) console.debug("[track]", name, payload);
-  } catch (err) {
-    console.error("[trackEvent]", err);
+function trackEvent(name: string, data?: any) {
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', name, data);
   }
 }
 
+import ogInstagram from "@/assets/og-instagram.jpg";
+const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
+const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
+
+/* Auditoria Forense & Finalização de Turno (v565):
+- Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
+- Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
+- Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
+(v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
 
 export const Route = createFileRoute("/")({
   head: () => {
@@ -78,9 +86,6 @@ export const Route = createFileRoute("/")({
     const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
     const description =
       "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
-    // v302 — www é a versão que o Google escolheu como canônica ("googleCanonical").
-    // Apontar a canonical para a versão sem www fazia o Google ignorar nossa
-    // marcação e usar a dele. Agora as duas batem.
     const url = "https://www.boostgg.com.br/";
     const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
     return {
@@ -130,15 +135,6 @@ export const Route = createFileRoute("/")({
                 inLanguage: "pt-BR",
                 publisher: { "@id": "https://www.boostgg.com.br/#organization" },
               },
-              // v302 — O nó Service foi REMOVIDO de propósito.
-              // O Google reportou "Review snippets: tipo de objeto do campo
-              // <parent_node> não é válido" apontando para o item
-              // "Compra de Seguidores no Instagram". Causa: Service não é um
-              // tipo que aceita nota/avaliação; como Service e Product
-              // descreviam a MESMA página, o Google colava a nota do Product
-              // no Service e invalidava o rich snippet inteiro.
-              // Ponto único de verdade: só o Product carrega oferta + nota.
-
               {
                 "@type": "FAQPage",
                 mainEntity: [
@@ -175,8 +171,6 @@ export const Route = createFileRoute("/")({
                 description,
                 brand: { "@type": "Brand", name: "BoostGG" },
                 image: ogImage,
-                // Oferta herdada do antigo nó Service (v302): rich snippet de
-                // preço + nota agora vivem no mesmo item suportado.
                 offers: {
                   "@type": "AggregateOffer",
                   priceCurrency: "BRL",
@@ -224,8 +218,6 @@ export const Route = createFileRoute("/")({
       ],
     };
   },
-
-
   component: Landing,
 });
 
@@ -1441,6 +1433,8 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
       />
       <LivePurchasesTicker accent="#FFD700" />
       </MobileFrame>
-    );
-  }
+    </PlansShowcaseProvider>
+  );
+}
+
 
