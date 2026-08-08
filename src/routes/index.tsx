@@ -1,4 +1,4 @@
-/* PROTOCOLO DE RECONHECIMENTO E INTEGRAÇÃO CONTROLADA (v532): Inventário forense do pacote de skills em andamento. Objetivo: Identificar lacunas reais sem criar duplicação ou quebrar a arquitetura autocurativa. */
+/* Faça um plano completo e detalhado: legal, mais oque me sugere?nao entendi */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
@@ -432,7 +432,7 @@ type PedidoInfo = {
 };
 
 function Landing() {
-  /* ALTO AUDITORIA v532 (Engenharia Principal): Iniciando Inventário Forense do pacote 'skills-live-06-08.zip'. Princípio: CAUSA RAIZ > SINTOMA. O sistema atual já possui blindagem de margem (12x), roteamento inteligente e idempotência. Avaliando se o pacote adiciona inteligência real ou apenas 'bloat' documental. Nenhuma alteração de código será feita nesta etapa. */
+  /* ALTO AUDITORIA v533 (Engenheiro Principal): Plano de Ação Estratégico para Rankeamento e Conversão. Diagnóstico: O sistema está blindado, mas o GSC aponta erros de 'Falha no Redirecionamento' (conflito Apex vs WWW). Sugestão Técnica: 1. Consolidar Schema.org (Product/Offer) para 'Comprar Seguidores'; 2. Implementar Pre-warming de Pix (redução de latência); 3. Otimizar LCP removendo scripts não críticos. Objetivo: Rank 1 e aumento de 15% na taxa de conversão. */
 
   const scrolled = useScrolledPast(50);
   const [categoria, setCategoria] = useState<Categoria>("seguidores");
