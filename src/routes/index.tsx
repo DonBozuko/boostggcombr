@@ -1468,7 +1468,7 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         </div>
       </footer>
       </PlansShowcaseProvider>
-          <FaqSection network="instagram" />
+      <FaqSection network="instagram" />
       <ExitRecoveryModal
         open={exitOpen}
         onClose={() => { setExitOpen(false); resetExit(); }}
@@ -1479,6 +1479,15 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
           setTimeout(() => profileInputRef.current?.focus(), 400);
         }}
       />
+      <SocialProofPopup accent="#FFD700" />
+      <ProductSchema
+        name="Seguidores Reais para Instagram"
+        description="Aumente sua autoridade no Instagram com seguidores brasileiros e reais. Entrega automática e garantia de reposição."
+        price="5.00"
+        priceCurrency="BRL"
+      />
+      <LivePurchasesTicker accent="#FFD700" />
       </MobileFrame>
-  );
-}
+    );
+  }
+
