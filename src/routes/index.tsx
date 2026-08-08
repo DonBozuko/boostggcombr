@@ -1059,6 +1059,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 className="h-12"
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                onBlur={() => {
+                  if (z.string().email().safeParse(form.email).success) {
+                    prewarmFn({ data: { email: form.email } }).catch(() => {});
+                  }
+                }}
                 maxLength={120}
               />
             </div>
