@@ -24,7 +24,7 @@ const STORAGE_KEY = "bgg_reseller_key";
 export const Route = createFileRoute("/_authenticated/painel-revendedor")({
   head: () => ({
     meta: [
-      { title: "Painel do Revendedor — Elite Boost Prime | BoostGG" },
+      { title: "Painel do Revendedor — Elite Boost Prime — BOOSTGG" },
       // v524 — área privada: nunca indexar (evita URL vazia no índice e desperdício de crawl budget)
       { name: "robots", content: "noindex, nofollow" },
       {
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/painel-revendedor")({
         content:
           "Área do revendedor BoostGG: consulte seu saldo, recarregue por Pix com crédito automático, envie pedidos e acompanhe seu extrato.",
       },
-      { property: "og:title", content: "Painel do Revendedor — BoostGG" },
+      { property: "og:title", content: "Painel do Revendedor — BOOSTGG" },
       { property: "og:description", content: "Saldo, recarga Pix automática, pedidos e extrato do revendedor BoostGG." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

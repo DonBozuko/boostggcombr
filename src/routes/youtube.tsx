@@ -45,7 +45,7 @@ import { normalizeCheckoutEmail, checkoutEmailError } from "@/lib/checkout-email
 
 export const Route = createFileRoute("/youtube")({
   head: () => {
-    const title = "Comprar Inscritos e Views no YouTube via Pix | BoostGG";
+    const title = "Comprar Inscritos e Views no YouTube via Pix — BOOSTGG";
     const description =
       "Cresça no YouTube com inscritos, views e likes via Pix. Acelera monetização, entrega acompanhada e sem pedir sua senha.";
     const url = "https://www.boostgg.com.br/youtube";

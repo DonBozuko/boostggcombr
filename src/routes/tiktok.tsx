@@ -46,7 +46,7 @@ import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
 
 export const Route = createFileRoute("/tiktok")({
   head: () => {
-    const title = "Comprar Seguidores e Views no TikTok via Pix | BoostGG";
+    const title = "Comprar Seguidores e Views no TikTok via Pix — BOOSTGG";
     const description =
       "Turbine seu TikTok com seguidores, curtidas e views via Pix. Entrega imediata e reposição nos pacotes brasileiros.";
     const url = "https://www.boostgg.com.br/tiktok";

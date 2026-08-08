@@ -16,7 +16,7 @@ declare global {
 
 export const Route = createFileRoute("/obrigado")({
   head: () => {
-    const title = "Pedido Confirmado — BoostGG";
+    const title = "Pedido Confirmado — BOOSTGG";
     const description = "Seu pagamento foi confirmado. Estamos processando sua entrega.";
     return {
       meta: [

@@ -37,7 +37,7 @@ const FAQ = [
 export const Route = createFileRoute("/ferramentas/contador-seguidores")({
   head: () => ({
     meta: [
-      { title: "Contador de Seguidores Instagram Grátis | BoostGG" },
+      { title: "Contador de Seguidores Instagram Grátis — BOOSTGG" },
       {
         name: "description",
         content:

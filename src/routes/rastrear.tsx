@@ -7,7 +7,7 @@ import { consultarPedidoPublico } from "@/lib/consulta-pedido.functions";
 
 export const Route = createFileRoute("/rastrear")({
   head: () => {
-    const title = "Rastrear Pedido — BoostGG";
+    const title = "Rastrear Pedido — BOOSTGG";
     const description =
       "Acompanhe o status do seu pedido de seguidores, curtidas ou views em tempo real. Basta informar o código do pedido.";
     return {

@@ -21,7 +21,7 @@ const PROMO_DESC =
 export const Route = createFileRoute("/promo-5reais")({
   head: () => ({
     meta: [
-      { title: "100 Seguidores no Instagram por R$5 — BoostGG" },
+      { title: "100 Seguidores no Instagram por R$5 — BOOSTGG" },
       { name: "description", content: PROMO_DESC },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "100 Seguidores por R$5 — Pix instantâneo" },
