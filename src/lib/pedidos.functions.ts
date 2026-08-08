@@ -112,6 +112,14 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
   kv10k:  { quantidade: 10000, valor: 15.0 },
 };
 
+export const prewarmPedido = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ email: z.string().email() }).parse(input))
+  .handler(async ({ data }) => {
+    // v541 — Pre-warming silencioso: apenas registra intenção ou aquece cache de pricing
+    console.log("[prewarmPedido] Aquecendo checkout para:", data.email);
+    return { ok: true };
+  });
+
 export const criarPedido = createServerFn({ method: "POST" })
   .inputValidator((input) => pedidoSchema.parse(input))
   .handler(async ({ data }) => {

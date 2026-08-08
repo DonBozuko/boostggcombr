@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: sim, começe pelo recomendado e pois vamos atacar por parte, mais uma coisa,por toda pergunta vc eleva a 517,518,519,etc) vc nao ta criando arquivos desnescessarios? */
+/* Faça um plano completo e detalhado: sim,pode realizar prox passo se for melhor pra sistema */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
@@ -69,7 +69,7 @@ import { toast } from "sonner";
 import PixCountdown from "@/components/PixCountdown";
 import CardPayOption from "@/components/CardPayOption";
 import { z } from "zod";
-import { criarPedido } from "@/lib/pedidos.functions";
+import { criarPedido, prewarmPedido } from "@/lib/pedidos.functions";
 import { trackInitiateCheckout, trackViewContent, trackAddToCart } from "@/lib/tiktok-pixel";
 
 import { OrderBumpDialog, findUpgrade } from "@/components/OrderBumpDialog";
@@ -452,6 +452,7 @@ function Landing() {
   const attemptLoggedRef = useRef(false);
   const profileInputRef = useRef<HTMLInputElement | null>(null);
   const criarPedidoFn = useServerFn(criarPedido);
+  const prewarmFn = useServerFn(prewarmPedido);
   const simulatePurchaseFn = useServerFn(simulatePurchase);
   const getStatusFn = useServerFn(getPedidoStatus);
   const blockedMap = useBlockedMap();
@@ -1058,6 +1059,11 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
                 className="h-12"
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                onBlur={() => {
+                  if (z.string().email().safeParse(form.email).success) {
+                    prewarmFn({ data: { email: form.email } }).catch(() => {});
+                  }
+                }}
                 maxLength={120}
               />
             </div>
