@@ -36,6 +36,7 @@ export const Route = createFileRoute("/comprar-seguidores-instagram")({
     meta: [
       { title: TITLE },
       { name: "description", content: DESC },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESC },
       { property: "og:url", content: URL },

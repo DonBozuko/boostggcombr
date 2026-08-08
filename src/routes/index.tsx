@@ -94,7 +94,7 @@ export const Route = createFileRoute("/")({
       meta: [
         { title },
         { name: "description", content: description },
-        { name: "robots", content: "index, follow" },
+        { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
         { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
         { property: "og:type", content: "website" },
         { property: "og:title", content: ogTitle },
