@@ -51,4 +51,4 @@ Tolerância ≤1% de falha/semana (zero só para cobrar-sem-entregar); conflito 
 - [Prateleira honesta](mem://preferences/prateleira-honesta) — Vitrine só mostra o que a Bancada prova que entrega: sem fallback estático, sem aba vazia.
 - [Alarme que não anda](mem://preferences/alarme-que-nao-anda) — Limiar de dinheiro só no módulo dono; achado repetido 6 varreduras vira defeito de engenharia.
 - [Sem percentual chutado](mem://preferences/sem-percentual-tres-numeros) — Proibido dizer "sistema está X%". Vale o Termômetro Real (30d) no painel SLO.
-54: - [Protocolo de Excelência v575](mem://preferences/protocolo-excelencia-v575) — Restauração da postura de Orquestrador e Auditor Forense (auge de 5 semanas atrás).
+ - [Protocolo de Excelência v575](mem://preferences/protocolo-excelencia-v575) — Restauração da postura de Orquestrador e Auditor Forense (auge de 5 semanas atrás).
