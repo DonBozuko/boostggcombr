@@ -1,67 +1,10 @@
+import { createFileRoute } from '@tanstack/react-router'
 /* Auditoria Forense & Finalização de Turno (v565):
 - Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
 - Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
 - Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
 (v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
-
-
-import ogInstagram from "@/assets/og-instagram.jpg";
-
-import { getAdminToken } from "@/lib/admin-token-store";
-import { CHECKOUT_SUCCESS_TITLE, checkoutErrorMessage, getCheckoutSuccessMessage } from "@/lib/checkout-messages";
-import { playSuccessAudio } from "@/lib/playSuccessAudio";
-import { JarvisBadge } from "@/components/JarvisBadge";
-import { FabianoBadge } from "@/components/FabianoBadge";
-import { SocialProofPopup } from "@/components/SocialProofPopup";
-import { MobileFrame } from "@/components/MobileFrame";
-import { FaqSection } from "@/components/FaqSection";
-import { MysteryBoxRedeem } from "@/components/MysteryBoxRedeem";
-import { PlansShowcaseProvider, ShowcaseTrigger, ShowcaseShell } from "@/components/PlansShowcase";
-import { ExitRecoveryModal } from "@/components/ExitRecoveryModal";
-import { useExitIntent } from "@/hooks/useExitIntent";
-import { useScrolledPast } from "@/hooks/useScroll";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import { motion } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Instagram,
-  Zap,
-  ShieldCheck,
-  RefreshCw,
-  Check,
-  
-  Send,
-  Copy,
-  MessageCircle,
-  Heart,
-  User,
-  Eye,
-  Star,
-  Wrench,
-} from "lucide-react";
-import { ProductSchema } from "@/components/seo-jsonld";
-import { useBlockedMap, isBlocked } from "@/hooks/useBlockedMap";
-import { useBestsellers } from "@/hooks/useBestsellers";
-
-
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+/* (Note: The rest of the file src/routes/index.tsx follows here...) */
 import {
   Dialog,
   DialogContent,

@@ -1,6 +1,0 @@
-/* Auditoria Forense & Finalização de Turno (v565):
-- Status: Perfeito. Todos os núcleos de estabilidade (Ledger, Pricing, Dispatch e SEO) foram auditados e blindados.
-- Turno Encerrado: "perfeito, vamos descansar por hoje, amanha continuamos,ta bom?"
-- Resumo Técnico: Drift financeiro travado em 1%, latência de Pix reduzida via prewarm, e metadados BOOSTGG unificados em 63 rotas.
-(v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
-/* (Note: The rest of the file src/routes/index.tsx follows here...) */
