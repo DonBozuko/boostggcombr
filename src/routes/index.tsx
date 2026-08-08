@@ -81,6 +81,7 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
 (v565 - Sócio Sênior - Auditoria Forense & Integridade Finalizada) */
 
 export const Route = createFileRoute("/")({
+
   head: () => {
     const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
     const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
