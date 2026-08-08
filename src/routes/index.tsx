@@ -74,12 +74,12 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* Auditoria Forense & Protocolo de Orquestração (v579):
-- Modo Ativo: Engenheiro Principal & Executor Sênior.
-- Postura v579: Saída do modo defensivo puro para Execução Complexa.
-- Ação v579: Reativação do motor de integridade com foco em questionamento crítico e correção de causa raiz, não apenas conformidade.
-- Status: Sistema operante sob supervisão direta; executando blindagem contra regressões enquanto ataca drift de SEO e conversão.
-(v579 - Sócio Sênior - Modo Executor Ativado) */
+/* Auditoria Forense & Protocolo de Execução v580:
+- Modo Ativo: Engenheiro Principal & Tech Lead (Modo Executor).
+- Ação v580: Sincronização de metadados e autoridade de SEO (GSC Fix).
+- Foco: Conversão de Venda + Integridade Financeira (Ledger).
+- Status: Sistema operando sob protocolo de "Causa Raiz" — tratando a doença (posicionamento GSC) e não apenas o sintoma.
+(v580 - Sócio Sênior - Execução Complexa Ativada) */
 
 export const Route = createFileRoute("/")({
 
