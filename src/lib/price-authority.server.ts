@@ -32,31 +32,32 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
   let applied = 0;
   let errors = 0;
 
-  // v583: Implementação de Fila Segura para evitar drift temporário.
-  // Executamos as atualizações em paralelo controlado (Promise.all) para garantir que todas as 
-  // tentativas de persistência sejam disparadas antes do reporte de status.
-  const updatePromises = plan.changes.map(async (c) => {
+  // v584: Migração para RPC Atômico.
+  // Em vez de múltiplas requisições paralelas (v583) que podem estourar o pool de conexões,
+  // enviamos todos os updates em um único lote JSON para ser processado no banco.
+  if (plan.changes.length > 0) {
     try {
-      const { error } = await supabaseAdmin
-        .from("pricing_items" as any)
-        .update({ price_brl: c.para })
-        .eq("pacote", c.pacote);
-      
-      if (error) throw new Error(error.message);
-      return { ok: true, pacote: c.pacote };
-    } catch (err) {
-      return { ok: false, pacote: c.pacote, error: (err as Error).message };
-    }
-  });
+      const updates = plan.changes.map(c => ({
+        pacote: c.pacote,
+        price: c.para
+      }));
 
-  const results = await Promise.all(updatePromises);
-  
-  for (const res of results) {
-    if (res.ok) {
-      applied += 1;
-    } else {
-      errors += 1;
-      console.error("[pricing] v583 falha atômica na fila", { pacote: res.pacote, error: res.error });
+      const { data: rpcRes, error: rpcError } = await supabaseAdmin.rpc("bulk_update_pricing", {
+        updates
+      });
+
+      if (rpcError) throw new Error(rpcError.message);
+
+      const stats = rpcRes as { applied: number; errors: number; failed_items: string[] };
+      applied = stats.applied;
+      errors = stats.errors;
+
+      if (errors > 0) {
+        console.error("[pricing] v584 falhas parciais no RPC", stats.failed_items);
+      }
+    } catch (err) {
+      errors = plan.changes.length;
+      console.error("[pricing] v584 falha crítica no RPC atômico", err);
     }
   }
 

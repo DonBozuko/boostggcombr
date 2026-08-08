@@ -2093,6 +2093,7 @@ export type Database = {
         }[]
       }
       anonimizar_pedidos_antigos: { Args: never; Returns: number }
+      bulk_update_pricing: { Args: { updates: Json }; Returns: Json }
       cancel_orphan_pending: { Args: never; Returns: number }
       delete_email: {
         Args: { message_id: number; queue_name: string }
