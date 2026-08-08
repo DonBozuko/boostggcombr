@@ -1,4 +1,4 @@
-/* perfeito, pra nos manter sincronismo nas conversas, faça uma alto auditoria super profunda sem quebrar e sem esquecer nada pra pra tras, assim nos mantem mesmo conversa inteligente de antes, vc mais detalhistas,etc, vc que toca conta do meu projeto */
+/* vc esta em modo segurança?é que nao apareceu pra mim oque fes(auditoria profunda) */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
