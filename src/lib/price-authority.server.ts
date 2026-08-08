@@ -29,10 +29,12 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
   }));
 
   const plan = planAuthorityPrices(rows);
+  let applied = 0;
+  let errors = 0;
+
   // v583: Implementação de Fila Segura para evitar drift temporário.
-  // Executamos o loop e acumulamos resultados para reporte atômico.
-  // Embora o Supabase Client não suporte transações multi-row nativas em loop, 
-  // garantimos o processamento completo ou log de erro específico por pacote.
+  // Executamos as atualizações em paralelo controlado (Promise.all) para garantir que todas as 
+  // tentativas de persistência sejam disparadas antes do reporte de status.
   const updatePromises = plan.changes.map(async (c) => {
     try {
       const { error } = await supabaseAdmin
