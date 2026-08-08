@@ -1,3 +1,4 @@
+// v580 — Ferramentas Hub: Central de Utilidades para Social Media
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Card } from "@/components/ui/card";
 import { Calculator, Users, Sparkles, ArrowRight } from "lucide-react";

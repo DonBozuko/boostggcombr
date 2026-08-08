@@ -1,3 +1,4 @@
+// v580 — Blog Hub: Central de Autoridade em Crescimento Social
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TrendingUp } from "lucide-react";
 
