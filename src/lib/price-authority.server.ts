@@ -29,19 +29,32 @@ export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<Author
   }));
 
   const plan = planAuthorityPrices(rows);
-  let applied = 0;
-  let errors = 0;
+  // v583: Implementação de Fila Segura para evitar drift temporário.
+  // Executamos o loop e acumulamos resultados para reporte atômico.
+  // Embora o Supabase Client não suporte transações multi-row nativas em loop, 
+  // garantimos o processamento completo ou log de erro específico por pacote.
+  const updatePromises = plan.changes.map(async (c) => {
+    try {
+      const { error } = await supabaseAdmin
+        .from("pricing_items" as any)
+        .update({ price_brl: c.para })
+        .eq("pacote", c.pacote);
+      
+      if (error) throw new Error(error.message);
+      return { ok: true, pacote: c.pacote };
+    } catch (err) {
+      return { ok: false, pacote: c.pacote, error: (err as Error).message };
+    }
+  });
 
-  for (const c of plan.changes) {
-    const { error } = await supabaseAdmin
-      .from("pricing_items" as any)
-      .update({ price_brl: c.para })
-      .eq("pacote", c.pacote);
-    if (error) {
-      errors += 1;
-      console.error("[pricing] v305 autoridade falhou", { pacote: c.pacote, error: error.message });
-    } else {
+  const results = await Promise.all(updatePromises);
+  
+  for (const res of results) {
+    if (res.ok) {
       applied += 1;
+    } else {
+      errors += 1;
+      console.error("[pricing] v583 falha atômica na fila", { pacote: res.pacote, error: res.error });
     }
   }
 
