@@ -1,4 +1,4 @@
-/* Faça um plano completo e detalhado: me de sugestoes(recomendaçoes)por prioridade,tipo isso é(recomendado),depois fica b,c,d,etc,entendeu? */
+/* Faça um plano completo e detalhado: sim, começe pelo recomendado e pois vamos atacar por parte, mais uma coisa,por toda pergunta vc eleva a 517,518,519,etc) vc nao ta criando arquivos desnescessarios? */
 
 
 import ogInstagram from "@/assets/og-instagram.jpg";
