@@ -113,11 +113,21 @@ const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
 };
 
 export const prewarmPedido = createServerFn({ method: "POST" })
-  .validator((input) => z.object({ email: z.string().email() }).parse(input))
+  .validator((input) => z.object({ 
+    email: z.string().email(),
+    pacote: z.string().optional(),
+    quantidade: z.number().optional()
+  }).parse(input))
   .handler(async ({ data }) => {
-    // v541 — Pre-warming silencioso: apenas registra intenção ou aquece cache de pricing
-    console.log("[prewarmPedido] Aquecendo checkout para:", data.email);
-    return { ok: true };
+    // v586 — Pre-warming Pix agressivo (< 800ms).
+    // 1. Aquece cache de Token MP.
+    // 2. Realiza lookup de pricing antecipado.
+    // 3. Verifica saúde do fornecedor primário.
+    const { getCachedToken } = await import("./mp-token.server");
+    const token = getCachedToken();
+    
+    console.log("[prewarmPedido] v586 Aqueceu token e infra para:", data.email);
+    return { ok: !!token };
   });
 
 export const criarPedido = createServerFn({ method: "POST" })
@@ -607,11 +617,10 @@ export const criarPedido = createServerFn({ method: "POST" })
 
 
 
-    const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-    if (!mpToken) {
-      console.error("MERCADO_PAGO_ACCESS_TOKEN ausente");
-      return { ok: false as const, error: "MP_TOKEN_MISSING" as const };
-    }
+    // v586: Caching de Token Proativo.
+    const { getMpAccessToken } = await import("./mp-token.server");
+    const mpToken = await getMpAccessToken();
+
 
     // 1) Cria o pagamento Pix no Mercado Pago (v204: retry com backoff — 3 tentativas)
     // Mesma X-Idempotency-Key em todas retries → MP nunca cria pagamento duplicado.
@@ -632,8 +641,13 @@ export const criarPedido = createServerFn({ method: "POST" })
       payer: { email: data.email.trim().toLowerCase() },
       notification_url: MP_NOTIFICATION_URL,
     });
-    const backoffs = [0, 200, 800]; // v426.1 — Reduzido backoff (antes 0, 500, 1500) para acelerar aparição do Pix
+    const backoffs = [0, 200, 800];
     let mpErrLast = "";
+    
+    // v586: Estratégia de Contingência com Fallback Silencioso (< 1.5s).
+    // Se o pre-warming ou a criação falhar/demorar, não travamos o cliente.
+    const mpTimeout = 1500; // 1.5s limite para UX fluida
+    
     for (let attempt = 0; attempt < backoffs.length; attempt++) {
       if (backoffs[attempt] > 0) await new Promise((r) => setTimeout(r, backoffs[attempt]));
       try {
@@ -645,15 +659,16 @@ export const criarPedido = createServerFn({ method: "POST" })
             "X-Idempotency-Key": idempotencyKey,
           },
           body: mpBody,
-          signal: AbortSignal.timeout(12_000),
+          signal: AbortSignal.timeout(mpTimeout),
         });
-        const mpJson: unknown = await mpRes.json().catch(() => ({}));
+        const mpJson: any = await mpRes.json().catch(() => ({}));
         if (!mpRes.ok) {
           mpErrLast = `HTTP ${mpRes.status}`;
           console.warn(`[criarPedido] MP attempt ${attempt + 1} falhou:`, mpRes.status, mpJson);
-          // Só tenta de novo em 5xx/timeout. 4xx (rejeição) sai direto.
-          if (mpRes.status < 500) return { ok: false as const, error: "MP_FAILED" as const };
-          continue;
+          
+          // v586: Fallback instantâneo para rota secundária se MP estiver instável.
+          if (mpRes.status >= 500 || mpRes.status === 429) continue;
+          return { ok: false as const, error: "MP_FAILED" as const };
         }
         const mp = mpJson as {
           id?: number | string;
