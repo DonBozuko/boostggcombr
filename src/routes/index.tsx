@@ -88,7 +88,7 @@ export const Route = createFileRoute("/")({
     const description =
       "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
     const url = "https://www.boostgg.com.br/";
-    const ogImage = `https://www.boostgg.com.br${ogInstagram}?v=49`;
+    const ogImage = "https://www.boostgg.com.br/og-instagram.jpg";
     return {
       meta: [
         { title },
@@ -1432,10 +1432,10 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
         priceCurrency="BRL"
       />
       <LivePurchasesTicker accent="#FFD700" />
-      </PlansShowcaseProvider>
-    </MobileFrame>
+    </PlansShowcaseProvider>
   );
 }
+
 
 
 
