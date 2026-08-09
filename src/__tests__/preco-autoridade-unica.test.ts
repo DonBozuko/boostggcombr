@@ -48,7 +48,9 @@ describe("v590 — preço do checkout sai só de pricing_items", () => {
     const r = await resolveCheckoutPricing("p500");
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toBe("PRICE_UNAVAILABLE");
+    quieto.mockRestore();
   });
+
 
   it("bloqueia pacote pausado ou sem fornecedor", async () => {
     maybeSingle.mockResolvedValue({
