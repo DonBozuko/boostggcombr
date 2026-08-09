@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS pricing_items_enforce_markup ON public.pricing_items;
