@@ -42,7 +42,8 @@ describe("v590 — preço do checkout sai só de pricing_items", () => {
 
   it("falha fechado quando o banco não responde (nunca inventa preço)", async () => {
     const quieto = vi.spyOn(console, "error").mockImplementation(() => {});
-    maybeSingle.mockImplementation(async () => { throw new Error("db fora do ar"); });
+    maybeSingle.mockResolvedValue({ data: null, error: { message: "db fora do ar" } });
+
 
     const { resolveCheckoutPricing } = await import("../lib/checkout-pricing.server");
     const r = await resolveCheckoutPricing("p500");
