@@ -32,6 +32,8 @@ export const FAMILIAS: Familia[] = [
       "price-authority.test.ts",
       "price-single-writer.test.ts",
       "price-single-math.test.ts",
+      "preco-autoridade-unica.test.ts",
+
       "margin-guard.test.ts",
       "margin-epsilon.test.ts",
       "margem-dupla-leitura.test.ts",
