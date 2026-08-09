@@ -201,17 +201,16 @@ export const criarPedido = createServerFn({ method: "POST" })
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
-    // v297/v301 — PREFLIGHTS PARALELOS (Otimização v426.1).
-    // Antes eram sequenciais, adicionando ~2-4s de latência. Agora rodam juntos.
-    // Prova de ROTA + Prova de ALVO. Se algum falhar, bloqueia antes de cobrar.
-    // v297/v301 — PREFLIGHTS PARALELOS COM TIMEOUT (Otimização v457).
-    // Preflights rodam juntos com AbortSignal.timeout de 5s para evitar
-    // travamento do checkout por lentidão de APIs externas.
+    // v297/v301 — PREFLIGHTS PARALELOS. Prova de ROTA + prova de ALVO antes de cobrar.
+    // v590 — o AbortController anterior era decorativo: nada era abortado e o
+    // Promise.all podia esperar indefinidamente. Agora o orçamento de 5s é uma
+    // corrida real (Promise.race) e o resultado tardio é descartado.
+    // v590 — fail-open deixa de ser universal: acima de PREFLIGHT_STRICT_BRL o
+    // pedido é recusado quando não conseguimos PROVAR a rota. Um reembolso de
+    // R$ 283 custa mais que uma venda grande adiada.
+    const PREFLIGHT_STRICT_BRL = 100;
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-      const [preflightRoute, preflightTarget] = await Promise.all([
+      const preflights = Promise.all([
         import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
           pacote: pacoteEfetivo,
           quantidade: quantidadeEfetiva,
@@ -221,8 +220,15 @@ export const criarPedido = createServerFn({ method: "POST" })
           rede: data.rede_social ?? "instagram",
           pacote: pacoteEfetivo,
           alvo: data.instagram_user,
-        }))
-      ]).finally(() => clearTimeout(timeoutId));
+        })),
+      ]);
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), 5000);
+      });
+      const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
+        .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
+
 
       if (!preflightRoute.ok) {
         console.error("[criarPedido] v297 cobrança bloqueada (rota):", pacoteEfetivo, preflightRoute.reason);
