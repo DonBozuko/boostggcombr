@@ -27,90 +27,8 @@ const utmClean = (v: string | null | undefined) =>
 
 const clean = (s: string) => s.replace(/\s+/g, " ").trim().slice(0, 300);
 
-// Tabela oficial (fonte de verdade no servidor) — keyed por pacote id.
-// Evita preço adulterado pelo cliente e diferencia seguidores vs curtidas.
-const PRICE_TABLE: Record<string, { quantidade: number; valor: number }> = {
-  // Instagram — Seguidores
-  p100:   { quantidade: 100,    valor: 5.0 },
-  p500:   { quantidade: 500,    valor: 12.0 },
-  p1k:    { quantidade: 1000,   valor: 18.0 },
-  p2k:    { quantidade: 2000,   valor: 30.0 },
-  p5k:    { quantidade: 5000,   valor: 65.0 },
-  p10k:   { quantidade: 10000,  valor: 120.0 },
-  p20k:   { quantidade: 20000,  valor: 220.0 },
-  p50k:   { quantidade: 50000,  valor: 490.0 },
-  p100k:  { quantidade: 100000, valor: 890.0 },
-  // Instagram — Curtidas (service 18860)
-  l100:   { quantidade: 100,  valor: 3.0 },
-  l500:   { quantidade: 500,  valor: 7.0 },
-  // v407 - Prateleira de Impulso
-  l100_v2: { quantidade: 100, valor: 9.90 },
-  l250_v2: { quantidade: 250, valor: 14.90 },
-  l500_v2: { quantidade: 500, valor: 19.90 },
-  l1k:    { quantidade: 1000, valor: 12.0 },
-  l2k:    { quantidade: 2000, valor: 19.0 },
-  l5k:    { quantidade: 5000, valor: 39.0 },
-  // Instagram — Visualizações
-  v1k:    { quantidade: 1000,  valor: 5.0 },
-  v5k:    { quantidade: 5000,  valor: 12.0 },
-  v10k:   { quantidade: 10000, valor: 19.0 },
-  v25k:   { quantidade: 25000, valor: 39.0 },
-  v50k:   { quantidade: 50000, valor: 69.0 },
-  // TikTok — Seguidores (service 14330)
-  tf100:  { quantidade: 100,  valor: 9.0 },
-  tf500:  { quantidade: 500,  valor: 29.0 },
-  tf1k:   { quantidade: 1000, valor: 49.0 },
-  // TikTok — Curtidas (service 19191)
-  tl500:  { quantidade: 500,  valor: 9.0 },
-  tl1k:   { quantidade: 1000, valor: 15.0 },
-  tl2k:   { quantidade: 2000, valor: 27.0 },
-  // TikTok — Visualizações (service 14907)
-  tv5k:   { quantidade: 5000,  valor: 7.0 },
-  tv10k:  { quantidade: 10000, valor: 12.0 },
-  tv50k:  { quantidade: 50000, valor: 39.0 },
-  // YouTube — Inscritos (service 19440 — R$ 97,86/1k, recarga 30 dias)
-  ys100:  { quantidade: 100,  valor: 29.0 },
-  ys500:  { quantidade: 500,  valor: 99.0 },
-  ys1k:   { quantidade: 1000, valor: 189.0 },
-  // YouTube — Visualizações (service 14321 — R$ 3,27/1k, recarga vitalícia)
-  yv1k:   { quantidade: 1000,  valor: 19.0 },
-  yv5k:   { quantidade: 5000,  valor: 59.0 },
-  yv10k:  { quantidade: 10000, valor: 99.0 },
-  // Facebook — Seguidores (service 18870)
-  ff500:  { quantidade: 500,  valor: 19.0 },
-  ff1k:   { quantidade: 1000, valor: 29.0 },
-  ff2k5:  { quantidade: 2500, valor: 69.0 },
-  // Facebook — Curtidas (service 7593)
-
-  fl500:  { quantidade: 500,  valor: 9.0 },
-  fl1k:   { quantidade: 1000, valor: 15.0 },
-  fl2k:   { quantidade: 2000, valor: 27.0 },
-  // Tráfego Web — ID 9313 (Brasil) e 10351 (Mundial)
-  wbr1k:  { quantidade: 1000,  valor: 19.0 },
-  wbr5k:  { quantidade: 5000,  valor: 69.0 },
-  wbr10k: { quantidade: 10000, valor: 119.0 },
-  wgl1k:  { quantidade: 1000,  valor: 9.0 },
-  wgl5k:  { quantidade: 5000,  valor: 29.0 },
-  wgl10k: { quantidade: 10000, valor: 49.0 },
-  // Telegram — Canal (service 19106)
-  tgc500: { quantidade: 500,  valor: 19.0 },
-  tgc1k:  { quantidade: 1000, valor: 35.0 },
-  // Telegram — Grupo (service 19107)
-  tgg500: { quantidade: 500,  valor: 19.0 },
-  tgg1k:  { quantidade: 1000, valor: 35.0 },
-  // Kwai — fallback estático (v203). Se pricing_engine cair, Kwai continua vendendo.
-  // Preços refletem a categoria em pricing_engine (kf/kl/kv). Ajuste via admin altera engine;
-  // essa tabela só entra em ação se o pricing-engine.server falhar.
-  kf500:  { quantidade: 500,   valor: 19.0 },
-  kf1k:   { quantidade: 1000,  valor: 29.0 },
-  kf2k:   { quantidade: 2000,  valor: 49.0 },
-  kf5k:   { quantidade: 5000,  valor: 99.0 },
-  kl500:  { quantidade: 500,   valor: 9.0 },
-  kl1k:   { quantidade: 1000,  valor: 15.0 },
-  kl2k:   { quantidade: 2000,  valor: 27.0 },
-  kv5k:   { quantidade: 5000,  valor: 9.0 },
-  kv10k:  { quantidade: 10000, valor: 15.0 },
-};
+// v590 — a tabela fixa de preços saiu daqui. Autoridade única: pricing_items,
+// lido por `resolveCheckoutPricing` em src/lib/checkout-pricing.server.ts.
 
 export const prewarmPedido = createServerFn({ method: "POST" })
   .validator((input) => z.object({ 
@@ -201,127 +119,52 @@ export const criarPedido = createServerFn({ method: "POST" })
         ? (pkg.startsWith("kl") ? "curtidas" : pkg.startsWith("kv") ? "visualizacoes" : "seguidores")
         : (pkg.startsWith("l") ? "curtidas" : pkg.startsWith("v") ? "visualizacoes" : "seguidores");
 
-    // Universal Single Source of Truth: pricing-engine para TODAS as 6 redes.
-    // PRICE_TABLE permanece apenas como fallback de último recurso.
-    let valorBase: number | null = null;
-    let qtdOficial: number = data.quantidade;
-    let gridRef: Awaited<ReturnType<typeof import("./pricing-engine.server").getPricingGridImpl>> | null = null;
-    let catRef: string | null = null;
+    // v590 — AUTORIDADE ÚNICA DE PREÇO + LEITURA ÚNICA.
+    // Uma só ida ao banco resolve preço, quantidade oficial, custo e
+    // disponibilidade. A grade (usada só pelo order bump) roda em paralelo,
+    // então não soma latência ao caminho do Pix.
+    const { resolveCheckoutPricing, precoAceito } = await import("./checkout-pricing.server");
 
-    // v211 — BR variants (`br-*`) live in a separate pricing_items subcategory
-    // (ex: `instagram:seguidores:br`) that categoryFromPacote() doesn't map.
-    // Query pricing_items directly by full pacote id to avoid INVALID_PACKAGE.
-    if (isBrVariant) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: row } = await supabaseAdmin
-          .from("pricing_items" as any)
-          .select("price_brl, quantidade")
-          .eq("pacote", pacoteRaw)
-          .maybeSingle();
-        const v = Number((row as any)?.price_brl);
-        const q = Number((row as any)?.quantidade);
-        if (Number.isFinite(v) && v > 0 && Number.isFinite(q) && q > 0) {
-          valorBase = v;
-          qtdOficial = q;
-        }
-      } catch (err) {
-        console.error("[criarPedido] BR lookup falhou:", err);
-      }
-    }
-
-    if (valorBase == null) {
+    const gridPromise = (async () => {
       try {
         const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
         const cat = categoryFromPacote(pkg);
-        if (cat) {
-          catRef = cat;
-          const grid = await getPricingGridImpl(cat);
-          gridRef = grid;
-          const item = grid.items.find((i) => i.id === pkg);
-          if (item) {
-            valorBase = item.valor;
-            qtdOficial = item.quantidade;
-          }
-        }
+        if (!cat) return null;
+        return await getPricingGridImpl(cat);
       } catch (err) {
-        console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
+        console.warn("[criarPedido] grade indisponível (order bump desativado):", err);
+        return null;
       }
+    })();
+
+    const [pricing, gridRef] = await Promise.all([resolveCheckoutPricing(pacoteRaw), gridPromise]);
+
+    if (!pricing.ok) {
+      console.error("[criarPedido] v590 preço bloqueado:", pacoteRaw, pricing.error, pricing.motivo);
+      try {
+        const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+        const titulo =
+          pricing.error === "PRICE_UNAVAILABLE"
+            ? "🛑 CHECKOUT SEM PREÇO OFICIAL"
+            : "🛑 PACOTE BLOQUEADO ANTES DE COBRAR";
+        await dispatchWhatsappAlert(
+          `${titulo}\n\nPROBLEMA: cliente tentou "${data.pacote}" (${data.quantidade} ${categoria} ${rede}). Motivo: ${pricing.motivo}. Não cobrei nada.\n\nO QUE FAZER: abrir Admin › Saúde do Catálogo e conferir esse pacote (preço, custo e fornecedor vinculado).`,
+        ).catch(() => {});
+      } catch { /* noop */ }
+      return { ok: false as const, error: pricing.error };
     }
-    if (valorBase == null) {
-      const oficial = PRICE_TABLE[pkg];
-      if (!oficial) {
-        console.error("[criarPedido] pacote inválido:", data.pacote);
-        // v211 — Alerta imediato: pacote inválido = venda perdida silenciosa.
-        try {
-          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
-          await dispatchWhatsappAlert(
-            `⚠️ CLIENTE TENTOU PACOTE QUE NÃO EXISTE\n\nPROBLEMA: alguém clicou no pacote "${data.pacote}" (${data.quantidade} ${categoria} ${rede}) mas o backend não conhece esse ID. Checkout travou pro cliente.\n\nO QUE FAZER: verificar se esse pacote aparece no front mas sumiu do pricing_items. Rodar sync-pricing no admin.`,
-          ).catch(() => {});
-        } catch { /* noop */ }
-        return { ok: false as const, error: "INVALID_PACKAGE" as const };
-      }
-      valorBase = oficial.valor;
-      qtdOficial = oficial.quantidade;
-    }
+
+    let valorBase: number = pricing.valor;
+    const qtdOficial: number = pricing.quantidade;
+
     if (qtdOficial !== data.quantidade) {
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
 
-    // v214 — Trava sellable universal: consulta flag persistente do teste seco
-    // (`is_sellable` + `sellable_reason`) atualizada por cron diário. Bloqueia
-    // pacote pausado antes de cobrar Pix. Fallback estrutural (sem custo /
-    // sem provedor) mantido pra casos onde o dry-run ainda não rodou.
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: sellRow } = await supabaseAdmin
-        .from("pricing_items" as any)
-        .select("cost_brl, is_sellable, sellable_reason, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id")
-        .eq("pacote", pacoteRaw)
-        .maybeSingle();
-      if (sellRow) {
-        const row = sellRow as any;
-        // v290 — conta o 4º fornecedor e os IDs auto-resolvidos. Antes, pacote
-        // atendido só por eles era barrado como "sem fornecedor" e o cliente
-        // levava erro em um produto que o sistema entregaria normalmente.
-        const hasProvider = !!(
-          row.smmhype_service_id || row.smmpanel_service_id || row.verified_service_id || row.provider4_service_id ||
-          row.smmhype_auto_id || row.smmpanel_auto_id || row.verified_auto_id || row.provider4_auto_id
-        );
-        const hasCost = Number(row.cost_brl) > 0;
-        const blocked = row.is_sellable === false || !hasProvider || !hasCost;
-        if (blocked) {
-          const motivo = row.sellable_reason ?? (!hasProvider ? "Sem fornecedor vinculado" : !hasCost ? "Custo zerado" : "Pacote pausado");
-          try {
-            const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
-            await dispatchWhatsappAlert(
-              `🛑 PACOTE BLOQUEADO ANTES DE COBRAR\n\nPROBLEMA: cliente tentou "${data.pacote}" (${data.quantidade} ${categoria} ${rede}). Motivo: ${motivo}. Bloqueei o pagamento pra não cobrar sem conseguir entregar.\n\nO QUE FAZER: abrir Admin › Saúde do Catálogo, ver o pacote em vermelho e vincular fornecedor OU tirar do site.`,
-            ).catch(() => {});
-          } catch { /* noop */ }
-          return { ok: false as const, error: "INVALID_PACKAGE" as const };
-        }
-      }
-    } catch (err) {
-      console.error("[criarPedido] sellable check falhou:", err);
-      // não bloqueia — falha do check não deve derrubar venda válida
-    }
+    // v186/v540 — honra o preço mostrado na tela apenas dentro de 1% de drift.
+    valorBase = precoAceito(valorBase, Number(data.valor));
 
-
-
-
-    // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
-    // v540 — Redução Drástica de Drift: Aceita apenas drift de 1% (anti-tampering máximo).
-    // Proteger a margem em oscilações de câmbio/pricing sem quebrar checkout por delay de cache.
-    const serverValor = valorBase!;
-    const clientValor = Number(data.valor);
-    if (Number.isFinite(clientValor) && clientValor > 0) {
-      const drift = Math.abs(clientValor - serverValor) / serverValor;
-      if (drift <= 0.01 && clientValor >= serverValor * 0.99) {
-        valorBase = Number(clientValor.toFixed(2));
-      }
-      // else: mantém serverValor (cliente tentou tamper ou preço mudou muito)
-    }
 
 
     // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
@@ -358,17 +201,16 @@ export const criarPedido = createServerFn({ method: "POST" })
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
-    // v297/v301 — PREFLIGHTS PARALELOS (Otimização v426.1).
-    // Antes eram sequenciais, adicionando ~2-4s de latência. Agora rodam juntos.
-    // Prova de ROTA + Prova de ALVO. Se algum falhar, bloqueia antes de cobrar.
-    // v297/v301 — PREFLIGHTS PARALELOS COM TIMEOUT (Otimização v457).
-    // Preflights rodam juntos com AbortSignal.timeout de 5s para evitar
-    // travamento do checkout por lentidão de APIs externas.
+    // v297/v301 — PREFLIGHTS PARALELOS. Prova de ROTA + prova de ALVO antes de cobrar.
+    // v590 — o AbortController anterior era decorativo: nada era abortado e o
+    // Promise.all podia esperar indefinidamente. Agora o orçamento de 5s é uma
+    // corrida real (Promise.race) e o resultado tardio é descartado.
+    // v590 — fail-open deixa de ser universal: acima de PREFLIGHT_STRICT_BRL o
+    // pedido é recusado quando não conseguimos PROVAR a rota. Um reembolso de
+    // R$ 283 custa mais que uma venda grande adiada.
+    const PREFLIGHT_STRICT_BRL = 100;
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-      const [preflightRoute, preflightTarget] = await Promise.all([
+      const preflights = Promise.all([
         import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
           pacote: pacoteEfetivo,
           quantidade: quantidadeEfetiva,
@@ -378,8 +220,15 @@ export const criarPedido = createServerFn({ method: "POST" })
           rede: data.rede_social ?? "instagram",
           pacote: pacoteEfetivo,
           alvo: data.instagram_user,
-        }))
-      ]).finally(() => clearTimeout(timeoutId));
+        })),
+      ]);
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      const timeout = new Promise<never>((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), 5000);
+      });
+      const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
+        .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
+
 
       if (!preflightRoute.ok) {
         console.error("[criarPedido] v297 cobrança bloqueada (rota):", pacoteEfetivo, preflightRoute.reason);
@@ -413,13 +262,23 @@ export const criarPedido = createServerFn({ method: "POST" })
 
         return { ok: false as const, error: preflightTarget.code };
       }
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        console.warn("[criarPedido] Preflights abortados por TIMEOUT (5s) - Seguindo via fail-open");
-      } else {
-        console.warn("[criarPedido] Preflights falharam (venda liberada por fail-open):", err);
+    } catch (err) {
+      const motivo = err instanceof Error ? err.message : String(err);
+      if (valorCobrar >= PREFLIGHT_STRICT_BRL) {
+        console.error(
+          `[criarPedido] v590 pedido de R$${valorCobrar} recusado: rota não pôde ser provada (${motivo})`,
+        );
+        try {
+          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+          await dispatchWhatsappAlert(
+            `🛑 PEDIDO GRANDE RECUSADO POR SEGURANÇA\n\nPROBLEMA: cliente tentou "${pacoteEfetivo}" por R$ ${valorCobrar.toFixed(2)}, mas a checagem de fornecedor não respondeu a tempo (${motivo}). Preferi não cobrar a arriscar reembolso.\n\nO QUE FAZER: conferir se os fornecedores estão respondendo em Admin › Saúde.`,
+          ).catch(() => {});
+        } catch { /* noop */ }
+        return { ok: false as const, error: "INVALID_PACKAGE" as const };
       }
+      console.warn(`[criarPedido] preflight indisponível (${motivo}); venda pequena liberada por fail-open`);
     }
+
 
 
 
