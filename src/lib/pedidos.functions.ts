@@ -119,127 +119,52 @@ export const criarPedido = createServerFn({ method: "POST" })
         ? (pkg.startsWith("kl") ? "curtidas" : pkg.startsWith("kv") ? "visualizacoes" : "seguidores")
         : (pkg.startsWith("l") ? "curtidas" : pkg.startsWith("v") ? "visualizacoes" : "seguidores");
 
-    // Universal Single Source of Truth: pricing-engine para TODAS as 6 redes.
-    // PRICE_TABLE permanece apenas como fallback de último recurso.
-    let valorBase: number | null = null;
-    let qtdOficial: number = data.quantidade;
-    let gridRef: Awaited<ReturnType<typeof import("./pricing-engine.server").getPricingGridImpl>> | null = null;
-    let catRef: string | null = null;
+    // v590 — AUTORIDADE ÚNICA DE PREÇO + LEITURA ÚNICA.
+    // Uma só ida ao banco resolve preço, quantidade oficial, custo e
+    // disponibilidade. A grade (usada só pelo order bump) roda em paralelo,
+    // então não soma latência ao caminho do Pix.
+    const { resolveCheckoutPricing, precoAceito } = await import("./checkout-pricing.server");
 
-    // v211 — BR variants (`br-*`) live in a separate pricing_items subcategory
-    // (ex: `instagram:seguidores:br`) that categoryFromPacote() doesn't map.
-    // Query pricing_items directly by full pacote id to avoid INVALID_PACKAGE.
-    if (isBrVariant) {
-      try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { data: row } = await supabaseAdmin
-          .from("pricing_items" as any)
-          .select("price_brl, quantidade")
-          .eq("pacote", pacoteRaw)
-          .maybeSingle();
-        const v = Number((row as any)?.price_brl);
-        const q = Number((row as any)?.quantidade);
-        if (Number.isFinite(v) && v > 0 && Number.isFinite(q) && q > 0) {
-          valorBase = v;
-          qtdOficial = q;
-        }
-      } catch (err) {
-        console.error("[criarPedido] BR lookup falhou:", err);
-      }
-    }
-
-    if (valorBase == null) {
+    const gridPromise = (async () => {
       try {
         const { getPricingGridImpl, categoryFromPacote } = await import("./pricing-engine.server");
         const cat = categoryFromPacote(pkg);
-        if (cat) {
-          catRef = cat;
-          const grid = await getPricingGridImpl(cat);
-          gridRef = grid;
-          const item = grid.items.find((i) => i.id === pkg);
-          if (item) {
-            valorBase = item.valor;
-            qtdOficial = item.quantidade;
-          }
-        }
+        if (!cat) return null;
+        return await getPricingGridImpl(cat);
       } catch (err) {
-        console.error("[criarPedido] pricing-engine falhou, usando fallback:", err);
+        console.warn("[criarPedido] grade indisponível (order bump desativado):", err);
+        return null;
       }
+    })();
+
+    const [pricing, gridRef] = await Promise.all([resolveCheckoutPricing(pacoteRaw), gridPromise]);
+
+    if (!pricing.ok) {
+      console.error("[criarPedido] v590 preço bloqueado:", pacoteRaw, pricing.error, pricing.motivo);
+      try {
+        const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+        const titulo =
+          pricing.error === "PRICE_UNAVAILABLE"
+            ? "🛑 CHECKOUT SEM PREÇO OFICIAL"
+            : "🛑 PACOTE BLOQUEADO ANTES DE COBRAR";
+        await dispatchWhatsappAlert(
+          `${titulo}\n\nPROBLEMA: cliente tentou "${data.pacote}" (${data.quantidade} ${categoria} ${rede}). Motivo: ${pricing.motivo}. Não cobrei nada.\n\nO QUE FAZER: abrir Admin › Saúde do Catálogo e conferir esse pacote (preço, custo e fornecedor vinculado).`,
+        ).catch(() => {});
+      } catch { /* noop */ }
+      return { ok: false as const, error: pricing.error };
     }
-    if (valorBase == null) {
-      const oficial = PRICE_TABLE[pkg];
-      if (!oficial) {
-        console.error("[criarPedido] pacote inválido:", data.pacote);
-        // v211 — Alerta imediato: pacote inválido = venda perdida silenciosa.
-        try {
-          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
-          await dispatchWhatsappAlert(
-            `⚠️ CLIENTE TENTOU PACOTE QUE NÃO EXISTE\n\nPROBLEMA: alguém clicou no pacote "${data.pacote}" (${data.quantidade} ${categoria} ${rede}) mas o backend não conhece esse ID. Checkout travou pro cliente.\n\nO QUE FAZER: verificar se esse pacote aparece no front mas sumiu do pricing_items. Rodar sync-pricing no admin.`,
-          ).catch(() => {});
-        } catch { /* noop */ }
-        return { ok: false as const, error: "INVALID_PACKAGE" as const };
-      }
-      valorBase = oficial.valor;
-      qtdOficial = oficial.quantidade;
-    }
+
+    let valorBase: number = pricing.valor;
+    const qtdOficial: number = pricing.quantidade;
+
     if (qtdOficial !== data.quantidade) {
       console.error("[criarPedido] quantidade divergente:", data.pacote, data.quantidade, qtdOficial);
       return { ok: false as const, error: "INVALID_PACKAGE" as const };
     }
 
-    // v214 — Trava sellable universal: consulta flag persistente do teste seco
-    // (`is_sellable` + `sellable_reason`) atualizada por cron diário. Bloqueia
-    // pacote pausado antes de cobrar Pix. Fallback estrutural (sem custo /
-    // sem provedor) mantido pra casos onde o dry-run ainda não rodou.
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: sellRow } = await supabaseAdmin
-        .from("pricing_items" as any)
-        .select("cost_brl, is_sellable, sellable_reason, smmhype_service_id, smmpanel_service_id, verified_service_id, provider4_service_id, smmhype_auto_id, smmpanel_auto_id, verified_auto_id, provider4_auto_id")
-        .eq("pacote", pacoteRaw)
-        .maybeSingle();
-      if (sellRow) {
-        const row = sellRow as any;
-        // v290 — conta o 4º fornecedor e os IDs auto-resolvidos. Antes, pacote
-        // atendido só por eles era barrado como "sem fornecedor" e o cliente
-        // levava erro em um produto que o sistema entregaria normalmente.
-        const hasProvider = !!(
-          row.smmhype_service_id || row.smmpanel_service_id || row.verified_service_id || row.provider4_service_id ||
-          row.smmhype_auto_id || row.smmpanel_auto_id || row.verified_auto_id || row.provider4_auto_id
-        );
-        const hasCost = Number(row.cost_brl) > 0;
-        const blocked = row.is_sellable === false || !hasProvider || !hasCost;
-        if (blocked) {
-          const motivo = row.sellable_reason ?? (!hasProvider ? "Sem fornecedor vinculado" : !hasCost ? "Custo zerado" : "Pacote pausado");
-          try {
-            const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
-            await dispatchWhatsappAlert(
-              `🛑 PACOTE BLOQUEADO ANTES DE COBRAR\n\nPROBLEMA: cliente tentou "${data.pacote}" (${data.quantidade} ${categoria} ${rede}). Motivo: ${motivo}. Bloqueei o pagamento pra não cobrar sem conseguir entregar.\n\nO QUE FAZER: abrir Admin › Saúde do Catálogo, ver o pacote em vermelho e vincular fornecedor OU tirar do site.`,
-            ).catch(() => {});
-          } catch { /* noop */ }
-          return { ok: false as const, error: "INVALID_PACKAGE" as const };
-        }
-      }
-    } catch (err) {
-      console.error("[criarPedido] sellable check falhou:", err);
-      // não bloqueia — falha do check não deve derrubar venda válida
-    }
+    // v186/v540 — honra o preço mostrado na tela apenas dentro de 1% de drift.
+    valorBase = precoAceito(valorBase, Number(data.valor));
 
-
-
-
-    // v186 — Honor client-shown price to preserve UX consistency (dropdown ≠ Pix bug).
-    // v540 — Redução Drástica de Drift: Aceita apenas drift de 1% (anti-tampering máximo).
-    // Proteger a margem em oscilações de câmbio/pricing sem quebrar checkout por delay de cache.
-    const serverValor = valorBase!;
-    const clientValor = Number(data.valor);
-    if (Number.isFinite(clientValor) && clientValor > 0) {
-      const drift = Math.abs(clientValor - serverValor) / serverValor;
-      if (drift <= 0.01 && clientValor >= serverValor * 0.99) {
-        valorBase = Number(clientValor.toFixed(2));
-      }
-      // else: mantém serverValor (cliente tentou tamper ou preço mudou muito)
-    }
 
 
     // v183 — Order Bump: se aceito, troca pra próximo tier com 20% off.
