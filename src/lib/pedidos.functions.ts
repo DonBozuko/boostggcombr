@@ -262,13 +262,23 @@ export const criarPedido = createServerFn({ method: "POST" })
 
         return { ok: false as const, error: preflightTarget.code };
       }
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        console.warn("[criarPedido] Preflights abortados por TIMEOUT (5s) - Seguindo via fail-open");
-      } else {
-        console.warn("[criarPedido] Preflights falharam (venda liberada por fail-open):", err);
+    } catch (err) {
+      const motivo = err instanceof Error ? err.message : String(err);
+      if (valorCobrar >= PREFLIGHT_STRICT_BRL) {
+        console.error(
+          `[criarPedido] v590 pedido de R$${valorCobrar} recusado: rota não pôde ser provada (${motivo})`,
+        );
+        try {
+          const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+          await dispatchWhatsappAlert(
+            `🛑 PEDIDO GRANDE RECUSADO POR SEGURANÇA\n\nPROBLEMA: cliente tentou "${pacoteEfetivo}" por R$ ${valorCobrar.toFixed(2)}, mas a checagem de fornecedor não respondeu a tempo (${motivo}). Preferi não cobrar a arriscar reembolso.\n\nO QUE FAZER: conferir se os fornecedores estão respondendo em Admin › Saúde.`,
+          ).catch(() => {});
+        } catch { /* noop */ }
+        return { ok: false as const, error: "INVALID_PACKAGE" as const };
       }
+      console.warn(`[criarPedido] preflight indisponível (${motivo}); venda pequena liberada por fail-open`);
     }
+
 
 
 
