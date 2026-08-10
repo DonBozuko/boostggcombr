@@ -932,6 +932,27 @@ export type Database = {
         }
         Relationships: []
       }
+      memorias_sistema: {
+        Row: {
+          contexto: string
+          criado_em: string | null
+          embedding: string | null
+          id: string
+        }
+        Insert: {
+          contexto: string
+          criado_em?: string | null
+          embedding?: string | null
+          id?: string
+        }
+        Update: {
+          contexto?: string
+          criado_em?: string | null
+          embedding?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       monitoramento_saldo: {
         Row: {
           cotacao_brl: number | null
