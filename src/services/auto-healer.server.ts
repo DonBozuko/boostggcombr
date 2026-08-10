@@ -224,5 +224,15 @@ export async function runAutoHealer(): Promise<HealReport> {
     report.errors.push(`audit log insert failed: ${e?.message ?? "unknown"}`);
   }
 
+  // v609 — Gatilho Shadow Mode para Diagnóstico de IA
+  if (report.errors.length > 0 || report.providers_marked_unstable.length > 0) {
+    const { runShadowInspection } = await import("./ai-inspector");
+    runShadowInspection({
+      source: 'infra',
+      context: `Auto-Healer detectou falhas: ${report.id_fixed} IDs corrigidos, ${report.price_fixed} preços corrigidos, ${report.providers_marked_unstable.length} provedores instáveis.`,
+      logs: report.errors
+    }).catch(() => {});
+  }
+
   return report;
 }
