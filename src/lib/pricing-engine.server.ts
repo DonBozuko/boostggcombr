@@ -826,19 +826,18 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     console.log("[pricing] v137 reserve live handshake", rep);
   } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
 
-  // v274 — Recusto pelo fornecedor de reserva.
-  // CAUSA RAIZ do p15k a R$2.509: quando o fornecedor primário (SMMhype) não
-  // tem o serviço, o motor caía na tabela FALLBACK (ex.: R$12/1k) mesmo com um
-  // fornecedor de reserva vendendo o mesmo pacote por R$1,91/1k. Resultado:
-  // custo fantasma inflado e preço de vitrine absurdo. Agora, todo item em
-  // 'fallback' que tenha ID de reserva com tarifa real usa a tarifa real.
+  // v605 — Recusto por Fornecedor de Reserva (Smart Routing Fallback).
+  // Elimina o "custo fantasma" do fallback estático quando um fornecedor de 
+  // reserva possui o item em catálogo com tarifa real.
+
   try {
     const rec = await recostFromReserves();
     
   } catch (e) { console.warn("[pricing] v274 recost fail", e); }
 
-  // v304 — última palavra: escada monotônica sobre o estado REAL do banco,
-  // depois de todos os motores gravarem.
+  // v605 — Autoridade Final: Handover para PriceAuthorityServer para aplicação 
+  // de rampa de margem e escada monotônica sobre o estado final.
+
   try {
     const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
     await enforcePriceAuthority("pos-sync-live");
@@ -850,11 +849,10 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 }
 
 /**
- * v274 — Corrige itens precificados por fallback quando existe tarifa real de
- * um fornecedor de reserva (SMMPainel / Verified, ambos em BRL).
- * Só age para BAIXO ou quando o custo fantasma diverge >10% do real — nunca
- * encarece o site por conta própria.
+ * v605 — Recusto Inteligente.
+ * Neutraliza divergências entre fallback e tarifas reais de reserva.
  */
+
 export async function recostFromReserves(): Promise<{
   checked: number;
   fixed: number;
