@@ -58,3 +58,29 @@ export async function checkRateLimit(
     return { allowed: true, hits: 0, retryAfterSeconds: 0 };
   }
 }
+
+/**
+ * v607 — Leitura NÃO destrutiva da janela (não consome crédito).
+ * Usada pelo Security Proxy do admin: nega antes de comparar o token quando o
+ * IP já estourou o limite de falhas. Fail-open: erro de infra nunca tranca.
+ */
+export async function peekRateLimit(
+  scope: string,
+  identity: string,
+  limit: number,
+  windowSeconds: number,
+): Promise<boolean> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const since = new Date(Date.now() - windowSeconds * 1000).toISOString();
+    const { count, error } = await supabaseAdmin
+      .from("rate_limit_hits" as any)
+      .select("id", { count: "exact", head: true })
+      .eq("bucket_key", `${scope}:${identity}`.slice(0, 200))
+      .gte("created_at", since);
+    if (error) return false;
+    return Number(count ?? 0) >= limit;
+  } catch {
+    return false;
+  }
+}
