@@ -10,7 +10,7 @@ export const Route = createFileRoute("/api/public/queue/reprocess")({
     handlers: {
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
-        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:reprocess")).ok) {
           return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },

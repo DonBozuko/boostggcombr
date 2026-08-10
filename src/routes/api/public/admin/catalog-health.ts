@@ -7,9 +7,7 @@ export const Route = createFileRoute("/api/public/admin/catalog-health")({
       GET: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
         if (
-          !token ||
-          (token !== process.env.ADMIN_TOKEN &&
-            token !== process.env.CRON_ADMIN_TOKEN)
+          !(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:catalog-health", { allowCron: true })).ok
         ) {
           return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), {
             status: 401,
