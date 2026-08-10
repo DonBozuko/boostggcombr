@@ -706,7 +706,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     ? { rateById: new Map<number, number>(), rangeById: new Map<number, { min?: number; max?: number }>(), provider: "none" as const, fx: USD_TO_BRL_FALLBACK }
     : await loadProviderRateMap();
 
-  console.log(`[pricing] sync provider=${provider} services=${rateById.size}`);
+  
 
 
   const cats = Object.keys(CANONICAL_QTYS) as Category[];
@@ -833,7 +833,7 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
   // 'fallback' que tenha ID de reserva com tarifa real usa a tarifa real.
   try {
     const rec = await recostFromReserves();
-    console.log("[pricing] v274 recost from reserves", rec);
+    
   } catch (e) { console.warn("[pricing] v274 recost fail", e); }
 
   // v304 — última palavra: escada monotônica sobre o estado REAL do banco,

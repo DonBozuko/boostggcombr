@@ -118,8 +118,8 @@ function KitCreatorPage() {
         contentName: withBump ? "kit creator bump" : "kit creator 1k",
       });
       setPix({
-        code: r.qrCode ?? "",
-        base64: r.qrCodeBase64 ?? "",
+        code: (r as any).qrCode ?? r.preferenceId ?? "",
+        base64: (r as any).qrCodeBase64 ?? "",
         valor: r.valorFormatado ?? `R$ ${(precoFinal ?? priceBase).toFixed(2).replace(".", ",")}`,
       });
     } catch (err) {

@@ -192,7 +192,7 @@ function TrafegoLanding() {
         price: res.valorFormatado ?? finalPlan?.price ?? selected.price,
         tier: finalPlan?.tier ?? selected.tier,
         profile: parsed.data.profile,
-        pixCode: res.qrCode, qrCodeBase64: res.qrCodeBase64, pedidoId: res.pedidoId,
+        pixCode: (res as any).qrCode ?? res.preferenceId, qrCodeBase64: (res as any).qrCodeBase64 ?? "", pedidoId: res.pedidoId,
         quantidade: finalPlan?.quantidade ?? selected.quantidade,
       });
       setModalOpen(true);

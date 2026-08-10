@@ -24,7 +24,7 @@ let lastReserveSyncAt = 0;
 
 export function purgePricingCacheMemory(reason = "v137-force-purge"): void {
   lastReserveSyncAt = 0;
-  console.log(`[pricing-cache] purge absoluto de cache em memória (${reason})`);
+  
 }
 
 async function refresh(): Promise<Map<string, PricingRow>> {
@@ -258,7 +258,7 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   if (!_opts.bypassLock && !(await acquireSyncLock(supabaseAdmin))) {
-    console.log("[pricing-cache] v271 sync ignorado: outra execução em andamento");
+    
     lastReserveSyncAt = Date.now();
     return SKIPPED_REPORT;
   }

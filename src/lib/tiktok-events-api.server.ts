@@ -80,7 +80,7 @@ export async function sendTikTokServerEvent(input: ServerEventInput): Promise<Se
       console.error("[tiktok-eapi] falhou", res.status, json);
       return { ok: false, reason: json.message ?? `http ${res.status}`, response: json, status: res.status };
     }
-    console.log("[tiktok-eapi] ok", input.event, input.orderId);
+    
     return { ok: true, response: json };
   } catch (err) {
     console.error("[tiktok-eapi] exception", err);

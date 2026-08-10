@@ -193,8 +193,8 @@ function TelegramLanding() {
         price: res.valorFormatado ?? selected.price,
         tier: finalPlan?.tier ?? selected.tier,
         profile: profileValue,
-        pixCode: res.qrCode,
-        qrCodeBase64: res.qrCodeBase64,
+        pixCode: (res as any).qrCode ?? res.preferenceId,
+        qrCodeBase64: (res as any).qrCodeBase64 ?? "",
         pedidoId: res.pedidoId,
         quantidade: res.quantidadeFinal ?? selected.quantidade,
       });

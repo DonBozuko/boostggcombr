@@ -109,8 +109,8 @@ function Promo5Page() {
         contentName: withBump ? "bump upgrade instagram" : "100 seguidores instagram",
       });
       setPix({
-        code: r.qrCode ?? "",
-        base64: r.qrCodeBase64 ?? "",
+        code: (r as any).qrCode ?? r.preferenceId ?? "",
+        base64: (r as any).qrCodeBase64 ?? "",
         valor: r.valorFormatado ?? `R$ ${PRECO_FINAL.toFixed(2).replace(".", ",")}`,
       });
     } catch (err) {
