@@ -61,9 +61,10 @@ function Page() {
   return (
     <SeoLanding
       accent="#e1306c"
-      h1="Como Aumentar o Alcance no Instagram com Curtidas Reais via Pix"
-      subtitle="Engajamento estratégico para posts e Reels"
-      intro="O algoritmo do Instagram prioriza conteúdos com sinais rápidos de interesse. Nosso sistema entrega curtidas reais em minutos para validar sua prova social e destravar a distribuição orgânica. Tudo via Pix, sem senha e com total segurança."
+      h1="Como Curtidas no Instagram Aumentam seu Alcance Orgânico"
+      subtitle="Engajamento estratégico para validar sua prova social"
+      intro="O algoritmo do Instagram prioriza conteúdos que geram interesse imediato. Ao receber curtidas reais de forma gradual, seu post ou Reel ganha o sinal de relevância necessário para ser distribuído para novas audiências. Segurança total via Pix, sem necessidade de senha."
+
       ctaHref="/"
       ctaLabel="Comprar curtidas agora"
       benefits={[
