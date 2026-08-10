@@ -233,8 +233,9 @@ function formatBRL(v: number): string {
   return `R$ ${v.toFixed(2).replace(".", ",")}`;
 }
 
-// v50 — JSON Response Sanitizer Matrix. Lê services de qualquer panel SMM
-// (SMMhype/SMMPainel/Verified) sem nunca explodir em "Unable to ... not valid JSON".
+// v605 — Matriz de Sanitização JSON Universal.
+// Blindagem contra payloads corrompidos ou binários injetados nos endpoints de fornecedores.
+
 async function safeFetchProviderServices(
   endpoint: string,
   apiKey: string,
