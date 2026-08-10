@@ -12,8 +12,8 @@ function extractToken(request: Request) {
 
 function authorized(token: string) {
   if (!token) return false;
-  if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return true;
-  if (process.env.CRON_ADMIN_TOKEN && token === process.env.CRON_ADMIN_TOKEN) return true;
+  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:dry-run-catalog")).ok) return true;
+  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:dry-run-catalog", { allowCron: true })).ok) return true;
   return false;
 }
 

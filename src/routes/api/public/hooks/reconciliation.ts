@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/public/hooks/reconciliation")({
     handlers: {
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
-        if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:reconciliation", { allowCron: true })).ok) {
           return new Response(JSON.stringify({ error: "Unauthorized" }), {
             status: 401,
             headers: { "Content-Type": "application/json" },

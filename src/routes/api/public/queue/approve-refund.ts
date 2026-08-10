@@ -24,7 +24,7 @@ async function authorize(request: Request): Promise<{ ok: boolean; who: string }
     } catch { /* cai pro fallback */ }
   }
   const tok = request.headers.get("x-admin-token") ?? "";
-  if (process.env.ADMIN_TOKEN && tok === process.env.ADMIN_TOKEN) return { ok: true, who: "admin@token" };
+  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(tok, "route:approve-refund")).ok) return { ok: true, who: "admin@token" };
   return { ok: false, who: "" };
 }
 

@@ -9,7 +9,7 @@ export const Route = createFileRoute("/api/public/diag/probe-cancel")({
     handlers: {
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token");
-        if (!token || token !== process.env.ADMIN_TOKEN) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:probe-cancel")).ok) {
           return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), {
             status: 401, headers: { "Content-Type": "application/json" },
           });
