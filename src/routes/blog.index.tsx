@@ -1,4 +1,4 @@
-// v580 — Blog Hub: Central de Autoridade em Crescimento Social
+// v605 — Blog Hub: Autoridade Máxima em Crescimento Social.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { TrendingUp } from "lucide-react";
 
@@ -91,8 +91,9 @@ const OG_IMAGE = "https://www.boostgg.com.br/og-instagram.jpg";
 
 export const Route = createFileRoute("/blog/")({
   head: () => {
-    const title = "Blog BoostGG — Crescimento no Instagram";
-    const description = "Guias práticos sobre crescer no Instagram, comprar seguidores com segurança e escolher os melhores serviços em 2026.";
+    const title = "Blog BoostGG — Autoridade em Crescimento no Instagram";
+    const description = "Guias avançados sobre estratégia de Reels, algoritmo do Instagram e como comprar seguidores com segurança em 2026.";
+
     return {
       meta: [
         { title },
@@ -137,7 +138,7 @@ function BlogIndex() {
       <main className="container mx-auto px-6 py-16 max-w-3xl">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Blog</h1>
         <p className="text-lg text-muted-foreground mb-10">
-          Estratégias e análises honestas sobre crescimento no Instagram.
+          Estratégias avançadas e guias técnicos sobre crescimento exponencial e autoridade social.
         </p>
 
         <div className="space-y-4">
