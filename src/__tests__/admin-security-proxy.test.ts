@@ -39,6 +39,8 @@ const GUARDAS = [
   "authReseller",
   "isCronAuthorized",
   "CRON_SECRET",
+  "assertAdmin",
+  "signPedidoToken",
 ];
 
 function listFiles(dir: string, suffix: string): string[] {
