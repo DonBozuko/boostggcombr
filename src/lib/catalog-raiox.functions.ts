@@ -37,7 +37,8 @@ export const getCatalogRaioX = createServerFn({ method: "POST" })
       trocas_de_produto: [],
       generated_at: new Date().toISOString(),
     };
-    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "catalog-raiox")).ok) return { ...vazio, error: "UNAUTHORIZED" };
+    const guard = await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "catalog-raiox");
+    if (!guard.ok) return { ...vazio, error: "UNAUTHORIZED" };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const desde = new Date(Date.now() - 48 * 3600_000).toISOString();

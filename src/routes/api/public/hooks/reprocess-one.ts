@@ -24,14 +24,20 @@ export const Route = createFileRoute("/api/public/hooks/reprocess-one")({
         const url = new URL(request.url);
         const id = url.searchParams.get("id") ?? "";
         const token = url.searchParams.get("t") ?? "";
-        const secret = process.env.ADMIN_TOKEN;
-        if (!secret) return html("⚠️ Erro de configuração", "ADMIN_TOKEN ausente no servidor.", "#dc2626");
+        const masterSecret = process.env.ADMIN_TOKEN;
+        const cronSecret = process.env.CRON_ADMIN_TOKEN;
+        if (!masterSecret && !cronSecret) return html("⚠️ Erro de configuração", "Segredos de admin ausentes.", "#dc2626");
         if (!id || !token) return html("❌ Link inválido", "Faltam parâmetros id/token.", "#dc2626");
 
-        const expected = signPedidoToken(id, secret);
+        // Tenta validar contra o token mestre ou o token de cron (v607)
+        const expectedMaster = masterSecret ? signPedidoToken(id, masterSecret) : null;
+        const expectedCron = cronSecret ? signPedidoToken(id, cronSecret) : null;
+        
         const a = Buffer.from(token);
-        const b = Buffer.from(expected);
-        if (a.length !== b.length || !timingSafeEqual(a, b)) {
+        const matchMaster = expectedMaster && timingSafeEqual(a, Buffer.from(expectedMaster));
+        const matchCron = expectedCron && timingSafeEqual(a, Buffer.from(expectedCron));
+
+        if (!matchMaster && !matchCron) {
           return html("❌ Token inválido", "Este link não é autêntico ou expirou.", "#dc2626");
         }
 
