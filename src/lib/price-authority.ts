@@ -115,7 +115,8 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
     // máximo que podemos subir agora. Se esse alvo ainda não fecha a margem, 
     // o pacote continua 'blocked', mas o preço NO BANCO deve ser atualizado para
     // esse alvo para que no próximo ciclo a rampa parta de um valor maior.
-    if (Math.abs(alvo - price) > 0.009) {
+    const reajuste = Math.abs(alvo - price);
+    if (reajuste > 0.009) {
       r.price_brl = r2(alvo);
       motivos.set(r.pacote, "margem");
     }
