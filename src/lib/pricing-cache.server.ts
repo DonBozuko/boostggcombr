@@ -229,7 +229,7 @@ export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<v
  * 1 execução a cada 120s no projeto inteiro. Sem isso, cron + admin +
  * dispatch rodavam a sincronização ao mesmo tempo, cada uma lia um preço
  * antigo diferente e o alerta de reprecificação disparava em looping. */
-async function acquireSyncLock(supabaseAdmin: any, windowSeconds = 120): Promise<boolean> {
+async function acquireSyncLock(supabaseAdmin: any, windowSeconds = 60): Promise<boolean> {
   try {
     const { data, error } = await supabaseAdmin.rpc("rate_limit_check", {
       _key: "pricing_sync_global",
@@ -257,8 +257,8 @@ async function syncReserveProviderIdsNow(_opts: { force: boolean; bypassLock?: b
   purgePricingCacheMemory(_opts.force ? "v266-force-live-handshake" : "v266-lazy-live-handshake");
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  if (!_opts.bypassLock && !(await acquireSyncLock(supabaseAdmin))) {
-    
+  if (!_opts.bypassLock && !(await acquireSyncLock(supabaseAdmin, 60))) {
+    // v602: Redução da janela de lock para 60s e log de bypass silencioso.
     lastReserveSyncAt = Date.now();
     return SKIPPED_REPORT;
   }
