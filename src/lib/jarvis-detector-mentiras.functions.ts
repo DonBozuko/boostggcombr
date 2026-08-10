@@ -298,7 +298,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
 
     const passed = checks.filter((c) => c.ok).length;
     return {
-      version: "v51",
+      version: "v52",
       timestamp: new Date().toISOString(),
       passed,
       total: checks.length,
