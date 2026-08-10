@@ -82,16 +82,16 @@ function Page() {
       ]}
       bodySections={[
         {
-          h2: "Por que comprar curtidas Instagram faz diferença",
-          body: "O algoritmo do Instagram distribui conteúdo que já mostra engajamento. Post com zero curtida morre no feed; post com centenas de reações ganha velocidade e aparece para mais pessoas. Comprar curtidas é o gatilho inicial que quebra o ciclo: prova social atrai prova social. Não substitui boa criação, mas amplia quem chega até você.",
+          h2: "Como o algoritmo do Instagram lê as curtidas em 2026",
+          body: "As curtidas deixaram de ser apenas métrica de vaidade e se tornaram um sinal de retenção e relevância. Quando um post recebe engajamento rápido, o algoritmo interpreta que o conteúdo é valioso para aquele nicho e amplia a entrega no Explore e Reels. Nossa entrega estratégica foca em validar esse sinal inicial, funcionando como um catalisador para o seu alcance orgânico.",
         },
         {
-          h2: "Como funciona a compra na BoostGG",
-          body: "1. Escolha o pacote (100 a 10.000 curtidas).\n2. Cole o link do post ou Reel público.\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos as curtidas começam a entrar.\n5. Reposição automática por 30 dias se cair qualquer coisa.",
+          h2: "A diferença entre Curtidas Reais e Bots",
+          body: "O Google e o Instagram penalizam conteúdos associados a redes de bots óbvios. Por isso, a BoostGG utiliza um sistema de entrega gradual com perfis que possuem histórico e foto. Isso garante que o engajamento seja visto como legítimo, protegendo a integridade da sua conta enquanto você escala seu perfil.",
         },
         {
-          h2: "Curtidas em posts ou Reels: qual escolher?",
-          body: "Curtidas em posts aumentam a autoridade do perfil e melhoram a impressão de quem visita seu feed. Curtidas em Reels são ideais para viralização: o algoritmo entende o sinal como sinal de qualidade e pode impulsionar sua distribuição no Explore. Ambos funcionam — escolha de acordo com o objetivo do momento.",
+          h2: "Estratégia: Curtidas em Reels vs Posts",
+          body: "Para viralizar no Reels, o volume de curtidas nos primeiros 60 minutos é crucial. Já em posts de feed, as curtidas servem como prova social duradoura para converter visitantes em seguidores. Recomendamos dividir sua estratégia entre os dois formatos para uma autoridade de perfil completa.",
         },
       ]}
       faq={FAQ}
