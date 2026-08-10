@@ -28,7 +28,7 @@ const buildSitemapXml = () => {
     { path: "/telegram", changefreq: "weekly", priority: "0.7" },
     
     { path: "/blog", changefreq: "weekly", priority: "0.7" },
-    { path: "/blog/como-ganhar-seguidores-instagram", changefreq: "monthly", priority: "0.6" },
+    { path: "/blog/como-ganhar-seguidores-instagram", changefreq: "weekly", priority: "0.8" },
     { path: "/blog/e-seguro-comprar-seguidores", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/melhor-site-comprar-seguidores", changefreq: "monthly", priority: "0.6" },
     { path: "/blog/comprar-seguidores-pix", changefreq: "monthly", priority: "0.6" },
