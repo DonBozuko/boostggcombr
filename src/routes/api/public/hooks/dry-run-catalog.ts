@@ -25,7 +25,7 @@ export const Route = createFileRoute("/api/public/hooks/dry-run-catalog")({
 });
 
 async function run(request: Request) {
-  if (!authorized(extractToken(request))) {
+  if (!(await authorized(extractToken(request)))) {
     return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
