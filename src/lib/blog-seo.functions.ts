@@ -15,6 +15,9 @@ const KEYWORD_MAP: Record<string, string> = {
   "inscritos youtube": "/comprar-inscritos-youtube",
   "comprar seguidores": "/comprar-seguidores-instagram",
   "seguidores reais": "/seguidores-reais-instagram",
+  "seguidores brasileiros reais": "/comprar-seguidores-brasileiros",
+  "ganhar seguidores": "/blog/como-ganhar-seguidores-instagram",
+  "comprar seguidores reais": "/comprar-seguidores-instagram",
 };
 
 /**
@@ -35,7 +38,7 @@ export const getSmartInterlinks = createServerFn({ method: "GET" })
       })
       .map(([keyword, path]) => ({ keyword, path }));
 
-    // Retorna os top 3 links mais relevantes para evitar spam
-    return found.slice(0, 3);
+    // Retorna os top 5 links mais relevantes (v608)
+    return found.slice(0, 5);
   });
 
