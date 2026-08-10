@@ -152,12 +152,15 @@ export function minNetRatio(costBrl: number): number {
 // (br-tf100: custo gravado R$ 1,15 x tarifa lida R$ 1,16 = 0,87% → pacote
 // lucrativo saía da vitrine sozinho). 1,5% de folga sobre um lucro de 4x não
 // cria prejuízo nenhum; o ciclo de preço seguinte reajusta o preço de verdade.
-const MARGIN_EPSILON = 0.985; // v596 — 1,5% de tolerância p/ drift de câmbio/ruído centavos
-
+// v598 — TOLERÂNCIA DE DRIFT (v596)
+// 1.5% de folga sobre um lucro de 4x não cria prejuízo nenhum e elimina a
+// auto-contradição da Bancada de Provas.
+const MARGIN_EPSILON = 0.985; // 1.5% de tolerância p/ drift de câmbio/ruído
 
 export function respectsMinMargin(priceBrl: number, costBrl: number): boolean {
   if (!(costBrl > 0)) return false;
   const net = estimateNetProfit(priceBrl, costBrl);
+  // v598: net/cost >= minNetRatio * 0.985
   return net / costBrl >= minNetRatio(costBrl) * MARGIN_EPSILON;
 }
 
