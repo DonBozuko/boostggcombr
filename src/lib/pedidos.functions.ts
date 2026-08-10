@@ -163,7 +163,7 @@ export const criarPedido = createServerFn({ method: "POST" })
         const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
           .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
 
-        if (!preflightRoute.ok) return { ok: false, error: "INVALID_PACKAGE", reason: preflightRoute.reason };
+        if (!preflightRoute.ok) return { ok: false, error: "INVALID_PACKAGE", reason: preflightRoute.reason ?? undefined };
         if (!preflightTarget.ok) return { ok: false, error: "INVALID_TARGET", reason: preflightTarget.code };
         
         return { ok: true };
