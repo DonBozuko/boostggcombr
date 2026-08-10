@@ -57,7 +57,9 @@ export function enforceMonotonicLadder<T extends LadderRow>(
     for (const r of list) {
       const price = Number(r.price_brl);
       if (!Number.isFinite(price) || price <= 0) continue;
-      if (prev > 0 && price <= prev) {
+      // v595 — A escada é impiedosa: se o pacote maior está mais barato (inversão),
+      // ele SOBE até o preço do anterior + degrau, MESMO que isso custe caro.
+      if (prev > 0 && price < prev + 0.009) {
         const corrigido = nextStepFloor(prev);
         fixes.push({
           pacote: r.pacote,
