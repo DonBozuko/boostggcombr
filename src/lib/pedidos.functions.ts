@@ -13,8 +13,8 @@ const clean = (s: string) => (s || "").trim().replace(/^@/, "");
 export const prewarmPedido = createServerFn({ method: "POST" })
   .handler(async () => {
     try {
-      const { getMpToken } = await import("./mp-token.server");
-      const token = await getMpToken();
+      const { getMpAccessToken } = await import("./mp-token.server");
+      const token = await getMpAccessToken();
       return { ok: true, token: !!token };
     } catch (err) {
       console.error("[prewarmPedido] falha silenciosa no pre-warming:", err);
@@ -194,8 +194,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         status: "pending",
         bump_ofertado: bumpOfertado,
         bump_aplicado: bumpAplicado,
-        cupom_aplicado: hasPrime && discount > 0 ? "PRIME15" : null,
-      })
+        cupom_aplicado: (hasPrime && discount > 0 ? "PRIME15" : null) as any,
+      } as any)
       .select("id")
       .single();
 
