@@ -109,28 +109,30 @@ export function planAuthorityPrices(input: AuthorityRow[]): AuthorityPlan {
     // e nos ciclos seguintes continua subindo até o preço justo, ou para de
     // subir sozinho quando o fornecedor baixar o custo (margem fica mais gorda).
     const alvo = Math.min(justo, price * AUTHORITY_MAX_UP);
+    // v591 — DESTRAVA ALARME QUE NÃO ANDA.
+    // Em pacotes com custo muito alto, o limite de +40% pode não ser suficiente 
+    // para atingir o lucro mínimo em um único ciclo. O 'alvo' calculado é o 
+    // máximo que podemos subir agora. Se esse alvo ainda não fecha a margem, 
+    // o pacote continua 'blocked', mas o preço NO BANCO deve ser atualizado para
+    // esse alvo para que no próximo ciclo a rampa parta de um valor maior.
+    if (Math.abs(alvo - price) > 0.009) {
+      r.price_brl = r2(alvo);
+      motivos.set(r.pacote, "margem");
+    }
+
     if (!respectsMinMargin(alvo, cost)) {
-      // v371 — A RAMPA ANDA MESMO PAUSADO.
-      // Antes: quando nem +40% cobria o custo, o preço ficava CONGELADO e o
-      // pacote pausado para sempre. Como nada mudava, a varredura repetia o
-      // mesmo alerta ("alarme que não anda") ciclo após ciclo — br-tf100 e
-      // br-tf500 travados assim. O teto de +40% é limite POR CICLO, não
-      // sentença: o preço sobe o que pode agora, o pacote fica fora da vitrine
-      // enquanto não fecha a margem, e em 1-2 ciclos converge sozinho.
       blocked.push({
         pacote: r.pacote,
         atual: r2(price),
         justo: r2(justo),
         salto: Number((justo / price).toFixed(3)),
       });
-      r.price_brl = r2(alvo);
-      if (Math.abs(alvo - price) > 0.009) motivos.set(r.pacote, "margem");
       continue;
     }
 
-
     r.price_brl = r2(alvo);
     motivos.set(r.pacote, "margem");
+
 
   }
 
