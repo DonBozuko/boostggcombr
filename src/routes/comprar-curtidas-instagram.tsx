@@ -4,9 +4,9 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Comprar Curtidas no Instagram via Pix — BOOSTGG";
+const TITLE = "Curtidas no Instagram: Como Aumentar o Alcance com Prova Social";
 const DESC =
-  "Curtidas no Instagram a partir de R$ 5,00, entrega em 1 a 5 minutos após o Pix. Sem senha e com reposição de 30 dias.";
+  "Entenda como curtidas influenciam o algoritmo do Instagram. Pacotes de engajamento a partir de R$ 5,00 com entrega automática e garantia de 30 dias.";
 
 
 
@@ -60,9 +60,9 @@ function Page() {
   return (
     <SeoLanding
       accent="#e1306c"
-      h1="Comprar Curtidas Instagram Reais via Pix — Entrega em Minutos"
-      subtitle="Curtidas para posts e Reels entregues em minutos"
-      intro="Dê aquele empurrão nos seus posts e Reels: pague com Pix, receba curtidas em minutos e aumente o alcance orgânico. Sem senha, sem risco, sem cadastro."
+      h1="Como Aumentar o Alcance no Instagram com Curtidas Reais via Pix"
+      subtitle="Engajamento estratégico para posts e Reels"
+      intro="O algoritmo do Instagram prioriza conteúdos com sinais rápidos de interesse. Nosso sistema entrega curtidas reais em minutos para validar sua prova social e destravar a distribuição orgânica. Tudo via Pix, sem senha e com total segurança."
       ctaHref="/"
       ctaLabel="Comprar curtidas agora"
       benefits={[
