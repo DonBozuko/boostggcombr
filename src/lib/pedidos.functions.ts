@@ -220,6 +220,10 @@ export const criarPedido = createServerFn({ method: "POST" })
         preferenceId: pref.id,
         initPoint: pref.initPoint,
         sandboxInitPoint: pref.sandboxInitPoint,
+        pacoteFinal: pacoteEfetivo,
+        quantidadeFinal: quantidadeEfetiva,
+        valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
+        valorCobrado: valorCobrar,
       };
     } catch (err) {
       console.error("[criarPedido] erro MP:", err);
