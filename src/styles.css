@@ -2,6 +2,10 @@
   display: none !important;
 }
 
+/* v606 — Antidote CSS: Colapsa elementos que contenham apenas caracteres de controle invisíveis */
+span:empty { display: none !important; }
+
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";

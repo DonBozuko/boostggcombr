@@ -2,6 +2,10 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { BlogLayout } from "@/components/BlogLayout";
 import { BlogCTA } from "@/components/BlogCTA";
 import { Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getSmartInterlinks } from "@/lib/blog-seo.functions";
+import { buildFaqJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
+
 
 
 const BASE = "https://www.boostgg.com.br";

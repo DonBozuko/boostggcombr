@@ -138,53 +138,70 @@ export const criarPedido = createServerFn({ method: "POST" })
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
     const PREFLIGHT_STRICT_BRL = 50;
-    try {
-      // v605 — Preflight Determinístico em Paralelo.
-      const preflights = Promise.all([
-        import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
-          pacote: pacoteEfetivo,
-          quantidade: quantidadeEfetiva,
-          valorBrl: valorCobrar,
-        })),
-        import("./target-preflight.server").then(m => m.preflightTargetOrBlock({
-          rede: data.rede_social ?? "instagram",
-          pacote: pacoteEfetivo,
-          alvo: data.instagram_user,
-        })),
-      ]);
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
-      const timeout = new Promise<never>((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), valorCobrar >= PREFLIGHT_STRICT_BRL ? 12000 : 6000);
-      });
-
-      const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
-        .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
-
-      if (!preflightRoute.ok) {
-        console.error("[criarPedido] v297 cobrança bloqueada (rota):", pacoteEfetivo, preflightRoute.reason);
-        return { ok: false as const, error: "INVALID_PACKAGE" as const };
-      }
-      if (!preflightTarget.ok) {
-        console.error("[criarPedido] v301 cobrança bloqueada (alvo):", data.instagram_user, preflightTarget.code);
-        try {
-          const { supabaseAdmin: sbLog } = await import("@/integrations/supabase/client.server");
-          await sbLog.from("pedidos").insert({
-            instagram_user: clean(data.instagram_user),
-            pacote: clean(pacoteEfetivo),
+    
+    // v606 — Retry Atômico: Tenta preflight até 2 vezes em caso de timeout/rede
+    const executePreflight = async (retryCount = 0): Promise<{ ok: boolean; error?: string; reason?: string }> => {
+      try {
+        const preflights = Promise.all([
+          import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
+            pacote: pacoteEfetivo,
             quantidade: quantidadeEfetiva,
-            valor: valorCobrar,
-            status: "blocked",
-            error_detail: `Bloqueio Preflight: ${preflightTarget.code}`,
-          } as any);
-        } catch { /* noop */ }
-        return { ok: false as const, error: "INVALID_TARGET", reason: preflightTarget.code };
+            valorBrl: valorCobrar,
+          })),
+          import("./target-preflight.server").then(m => m.preflightTargetOrBlock({
+            rede: data.rede_social ?? "instagram",
+            pacote: pacoteEfetivo,
+            alvo: data.instagram_user,
+          })),
+        ]);
+        
+        let timeoutId: ReturnType<typeof setTimeout> | undefined;
+        const timeout = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), valorCobrar >= PREFLIGHT_STRICT_BRL ? 12000 : 6000);
+        });
+
+        const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
+          .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
+
+        if (!preflightRoute.ok) return { ok: false, error: "INVALID_PACKAGE", reason: preflightRoute.reason ?? undefined };
+        if (!preflightTarget.ok) return { ok: false, error: "INVALID_TARGET", reason: preflightTarget.code };
+        
+        return { ok: true };
+      } catch (err) {
+        if (retryCount < 1) {
+          console.warn(`[criarPedido] v606 preflight falhou (tentativa ${retryCount + 1}), tentando retry...`);
+          return executePreflight(retryCount + 1);
+        }
+        throw err;
+      }
+    };
+
+    try {
+      const result = await executePreflight();
+      if (!result.ok) {
+        if (result.error === "INVALID_TARGET") {
+          try {
+            const { supabaseAdmin: sbLog } = await import("@/integrations/supabase/client.server");
+            await sbLog.from("pedidos").insert({
+              instagram_user: clean(data.instagram_user),
+              pacote: clean(pacoteEfetivo),
+              quantidade: quantidadeEfetiva,
+              valor: valorCobrar,
+              status: "blocked",
+              error_detail: `Bloqueio Preflight: ${result.reason}`,
+            } as any);
+          } catch { /* noop */ }
+          return { ok: false as const, error: "INVALID_TARGET", reason: result.reason };
+        }
+        return { ok: false as const, error: "INVALID_PACKAGE" as const };
       }
     } catch (err) {
       if (valorCobrar >= PREFLIGHT_STRICT_BRL) {
-        console.error("[criarPedido] v304 preflight falhou em pacote caro — abortando:", err);
+        console.error("[criarPedido] v606 preflight falhou após retry em pacote caro:", err);
         return { ok: false as const, error: "GATEWAY_TIMEOUT" as const };
       }
     }
+
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: pedido, error } = await supabaseAdmin

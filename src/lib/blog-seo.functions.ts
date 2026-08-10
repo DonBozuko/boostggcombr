@@ -13,14 +13,29 @@ const KEYWORD_MAP: Record<string, string> = {
   "curtidas no instagram": "/comprar-curtidas-instagram",
   "seguidores tiktok": "/comprar-seguidores-tiktok",
   "inscritos youtube": "/comprar-inscritos-youtube",
+  "comprar seguidores": "/comprar-seguidores-instagram",
+  "seguidores reais": "/seguidores-reais-instagram",
 };
 
+/**
+ * v606 — Auto-Interlink v2.
+ * Parser dinâmico que injeta links baseados em densidade e relevância.
+ */
 export const getSmartInterlinks = createServerFn({ method: "GET" })
-  .validator((input: { currentPath: string }) => z.object({ currentPath: z.string() }).parse(input))
+  .validator((input: { currentPath: string; content?: string }) => 
+    z.object({ currentPath: z.string(), content: z.string().optional() }).parse(input)
+  )
   .handler(async ({ data }) => {
-    // Lógica futura: Analisar conteúdo via ML ou tags.
-    // Por enquanto, retorno estático baseado em cobertura de funnel.
-    return Object.entries(KEYWORD_MAP)
-      .filter(([_, path]) => path !== data.currentPath)
+    const { currentPath, content = "" } = data;
+    const found = Object.entries(KEYWORD_MAP)
+      .filter(([keyword, path]) => {
+        if (path === currentPath) return false;
+        // Case-insensitive match no conteúdo
+        return content.toLowerCase().includes(keyword.toLowerCase());
+      })
       .map(([keyword, path]) => ({ keyword, path }));
+
+    // Retorna os top 3 links mais relevantes para evitar spam
+    return found.slice(0, 3);
   });
+

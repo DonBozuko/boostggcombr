@@ -84,17 +84,16 @@ const buildSitemapXml = () => {
   ];
 
 
-  // v598 — REATIVAÇÃO DO LASTMOD DINÂMICO (FRESHNESS)
-  // Sinaliza frescor real para o Google (date-anchored freshness).
-  // A data de modificação baseada no início da semana ajuda a manter o rastreio ativo.
+  // v606 — Lastmod de Alta Resolução.
+  // Combina frescor de catálogo (dia atual) com sinal de autoridade.
   const today = new Date();
-  const weekStart = new Date(today.setDate(today.getDate() - today.getDay())).toISOString().split('T')[0];
+  const todayStr = today.toISOString().split('T')[0];
 
   const urls = entries.map((e) =>
     [
       `  <url>`,
       `    <loc>${BASE_URL}${e.path}</loc>`,
-      `    <lastmod>${weekStart}</lastmod>`,
+      `    <lastmod>${todayStr}</lastmod>`,
       e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
       e.priority ? `    <priority>${e.priority}</priority>` : null,
       `  </url>`,
@@ -109,6 +108,7 @@ const buildSitemapXml = () => {
     ...urls,
     `</urlset>`,
   ].join("\n");
+
 };
 
 export const Route = createFileRoute("/sitemap.xml")({
