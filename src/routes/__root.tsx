@@ -190,21 +190,34 @@ function RootComponent() {
     import("@/lib/affiliate").then((m) => m.captureAffiliateRef()).catch(() => {});
   }, []);
 
-  // v605 — DOM Sanitizer Pro: Supressão atômica de resíduos binários e injeções GTM/TikTok.
+  // v606 — Blindagem Total (Antidote Pro): Remoção recursiva e agressiva de caracteres invisíveis (U+2063, U+200B, U+FEFF).
   useEffect(() => {
     const sanitize = () => {
-      document.querySelectorAll("span").forEach((s) => {
-        // Captura U+2063 e outros caracteres de controle invisíveis injetados por trackers.
-        if (s.textContent === "\u2063" || s.textContent === "⁣" || s.textContent === "\u200B") {
-          s.remove();
+      // Microtask priority: limpa o DOM antes da próxima pintura do navegador
+      const nodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
+      let node;
+      while (node = nodes.nextNode()) {
+        const text = node.textContent || "";
+        if (/[\u2063\u200B\uFEFF]/.test(text)) {
+          const parent = node.parentElement;
+          if (parent && parent.tagName === "SPAN" && parent.childNodes.length === 1) {
+            parent.remove();
+          } else {
+            node.textContent = text.replace(/[\u2063\u200B\uFEFF]/g, "");
+          }
         }
-      });
+      }
     };
     sanitize();
-    const observer = new MutationObserver(sanitize);
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length) sanitize();
+      }
+    });
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, []);
+
 
 
   useEffect(() => {

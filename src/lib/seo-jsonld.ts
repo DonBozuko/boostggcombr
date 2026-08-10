@@ -58,8 +58,8 @@ export function buildFaqJsonLd(items: { q: string; a: string }[]) {
   };
 }
 
-// v172 — BreadcrumbList para rotas profundas (blog, landings de nicho).
-// Google usa isso pra mostrar caminho no SERP em vez de URL cruda.
+// v606 — BreadcrumbList + FAQPage Authority.
+// Google utiliza isso para exibir o caminho (breadcrumbs) e snippets de FAQ no SERP.
 export function buildBreadcrumbJsonLd(items: { name: string; url: string }[]) {
   return {
     type: "application/ld+json" as const,
@@ -70,8 +70,9 @@ export function buildBreadcrumbJsonLd(items: { name: string; url: string }[]) {
         "@type": "ListItem",
         position: i + 1,
         name: item.name,
-        item: item.url,
+        item: item.url.startsWith("http") ? item.url : `https://www.boostgg.com.br${item.url}`,
       })),
     }),
   };
 }
+
