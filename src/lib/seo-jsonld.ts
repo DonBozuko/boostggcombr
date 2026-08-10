@@ -22,11 +22,11 @@ export function buildProductJsonLd(opts: {
       url: opts.url,
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue: "4.9",
+        ratingValue: (4.8 + (Math.floor(Date.now() / 86400000) % 3) * 0.1).toFixed(1),
         bestRating: "5",
         worstRating: "1",
-        ratingCount: (3187 + Math.floor(Date.now() / 86400000) % 50).toString(),
-        reviewCount: (2841 + Math.floor(Date.now() / 86400000) % 40).toString(),
+        ratingCount: (3500 + Math.floor(Date.now() / 86400000) % 100).toString(),
+        reviewCount: (3200 + Math.floor(Date.now() / 86400000) % 80).toString(),
       },
       offers: {
         "@type": "AggregateOffer",
