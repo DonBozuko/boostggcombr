@@ -255,39 +255,45 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       });
       blockDeploy = true;
     }
-
+    
     // 10. Monotonicidade de Escada (v595)
     {
-      const { data: allItems } = await supabaseAdmin
-        .from("pricing_items")
-        .select("pacote, category, quantidade, price_brl")
-        .eq("is_sellable", true);
-      
-      const byCat = new Map<string, any[]>();
-      for (const it of (allItems ?? [])) {
-        const list = byCat.get(it.category) ?? [];
-        list.push(it);
-        byCat.set(it.category, list);
-      }
+      try {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: allItems } = await supabaseAdmin
+          .from("pricing_items")
+          .select("pacote, category, quantidade, price_brl")
+          .eq("is_sellable", true);
+        
+        const byCat = new Map<string, any[]>();
+        for (const it of (allItems ?? [])) {
+          const list = byCat.get(it.category) ?? [];
+          list.push(it);
+          byCat.set(it.category, list);
+        }
 
-      const inversions: string[] = [];
-      for (const [cat, list] of byCat) {
-        list.sort((a, b) => a.quantidade - b.quantidade);
-        for (let i = 1; i < list.length; i++) {
-          if (Number(list[i].price_brl) < Number(list[i-1].price_brl)) {
-            inversions.push(`${list[i].pacote}(${list[i].price_brl}) < ${list[i-1].pacote}(${list[i-1].price_brl})`);
+        const inversions: string[] = [];
+        for (const [cat, list] of byCat) {
+          list.sort((a, b) => a.quantidade - b.quantidade);
+          for (let i = 1; i < list.length; i++) {
+            if (Number(list[i].price_brl) < Number(list[i-1].price_brl)) {
+              inversions.push(`${list[i].pacote}(${list[i].price_brl}) < ${list[i-1].pacote}(${list[i-1].price_brl})`);
+            }
           }
         }
-      }
 
-      const monoOk = inversions.length === 0;
-      checks.push({
-        id: "monotonic_ladder",
-        label: `Escada de Preços (${inversions.length} inversões)`,
-        ok: monoOk,
-        detail: monoOk ? "pacotes maiores sempre mais caros" : `🚨 ${inversions.length} erros: ${inversions.slice(0, 2).join(", ")}`
-      });
-      if (!monoOk) blockDeploy = true;
+        const monoOk = inversions.length === 0;
+        checks.push({
+          id: "monotonic_ladder",
+          label: `Escada de Preços (${inversions.length} inversões)`,
+          ok: monoOk,
+          detail: monoOk ? "pacotes maiores sempre mais caros" : `🚨 ${inversions.length} erros: ${inversions.slice(0, 2).join(", ")}`
+        });
+        if (!monoOk) blockDeploy = true;
+      } catch (e) {
+         checks.push({ id: "monotonic_ladder", label: "Escada de Preços", ok: false, detail: "erro ao validar escada" });
+         blockDeploy = true;
+      }
     }
 
     const passed = checks.filter((c) => c.ok).length;
