@@ -1,23 +1,27 @@
----
-name: Protocolo v592 (Auditoria Forense de Pedido e Limpeza de Invisible Separator)
-description: Auditoria do pedido 2fe66 e remoção de caracteres invisíveis residuais no assets/logo.
-type: feature
----
+# Plano de Estabilização v595 — Correção de Inversão de Preço e Travas de Margem
 
-# Protocolo v592 — Auditoria Forense e Integridade Visual
+Este plano detalha a correção dos problemas reportados nas varreduras automáticas: pacotes vendendo com prejuízo, alarmes travados e a inversão de preço onde pacotes maiores custam menos que os menores.
 
-## 1. Auditoria do Pedido 2fe66a40-6845-4414-9739-7c1b68639882
-- **Status:** `completed` (2026-08-09 20:42 UTC).
-- **Fluxo:** 
-  1. `LATE_PAYMENT_CATCH` (v98): Pagamento aprovado após o timeout do frontend.
-  2. `PIX_APPROVED` (v94): Processado com sucesso pelo webhook.
-  3. `TELEGRAM_PAID_SENT`: Notificação enviada.
-  4. `PROVIDER_RECHARGE_MANUAL`: Intervenção manual para recarga/despacho via `smmpainel`.
-- **Integridade:** Lucro de R$ 5,38 (ROI 1311%) confirmado pelo `custo_real` de R$ 0,41.
+## Diagnóstico Técnico
+1.  **Inversão de Preço (p350k vs p200k):** O pacote de 350k está mais barato que o de 200k. Isso indica uma falha na lógica de "Preço Mínimo Progressivo" ou uma cotação de custo desatualizada em um dos fornecedores da rota.
+2.  **Alarmes de Margem Travados (br-p100, br-p10k, etc.):** A v591 tentou destravar a rampa, mas os alertas persistem. É necessário revisar a `enforcePriceAuthority` para garantir que o ajuste de preço não esteja sendo barrado por um teto muito baixo em relação ao custo real (Price Drift).
+3.  **Pacotes com Prejuízo (br-p100, p200k):** Confirmação de que o buffer de 15% (PRIME15) + Taxas MP está consumindo a margem bruta devido ao custo base do fornecedor ter subido acima do preço de venda calculado.
 
-## 2. Diagnóstico de Caractere Invisível (\u2063)
-- O caractere `\u2063` (Invisible Separator) foi identificado como metadado ou resíduo binário apenas no arquivo `src/assets/boostgg-logo.png`.
-- Não há ocorrências em arquivos de texto (TSX/TS/CSS), confirmando que o pedido de edição visual se refere a um artefato de renderização dinâmica ou erro de colagem no preview, sem persistência no código-fonte.
+## Ações Imediatas
 
-## 3. Ação v181 (Provisão Necessária)
-- O status `v181 · Provisão Necessária` disparado no Telegram é o comportamento nominal quando o robô externo não confirma o envio imediatamente após a aprovação do Pix, exigindo verificação humana (Best-effort).
+### 1. Ajuste na Autoridade de Preço (`src/lib/price-authority.server.ts`)
+- Implementar a trava de **Monotonicidade de Preço**: Garantir que, dentro da mesma categoria, um pacote com maior quantidade nunca custe menos que um pacote com menor quantidade.
+- Revisar a `resolveCheckoutPricing` para garantir que o custo real do fornecedor (Smart Routing) seja sempre a base primária, ignorando tetos de segurança se o custo ultrapassar o preço de venda (forçando o aumento ou pausa do item).
+
+### 2. SQL Migration — Ajuste de Margens e Limpezas
+- Executar `update_pricing_monotonicity`: Uma rotina no banco para alinhar preços que ficaram defasados.
+- Limpeza de alertas obsoletos de "Canal Morto" ou "Margem" que já foram tratados mas persistem no log de 2h do Jarvis.
+
+### 3. Validação do Jarvis (`src/lib/jarvis-detector-mentiras.server.ts`)
+- Adicionar um novo check: "Monotonicidade de Preço" para capturar inversões antes do deploy.
+
+## Critérios de Aceite
+- [ ] Nenhum pacote de quantidade X+1 custa menos que o pacote de quantidade X.
+- [ ] O pacote `p350k` deve ter seu preço recalculado para ser ≥ `p200k`.
+- [ ] Alarmes de "Pacote vendendo com prejuízo" devem cessar após o recálculo automático.
+- [ ] O caractere `U+2063` (objeto de alarmes anteriores) continuará sendo tratado como ruído de runtime, sem intervenção no código.
