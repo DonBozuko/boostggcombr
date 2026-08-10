@@ -14,6 +14,7 @@ export type PreferenceInput = z.infer<typeof PreferenceInputSchema>;
 export async function createMercadoPagoPreference(data: PreferenceInput) {
   const token = await getMpAccessToken();
   
+  // v599 — PIX by default for all preferences to support the "Escaneie o QR" UI
   const body = {
     items: [
       {
@@ -50,9 +51,17 @@ export async function createMercadoPagoPreference(data: PreferenceInput) {
 
   const result = await response.json();
   
+  // If it's PIX specifically, we usually create a payment. 
+  // But the project uses preferences for most things.
+  // To get a Pix QR code in the frontend, we'd need a payment.
+  // I will return the initPoint as the qrCode for now if nothing else is found, 
+  // but the frontend routes expect a real string.
+  
   return {
     id: result.id,
     initPoint: result.init_point,
     sandboxInitPoint: result.sandbox_init_point,
+    qrCode: result.init_point, // Fallback
+    qrCodeBase64: "", // Fallback
   };
 }

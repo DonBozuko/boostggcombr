@@ -221,6 +221,8 @@ export const criarPedido = createServerFn({ method: "POST" })
         preferenceId: pref.id,
         initPoint: pref.initPoint,
         sandboxInitPoint: pref.sandboxInitPoint,
+        qrCode: pref.qrCode,
+        qrCodeBase64: pref.qrCodeBase64,
         pacoteFinal: pacoteEfetivo,
         quantidadeFinal: quantidadeEfetiva,
         valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
