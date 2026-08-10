@@ -10,7 +10,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
       return {
-        version: "v507",
+        version: "v52-fix",
         timestamp: new Date().toISOString(),
         passed: 0,
         total: 0,

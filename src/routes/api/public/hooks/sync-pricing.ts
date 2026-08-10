@@ -10,7 +10,8 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
         const token = request.headers.get("x-admin-token") ?? "";
         // v601 — Modo Noturno (UTC-3). Entre 02:00 e 06:00 o sincronismo é reduzido.
         const now = new Date();
-        const hourBR = (now.getUTCHours() - 3 + 24) % 24;
+        const hourBR = (now.getUTCHours() - 3 + 24) % 24; // v602: UTC-3 oficial
+
         const isNight = hourBR >= 2 && hourBR < 6;
         const url = new URL(request.url);
         const isForced = url.searchParams.get("force") === "true";
@@ -57,7 +58,8 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
         const token = request.headers.get("x-admin-token") ?? "";
         // v601 — Modo Noturno (UTC-3). Entre 02:00 e 06:00 o sincronismo é reduzido.
         const now = new Date();
-        const hourBR = (now.getUTCHours() - 3 + 24) % 24;
+        const hourBR = (now.getUTCHours() - 3 + 24) % 24; // v602: UTC-3 oficial
+
         const isNight = hourBR >= 2 && hourBR < 6;
         const url = new URL(request.url);
         const isForced = url.searchParams.get("force") === "true";
