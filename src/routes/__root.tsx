@@ -190,13 +190,14 @@ function RootComponent() {
     import("@/lib/affiliate").then((m) => m.captureAffiliateRef()).catch(() => {});
   }, []);
 
-  // v600 — DOM Sanitizer: Remove spans invisíveis (U+2063) injetados por pixels de terceiros
+  // v605 — DOM Sanitizer Pro: Supressão atômica de resíduos binários e injeções GTM/TikTok.
   useEffect(() => {
     const sanitize = () => {
       document.querySelectorAll("span").forEach((s) => {
-        // v604: Expansão do sanitizador para capturar tanto o caractere literal quanto o código de escape
-        // que pixels de terceiros (TikTok/GTM) costumam injetar em wrappers vazios.
-        if (s.textContent === "\u2063" || s.textContent === "⁣") s.remove();
+        // Captura U+2063 e outros caracteres de controle invisíveis injetados por trackers.
+        if (s.textContent === "\u2063" || s.textContent === "⁣" || s.textContent === "\u200B") {
+          s.remove();
+        }
       });
     };
     sanitize();
@@ -204,6 +205,7 @@ function RootComponent() {
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, []);
+
 
   useEffect(() => {
     // Trava silenciadora de áudio concorrente: pausa Jarvis em qualquer troca de rota

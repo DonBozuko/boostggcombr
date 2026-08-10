@@ -139,6 +139,7 @@ export const criarPedido = createServerFn({ method: "POST" })
 
     const PREFLIGHT_STRICT_BRL = 50;
     try {
+      // v605 — Preflight Determinístico em Paralelo.
       const preflights = Promise.all([
         import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
           pacote: pacoteEfetivo,
@@ -153,8 +154,9 @@ export const criarPedido = createServerFn({ method: "POST" })
       ]);
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
       const timeout = new Promise<never>((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), valorCobrar >= PREFLIGHT_STRICT_BRL ? 8000 : 5000);
+        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), valorCobrar >= PREFLIGHT_STRICT_BRL ? 12000 : 6000);
       });
+
       const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
         .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
 

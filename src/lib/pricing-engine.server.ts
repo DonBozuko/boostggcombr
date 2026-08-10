@@ -1,6 +1,7 @@
-// Server-only pricing engine. Lê custo/1000 do SMMhype, aplica multiplicadores
-// de margem progressiva High-CAC. Em qualquer falha cai no FALLBACK_RATES.
-// NÃO importar de módulos client-reachable em escopo de módulo.
+// v605 — Motor de Precificação de Alta Escala.
+// Gerencia margem, multiplicadores progressivos High-CAC e fallbacks de contingência.
+// Única fonte de verdade para a precificação transacional entre provedores.
+
 
 import { resolveServiceId, resolveServiceIdAsync } from "./smmhype.server";
 import { guardBindings } from "./bind-guard.server";
@@ -171,12 +172,11 @@ async function fxForProvider(name: string): Promise<number> {
 
 const CONTINGENCY_SOURCE = "fallback" as const;
 
-// v173 — Equação Fabiano Tiered. Fórmula:
+// v605 — Equação Fabiano Tiered (Escalabilidade Linear).
 //   preço = (custo * FABIANO_PROFIT * tierFactor(qty) * COUPON + PIX_FIXED) / PIX_NET
-// FABIANO_PROFIT continua sendo o piso 5.0 (trigger DB enforce_pricing_markup);
-// o escalonamento vem de tierFactor(qty) — desconto PRIME15 preservado no
-// COUPON e margem compensada por faixa.
-let FABIANO_PROFIT = 5.0; // base — trigger DB usa este piso
+// FABIANO_PROFIT (Piso 5.0) garante a viabilidade do tráfego pago (CAC).
+let FABIANO_PROFIT = 5.0;
+
 let FABIANO_COUPON = 1.15;
 let FABIANO_PIX_NET = 0.9901;
 let FABIANO_PIX_FIXED = 0.49;
@@ -233,8 +233,9 @@ function formatBRL(v: number): string {
   return `R$ ${v.toFixed(2).replace(".", ",")}`;
 }
 
-// v50 — JSON Response Sanitizer Matrix. Lê services de qualquer panel SMM
-// (SMMhype/SMMPainel/Verified) sem nunca explodir em "Unable to ... not valid JSON".
+// v605 — Matriz de Sanitização JSON Universal.
+// Blindagem contra payloads corrompidos ou binários injetados nos endpoints de fornecedores.
+
 async function safeFetchProviderServices(
   endpoint: string,
   apiKey: string,
@@ -825,19 +826,18 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
     console.log("[pricing] v137 reserve live handshake", rep);
   } catch (e) { console.warn("[pricing] v137 reserve live handshake fail", e); }
 
-  // v274 — Recusto pelo fornecedor de reserva.
-  // CAUSA RAIZ do p15k a R$2.509: quando o fornecedor primário (SMMhype) não
-  // tem o serviço, o motor caía na tabela FALLBACK (ex.: R$12/1k) mesmo com um
-  // fornecedor de reserva vendendo o mesmo pacote por R$1,91/1k. Resultado:
-  // custo fantasma inflado e preço de vitrine absurdo. Agora, todo item em
-  // 'fallback' que tenha ID de reserva com tarifa real usa a tarifa real.
+  // v605 — Recusto por Fornecedor de Reserva (Smart Routing Fallback).
+  // Elimina o "custo fantasma" do fallback estático quando um fornecedor de 
+  // reserva possui o item em catálogo com tarifa real.
+
   try {
     const rec = await recostFromReserves();
     
   } catch (e) { console.warn("[pricing] v274 recost fail", e); }
 
-  // v304 — última palavra: escada monotônica sobre o estado REAL do banco,
-  // depois de todos os motores gravarem.
+  // v605 — Autoridade Final: Handover para PriceAuthorityServer para aplicação 
+  // de rampa de margem e escada monotônica sobre o estado final.
+
   try {
     const { enforcePriceAuthority } = await import("@/lib/price-authority.server");
     await enforcePriceAuthority("pos-sync-live");
@@ -849,11 +849,10 @@ export async function syncPricingCacheAll(options: { forceContingency?: boolean 
 }
 
 /**
- * v274 — Corrige itens precificados por fallback quando existe tarifa real de
- * um fornecedor de reserva (SMMPainel / Verified, ambos em BRL).
- * Só age para BAIXO ou quando o custo fantasma diverge >10% do real — nunca
- * encarece o site por conta própria.
+ * v605 — Recusto Inteligente.
+ * Neutraliza divergências entre fallback e tarifas reais de reserva.
  */
+
 export async function recostFromReserves(): Promise<{
   checked: number;
   fixed: number;

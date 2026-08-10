@@ -4,9 +4,10 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Curtidas no Instagram: Como Aumentar o Alcance com Prova Social";
+const TITLE = "Curtidas no Instagram: Aumente Alcance e Engajamento";
 const DESC =
-  "Entenda como curtidas influenciam o algoritmo do Instagram. Pacotes de engajamento a partir de R$ 5,00 com entrega automática e garantia de 30 dias.";
+  "Descubra como as curtidas no Instagram impactam o algoritmo e aumentam o alcance dos seus Reels e posts. Pacotes seguros com entrega via Pix e garantia.";
+
 
 
 
@@ -60,9 +61,10 @@ function Page() {
   return (
     <SeoLanding
       accent="#e1306c"
-      h1="Como Aumentar o Alcance no Instagram com Curtidas Reais via Pix"
-      subtitle="Engajamento estratégico para posts e Reels"
-      intro="O algoritmo do Instagram prioriza conteúdos com sinais rápidos de interesse. Nosso sistema entrega curtidas reais em minutos para validar sua prova social e destravar a distribuição orgânica. Tudo via Pix, sem senha e com total segurança."
+      h1="Como Curtidas no Instagram Aumentam seu Alcance Orgânico"
+      subtitle="Engajamento estratégico para validar sua prova social"
+      intro="O algoritmo do Instagram prioriza conteúdos que geram interesse imediato. Ao receber curtidas reais de forma gradual, seu post ou Reel ganha o sinal de relevância necessário para ser distribuído para novas audiências. Segurança total via Pix, sem necessidade de senha."
+
       ctaHref="/"
       ctaLabel="Comprar curtidas agora"
       benefits={[
@@ -82,9 +84,10 @@ function Page() {
       ]}
       bodySections={[
         {
-          h2: "Como o algoritmo do Instagram lê as curtidas em 2026",
+          h2: "Como o algoritmo lê curtidas em 2026",
           body: "As curtidas deixaram de ser apenas métrica de vaidade e se tornaram um sinal de retenção e relevância. Quando um post recebe engajamento rápido, o algoritmo interpreta que o conteúdo é valioso para aquele nicho e amplia a entrega no Explore e Reels. Nossa entrega estratégica foca em validar esse sinal inicial, funcionando como um catalisador para o seu alcance orgânico.",
         },
+
         {
           h2: "A diferença entre Curtidas Reais e Bots",
           body: "O Google e o Instagram penalizam conteúdos associados a redes de bots óbvios. Por isso, a BoostGG utiliza um sistema de entrega gradual com perfis que possuem histórico e foto. Isso garante que o engajamento seja visto como legítimo, protegendo a integridade da sua conta enquanto você escala seu perfil.",
