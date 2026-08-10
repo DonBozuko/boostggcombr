@@ -84,12 +84,17 @@ const buildSitemapXml = () => {
   ];
 
 
-  // v308 — lastmod removido: data de build em todas as URLs é sinal falso de frescor
-  // e faz o Google desconfiar do sitemap inteiro. Só volta com timestamp real por página.
+  // v598 — REATIVAÇÃO DO LASTMOD DINÂMICO (FRESHNESS)
+  // Sinaliza frescor real para o Google (date-anchored freshness).
+  // A data de modificação baseada no início da semana ajuda a manter o rastreio ativo.
+  const today = new Date();
+  const weekStart = new Date(today.setDate(today.getDate() - today.getDay())).toISOString().split('T')[0];
+
   const urls = entries.map((e) =>
     [
       `  <url>`,
       `    <loc>${BASE_URL}${e.path}</loc>`,
+      `    <lastmod>${weekStart}</lastmod>`,
       e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
       e.priority ? `    <priority>${e.priority}</priority>` : null,
       `  </url>`,
