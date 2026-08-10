@@ -303,6 +303,29 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       }
     }
 
+    // v607 — Telemetria de autenticação: pico de negações no Security Proxy.
+    // Antes disso, força bruta contra o painel era invisível.
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const desde = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await supabaseAdmin
+        .from("admin_audit_logs" as any)
+        .select("id", { count: "exact", head: true })
+        .eq("action", "admin_auth_denied")
+        .gte("created_at", desde);
+      const denials = Number(count ?? 0);
+      const authOk = denials < 20;
+      checks.push({
+        id: "admin_auth_denied",
+        label: `Tentativas de acesso admin negadas (1h): ${denials}`,
+        ok: authOk,
+        detail: authOk ? "sem sinal de força bruta" : `🚨 ${denials} negações em 1h — possível ataque ao painel`,
+      });
+      // Sinal de segurança não bloqueia deploy; bloquear entregaria DoS ao atacante.
+    } catch {
+      /* telemetria nunca derruba o detector */
+    }
+
     const passed = checks.filter((c) => c.ok).length;
     return {
       version: "v52",
