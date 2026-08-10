@@ -37,7 +37,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }): Promise<TriageDigest> => {
     // v425 — Triage agora usa autenticação Supabase nativa se o token ADMIN_TOKEN não for suficiente.
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-triage")).ok) {
       return {
         status: "red",
         headline: "Sessão Administrativa Expirada",

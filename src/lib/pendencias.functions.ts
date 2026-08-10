@@ -7,7 +7,7 @@ export type { PendenciasDigest, PendenciaManual };
 export const getPendenciasManuais = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }): Promise<PendenciasDigest> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "pendencias")).ok) {
       return { pendencias: [], robosAtivos: 0, geradoEm: new Date().toISOString() };
     }
     const { collectPendencias } = await import("@/lib/pendencias.server");

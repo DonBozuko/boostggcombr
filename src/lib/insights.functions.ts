@@ -20,7 +20,7 @@ export type InsightsPayload = {
 export const getInsightsIA = createServerFn({ method: "POST" })
   .validator((input) => adminInput.parse(input))
   .handler(async ({ data }): Promise<InsightsPayload> => {
-    if (data.token !== process.env.ADMIN_TOKEN) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "insights")).ok) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const yearAgo = new Date(Date.now() - 365 * 24 * 3600_000).toISOString();

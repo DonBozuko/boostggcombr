@@ -31,7 +31,7 @@ export type PricingLedgerSnapshot =
 export const treasurySnapshot = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<TreasurySnapshot> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "treasury")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -71,7 +71,7 @@ export const treasurySnapshot = createServerFn({ method: "POST" })
 export const pricingLedgerSnapshot = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<PricingLedgerSnapshot> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "treasury")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

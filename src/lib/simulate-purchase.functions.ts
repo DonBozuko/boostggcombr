@@ -19,7 +19,7 @@ type Step = { key: string; ok: boolean; ms: number; detail: string };
 export const listSimulatablePackages = createServerFn({ method: "POST" })
   .validator((i) => z.object({ token: z.string().min(8) }).parse(i))
   .handler(async ({ data }) => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "simulate-purchase")).ok) {
       return { ok: false as const, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -34,7 +34,7 @@ export const listSimulatablePackages = createServerFn({ method: "POST" })
 export const simulatePurchase = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "simulate-purchase")).ok) {
       return { ok: false as const, error: "UNAUTHORIZED", steps: [] as Step[] };
     }
     const steps: Step[] = [];

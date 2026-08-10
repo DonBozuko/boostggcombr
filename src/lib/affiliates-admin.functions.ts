@@ -23,7 +23,7 @@ export type AfiliadoRow = {
 export const listAffiliates = createServerFn({ method: "POST" })
   .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; afiliados: AfiliadoRow[] }> => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED", afiliados: [] };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "affiliates-admin")).ok) return { ok: false, error: "UNAUTHORIZED", afiliados: [] };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: rows }, { data: com }] = await Promise.all([
       supabaseAdmin.from("afiliados" as any).select("*").order("total_ganho", { ascending: false }),
@@ -57,7 +57,7 @@ export const listAffiliates = createServerFn({ method: "POST" })
 export const payAffiliate = createServerFn({ method: "POST" })
   .validator((i) => tokenOnly.extend({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "affiliates-admin")).ok) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: a } = await supabaseAdmin
       .from("afiliados" as any)
@@ -87,7 +87,7 @@ export const payAffiliate = createServerFn({ method: "POST" })
 export const toggleAffiliate = createServerFn({ method: "POST" })
   .validator((i) => tokenOnly.extend({ id: z.string().uuid(), ativo: z.boolean() }).parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "affiliates-admin")).ok) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("afiliados" as any)

@@ -8,7 +8,7 @@ import { z } from "zod";
 export const runJarvisLieDetector = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-detector-mentiras")).ok) {
       return {
         version: "v52-fix",
         timestamp: new Date().toISOString(),

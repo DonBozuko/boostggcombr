@@ -30,7 +30,7 @@ const USED_IDS = new Set<number>([
 export const auditarFornecedor = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<AuditResp> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "audit")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -113,7 +113,7 @@ export const auditarFornecedor = createServerFn({ method: "POST" })
 export const auditoriaContingenciaLocal = createServerFn({ method: "POST" })
   .validator((i) => tokenOnlyInput.parse(i))
   .handler(async ({ data }): Promise<AuditResp> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "audit")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const rows = await (await import("@/lib/audit-contingency.server")).buildContingencyAuditRows();

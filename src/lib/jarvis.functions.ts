@@ -22,7 +22,7 @@ export const logJarvisAlert = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" as const };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis")).ok) return { ok: false, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("jarvis_alerts").insert({
       severidade: data.severidade,
@@ -44,7 +44,7 @@ export const listJarvisAlerts = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data }): Promise<{ rows: JarvisAlertRow[]; error?: string }> => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { rows: [], error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis")).ok) return { rows: [], error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("jarvis_alerts")
