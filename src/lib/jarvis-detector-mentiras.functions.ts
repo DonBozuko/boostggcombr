@@ -267,17 +267,19 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
         
         const byCat = new Map<string, any[]>();
         for (const it of (allItems ?? [])) {
-          const list = byCat.get(it.category) ?? [];
+          const cat = String(it.category || "uncategorized");
+          const list = byCat.get(cat) ?? [];
           list.push(it);
-          byCat.set(it.category, list);
+          byCat.set(cat, list);
         }
 
         const inversions: string[] = [];
         for (const [cat, list] of byCat) {
           list.sort((a, b) => a.quantidade - b.quantidade);
           for (let i = 1; i < list.length; i++) {
+            // v598: Trava estrita de Monotonicidade
             if (Number(list[i].price_brl) < Number(list[i-1].price_brl)) {
-              inversions.push(`${list[i].pacote}(${list[i].price_brl}) < ${list[i-1].pacote}(${list[i-1].price_brl})`);
+              inversions.push(`${list[i].pacote}(R$${list[i].price_brl}) < ${list[i-1].pacote}(R$${list[i-1].price_brl})`);
             }
           }
         }
@@ -291,7 +293,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
         });
         if (!monoOk) blockDeploy = true;
       } catch (e) {
-         checks.push({ id: "monotonic_ladder", label: "Escada de Preços", ok: false, detail: "erro ao validar escada" });
+         checks.push({ id: "monotonic_ladder", label: "Escada de Preços", ok: false, detail: "erro ao validar escada: " + (e instanceof Error ? e.message : String(e)) });
          blockDeploy = true;
       }
     }
