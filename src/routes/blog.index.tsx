@@ -7,8 +7,8 @@ const BASE = "https://www.boostgg.com.br";
 const POSTS = [
   {
     slug: "como-ganhar-seguidores-instagram",
-    title: "Como Ganhar Seguidores no Instagram em 2026",
-    excerpt: "Estratégias reais que funcionam hoje — orgânicas e pagas — sem cair em promessas vazias.",
+    title: "Como Ganhar Seguidores no Instagram em 2026 (Guia Real)",
+    excerpt: "O método definitivo para crescer do zero — do ajuste do perfil ao domínio do algoritmo de Reels.",
   },
   {
     slug: "e-seguro-comprar-seguidores",
