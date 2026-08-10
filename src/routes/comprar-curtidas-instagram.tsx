@@ -84,9 +84,10 @@ function Page() {
       ]}
       bodySections={[
         {
-          h2: "Como o algoritmo do Instagram lê as curtidas em 2026",
+          h2: "Como o algoritmo lê curtidas em 2026",
           body: "As curtidas deixaram de ser apenas métrica de vaidade e se tornaram um sinal de retenção e relevância. Quando um post recebe engajamento rápido, o algoritmo interpreta que o conteúdo é valioso para aquele nicho e amplia a entrega no Explore e Reels. Nossa entrega estratégica foca em validar esse sinal inicial, funcionando como um catalisador para o seu alcance orgânico.",
         },
+
         {
           h2: "A diferença entre Curtidas Reais e Bots",
           body: "O Google e o Instagram penalizam conteúdos associados a redes de bots óbvios. Por isso, a BoostGG utiliza um sistema de entrega gradual com perfis que possuem histórico e foto. Isso garante que o engajamento seja visto como legítimo, protegendo a integridade da sua conta enquanto você escala seu perfil.",
