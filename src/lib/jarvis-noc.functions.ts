@@ -27,7 +27,7 @@ export type NocSnapshot = {
 export const jarvisNocSnapshot = createServerFn({ method: "POST" })
   .validator((input) => adminInput.parse(input))
   .handler(async ({ data }): Promise<NocSnapshot> => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-noc")).ok) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { checkAllProvidersBalance } = await import("@/lib/monitor-saldo.server");
 
@@ -141,7 +141,7 @@ export type JarvisChatResp =
 export const jarvisChat = createServerFn({ method: "POST" })
   .validator((input) => z.object({ token: z.string().min(8), question: z.string().min(2).max(500) }).parse(input))
   .handler(async ({ data }): Promise<JarvisChatResp> => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-noc")).ok) return { ok: false, error: "UNAUTHORIZED" };
 
     const qLower = data.question.toLowerCase();
     if (CRITICAL_KEYWORDS.some((k) => qLower.includes(k))) {
@@ -234,7 +234,7 @@ export const jarvisChat = createServerFn({ method: "POST" })
 export const jarvisFailoverAtivo = createServerFn({ method: "POST" })
   .validator((input) => adminInput.parse(input))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-noc")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: forns } = await supabaseAdmin
       .from("fornecedores")

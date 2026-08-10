@@ -40,7 +40,7 @@ export type PricingCatalogList =
 export const listPricingCatalog = createServerFn({ method: "POST" })
   .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<PricingCatalogList> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "pricing-catalog")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { ensureReserveProviderIdsFresh, syncReserveProviderIds } = await import("@/lib/pricing-cache.server");
@@ -69,7 +69,7 @@ const DUP_ID_MSG = "⚠️ Erro Contábil: Os IDs das chaves reservas não podem
 export const upsertPricingCatalog = createServerFn({ method: "POST" })
   .validator((i) => upsertInput.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "pricing-catalog")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -151,7 +151,7 @@ export const upsertPricingCatalog = createServerFn({ method: "POST" })
 export const deletePricingCatalog = createServerFn({ method: "POST" })
   .validator((i) => deleteInput.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "pricing-catalog")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -183,7 +183,7 @@ export type QuarantineView =
 export const getPriceQuarantine = createServerFn({ method: "POST" })
   .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<QuarantineView> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "pricing-catalog")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -208,7 +208,7 @@ export const getPriceQuarantine = createServerFn({ method: "POST" })
 export const approvePriceQuarantine = createServerFn({ method: "POST" })
   .validator((i) => tokenOnly.parse(i))
   .handler(async ({ data }): Promise<{ ok: boolean; error?: string; applied?: number }> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "pricing-catalog")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

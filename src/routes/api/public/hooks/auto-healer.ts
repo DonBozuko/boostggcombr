@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/public/hooks/auto-healer")({
     handlers: {
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
-        if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:auto-healer", { allowCron: true })).ok) {
           return new Response("Unauthorized", { status: 401 });
         }
 

@@ -11,8 +11,7 @@ export const Route = createFileRoute('/api/public/hooks/recovery-email')({
       POST: async ({ request }) => {
         const adminToken = request.headers.get('x-admin-token')
         if (
-          !adminToken ||
-          (adminToken !== process.env.ADMIN_TOKEN && adminToken !== process.env.CRON_ADMIN_TOKEN)
+          !(await (await import("@/lib/admin-guard.server")).assertAdmin(adminToken, "route:recovery-email", { allowCron: true })).ok
         ) {
           return Response.json({ error: 'unauthorized' }, { status: 401 })
         }

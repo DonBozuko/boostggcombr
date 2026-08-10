@@ -23,7 +23,7 @@ const inputSchema = z.object({
 export const getRoasReport = createServerFn({ method: "POST" })
   .validator((data: unknown) => inputSchema.parse(data))
   .handler(async ({ data }) => {
-    if (data.adminToken !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.adminToken, "roas")).ok) {
       return { ok: false as const, error: "UNAUTHORIZED" as const };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

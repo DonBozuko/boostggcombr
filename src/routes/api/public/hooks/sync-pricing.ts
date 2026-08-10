@@ -18,7 +18,7 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
         if (isNight && !isForced) {
           return new Response(JSON.stringify({ ok: true, mode: "night", message: "Sincronismo suprimido pelo Modo Noturno (02h-06h). Use ?force=true para ignorar." }), { status: 202 });
         }
-        if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:sync-pricing", { allowCron: true })).ok) {
           return new Response("Unauthorized", { status: 401 });
         }
         try {
@@ -66,7 +66,7 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
         if (isNight && !isForced) {
           return new Response(JSON.stringify({ ok: true, mode: "night", message: "Sincronismo suprimido pelo Modo Noturno (02h-06h). Use ?force=true para ignorar." }), { status: 202 });
         }
-        if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:sync-pricing", { allowCron: true })).ok) {
           return new Response("Unauthorized", { status: 401 });
         }
         try {

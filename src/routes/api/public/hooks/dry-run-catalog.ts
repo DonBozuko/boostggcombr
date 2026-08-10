@@ -10,11 +10,9 @@ function extractToken(request: Request) {
   );
 }
 
-function authorized(token: string) {
+async function authorized(token: string) {
   if (!token) return false;
-  if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return true;
-  if (process.env.CRON_ADMIN_TOKEN && token === process.env.CRON_ADMIN_TOKEN) return true;
-  return false;
+  return (await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:dry-run-catalog", { allowCron: true })).ok;
 }
 
 export const Route = createFileRoute("/api/public/hooks/dry-run-catalog")({
@@ -27,7 +25,7 @@ export const Route = createFileRoute("/api/public/hooks/dry-run-catalog")({
 });
 
 async function run(request: Request) {
-  if (!authorized(extractToken(request))) {
+  if (!(await authorized(extractToken(request)))) {
     return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },

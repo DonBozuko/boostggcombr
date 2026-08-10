@@ -14,8 +14,7 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
     }).parse(input)
   )
   .handler(async ({ data }) => {
-    const { isAdminToken } = await import("@/lib/admin-token.server");
-    if (!isAdminToken(data.token)) return { ok: false, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-resolve")).ok) return { ok: false, error: "UNAUTHORIZED" };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     

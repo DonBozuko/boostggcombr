@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/public/jarvis-pipeline")({
       GET: async ({ request }) => {
         // v227 — Token só via header (x-admin-token). Query string removida.
         const key = request.headers.get("x-admin-token") ?? "";
-        if (!process.env.ADMIN_TOKEN || key !== process.env.ADMIN_TOKEN) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(key, "route:jarvis-pipeline")).ok) {
           return new Response("403 Forbidden — Acesso Bloqueado", {
             status: 403,
             headers: {

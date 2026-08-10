@@ -126,7 +126,13 @@ export const FAMILIAS: Familia[] = [
     id: "rls",
     nome: "Acesso a dados",
     detector: "linter RLS + autenticação dos robôs",
-    provas: ["cron-auth.test.ts", "rate-limit.test.ts", "status-publico-sem-vazamento.test.ts"],
+    provas: [
+      "cron-auth.test.ts",
+      "rate-limit.test.ts",
+      "status-publico-sem-vazamento.test.ts",
+      // v607 — porteiro único do painel (timing-safe + lockout + trilha)
+      "admin-security-proxy.test.ts",
+    ],
   },
   {
     id: "promessa",

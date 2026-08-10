@@ -7,7 +7,7 @@ const tokenIn = z.object({ token: z.string().min(8) });
 export const getCanaryPanel = createServerFn({ method: "POST" })
   .validator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "canary")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { getCanaryConfig, canarySpendThisMonth } = await import("@/services/canary.server");
     const cfg = await getCanaryConfig();
@@ -63,7 +63,7 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
     }).parse(i),
   )
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "canary")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const value = {
       enabled: data.enabled,
@@ -95,7 +95,7 @@ export const saveCanaryConfig = createServerFn({ method: "POST" })
 export const suggestCanaryTargets = createServerFn({ method: "POST" })
   .validator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "canary")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows } = await supabaseAdmin
       .from("pricing_items")
@@ -125,7 +125,7 @@ export const suggestCanaryTargets = createServerFn({ method: "POST" })
 export const runCanaryNow = createServerFn({ method: "POST" })
   .validator((i) => tokenIn.parse(i))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "canary")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { runCanary } = await import("@/services/canary.server");
     const report = await runCanary(true);
     return { ok: true as const, report };

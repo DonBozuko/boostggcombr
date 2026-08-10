@@ -3,9 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 export const runAutoResolveIds = createServerFn({ method: "POST" })
   .validator((d: { token: string }) => d)
   .handler(async ({ data }) => {
-    const admin = process.env.ADMIN_TOKEN;
-    const cron = process.env.CRON_ADMIN_TOKEN;
-    if (!data.token || (data.token !== admin && data.token !== cron)) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "auto-resolver", { allowCron: true })).ok) {
       throw new Error("unauthorized");
     }
     const { autoResolveAll } = await import("@/lib/auto-resolver.server");

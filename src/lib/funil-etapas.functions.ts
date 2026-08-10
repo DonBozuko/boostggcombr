@@ -42,8 +42,7 @@ export const getFunilEtapas = createServerFn({ method: "POST" })
       quedas_por_pacote: [],
       dias: data.days,
     };
-    const expected = process.env.ADMIN_TOKEN;
-    if (!expected || data.token !== expected) return { ...vazio, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "funil-etapas")).ok) return { ...vazio, error: "UNAUTHORIZED" };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const desde = new Date(Date.now() - data.days * 86_400_000).toISOString();

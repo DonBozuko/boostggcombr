@@ -187,7 +187,7 @@ export const Route = createFileRoute("/api/public/hooks/backfill-smmhype-ids")({
     handlers: {
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token");
-        if (!token || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:backfill-smmhype-ids", { allowCron: true })).ok) {
           return new Response(JSON.stringify({ ok: false, error: "unauthorized" }), {
             status: 401, headers: { "Content-Type": "application/json" },
           });

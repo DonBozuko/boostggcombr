@@ -8,7 +8,7 @@ import { z } from "zod";
 export const runJarvisLieDetector = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-detector-mentiras")).ok) {
       return {
         version: "v52-fix",
         timestamp: new Date().toISOString(),
@@ -301,6 +301,29 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
          checks.push({ id: "monotonic_ladder", label: "Escada de Preços", ok: false, detail: "erro ao validar escada: " + (e instanceof Error ? e.message : String(e)) });
          blockDeploy = true;
       }
+    }
+
+    // v607 — Telemetria de autenticação: pico de negações no Security Proxy.
+    // Antes disso, força bruta contra o painel era invisível.
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const desde = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await supabaseAdmin
+        .from("admin_audit_logs" as any)
+        .select("id", { count: "exact", head: true })
+        .eq("action", "admin_auth_denied")
+        .gte("created_at", desde);
+      const denials = Number(count ?? 0);
+      const authOk = denials < 20;
+      checks.push({
+        id: "admin_auth_denied",
+        label: `Tentativas de acesso admin negadas (1h): ${denials}`,
+        ok: authOk,
+        detail: authOk ? "sem sinal de força bruta" : `🚨 ${denials} negações em 1h — possível ataque ao painel`,
+      });
+      // Sinal de segurança não bloqueia deploy; bloquear entregaria DoS ao atacante.
+    } catch {
+      /* telemetria nunca derruba o detector */
     }
 
     const passed = checks.filter((c) => c.ok).length;

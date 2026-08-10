@@ -33,7 +33,7 @@ export type DispatchLogRow = {
 export const getDispatchLogs = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "dispatch-log")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     let q = (supabaseAdmin as any)

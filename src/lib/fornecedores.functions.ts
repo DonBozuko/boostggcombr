@@ -7,7 +7,7 @@ const tokenInput = z.object({ token: z.string().min(8) });
 export const listarFornecedores = createServerFn({ method: "POST" })
   .validator((input) => tokenInput.parse(input))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "fornecedores")).ok) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("fornecedores")
@@ -34,7 +34,7 @@ export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
     z.object({ token: z.string().min(8), id: z.string().uuid(), ativo: z.boolean() }).parse(input),
   )
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "fornecedores")).ok) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: updated, error } = await supabaseAdmin
       .from("fornecedores")
@@ -55,7 +55,7 @@ export const toggleFornecedorAtivo = createServerFn({ method: "POST" })
 export const getRecargaFornecedores = createServerFn({ method: "POST" })
   .validator((input) => tokenInput.parse(input))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "fornecedores")).ok) return { ok: false as const, error: "UNAUTHORIZED" as const };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { PAINEL_URL, painelFromApiUrl, pixFor } = await import("@/lib/fornecedores-recarga.server");
     const { data: rows } = await supabaseAdmin

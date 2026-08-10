@@ -19,7 +19,7 @@ export type WalletsSnapshot =
 export const walletsSnapshot = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<WalletsSnapshot> => {
-    if (!process.env.ADMIN_TOKEN || data.token !== process.env.ADMIN_TOKEN) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "wallets")).ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

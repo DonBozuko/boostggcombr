@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/admin/pricing-config")({
     handlers: {
       GET: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
-        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:pricing-config")).ok) {
           return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), { status: 401, headers: { "Content-Type": "application/json" } });
         }
         const { getPricingConfig } = await import("@/lib/pricing-config.server");
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/api/public/admin/pricing-config")({
       },
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
-        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+        if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:pricing-config")).ok) {
           return new Response(JSON.stringify({ ok: false, error: "UNAUTHORIZED" }), { status: 401, headers: { "Content-Type": "application/json" } });
         }
         let body: unknown;

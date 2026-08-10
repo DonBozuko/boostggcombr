@@ -9,7 +9,7 @@ const tokenInput = z.object({ token: z.string().min(8) });
 export const getLastBenchRun = createServerFn({ method: "POST" })
   .validator((i) => tokenInput.parse(i))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "bench-autonomo")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: run } = await (supabaseAdmin as any)
@@ -35,7 +35,7 @@ export const getLastBenchRun = createServerFn({ method: "POST" })
 export const runBenchNow = createServerFn({ method: "POST" })
   .validator((i) => tokenInput.parse(i))
   .handler(async ({ data }) => {
-    if (!(await import("@/lib/admin-token.server")).isAdminToken(data.token)) return { ok: false as const, error: "UNAUTHORIZED" };
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "bench-autonomo")).ok) return { ok: false as const, error: "UNAUTHORIZED" };
     const { runBenchAutonomo } = await import("@/services/bench-autonomo.server");
     return await runBenchAutonomo({ notify: true, origem: "manual" });
   });

@@ -13,8 +13,8 @@ async function authorized(request: Request) {
   if (isCronAuthorized(request)) return true;
   const token = extractToken(request);
   if (!token) return false;
-  if (process.env.ADMIN_TOKEN && token === process.env.ADMIN_TOKEN) return true;
-  if (process.env.CRON_ADMIN_TOKEN && token === process.env.CRON_ADMIN_TOKEN) return true;
+  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:sync-services")).ok) return true;
+  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:sync-services", { allowCron: true })).ok) return true;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin

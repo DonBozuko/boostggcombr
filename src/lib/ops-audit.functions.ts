@@ -5,8 +5,7 @@ import { z } from "zod";
 export const runOpsAuditNow = createServerFn({ method: "POST" })
   .validator((input) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
-    const expected = process.env.ADMIN_TOKEN;
-    if (!expected || data.token !== expected) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "ops-audit")).ok) {
       return { ok: false as const, error: "UNAUTHORIZED" as const };
     }
     const { runOpsAudit } = await import("@/services/ops-audit.server");
