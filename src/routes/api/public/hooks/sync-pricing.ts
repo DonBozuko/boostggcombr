@@ -1,3 +1,4 @@
+import { pingGoogleSitemap } from "@/lib/gsc-ping.server";
 import { createFileRoute } from "@tanstack/react-router";
 
 // Cron-Driven API Replication Layer — endpoint público chamado via pg_cron.
@@ -7,6 +8,15 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
     handlers: {
       POST: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
+        // v601 — Modo Noturno (UTC-3). Entre 02:00 e 06:00 o sincronismo é reduzido.
+        const now = new Date();
+        const hourBR = (now.getUTCHours() - 3 + 24) % 24;
+        const isNight = hourBR >= 2 && hourBR < 6;
+        const url = new URL(request.url);
+        const isForced = url.searchParams.get("force") === "true";
+        if (isNight && !isForced) {
+          return new Response(JSON.stringify({ ok: true, mode: "night", message: "Sincronismo suprimido pelo Modo Noturno (02h-06h). Use ?force=true para ignorar." }), { status: 202 });
+        }
         if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
           return new Response("Unauthorized", { status: 401 });
         }
@@ -26,6 +36,7 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
 
           (result as any).reserves = reserves;
           (result as any).escada = escada;
+          if (!isNight) await pingGoogleSitemap().catch(() => {});
           return new Response(JSON.stringify(result), {
             status: 200,
             headers: {
@@ -44,6 +55,15 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
       },
       GET: async ({ request }) => {
         const token = request.headers.get("x-admin-token") ?? "";
+        // v601 — Modo Noturno (UTC-3). Entre 02:00 e 06:00 o sincronismo é reduzido.
+        const now = new Date();
+        const hourBR = (now.getUTCHours() - 3 + 24) % 24;
+        const isNight = hourBR >= 2 && hourBR < 6;
+        const url = new URL(request.url);
+        const isForced = url.searchParams.get("force") === "true";
+        if (isNight && !isForced) {
+          return new Response(JSON.stringify({ ok: true, mode: "night", message: "Sincronismo suprimido pelo Modo Noturno (02h-06h). Use ?force=true para ignorar." }), { status: 202 });
+        }
         if ((!process.env.ADMIN_TOKEN && !process.env.CRON_ADMIN_TOKEN) || (token !== process.env.ADMIN_TOKEN && token !== process.env.CRON_ADMIN_TOKEN)) {
           return new Response("Unauthorized", { status: 401 });
         }
@@ -60,6 +80,7 @@ export const Route = createFileRoute("/api/public/hooks/sync-pricing")({
           const escada = await enforcePriceAuthority("hook-get").catch((e) => ({ error: String(e?.message ?? e) }));
           (result as any).reserves = reserves;
           (result as any).escada = escada;
+          if (!isNight) await pingGoogleSitemap().catch(() => {});
           return new Response(JSON.stringify(result), {
             status: 200,
             headers: {
