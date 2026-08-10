@@ -29,7 +29,7 @@ async function saveToSystemMemory(diagnosis: string, embedding?: number[]) {
   try {
     await supabaseAdmin.from("memorias_sistema").insert({
       contexto: diagnosis,
-      embedding: embedding || null,
+      embedding: embedding ? (embedding as any) : null,
       criado_em: new Date().toISOString(),
     });
   } catch (error) {
