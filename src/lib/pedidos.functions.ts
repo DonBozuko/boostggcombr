@@ -137,7 +137,7 @@ export const criarPedido = createServerFn({ method: "POST" })
     const discount = hasPrime && valorBase >= 30 ? 0.15 : 0;
     const valorCobrar = Number((valorBase * (1 - discount)).toFixed(2));
 
-    const PREFLIGHT_STRICT_BRL = 100;
+    const PREFLIGHT_STRICT_BRL = 50;
     try {
       const preflights = Promise.all([
         import("./route-preflight.server").then(m => m.preflightRouteOrBlock({
@@ -153,7 +153,7 @@ export const criarPedido = createServerFn({ method: "POST" })
       ]);
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
       const timeout = new Promise<never>((_, reject) => {
-        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), 5000);
+        timeoutId = setTimeout(() => reject(new Error("PREFLIGHT_TIMEOUT")), valorCobrar >= PREFLIGHT_STRICT_BRL ? 8000 : 5000);
       });
       const [preflightRoute, preflightTarget] = await Promise.race([preflights, timeout])
         .finally(() => { if (timeoutId) clearTimeout(timeoutId); });
