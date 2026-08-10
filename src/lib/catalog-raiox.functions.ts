@@ -29,7 +29,6 @@ export type RaioXPayload = {
 export const getCatalogRaioX = createServerFn({ method: "POST" })
   .validator((i) => input.parse(i))
   .handler(async ({ data }): Promise<RaioXPayload> => {
-    const expected = process.env.ADMIN_TOKEN;
     const vazio: RaioXPayload = {
       ok: false,
       total: 0,

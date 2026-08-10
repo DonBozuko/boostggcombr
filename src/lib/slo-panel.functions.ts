@@ -32,8 +32,7 @@ type SloMetrics = {
 export const getSloMetrics = createServerFn({ method: "POST" })
   .validator((d: { token: string }) => d)
   .handler(async ({ data }): Promise<SloMetrics> => {
-    const admin = process.env.ADMIN_TOKEN;
-    if (!admin || data.token !== admin) {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "slo-panel")).ok) {
       return {
         ok: false, windowDays: 7,
         totals: { pagos: 0, entregues: 0, processando: 0, refunded: 0, awaiting_approval: 0, smm_failed: 0, margin_hold: 0, revenue_brl: 0 },
