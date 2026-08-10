@@ -51,7 +51,7 @@ export const prewarmPedido = createServerFn({ method: "POST" })
         tokenPromise,
         new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1500))
       ]);
-      console.log("[prewarmPedido] v588 Aqueceu token centralizado:", !!token);
+      
       return { ok: true };
     } catch (err) {
       console.warn("[prewarmPedido] v587 Fallback silencioso no aquecimento:", err);
@@ -463,7 +463,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           const qr = mpPrev?.point_of_interaction?.transaction_data?.qr_code;
           const qr64 = mpPrev?.point_of_interaction?.transaction_data?.qr_code_base64;
           if (qr && qr64 && mpPrev?.status === "pending") {
-            console.log("[criarPedido] v218 dedup HIT — reaproveitando Pix", existing.id);
+            
             const { logGuard } = await import("@/lib/guard-events.server");
             void logGuard("CHECKOUT_DEDUPE", { pedidoId: existing.id, pacote: existing.pacote });
             return {

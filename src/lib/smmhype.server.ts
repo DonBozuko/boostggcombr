@@ -183,7 +183,7 @@ export function validateDispatcherConfig(): { ok: boolean; missing: string[]; as
 
   if (missing.length) console.error("[smmhype] dispatcher inválido — pacotes sem service id:", missing);
   if (assertions.length) console.error("[smmhype] asserts falharam:", assertions);
-  else console.log("[smmhype] self-check OK · 19 pacotes (9 seg + 5 likes + 5 views)");
+  
   return { ok: missing.length === 0 && assertions.length === 0, missing, assertions };
 }
 

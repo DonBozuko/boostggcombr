@@ -159,7 +159,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
               // 23505 = unique_violation → MP reenvia o mesmo payment_id em estados diferentes.
               // NÃO podemos sair aqui: o primeiro evento pode ser "pending" e o próximo "approved".
               if ((dupErr as { code?: string }).code === "23505") {
-                console.log("[mp-webhook] v188 idempotency: evento repetido, reconsultando MP", { paymentId });
+                
               } else {
               console.warn("[mp-webhook] v181 webhook_events insert non-dup fail", dupErr);
               }
