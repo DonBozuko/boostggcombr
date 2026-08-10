@@ -31,7 +31,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "O método real, em ordem — do perfil ao algoritmo. Sem hashtag mágica e sem promessa vazia.",
     datePublished: "2026-01-15",
-    dateModified: new Date().toISOString().split('T')[0],
+    dateModified: new Date().toISOString().split('T')[0], // v608: Auto-freshness daily
     faq: [
       {
         q: "Como ganhar seguidores no Instagram de graça?",

@@ -96,6 +96,7 @@ export const Route = createFileRoute("/")({
         { name: "description", content: description },
         { name: "robots", content: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" },
         { name: "google-site-verification", content: "y8Z87vQybaocMrzCC4Zzur2UBFi7VEGWAfdklGB2opM" },
+        { name: "keywords", content: "comprar seguidores instagram, seguidores brasileiros, pix seguidores, comprar curtidas instagram" },
         { property: "og:type", content: "website" },
         { property: "og:title", content: ogTitle },
         { property: "og:description", content: description },
