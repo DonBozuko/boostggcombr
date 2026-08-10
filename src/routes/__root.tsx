@@ -194,7 +194,9 @@ function RootComponent() {
   useEffect(() => {
     const sanitize = () => {
       document.querySelectorAll("span").forEach((s) => {
-        if (s.textContent === "\u2063") s.remove();
+        // v604: Expansão do sanitizador para capturar tanto o caractere literal quanto o código de escape
+        // que pixels de terceiros (TikTok/GTM) costumam injetar em wrappers vazios.
+        if (s.textContent === "\u2063" || s.textContent === "⁣") s.remove();
       });
     };
     sanitize();
