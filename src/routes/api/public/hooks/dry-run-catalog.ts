@@ -10,11 +10,9 @@ function extractToken(request: Request) {
   );
 }
 
-function authorized(token: string) {
+async function authorized(token: string) {
   if (!token) return false;
-  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:dry-run-catalog")).ok) return true;
-  if ((await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:dry-run-catalog", { allowCron: true })).ok) return true;
-  return false;
+  return (await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:dry-run-catalog", { allowCron: true })).ok;
 }
 
 export const Route = createFileRoute("/api/public/hooks/dry-run-catalog")({
