@@ -239,9 +239,11 @@
 /* 4. Centralização milimétrica de containers do /admin (1200px) */
 .jarvis-hud > * { margin-left: auto; margin-right: auto; }
 
-/* 5. Anti-quebra de texto desalinhado */
+/* 5. Anti-quebra de texto desalinhado & Sanitização Visual */
 h1, h2, h3 { text-wrap: balance; }
 p, li, span { text-wrap: pretty; }
+span:empty { display: none !important; }
+
 
 /* 6. Footer de versão (v1.0.0-LAUNCH) — preservado e refinado */
 footer[aria-label="Versão de lançamento"] span {
