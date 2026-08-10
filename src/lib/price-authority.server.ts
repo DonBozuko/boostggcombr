@@ -14,6 +14,8 @@ export type AuthorityReport = {
 };
 
 export async function enforcePriceAuthority(motivo = "pos-sync"): Promise<AuthorityReport> {
+  // v602: Redução de lock side-effect.
+
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   const { data } = await supabaseAdmin
