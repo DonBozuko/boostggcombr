@@ -1,13 +1,11 @@
 // v399 — Ponto único de verdade do token de admin.
-// Antes cada arquivo .functions.ts declarava seu próprio checkToken/auth/authorized
-// no escopo de módulo. O divisor de server functions pode apagar esses helpers no
-// bundle e derrubar admin/despacho com ReferenceError. Agora vive num .server.ts
-// importado dinamicamente dentro do handler.
+// v607 — Delegado ao Security Proxy (`admin-guard.server`): comparação em
+// tempo constante. Mantido como fachada síncrona para call sites legados;
+// código novo deve chamar `assertAdmin` (lockout + trilha de auditoria).
 
-/** true somente se o token bater exatamente com ADMIN_TOKEN configurado. */
+import { isMasterToken } from "@/lib/admin-guard.server";
+
+/** true somente se o token bater com ADMIN_TOKEN (timing-safe). */
 export function isAdminToken(token: string | undefined | null): boolean {
-  const expected = process.env.ADMIN_TOKEN;
-  if (!expected) return false;
-  if (!token) return false;
-  return token === expected;
+  return isMasterToken(token);
 }
