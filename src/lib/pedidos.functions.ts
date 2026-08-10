@@ -11,7 +11,8 @@ const clean = (s: string) => (s || "").trim().replace(/^@/, "");
  * O checkout lê do banco (ms); o cron atualiza a cada 12h.
  */
 export const prewarmPedido = createServerFn({ method: "POST" })
-  .handler(async () => {
+  .validator((d: unknown) => z.object({ email: z.string().optional() }).parse(d))
+  .handler(async ({ data }) => {
     try {
       const { getMpAccessToken } = await import("./mp-token.server");
       const token = await getMpAccessToken();
