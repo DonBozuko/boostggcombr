@@ -825,44 +825,23 @@ export const Route = createFileRoute("/blog/$slug")({
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Article",
+            "@type": "BlogPosting",
             headline: post.title,
             description: post.description,
             datePublished: post.datePublished,
             dateModified: post.dateModified ?? post.datePublished,
-            author: { "@type": "Organization", name: "BoostGG" },
-            publisher: { "@type": "Organization", name: "BoostGG" },
-            mainEntityOfPage: url,
+            author: { "@type": "Organization", name: "BoostGG Editorial Team", url: BASE },
+            publisher: { "@type": "Organization", name: "BoostGG", logo: { "@type": "ImageObject", url: `${BASE}/og-instagram.jpg` } },
+            mainEntityOfPage: { "@type": "WebPage", "@id": url },
+            image: `${BASE}/og-instagram.jpg`,
           }),
         },
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: BASE },
-              { "@type": "ListItem", position: 2, name: "Blog", item: `${BASE}/blog` },
-              { "@type": "ListItem", position: 3, name: post.title, item: url },
-            ],
-          }),
-        },
-        ...(post.faq?.length
-          ? [
-              {
-                type: "application/ld+json",
-                children: JSON.stringify({
-                  "@context": "https://schema.org",
-                  "@type": "FAQPage",
-                  mainEntity: post.faq.map((f) => ({
-                    "@type": "Question",
-                    name: f.q,
-                    acceptedAnswer: { "@type": "Answer", text: f.a },
-                  })),
-                }),
-              },
-            ]
-          : []),
+        buildBreadcrumbJsonLd([
+          { name: "Início", url: BASE },
+          { name: "Blog", url: `${BASE}/blog` },
+          { name: post.title, url: url },
+        ]),
+        ...(post.faq?.length ? [buildFaqJsonLd(post.faq)] : []),
       ],
 
     };
