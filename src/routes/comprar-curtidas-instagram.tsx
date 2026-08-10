@@ -60,7 +60,7 @@ function Page() {
   return (
     <SeoLanding
       accent="#e1306c"
-      h1="Comprar Curtidas Instagram — Reais, Rápidas e com Pix"
+      h1="Comprar Curtidas Instagram Reais via Pix — Entrega em Minutos"
       subtitle="Curtidas para posts e Reels entregues em minutos"
       intro="Dê aquele empurrão nos seus posts e Reels: pague com Pix, receba curtidas em minutos e aumente o alcance orgânico. Sem senha, sem risco, sem cadastro."
       ctaHref="/"
