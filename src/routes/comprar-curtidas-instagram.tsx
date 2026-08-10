@@ -4,9 +4,10 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Curtidas no Instagram: Como Aumentar o Alcance com Prova Social";
+const TITLE = "Curtidas no Instagram: Aumente Alcance e Engajamento";
 const DESC =
-  "Entenda como curtidas influenciam o algoritmo do Instagram. Pacotes de engajamento a partir de R$ 5,00 com entrega automática e garantia de 30 dias.";
+  "Descubra como as curtidas no Instagram impactam o algoritmo e aumentam o alcance dos seus Reels e posts. Pacotes seguros com entrega via Pix e garantia.";
+
 
 
 
