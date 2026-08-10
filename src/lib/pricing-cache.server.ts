@@ -231,12 +231,15 @@ export async function ensureReserveProviderIdsFresh(staleMs = 30_000): Promise<v
  * antigo diferente e o alerta de reprecificação disparava em looping. */
 async function acquireSyncLock(supabaseAdmin: any, windowSeconds = 60): Promise<boolean> {
   try {
+    // v604: Blindagem contra drift de execução. 
+    // Reduzimos a janela de lock de 120s para 60s para evitar que reinicializações 
+    // de isolates em picos de tráfego causem "congelamento" falso do sincronismo.
     const { data, error } = await supabaseAdmin.rpc("rate_limit_check", {
       _key: "pricing_sync_global",
       _limit: 1,
       _window_seconds: windowSeconds,
     });
-    if (error) return true; // fail-open: nunca travar a sincronização por erro da trava
+    if (error) return true; // Fail-open: integridade de preço > bloqueio de trava
     const row = Array.isArray(data) ? data[0] : data;
     return row?.allowed !== false;
   } catch {
