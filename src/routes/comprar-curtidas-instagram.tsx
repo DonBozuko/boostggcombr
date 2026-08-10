@@ -4,9 +4,9 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Comprar Curtidas no Instagram via Pix — BOOSTGG";
+const TITLE = "Curtidas no Instagram: Como Aumentar o Alcance com Prova Social";
 const DESC =
-  "Curtidas no Instagram a partir de R$ 5,00, entrega em 1 a 5 minutos após o Pix. Sem senha e com reposição de 30 dias.";
+  "Entenda como curtidas influenciam o algoritmo do Instagram. Pacotes de engajamento a partir de R$ 5,00 com entrega automática e garantia de 30 dias.";
 
 
 
@@ -60,9 +60,9 @@ function Page() {
   return (
     <SeoLanding
       accent="#e1306c"
-      h1="Comprar Curtidas Instagram Reais via Pix — Entrega em Minutos"
-      subtitle="Curtidas para posts e Reels entregues em minutos"
-      intro="Dê aquele empurrão nos seus posts e Reels: pague com Pix, receba curtidas em minutos e aumente o alcance orgânico. Sem senha, sem risco, sem cadastro."
+      h1="Como Aumentar o Alcance no Instagram com Curtidas Reais via Pix"
+      subtitle="Engajamento estratégico para posts e Reels"
+      intro="O algoritmo do Instagram prioriza conteúdos com sinais rápidos de interesse. Nosso sistema entrega curtidas reais em minutos para validar sua prova social e destravar a distribuição orgânica. Tudo via Pix, sem senha e com total segurança."
       ctaHref="/"
       ctaLabel="Comprar curtidas agora"
       benefits={[
@@ -82,16 +82,16 @@ function Page() {
       ]}
       bodySections={[
         {
-          h2: "Por que comprar curtidas Instagram faz diferença",
-          body: "O algoritmo do Instagram distribui conteúdo que já mostra engajamento. Post com zero curtida morre no feed; post com centenas de reações ganha velocidade e aparece para mais pessoas. Comprar curtidas é o gatilho inicial que quebra o ciclo: prova social atrai prova social. Não substitui boa criação, mas amplia quem chega até você.",
+          h2: "Como o algoritmo do Instagram lê as curtidas em 2026",
+          body: "As curtidas deixaram de ser apenas métrica de vaidade e se tornaram um sinal de retenção e relevância. Quando um post recebe engajamento rápido, o algoritmo interpreta que o conteúdo é valioso para aquele nicho e amplia a entrega no Explore e Reels. Nossa entrega estratégica foca em validar esse sinal inicial, funcionando como um catalisador para o seu alcance orgânico.",
         },
         {
-          h2: "Como funciona a compra na BoostGG",
-          body: "1. Escolha o pacote (100 a 10.000 curtidas).\n2. Cole o link do post ou Reel público.\n3. Pague o Pix — QR Code ou copia e cola.\n4. Em 1-5 minutos as curtidas começam a entrar.\n5. Reposição automática por 30 dias se cair qualquer coisa.",
+          h2: "A diferença entre Curtidas Reais e Bots",
+          body: "O Google e o Instagram penalizam conteúdos associados a redes de bots óbvios. Por isso, a BoostGG utiliza um sistema de entrega gradual com perfis que possuem histórico e foto. Isso garante que o engajamento seja visto como legítimo, protegendo a integridade da sua conta enquanto você escala seu perfil.",
         },
         {
-          h2: "Curtidas em posts ou Reels: qual escolher?",
-          body: "Curtidas em posts aumentam a autoridade do perfil e melhoram a impressão de quem visita seu feed. Curtidas em Reels são ideais para viralização: o algoritmo entende o sinal como sinal de qualidade e pode impulsionar sua distribuição no Explore. Ambos funcionam — escolha de acordo com o objetivo do momento.",
+          h2: "Estratégia: Curtidas em Reels vs Posts",
+          body: "Para viralizar no Reels, o volume de curtidas nos primeiros 60 minutos é crucial. Já em posts de feed, as curtidas servem como prova social duradoura para converter visitantes em seguidores. Recomendamos dividir sua estratégia entre os dois formatos para uma autoridade de perfil completa.",
         },
       ]}
       faq={FAQ}

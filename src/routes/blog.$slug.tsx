@@ -141,9 +141,29 @@ const POSTS: Record<string, Post> = {
           entrega gradual</strong> reduz o atrito — não gera alcance, gera
           confiança. Funciona como complemento ao conteúdo, nunca como
           substituto. Se você não posta, comprar seguidores só deixa o perfil
-          bonito e parado. Veja como funciona em{" "}
+          bonito e parado.
+        </p>
+
+        <div className="my-8 rounded-2xl p-6 bg-zinc-900 border border-amber-500/30">
+          <h3 className="text-xl font-bold text-white mb-2">Acelerador de Prova Social 🚀</h3>
+          <p className="text-zinc-400 text-sm mb-4">
+            Se o seu perfil está travado abaixo dos 1.000 seguidores, você está perdendo 70% das conversões. 
+            Use nosso motor de crescimento seguro para destravar hoje.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a href="/comprar-seguidores-brasileiros" className="rounded-xl px-5 py-3 bg-amber-500 text-black font-black text-sm hover:scale-105 transition-transform">
+              Ver Seguidores Brasileiros
+            </a>
+            <a href="/seguidores-pix" className="rounded-xl px-5 py-3 bg-zinc-800 text-white font-bold text-sm hover:bg-zinc-700 transition-colors">
+              Pagar com Pix (R$ 5)
+            </a>
+          </div>
+        </div>
+
+        <p>
+          Entenda os detalhes em{" "}
           <a href="/comprar-seguidores-brasileiros">seguidores brasileiros reais</a>{" "}
-          ou entenda o pagamento em{" "}
+          ou o funcionamento do pagamento em{" "}
           <a href="/seguidores-pix">seguidores no Pix</a>.
         </p>
 
