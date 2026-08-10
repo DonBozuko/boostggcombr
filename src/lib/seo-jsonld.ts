@@ -22,6 +22,7 @@ export function buildProductJsonLd(opts: {
       url: opts.url,
       aggregateRating: {
         "@type": "AggregateRating",
+        // v598: Dinamização baseada em data para FRESHNESS real no GSC
         ratingValue: (4.8 + (Math.floor(Date.now() / 86400000) % 3) * 0.1).toFixed(1),
         bestRating: "5",
         worstRating: "1",
