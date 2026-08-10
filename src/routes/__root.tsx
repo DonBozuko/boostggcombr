@@ -190,7 +190,18 @@ function RootComponent() {
     import("@/lib/affiliate").then((m) => m.captureAffiliateRef()).catch(() => {});
   }, []);
 
-
+  // v600 — DOM Sanitizer: Remove spans invisíveis (U+2063) injetados por pixels de terceiros
+  useEffect(() => {
+    const sanitize = () => {
+      document.querySelectorAll("span").forEach((s) => {
+        if (s.textContent === "\u2063") s.remove();
+      });
+    };
+    sanitize();
+    const observer = new MutationObserver(sanitize);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     // Trava silenciadora de áudio concorrente: pausa Jarvis em qualquer troca de rota
