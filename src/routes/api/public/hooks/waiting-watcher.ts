@@ -19,10 +19,9 @@ export const Route = createFileRoute("/api/public/hooks/waiting-watcher")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = request.headers.get("x-admin-token") ?? "";
-        const secret = process.env.ADMIN_TOKEN;
-        const cronSecret = process.env.CRON_ADMIN_TOKEN;
-        if ((!secret && !cronSecret) || (token !== secret && token !== cronSecret)) return new Response("Unauthorized", { status: 401 });
+        const token = (request.headers.get("x-admin-token") ?? "").trim();
+        const guard = await (await import("@/lib/admin-guard.server")).assertAdmin(token, "route:waiting-watcher", { allowCron: true });
+        if (!guard.ok) return new Response("Unauthorized", { status: 401 });
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { dispatchWhatsappAlert } = await import("@/lib/whatsapp-alert.server");
@@ -46,7 +45,9 @@ export const Route = createFileRoute("/api/public/hooks/waiting-watcher")({
             continue;
           }
 
-          const tkn = signPedidoToken(p.id, (secret ?? cronSecret) as string);
+          const secretForSign = process.env.ADMIN_TOKEN || process.env.CRON_ADMIN_TOKEN;
+          if (!secretForSign) continue;
+          const tkn = signPedidoToken(p.id, secretForSign);
           const link = `${PUBLIC_BASE}/api/public/hooks/reprocess-one?id=${encodeURIComponent(p.id)}&t=${tkn}`;
           const idadeMin = Math.round((Date.now() - new Date(p.created_at).getTime()) / 60000);
           const urgent = idadeMin > 120 ? "🚨 URGENTE " : "⚠️ ";
