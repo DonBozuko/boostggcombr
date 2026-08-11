@@ -841,7 +841,8 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
 
         // v612 — Otimização Assíncrona: agendamos o processamento pesado e respondemos 200 OK.
         // O MP não ficará pendente aguardando logs deprovisionamento ou ledger.
-        scheduleWebhookBackground(job, context);
+        scheduleWebhookBackground(job(), context);
+
 
 
         // v522 — carimba resultado no evento (best-effort, nunca bloqueia a resposta ao MP)

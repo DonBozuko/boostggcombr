@@ -2,6 +2,9 @@ import { getAdminToken } from "@/lib/admin-token-store";
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { getJarvisTriage, type TriageDigest } from "@/lib/jarvis-triage.functions";
+import { resolveJarvisAlerts } from "@/lib/jarvis-resolve.functions";
+import { toast } from "sonner";
+
 
 /**
  * v223 — Semáforo Único do Admin
@@ -10,8 +13,11 @@ import { getJarvisTriage, type TriageDigest } from "@/lib/jarvis-triage.function
  */
 export function AdminHealthSemaphore() {
   const fetchTriage = useServerFn(getJarvisTriage);
+  const resolve = useServerFn(resolveJarvisAlerts);
   const [d, setD] = useState<TriageDigest | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fixing, setFixing] = useState(false);
+
 
   const load = useCallback(async () => {
     try {
@@ -29,7 +35,25 @@ export function AdminHealthSemaphore() {
     return () => clearInterval(id);
   }, [load]);
 
+  const handleFixAll = async () => {
+    const token = getAdminToken();
+    if (!token || !d) return;
+    setFixing(true);
+    try {
+      const ids = d.actions.map(a => a.id).filter(Boolean);
+      await resolve({ data: { token, ids } });
+      toast.success("Comando de auto-cura enviado!");
+      await load();
+    } catch (e) {
+      toast.error("Falha ao enviar comando de auto-cura.");
+      console.error(e);
+    } finally {
+      setFixing(false);
+    }
+  };
+
   const status = d?.status ?? "green";
+
   const palette = {
     green:  { ring: "ring-emerald-400/60", bg: "from-emerald-950/60 to-black/40", dot: "bg-emerald-400 shadow-[0_0_20px_rgba(52,211,153,0.9)]", text: "text-emerald-200" },
     yellow: { ring: "ring-amber-400/60",   bg: "from-amber-950/60 to-black/40",   dot: "bg-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.9)]",   text: "text-amber-200" },
@@ -68,6 +92,25 @@ export function AdminHealthSemaphore() {
               ))}
             </div>
           )}
+
+          {d && (d.counters.criticalAlerts > 0 || d.counters.stuckOrders > 0) && (
+            <div className="mt-4">
+              <button
+                onClick={handleFixAll}
+                disabled={fixing}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white text-xs font-black uppercase tracking-widest px-6 py-2.5 rounded-xl border border-white/20 transition-all active:scale-95"
+              >
+                {fixing ? (
+                  <span className="flex items-center gap-2">
+                    <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Consertando...
+                  </span>
+                ) : (
+                  <>🛠️ EXECUTAR AUTO-CURA (v612)</>
+                )}
+              </button>
+            </div>
+
 
           {d && (
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-white/50">
