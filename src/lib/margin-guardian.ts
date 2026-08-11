@@ -153,9 +153,9 @@ export function minNetRatio(costBrl: number): number {
 // lucrativo saía da vitrine sozinho). 1,5% de folga sobre um lucro de 4x não
 // cria prejuízo nenhum; o ciclo de preço seguinte reajusta o preço de verdade.
 // v598 — TOLERÂNCIA DE DRIFT (v596)
-// 1.5% de folga sobre um lucro de 4x não cria prejuízo nenhum e elimina a
-// auto-contradição da Bancada de Provas.
-const MARGIN_EPSILON = 0.985; // 1.5% de tolerância p/ drift de câmbio/ruído
+// 1.2% de folga sobre um lucro de 4x (v612: rigor aumentado de 1.5% -> 1.2%)
+const MARGIN_EPSILON = 0.988; 
+
 
 export function respectsMinMargin(priceBrl: number, costBrl: number): boolean {
   if (!(costBrl > 0)) return false;

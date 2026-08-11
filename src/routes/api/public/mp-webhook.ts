@@ -68,7 +68,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         // Extrai data.id (query tem prioridade — é o valor que o MP usa no manifesto)
         let sigDataId: string | null = null;
         try {
-          const u = new URL(request.url);
+          const u = new URL(requestUrl);
           sigDataId = u.searchParams.get("data.id") ?? u.searchParams.get("id");
         } catch { /* noop */ }
         if (!sigDataId && rawBody) {
@@ -82,15 +82,16 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
-        // v522 — Auditoria de canal: marca o evento como processado no fim do fluxo.
-        // Antes, webhook_events nascia com processed_ok=false e NUNCA era atualizado,
-        // então o monitor de canal morto não distinguia "recebido e ok" de "falhou".
+        // v612 — EXECUÇÃO EM BACKGROUND REAL.
+        // Respondemos 200 OK imediatamente para o MP e processamos o provisionamento/despacho
+        // de forma assíncrona. Isso elimina timeouts durante picos de venda.
         let auditPaymentId: string | null = null;
         let auditError: string | null = null;
 
-        const backgroundJob = Promise.resolve().then(async () => {
+        const job = (async () => {
           // Sempre 200 — MP reenvia se for !=2xx. Logamos erros e seguimos.
           try {
+
           const mpToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
           if (!mpToken) {
             console.error("[mp-webhook] MERCADO_PAGO_ACCESS_TOKEN ausente");
@@ -838,9 +839,11 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         }
         });
 
-        // v144 — Dispatch síncrono: aguarda backgroundJob completar antes de responder MP,
-        // garantindo que notifyAdminProvisioning entregue o Pix Copia e Cola ao WhatsApp.
-        try { await backgroundJob; } catch (err) { auditError = String((err as Error)?.message ?? err).slice(0, 500); console.error("[mp-webhook] v144 sync fail", err); }
+        // v612 — Otimização Assíncrona: agendamos o processamento pesado e respondemos 200 OK.
+        // O MP não ficará pendente aguardando logs deprovisionamento ou ledger.
+        scheduleWebhookBackground(job(), context);
+
+
 
         // v522 — carimba resultado no evento (best-effort, nunca bloqueia a resposta ao MP)
         if (auditPaymentId) {

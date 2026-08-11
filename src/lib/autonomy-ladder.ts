@@ -108,6 +108,16 @@ export const ACOES: AcaoAutonoma[] = [
 
   // ---------- Nível 3: só alerta (dinheiro saindo)
   {
+    id: "reprocesso_jarvis",
+    familia: "entrega",
+    nome: "Reprocessar pedidos travados detectados na triagem",
+    nivel: 1, // v612: Promovido a Nível 1 — Auto-reparo atômico
+    executor: "lib/jarvis-resolve.functions.ts",
+    flag: null,
+    teto: null,
+    rollback: "logs em admin_audit_logs",
+  },
+  {
     id: "estorno_automatico",
     familia: "caixa",
     nome: "Estornar pedido pago que não entregou",
@@ -127,6 +137,7 @@ export const ACOES: AcaoAutonoma[] = [
     teto: null,
     rollback: "botão manual no admin continua sendo o caminho",
   },
+
 ];
 
 /** Executores citados que não existem no disco = remédio fantasma. */
