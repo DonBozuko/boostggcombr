@@ -76,5 +76,10 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
       }
     }
 
-    return { ok: true, resolved: resolvedCount };
+    return { 
+      ok: true, 
+      resolved: resolvedCount,
+      auto_healer: autoHealerResult,
+      reconciler: reconcilerResult
+    };
   });
