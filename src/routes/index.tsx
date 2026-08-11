@@ -742,16 +742,49 @@ useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName
     setPendingOrder(null);
   };
 
+  // v616 — Clipboard resiliente: navegadores in-app (Instagram/TikTok/Facebook)
+  // bloqueiam navigator.clipboard. Sem fallback o cliente via o Pix e nao copiava
+  // (funil: 5 viram o Pix, 0 copiaram). Agora ha fallback por textarea.
   const copyPix = async () => {
     if (!pedidoInfo) return;
-    try {
-      await navigator.clipboard.writeText(pedidoInfo.pixCode);
+    const code = pedidoInfo.pixCode;
+    const done = () => {
       trackFunnel("pix_copiado", { plan_id: form.plan || null, categoria });
       toast.success("Código Pix copiado!");
+    };
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(code);
+        done();
+        return;
+      }
+      throw new Error("clipboard indisponivel");
     } catch {
-      toast.error("Não foi possível copiar. Copie manualmente.");
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = code;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.top = "0";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ta.setSelectionRange(0, code.length);
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        if (ok) {
+          done();
+          return;
+        }
+      } catch {
+        // segue para o aviso manual
+      }
+      trackFunnel("pix_falhou", { plan_id: form.plan || null, categoria, detail: "clipboard_bloqueado" });
+      toast.error("Seu navegador bloqueou a cópia. Toque e segure no código para copiar.");
     }
   };
+
 
   // v125 — Isolamento de tráfego: comprovantes vão para o Telegram público,
   // preservando a linha privada do Diretor no WhatsApp (alertas backend v121).

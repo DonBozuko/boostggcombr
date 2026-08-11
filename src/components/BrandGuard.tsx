@@ -8,7 +8,8 @@ const OFFICIAL_HOSTS = [
   "localhost",
   "127.0.0.1",
 ];
-const OFFICIAL_URL = "https://boostgg.com.br";
+// v616 — domínio canônico é o COM www (todos os canonical/sitemap usam www).
+const OFFICIAL_URL = "https://www.boostgg.com.br";
 
 export function BrandGuard() {
   useEffect(() => {
