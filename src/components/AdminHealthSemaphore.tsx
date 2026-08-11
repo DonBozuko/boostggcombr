@@ -112,7 +112,9 @@ export function AdminHealthSemaphore() {
             </div>
 
 
+          )}
           {d && (
+
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-white/50">
               <span>🔴 críticos: <b className="text-white/80">{d.counters.criticalAlerts}</b></span>
               <span>🟡 avisos: <b className="text-white/80">{d.counters.warningAlerts}</b></span>
