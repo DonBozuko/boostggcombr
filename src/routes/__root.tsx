@@ -194,7 +194,16 @@ function RootComponent() {
   useEffect(() => {
     const sanitize = () => {
       // Microtask priority: limpa o DOM antes da próxima pintura do navegador
-      const nodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
+      // v621 — NUNCA tocar em SCRIPT/STYLE/TEMPLATE: contêm o payload de hidratação (window.$_TSR).
+      const nodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const tag = (n.parentElement?.tagName || "").toUpperCase();
+          if (tag === "SCRIPT" || tag === "STYLE" || tag === "TEMPLATE" || tag === "NOSCRIPT") {
+            return NodeFilter.FILTER_REJECT;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
       let node;
       while (node = nodes.nextNode()) {
         const text = node.textContent || "";
