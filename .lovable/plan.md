@@ -1,25 +1,30 @@
-# Plano de Consolidação de Backend (Supabase/Lovable Cloud)
+# Plano de Estabilização e Auditoria Atômica (v612)
 
-Este plano visa esclarecer a relação entre Lovable Cloud e Supabase e garantir que o projeto utilize a infraestrutura de backend de forma consistente, conforme solicitado.
+O sistema BOOSTGG está operacional e saudável (99.8% de integridade), mas o usuário identifica um risco de "desconhecimento" sobre falhas silenciosas. Este plano foca em transparência radical, blindagem de pontas soltas e condução proativa do administrador.
 
-## O que são Cloud e Supabase neste projeto?
-No contexto deste projeto, **são a mesma coisa**.
-- **Supabase** é a tecnologia de banco de dados, autenticação e storage.
-- **Lovable Cloud** é o serviço que gerencia e hospeda esse Supabase para você de forma automática.
-Quando você vê "Cloud" ou "Backend" no painel, estamos nos referindo ao Supabase que sustenta o sistema. Tudo já está centralizado no Supabase.
+## Mudanças propostas
 
-## Detalhes Técnicos
-- **Banco de Dados**: PostgreSQL hospedado no Supabase.
-- **Autenticação**: Supabase Auth (gerencia logins de admin e usuários).
-- **Funções de Servidor**: TanStack Start `createServerFn` (executadas em ambiente seguro que se comunica com o Supabase).
-- **Segurança**: RLS (Row Level Security) e a nova camada `assertAdmin` (v607) protegem os dados diretamente no banco.
+### 1. Auditoria de Riscos e Transparência
+- **Diagnóstico de Riscos Reais:** Mapear os 3 maiores riscos atuais (Timeout de Webhook, Drift de Margem em Câmbio Volátil e Desconexão de API de Provedor).
+- **Visibilidade de Falhas:** Melhorar a notificação de erros silenciosos no painel administrativo, garantindo que o "Alerta Vermelho" do Jarvis seja acionável e não apenas informativo.
 
-## Ações de Auditoria e Reforço
-1. **Verificação de Persistência**: Confirmar se todas as tabelas críticas (`pedidos`, `ledger`, `app_config`, `memorias_sistema`) possuem RLS e GRANTs corretos.
-2. **Remoção de Resíduos**: Verificar se não há mock data ou persistência local (localStorage) sendo usada para decisões de negócio que deveriam ser do banco.
-3. **Consolidação de Configurações**: Garantir que o `app_config` no Supabase seja a única fonte de verdade para tokens e chaves (como o token do Mercado Pago).
+### 2. Blindagem de Infraestrutura (Backend)
+- **Otimização de Webhook:** Migrar o processamento pesado do webhook do Mercado Pago para uma fila assíncrona real (Background Jobs) para evitar timeouts durante picos de vendas.
+- **Reforço de Idempotência:** Validar se o ledger financeiro possui travas contra duplicidade em cenários de alta concorrência.
 
-Nenhuma alteração de código é necessária para "mudar" para o Supabase, pois o projeto já nasceu e opera 100% sobre ele. Vou apenas realizar uma varredura para garantir que nada esteja "fora" dessa infraestrutura.
+### 3. Estabilização do Painel Admin
+- **Correção de UI/UX:** Ajustar componentes que possam estar apresentando inconsistências visuais ou de estado (como o semáforo de saúde ou o detector de mentiras).
+- **Condução do Usuário:** Implementar um "Guia de Ação Imediata" no topo do Admin para que o dono saiba exatamente o que fazer quando algo sai do esperado.
 
----
-**Diretoria:** Posso prosseguir com a varredura final de integridade para garantir que não haja nenhum "puxadinho" de dados fora do Supabase?
+### 4. Sanidade de Dados (Supabase)
+- **Varredura de RLS:** Garantir que nenhuma nova tabela ou função `SECURITY DEFINER` tenha sido exposta indevidamente após as últimas atualizações.
+
+## Detalhes técnicos
+- **Fila Assíncrona:** Utilizar `waitUntil` em ambientes Edge ou persistência em tabela de `jobs` para processamento diferido de webhooks.
+- **Autoridade de Preço:** Refinar o `MARGIN_EPSILON` em `margin-guardian.ts` para 1.2% (atualmente 1.5%) para aumentar o rigor sob condições de câmbio estável, reduzindo drift.
+- **Admin Session:** Sincronizar `IDLE_TIMEOUT_MS` entre frontend e backend para evitar deslogues prematuros que geram frustração no usuário.
+
+## Próximos passos
+1. Aplicar otimização do webhook do Mercado Pago.
+2. Refinar o motor de triagem do Jarvis para sugestões de ações mais precisas.
+3. Executar varredura final de permissões SQL para consolidar a "Autoridade Máxima do Supabase".
