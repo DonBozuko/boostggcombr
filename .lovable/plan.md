@@ -1,35 +1,35 @@
-# Plano v617: Blindagem Antidote Pro (Execução Forense)
+# Plano de Investigação Forense: Isolamento Causal do U+2063
 
-Este plano ataca a causa raiz do caractere invisível `U+2063` (Invisible Separator) que persiste no DOM, possivelmente injetado por scripts externos ou cache, causando erros de layout ou alertas no sistema.
+O objetivo é identificar qual script externo é o responsável pela injeção do caractere invisível `U+2063` (Invisible Separator) através de testes de isolamento controlado.
 
-## Relatório Investigativo (Adicional)
+## Scripts Alvos
+1. **TikTok Pixel** (ID: `D97FQ2RC77U5KEVKK73G`)
+2. **Google Tag Manager** (ID: `GTM-MSX3W7PZ`)
+3. **Google Analytics / GA4** (ID: `G-9RBZGZTTMC`)
+4. **JivoChat** (Script injetado via `window.jivo_id`)
 
-### 1. FATO COMPROVADO
-- **Inexistência no Fonte:** Não existem bytes literais `U+2063` nos arquivos de código do projeto (`src/`), exceto no sanitizador.
-- **Inexistência em Dados Estáticos:** As listas de nomes, cidades e produtos em `SocialProofPopup.tsx` são strings limpas.
-- **Vetor de Scripts:** O projeto carrega scripts externos agressivos (GTM, GA4, TikTok Pixel) que manipulam o DOM.
+## Metodologia de Teste (Sandbox)
+Para cada script, utilizaremos um script de automação (Playwright) que:
+- Carrega a página com **interceptação de rede** para bloquear/permitir scripts específicos.
+- Monitora o DOM em tempo real usando `MutationObserver` injetado via `evaluateHandle`.
+- Captura o exato momento em que um nó contendo `\u2063` é inserido.
+- Registra o `stack trace` do script que realizou a operação `appendChild` ou `innerHTML`.
 
-### 2. HIPÓTESE
-- **Injeção de Terceiros (Vetor E):** Scripts externos utilizam caracteres invisíveis para marcação técnica ou beacons.
-- **Latência do Sanitizador:** O `requestIdleCallback` atual permite que o caractere permaneça visível por alguns milissegundos antes da limpeza.
+## Etapas da Investigação
+1. **Baseline:** Carregar o site bloqueando TODOS os scripts externos. Verificar se o caractere aparece (deve ser negativo).
+2. **Isolamento TikTok:** Carregar APENAS o script do TikTok. Observar o DOM.
+3. **Isolamento GTM:** Carregar APENAS o Google Tag Manager. Observar o DOM.
+4. **Isolamento GA4:** Carregar APENAS o Google Analytics. Observar o DOM.
+5. **Isolamento JivoChat:** Carregar APENAS o script do Jivo. Observar o DOM.
+6. **Cruzamento:** Se nenhum isolado disparar, testar combinações (ex: GTM + TikTok).
 
-### 3. CAUSA RAIZ CONFIRMADA
-**CAUSA RAIZ AINDA NÃO CONFIRMADA** (Vetor E é o suspeito principal, mas depende de execução de scripts de terceiros em tempo real).
+## Relatório Final de Causalidade
+O resultado será apresentado no formato solicitado:
+- **Conclusão:** 🟢 CONFIRMADA, 🟡 PROVÁVEL ou 🔴 NÃO IDENTIFICADA.
+- **Análise Técnica:** Por que o script insere o caractere e se ele é crítico para o tracking.
+- **Impacto da Remoção:** Se a remoção quebra a funcionalidade do script.
+- **Recomendação de Correção:** Solução técnica definitiva baseada na causa.
 
 ---
 
-## Ações de Execução
-
-### 1. Reforço da Blindagem DOM (Antidote Pro)
-- Modificar `src/routes/__root.tsx` para usar um `MutationObserver` mais agressivo que remove o caractere no momento da inserção (`sync`), em vez de esperar pelo `idle`.
-- Adicionar remoção específica para spans que contenham apenas o caractere invisível.
-
-### 2. Blindagem de Estilo (CSS Layer)
-- Implementar regra no `src/styles.css` para esconder qualquer elemento que contenha apenas o caractere `\u2063`.
-
-### 3. Saneamento de Componentes Críticos
-- Revisar `src/components/SocialProofPopup.tsx` para garantir a higienização de strings dinâmicas.
-
-## Como Validar
-- Executar `npm run build` para garantir a integridade do bundle.
-- Verificar via console do navegador se o caractere `\u2063` ainda é detectável após a carga de scripts externos.
+**IMPORTANTE:** Nenhuma alteração será feita nos arquivos `src/` ou `public/` durante este processo. Tudo ocorrerá em scripts temporários na pasta `/tmp/browser/`.
