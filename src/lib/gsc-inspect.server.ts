@@ -1,5 +1,5 @@
 // v399 — inspeção de URL no Google Search Console (chama API externa → server-only).
-export const GSC_SITE = "https://boostgg.com.br/";
+export const GSC_SITE = "sc-domain:boostgg.com.br";
 export const GSC_ROUTES = ["/", "/tiktok", "/youtube", "/facebook", "/telegram", "/trafego"];
 
 export type InspectRow = {
@@ -17,7 +17,7 @@ export type InspectRow = {
 };
 
 export async function inspectOne(path: string): Promise<InspectRow> {
-  const url = `https://boostgg.com.br${path}`;
+  const url = `https://www.boostgg.com.br${path}`;
   try {
     const res = await fetch(
       "https://connector-gateway.lovable.dev/google_search_console/v1/urlInspection/index:inspect",

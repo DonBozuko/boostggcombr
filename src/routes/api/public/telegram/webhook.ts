@@ -4,13 +4,13 @@ import { createHash, timingSafeEqual } from 'crypto';
 const GATEWAY_URL = 'https://connector-gateway.lovable.dev/telegram';
 
 const ROUTES: Record<string, { label: string; url: string }> = {
-  ig: { label: '📸 Instagram', url: 'https://boostgg.com.br/' },
-  tk: { label: '🎵 TikTok', url: 'https://boostgg.com.br/tiktok' },
-  yt: { label: '▶️ YouTube', url: 'https://boostgg.com.br/youtube' },
-  fb: { label: '🔵 Facebook', url: 'https://boostgg.com.br/facebook' },
-  tg: { label: '✈️ Telegram', url: 'https://boostgg.com.br/telegram' },
-  tf: { label: '🌐 Tráfego', url: 'https://boostgg.com.br/trafego' },
-  kw: { label: '🧡 Kwai', url: 'https://boostgg.com.br/kwai' },
+  ig: { label: '📸 Instagram', url: 'https://www.boostgg.com.br/' },
+  tk: { label: '🎵 TikTok', url: 'https://www.boostgg.com.br/tiktok' },
+  yt: { label: '▶️ YouTube', url: 'https://www.boostgg.com.br/youtube' },
+  fb: { label: '🔵 Facebook', url: 'https://www.boostgg.com.br/facebook' },
+  tg: { label: '✈️ Telegram', url: 'https://www.boostgg.com.br/telegram' },
+  tf: { label: '🌐 Tráfego', url: 'https://www.boostgg.com.br/trafego' },
+  kw: { label: '🧡 Kwai', url: 'https://www.boostgg.com.br/kwai' },
 };
 
 function deriveSecret(key: string) {

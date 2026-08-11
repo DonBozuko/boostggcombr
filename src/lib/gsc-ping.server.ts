@@ -3,7 +3,7 @@
  * Notifica o Google sobre atualizações no sitemap para acelerar indexação.
  */
 export async function pingGoogleSitemap() {
-  const sitemapUrl = "https://boostgg.com.br/sitemap.xml";
+  const sitemapUrl = "https://www.boostgg.com.br/sitemap.xml";
   try {
     const res = await fetch(`https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
