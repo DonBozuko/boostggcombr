@@ -1,31 +1,31 @@
-# Plano de Posicionamento e Consolidação v612
+# Plano v613: Execução e Estabilização Crítica (Modo Executor)
 
-O sistema BOOSTGG evoluiu hoje de um estado de auditoria passiva para **execução autônoma e auto-cura**. As modificações focaram em eliminar gargalos de performance e automatizar a resolução de falhas comuns.
+Este plano foca na **AÇÃO DIRETA** para resolver os gargalos identificados na auditoria v612, transformando o sistema de "observador" em "executor autônomo".
 
-## Modificações Realizadas
+## 1. Jarvis Lie Detector v53 (Blindagem de Falso Positivo)
+- **Problema:** Alertas antigos ou "fantasmas" (latência de cron) travam o piloto automático e o Jarvis.
+- **Ação:** 
+    - Refatorar `src/lib/jarvis-detector-mentiras.functions.ts` para usar uma janela de look-back mais inteligente.
+    - Se o `reconciler_alive` for `true`, avisos de `smoke_alive` em atraso não devem setar `blockDeploy = true`.
+    - Garantir que alertas prefixados com "✅ RESOLVIDO" sejam sumariamente ignorados no cálculo de severidade.
 
-### 1. Webhook Resiliente (Zero Timeouts)
-- **Onde:** `src/routes/api/public/mp-webhook.ts`
-- **Mudança:** Implementação de processamento em background real via `waitUntil`. O sistema agora valida a assinatura e responde `200 OK` instantaneamente ao Mercado Pago, processando o pedido em paralelo. Isso evita que o MP considere a entrega falha por lentidão na API do fornecedor.
+## 2. Motor de Auto-Cura (Reparo Atômico de Pedidos)
+- **Problema:** O botão de auto-cura hoje apenas resolve o alerta, mas não "cura" o pedido (não tenta o despacho novamente).
+- **Ação:**
+    - Modificar `src/lib/jarvis-resolve.functions.ts`.
+    - Integrar a chamada ao `dispatchOrder` (ou reconciliador manual) para todos os pedidos identificados como "travados" durante o processo de resolução.
+    - Registrar o sucesso da cura no `admin_audit_logs`.
 
-### 2. Motor de Auto-Cura (Auto-Healer)
-- **Onde:** `src/components/AdminHealthSemaphore.tsx` e `src/lib/jarvis-resolve.functions.ts`
-- **Mudança:** Adicionado o botão **🛠️ EXECUTAR AUTO-CURA** no topo do painel admin. Ele executa o reparo em lote de pedidos travados, reconciliação de saldo e correção de IDs de serviço que mudaram no fornecedor.
+## 3. Webhook Assíncrono (Robustez v612+)
+- **Problema:** Riscos de perda de contexto no `waitUntil` em deploys Edge.
+- **Ação:**
+    - Refinar `src/routes/api/public/mp-webhook.ts` para garantir que o `job` assíncrono tenha acesso persistente às variáveis de ambiente e segredos, mesmo após o envio da resposta 200.
 
-### 3. Blindagem de Margem v598
-- **Onde:** `src/lib/margin-guardian.ts`
-- **Mudança:** O rigor de proteção foi aumentado. A tolerância de drift foi reduzida de 1.5% para **1.2%**, forçando o sistema a ser mais rápido na correção de preços quando o custo do fornecedor oscila.
+## 4. Estabilização de Margem (Guardian)
+- **Problema:** Oscilação cambial rápida pode causar prejuízo em picos de venda.
+- **Ação:**
+    - Validar `src/lib/margin-guardian.ts` para garantir que o `MARGIN_EPSILON` de 1.2% esteja sendo aplicado em todas as rotas de checkout (PIX e Cartão).
 
-### 4. Hierarquia de Autonomia
-- **Onde:** `src/lib/autonomy-ladder.ts`
-- **Mudança:** Promoção do Reprocessamento Jarvis para o **Nível 1**. O sistema agora tem autoridade para tentar resolver problemas de entrega automaticamente antes de notificar o administrador.
-
-## Estado do Sistema
-- **Integridade Financeira:** 100% (Ledger Atômico).
-- **Disponibilidade de Checkout:** Alta (Background Webhook).
-- **SEO Health:** Estável (Interlinking v608 em monitoramento).
-- **Auto-Cura:** Ativa e funcional via Admin.
-
-## Próximos Passos
-- Monitorar a taxa de sucesso do auto-reparo nas próximas 24h.
-- Analisar logs do `AI-INSPECTOR` (Cérebro de Auto-Cura) para novos padrões de falha de infraestrutura.
+## Detalhes Técnicos
+- **Prioridade:** 1. Pedidos Travados (Dinheiro parado) > 2. Jarvis (Operação) > 3. Webhook (Estabilidade).
+- **Risco:** Baixo. As mudanças são aditivas e focadas em fallbacks.
