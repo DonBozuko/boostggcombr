@@ -1,55 +1,31 @@
----
-name: Auditoria Real do Sistema v614
-description: Relatório técnico profundo da estrutura atual frontend, backend e banco de dados sem alterações.
-type: reference
----
+# Plano v617: Blindagem Antidote Pro (Execução Forense)
 
-# MAPA REAL DO SISTEMA ATUAL — BOOSTGG (v614)
+Este plano ataca a causa raiz do caractere invisível `U+2063` (Invisible Separator) que persiste no DOM, possivelmente injetado por scripts externos ou cache, causando erros de layout ou alertas no sistema.
 
-Este relatório reflete o estado técnico exato do projeto em 11 de Agosto de 2026, obtido via inspeção forense de arquivos, esquemas de banco de dados e runtime.
+## Diagnóstico Técnico
+- **Sintoma:** Caractere `\u2063` (⁣) detectado como primeiro elemento do `body` ou em spans dinâmicos.
+- **Causa Raiz:** Injeção via scripts de terceiros (TikTok/Google Analytics) ou persistência em strings de tradução/template injetadas em tempo de execução que burlam o sanitizador passivo atual.
+- **Evidência:** O sanitizador em `src/routes/__root.tsx` usa `requestIdleCallback`, o que pode deixar uma janela de milissegundos onde o caractere é visível e indexado pelo agente.
 
-## 1. Estrutura de Software
-- **Frontend:** TanStack Start v1 (React 19 + Vite 7). Arquitetura baseada em rotas (`src/routes`) com SSR/SSG.
-- **Backend:** TanStack Server Functions (`src/lib/*.functions.ts`) rodando em Edge Runtime. Não utiliza Supabase Edge Functions externas, mas sim RPCs internas.
-- **Banco de Dados:** PostgreSQL (Supabase/Lovable Cloud) com RLS (Row Level Security) ativo em tabelas críticas.
-- **Autenticação:** Supabase Auth (JWT via Bearer Token) integrado via middleware do TanStack (`requireSupabaseAuth`).
+## Ações de Execução
 
-## 2. Mapa de Dados (Supabase)
-Tabelas identificadas e ativas:
-- **`pedidos`**: Coração da operação (ID MP, Status, Valor, Fornecedor).
-- **`pricing_items`**: Autoridade de Vitrine (Preços, IDs de serviço, Categoria).
-- **`financial_ledger` / `admin_treasury`**: Fonte de verdade financeira (Lucro, Custo, Taxas).
-- **`jarvis_alerts`**: Log de integridade e alarmes do sistema.
-- **`admin_audit_logs`**: Rastro de ações administrativas e disparos de cron.
-- **`afiliados` / `afiliado_comissoes`**: Sistema de parceiros e saldo.
-- **`app_config`**: Persistência de tokens (ex: Mercado Pago) e flags globais.
-- **`user_roles`**: Controle de permissões (Admin/User).
+### 1. Reforço da Blindagem DOM (Antidote Pro)
+- Modificar `src/routes/__root.tsx` para usar um `MutationObserver` mais agressivo que remove o caractere no momento da inserção (`sync`), em vez de esperar pelo `idle`.
+- Adicionar remoção específica para spans que contenham apenas o caractere invisível, tratando-os como "nós de injeção externa".
 
-## 3. Matriz de Funcionalidades
+### 2. Blindagem de Estilo (CSS Layer)
+- Implementar regra no `src/styles.css` para esconder qualquer elemento que contenha apenas o caractere `\u2063` via seletor de atributo ou pseudo-classe, caso a remoção JS falhe momentaneamente.
 
-| FUNCIONALIDADE | FRONTEND | BACKEND | BANCO | STATUS |
-| :--- | :--- | :--- | :--- | :--- |
-| **Checkout (Pix/MP)** | Real | Real | Real | Funcionando |
-| **Despacho Automático** | Parcial (Logs) | Real | Real | Funcionando (v613) |
-| **Painel Jarvis (NOC)** | Real | Real | Real | Funcionando |
-| **Autoridade de Preço** | Real | Real | Real | Funcionando (Drift 1.2%) |
-| **Auto-Cura (Reparo)** | Real | Real | Real | Funcionando (v613) |
-| **Sistema de Afiliados** | Real | Real | Real | Funcionando |
-| **Webhooks (MP)** | inexistente | Real | Real | Funcionando (v613) |
-| **SEO Dinâmico** | Real | Real | Parcial | Funcionando |
-| **Contador Inscritos** | Real | Real | Parcial | Funcionando |
+### 3. Saneamento de Componentes Críticos
+- Revisar `src/components/SocialProofPopup.tsx` para garantir que as strings dinâmicas (`item.person.name`, `item.city`) passem por uma higienização antes de serem renderizadas.
 
-## 4. Auditoria de Saúde Técnico-Operacional
-- **Erros Atuais:** Nenhum erro de sintaxe ou build detectado. O sistema está estável.
-- **Funções Incompletas:** Algumas rotas de "Revenda" possuem UI avançada mas dependem de saldo manual (Nível 3 de autonomia).
-- **Dados:** Operação 100% real. Mock apenas em modos de `sandbox` explicitamente ativados por flag no `admin_settings`.
-- **APIs Configuradas:** Mercado Pago (Pagamentos), SMMHype, SMMPanel, VerifiedSMM (Fornecedores), Telegram (Alertas), TikTok/Google (Pixels/Ads).
+## Relatório Forense Final
+- **🔴 SINTOMA:** Caractere `U+2063` (Invisible Separator) persistente.
+- **🧬 CAUSA RAIZ:** Janela de latência no sanitizador `requestIdleCallback` e injeção externa síncrona.
+- **🔎 EVIDÊNCIA:** Localizado no log de inspeção do agente e no regex de `src/routes/__root.tsx`.
+- **⚠️ IMPACTO:** Ruído visual, falhas em testes automatizados e possível degradação de SEO (caracteres estranhos no snippet).
+- **🛠️ CORREÇÃO:** Sanitização síncrona + Blindagem CSS + Higienização de Props.
 
-## 5. Riscos e Observações
-- **Drift de Margem:** Controlado por `MARGIN_EPSILON = 0.988` (1.2% de folga).
-- **Latência de Cron:** O sistema ignora falhas de smoke test se o reconciliador estiver vivo (Prevenção de Falso Positivo v613).
-- **Persistência:** O token do Mercado Pago é persistido em `app_config`, eliminando dependência de env vars dinâmicas para renovação.
-
----
-**NÃO FORAM ENCONTRADAS FALHAS CRÍTICAS DURANTE ESTA INSPEÇÃO.**
-**ESTADO: READY FOR OPERATION.**
+## Como Validar
+- Executar `npm run build` para garantir que o sanitizador não quebra o bundle.
+- Verificar via console do navegador se o caractere `\u2063` ainda é detectável após a carga de scripts externos.
