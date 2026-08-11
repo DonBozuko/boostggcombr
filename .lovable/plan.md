@@ -1,31 +1,30 @@
-# Plano de Contenção v617 — Opção B (Proteção Mínima e Segura)
+# Diagnóstico de Erro de Build (v618)
 
-Este plano detalha a implementação da estratégia de contenção preventiva do caractere invisível `U+2063`, cuja origem permanece **NÃO IDENTIFICADA**. A implementação foca em sanitização localizada e atômica, preservando a estabilidade da v615 e evitando mecanismos globais agressivos.
+## 🔴 ERRO REAL
+Falha no teste de integridade da memória do projeto (`src/__tests__/memory-index-integrity.test.ts`).
+O build foi interrompido porque o arquivo `.lovable/memory/tracking-ads.md` existe no sistema de arquivos, mas não está referenciado no índice `.lovable/memory/index.md`.
 
-## 1. Escopo de Implementação
+## 📍 ARQUIVO/LINHA
+- **Teste:** `src/__tests__/memory-index-integrity.test.ts` na linha 39.
+- **Arquivo Órfão:** `.lovable/memory/tracking-ads.md`.
+- **Índice Incompleto:** `.lovable/memory/index.md`.
 
-### A) Criação de Utilitário de Sanitização
-- **Local:** `src/lib/dom-sanitizer.ts`
-- **Ação:** Criar uma função pura `sanitizeText(str: string)` que remove `\u2063`, `\u200B` e `\uFEFF` de forma segura, sem afetar caracteres alfanuméricos ou pontuação legítima.
+## 🧬 CAUSA RAIZ
+A introdução ou permanência do arquivo `tracking-ads.md` na raiz da pasta de memória sem a devida citação no `index.md` viola a invariante de integridade v394. Esta trava existe para garantir que toda documentação de regra/feature seja visível e auditável.
 
-### B) Sanitização no `SocialProofPopup.tsx`
-- **Local:** `src/components/SocialProofPopup.tsx`
-- **Ação:** Sanitizar os campos `item.person.name`, `item.city` e `item.product` antes de serem exibidos nos parágrafos.
+## 🔎 EVIDÊNCIA
+A execução do comando `ls` confirmou a existência do arquivo físico, enquanto o `grep` confirmou a ausência do link `mem://tracking-ads` no índice. O teste `memory-index-integrity.test.ts` falha exatamente quando a lista de arquivos físicos é maior que a lista de links no índice.
 
-### C) Sanitização no `JarvisDetectorMentiras.tsx`
-- **Local:** `src/components/JarvisDetectorMentiras.tsx`
-- **Ação:** Sanitizar a string injetada via `dangerouslySetInnerHTML` na lista de auditoria, garantindo que o detalhe do relatório não contenha o caractere.
+## 📊 IMPACTO
+**BLOQUEIO DE DEPLOY.** O sistema está operando em modo de segurança, impedindo qualquer build de produção até que a documentação esteja sincronizada.
 
-## 2. Preservação e Segurança
-- **Baseline v615:** Nenhuma alteração em lógica de despacho, pagamentos ou RLS.
-- **Sanitizador Global:** O código em `__root.tsx` baseado em `requestIdleCallback` será mantido intacto como segunda camada de defesa.
-- **Sem MutationObserver:** Não será implementado o observer síncrono.
-- **Sem CSS global:** Não haverá alteração em `styles.css`.
+## 🟢 CLASSIFICAÇÃO DE RISCO
+**BAIXO.** A correção é puramente documental. Envolve adicionar uma linha ao `index.md` apontando para o arquivo órfão ou remover o arquivo se ele for lixo/temporário.
 
-## 3. Validação Final
-- Execução de `npm run test` para garantir integridade.
-- Execução de `npm run build` para validar o pacote de produção.
-- Inspeção visual via console para confirmar a ausência do caractere nos pontos tratados.
+## 🛠️ CORREÇÃO PROPOSTA
+1. Adicionar o link `- [Tracking Ads](mem://tracking-ads)` na seção `## Memories` do arquivo `.lovable/memory/index.md`.
+2. Executar `npx vitest src/__tests__/memory-index-integrity.test.ts` para confirmar a resolução.
+3. Prosseguir com o build normal.
 
 ---
-*Nenhuma alteração foi realizada. Aguardando aprovação final para execução.*
+*Aguardando aprovação para sincronizar a memória e liberar o build.*
