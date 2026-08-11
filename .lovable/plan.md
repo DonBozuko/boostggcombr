@@ -38,9 +38,9 @@ dateModified: (typeof post.dateModified === 'function' ? post.dateModified() : p
 Uso de função dinâmica `() => new Date()` no campo `dateModified` do objeto de metadados dos posts.
 
 ### Plano de Ação
-1.  **Refatoração do Type:** Alterar o tipo `dateModified` para aceitar apenas `string` opcional, removendo o suporte a funções dinâmicas.
-2.  **Fixação de Datas:** Substituir as funções dinâmicas nos `POSTS` por strings estáticas representando a última data de alteração real (ex: a data em que a v619 foi aplicada).
-3.  **Simplificação do JSON-LD:** Remover a lógica de execução de função no componente de SEO, usando o valor direto.
+1.  **Refatoração do Type:** Alterar o tipo `dateModified` em `src/routes/blog.$slug.tsx` para aceitar apenas `string` opcional, removendo o suporte a funções dinâmicas.
+2.  **Fixação de Datas:** Substituir todas as funções dinâmicas `() => ...` nos `POSTS` por strings estáticas representando a data da última alteração real (ex: `2026-08-11`, data da v619/v620).
+3.  **Simplificação do JSON-LD:** Remover a lógica de execução de função (`typeof post.dateModified === 'function'`) no bloco `head` da rota, simplificando para `post.dateModified ?? post.datePublished`.
 
 ### Benefícios
 -   Elimina o risco de penalização por manipulação de frescor.
