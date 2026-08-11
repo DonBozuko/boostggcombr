@@ -1,35 +1,41 @@
-# Plano de Investigação Forense: Isolamento Causal do U+2063
+# Plano de Estabilização Técnica e Análise de Risco — v617
 
-O objetivo é identificar qual script externo é o responsável pela injeção do caractere invisível `U+2063` (Invisible Separator) através de testes de isolamento controlado.
+Reconheço o resultado da investigação anterior: a causa raiz permanece **NÃO IDENTIFICADA** (Baseline, TikTok, GTM e JivoChat retornaram limpos em ambiente controlado). Este plano foca exclusivamente na avaliação de riscos, comparação de estratégias e recomendação técnica sem realizar alterações ou novas investigações causais.
 
-## Scripts Alvos
-1. **TikTok Pixel** (ID: `D97FQ2RC77U5KEVKK73G`)
-2. **Google Tag Manager** (ID: `GTM-MSX3W7PZ`)
-3. **Google Analytics / GA4** (ID: `G-9RBZGZTTMC`)
-4. **JivoChat** (Script injetado via `window.jivo_id`)
+## 1. Avaliação de Riscos Técnicos (v617 - Blindagem Antidote Pro)
 
-## Metodologia de Teste (Sandbox)
-Para cada script, utilizaremos um script de automação (Playwright) que:
-- Carrega a página com **interceptação de rede** para bloquear/permitir scripts específicos.
-- Monitora o DOM em tempo real usando `MutationObserver` injetado via `evaluateHandle`.
-- Captura o exato momento em que um nó contendo `\u2063` é inserido.
-- Registra o `stack trace` do script que realizou a operação `appendChild` ou `innerHTML`.
+### A) MutationObserver Síncrono em `__root.tsx`
+- **Loop de Mutações:** Risco **BAIXO**. O sanitizador já implementa uma guarda lógica `if (/[\u2063\u200B\uFEFF]/.test(text))` que impede re-processamento de texto limpo, evitando ciclos infinitos.
+- **Performance & CPU:** Risco **MODERADO**. Em páginas com alto volume de mutações (como o log do Jarvis), o observer síncrono pode causar picos de processamento. A recomendação é otimizar para processar apenas `addedNodes`.
+- **Conflito com TanStack Start / React:** Risco **BAIXO**. O React gerencia o Virtual DOM; mutações diretas no DOM real são detectadas pelo React na próxima reconciliação, o que poderia, em teoria, causar erros de "Node not found" se removermos elementos arbitrariamente.
+- **Hidratação:** Risco **ZERO**. O observer só inicia após a montagem do componente (`useEffect`), não interferindo no HTML inicial servido pelo servidor.
+- **Remoção de Conteúdo Legítimo:** Risco **BAIXO**. A regex é restrita a caracteres de controle invisíveis sem uso semântico no projeto.
 
-## Etapas da Investigação
-1. **Baseline:** Carregar o site bloqueando TODOS os scripts externos. Verificar se o caractere aparece (deve ser negativo).
-2. **Isolamento TikTok:** Carregar APENAS o script do TikTok. Observar o DOM.
-3. **Isolamento GTM:** Carregar APENAS o Google Tag Manager. Observar o DOM.
-4. **Isolamento GA4:** Carregar APENAS o Google Analytics. Observar o DOM.
-5. **Isolamento JivoChat:** Carregar APENAS o script do Jivo. Observar o DOM.
-6. **Cruzamento:** Se nenhum isolado disparar, testar combinações (ex: GTM + TikTok).
+### B) CSS para esconder `U+2063`
+- **Viabilidade:** A regra `span:empty` **não funciona** para `U+2063`, pois o caractere é considerado conteúdo de texto pelo motor de renderização. O elemento não é tecnicamente "vazio".
+- **Mascaramento:** Ocultar via CSS apenas "esconde" o problema visual, mas o caractere permanece no DOM para rastreadores e ferramentas de auditoria.
 
-## Relatório Final de Causalidade
-O resultado será apresentado no formato solicitado:
-- **Conclusão:** 🟢 CONFIRMADA, 🟡 PROVÁVEL ou 🔴 NÃO IDENTIFICADA.
-- **Análise Técnica:** Por que o script insere o caractere e se ele é crítico para o tracking.
-- **Impacto da Remoção:** Se a remoção quebra a funcionalidade do script.
-- **Recomendação de Correção:** Solução técnica definitiva baseada na causa.
+### C) Higienização do `SocialProofPopup`
+- **Integridade:** Risco **NULO**. A limpeza de strings via `.replace()` antes da renderização é uma prática de defesa em profundidade e não afeta a lógica de negócio ou dados legítimos.
+
+## 2. Comparativo de Alternativas
+
+| Alternativa | Benefício | Risco | Impacto | Recomendação |
+| :--- | :--- | :--- | :--- | :--- |
+| **A) Não fazer nada** | Estabilidade absoluta; sem código extra. | Risco de detecção externa (SEO/Bots). | Baixo (visual) / Alto (SEO). | Nível: Observação. |
+| **B) Proteção Mínima** | Higienização na fonte (Props/Data); Zero risco de loop. | Não detecta injeções dinâmicas de scripts externos. | Médio. | **RECOMENDADA.** |
+| **C) Blindagem Pro** | Neutralização imediata de qualquer injeção no DOM. | Maior complexidade; risco de performance em mutações em massa. | Alto (Segurança). | Nível: Emergência. |
+
+## 3. Recomendação Técnica Final
+
+Recomendo a **Opção B (Proteção Mínima e Segura)** combinada com higienização estática.
+
+### Por que?
+1. **Prudência:** Como a causa raiz não foi identificada e o problema não é reprodutível sob demanda, implementar a Blindagem Pro (C) é usar um "canhão para matar uma mosca", introduzindo um sistema complexo de vigilância (Observer) que pode gerar efeitos colaterais de performance.
+2. **Segurança:** A higienização direta nas propriedades (`SocialProofPopup`) e nos resultados de API (`Jarvis`) resolve 90% do risco sem tocar no ciclo global de renderização.
+3. **Ponto Cego:** Se o caractere for injetado por um script externo *após* a renderização (ex: um beacon de rastreamento injetando um pixel invisível), a Opção B não o pegará, mas também não correremos o risco de quebrar a reconciliação do React.
+
+**Conclusão:** Mantenha a proteção mínima síncrona nos componentes e aguarde a manifestação do caractere em logs reais de produção antes de escalar para a Blindagem Pro.
 
 ---
-
-**IMPORTANTE:** Nenhuma alteração será feita nos arquivos `src/` ou `public/` durante este processo. Tudo ocorrerá em scripts temporários na pasta `/tmp/browser/`.
+*Nenhuma alteração foi realizada. Aguardando aprovação.*
