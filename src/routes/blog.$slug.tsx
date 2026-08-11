@@ -204,6 +204,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "O que diferencia um serviço sério de um serviço que arrisca sua conta.",
     datePublished: "2026-01-20",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -255,6 +256,7 @@ const POSTS: Record<string, Post> = {
       "Como escolher onde comprar seguidores sem perder dinheiro: 5 critérios objetivos para avaliar qualquer serviço antes de pagar.",
     subtitle: "Cinco critérios objetivos que separam serviço sério de furada.",
     datePublished: "2026-01-25",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -312,6 +314,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "Por que o Pix virou o método padrão para comprar seguidores reais.",
     datePublished: "2026-02-01",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -360,6 +363,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "Retenção real, reposição e os sinais que revelam se você comprou seguidores de verdade ou bots.",
     datePublished: "2026-07-20",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -430,6 +434,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "Redes sociais, não games: o que a BoostGG realmente entrega.",
     datePublished: "2026-07-21",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -486,6 +491,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "Barato demais quase sempre custa caro depois. Entenda a diferença.",
     datePublished: "2026-02-05",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -534,6 +540,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "Passo a passo atualizado para deixar seu perfil público — e por que isso é obrigatório antes de qualquer campanha de crescimento.",
     datePublished: "2026-03-01",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>
@@ -637,6 +644,7 @@ const POSTS: Record<string, Post> = {
     description: "Entenda como a Meta identifica automação e o que diferencia serviços seguros de bots descartáveis.",
     subtitle: "A ciência por trás dos filtros do Instagram.",
     datePublished: "2026-08-04",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>A Meta (dona do Instagram) investe bilhões em IA para detectar padrões não humanos. Mas como isso funciona na prática e por que alguns perfis crescem com ajuda e outros são punidos?</p>
@@ -652,6 +660,7 @@ const POSTS: Record<string, Post> = {
     description: "Análise técnica sobre o bloqueio de alcance no Instagram e se a compra de seguidores é a causa real.",
     subtitle: "O que realmente trava o seu alcance.",
     datePublished: "2026-08-04",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>O termo 'Shadowban' assombra criadores de conteúdo. Mas será que comprar seguidores causa isso? A resposta é: <strong>não diretamente</strong>.</p>
@@ -667,6 +676,7 @@ const POSTS: Record<string, Post> = {
     description: "Aprenda a estruturar sua biografia do Instagram para transformar seguidores em clientes reais.",
     subtitle: "Sua bio é seu cartão de visitas e sua página de vendas.",
     datePublished: "2026-08-04",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>Não adianta ter 10 mil seguidores se ninguém clica no seu link. A biografia é o que decide se o visitante fica ou vai embora.</p>
@@ -685,6 +695,7 @@ const POSTS: Record<string, Post> = {
     description: "Comparativo entre as duas maiores redes sociais de 2026 para quem quer começar um negócio digital.",
     subtitle: "Escolha a rede certa para o seu tipo de conteúdo.",
     datePublished: "2026-08-04",
+    dateModified: "2026-08-11",
     body: (
       <>
         <p>O TikTok ainda é a rede do 'viral fácil', mas o Instagram é a rede da 'venda de alto ticket'.</p>
