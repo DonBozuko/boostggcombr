@@ -362,11 +362,11 @@ type UtmProps = { networks: Network[]; format: Format };
 
 function UtmLinkGenerator({ networks, format }: UtmProps) {
   const BASE_BY_NET: Record<Network, string> = {
-    instagram: "https://boostgg.com.br",
-    tiktok: "https://boostgg.com.br/tiktok",
-    facebook: "https://boostgg.com.br/facebook",
-    youtube: "https://boostgg.com.br/youtube",
-    telegram: "https://boostgg.com.br/telegram",
+    instagram: "https://www.boostgg.com.br",
+    tiktok: "https://www.boostgg.com.br/tiktok",
+    facebook: "https://www.boostgg.com.br/facebook",
+    youtube: "https://www.boostgg.com.br/youtube",
+    telegram: "https://www.boostgg.com.br/telegram",
   };
   const [selected, setSelected] = useState<Network>(networks[0] ?? "instagram");
   const [copied, setCopied] = useState(false);
