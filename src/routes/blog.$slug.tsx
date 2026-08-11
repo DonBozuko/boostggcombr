@@ -16,7 +16,7 @@ type Post = {
   description: string;
   subtitle: string;
   datePublished: string;
-  dateModified?: string;
+  dateModified?: string | (() => string);
   faq?: { q: string; a: string }[];
   body: React.ReactNode;
 };
@@ -31,7 +31,7 @@ const POSTS: Record<string, Post> = {
     subtitle:
       "O método real, em ordem — do perfil ao algoritmo. Sem hashtag mágica e sem promessa vazia.",
     datePublished: "2026-01-15",
-    dateModified: new Date().toISOString().split('T')[0],
+    dateModified: () => new Date().toISOString().split('T')[0],
     faq: [
       {
         q: "Como ganhar seguidores no Instagram de graça?",
@@ -700,6 +700,7 @@ const POSTS: Record<string, Post> = {
     description: "Entenda por que a velocidade da entrega de seguidores define a saúde da sua conta a longo prazo.",
     subtitle: "Qualidade sobre pressa: a filosofia BoostGG.",
     datePublished: "2026-08-04",
+    dateModified: () => new Date().toISOString().split('T')[0],
     body: (
       <>
         <p>Ninguém ganha 10 mil seguidores em um segundo de forma orgânica. Se um serviço oferece isso, ele está te entregando um risco.</p>
@@ -713,6 +714,7 @@ const POSTS: Record<string, Post> = {
     description: "Aprenda a comprar seguidores com segurança, preparando seu perfil e seguindo as melhores práticas do mercado SMM.",
     subtitle: "Segurança em primeiro lugar: o manual definitivo da BoostGG.",
     datePublished: "2026-08-04",
+    dateModified: () => new Date().toISOString().split('T')[0],
     body: (
       <>
         <h2>O que significa comprar seguidores e como o serviço funciona</h2>
@@ -760,6 +762,7 @@ const POSTS: Record<string, Post> = {
     description: "Guia para identificar credibilidade, garantias e segurança em painéis de seguidores SMM.",
     subtitle: "Não perca dinheiro: aprenda a identificar um fornecedor real.",
     datePublished: "2026-08-04",
+    dateModified: () => new Date().toISOString().split('T')[0],
     body: (
       <>
         <h2>Sinais de credibilidade antes da compra</h2>
@@ -778,6 +781,7 @@ const POSTS: Record<string, Post> = {
     description: "Estratégias de conteúdo, engajamento e marketing para converter seguidores em autoridade digital.",
     subtitle: "O número é o começo, não o fim. Saiba como crescer de verdade.",
     datePublished: "2026-08-04",
+    dateModified: () => new Date().toISOString().split('T')[0],
     body: (
       <>
         <h2>Produção de conteúdo consistente</h2>
@@ -829,7 +833,7 @@ export const Route = createFileRoute("/blog/$slug")({
             headline: post.title,
             description: post.description,
             datePublished: post.datePublished,
-            dateModified: post.dateModified ?? post.datePublished,
+            dateModified: (typeof post.dateModified === 'function' ? post.dateModified() : post.dateModified) ?? post.datePublished,
             author: { "@type": "Organization", name: "BoostGG Editorial Team", url: BASE },
             publisher: { "@type": "Organization", name: "BoostGG", logo: { "@type": "ImageObject", url: `${BASE}/og-instagram.jpg` } },
             mainEntityOfPage: { "@type": "WebPage", "@id": url },
