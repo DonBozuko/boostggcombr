@@ -24,7 +24,7 @@ Preço tem dono único: só `price-authority.server.ts` grava `price_brl`. Ver [
 Projeto único: revenda vive só aqui; proibido recriar em outro projeto/banco. Ver [Projeto de revenda único](mem://constraints/projeto-revenda-unico).
 Documento nunca manda no código: `ARQUITETURA.md` e `.lovable/*.md` são índice. Se divergir, o CÓDIGO vence e eu corrijo o documento no mesmo turno.
 Modo Orquestrador: mapear impacto cruzado, ordem, rollback e prova real antes de mexer. Ver [Modo Orquestrador](mem://preferences/modo-orquestrador).
-Portão de Risco: todo pedido passa por triagem (vermelha/amarela/verde) e resposta PEDIU / QUEBRARIA / VERSÃO SEGURA. Ver [Protocolo de Risco](mem://preferences/protocolo-de-risco).
+Portão de Risco: todo pedido passa por triagem (vermelha/amarela/verde) e resposta PEDIU / QUEBRARIA / VERSÃO SEGURA. Ver [Portão de Risco](mem://preferences/portao-de-risco) e [Protocolo de Risco](mem://preferences/protocolo-de-risco).
 Toda tarefa começa com rótulo RÁPIDO · MÉDIO · PESADO. Ver [Protocolo de trabalho](mem://preferences/protocolo-de-trabalho).
 Bug achado por acaso é falha de instrumentação: vira invariante + teste. Ver [Bug vira invariante](mem://preferences/bug-vira-invariante).
 Regra 2x: mesmo TIPO de problema pela 2ª vez proíbe patch — mata a causa. Ver [Regra 2x](mem://preferences/regra-2x-causa-raiz).
