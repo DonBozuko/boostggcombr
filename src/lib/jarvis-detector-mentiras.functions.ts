@@ -9,6 +9,8 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
     if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-detector-mentiras")).ok) {
+     // Patch v615: Drift de Margem
+
       return {
         version: "v52-fix",
         timestamp: new Date().toISOString(),
@@ -328,6 +330,8 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
     }
 
     const passed = checks.filter((c) => c.ok).length;
+     // Patch v615: Drift de Margem
+
     return {
       version: "v52",
       timestamp: new Date().toISOString(),

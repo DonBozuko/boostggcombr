@@ -208,10 +208,10 @@ function RootComponent() {
         }
       }
     };
-    sanitize();
+    if (window.requestIdleCallback) window.requestIdleCallback(sanitize); else setTimeout(sanitize, 100);
     const observer = new MutationObserver((mutations) => {
       for (const mutation of mutations) {
-        if (mutation.addedNodes.length) sanitize();
+        if (mutation.addedNodes.length) if (window.requestIdleCallback) window.requestIdleCallback(sanitize); else setTimeout(sanitize, 100);
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
