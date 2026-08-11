@@ -82,9 +82,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
           return new Response("Invalid signature", { status: 401, headers: { "cache-control": "no-store" } });
         }
 
-        // v612 — EXECUÇÃO EM BACKGROUND REAL.
+        // v613 — EXECUÇÃO EM BACKGROUND REAL (Reforçado).
         // Respondemos 200 OK imediatamente para o MP e processamos o provisionamento/despacho
-        // de forma assíncrona. Isso elimina timeouts durante picos de venda.
+        // de forma assíncrona. O uso de worker.waitUntil garante que o processo sobreviva
+        // ao retorno da Response principal em ambientes Cloudflare.
         let auditPaymentId: string | null = null;
         let auditError: string | null = null;
 

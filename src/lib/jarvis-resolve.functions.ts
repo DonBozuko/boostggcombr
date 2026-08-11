@@ -17,6 +17,22 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
     if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "jarvis-resolve")).ok) return { ok: false, error: "UNAUTHORIZED" };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { runPedidoReconciler } = await import("@/services/pedido-reconciler.server");
+    const { runAutoHealer } = await import("@/services/auto-healer.server");
+    
+    // v613: AUTO-CURA ATÔMICA. Antes de resolver os alertas, tentamos o reparo real.
+    // Isso garante que o botão "EXECUTAR AUTO-CURA" no admin de fato tente consertar o sistema.
+    let autoHealerResult = null;
+    let reconcilerResult = null;
+    
+    try {
+      // 1. Reconciliação de pedidos (despacha órfãos)
+      reconcilerResult = await runPedidoReconciler();
+      // 2. Auto-Healer (corrige IDs e sincroniza preços)
+      autoHealerResult = await runAutoHealer();
+    } catch (e) {
+      console.error("[jarvis-resolve] v613 falha na auto-cura prévia", e);
+    }
     
     // v416: Aumentado para 6h para garantir que alertas persistentes sejam capturados
     const since = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
@@ -60,5 +76,10 @@ export const resolveJarvisAlerts = createServerFn({ method: "POST" })
       }
     }
 
-    return { ok: true, resolved: resolvedCount };
+    return { 
+      ok: true, 
+      resolved: resolvedCount,
+      auto_healer: autoHealerResult,
+      reconciler: reconcilerResult
+    };
   });
