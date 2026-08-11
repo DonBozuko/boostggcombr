@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
+import { sanitizeText } from "@/lib/dom-sanitizer";
+
 
 const PEOPLE: { name: string; avatar: string }[] = [
   { name: "Rodrigo", avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
@@ -105,11 +107,12 @@ export function SocialProofPopup({ route = "/" }: { route?: string }) {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[11px] font-extrabold text-white leading-tight uppercase tracking-wide truncate">
-            {item.person.name}
+            {sanitizeText(item.person.name)}
           </p>
-          <p className="text-[10px] text-white/70 leading-tight truncate">{item.city}</p>
+          <p className="text-[10px] text-white/70 leading-tight truncate">{sanitizeText(item.city)}</p>
           <p className="text-[11px] font-semibold text-white leading-tight">
-            <span className="text-red-500 font-extrabold">{fmt(item.qty)}</span> {item.product}
+            <span className="text-red-500 font-extrabold">{fmt(item.qty)}</span> {sanitizeText(item.product)}
+
           </p>
         </div>
         <span className="bg-green-500 rounded-full h-2.5 w-2.5 animate-pulse shrink-0 ring-2 ring-black" />

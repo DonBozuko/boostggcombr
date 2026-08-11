@@ -5,6 +5,8 @@ import { runJarvisLieDetector } from "@/lib/jarvis-detector-mentiras.functions";
 import { resolveJarvisAlerts } from "@/lib/jarvis-resolve.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CheckCircle2, ShieldAlert, Loader2, Check } from "lucide-react";
+import { sanitizeText } from "@/lib/dom-sanitizer";
+
 
 type Report = Awaited<ReturnType<typeof runJarvisLieDetector>>;
 
@@ -122,7 +124,7 @@ export function JarvisDetectorMentiras() {
                   <AlertTriangle className="h-3.5 w-3.5 text-red-400 mt-0.5" />
                 )}
                 <span className="font-medium">{c.label}</span>
-                <span className="text-white/40" dangerouslySetInnerHTML={{ __html: `— ${c.detail}` }} />
+                <span className="text-white/40" dangerouslySetInnerHTML={{ __html: sanitizeText(`— ${c.detail}`) }} />
               </li>
             ))}
           </ul>
