@@ -1,41 +1,31 @@
-# Plano de Estabilização Técnica e Análise de Risco — v617
+# Plano de Contenção v617 — Opção B (Proteção Mínima e Segura)
 
-Reconheço o resultado da investigação anterior: a causa raiz permanece **NÃO IDENTIFICADA** (Baseline, TikTok, GTM e JivoChat retornaram limpos em ambiente controlado). Este plano foca na avaliação de riscos, comparação de estratégias e recomendação técnica para neutralizar o caractere invisível `U+2063` com o menor impacto sistêmico possível.
+Este plano detalha a implementação da estratégia de contenção preventiva do caractere invisível `U+2063`, cuja origem permanece **NÃO IDENTIFICADA**. A implementação foca em sanitização localizada e atômica, preservando a estabilidade da v615 e evitando mecanismos globais agressivos.
 
-## 1. Avaliação de Riscos Técnicos (v617 - Blindagem Antidote Pro)
+## 1. Escopo de Implementação
 
-### A) MutationObserver Síncrono em `__root.tsx`
-- **Loop de Mutações:** Risco **BAIXO**. O sanitizador implementa uma guarda lógica `if (/[\u2063\u200B\uFEFF]/.test(text))` que impede re-processamento de texto já limpo, evitando ciclos infinitos.
-- **Performance & CPU:** Risco **MODERADO**. Em páginas com alto volume de mutações (como o log do Jarvis ou dashboards dinâmicos), o observer síncrono pode causar overhead. É necessário otimizar para processar apenas `addedNodes` e não o `body` inteiro repetidamente.
-- **Conflito com React/TanStack:** Risco **BAIXO**. Embora mutações diretas no DOM real não sejam recomendadas em React, a alteração de `textContent` é geralmente segura. O risco reside na remoção de nós (`parent.remove()`), que pode causar erros de "NotFoundError" durante a reconciliação do React.
-- **Hidratação:** Risco **ZERO**. O observer é instanciado em um `useEffect`, garantindo que ele só atue após a hidratação completa.
-- **Remoção de Conteúdo Legítimo:** Risco **BAIXO**. Os caracteres visados (`U+2063`, `U+200B`, `U+FEFF`) são caracteres de controle sem valor semântico no projeto.
+### A) Criação de Utilitário de Sanitização
+- **Local:** `src/lib/dom-sanitizer.ts`
+- **Ação:** Criar uma função pura `sanitizeText(str: string)` que remove `\u2063`, `\u200B` e `\uFEFF` de forma segura, sem afetar caracteres alfanuméricos ou pontuação legítima.
 
-### B) CSS para esconder `U+2063`
-- **Viabilidade:** A regra `span:empty` **não é confiável** para este caso. O caractere `U+2063` (Invisible Separator) é tecnicamente um nó de texto; portanto, o elemento não é considerado vazio pelo motor de CSS.
-- **Mascaramento:** Esconder via CSS apenas oculta o sintoma visual, mantendo o caractere presente no DOM para crawlers e bots, o que não resolve o risco de SEO.
+### B) Sanitização no `SocialProofPopup.tsx`
+- **Local:** `src/components/SocialProofPopup.tsx`
+- **Ação:** Sanitizar os campos `item.person.name`, `item.city` e `item.product` antes de serem exibidos nos parágrafos.
 
-### C) Higienização do `SocialProofPopup`
-- **Segurança:** Risco **NULO**. Implementar uma função de sanitização nas strings de entrada é a abordagem mais segura e atômica, pois não interfere no DOM global.
+### C) Sanitização no `JarvisDetectorMentiras.tsx`
+- **Local:** `src/components/JarvisDetectorMentiras.tsx`
+- **Ação:** Sanitizar a string injetada via `dangerouslySetInnerHTML` na lista de auditoria, garantindo que o detalhe do relatório não contenha o caractere.
 
-## 2. Comparativo de Alternativas
+## 2. Preservação e Segurança
+- **Baseline v615:** Nenhuma alteração em lógica de despacho, pagamentos ou RLS.
+- **Sanitizador Global:** O código em `__root.tsx` baseado em `requestIdleCallback` será mantido intacto como segunda camada de defesa.
+- **Sem MutationObserver:** Não será implementado o observer síncrono.
+- **Sem CSS global:** Não haverá alteração em `styles.css`.
 
-| Alternativa | Benefício | Risco | Impacto | Recomendação |
-| :--- | :--- | :--- | :--- | :--- |
-| **A) Não fazer nada** | Estabilidade total; sem código extra. | Risco de detecção externa (SEO/Auditoria). | Baixo (Operacional) / Alto (SEO). | Nível: Observação. |
-| **B) Proteção Mínima** | Higienização na fonte (Props/Data); Risco zero de loops. | Pode não pegar injeções dinâmicas de scripts externos 3rd-party. | Médio. | **RECOMENDADA.** |
-| **C) Blindagem Pro** | Neutralização agressiva e em tempo real de qualquer injeção. | Maior complexidade; risco de performance. | Alto (Segurança). | Nível: Emergência. |
-
-## 3. Detalhes Técnicos da Recomendação (Opção B)
-
-A **Opção B (Proteção Mínima e Segura)** é a recomendada por ser a mais equilibrada diante de uma causa raiz não identificada.
-
-### O que será feito:
-1. **Sanitização na Fonte:** Criar um utilitário de limpeza de strings e aplicá-lo nos componentes que renderizam dados dinâmicos (`SocialProofPopup.tsx` e `JarvisDetectorMentiras.tsx`).
-2. **Refino do Sanitizador Global:** Manter a versão atual baseada em `requestIdleCallback` no `__root.tsx`, mas melhorar a regex para ser mais seletiva.
-3. **Evitar Observer Síncrono:** Não implementar o `MutationObserver` síncrono neste estágio para evitar riscos de performance e regressões no React.
-
-**Por que:** Esta abordagem elimina o caractere onde ele é mais provável de aparecer (dados dinâmicos) sem comprometer a estabilidade do orquestrador global do projeto.
+## 3. Validação Final
+- Execução de `npm run test` para garantir integridade.
+- Execução de `npm run build` para validar o pacote de produção.
+- Inspeção visual via console para confirmar a ausência do caractere nos pontos tratados.
 
 ---
-*Nenhuma alteração foi realizada. Este plano é para análise e aprovação.*
+*Nenhuma alteração foi realizada. Aguardando aprovação final para execução.*
