@@ -40,6 +40,7 @@ Tolerância ≤1% de falha/semana (zero só para cobrar-sem-entregar); conflito 
 - [Rota Reserva Quente v406](mem://features/rota-reserva-quente) — Plano B pré-validado por pacote (quente/morna/única); dono único `hot-standby.ts`; aviso amarelo na Bancada, nunca bloqueio.
 - [Dívidas aceitas](mem://preferences/dividas-aceitas) — Cores hardcoded, arquivos gigantes e console.log de servidor: decidido NÃO consertar. Não reabrir sem motivo de negócio.
 - [Motor Anti-Alucinação](mem://preferences/motor-anti-alucinacao) — `npm run audit` lê src/ inteiro e grava .lovable/audit-report.md; gravidades bloqueante/atenção/nota.
+- [Tracking Ads](mem://tracking-ads) — IDs oficiais de conversão Google Ads/GA4 e local onde disparam.
 
 - [Moeda única BRL](mem://constraints/moeda-unica-brl) — Dinheiro sempre em BRL. `monitoramento_saldo.saldo` é USD legado; usar `saldo_brl`/`fornecedores.saldo_atual`.
 - [Markup por custo](mem://features/markup-por-custo) — Múltiplo de lucro cai conforme o custo sobe (5x→2x), teto de vitrine, piso de revenda. Consultar antes de mexer em preço.
@@ -51,4 +52,4 @@ Tolerância ≤1% de falha/semana (zero só para cobrar-sem-entregar); conflito 
 - [Prateleira honesta](mem://preferences/prateleira-honesta) — Vitrine só mostra o que a Bancada prova que entrega: sem fallback estático, sem aba vazia.
 - [Alarme que não anda](mem://preferences/alarme-que-nao-anda) — Limiar de dinheiro só no módulo dono; achado repetido 6 varreduras vira defeito de engenharia.
 - [Sem percentual chutado](mem://preferences/sem-percentual-tres-numeros) — Proibido dizer "sistema está X%". Vale o Termômetro Real (30d) no painel SLO.
- - [Protocolo de Excelência v575](mem://preferences/protocolo-excelencia-v575) — Restauração da postura de Orquestrador e Auditor Forense (auge de 5 semanas atrás).
+- [Protocolo de Excelência v575](mem://preferences/protocolo-excelencia-v575) — Restauração da postura de Orquestrador e Auditor Forense (auge de 5 semanas atrás).
