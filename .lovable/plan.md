@@ -1,41 +1,41 @@
 # Plano de Estabilização Técnica e Análise de Risco — v617
 
-Reconheço o resultado da investigação anterior: a causa raiz permanece **NÃO IDENTIFICADA** (Baseline, TikTok, GTM e JivoChat retornaram limpos em ambiente controlado). Este plano foca exclusivamente na avaliação de riscos, comparação de estratégias e recomendação técnica sem realizar alterações ou novas investigações causais.
+Reconheço o resultado da investigação anterior: a causa raiz permanece **NÃO IDENTIFICADA** (Baseline, TikTok, GTM e JivoChat retornaram limpos em ambiente controlado). Este plano foca na avaliação de riscos, comparação de estratégias e recomendação técnica para neutralizar o caractere invisível `U+2063` com o menor impacto sistêmico possível.
 
 ## 1. Avaliação de Riscos Técnicos (v617 - Blindagem Antidote Pro)
 
 ### A) MutationObserver Síncrono em `__root.tsx`
-- **Loop de Mutações:** Risco **BAIXO**. O sanitizador já implementa uma guarda lógica `if (/[\u2063\u200B\uFEFF]/.test(text))` que impede re-processamento de texto limpo, evitando ciclos infinitos.
-- **Performance & CPU:** Risco **MODERADO**. Em páginas com alto volume de mutações (como o log do Jarvis), o observer síncrono pode causar picos de processamento. A recomendação é otimizar para processar apenas `addedNodes`.
-- **Conflito com TanStack Start / React:** Risco **BAIXO**. O React gerencia o Virtual DOM; mutações diretas no DOM real são detectadas pelo React na próxima reconciliação, o que poderia, em teoria, causar erros de "Node not found" se removermos elementos arbitrariamente.
-- **Hidratação:** Risco **ZERO**. O observer só inicia após a montagem do componente (`useEffect`), não interferindo no HTML inicial servido pelo servidor.
-- **Remoção de Conteúdo Legítimo:** Risco **BAIXO**. A regex é restrita a caracteres de controle invisíveis sem uso semântico no projeto.
+- **Loop de Mutações:** Risco **BAIXO**. O sanitizador implementa uma guarda lógica `if (/[\u2063\u200B\uFEFF]/.test(text))` que impede re-processamento de texto já limpo, evitando ciclos infinitos.
+- **Performance & CPU:** Risco **MODERADO**. Em páginas com alto volume de mutações (como o log do Jarvis ou dashboards dinâmicos), o observer síncrono pode causar overhead. É necessário otimizar para processar apenas `addedNodes` e não o `body` inteiro repetidamente.
+- **Conflito com React/TanStack:** Risco **BAIXO**. Embora mutações diretas no DOM real não sejam recomendadas em React, a alteração de `textContent` é geralmente segura. O risco reside na remoção de nós (`parent.remove()`), que pode causar erros de "NotFoundError" durante a reconciliação do React.
+- **Hidratação:** Risco **ZERO**. O observer é instanciado em um `useEffect`, garantindo que ele só atue após a hidratação completa.
+- **Remoção de Conteúdo Legítimo:** Risco **BAIXO**. Os caracteres visados (`U+2063`, `U+200B`, `U+FEFF`) são caracteres de controle sem valor semântico no projeto.
 
 ### B) CSS para esconder `U+2063`
-- **Viabilidade:** A regra `span:empty` **não funciona** para `U+2063`, pois o caractere é considerado conteúdo de texto pelo motor de renderização. O elemento não é tecnicamente "vazio".
-- **Mascaramento:** Ocultar via CSS apenas "esconde" o problema visual, mas o caractere permanece no DOM para rastreadores e ferramentas de auditoria.
+- **Viabilidade:** A regra `span:empty` **não é confiável** para este caso. O caractere `U+2063` (Invisible Separator) é tecnicamente um nó de texto; portanto, o elemento não é considerado vazio pelo motor de CSS.
+- **Mascaramento:** Esconder via CSS apenas oculta o sintoma visual, mantendo o caractere presente no DOM para crawlers e bots, o que não resolve o risco de SEO.
 
 ### C) Higienização do `SocialProofPopup`
-- **Integridade:** Risco **NULO**. A limpeza de strings via `.replace()` antes da renderização é uma prática de defesa em profundidade e não afeta a lógica de negócio ou dados legítimos.
+- **Segurança:** Risco **NULO**. Implementar uma função de sanitização nas strings de entrada é a abordagem mais segura e atômica, pois não interfere no DOM global.
 
 ## 2. Comparativo de Alternativas
 
 | Alternativa | Benefício | Risco | Impacto | Recomendação |
 | :--- | :--- | :--- | :--- | :--- |
-| **A) Não fazer nada** | Estabilidade absoluta; sem código extra. | Risco de detecção externa (SEO/Bots). | Baixo (visual) / Alto (SEO). | Nível: Observação. |
-| **B) Proteção Mínima** | Higienização na fonte (Props/Data); Zero risco de loop. | Não detecta injeções dinâmicas de scripts externos. | Médio. | **RECOMENDADA.** |
-| **C) Blindagem Pro** | Neutralização imediata de qualquer injeção no DOM. | Maior complexidade; risco de performance em mutações em massa. | Alto (Segurança). | Nível: Emergência. |
+| **A) Não fazer nada** | Estabilidade total; sem código extra. | Risco de detecção externa (SEO/Auditoria). | Baixo (Operacional) / Alto (SEO). | Nível: Observação. |
+| **B) Proteção Mínima** | Higienização na fonte (Props/Data); Risco zero de loops. | Pode não pegar injeções dinâmicas de scripts externos 3rd-party. | Médio. | **RECOMENDADA.** |
+| **C) Blindagem Pro** | Neutralização agressiva e em tempo real de qualquer injeção. | Maior complexidade; risco de performance. | Alto (Segurança). | Nível: Emergência. |
 
-## 3. Recomendação Técnica Final
+## 3. Detalhes Técnicos da Recomendação (Opção B)
 
-Recomendo a **Opção B (Proteção Mínima e Segura)** combinada com higienização estática.
+A **Opção B (Proteção Mínima e Segura)** é a recomendada por ser a mais equilibrada diante de uma causa raiz não identificada.
 
-### Por que?
-1. **Prudência:** Como a causa raiz não foi identificada e o problema não é reprodutível sob demanda, implementar a Blindagem Pro (C) é usar um "canhão para matar uma mosca", introduzindo um sistema complexo de vigilância (Observer) que pode gerar efeitos colaterais de performance.
-2. **Segurança:** A higienização direta nas propriedades (`SocialProofPopup`) e nos resultados de API (`Jarvis`) resolve 90% do risco sem tocar no ciclo global de renderização.
-3. **Ponto Cego:** Se o caractere for injetado por um script externo *após* a renderização (ex: um beacon de rastreamento injetando um pixel invisível), a Opção B não o pegará, mas também não correremos o risco de quebrar a reconciliação do React.
+### O que será feito:
+1. **Sanitização na Fonte:** Criar um utilitário de limpeza de strings e aplicá-lo nos componentes que renderizam dados dinâmicos (`SocialProofPopup.tsx` e `JarvisDetectorMentiras.tsx`).
+2. **Refino do Sanitizador Global:** Manter a versão atual baseada em `requestIdleCallback` no `__root.tsx`, mas melhorar a regex para ser mais seletiva.
+3. **Evitar Observer Síncrono:** Não implementar o `MutationObserver` síncrono neste estágio para evitar riscos de performance e regressões no React.
 
-**Conclusão:** Mantenha a proteção mínima síncrona nos componentes e aguarde a manifestação do caractere em logs reais de produção antes de escalar para a Blindagem Pro.
+**Por que:** Esta abordagem elimina o caractere onde ele é mais provável de aparecer (dados dinâmicos) sem comprometer a estabilidade do orquestrador global do projeto.
 
 ---
-*Nenhuma alteração foi realizada. Aguardando aprovação.*
+*Nenhuma alteração foi realizada. Este plano é para análise e aprovação.*
