@@ -839,9 +839,10 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         }
         });
 
-        // v144 — Dispatch síncrono: aguarda backgroundJob completar antes de responder MP,
-        // garantindo que notifyAdminProvisioning entregue o Pix Copia e Cola ao WhatsApp.
-        try { await backgroundJob; } catch (err) { auditError = String((err as Error)?.message ?? err).slice(0, 500); console.error("[mp-webhook] v144 sync fail", err); }
+        // v612 — Otimização Assíncrona: agendamos o processamento pesado e respondemos 200 OK.
+        // O MP não ficará pendente aguardando logs deprovisionamento ou ledger.
+        scheduleWebhookBackground(job, context);
+
 
         // v522 — carimba resultado no evento (best-effort, nunca bloqueia a resposta ao MP)
         if (auditPaymentId) {
