@@ -94,7 +94,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       const { data: alertas } = await supabaseAdmin
         .from("jarvis_alerts")
         .select("severidade, origem, mensagem, created_at")
-        .gte("created_at", new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString())
+        .gte("created_at", new Date(Date.now() - 30 * 60 * 1000).toISOString()) // v613: Janela reduzida para 30min para maior frescor
         .order("created_at", { ascending: false });
       const abertos = (alertas ?? []).filter((a) => !String(a.mensagem ?? "").startsWith("✅ RESOLVIDO"));
       // Só o alerta mais recente de cada origem vale: se a mesma rotina rodou depois
