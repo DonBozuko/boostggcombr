@@ -1,41 +1,63 @@
-# Investigação Forense: Origem do U+2063 (Invisible Separator)
+# Análise Técnica: Blindagem Antidote Pro (v617)
 
-Conforme instrução, executei uma investigação de runtime profunda para determinar a causa real do caractere `U+2063` no DOM.
+Esta análise atende à solicitação de auditoria profunda sobre os riscos e impactos da implementação da Blindagem Antidote Pro v617, comparando alternativas e avaliando a segurança dos mecanismos propostos.
 
-## Resultados da Investigação
+## 1. Avaliação de Riscos do MutationObserver Síncrono em `__root.tsx`
 
-### 1. Fatos Comprovados
-- **Inexistência no SSR:** O `curl` do HTML inicial não contém o byte `U+2063`. O caractere surge **após** o início da execução do JavaScript no cliente.
-- **Inexistência no Código-Fonte:** Varreduras binárias (`grep -a`, `perl`, `od`) em `src/` e `public/` não encontraram o caractere em arquivos estáticos, exceto nas expressões regulares do sanitizador.
-- **Bloqueio do Sanitizador:** Ao desativar o `Antidote Pro` atual em ambiente de teste, o caractere **não foi capturado** nas rotas padrão (Home/Admin) sob condições normais de carregamento.
-- **Localização dos Spans:** O caractere costuma aparecer dentro de elementos `<span>` vazios, frequentemente no topo do `body` ou injetados por scripts de rastreamento.
+### Loop de Mutações (Infinite Loops)
+- **Risco:** Alto se não for controlado. Se o sanitizador modificar o texto e essa modificação disparar o observer, o sistema entra em loop, travando o navegador (CPU 100%).
+- **Mitigação:** O código atual já verifica a presença dos caracteres (`/[\u2063\u200B\uFEFF]/.test(text)`) antes de agir. Se o caractere não estiver lá, ele não altera nada, impedindo o loop.
+- **Veredito:** Seguro, desde que a regex seja estrita.
 
-### 2. Análise Causal (Respostas aos 9 Pontos)
-1. **Script/Componente:** A evidência aponta para o **TikTok Pixel** ou **GTM**, que utilizam esses caracteres como "beacons" ou marcadores de posição para evitar o colapso de elementos vazios.
-2. **Momento:** Aparece durante o carregamento de scripts externos, tipicamente após a hidratação do React.
-3. **ParentNode:** Geralmente injetado diretamente como filho de `<body>` ou dentro de containers de analytics.
-4. **Script em Execução:** `analytics.tiktok.com/i18n/pixel/events.js` é o principal suspeito.
-5. **Ordem de Execução:** Surge **depois** da carga dos scripts externos e **depois** da hidratação.
-6. **SSR vs Runtime:** Surge exclusivamente em **Runtime**.
-7. **Removido pelo sanitizador:** Sim, a lógica atual remove, mas o `requestIdleCallback` cria uma janela de latência.
-8. **Reaparece:** Sim, scripts de analytics frequentemente reinjetam seus elementos de controle se detectarem que foram removidos.
-9. **MutationObserver:** O TikTok Pixel possui lógica interna para manter a integridade de seus beacons no DOM.
+### Degradação de Performance & Aumento de CPU
+- **Risco:** Moderado. `MutationObserver` é mais performático que `requestIdleCallback` para detecção imediata, mas em páginas com muitas atualizações de DOM (como o Feed/Jarvis), pode gerar overhead.
+- **Mitigação:** Uso de `document.createNodeIterator` é eficiente, mas percorrer o `document.body` inteiro em cada mutação é custoso. 
+- **Melhoria Sugerida:** Filtrar apenas `mutation.addedNodes` em vez de re-escanear o body inteiro.
 
-## Classificação Final
-
-🔴 **ORIGEM NÃO DETERMINADA COM PRECISÃO ABSOLUTA NO AMBIENTE DE DEV**
-
-**Justificativa:** No ambiente de sandbox, os scripts externos (TikTok/Google) podem não disparar o tracking completo devido à ausência de cookies de usuário real ou bloqueios de rede do sandbox, o que impede a reprodução da injeção que ocorre no navegador do cliente real.
+### Conflito com React/TanStack & Hidratação
+- **Risco:** Baixo/Moderado. O React não gosta que o DOM seja manipulado por fora. Se o sanitizador remover um `<span>` que o React espera controlar, pode causar erros de reconciliação ("NotFoundError: Failed to execute 'removeChild'").
+- **Mitigação:** Priorizar a limpeza do `textContent` em vez da remoção do elemento (`parent.remove()`).
 
 ---
 
-## Próximos Passos e Recomendações
+## 2. Avaliação da Proposta de CSS (`span:empty`)
 
-Para confirmar a origem, seria necessário:
-1. **Log de Produção:** Injetar temporariamente um `MutationObserver` em produção (via GTM) que apenas faça um `fetch` para um endpoint de log contendo o `stack trace` no momento da inserção.
-2. **Isolamento Controlado:** Desativar o TikTok Pixel por 1 hora e monitorar o Google Search Console/Auditores.
+```css
+span:empty { display: none !important; }
+```
+- **Viabilidade:** Funciona para elementos **totalmente vazios**. No entanto, o caractere `U+2063` (Invisible Separator) é considerado conteúdo de texto, portanto o elemento **não estará vazio** para o CSS.
+- **Risco de Mascaramento:** Se for aplicado a spans legítimos que servem como âncoras ou placeholders de ícones, quebrará o layout.
+- **Conclusão:** Ineficaz para `U+2063` se o caractere estiver dentro do span. Só funcionaria se o span estivesse literalmente `<span></span>`.
 
-### Por que o v617 ainda é a solução correta?
-Mesmo sem o script "assumir a culpa", a investigação confirmou que a **latência** do sanitizador atual é o que permite a detecção. O v617 propõe trocar a limpeza reativa (Idle) por uma blindagem síncrona (MutationObserver) e visual (CSS), garantindo que, independentemente da origem, o caractere seja neutralizado antes de afetar o sistema.
+---
 
-**NÃO foram alterados arquivos neste turno.**
+## 3. Higienização das Props do `SocialProofPopup`
+
+- **Risco:** Mínimo. A higienização via `text.replace()` em strings de exibição é uma prática padrão de segurança.
+- **Integridade:** Não altera a lógica de negócio, apenas a representação visual. O risco de alterar dados legítimos é zero, pois `U+2063` não tem uso semântico no projeto BOOSTGG.
+
+---
+
+## 4. Comparativo de Alternativas
+
+| Critério | A) Não fazer nada | B) Proteção Mínima (Recomendada) | C) Blindagem v617 Completa |
+| :--- | :--- | :--- | :--- |
+| **Benefício** | Estabilidade total do código atual. | Proteção sem risco de performance/loops. | Eliminação imediata e agressiva. |
+| **Risco** | Bots/Google podem capturar o caractere. | Janela milimétrica de exposição. | Risco de loop e erro de React. |
+| **Impacto** | Risco de SEO se o caractere for malicioso. | Zero impacto em performance. | Pequeno impacto em CPU. |
+| **Reversibilidade** | N/A | Total (1 linha). | Média (complexidade de observer). |
+| **Recomendação** | Não recomendado (Risco SEO). | **ALTAMENTE RECOMENDADO.** | Apenas se o erro persistir. |
+
+---
+
+## Recomendação Final
+
+Recomendo a **Alternativa B (Proteção Mínima e Segura)**:
+
+1. **Camada CSS de Atributo:** Em vez de `span:empty`, usar um seletor que não afete elementos legítimos, ou apenas reforçar o `display: none` em spans injetados externamente se eles tiverem classes conhecidas.
+2. **Higienização na Fonte:** Limpar as strings no `SocialProofPopup.tsx` e no `JarvisDetectorMentiras.tsx` (nos locais onde se usa `dangerouslySetInnerHTML`). Isso é síncrono, seguro e não interfere no ciclo do React.
+3. **Manter o Sanitizador Atual:** O `requestIdleCallback` em `__root.tsx` é seguro e não causa loops. O upgrade para `MutationObserver` deve ser evitado até que se confirme que a "janela de exposição" realmente causa prejuízo.
+
+**Por que:** A causa raiz permanece **NÃO IDENTIFICADA**. Implementar um sistema de vigilância síncrono e agressivo (`MutationObserver`) para um problema que não conseguimos reproduzir é introduzir complexidade e risco de regressão desnecessários.
+
+Aguardando aprovação para seguir com a **Alternativa B**.
