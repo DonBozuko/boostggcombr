@@ -84,10 +84,10 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
 export const Route = createFileRoute("/")({
 
   head: () => {
-    const title = "Comprar Seguidores Instagram Reais via Pix — BOOSTGG";
-    const ogTitle = "BOOSTGG — Seguidores no Instagram Reais e Brasileiros";
+    const title = "Comprar Seguidores Instagram Reais via Pix: BOOSTGG";
+    const ogTitle = "BOOSTGG: Seguidores no Instagram Reais e Brasileiros";
     const description =
-      "Comprar seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição garantida. Segurança e autoridade.";
+      "Compre seguidores Instagram reais via Pix com entrega imediata na BOOSTGG. Seguidores brasileiros com alta retenção e reposição.";
     const url = "https://www.boostgg.com.br/";
     const ogImage = "https://www.boostgg.com.br/og-instagram.jpg";
     return {

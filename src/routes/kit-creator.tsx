@@ -21,7 +21,7 @@ const KIT_DESC =
 export const Route = createFileRoute("/kit-creator")({
   head: () => ({
     meta: [
-      { title: "Kit Creator — 1.000 Seguidores Instagram — BOOSTGG" },
+      { title: "Kit Creator: 1.000 Seguidores Instagram — BOOSTGG" },
       { name: "description", content: KIT_DESC },
       { name: "robots", content: "index,follow" },
       { property: "og:title", content: "Kit Creator — 1.000 Seguidores Instagram" },

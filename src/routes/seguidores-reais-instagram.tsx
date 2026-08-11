@@ -4,9 +4,9 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/seguidores-reais-instagram";
-const TITLE = "Seguidores Reais no Instagram — Perfis Brasileiros — BOOSTGG";
+const TITLE = "Seguidores Reais no Instagram: Perfis Brasileiros — BOOSTGG";
 const DESC =
-  "Seguidores reais e brasileiros no Instagram, com reposição de 30 dias e entrega gradual via Pix. Sem bot, sem senha e sem queda no dia seguinte.";
+  "Seguidores reais e brasileiros no Instagram com reposição 30 dias e entrega gradual via Pix. Sem bots, sem senha e sem quedas.";
 
 const FAQ = [
   {
