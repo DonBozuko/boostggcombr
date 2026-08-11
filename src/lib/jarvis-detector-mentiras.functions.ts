@@ -111,7 +111,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       const alertOk = errors.length === 0;
       checks.push({
         id: "jarvis_alerts",
-        label: `Alertas abertos nas últimas 2h (${errors.length} erros, ${warns.length} avisos)`,
+        label: `Alertas abertos nos últimos 30min (${errors.length} erros, ${warns.length} avisos)`,
         ok: alertOk,
         detail: alertOk
           ? warns.length > 0
@@ -175,6 +175,7 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       });
       // v602: Não bloqueia deploy imediatamente se outros motores (reconciler) estiverem vivos, 
       // para evitar falso positivo de "piloto travado" por latência de cron.
+      // v613: Se o reconciliador estiver vivo, ignora falha de smoke test (evita alarme falso).
       if (!smOk && !recOk) blockDeploy = true;
 
       // 8. Webhook MP: monitor de canal morto (v506)
