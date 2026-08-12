@@ -23,12 +23,13 @@ export function ConversionAnalytics() {
         const { data } = await supabase
           .from("pedidos")
           .select("status, valor, abandono_notificado_at")
+          .order("created_at", { ascending: false })
           .limit(2000);
         const rows = (data as Array<{ status: string | null; valor: number | null; abandono_notificado_at: string | null }> | null) ?? [];
         const total = rows.length;
-        const pagos = rows.filter((r) => r.status === "pago").length;
-        const pendentes = rows.filter((r) => r.status === "pendente").length;
-        const falhos = rows.filter((r) => r.status === "falho" || r.status === "erro").length;
+        const pagos = rows.filter((r) => r.status === "pago" || r.status === "paid" || r.status === "completed" || r.status === "Enviado").length;
+        const pendentes = rows.filter((r) => r.status === "pendente" || r.status === "pending" || r.status === "mp_pending").length;
+        const falhos = rows.filter((r) => r.status === "falho" || r.status === "erro" || r.status === "cancelled" || r.status === "mp_cancelled").length;
         const abandonadosNotificados = rows.filter((r) => !!r.abandono_notificado_at).length;
         const recuperados = rows.filter((r) => !!r.abandono_notificado_at && r.status === "pago").length;
         const faturamento = rows
