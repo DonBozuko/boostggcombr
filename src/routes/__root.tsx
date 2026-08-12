@@ -194,11 +194,13 @@ function RootComponent() {
     import("@/lib/affiliate").then((m) => m.captureAffiliateRef()).catch(() => {});
   }, []);
 
-  // v606 — Blindagem Total (Antidote Pro): Remoção recursiva e agressiva de caracteres invisíveis (U+2063, U+200B, U+FEFF).
+  // v627 — Blindagem Total (Antidote Pro): Remoção visual agressiva de caracteres invisíveis (U+2063, U+200B, U+FEFF).
+  // Este hook atua como última camada de defesa na renderização do navegador,
+  // limpando nós de texto que foram injetados ou hidratados com caracteres de controle.
   useEffect(() => {
-    const sanitize = () => {
+    const sanitizeDOM = () => {
       // Microtask priority: limpa o DOM antes da próxima pintura do navegador
-      // v622 — Blindagem Antidote Pro: Higienização atômica sem remoção de nós (preservação de âncoras sintéticas).
+      // v627 — Higienização atômica para experiência do usuário, sem afetar dados subjacentes.
       const nodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
           const tag = (n.parentElement?.tagName || "").toUpperCase();
@@ -212,22 +214,39 @@ function RootComponent() {
       while (node = nodes.nextNode()) {
         const text = node.textContent || "";
         if (/[\u2063\u200B\uFEFF]/.test(text)) {
-          const parent = node.parentElement;
-          // v622 — Preserva a estrutura de SPANs injetados mas limpa o caractere.
-          // Nunca remove o elemento, apenas higieniza o conteúdo.
+          // v627 — Remove apenas a representação visual, preservando o nó de texto.
           node.textContent = text.replace(/[\u2063\u200B\uFEFF]/g, "");
         }
       }
     };
-    if (window.requestIdleCallback) window.requestIdleCallback(sanitize); else setTimeout(sanitize, 100);
+
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(sanitizeDOM);
+    } else {
+      setTimeout(sanitizeDOM, 100);
+    }
+
     const observer = new MutationObserver((mutations) => {
+      let shouldSanitize = false;
       for (const mutation of mutations) {
-        if (mutation.addedNodes.length) if (window.requestIdleCallback) window.requestIdleCallback(sanitize); else setTimeout(sanitize, 100);
+        if (mutation.addedNodes.length) {
+          shouldSanitize = true;
+          break;
+        }
+      }
+      if (shouldSanitize) {
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback(sanitizeDOM);
+        } else {
+          setTimeout(sanitizeDOM, 100);
+        }
       }
     });
+
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
   }, []);
+
 
 
 

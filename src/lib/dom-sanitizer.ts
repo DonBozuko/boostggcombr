@@ -1,18 +1,25 @@
 /**
- * Protocolo Antidote Pro (v617)
- * Sanitizador atômico para neutralização de caracteres invisíveis injetados (U+2063, etc.)
+ * Protocolo Antidote Pro (v627)
+ * Higienização atômica de caracteres invisíveis para camada de UI.
+ * 
+ * Este módulo isola a limpeza visual (apresentação) sem afetar 
+ * a integridade dos dados originais em fluxos de transporte.
  */
 
+/**
+ * sanitizeText: Remove caracteres invisíveis estritamente para exibição.
+ * Use este método apenas em JSX ou componentes que renderizam texto na tela.
+ */
 export const sanitizeText = (text: string | null | undefined): string => {
   if (!text) return "";
   
-  // Remove U+2063 (Invisible Separator), U+200B (Zero Width Space), U+FEFF (BOM)
-  // Mapeia e remove apenas os caracteres de controle problemáticos identificados
+  // v627: Remoção visual agressiva de U+2063, U+200B e U+FEFF
+  // preservando a string original nos fluxos que NÃO chamam esta função.
   return text.replace(/[\u2063\u200B\uFEFF]/g, "");
 };
 
 /**
- * Sanitiza objetos recursivamente (útil para props de componentes)
+ * sanitizeObject: Higieniza objetos recursivamente para injeção em props/UI.
  */
 export const sanitizeObject = <T extends Record<string, any>>(obj: T): T => {
   if (!obj || typeof obj !== 'object') return obj;
@@ -29,3 +36,4 @@ export const sanitizeObject = <T extends Record<string, any>>(obj: T): T => {
   }
   return newObj as T;
 };
+
