@@ -81,13 +81,20 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         .gte("created_at", since6h)
         .order("created_at", { ascending: false });
 
-      const vistos = new Set<string>();
+      const vistos = new Map<string, number>(); // origem -> severidade (0=info, 1=warn, 2=crit)
+      const SEV_MAP: Record<string, number> = { info: 0, warning: 1, critical: 2, error: 2 };
+
       for (const a of (alertas ?? []) as unknown as Array<{ severidade?: string; origem?: string; created_at?: string }>) {
         const s = String(a.severidade ?? "").toLowerCase();
         const orig = String(a.origem ?? "system");
         const at = new Date(String(a.created_at ?? 0)).getTime();
-        if (vistos.has(orig)) continue;
-        vistos.add(orig);
+        
+        // v628: Proteção contra silenciamento — Alertas críticos de checkout/pagamento não podem ser suprimidos
+        const isCriticalCheckout = (orig === "checkout" || orig === "payment") && (s === "critical" || s === "error");
+        
+        if (vistos.has(orig) && !isCriticalCheckout) continue;
+        if (!vistos.has(orig)) vistos.set(orig, SEV_MAP[s] ?? 1);
+        
         if (at < since20m) continue;
         if (s === "critical" || s === "error") counters.criticalAlerts++;
         else if (s === "warning") counters.warningAlerts++;

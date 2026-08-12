@@ -23,11 +23,13 @@ export const getInsightsIA = createServerFn({ method: "POST" })
     if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "insights")).ok) return { ok: false, error: "UNAUTHORIZED" };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
+    // v628: Janela de Insights aumentada para 365 dias, mas focando em consistência de volume.
     const yearAgo = new Date(Date.now() - 365 * 24 * 3600_000).toISOString();
     const { data: rows, error } = await supabaseAdmin
       .from("pedidos")
-      .select("status, valor, custo_real, created_at, rede_social, utm_source")
+      .select("status, valor, custo_real, created_at, rede_social, utm_source, metodo_pagamento")
       .gte("created_at", yearAgo)
+      .order("created_at", { ascending: false })
       .limit(5000);
     if (error) return { ok: false, error: error.message };
 
@@ -47,7 +49,7 @@ export const getInsightsIA = createServerFn({ method: "POST" })
     const totalGeral = rows?.length ?? 0;
 
     for (const r of rows ?? []) {
-      const isPaid = r.status === "paid" || r.status === "Enviado" || r.status === "pago" || r.status === "completed" || r.status === "processing";
+      const isPaid = r.status === "paid" || r.status === "Enviado" || r.status === "pago" || r.status === "completed" || r.status === "concluido" || r.status === "concluído" || r.status === "processing";
       if (!isPaid) continue;
       totalPagos++;
       const val = Number(r.valor) || 0;
