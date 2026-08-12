@@ -194,7 +194,7 @@ function RootComponent() {
   useEffect(() => {
     const sanitize = () => {
       // Microtask priority: limpa o DOM antes da próxima pintura do navegador
-      // v621 — NUNCA tocar em SCRIPT/STYLE/TEMPLATE: contêm o payload de hidratação (window.$_TSR).
+      // v622 — Blindagem Antidote Pro: Higienização atômica sem remoção de nós (preservação de âncoras sintéticas).
       const nodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
           const tag = (n.parentElement?.tagName || "").toUpperCase();
@@ -209,11 +209,9 @@ function RootComponent() {
         const text = node.textContent || "";
         if (/[\u2063\u200B\uFEFF]/.test(text)) {
           const parent = node.parentElement;
-          if (parent && parent.tagName === "SPAN" && parent.childNodes.length === 1) {
-            parent.remove();
-          } else {
-            node.textContent = text.replace(/[\u2063\u200B\uFEFF]/g, "");
-          }
+          // v622 — Preserva a estrutura de SPANs injetados mas limpa o caractere.
+          // Nunca remove o elemento, apenas higieniza o conteúdo.
+          node.textContent = text.replace(/[\u2063\u200B\uFEFF]/g, "");
         }
       }
     };
