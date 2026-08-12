@@ -78,6 +78,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  /* Protocolo de Execução v623:
+   * - Prioridade: DESENVOLVIMENTO > AUDITORIA.
+   * - Foco: CONSTRUIR → IMPLEMENTAR → TESTAR → CORRIGIR → ENTREGAR.
+   */
   head: () => ({
     meta: [
       { title: "BOOSTGG — Seguidores Reais e Brasileiros" },
