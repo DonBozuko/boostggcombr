@@ -29,6 +29,8 @@ export type TriageDigest = {
     stuckOrders: number;
     lowBalanceProviders: number;
     pendingRecovery: number;
+    databaseErrors: number;
+    invalidTargetAnomalies: number;
   };
   generatedAt: string;
 };
@@ -45,7 +47,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         actions: [
           { id: "re-auth", label: "Fazer Login Novamente", href: "/auth?next=/admin", urgency: "high" }
         ],
-        counters: { criticalAlerts: 0, warningAlerts: 0, stuckOrders: 0, lowBalanceProviders: 0, pendingRecovery: 0 },
+        counters: { criticalAlerts: 0, warningAlerts: 0, stuckOrders: 0, lowBalanceProviders: 0, pendingRecovery: 0, databaseErrors: 0, invalidTargetAnomalies: 0 },
         generatedAt: new Date().toISOString(),
       };
     }
@@ -56,6 +58,8 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
       stuckOrders: 0,
       lowBalanceProviders: 0,
       pendingRecovery: 0,
+      databaseErrors: 0,
+      invalidTargetAnomalies: 0,
     };
     const actions: TriageAction[] = [];
     let status: TriageDigest["status"] = "green";
@@ -87,6 +91,24 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         if (at < since20m) continue;
         if (s === "critical" || s === "error") counters.criticalAlerts++;
         else if (s === "warning") counters.warningAlerts++;
+      }
+
+      // v628 — Saúde do Funil e Detecção de Anomalias
+      // Busca eventos de falha no funil nos últimos 15 min
+      const since15m = new Date(now - 15 * 60 * 1000).toISOString();
+      const { data: funnelFailures } = await supabaseAdmin
+        .from("funnel_events")
+        .select("detail, step")
+        .eq("step", "pix_falhou")
+        .gte("created_at", since15m);
+      
+      const failures = (funnelFailures ?? []) as unknown as Array<{ detail: string }>;
+      counters.databaseErrors = failures.filter(f => f.detail?.includes("DATABASE_ERROR")).length;
+      
+      const targetFailures = failures.filter(f => f.detail?.includes("PROFILE_NOT_FOUND") || f.detail?.includes("INVALID_TARGET")).length;
+      // Gatilho: >3 falhas de alvo em 15min vira anomalia amarela
+      if (targetFailures > 3) {
+        counters.invalidTargetAnomalies = targetFailures;
       }
 
 
@@ -133,7 +155,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
       } catch { /* opcional */ }
 
       // Classificação
-      if (counters.stuckOrders > 0 || counters.criticalAlerts > 0) {
+      if (counters.stuckOrders > 0 || counters.criticalAlerts > 0 || counters.databaseErrors > 0) {
         status = "red";
         const parts: string[] = [];
         if (counters.stuckOrders > 0) {
@@ -154,9 +176,18 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
             urgency: "high",
           });
         }
+        if (counters.databaseErrors > 0) {
+          parts.push(`${counters.databaseErrors} erro(s) de banco no checkout`);
+          actions.push({
+            id: "check-db-health",
+            label: "Verificar Saúde da Infraestrutura",
+            href: "/admin",
+            urgency: "high",
+          });
+        }
         headline = `🔴 ${parts.join(" · ")} — abrir agora`;
         summary = "Cliente pode estar sendo afetado. Resolver imediatamente.";
-      } else if (counters.pendingRecovery > 0 || counters.lowBalanceProviders > 0 || counters.warningAlerts >= 5) {
+      } else if (counters.pendingRecovery > 0 || counters.lowBalanceProviders > 0 || counters.warningAlerts >= 5 || counters.invalidTargetAnomalies > 0) {
         status = "yellow";
         const parts: string[] = [];
         if (counters.pendingRecovery > 0) {
@@ -184,6 +215,15 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
             label: "Revisar avisos acumulados",
             href: "/admin",
             urgency: "low",
+          });
+        }
+        if (counters.invalidTargetAnomalies > 0) {
+          parts.push(`${counters.invalidTargetAnomalies} falhas de alvo (anomalia)`);
+          actions.push({
+            id: "check-funnel-targets",
+            label: "Investigar falhas de @perfil",
+            href: "/admin",
+            urgency: "medium",
           });
         }
         headline = `🟡 ${parts.join(" · ")}`;
