@@ -1,18 +1,29 @@
-# Plano de Estabilidade Visual e Semântica (v627)
+# Plano de Estabilização e Veracidade Jarvis (v628)
 
-Este plano visa atender à solicitação do usuário de manter a integridade do sistema de transporte de dados enquanto remove ruídos visuais desnecessários em elementos de interface, seguindo a diretriz de "questione se não for legal".
+O objetivo é resolver a inconsistência entre o status reportado pelo J.A.R.V.I.S. (Semáforo Verde/Amarelo) e a realidade operacional (DATABASE_ERROR e PROFILE_NOT_FOUND no funil, receita estagnada).
 
-## Problema
-O usuário solicitou a alteração visual de um caractere invisível (`\u2063`) para ele mesmo em um elemento específico. Na prática, este caractere é usado pelo sistema como um "separador de transporte" para evitar que scripts de terceiros ou IAs corrompam strings sensíveis, mas ele não deve ser renderizado como conteúdo visual para o usuário final quando não for necessário.
+## Diagnóstico
+1. **DATABASE_ERROR**: Ocorre quando o `criarPedido` (server function) falha ao inserir no Supabase. Isso é um erro crítico de infraestrutura que deve disparar Alerta Vermelho.
+2. **PROFILE_NOT_FOUND**: Ocorre quando o `preflightTargetOrBlock` identifica que o perfil não existe. No funil, isso aparece como falha de Pix, o que é tecnicamente correto (o checkout é bloqueado antes de gerar o Pix), mas o admin não está sendo alertado sobre picos dessas falhas.
+3. **Semáforo Omissivo**: O `getJarvisTriage` foca em pedidos pagos travados e alertas explícitos em `jarvis_alerts`. Erros de "Tentativa de Compra" (DATABASE_ERROR) não estão sendo registrados como alertas, tornando o semáforo cego para falhas no topo do funil.
 
-## Solução
-Implementar um ajuste fino no `src/lib/dom-sanitizer.ts` para garantir que a higienização de interface seja agressiva na remoção visual, mas preserve a integridade em fluxos de transporte (como o Jarvis ou Webhooks).
+## Ações
 
-## Mudanças Técnicas
-1. **Sanitização de Renderização**: Refinar o `sanitizeText` para garantir que o caractere `\u2063` seja removido em contextos de exibição UI, enquanto mantemos sua função em logs técnicos e transporte.
-2. **Validação de Impacto**: Garantir que componentes como `SocialProofPopup` e `JarvisDetectorMentiras` continuem funcionando, já que utilizam este protocolo para integridade.
+### 1. Registro de Falhas Críticas de Checkout
+Alterar `src/lib/pedidos.functions.ts` para registrar erros de banco de dados (`DATABASE_ERROR`) e erros inesperados do gateway de pagamento como alertas críticos em `jarvis_alerts`.
 
-## Detalhes para o usuário
-- Não haverá alteração no design ou em textos visíveis.
-- O ajuste é puramente técnico para "limpar" o código que o navegador lê, evitando que caracteres de controle apareçam por erro em telas de dispositivos móveis ou leitores de tela.
-- A estabilidade operacional e financeira (Regra de Ouro) é preservada integralmente.
+### 2. Triagem Inteligente de Funil
+Atualizar `src/lib/jarvis-triage.functions.ts` para incluir uma verificação de saúde do checkout:
+- Se houver `DATABASE_ERROR` nos últimos 15 minutos → **Status Vermelho**.
+- Se houver um pico anômalo de `PROFILE_NOT_FOUND` ou `INVALID_TARGET` → **Status Amarelo** (pode ser ataque de spam ou instabilidade na API do Instagram).
+
+### 3. Melhoria na Classificação de Severidade
+Ajustar `src/lib/alert-severity.ts` para garantir que `DATABASE_ERROR` seja categorizado como `critical`.
+
+### 4. Visibilidade no Painel Funil
+Garantir que o `FunilEtapasPanel` destaque erros de sistema (DATABASE_ERROR) de forma distinta de erros de usuário (PROFILE_NOT_FOUND).
+
+## Detalhes Técnicos
+- Utilizar `supabaseAdmin` para inserir em `jarvis_alerts` com `severidade='critical'`.
+- Adicionar contadores de erros de checkout no payload do `getJarvisTriage`.
+- Implementar detecção de anomalia simples (ex: > 3 falhas de banco seguidas).
