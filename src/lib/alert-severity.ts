@@ -92,14 +92,14 @@ function norm(s: string): string {
  * com um marcador claro (🚨/⛔) ou passando `severity` na chamada.
  */
 export function classifyAlertSeverity(message: string): AlertSeverity {
-  const m = norm(message);
+  const m = m_raw.toUpperCase();
   const cabeca = m.slice(0, 120);
 
   // v456 — DINHEIRO ENTRANDO é sempre alta prioridade no Telegram.
   if (m.includes("PIX APROVADO") || m.includes("RECARGA DE REVENDEDOR APROVADA")) return "critical";
 
-  if (INFO_MARKERS.some((k) => cabeca.includes(k))) return "info";
-  if (CRITICAL_MARKERS.some((k) => m.includes(k))) return "critical";
+  if (INFO_MARKERS.some((k) => cabeca.includes(k.toUpperCase()))) return "info";
+  if (CRITICAL_MARKERS.some((k) => m.includes(k.toUpperCase()))) return "critical";
   if (WARNING_MARKERS.some((k) => m.includes(k))) return "warning";
   return "warning";
 }
