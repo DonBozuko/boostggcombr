@@ -70,6 +70,8 @@ const CRITICAL_MARKERS = [
   "cobranca orfa",
   "todos fornecedores",
   "dupla entrega",
+  "DATABASE_ERROR",
+  "PAYMENT_GATEWAY_ERROR",
 ];
 
 

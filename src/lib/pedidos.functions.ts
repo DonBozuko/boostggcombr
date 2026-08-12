@@ -221,6 +221,17 @@ export const criarPedido = createServerFn({ method: "POST" })
 
     if (error || !pedido) {
       console.error("[criarPedido] erro ao salvar:", error);
+      // v628 — Proteção contra falha em cascata: tenta registrar alerta, mas não bloqueia se falhar
+      try {
+        const { supabaseAdmin: sbAdmin } = await import("@/integrations/supabase/client.server");
+        await sbAdmin.from("jarvis_alerts").insert({
+          severidade: "critical",
+          origem: "checkout",
+          mensagem: `🚨 DATABASE_ERROR no checkout: falha ao inserir pedido para @${data.instagram_user}. Erro: ${error?.message || "desconhecido"}`,
+          created_at: new Date().toISOString()
+        });
+      } catch { /* noop */ }
+      
       return { ok: false as const, error: "DATABASE_ERROR" as const };
     }
 
@@ -249,6 +260,17 @@ export const criarPedido = createServerFn({ method: "POST" })
       };
     } catch (err) {
       console.error("[criarPedido] erro MP:", err);
+      // v628 — Alerta de erro de gateway
+      try {
+        const { supabaseAdmin: sbAdmin } = await import("@/integrations/supabase/client.server");
+        await sbAdmin.from("jarvis_alerts").insert({
+          severidade: "critical",
+          origem: "checkout",
+          mensagem: `🚨 PAYMENT_GATEWAY_ERROR: falha ao gerar preferência MP para o pedido ${pedido.id}. Erro: ${(err as Error).message}`,
+          created_at: new Date().toISOString()
+        });
+      } catch { /* noop */ }
+
       return { ok: false as const, error: "PAYMENT_GATEWAY_ERROR" as const };
     }
   });
