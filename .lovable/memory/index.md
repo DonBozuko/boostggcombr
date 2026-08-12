@@ -8,11 +8,48 @@ Escrita Atômica (v383): Trava idempotente anti-gasto duplo em `dispatch-commit.
 Hierarquia de Identidade: BOOSTGG (Marca) > Elite Boost Prime (Legal).
 
 ## Memories
-- [Protocolo de Risco](mem://preferences/protocolo-de-risco) — Matriz de autonomia v623 (Build First).
-- [Auditoria Forense v596](mem://features/auditoria-forense-v596.md) — Estabilização de margem e limpeza de IDs.
-- [Pricing Engine](mem://preferences/preco-dono-unico.md) — Autoridade única de preço.
-- [Ledger Financeiro](mem://preferences/nunca-cobrar-sem-preflight.md) — Fonte de verdade para transações.
-- [Dispatch Commit](mem://features/fila-e-status-canonico.md) — Sincronia entre banco e fornecedor.
-- [Sanitizador Antidote Pro](mem://constraints/regra-que-nao-anda.md) — Blindagem contra injeção de caracteres.
-- [SEO & Freshness](mem://preferences/evolucao-futura.md) — Diretrizes de rankeamento e metadados.
-- [Jarvis AI Inspector](mem://preferences/motor-anti-alucinacao.md) — Monitoramento de integridade e auto-cura.
+- [Alerta de Versão](mem://constraints/alerta-repete-versao-publicada.md)
+- [Custo do Serviço](mem://constraints/custo-do-servico-despachado.md)
+- [Custo de Entrega](mem://constraints/custo-so-de-quem-entrega.md)
+- [Dupla Leitura de Custo](mem://constraints/dupla-leitura-de-custo.md)
+- [Fonte Única Fornecedor](mem://constraints/fonte-unica-id-fornecedor.md)
+- [ID Descartável](mem://constraints/id-descartavel.md)
+- [Moeda Única BRL](mem://constraints/moeda-unica-brl.md)
+- [Motor Forte](mem://constraints/motor-forte-nao-motor-novo.md)
+- [Rotas Reais](mem://constraints/nada-fake-nas-rotas.md)
+- [Projeto Revenda Único](mem://constraints/projeto-revenda-unico.md)
+- [Recusto Respeita Faixa](mem://constraints/recusto-respeita-faixa.md)
+- [Regra que não anda](mem://constraints/regra-que-nao-anda.md)
+- [Saldo Venda](mem://constraints/saldo-nunca-bloqueia-venda.md)
+- [Saldo Pausa](mem://constraints/saldo-nunca-pausa.md)
+- [Sync Fornecedor](mem://constraints/sync-fornecedor-completo.md)
+- [Vínculo Banco](mem://constraints/vinculo-banco-vence-codigo.md)
+- [Bancada Autônoma](mem://features/bancada-autonoma.md)
+- [Escopo Fechado](mem://features/escopo-fechado.md)
+- [Fila e Status Canônico](mem://features/fila-e-status-canonico.md)
+- [Markup por Custo](mem://features/markup-por-custo.md)
+- [Rota Reserva Quente](mem://features/rota-reserva-quente.md)
+- [Alarme que não anda](mem://preferences/alarme-que-nao-anda.md)
+- [Alertas em Português](mem://preferences/alertas-em-portugues.md)
+- [Bug vira Invariante](mem://preferences/bug-vira-invariante.md)
+- [Dívidas Aceitas](mem://preferences/dividas-aceitas.md)
+- [Escada de Autonomia](mem://preferences/escada-de-autonomia.md)
+- [Evolução Futura](mem://preferences/evolucao-futura.md)
+- [Medidor antes do Remédio](mem://preferences/medidor-antes-do-remedio.md)
+- [Modo Orquestrador](mem://preferences/modo-orquestrador.md)
+- [Modo Torre Clean Code](mem://preferences/modo-torre-clean-code.md)
+- [Motor Anti-Alucinação](mem://preferences/motor-anti-alucinacao.md)
+- [Nunca Cobrar sem Preflight](mem://preferences/nunca-cobrar-sem-preflight.md)
+- [Nunca Cobrar sem Validar Alvo](mem://preferences/nunca-cobrar-sem-validar-alvo.md)
+- [Nunca Responder de Memória](mem://preferences/nunca-responder-de-memoria.md)
+- [Pacote BR](mem://preferences/pacote-br-so-servico-br.md)
+- [Portão de Risco](mem://preferences/portao-de-risco.md)
+- [Prateleira Honesta](mem://preferences/prateleira-honesta.md)
+- [Preço Dono Único](mem://preferences/preco-dono-unico.md)
+- [Protocolo de Risco](mem://preferences/protocolo-de-risco.md)
+- [Regra 2x Causa Raiz](mem://preferences/regra-2x-causa-raiz.md)
+- [Sem Percentual](mem://preferences/sem-percentual-tres-numeros.md)
+- [Sinal Verde Escopado](mem://preferences/sinal-verde-escopado.md)
+- [Testes Gate de Deploy](mem://preferences/testes-gate-de-deploy.md)
+- [Tolerância e Hierarquia](mem://preferences/tolerancia-e-hierarquia.md)
+- [Tracking Ads](mem://tracking-ads.md)
