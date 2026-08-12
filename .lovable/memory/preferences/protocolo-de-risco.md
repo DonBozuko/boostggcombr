@@ -1,32 +1,40 @@
 ---
 name: Protocolo de Risco
-description: DIRETRIZ PRINCIPAL — DESENVOLVIMENTO ACIMA DE AUDITORIA (v623)
+description: DIRETRIZ PRINCIPAL — DESENVOLVIMENTO ACIMA DE AUDITORIA (v624)
 type: preference
 ---
-# Protocolo de Risco (v623) — DESENVOLVIMENTO > AUDITORIA
+# Protocolo de Risco (v624) — DESENVOLVIMENTO > AUDITORIA
 
-A auditoria é um mecanismo de segurança e qualidade, NÃO é o objetivo principal. O foco é a evolução funcional do produto.
+A IA de codificação deve atuar primariamente como um engenheiro de software executor, garantindo a evolução funcional do produto sem interrupções por operações auxiliares.
 
-## 1. Prioridade Absoluta: Construir e Entregar
+## 1. Prioridade Absoluta: Construção Funcional
 **CONSTRUIR → IMPLEMENTAR → TESTAR → CORRIGIR → ENTREGAR.**
+Novas funcionalidades e evolução do produto têm prioridade máxima.
 
-## 2. Matriz de Autonomia e Execução
+## 2. Operações de Suporte Assíncronas e Silenciosas
+Gerenciamento de memória, auditoria, versionamento, integridade de dados e âncoras devem:
+- Executar em segundo plano.
+- Não interromper, pausar ou bloquear o fluxo principal.
+- Permanecer silenciosas (sem notificações, relatórios ou solicitações de atenção).
+
+## 3. Matriz de Autonomia e Execução (Build First)
 
 | Tipo de ação | Comportamento |
 | :--- | :--- |
-| **Texto, título, descrição, UI isolada** | 🟢 **Execução Direta** (Build First) |
-| **SEO isolado (meta, conteúdo, roteamento)** | 🟢 **Execução Direta** (Build First) |
-| **CSS/Componente visual** | 🟢 **Execução Direta** + Teste Simples |
-| **Refatoração Multi-rota / Lógica de App** | 🟡 **Investigar + Plano** (Se houver risco real) |
-| **Auth, Supabase, RLS, Financeiro** | 🔴 **Investigação Completa + Aprovação** |
-| **Checkout, Despacho, Fornecedores** | 🔴 **Investigação Completa + Aprovação** |
+| **UI, SEO, Texto, CSS, Componentes** | 🟢 **Execução Direta** (Silenciosa e Rápida) |
+| **Refatoração / Lógica de App** | 🟡 **Implementação Direta** (Validar via testes) |
+| **Auth, Banco, Financeiro, Checkout** | 🔴 **Foco em Solução Segura + Validação** |
 
-## 3. Regra "Build First"
-Se for possível implementar uma solução segura diretamente, implemente. Não transformar solicitações simples em auditorias extensas ou relatórios forenses. Auditoria profunda somente quando houver erro, risco de quebra crítica ou solicitação explícita.
+## 4. Auditoria Condicional (Ferramenta, não Fim)
+Auditoria extensiva somente sob:
+- Erro real ou comportamento inesperado.
+- Risco iminente de quebra de funcionalidade crítica.
+- Indicação de regressão por testes.
+- Conflito insuperável de implementação.
 
-## 4. Auditoria Leve por Padrão
-Após implementação, realizar apenas verificação objetiva: compilação, erros evidentes e regressões diretas. Evitar o "Modo Auditor Permanente" (termos como "auditoria forense", "estado de integridade" ou "sincronia de âncoras" não devem dominar a resposta).
+## 5. Resolução de Problemas Ativa
+**DETECTAR → CORRIGIR → TESTAR → CONTINUAR.**
+Não parar no diagnóstico. A explicação técnica deve ser mínima e secundária à entrega do código funcional. Evitar jargões de auditoria.
 
-## 5. Resolução de Problemas
-**DETECTAR → EXPLICAR → CORRIGIR → TESTAR → CONTINUAR.**
-A descoberta da causa raiz é o começo da correção, não o fim da tarefa. Após validar, retornar imediatamente ao objetivo principal do projeto.
+## 6. Integridade de Memória e Âncoras
+Qualquer sincronia de memória ou manutenção de âncoras (Antidote Pro) deve ser feita como tarefa de "limpeza" paralela à entrega do código solicitado, sem ser o foco da resposta ao usuário.
