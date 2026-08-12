@@ -114,13 +114,18 @@ export function AdminHealthSemaphore() {
 
           )}
           {d && (
-
             <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-white/50">
               <span>🔴 críticos: <b className="text-white/80">{d.counters.criticalAlerts}</b></span>
+              {d.counters.databaseErrors > 0 && (
+                <span className="text-red-400 font-bold">⚠️ DB: <b>{d.counters.databaseErrors}</b></span>
+              )}
               <span>🟡 avisos: <b className="text-white/80">{d.counters.warningAlerts}</b></span>
-              <span>⏱ pedidos travados: <b className="text-white/80">{d.counters.stuckOrders}</b></span>
-              <span>💰 saldo baixo: <b className="text-white/80">{d.counters.lowBalanceProviders}</b></span>
-              <span>🛒 Pix abandonados: <b className="text-white/80">{d.counters.pendingRecovery}</b></span>
+              {d.counters.invalidTargetAnomalies > 0 && (
+                <span className="text-amber-400">👤 perfil: <b>{d.counters.invalidTargetAnomalies}</b></span>
+              )}
+              <span>⏱ pedidos: <b className="text-white/80">{d.counters.stuckOrders}</b></span>
+              <span>💰 saldo: <b className="text-white/80">{d.counters.lowBalanceProviders}</b></span>
+              <span>🛒 Pix: <b className="text-white/80">{d.counters.pendingRecovery}</b></span>
             </div>
           )}
         </div>
