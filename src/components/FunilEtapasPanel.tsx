@@ -78,7 +78,12 @@ export function FunilEtapasPanel({ token }: { token: string }) {
           <ul className="text-xs text-neutral-300 space-y-1">
             {data.falhas_pix.map((f) => (
               <li key={f.motivo} className="flex justify-between gap-3">
-                <span className="truncate">{f.motivo}</span>
+                <span className={`truncate ${f.motivo.includes('DATABASE_ERROR') || f.motivo.includes('PAYMENT_GATEWAY_ERROR') ? 'text-red-500 font-bold border-l-2 border-red-500 pl-1' : ''}`}>
+                  {f.motivo.includes('DATABASE_ERROR') ? '⚠️ ERRO DE SISTEMA: ' : 
+                   f.motivo.includes('PROFILE_NOT_FOUND') ? '👤 PERFIL NÃO ENCONTRADO: ' : 
+                   f.motivo.includes('INVALID_TARGET') ? '🚫 ALVO INVÁLIDO: ' : ''}
+                  {f.motivo}
+                </span>
                 <span className="font-mono text-red-300">{f.n}x</span>
               </li>
             ))}
