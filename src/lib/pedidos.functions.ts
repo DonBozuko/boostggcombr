@@ -229,7 +229,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           origem: "checkout",
           mensagem: `🚨 DATABASE_ERROR no checkout: falha ao inserir pedido para @${data.instagram_user}. Erro: ${error?.message || "desconhecido"}`,
           created_at: new Date().toISOString()
-        }).catch(() => {});
+        });
       } catch { /* noop */ }
       
       return { ok: false as const, error: "DATABASE_ERROR" as const };
@@ -268,7 +268,7 @@ export const criarPedido = createServerFn({ method: "POST" })
           origem: "checkout",
           mensagem: `🚨 PAYMENT_GATEWAY_ERROR: falha ao gerar preferência MP para o pedido ${pedido.id}. Erro: ${(err as Error).message}`,
           created_at: new Date().toISOString()
-        }).catch(() => {});
+        });
       } catch { /* noop */ }
 
       return { ok: false as const, error: "PAYMENT_GATEWAY_ERROR" as const };
