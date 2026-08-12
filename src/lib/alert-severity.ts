@@ -92,7 +92,7 @@ function norm(s: string): string {
  * com um marcador claro (🚨/⛔) ou passando `severity` na chamada.
  */
 export function classifyAlertSeverity(message: string): AlertSeverity {
-  const m = m_raw.toUpperCase();
+  const m = String(message ?? "").toUpperCase();
   const cabeca = m.slice(0, 120);
 
   // v456 — DINHEIRO ENTRANDO é sempre alta prioridade no Telegram.
