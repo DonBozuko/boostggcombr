@@ -95,8 +95,11 @@ export function classifyAlertSeverity(message: string): AlertSeverity {
   const m = String(message ?? "").toUpperCase();
   const cabeca = m.slice(0, 120);
 
-  // v456 — DINHEIRO ENTRANDO é sempre alta prioridade no Telegram.
-  if (m.includes("PIX APROVADO") || m.includes("RECARGA DE REVENDEDOR APROVADA")) return "critical";
+  // v629 — DINHEIRO ENTRANDO não é "crítico": é sucesso (info). O envio ao
+  // Telegram desses eventos já usa `force: true`, então não depende do gate.
+  // Marcar como critical pintava o semáforo de vermelho em venda aprovada.
+
+
 
   if (INFO_MARKERS.some((k) => cabeca.includes(k.toUpperCase()))) return "info";
   if (CRITICAL_MARKERS.some((k) => m.includes(k.toUpperCase()))) return "critical";
