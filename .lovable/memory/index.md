@@ -1,8 +1,8 @@
 # Project Memory
 
 ## Core
-Prioridade (v624): DESENVOLVIMENTO > AUDITORIA (Silencioso & Assíncrono).
-Protocolo de Risco (v624): Execução direta e invisível de tarefas de suporte.
+Prioridade (v625): MODO BUILD-FIRST. Construir e entregar acima de processos internos.
+Protocolo de Risco (v625): Ciclo ENTENDER -> CONSTRUIR -> TESTAR -> CORRIGIR -> ENTREGAR.
 Ritmo Adaptativo (v570): Agilidade extrema em confirmações simples vs. análise técnica sob demanda.
 Escrita Atômica (v383): Trava idempotente anti-gasto duplo em `dispatch-commit.server.ts`.
 Hierarquia de Identidade: BOOSTGG (Marca) > Elite Boost Prime (Legal).
