@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AI Engineering Reviewer</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-dim: #94a3b8;
+      --primary: #3b82f6;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+
+    body {
+      width: 400px;
+      margin: 0;
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 16px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin: 0;
+      color: var(--primary);
+    }
+
+    .settings-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-dim);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 8px;
+      font-size: 12px;
+      min-height: 80px;
+      resize: vertical;
+      font-family: monospace;
+    }
+
+    button.analyze-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button.analyze-btn:hover {
+      opacity: 0.9;
+    }
+
+    .results {
+      margin-top: 16px;
+      padding: 12px;
+      background: var(--card-bg);
+      border-radius: 6px;
+      border-left: 4px solid var(--primary);
+      display: none;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .status-approved { background: var(--success); color: white; }
+    .status-warning { background: var(--warning); color: black; }
+    .status-error { background: var(--danger); color: white; }
+
+    .confidence {
+      float: right;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .result-section {
+      margin-top: 12px;
+      font-size: 12px;
+    }
+
+    .result-section h3 {
+      font-size: 11px;
+      margin: 0 0 4px 0;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .copy-btn {
+      font-size: 10px;
+      padding: 4px 8px;
+      background: #334155;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>AI ENGINEERING REVIEWER</h1>
+    <button class="settings-btn" id="openSettings">⚙️</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-mode="PLAN">ANALISAR PLANO</div>
+    <div class="tab" data-mode="PROMPT">MELHORAR PROMPT</div>
+    <div class="tab" data-mode="VALIDATE">VALIDAR</div>
+  </div>
+
+  <div class="form-group">
+    <label>CONTEXTO / PROBLEMA</label>
+    <textarea id="contextInput" placeholder="Descreva o problema ou cole o contexto..."></textarea>
+  </div>
+
+  <div class="form-group">
+    <label id="inputLabel">PLANO / RESPOSTA DA IA</label>
+    <textarea id="aiInput" placeholder="Cole aqui o que a IA propôs..."></textarea>
+  </div>
+
+  <button class="analyze-btn" id="analyzeBtn">EXECUTAR ANÁLISE ADVERSÁRIA</button>
+
+  <div class="results" id="resultsArea">
+    <div class="confidence" id="confidenceValue">Score: 85%</div>
+    <div class="status-badge status-approved" id="statusBadge">APROVADO COM CORREÇÕES</div>
+    
+    <div class="result-section">
+      <h3>Problemas Detectados</h3>
+      <div id="problemsFound">Nenhum problema crítico detectado.</div>
+    </div>
+
+    <div class="result-section">
+      <h3>Melhor Alternativa</h3>
+      <div id="alternativeProposed">Utilizar idempotência no ledger em vez de apenas trava de UI.</div>
+    </div>
+
+    <div class="result-section">
+      <h3>Prompt Otimizado</h3>
+      <div style="background: #0f172a; padding: 8px; border-radius: 4px; font-size: 11px; margin-top: 4px;" id="optimizedPrompt">
+        [PROMPT OTIMIZADO SERÁ GERADO AQUI]
+      </div>
+      <button class="copy-btn" id="copyBtn">COPIAR PROMPT</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
