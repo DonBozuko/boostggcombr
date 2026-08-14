@@ -43,7 +43,8 @@ export const createIncident = createServerFn({ method: "POST" })
       const auth = await assertAdmin(data.token, "create-incident");
       if (!auth.ok) return { ok: false as const, error: "UNAUTHORIZED" };
 
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const adminEmail = "fabiano.majestic@gmail.com"; // Email mestre fixo do projeto (v434)
+
       
       const { data: incident, error } = await supabaseAdmin
         .from("jarvis_incidents")
