@@ -96,7 +96,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
       const vistos = new Map<string, number>(); // origem -> severidade (0=info, 1=warn, 2=crit)
       const SEV_MAP: Record<string, number> = { info: 0, warning: 1, critical: 2, error: 2 };
 
-      for (const a of (alertas ?? []) as unknown as Array<{ severidade?: string; origem?: string; created_at?: string }>) {
+      for (const a of (alertas ?? []) as unknown as Array<{ id: string; severidade?: string; origem?: string; mensagem?: string; created_at?: string }>) {
         const s = String(a.severidade ?? "").toLowerCase();
         const orig = String(a.origem ?? "system");
         const at = new Date(String(a.created_at ?? 0)).getTime();

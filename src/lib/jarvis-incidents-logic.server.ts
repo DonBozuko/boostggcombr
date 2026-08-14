@@ -9,12 +9,12 @@ import { z } from "zod";
 export const getIncidentTriage = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
   .handler(async ({ data }) => {
-    const { assertAdmin } = await import("@/lib/admin-guard.server");
-    if (!(await assertAdmin(data.token, "jarvis-incidents-triage")).ok) {
-       return { ok: false as const, error: "UNAUTHORIZED" };
-    }
-
     try {
+      const { assertAdmin } = await import("@/lib/admin-guard.server");
+      if (!(await assertAdmin(data.token, "jarvis-incidents-triage")).ok) {
+        return { ok: false as const, error: "UNAUTHORIZED" };
+      }
+
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       
       const { data: openIncidents, error } = await supabaseAdmin
@@ -25,19 +25,20 @@ export const getIncidentTriage = createServerFn({ method: "POST" })
 
       if (error) throw error;
 
-      const critical = (openIncidents ?? []).filter(i => i.severity === 'critical').length;
-      const investigating = (openIncidents ?? []).filter(i => i.status === 'INVESTIGATING').length;
-      const validating = (openIncidents ?? []).filter(i => i.status === 'VALIDATING').length;
+      const incs = (openIncidents ?? []) as any[];
+      const critical = incs.filter(i => i.severity === 'critical').length;
+      const investigating = incs.filter(i => i.status === 'INVESTIGATING').length;
+      const validating = incs.filter(i => i.status === 'VALIDATING').length;
 
       return {
         ok: true as const,
         counters: {
-          totalOpen: openIncidents?.length ?? 0,
+          totalOpen: incs.length,
           critical,
           investigating,
           validating
         },
-        incidents: openIncidents ?? []
+        incidents: incs
       };
     } catch (e) {
       console.error("[jarvis-incidents] triage failed", e);
@@ -46,8 +47,6 @@ export const getIncidentTriage = createServerFn({ method: "POST" })
   });
 
 export async function detectIncidentFromAlert(alert: { id: string; type: string; severity: string; origin: string; headline: string }) {
-  // Regra de Deduplicação v637:
-  // Mesma origem + mesmo tipo + status != CLOSED nas últimas 4h
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
@@ -62,15 +61,8 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
       .limit(1);
 
     if (existing && existing.length > 0) {
-      // Já existe um incidente aberto para este problema nas últimas 4h.
-      // Apenas vinculamos o alerta ao incidente existente (opcional, faremos na v638+)
       return { ok: true, duplicated: true, incidentId: existing[0].id };
     }
-
-    const { createIncident } = await import("./jarvis-incidents.server");
-    // Chamada interna sem token (usando supabaseAdmin direto no handler se necessário, 
-    // mas aqui chamamos a função exportada que espera token, então precisamos de um bypass ou service role)
-    // Para simplificar e manter a segurança v636.1, o detector usará supabaseAdmin diretamente.
 
     const { data: incident, error } = await supabaseAdmin
       .from("jarvis_incidents")

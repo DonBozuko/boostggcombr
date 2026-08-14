@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { jarvisNocSnapshot } from "@/lib/jarvis-noc.functions";
 import { getJarvisTriage } from "@/lib/jarvis-triage.functions";
+import { getIncidentTriage } from "@/lib/jarvis-incidents-logic.server";
 import { getAdminToken } from "@/lib/admin-token-store";
 import { toast } from "sonner";
 
@@ -93,7 +94,7 @@ export function JarvisNocDashboard() {
   if (loading) return <div className="p-8 text-zinc-500 text-center font-mono">Carregando telemetria real...</div>;
   if (!data) return <div className="p-8 text-red-500 text-center font-mono">Erro de conexão com NOC.</div>;
 
-  const { snapshot, triage } = data;
+  const { snapshot, triage, incidents } = data;
   const metrics: MetricCardProps[] = [
     { 
       title: "Checkout 24h", 
@@ -187,6 +188,35 @@ export function JarvisNocDashboard() {
             <p className="text-lg font-bold">{triage.headline}</p>
             <p className="text-sm text-zinc-400 mt-2">{triage.summary}</p>
         </Card>
+
+        {incidents?.ok && incidents.incidents.length > 0 && (
+          <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
+            <h2 className="text-sm font-bold text-zinc-400 mb-4 uppercase">Incidentes Ativos ({incidents.incidents.length})</h2>
+            <div className="space-y-4">
+              {incidents.incidents.map((inc: any) => (
+                <div key={inc.id} className="border-l-4 border-zinc-700 pl-4 py-2 hover:bg-zinc-800/50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
+                      inc.severity === 'critical' ? 'bg-red-500/20 text-red-500' :
+                      inc.severity === 'error' ? 'bg-red-400/20 text-red-400' :
+                      inc.severity === 'warning' ? 'bg-yellow-500/20 text-yellow-500' :
+                      'bg-zinc-500/20 text-zinc-500'
+                    }`}>
+                      {inc.severity}
+                    </span>
+                    <span className="text-[10px] font-mono text-zinc-500">{inc.status}</span>
+                  </div>
+                  <p className="font-bold text-sm mt-1">{inc.headline}</p>
+                  <div className="flex items-center gap-4 mt-2 text-[10px] text-zinc-500 font-mono">
+                    <span>ORIGEM: {inc.origin}</span>
+                    <span>TYPE: {inc.type}</span>
+                    <span>ID: {inc.id.slice(0, 8)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );
