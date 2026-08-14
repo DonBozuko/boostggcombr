@@ -198,7 +198,7 @@ export function JarvisNocDashboard() {
                   <Checkbox 
                     id="duplication" 
                     checked={incidentForm.noDuplication}
-                    onCheckedChange={(checked) => setIncidentForm({...incidentForm, noDuplication: !!checked})}
+                    onCheckedChange={(checked: boolean | "indeterminate") => setIncidentForm({...incidentForm, noDuplication: !!checked})}
                   />
                   <Label htmlFor="duplication" className="text-xs text-zinc-400 cursor-pointer">
                     Confirmo que a correção impede a duplicação de pedidos ou entregas (Protocolo Atômico v383)
