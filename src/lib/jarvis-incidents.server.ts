@@ -46,6 +46,8 @@ export const createIncident = createServerFn({ method: "POST" })
       const adminEmail = "fabiano.majestic@gmail.com"; // Email mestre fixo do projeto (v434)
 
       
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      
       const { data: incident, error } = await supabaseAdmin
         .from("jarvis_incidents")
         .insert({
@@ -63,12 +65,13 @@ export const createIncident = createServerFn({ method: "POST" })
 
       // Auditoria
       await supabaseAdmin.from("admin_audit_logs").insert({
-        admin_email: auth.email ?? "admin@jarvis",
+        admin_email: adminEmail,
         action: "incident_created",
         detail: { incidentId: incident.id, type: data.type }
       });
 
       return { ok: true as const, incident };
+
     } catch (e) {
       console.error("[jarvis-incidents] create failed (circuit breaker active)", e);
       return { ok: false as const, error: "CIRCUIT_BREAKER_ACTIVE" };
