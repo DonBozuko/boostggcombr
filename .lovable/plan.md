@@ -1,6 +1,6 @@
-# Plano de Implantação: Entidade jarvis_incidents (v636)
+# Plano de Implantação: Entidade jarvis_incidents (v636.1)
 
-Criação da estrutura de dados para o ciclo de vida de incidentes no J.A.R.V.I.S. NOC, garantindo consistência atômica, RLS restritivo e rastreabilidade total sem afetar o fluxo financeiro ou de checkout.
+Criação da estrutura de dados para o ciclo de vida de incidentes no J.A.R.V.I.S. NOC, garantindo consistência atômica, RLS restritivo e rastreabilidade total sem afetar o fluxo comercial.
 
 ## 1. Banco de Dados (Supabase Migration)
 
@@ -8,56 +8,39 @@ Criação da estrutura de dados para o ciclo de vida de incidentes no J.A.R.V.I.
 - `id`: uuid primary key (default gen_random_uuid())
 - `created_at`: timestamptz (default now())
 - `updated_at`: timestamptz (default now())
-- `status`: enum `incident_status`
-- `severity`: enum `alert_severity` (alinhado com `src/lib/alert-severity.ts`)
-- `type`: text (ex: 'DATABASE_ERROR', 'API_TIMEOUT')
+- `status`: public.incident_status
+- `severity`: public.alert_severity
+- `type`: text (ex: 'DATABASE_ERROR')
 - `headline`: text
-- `origin`: text (vínculo com a origem do alerta)
-- `root_cause`: text (opcional)
-- `fix_applied`: text (opcional)
-- `validation_notes`: text (opcional)
+- `origin`: text
+- `root_cause`: text
+- `fix_applied`: text
+- `validation_notes`: text
 - `regression_verified`: boolean (default false)
-- `closed_at`: timestamptz (null até CLOSED)
-- `alert_ids`: uuid[] (vínculo com `jarvis_alerts.id`)
-- `audit_log_ids`: uuid[] (vínculo com `admin_audit_logs.id`)
+- `closed_at`: timestamptz
+- `alert_ids`: uuid[] (rastreio de alertas relacionados)
+- `audit_log_ids`: uuid[] (rastreio de logs de auditoria)
 
-### Enums
-```sql
-CREATE TYPE public.incident_status AS ENUM (
-  'DETECTED',
-  'INVESTIGATING',
-  'ROOT_CAUSE_IDENTIFIED',
-  'FIX_APPLIED',
-  'VALIDATING',
-  'REGRESSION_VERIFIED',
-  'CLOSED'
-);
-
-CREATE TYPE public.alert_severity AS ENUM (
-  'critical',
-  'error',
-  'warning',
-  'info'
-);
-```
+### Tipos e Enums
+- `public.alert_severity`: ('critical', 'error', 'warning', 'info')
+- `public.incident_status`: ('DETECTED', 'INVESTIGATING', 'ROOT_CAUSE_IDENTIFIED', 'FIX_APPLIED', 'VALIDATING', 'REGRESSION_VERIFIED', 'CLOSED')
 
 ### RLS e Permissões
-- `ENABLE ROW LEVEL SECURITY`
 - `GRANT SELECT, INSERT, UPDATE ON public.jarvis_incidents TO authenticated`
 - `GRANT ALL ON public.jarvis_incidents TO service_role`
-- Policy: Somente administradores (via `public.has_role`) podem interagir.
+- Policy: Apenas usuários com `public.has_role(auth.uid(), 'admin')` podem acessar/editar.
 
-## 2. Implementação Técnica
+## 2. Implementação do Backend (`src/lib/jarvis-incidents.server.ts`)
 
-- **Migration SQL**: Script determinístico com `CREATE TABLE` e `GRANT`.
-- **Backend API**: Criação de `src/lib/jarvis-incidents.server.ts` para operações de backend.
-- **Circuit Breaker**: Garantia de que falhas na gravação de incidentes não bloqueiem processos de negócio.
+- **Máquina de Estados**: Validação rigorosa das transições (ex: impede encerramento sem causa raiz e validação).
+- **Circuit Breaker**: Try-catch global para garantir que falhas no registro de incidentes não afetem o checkout.
+- **Auditoria**: Registro automático em `admin_audit_logs` para cada transição de estado.
 
 ## 3. Validação Operacional
 
-- Verificação de schema e constraints.
-- Testes de RLS (acesso negado para não-admin).
-- Validação de que checkout e financeiro permanecem intocados.
+- Testes de integridade de tipos e constraints.
+- Testes de RLS com diferentes perfis de usuário.
+- Verificação de não-interferência no fluxo de pagamento e checkout.
 
 ---
-*Status: Aguardando aprovação para execução.*
+*Status: Pronto para execução da migration v636.1.*
