@@ -1,29 +1,63 @@
-# Plano de Implantação: Dashboard Jarvis NOC (v630)
+# Plano de Implantação: Entidade jarvis_incidents (v636)
 
-Implementação de um dashboard de monitoramento operacional "Build-First" focado em saúde de checkout, infraestrutura e registro de incidentes com base no protocolo de causa raiz (v629).
+Criação da estrutura de dados para o ciclo de vida de incidentes no J.A.R.V.I.S. NOC, garantindo consistência atômica, RLS restritivo e rastreabilidade total sem afetar o fluxo financeiro ou de checkout.
 
-## Mudanças do Usuário
+## 1. Banco de Dados (Supabase Migration)
 
-- Criação de uma interface de monitoramento em tempo real.
-- Sistema de semáforo global (Verde, Amarelo, Vermelho) baseado em métricas rígidas.
-- Formulário de registro de incidentes com validação de causa raiz e regressão.
-- Design dark mode focado em alta visibilidade operacional.
+### Estrutura da Tabela `public.jarvis_incidents`
+- `id`: uuid primary key (default gen_random_uuid())
+- `created_at`: timestamptz (default now())
+- `updated_at`: timestamptz (default now())
+- `status`: enum `incident_status`
+- `severity`: enum `alert_severity` (alinhado com `src/lib/alert-severity.ts`)
+- `type`: text (ex: 'DATABASE_ERROR', 'API_TIMEOUT')
+- `headline`: text
+- `origin`: text (vínculo com a origem do alerta)
+- `root_cause`: text (opcional)
+- `fix_applied`: text (opcional)
+- `validation_notes`: text (opcional)
+- `regression_verified`: boolean (default false)
+- `closed_at`: timestamptz (null até CLOSED)
+- `alert_ids`: uuid[] (vínculo com `jarvis_alerts.id`)
+- `audit_log_ids`: uuid[] (vínculo com `admin_audit_logs.id`)
 
-## Detalhes Técnicos
+### Enums
+```sql
+CREATE TYPE public.incident_status AS ENUM (
+  'DETECTED',
+  'INVESTIGATING',
+  'ROOT_CAUSE_IDENTIFIED',
+  'FIX_APPLIED',
+  'VALIDATING',
+  'REGRESSION_VERIFIED',
+  'CLOSED'
+);
 
-- **Status Global (v630):**
-  - **Verde:** Requer Sucesso Checkout > 95%, Latência < 200ms e Erros HTTP < 1%.
-  - **Amarelo:** Dados ausentes, métricas abaixo do ideal ou alertas ativos.
-  - **Vermelho:** Falha crítica detectada ou queda total de métrica.
-- **Componentes:**
-  - `JarvisNocDashboard.tsx`: Componente principal de visualização.
-  - `IncidentRegistryForm.tsx`: Formulário com validação Zod para conformidade v629.
-  - Integração com `jarvisNocSnapshot` para dados em tempo real.
-- **Rota:** Disponível em `/admin` sob a aba "NOC" ou via acesso direto se autenticado.
+CREATE TYPE public.alert_severity AS ENUM (
+  'critical',
+  'error',
+  'warning',
+  'info'
+);
+```
 
-## Próximos Passos
+### RLS e Permissões
+- `ENABLE ROW LEVEL SECURITY`
+- `GRANT SELECT, INSERT, UPDATE ON public.jarvis_incidents TO authenticated`
+- `GRANT ALL ON public.jarvis_incidents TO service_role`
+- Policy: Somente administradores (via `public.has_role`) podem interagir.
 
-1. Criar os componentes de UI para os cards de serviço e sparklines.
-2. Implementar a lógica de cálculo de status global baseada em janelas de tempo.
-3. Integrar o formulário de incidentes com a tabela `admin_audit_logs` ou uma nova tabela de incidentes.
-4. Atualizar a rota `/admin` para exibir este novo painel como prioridade de visualização NOC.
+## 2. Implementação Técnica
+
+- **Migration SQL**: Script determinístico com `CREATE TABLE` e `GRANT`.
+- **Backend API**: Criação de `src/lib/jarvis-incidents.server.ts` para operações de backend.
+- **Circuit Breaker**: Garantia de que falhas na gravação de incidentes não bloqueiem processos de negócio.
+
+## 3. Validação Operacional
+
+- Verificação de schema e constraints.
+- Testes de RLS (acesso negado para não-admin).
+- Validação de que checkout e financeiro permanecem intocados.
+
+---
+*Status: Aguardando aprovação para execução.*
