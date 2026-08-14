@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mocks para simular ambiente admin
 process.env.ADMIN_TOKEN = 'test-token-v636.2';
@@ -24,13 +24,14 @@ vi.mock("@/lib/admin-guard.server", () => ({
 }));
 
 // Mock do supabaseAdmin com encadeamento manual robusto
-const mockChain: any = {};
-mockChain.from = vi.fn().mockReturnValue(mockChain);
-mockChain.insert = vi.fn().mockReturnValue(mockChain);
-mockChain.select = vi.fn().mockReturnValue(mockChain);
-mockChain.update = vi.fn().mockReturnValue(mockChain);
-mockChain.eq = vi.fn().mockReturnValue(mockChain);
-mockChain.single = vi.fn().mockResolvedValue({ data: null, error: null });
+const mockChain: any = {
+  from: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  select: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  eq: vi.fn().mockReturnThis(),
+  single: vi.fn(),
+};
 
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: mockChain
@@ -40,6 +41,15 @@ import { createIncident, updateIncidentStatus } from './jarvis-incidents.server'
 
 describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', () => {
   const token = 'test-token-v636.2';
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockChain.from.mockReturnValue(mockChain);
+    mockChain.insert.mockReturnValue(mockChain);
+    mockChain.select.mockReturnValue(mockChain);
+    mockChain.update.mockReturnValue(mockChain);
+    mockChain.eq.mockReturnValue(mockChain);
+  });
 
   describe('4. Máquina de Estados - Transições Válidas', () => {
     const transitions = [
@@ -53,14 +63,14 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
-        // Reset e mock do single para a busca do estado atual
+        // 1. Mock para a busca do estado atual (current)
         mockChain.single.mockResolvedValueOnce({
           data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
           error: null
         });
         
-        // Mock do resultado do update (que também usa .eq().single() no código original ou apenas .eq())
-        // No server, updateIncidentStatus usa .update().eq() que retorna Promise<{error}>
+        // 2. Mock para o resultado do UPDATE
+        // updateIncidentStatus chama .update().eq() que retorna {error}
         mockChain.eq.mockResolvedValueOnce({ error: null });
 
         // @ts-ignore
@@ -91,6 +101,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
   describe('7. Circuit Breaker', () => {
     it('falha fatal no banco deve ativar circuit breaker', async () => {
+      // Forçamos erro no .from() que é o primeiro passo de createIncident
       mockChain.from.mockImplementationOnce(() => {
         throw new Error("DB_CRASH");
       });
