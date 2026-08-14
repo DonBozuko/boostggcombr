@@ -82,11 +82,14 @@ describe('TESTE E2E DE CONFIABILIDADE OPERACIONAL v638', () => {
 
       // Chamada do checkout
       const res = await criarPedido({
-        pacote: 'p1k',
-        quantidade: 1000,
-        valor: 18.0,
-        instagram_user: 'test.user'
+        data: {
+          pacote: 'p1k',
+          quantidade: 1000,
+          valor: 18.0,
+          instagram_user: 'test.user'
+        }
       });
+
 
       // Validação do erro original preservado
       expect(res.ok).toBe(false);
