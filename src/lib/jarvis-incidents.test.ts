@@ -5,16 +5,16 @@ process.env.ADMIN_TOKEN = 'test-token-v636.1';
 
 // Mocks manuais para evitar TanStack Start context em testes de unidade pura
 vi.mock("@tanstack/react-start", () => ({
-  createServerFn: (options: any) => {
-    const fn = async (args: any) => {
-      // Simula a execução do handler com validação de input mínima
-      const input = args.data;
-      return options.handler({ data: input });
-    };
-    fn.validator = () => fn;
-    return fn;
-  }
+  createServerFn: () => ({
+    validator: () => ({
+      handler: (handler: any) => {
+        const fn = async (args: any) => handler(args);
+        return fn;
+      }
+    })
+  })
 }));
+
 
 // Mock do assertAdmin para não depender de request context/headers
 vi.mock("@/lib/admin-guard.server", () => ({
