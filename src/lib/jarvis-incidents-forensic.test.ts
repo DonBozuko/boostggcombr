@@ -86,25 +86,31 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
+        // Para updateIncidentStatus, o mockFrom é chamado DUAS VEZES.
+        // 1. .from().select().eq().single()
+        // 2. .from().update().eq()
+        // E possivelmente uma terceira vez para a auditoria.
+        let callCount = 0;
         mockFrom.mockImplementation((table) => {
           if (table === 'jarvis_incidents') {
-            const chain: any = {};
-            chain.select = vi.fn().mockReturnThis();
-            chain.eq = vi.fn().mockReturnThis();
-            chain.single = vi.fn().mockResolvedValue({
-              data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
-              error: null
-            });
-            chain.update = vi.fn().mockReturnThis();
-            // Para o update, precisamos que o await final (.eq()) resolva {error: null}
-            chain.eq = vi.fn().mockImplementation(() => Promise.resolve({ error: null }));
-            
-            // Mas updateIncidentStatus faz:
-            // 1. .from().select().eq().single()
-            // 2. .from().update().eq()
-            // Precisamos que o primeiro chain retorne o select e o segundo o update
-            
-            return chain;
+            callCount++;
+            if (callCount === 1) {
+              return {
+                select: () => ({
+                  eq: () => ({
+                    single: () => Promise.resolve({
+                      data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
+                      error: null
+                    })
+                  })
+                })
+              };
+            }
+            return {
+              update: () => ({
+                eq: () => Promise.resolve({ error: null })
+              })
+            };
           }
           return { insert: () => Promise.resolve({ error: null }) };
         });
