@@ -375,7 +375,7 @@ type PedidoInfo = {
 };
 
 function Landing() {
-  const isPreflight = true;
+  const isPreflight = false;
   if (isPreflight) {
     return (
       <div className="min-h-screen bg-black text-zinc-100 p-8 font-mono leading-relaxed">
