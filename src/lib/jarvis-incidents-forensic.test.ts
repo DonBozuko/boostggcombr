@@ -25,6 +25,7 @@ vi.mock("@/lib/admin-guard.server", () => ({
 
 // Mock do supabaseAdmin com encadeamento completo e flexível
 const mockQueryBuilder: any = {
+  from: vi.fn().mockReturnThis(),
   insert: vi.fn().mockReturnThis(),
   select: vi.fn().mockReturnThis(),
   update: vi.fn().mockReturnThis(),
@@ -33,16 +34,16 @@ const mockQueryBuilder: any = {
 };
 
 // Garantir que todos os métodos retornem o builder para suportar chamadas encadeadas
+mockQueryBuilder.from.mockReturnValue(mockQueryBuilder);
 mockQueryBuilder.insert.mockReturnValue(mockQueryBuilder);
 mockQueryBuilder.select.mockReturnValue(mockQueryBuilder);
 mockQueryBuilder.update.mockReturnValue(mockQueryBuilder);
 mockQueryBuilder.eq.mockReturnValue(mockQueryBuilder);
 
 vi.mock("@/integrations/supabase/client.server", () => ({
-  supabaseAdmin: {
-    from: vi.fn().mockReturnValue(mockQueryBuilder),
-  }
+  supabaseAdmin: mockQueryBuilder
 }));
+
 
 import { createIncident, updateIncidentStatus } from './jarvis-incidents.server';
 
