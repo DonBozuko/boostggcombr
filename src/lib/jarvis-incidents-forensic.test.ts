@@ -25,12 +25,7 @@ vi.mock("@/lib/admin-guard.server", () => ({
 }));
 
 // Mock do supabaseAdmin
-const mockSingle = vi.fn();
-const mockEq = vi.fn();
-const mockUpdate = vi.fn();
-const mockSelect = vi.fn();
 const mockFrom = vi.fn();
-const mockInsert = vi.fn();
 
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
@@ -46,43 +41,35 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
-    // Configurar o encadeamento mockado
-    mockFrom.mockReturnValue({
-      select: mockSelect,
-      update: mockUpdate,
-      insert: mockInsert
-    });
-    
-    mockSelect.mockReturnValue({ eq: mockEq });
-    mockUpdate.mockReturnValue({ eq: mockEq });
-    
-    // Suporte para .insert().select().single()
-    const mockInsertResult = {
-      select: vi.fn().mockReturnValue({
-        single: vi.fn().mockResolvedValue({ data: { id: '1' }, error: null })
-      })
-    };
-    
-    // O mockInsert deve agir de duas formas:
-    // 1. Para jarvis_incidents: retorna o chain acima
-    // 2. Para admin_audit_logs: retorna {error: null}
+    // Configuração do mock dinâmico baseado na tabela
     mockFrom.mockImplementation((table: string) => {
+      const chain: any = {};
+      
+      chain.select = vi.fn().mockReturnThis();
+      chain.update = vi.fn().mockReturnThis();
+      chain.eq = vi.fn().mockReturnThis();
+      chain.single = vi.fn();
+      chain.insert = vi.fn();
+
       if (table === 'jarvis_incidents') {
-        return { insert: () => mockInsertResult };
+        // Mock padrão para jarvis_incidents
+        chain.insert.mockReturnValue({
+          select: () => ({
+            single: () => Promise.resolve({ data: { id: '1' }, error: null })
+          })
+        });
+        
+        // Mock padrao para updates
+        chain.eq.mockReturnValue({
+          single: chain.single,
+          then: (resolve: any) => resolve({ error: null })
+        });
+      } else {
+        // Outras tabelas (ex: admin_audit_logs)
+        chain.insert.mockResolvedValue({ error: null });
       }
-      if (table === 'admin_audit_logs') {
-        return { insert: () => Promise.resolve({ error: null }) };
-      }
-      return {
-        select: mockSelect,
-        update: mockUpdate,
-        insert: mockInsert
-      };
-    });
-    
-    mockEq.mockReturnValue({
-      single: mockSingle,
-      then: (resolve: any) => resolve({ error: null })
+
+      return chain;
     });
   });
 
@@ -117,10 +104,26 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
-        mockSingle.mockResolvedValueOnce({
-          data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
-          error: null
+        // Customizamos o mockFrom para este teste específico para garantir o retorno do single()
+        mockFrom.mockImplementation((table) => {
+          if (table === 'jarvis_incidents') {
+            return {
+              select: () => ({
+                eq: () => ({
+                  single: () => Promise.resolve({
+                    data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
+                    error: null
+                  })
+                })
+              }),
+              update: () => ({
+                eq: () => Promise.resolve({ error: null })
+              })
+            };
+          }
+          return { insert: () => Promise.resolve({ error: null }) };
         });
+
         // @ts-ignore
         const res = await updateIncidentStatus({ 
           data: { token, incidentId: 'uuid-1', newStatus: to, ...(extra || {}) } 
@@ -132,10 +135,23 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
   describe('5. Requisitos de Encerramento', () => {
     it('deve bloquear CLOSED sem root_cause', async () => {
-      mockSingle.mockResolvedValueOnce({
-        data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
-        error: null
+      mockFrom.mockImplementation((table) => {
+        if (table === 'jarvis_incidents') {
+          return {
+            select: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({
+                  data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
+                  error: null
+                })
+              })
+            }),
+            update: () => ({ eq: () => Promise.resolve({ error: null }) })
+          };
+        }
+        return { insert: () => Promise.resolve({ error: null }) };
       });
+
       // @ts-ignore
       const res = await updateIncidentStatus({ 
         data: { token, incidentId: 'uuid-1', newStatus: 'CLOSED', fixApplied: 'FIX', validationNotes: 'VAL', regressionVerified: true } 
@@ -145,10 +161,23 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
     });
 
     it('deve bloquear CLOSED com regression_verified=false', async () => {
-      mockSingle.mockResolvedValueOnce({
-        data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
-        error: null
+      mockFrom.mockImplementation((table) => {
+        if (table === 'jarvis_incidents') {
+          return {
+            select: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({
+                  data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
+                  error: null
+                })
+              })
+            }),
+            update: () => ({ eq: () => Promise.resolve({ error: null }) })
+          };
+        }
+        return { insert: () => Promise.resolve({ error: null }) };
       });
+
       // @ts-ignore
       const res = await updateIncidentStatus({ 
         data: { token, incidentId: 'uuid-1', newStatus: 'CLOSED', rootCause: 'RC', fixApplied: 'FIX', validationNotes: 'VAL', regressionVerified: false } 
@@ -160,10 +189,16 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
   describe('6. Auditoria (Integridade)', () => {
     it('deve registrar em admin_audit_logs em cada transição', async () => {
-      mockSingle.mockResolvedValueOnce({
-        data: { id: 'uuid-1', status: 'DETECTED' },
-        error: null
+       mockFrom.mockImplementation((table) => {
+        if (table === 'jarvis_incidents') {
+          return {
+            select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'uuid-1', status: 'DETECTED' }, error: null }) }) }),
+            update: () => ({ eq: () => Promise.resolve({ error: null }) })
+          };
+        }
+        return { insert: vi.fn().mockResolvedValue({ error: null }) };
       });
+
       // @ts-ignore
       await updateIncidentStatus({ 
         data: { token, incidentId: 'uuid-1', newStatus: 'INVESTIGATING' } 
