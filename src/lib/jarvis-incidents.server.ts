@@ -93,6 +93,9 @@ export const updateIncidentStatus = createServerFn({ method: "POST" })
       const auth = await assertAdmin(data.token, "update-incident");
       if (!auth.ok) return { ok: false as const, error: "UNAUTHORIZED" };
 
+      const adminEmail = "fabiano.majestic@gmail.com";
+
+
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
       // Buscar estado atual
