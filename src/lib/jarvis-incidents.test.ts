@@ -65,6 +65,8 @@ describe('Jarvis Incidents Logic & State Machine (Unit)', () => {
     });
 
 
+    // DETECTED -> CLOSED é permitido pela máquina de estados (falso positivo), 
+    // MAS deve falhar por falta de dados (rootCause, etc) conforme a regra 3.
     // @ts-ignore
     const res = await updateIncidentStatus({ 
       data: { 
@@ -75,6 +77,7 @@ describe('Jarvis Incidents Logic & State Machine (Unit)', () => {
     });
     
     expect(res.ok).toBe(false);
-    expect(res.error).toContain('INVALID_TRANSITION');
+    expect(res.error).toBe('MISSING_RESOLUTION_DATA');
+
   });
 });
