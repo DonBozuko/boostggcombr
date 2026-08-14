@@ -56,9 +56,11 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
     mockSelect.mockReturnValue({ eq: mockEq });
     mockUpdate.mockReturnValue({ eq: mockEq });
     
-    // Suporte para .insert().select()
+    // Suporte para .insert().select().single()
     const insertSelectChain = {
-      select: vi.fn().mockResolvedValue({ data: [{ id: '1' }], error: null })
+      select: vi.fn().mockReturnValue({
+        single: vi.fn().mockResolvedValue({ data: { id: '1' }, error: null })
+      })
     };
     mockInsert.mockReturnValue(insertSelectChain);
     
