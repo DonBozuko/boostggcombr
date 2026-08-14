@@ -905,6 +905,60 @@ export type Database = {
         }
         Relationships: []
       }
+      jarvis_incidents: {
+        Row: {
+          alert_ids: string[] | null
+          audit_log_ids: string[] | null
+          closed_at: string | null
+          created_at: string
+          fix_applied: string | null
+          headline: string
+          id: string
+          origin: string
+          regression_verified: boolean
+          root_cause: string | null
+          severity: Database["public"]["Enums"]["alert_severity"]
+          status: Database["public"]["Enums"]["incident_status"]
+          type: string
+          updated_at: string
+          validation_notes: string | null
+        }
+        Insert: {
+          alert_ids?: string[] | null
+          audit_log_ids?: string[] | null
+          closed_at?: string | null
+          created_at?: string
+          fix_applied?: string | null
+          headline: string
+          id?: string
+          origin: string
+          regression_verified?: boolean
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          type: string
+          updated_at?: string
+          validation_notes?: string | null
+        }
+        Update: {
+          alert_ids?: string[] | null
+          audit_log_ids?: string[] | null
+          closed_at?: string | null
+          created_at?: string
+          fix_applied?: string | null
+          headline?: string
+          id?: string
+          origin?: string
+          regression_verified?: boolean
+          root_cause?: string | null
+          severity?: Database["public"]["Enums"]["alert_severity"]
+          status?: Database["public"]["Enums"]["incident_status"]
+          type?: string
+          updated_at?: string
+          validation_notes?: string | null
+        }
+        Relationships: []
+      }
       lgpd_requests: {
         Row: {
           client_ip: string | null
@@ -2241,7 +2295,16 @@ export type Database = {
       }
     }
     Enums: {
+      alert_severity: "critical" | "error" | "warning" | "info"
       app_role: "admin" | "moderator" | "user" | "director"
+      incident_status:
+        | "DETECTED"
+        | "INVESTIGATING"
+        | "ROOT_CAUSE_IDENTIFIED"
+        | "FIX_APPLIED"
+        | "VALIDATING"
+        | "REGRESSION_VERIFIED"
+        | "CLOSED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2369,7 +2432,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      alert_severity: ["critical", "error", "warning", "info"],
       app_role: ["admin", "moderator", "user", "director"],
+      incident_status: [
+        "DETECTED",
+        "INVESTIGATING",
+        "ROOT_CAUSE_IDENTIFIED",
+        "FIX_APPLIED",
+        "VALIDATING",
+        "REGRESSION_VERIFIED",
+        "CLOSED",
+      ],
     },
   },
 } as const
