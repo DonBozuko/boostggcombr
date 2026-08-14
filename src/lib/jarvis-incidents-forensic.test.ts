@@ -46,6 +46,7 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     
+    // Configurar o encadeamento mockado
     mockFrom.mockReturnValue({
       select: mockSelect,
       update: mockUpdate,
@@ -54,7 +55,12 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
     
     mockSelect.mockReturnValue({ eq: mockEq });
     mockUpdate.mockReturnValue({ eq: mockEq });
-    mockInsert.mockReturnValue({ error: null });
+    
+    // Suporte para .insert().select()
+    const insertSelectChain = {
+      select: vi.fn().mockResolvedValue({ data: [{ id: '1' }], error: null })
+    };
+    mockInsert.mockReturnValue(insertSelectChain);
     
     mockEq.mockReturnValue({
       single: mockSingle,
@@ -73,7 +79,6 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
     });
 
     it('deve permitir acesso para admin', async () => {
-      mockInsert.mockResolvedValueOnce({ data: [{ id: '1' }], error: null });
       // @ts-ignore
       const res = await createIncident({ 
         data: { token, type: 'TEST', headline: 'Test', severity: 'info', origin: 'test' } 
@@ -118,7 +123,7 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
         data: { token, incidentId: 'uuid-1', newStatus: 'CLOSED', fixApplied: 'FIX', validationNotes: 'VAL', regressionVerified: true } 
       });
       expect(res.ok).toBe(false);
-      expect(res.error).toContain('MISSING_COMPLETION_DATA');
+      expect(res.error).toContain('MISSING_RESOLUTION_DATA');
     });
 
     it('deve bloquear CLOSED com regression_verified=false', async () => {
@@ -131,7 +136,7 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
         data: { token, incidentId: 'uuid-1', newStatus: 'CLOSED', rootCause: 'RC', fixApplied: 'FIX', validationNotes: 'VAL', regressionVerified: false } 
       });
       expect(res.ok).toBe(false);
-      expect(res.error).toContain('MISSING_COMPLETION_DATA');
+      expect(res.error).toContain('MISSING_RESOLUTION_DATA');
     });
   });
 
@@ -146,7 +151,6 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
         data: { token, incidentId: 'uuid-1', newStatus: 'INVESTIGATING' } 
       });
       
-      // Verifica se a auditoria foi chamada (admin_audit_logs)
       const auditCalls = mockFrom.mock.calls.filter(c => c[0] === 'admin_audit_logs');
       expect(auditCalls.length).toBeGreaterThan(0);
     });
