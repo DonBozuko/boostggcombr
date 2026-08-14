@@ -20,6 +20,8 @@ import { JarvisNocCenter } from "@/components/JarvisNocCenter";
 import { CatalogTelemetryPanel } from "@/components/CatalogTelemetryPanel";
 import { CatalogRaioXPanel } from "@/components/CatalogRaioXPanel";
 import { AuditoriaJarvis } from "@/components/AuditoriaJarvis";
+import { JarvisNocDashboard } from "@/components/JarvisNocDashboard";
+
 
 import { ClaudeCodeInspector } from "@/components/ClaudeCodeInspector";
 import { ProbeCancelButton } from "@/components/ProbeCancelButton";
