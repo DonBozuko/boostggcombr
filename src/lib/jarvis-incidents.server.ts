@@ -110,9 +110,10 @@ export const updateIncidentStatus = createServerFn({ method: "POST" })
 
       // Validação da Máquina de Estados
       const allowed = VALID_TRANSITIONS[current.status as IncidentStatus] ?? [];
-      if (data.newStatus !== 'DETECTED' && !allowed.includes(data.newStatus)) {
+      if (data.newStatus !== current.status && !allowed.includes(data.newStatus)) {
         return { ok: false as const, error: `INVALID_TRANSITION: ${current.status} -> ${data.newStatus}` };
       }
+
 
 
       // Validações de encerramento
