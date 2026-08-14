@@ -23,28 +23,17 @@ vi.mock("@/lib/admin-guard.server", () => ({
   }
 }));
 
-// Mock do supabaseAdmin com suporte a encadeamento e métodos mockados individuais
-const createMockChain = () => {
-  const chain: any = {
-    from: vi.fn().mockReturnThis(),
-    insert: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
-    update: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    single: vi.fn().mockReturnThis(),
-    // Para suportar o await da chain, precisamos que ela seja thenable ou que o último método retorne um valor
-  };
-  
-  // Tornar a chain thenable para simular a Promise do Supabase
-  chain.then = (resolve: any) => resolve({ data: chain._data, error: chain._error });
-  
-  return chain;
-};
-
-const mockChain = createMockChain();
+// Mock do supabaseAdmin - Definido antes do import
+const mockSingle = vi.fn();
+const mockEq = vi.fn();
+const mockUpdate = vi.fn();
+const mockSelect = vi.fn();
+const mockFrom = vi.fn();
 
 vi.mock("@/integrations/supabase/client.server", () => ({
-  supabaseAdmin: mockChain
+  supabaseAdmin: {
+    from: mockFrom,
+  }
 }));
 
 import { createIncident, updateIncidentStatus } from './jarvis-incidents.server';
@@ -54,16 +43,27 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockChain._data = null;
-    mockChain._error = null;
     
-    // Restaurar encadeamentos padrão
-    mockChain.from.mockReturnValue(mockChain);
-    mockChain.insert.mockReturnValue(mockChain);
-    mockChain.select.mockReturnValue(mockChain);
-    mockChain.update.mockReturnValue(mockChain);
-    mockChain.eq.mockReturnValue(mockChain);
-    mockChain.single.mockReturnValue(mockChain);
+    // Configurar o encadeamento: .from().select().eq().single()
+    mockFrom.mockReturnValue({
+      select: mockSelect,
+      update: mockUpdate,
+      insert: vi.fn().mockReturnValue({ error: null })
+    });
+    
+    mockSelect.mockReturnValue({
+      eq: mockEq,
+    });
+    
+    mockUpdate.mockReturnValue({
+      eq: mockEq,
+    });
+    
+    mockEq.mockReturnValue({
+      single: mockSingle,
+      // Para o caso do update que não chama single()
+      then: (resolve: any) => resolve({ error: null })
+    });
   });
 
   describe('4. Máquina de Estados - Transições Válidas', () => {
@@ -79,16 +79,15 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
         // 1. Mock para a busca do estado atual
-        // updateIncidentStatus faz: await supabaseAdmin.from().select().eq().single()
-        mockChain.single.mockResolvedValueOnce({
+        mockSingle.mockResolvedValueOnce({
           data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
           error: null
         });
         
-        // 2. Mock para o resultado do UPDATE
-        // updateIncidentStatus faz: await supabaseAdmin.from().update().eq()
-        // O mockChain.eq() precisa retornar o resultado final do update
-        mockChain.eq.mockResolvedValueOnce({ error: null });
+        // 2. O segundo mockEq (para o update) deve retornar {error: null}
+        // Mas o updateIncidentStatus faz o await direto no .eq() do update
+        // Precisamos que o eq retorne um objeto que, ao ser awaited, resolva para {error: null}
+        // Já configuramos o .then() acima para isso.
 
         // @ts-ignore
         const res = await updateIncidentStatus({ 
@@ -102,7 +101,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
   describe('4. Máquina de Estados - Transições Inválidas', () => {
     it('deve bloquear transição proibida DETECTED -> FIX_APPLIED', async () => {
-      mockChain.single.mockResolvedValueOnce({
+      mockSingle.mockResolvedValueOnce({
         data: { id: 'uuid-1', status: 'DETECTED' },
         error: null
       });
@@ -118,7 +117,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
   describe('7. Circuit Breaker', () => {
     it('falha fatal no banco deve ativar circuit breaker', async () => {
-      mockChain.from.mockImplementationOnce(() => {
+      mockFrom.mockImplementationOnce(() => {
         throw new Error("DB_CRASH");
       });
 
