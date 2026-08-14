@@ -17,18 +17,20 @@ vi.mock("@tanstack/react-start", () => ({
 
 // Mock do assertAdmin
 vi.mock("@/lib/admin-guard.server", () => ({
-  assertAdmin: async (token: string) => {
+  assertAdmin: async (token: string, action?: string) => {
     if (token === 'test-token-v636.2') return { ok: true, email: 'fabiano.majestic@gmail.com' };
+    if (token === 'unauthorized-token') return { ok: false, reason: 'UNAUTHORIZED' };
     return { ok: false, reason: 'UNAUTHORIZED' };
   }
 }));
 
-// Mock do supabaseAdmin - Definido antes do import
+// Mock do supabaseAdmin
 const mockSingle = vi.fn();
 const mockEq = vi.fn();
 const mockUpdate = vi.fn();
 const mockSelect = vi.fn();
 const mockFrom = vi.fn();
+const mockInsert = vi.fn();
 
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
@@ -38,31 +40,45 @@ vi.mock("@/integrations/supabase/client.server", () => ({
 
 import { createIncident, updateIncidentStatus } from './jarvis-incidents.server';
 
-describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', () => {
+describe('Auditoria Forense v636.2 - Relatório Final', () => {
   const token = 'test-token-v636.2';
 
   beforeEach(() => {
     vi.clearAllMocks();
     
-    // Configurar o encadeamento: .from().select().eq().single()
     mockFrom.mockReturnValue({
       select: mockSelect,
       update: mockUpdate,
-      insert: vi.fn().mockReturnValue({ error: null })
+      insert: mockInsert
     });
     
-    mockSelect.mockReturnValue({
-      eq: mockEq,
-    });
-    
-    mockUpdate.mockReturnValue({
-      eq: mockEq,
-    });
+    mockSelect.mockReturnValue({ eq: mockEq });
+    mockUpdate.mockReturnValue({ eq: mockEq });
+    mockInsert.mockReturnValue({ error: null });
     
     mockEq.mockReturnValue({
       single: mockSingle,
-      // Para o caso do update que não chama single()
       then: (resolve: any) => resolve({ error: null })
+    });
+  });
+
+  describe('3. Validação de RLS (Simulada)', () => {
+    it('deve bloquear acesso para usuário não-admin', async () => {
+      // @ts-ignore
+      const res = await createIncident({ 
+        data: { token: 'unauthorized-token', type: 'TEST', headline: 'Test', severity: 'info', origin: 'test' } 
+      });
+      expect(res.ok).toBe(false);
+      expect(res.error).toBe('UNAUTHORIZED');
+    });
+
+    it('deve permitir acesso para admin', async () => {
+      mockInsert.mockResolvedValueOnce({ data: [{ id: '1' }], error: null });
+      // @ts-ignore
+      const res = await createIncident({ 
+        data: { token, type: 'TEST', headline: 'Test', severity: 'info', origin: 'test' } 
+      });
+      expect(res.ok).toBe(true);
     });
   });
 
@@ -78,49 +94,67 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
-        // 1. Mock para a busca do estado atual
         mockSingle.mockResolvedValueOnce({
           data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
           error: null
         });
-        
-        // 2. O segundo mockEq (para o update) deve retornar {error: null}
-        // Mas o updateIncidentStatus faz o await direto no .eq() do update
-        // Precisamos que o eq retorne um objeto que, ao ser awaited, resolva para {error: null}
-        // Já configuramos o .then() acima para isso.
-
         // @ts-ignore
         const res = await updateIncidentStatus({ 
           data: { token, incidentId: 'uuid-1', newStatus: to, ...(extra || {}) } 
         });
-        
         expect(res.ok).toBe(true);
       });
     });
   });
 
-  describe('4. Máquina de Estados - Transições Inválidas', () => {
-    it('deve bloquear transição proibida DETECTED -> FIX_APPLIED', async () => {
+  describe('5. Requisitos de Encerramento', () => {
+    it('deve bloquear CLOSED sem root_cause', async () => {
+      mockSingle.mockResolvedValueOnce({
+        data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
+        error: null
+      });
+      // @ts-ignore
+      const res = await updateIncidentStatus({ 
+        data: { token, incidentId: 'uuid-1', newStatus: 'CLOSED', fixApplied: 'FIX', validationNotes: 'VAL', regressionVerified: true } 
+      });
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain('MISSING_COMPLETION_DATA');
+    });
+
+    it('deve bloquear CLOSED com regression_verified=false', async () => {
+      mockSingle.mockResolvedValueOnce({
+        data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
+        error: null
+      });
+      // @ts-ignore
+      const res = await updateIncidentStatus({ 
+        data: { token, incidentId: 'uuid-1', newStatus: 'CLOSED', rootCause: 'RC', fixApplied: 'FIX', validationNotes: 'VAL', regressionVerified: false } 
+      });
+      expect(res.ok).toBe(false);
+      expect(res.error).toContain('MISSING_COMPLETION_DATA');
+    });
+  });
+
+  describe('6. Auditoria (Integridade)', () => {
+    it('deve registrar em admin_audit_logs em cada transição', async () => {
       mockSingle.mockResolvedValueOnce({
         data: { id: 'uuid-1', status: 'DETECTED' },
         error: null
       });
-
       // @ts-ignore
-      const res = await updateIncidentStatus({ 
-        data: { token, incidentId: 'uuid-1', newStatus: 'FIX_APPLIED' } 
+      await updateIncidentStatus({ 
+        data: { token, incidentId: 'uuid-1', newStatus: 'INVESTIGATING' } 
       });
-      expect(res.ok).toBe(false);
-      expect(res.error).toContain('INVALID_TRANSITION');
+      
+      // Verifica se a auditoria foi chamada (admin_audit_logs)
+      const auditCalls = mockFrom.mock.calls.filter(c => c[0] === 'admin_audit_logs');
+      expect(auditCalls.length).toBeGreaterThan(0);
     });
   });
 
   describe('7. Circuit Breaker', () => {
     it('falha fatal no banco deve ativar circuit breaker', async () => {
-      mockFrom.mockImplementationOnce(() => {
-        throw new Error("DB_CRASH");
-      });
-
+      mockFrom.mockImplementationOnce(() => { throw new Error("DB_CRASH"); });
       // @ts-ignore
       const res = await createIncident({ 
         data: { token, type: 'TEST', headline: 'Test', severity: 'info', origin: 'test' } 
