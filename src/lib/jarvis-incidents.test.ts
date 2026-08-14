@@ -1,51 +1,78 @@
-import { describe, it, expect, beforeAll } from 'vitest';
-import { createIncident, updateIncidentStatus } from './jarvis-incidents.server';
+import { describe, it, expect, vi } from 'vitest';
 
-// Mocks para simular ambiente admin
+// Simular variáveis de ambiente para o admin-guard
 process.env.ADMIN_TOKEN = 'test-token-v636.1';
 
-describe('Jarvis Incidents Logic & State Machine', () => {
-  const token = process.env.ADMIN_TOKEN;
+// Mocks manuais para evitar TanStack Start context em testes de unidade pura
+vi.mock("@tanstack/react-start", () => ({
+  createServerFn: (options: any) => {
+    const fn = async (args: any) => {
+      // Simula a execução do handler com validação de input mínima
+      const input = args.data;
+      return options.handler({ data: input });
+    };
+    fn.validator = () => fn;
+    return fn;
+  }
+}));
+
+// Mock do assertAdmin para não depender de request context/headers
+vi.mock("@/lib/admin-guard.server", () => ({
+  assertAdmin: async (token: string) => {
+    if (token === 'test-token-v636.1') return { ok: true, email: 'fabiano.majestic@gmail.com' };
+    return { ok: false, reason: 'UNAUTHORIZED' };
+  }
+}));
+
+// Mock do supabaseAdmin para não tentar conexão real
+vi.mock("@/integrations/supabase/client.server", () => ({
+  supabaseAdmin: {
+    from: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockResolvedValue({ data: null, error: new Error("DB_OFFLINE") }),
+    select: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    single: vi.fn().mockResolvedValue({ data: null, error: null }),
+  }
+}));
+
+import { createIncident, updateIncidentStatus } from './jarvis-incidents.server';
+
+describe('Jarvis Incidents Logic & State Machine (Unit)', () => {
+  const token = 'test-token-v636.1';
 
   it('deve falhar se não for admin', async () => {
-    // @ts-ignore - chamando diretamente para teste
+    // @ts-ignore
     const res = await createIncident({ data: { token: 'wrong', type: 'TEST', headline: 'Test', severity: 'info', origin: 'test' } });
     expect(res.ok).toBe(false);
     expect(res.error).toBe('UNAUTHORIZED');
   });
 
-  it('deve permitir criar incidente no estado DETECTED', async () => {
-    // Nota: O teste real de inserção depende do SupabaseAdmin. 
-    // Aqui testamos a lógica se chegamos ao ponto de inserção.
-    // Como estamos em ambiente de teste sem DB real em todos os contextos, 
-    // validamos o circuit breaker / erro de DB esperado em vez de sucesso falso.
-    
+  it('deve ativar circuit breaker se o banco falhar na criação', async () => {
     // @ts-ignore
     const res = await createIncident({ data: { token, type: 'DATABASE_ERROR', headline: 'DB Down', severity: 'critical', origin: 'checkout' } });
-    
-    // Se não houver DB real configurado no ambiente de teste Vitest, deve cair no circuit breaker
-    if (!res.ok) {
-        expect(res.error).toBe('CIRCUIT_BREAKER_ACTIVE');
-    }
+    expect(res.ok).toBe(false);
+    expect(res.error).toBe('CIRCUIT_BREAKER_ACTIVE');
   });
 
-  describe('State Machine Transitions', () => {
-    // Teste de transições proibidas (lógica pura)
-    it('deve impedir transição DETECTED -> CLOSED sem dados de resolução', async () => {
-        // Simulando a lógica que o handler executaria
-        // No handler real, ele buscaria o incidente 'current'
-        
-        // @ts-ignore
-        const res = await updateIncidentStatus({ 
-            data: { 
-                token, 
-                incidentId: '00000000-0000-0000-0000-000000000000', 
-                newStatus: 'CLOSED' 
-            } 
-        });
-        
-        // Deve falhar ou por NOT_FOUND (ID fake) ou por lógica de transição
-        expect(res.ok).toBe(false);
+  it('deve validar transição de estado proibida (ex: DETECTED -> CLOSED sem dados)', async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Mockando retorno de incidente no estado DETECTED
+    (supabaseAdmin.single as any).mockResolvedValueOnce({
+      data: { id: 'uuid-1', status: 'DETECTED', root_cause: null, fix_applied: null },
+      error: null
     });
+
+    // @ts-ignore
+    const res = await updateIncidentStatus({ 
+      data: { 
+        token, 
+        incidentId: 'uuid-1', 
+        newStatus: 'CLOSED' 
+      } 
+    });
+    
+    expect(res.ok).toBe(false);
+    expect(res.error).toContain('INVALID_TRANSITION');
   });
 });

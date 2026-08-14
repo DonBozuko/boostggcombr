@@ -6,6 +6,7 @@ import { z } from "zod";
  * Implementação da máquina de estados e circuit breaker para incidentes.
  */
 
+
 export type IncidentStatus = 
   | 'DETECTED'
   | 'INVESTIGATING'
