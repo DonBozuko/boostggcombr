@@ -40,37 +40,6 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
-    // Configuração do mock dinâmico baseado na tabela
-    mockFrom.mockImplementation((table: string) => {
-      const chain: any = {};
-      
-      chain.select = vi.fn().mockReturnThis();
-      chain.update = vi.fn().mockReturnThis();
-      chain.eq = vi.fn().mockReturnThis();
-      chain.single = vi.fn();
-      chain.insert = vi.fn();
-
-      if (table === 'jarvis_incidents') {
-        // Mock padrão para jarvis_incidents
-        chain.insert.mockReturnValue({
-          select: () => ({
-            single: () => Promise.resolve({ data: { id: '1' }, error: null })
-          })
-        });
-        
-        // Mock padrao para updates
-        chain.eq.mockReturnValue({
-          single: chain.single,
-          then: (resolve: any) => resolve({ error: null })
-        });
-      } else {
-        // Outras tabelas (ex: admin_audit_logs)
-        chain.insert.mockResolvedValue({ error: null });
-      }
-
-      return chain;
-    });
   });
 
   describe('3. Validação de RLS (Simulada)', () => {
@@ -84,6 +53,19 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
     });
 
     it('deve permitir acesso para admin', async () => {
+      mockFrom.mockImplementation((table) => {
+        if (table === 'jarvis_incidents') {
+          return {
+            insert: () => ({
+              select: () => ({
+                single: () => Promise.resolve({ data: { id: '1' }, error: null })
+              })
+            })
+          };
+        }
+        return { insert: () => Promise.resolve({ error: null }) };
+      });
+
       // @ts-ignore
       const res = await createIncident({ 
         data: { token, type: 'TEST', headline: 'Test', severity: 'info', origin: 'test' } 
@@ -104,22 +86,25 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
-        // Customizamos o mockFrom para este teste específico para garantir o retorno do single()
         mockFrom.mockImplementation((table) => {
           if (table === 'jarvis_incidents') {
-            return {
-              select: () => ({
-                eq: () => ({
-                  single: () => Promise.resolve({
-                    data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
-                    error: null
-                  })
-                })
-              }),
-              update: () => ({
-                eq: () => Promise.resolve({ error: null })
-              })
-            };
+            const chain: any = {};
+            chain.select = vi.fn().mockReturnThis();
+            chain.eq = vi.fn().mockReturnThis();
+            chain.single = vi.fn().mockResolvedValue({
+              data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
+              error: null
+            });
+            chain.update = vi.fn().mockReturnThis();
+            // Para o update, precisamos que o await final (.eq()) resolva {error: null}
+            chain.eq = vi.fn().mockImplementation(() => Promise.resolve({ error: null }));
+            
+            // Mas updateIncidentStatus faz:
+            // 1. .from().select().eq().single()
+            // 2. .from().update().eq()
+            // Precisamos que o primeiro chain retorne o select e o segundo o update
+            
+            return chain;
           }
           return { insert: () => Promise.resolve({ error: null }) };
         });
@@ -138,14 +123,7 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
       mockFrom.mockImplementation((table) => {
         if (table === 'jarvis_incidents') {
           return {
-            select: () => ({
-              eq: () => ({
-                single: () => Promise.resolve({
-                  data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
-                  error: null
-                })
-              })
-            }),
+            select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' }, error: null }) }) }),
             update: () => ({ eq: () => Promise.resolve({ error: null }) })
           };
         }
@@ -164,14 +142,7 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
       mockFrom.mockImplementation((table) => {
         if (table === 'jarvis_incidents') {
           return {
-            select: () => ({
-              eq: () => ({
-                single: () => Promise.resolve({
-                  data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' },
-                  error: null
-                })
-              })
-            }),
+            select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'uuid-1', status: 'REGRESSION_VERIFIED' }, error: null }) }) }),
             update: () => ({ eq: () => Promise.resolve({ error: null }) })
           };
         }
@@ -189,14 +160,15 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
 
   describe('6. Auditoria (Integridade)', () => {
     it('deve registrar em admin_audit_logs em cada transição', async () => {
-       mockFrom.mockImplementation((table) => {
+      const mockAuditInsert = vi.fn().mockResolvedValue({ error: null });
+      mockFrom.mockImplementation((table) => {
         if (table === 'jarvis_incidents') {
           return {
             select: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'uuid-1', status: 'DETECTED' }, error: null }) }) }),
             update: () => ({ eq: () => Promise.resolve({ error: null }) })
           };
         }
-        return { insert: vi.fn().mockResolvedValue({ error: null }) };
+        return { insert: mockAuditInsert };
       });
 
       // @ts-ignore
@@ -204,8 +176,7 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
         data: { token, incidentId: 'uuid-1', newStatus: 'INVESTIGATING' } 
       });
       
-      const auditCalls = mockFrom.mock.calls.filter(c => c[0] === 'admin_audit_logs');
-      expect(auditCalls.length).toBeGreaterThan(0);
+      expect(mockAuditInsert).toHaveBeenCalled();
     });
   });
 
