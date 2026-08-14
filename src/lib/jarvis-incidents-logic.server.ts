@@ -51,7 +51,8 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
     
-    const { data: existing } = await supabaseAdmin
+    // v637: Deduplicação fluente
+    const { data: existing, error: findError } = await supabaseAdmin
       .from("jarvis_incidents")
       .select("id")
       .eq("origin", alert.origin)
@@ -60,11 +61,14 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
       .gte("created_at", fourHoursAgo)
       .limit(1);
 
+    if (findError) throw findError;
+
     if (existing && existing.length > 0) {
       return { ok: true, duplicated: true, incidentId: existing[0].id };
     }
 
-    const { data: incident, error } = await supabaseAdmin
+    // v637: Inserção fluente
+    const { data: incident, error: insertError } = await supabaseAdmin
       .from("jarvis_incidents")
       .insert({
         type: alert.type,
@@ -77,7 +81,7 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
       .select()
       .single();
 
-    if (error) throw error;
+    if (insertError) throw insertError;
 
     await supabaseAdmin.from("admin_audit_logs").insert({
       admin_email: "system@jarvis.detector",
