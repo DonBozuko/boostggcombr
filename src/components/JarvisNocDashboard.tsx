@@ -99,9 +99,9 @@ export function JarvisNocDashboard() {
     },
     { 
       title: "API Gateway", 
-      value: snapshot.ok ? (snapshot.apiLatency.find(a => a.name === 'MercadoPago')?.ms || 0).toString() : "??", 
+      value: snapshot.ok ? (snapshot.apiLatency.find((a: any) => a.name === 'MercadoPago')?.ms || 0).toString() : "??", 
       unit: "ms", 
-      status: snapshot.ok ? (snapshot.apiLatency.find(a => a.name === 'MercadoPago')?.ok ? "healthy" : "error") : "unknown", 
+      status: snapshot.ok ? (snapshot.apiLatency.find((a: any) => a.name === 'MercadoPago')?.ok ? "healthy" : "error") : "unknown", 
       icon: Zap, 
       data: [], 
       source: "ping.api" 
