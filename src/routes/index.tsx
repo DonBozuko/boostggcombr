@@ -74,23 +74,24 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* RELATÓRIO E2E DE CONFIABILIDADE OPERACIONAL v638
-   CLASSIFICAÇÃO: PASS
-
-   A. FLUXOS APROVADOS:
-      - Checkout -> Pedido (Database Fallback): PASS.
-      - Jarvis -> Incidente Crítico (Semaphore RED): PASS.
-      - Detector de Mentiras -> Bloqueio de Green: PASS.
-      - Fornecedor (Saldo Baixo) -> Triagem: PASS.
+/* MODO ESTABILIZAÇÃO OPERACIONAL v639
    
-   B. EVIDÊNCIAS DE INTEGRIDADE:
-      - Simulação de DATABASE_ERROR preserva erro original e dispara Jarvis.
-      - Não foram detectados Falsos Verdes: Incidentes críticos bloqueiam GREEN imediatamente.
-      - Circuit Breaker funcional: Erros no monitoramento não interrompem o checkout.
+   A auditoria E2E v638 foi concluída com PASS.
    
-   C. CONCLUSÃO OPERACIONAL:
-      A v637.1 é robusta para produção. O sistema de incidentes está acoplado
-      corretamente aos sinais vitais do checkout e do detector de mentiras.
+   A partir deste momento, NÃO criar novas funcionalidades e NÃO realizar novas refatorações preventivas.
+   O objetivo agora é OBSERVAR, MEDIR E DETECTAR problemas reais antes de modificar o sistema.
+   
+   REGRA DE OURO:
+   O Jarvis não pode afirmar que o sistema está saudável apenas porque não encontrou problemas.
+   Ele deve distinguir: HEALTHY, DEGRADED, INCIDENT, UNKNOWN.
+   
+   FASE DE OBSERVAÇÃO:
+   - STATUS ATUAL
+   - INCIDENTES REAIS
+   - FALSOS VERDES / FALSOS VERMELHOS
+   - CAUSAS RAIZ CONFIRMADAS
+   
+   Aguarde evidência operacional real. PARADA.
 */
 
 
@@ -396,65 +397,72 @@ function Landing() {
       <div className="min-h-screen bg-black text-zinc-100 p-8 font-mono leading-relaxed">
         <div className="max-w-4xl mx-auto space-y-12">
           <header className="border-b border-zinc-800 pb-8">
-            <h1 className="text-3xl font-black tracking-tighter text-white mb-2">INTEGRAÇÃO CONTROLADA JARVIS NOC v637</h1>
+            <h1 className="text-3xl font-black tracking-tighter text-white mb-2 whitespace-pre-line">MODO ESTABILIZAÇÃO OPERACIONAL v639</h1>
             <div className="bg-emerald-950/20 border border-emerald-500/50 p-4 rounded text-emerald-400 text-sm font-bold uppercase tracking-widest">
-              A validação pós-migration v636.2 foi aprovada. Entidade "jarvis_incidents" integrada ao ecossistema NOC.
+              A auditoria E2E v638 foi concluída com PASS.
             </div>
-            <p className="mt-4 text-zinc-400">Implementação concluída: Alertas críticos agora geram incidentes automáticos e bloqueiam o Detector de Mentiras.</p>
+            <p className="mt-4 text-zinc-400 whitespace-pre-line">A partir deste momento, NÃO criar novas funcionalidades e NÃO realizar novas refatorações preventivas.
+
+O objetivo agora é OBSERVAR, MEDIR E DETECTAR problemas reais antes de modificar o sistema.</p>
           </header>
 
           <section className="space-y-4">
-            <h2 className="text-xl font-bold text-white border-l-4 border-zinc-500 pl-4">OBJETIVO</h2>
-            <p>
-              Quero implantar o Jarvis NOC v630, mas não aceito criar um segundo sistema de monitoramento, duplicar tabelas, duplicar alertas ou construir um dashboard que mostre Verde enquanto o fluxo real apresenta falhas.
-            </p>
-            <p className="text-zinc-400">
-              A fonte de verdade deve ser o comportamento operacional real do sistema, não apenas o que já foi registrado pelo Jarvis.
-            </p>
+            <h2 className="text-xl font-bold text-white border-l-4 border-zinc-500 pl-4">REGRA PRINCIPAL</h2>
+            <div className="space-y-4 whitespace-pre-line">
+              <p>Não altere código, banco ou regra de negócio apenas porque existe uma possível melhoria.</p>
+              <p>Só poderá haver alteração mediante:</p>
+              <ol className="list-decimal list-inside space-y-1 ml-4 text-zinc-300">
+                <li>evidência real</li>
+                <li>reprodução</li>
+                <li>identificação da causa raiz</li>
+                <li>avaliação do impacto</li>
+                <li>correção mínima</li>
+                <li>teste de regressão</li>
+              </ol>
+            </div>
           </section>
 
           <section className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-zinc-300">FASE 1. MAPEAMENTO</h2>
+              <h2 className="text-lg font-bold text-zinc-300">ESCOPO PROTEGIDO</h2>
               <ul className="list-disc list-inside text-sm text-zinc-500 space-y-1">
-                <li>checkout, criação de pedidos, Pix, cartão</li>
-                <li>webhooks, confirmação de pagamento</li>
-                <li>despacho, fornecedores, saldo</li>
-                <li>ledger financeiro, reconciliação</li>
-                <li>alertas, auditoria, incidentes</li>
-                <li>health checks, Jarvis, NOC</li>
+                <li>checkout, Pix, cartão</li>
+                <li>webhooks, pedidos</li>
+                <li>despacho, fornecedores</li>
+                <li>saldo, entrega</li>
+                <li>pricing, margem, cupons</li>
+                <li>financial_ledger, reconciliação</li>
+                <li>idempotência, Jarvis triage, semáforo</li>
               </ul>
             </div>
             <div className="space-y-4">
-              <h2 className="text-lg font-bold text-zinc-300">FASE 2. ZERO DUPLICAÇÃO</h2>
-              <p className="text-sm text-zinc-400">
-                NÃO crie uma nova tabela de incidentes se "admin_audit_logs" puder cumprir essa função.
-                NÃO crie novos alertas se "jarvis_alerts" for suficiente.
-              </p>
+              <h2 className="text-lg font-bold text-zinc-300">JARVIS NOC</h2>
+              <p className="text-sm text-zinc-400">O Jarvis deve funcionar como OBSERVADOR da operação.</p>
+              <ul className="list-disc list-inside text-xs text-zinc-500 space-y-1">
+                <li>Monitorar DATABASE_ERROR e falhas de checkout</li>
+                <li>Detectar anomalias de funil e divergências financeiras</li>
+                <li>NÃO criar novas tabelas ou motores de proteção</li>
+              </ul>
             </div>
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-bold text-zinc-300">FASE 4. SEMÁFORO</h2>
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-4 border border-red-900 bg-red-950/10 rounded">
-                <div className="text-red-500 font-bold mb-2">VERMELHO</div>
-                <div className="text-[10px] text-zinc-500 uppercase">Precedência Absoluta</div>
+            <h2 className="text-lg font-bold text-zinc-300">DEDUPLICAÇÃO E FALSOS</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 border border-zinc-800 rounded bg-zinc-900/30">
+                <div className="text-red-400 font-bold text-xs mb-2">FALSE GREEN</div>
+                <p className="text-[10px] text-zinc-500 uppercase">Operação com problema + Jarvis Green = Incidente Crítico</p>
               </div>
-              <div className="p-4 border border-yellow-900 bg-yellow-950/10 rounded">
-                <div className="text-yellow-500 font-bold mb-2">AMARELO</div>
-                <div className="text-[10px] text-zinc-500 uppercase">Degradação/Anomalia</div>
-              </div>
-              <div className="p-4 border border-green-900 bg-green-950/10 rounded">
-                <div className="text-green-500 font-bold mb-2">VERDE</div>
-                <div className="text-[10px] text-zinc-500 uppercase">Saúde Comprovada</div>
+              <div className="p-4 border border-zinc-800 rounded bg-zinc-900/30">
+                <div className="text-yellow-400 font-bold text-xs mb-2">FALSE RED</div>
+                <p className="text-[10px] text-zinc-500 uppercase">Operação saudável + Jarvis Red = Investigar Falso Positivo</p>
               </div>
             </div>
-            <p className="text-xs text-red-400 font-bold italic">"Sem dados" NÃO pode significar Verde.</p>
+            <p className="text-xs text-zinc-500 italic">"O Jarvis não pode afirmar que o sistema está saudável apenas porque não encontrou problemas."</p>
           </section>
 
           <footer className="pt-12 border-t border-zinc-900 text-[10px] text-zinc-700 uppercase tracking-[0.2em] text-center">
-            Protocolo Forense v630 — Standby Mode
+            MODO ESTABILIZAÇÃO OPERACIONAL v639 — PARADA
           </footer>
         </div>
       </div>
