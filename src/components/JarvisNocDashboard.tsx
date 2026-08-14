@@ -62,24 +62,19 @@ export function JarvisNocDashboard() {
   const [loading, setLoading] = useState(true);
   const getSnapshotFn = useServerFn(jarvisNocSnapshot);
   const getTriageFn = useServerFn(getJarvisTriage);
-  
-  // v637
-  const [incidents, setIncidents] = useState<any[]>([]);
-  const [loadingIncidents, setLoadingIncidents] = useState(false);
-  const { getIncidentTriage } = await import("@/lib/jarvis-incidents-logic.server"); // Isso vai falhar no browser se for static import, mas JarvisNocDashboard já está no bundle admin.
-  // Correção: Use useServerFn para incidentes também.
-
+  const getIncidentsFn = useServerFn(getIncidentTriage);
 
   const fetchData = async () => {
     const token = getAdminToken();
     if (!token) return;
     try {
       setLoading(true);
-      const [snapshot, triage] = await Promise.all([
+      const [snapshot, triage, incidentData] = await Promise.all([
         getSnapshotFn({ data: { token } }),
-        getTriageFn({ data: { token } })
+        getTriageFn({ data: { token } }),
+        getIncidentsFn({ data: { token } })
       ]);
-      setData({ snapshot, triage });
+      setData({ snapshot, triage, incidentData });
     } catch (e) {
       toast.error("Erro na telemetria NOC");
     } finally {
@@ -94,7 +89,7 @@ export function JarvisNocDashboard() {
   if (loading) return <div className="p-8 text-zinc-500 text-center font-mono">Carregando telemetria real...</div>;
   if (!data) return <div className="p-8 text-red-500 text-center font-mono">Erro de conexão com NOC.</div>;
 
-  const { snapshot, triage, incidents } = data;
+  const { snapshot, triage, incidentData } = data;
   const metrics: MetricCardProps[] = [
     { 
       title: "Checkout 24h", 
@@ -154,7 +149,7 @@ export function JarvisNocDashboard() {
             <h1 className="text-2xl font-black tracking-tighter text-zinc-100 flex items-center gap-2">
               <ShieldAlert className="text-[#00B37E]" /> J.A.R.V.I.S. NOC
             </h1>
-            <p className="text-zinc-500 text-xs font-mono">Telemetria Real v631 · Última: {new Date(lastUpdate).toLocaleTimeString()}</p>
+            <p className="text-zinc-500 text-xs font-mono">Telemetria Real v637 · Última: {new Date(lastUpdate).toLocaleTimeString()}</p>
           </div>
           
           <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl border-2 ${
@@ -189,11 +184,11 @@ export function JarvisNocDashboard() {
             <p className="text-sm text-zinc-400 mt-2">{triage.summary}</p>
         </Card>
 
-        {incidents?.ok && incidents.incidents.length > 0 && (
+        {incidentData?.ok && incidentData.incidents.length > 0 && (
           <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
-            <h2 className="text-sm font-bold text-zinc-400 mb-4 uppercase">Incidentes Ativos ({incidents.incidents.length})</h2>
+            <h2 className="text-sm font-bold text-zinc-400 mb-4 uppercase">Incidentes Ativos ({incidentData.incidents.length})</h2>
             <div className="space-y-4">
-              {incidents.incidents.map((inc: any) => (
+              {incidentData.incidents.map((inc: any) => (
                 <div key={inc.id} className="border-l-4 border-zinc-700 pl-4 py-2 hover:bg-zinc-800/50 transition-colors">
                   <div className="flex items-center justify-between">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
