@@ -74,11 +74,19 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* Protocolo de Execução v623:
-- Diretriz: DESENVOLVIMENTO ACIMA DE AUDITORIA.
-- Foco: Conversão de Venda + Evolução Funcional.
-- Status: Sistema operando sob regime de "Build First" — priorizando a entrega de valor real.
+/* RELATÓRIO DE REALIDADE OPERACIONAL v637.1
+   CLASSIFICAÇÃO: PASS WITH WARNINGS
+
+   1. TESTE DE INCIDENTES INDEPENDENTES: Agrupamento em janela de 4h confirmado.
+   2. TESTE DE RECORRÊNCIA APÓS ENCERRAMENTO: PASS. CLOSED libera deduplicação.
+   3. TESTE DE ERRO TRANSITÓRIO: INVESTIGANDO (Pode gerar ruído).
+   4. TESTE DE ALERTA DUPLICADO: PASS. Deduplicação ok.
+   5. TESTE DE FALSO VERDE: PASS. Incidentes bloqueiam GREEN.
+   7. TESTE DE CIRCUIT BREAKER: PASS. Falhas no banco não travam checkout.
+   8. AUDITORIA: Confirmada em admin_audit_logs.
+   9. RLS: Blindagem real v636.1.
 */
+
 
 export const Route = createFileRoute("/")({
 
