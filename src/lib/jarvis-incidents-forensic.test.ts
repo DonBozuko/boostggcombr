@@ -57,12 +57,28 @@ describe('Auditoria Forense v636.2 - Relatório Final', () => {
     mockUpdate.mockReturnValue({ eq: mockEq });
     
     // Suporte para .insert().select().single()
-    const insertSelectChain = {
+    const mockInsertResult = {
       select: vi.fn().mockReturnValue({
         single: vi.fn().mockResolvedValue({ data: { id: '1' }, error: null })
       })
     };
-    mockInsert.mockReturnValue(insertSelectChain);
+    
+    // O mockInsert deve agir de duas formas:
+    // 1. Para jarvis_incidents: retorna o chain acima
+    // 2. Para admin_audit_logs: retorna {error: null}
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'jarvis_incidents') {
+        return { insert: () => mockInsertResult };
+      }
+      if (table === 'admin_audit_logs') {
+        return { insert: () => Promise.resolve({ error: null }) };
+      }
+      return {
+        select: mockSelect,
+        update: mockUpdate,
+        insert: mockInsert
+      };
+    });
     
     mockEq.mockReturnValue({
       single: mockSingle,
