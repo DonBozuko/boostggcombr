@@ -141,11 +141,34 @@ export function JarvisNocDashboard() {
   return (
     <div className="p-4 md:p-8 font-inter bg-[#121214] min-h-screen">
       <div className="max-w-7xl mx-auto space-y-6">
-        <header className="flex justify-between items-center">
-            <h1 className="text-xl font-black text-white flex items-center gap-2">
-                <ShieldAlert className="text-[#00B37E]" /> JARVIS NOC DASHBOARD (LIVE)
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black tracking-tighter text-zinc-100 flex items-center gap-2">
+              <ShieldAlert className="text-[#00B37E]" /> J.A.R.V.I.S. NOC
             </h1>
-            <Button size="sm" variant="outline" onClick={fetchData}>Atualizar</Button>
+            <p className="text-zinc-500 text-xs font-mono">Telemetria Real v631 · Última: {new Date(lastUpdate).toLocaleTimeString()}</p>
+          </div>
+          
+          <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl border-2 ${
+            globalStatus === "healthy" ? "border-[#00B37E]/20 bg-[#00B37E]/5" : 
+            globalStatus === "warning" ? "border-[#FBA94C]/20 bg-[#FBA94C]/5" : 
+            "border-[#F75A68]/20 bg-[#F75A68]/5"
+          }`}>
+            <div className={`h-3 w-3 rounded-full animate-pulse ${
+              globalStatus === "healthy" ? "bg-[#00B37E]" : 
+              globalStatus === "warning" ? "bg-[#FBA94C]" : 
+              "bg-[#F75A68]"
+            }`} />
+            <span className={`font-bold tracking-widest text-sm ${
+              globalStatus === "healthy" ? "text-[#00B37E]" : 
+              globalStatus === "warning" ? "text-[#FBA94C]" : 
+              "text-[#F75A68]"
+            }`}>
+              {globalStatus === "healthy" ? "SISTEMA SAUDÁVEL" : 
+               globalStatus === "warning" ? "ATENÇÃO OPERACIONAL" : 
+               "FALHA CRÍTICA"}
+            </span>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
