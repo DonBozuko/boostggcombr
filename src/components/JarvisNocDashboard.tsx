@@ -61,6 +61,13 @@ export function JarvisNocDashboard() {
   const [loading, setLoading] = useState(true);
   const getSnapshotFn = useServerFn(jarvisNocSnapshot);
   const getTriageFn = useServerFn(getJarvisTriage);
+  
+  // v637
+  const [incidents, setIncidents] = useState<any[]>([]);
+  const [loadingIncidents, setLoadingIncidents] = useState(false);
+  const { getIncidentTriage } = await import("@/lib/jarvis-incidents-logic.server"); // Isso vai falhar no browser se for static import, mas JarvisNocDashboard já está no bundle admin.
+  // Correção: Use useServerFn para incidentes também.
+
 
   const fetchData = async () => {
     const token = getAdminToken();

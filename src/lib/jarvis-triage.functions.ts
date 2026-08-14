@@ -60,6 +60,8 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
       pendingRecovery: 0,
       databaseErrors: 0,
       invalidTargetAnomalies: 0,
+      openIncidents: 0,
+      criticalIncidents: 0,
     };
     const actions: TriageAction[] = [];
     let status: TriageDigest["status"] = "green";
@@ -74,10 +76,20 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
       // Se o ops-audit rodou de novo e deu OK, o vermelho de 1h atrás morre.
       const since20m = now - 20 * 60 * 1000;
 
+      // 0. Incidentes (v637)
+      const { data: openIncidents } = await supabaseAdmin
+        .from("jarvis_incidents")
+        .select("id, severity, status")
+        .not("status", "eq", "CLOSED");
+
+      const incs = (openIncidents ?? []) as any[];
+      counters.openIncidents = incs.length;
+      counters.criticalIncidents = incs.filter(i => i.severity === 'critical').length;
+
       // 1. Alertas abertos últimas 6h
       const { data: alertas } = await supabaseAdmin
         .from("jarvis_alerts")
-        .select("severidade, mensagem, origem, created_at")
+        .select("id, severidade, mensagem, origem, created_at")
         .gte("created_at", since6h)
         .order("created_at", { ascending: false });
 
@@ -96,7 +108,20 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         if (!vistos.has(orig)) vistos.set(orig, SEV_MAP[s] ?? 1);
         
         if (at < since20m) continue;
-        if (s === "critical" || s === "error") counters.criticalAlerts++;
+        if (s === "critical" || s === "error") {
+           counters.criticalAlerts++;
+           // v637: Auto-detecção de incidentes críticos
+           if (orig === "checkout" || orig === "payment" || orig === "infra") {
+             const { detectIncidentFromAlert } = await import("./jarvis-incidents-logic.server");
+             await detectIncidentFromAlert({
+               id: a.id as string,
+               type: orig === "infra" ? "INFRA_FAILURE" : "CRITICAL_FLOW_ERROR",
+               severity: s,
+               origin: orig,
+               headline: String(a.mensagem ?? "").slice(0, 100)
+             }).catch(e => console.error("[jarvis-triage] incident auto-detect failed", e));
+           }
+        }
         else if (s === "warning") counters.warningAlerts++;
       }
 
@@ -161,10 +186,19 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         }
       } catch { /* opcional */ }
 
-      // Classificação
-      if (counters.stuckOrders > 0 || counters.criticalAlerts > 0 || counters.databaseErrors > 0) {
+      // Classificação (v637: Incidentes Críticos forçam VERMELHO)
+      if (counters.stuckOrders > 0 || counters.criticalAlerts > 0 || counters.databaseErrors > 0 || counters.criticalIncidents > 0) {
         status = "red";
         const parts: string[] = [];
+        if (counters.criticalIncidents > 0) {
+          parts.push(`${counters.criticalIncidents} incidente(s) crítico(s)`);
+          actions.push({
+            id: "view-incidents",
+            label: "Ver Incidentes Críticos",
+            href: "/admin",
+            urgency: "high",
+          });
+        }
         if (counters.stuckOrders > 0) {
           parts.push(`${counters.stuckOrders} pedido(s) pago(s) travado(s)`);
           actions.push({
@@ -194,9 +228,18 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         }
         headline = `🔴 ${parts.join(" · ")} — abrir agora`;
         summary = "Cliente pode estar sendo afetado. Resolver imediatamente.";
-      } else if (counters.pendingRecovery > 0 || counters.lowBalanceProviders > 0 || counters.warningAlerts >= 5 || counters.invalidTargetAnomalies > 0) {
+      } else if (counters.pendingRecovery > 0 || counters.lowBalanceProviders > 0 || counters.warningAlerts >= 5 || counters.invalidTargetAnomalies > 0 || (counters.openIncidents > 0 && counters.criticalIncidents === 0)) {
         status = "yellow";
         const parts: string[] = [];
+        if (counters.openIncidents > 0 && counters.criticalIncidents === 0) {
+           parts.push(`${counters.openIncidents} incidente(s) aberto(s)`);
+           actions.push({
+             id: "view-incidents-warn",
+             label: "Investigar Incidentes",
+             href: "/admin",
+             urgency: "medium",
+           });
+        }
         if (counters.pendingRecovery > 0) {
           parts.push(`${counters.pendingRecovery} Pix abandonado(s)`);
           actions.push({
