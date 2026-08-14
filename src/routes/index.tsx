@@ -381,11 +381,11 @@ function Landing() {
       <div className="min-h-screen bg-black text-zinc-100 p-8 font-mono leading-relaxed">
         <div className="max-w-4xl mx-auto space-y-12">
           <header className="border-b border-zinc-800 pb-8">
-            <h1 className="text-3xl font-black tracking-tighter text-white mb-2">Preflight Forense do Jarvis NOC v630</h1>
-            <div className="bg-red-950/20 border border-red-500/50 p-4 rounded text-red-400 text-sm font-bold uppercase tracking-widest">
-              NÃO IMPLEMENTE, NÃO EDITE, NÃO CRIE ARQUIVOS, NÃO CRIE TABELAS E NÃO ALTERE O CÓDIGO NESTA ETAPA.
+            <h1 className="text-3xl font-black tracking-tighter text-white mb-2">INTEGRAÇÃO CONTROLADA JARVIS NOC v637</h1>
+            <div className="bg-emerald-950/20 border border-emerald-500/50 p-4 rounded text-emerald-400 text-sm font-bold uppercase tracking-widest">
+              A validação pós-migration v636.2 foi aprovada. Entidade "jarvis_incidents" integrada ao ecossistema NOC.
             </div>
-            <p className="mt-4 text-zinc-400">Execute primeiro uma análise forense somente leitura do projeto atual.</p>
+            <p className="mt-4 text-zinc-400">Implementação concluída: Alertas críticos agora geram incidentes automáticos e bloqueiam o Detector de Mentiras.</p>
           </header>
 
           <section className="space-y-4">

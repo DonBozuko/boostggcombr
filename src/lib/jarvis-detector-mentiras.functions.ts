@@ -329,6 +329,27 @@ export const runJarvisLieDetector = createServerFn({ method: "POST" })
       /* telemetria nunca derruba o detector */
     }
 
+    // v637 — Verificação de Incidentes Críticos Abertos
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: criticalIncs } = await supabaseAdmin
+        .from("jarvis_incidents")
+        .select("id, headline")
+        .eq("severity", "critical")
+        .not("status", "eq", "CLOSED");
+      
+      const hasCritical = (criticalIncs ?? []).length > 0;
+      checks.push({
+        id: "critical_incidents",
+        label: `Incidentes Críticos Abertos (${(criticalIncs ?? []).length})`,
+        ok: !hasCritical,
+        detail: hasCritical 
+          ? `🚨 BLOQUEIO: ${criticalIncs![0].headline}`
+          : "nenhum incidente crítico impedindo a operação"
+      });
+      if (hasCritical) blockDeploy = true;
+    } catch { /* */ }
+
     const passed = checks.filter((c) => c.ok).length;
      // Patch v615: Drift de Margem
 
