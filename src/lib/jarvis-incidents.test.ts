@@ -58,10 +58,12 @@ describe('Jarvis Incidents Logic & State Machine (Unit)', () => {
   it('deve validar transição de estado proibida (ex: DETECTED -> CLOSED sem dados)', async () => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // Mockando retorno de incidente no estado DETECTED
+    // @ts-ignore
     (supabaseAdmin.single as any).mockResolvedValueOnce({
       data: { id: 'uuid-1', status: 'DETECTED', root_cause: null, fix_applied: null },
       error: null
     });
+
 
     // @ts-ignore
     const res = await updateIncidentStatus({ 
