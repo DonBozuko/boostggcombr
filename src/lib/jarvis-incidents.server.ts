@@ -146,7 +146,7 @@ export const updateIncidentStatus = createServerFn({ method: "POST" })
 
       // Auditoria
       await supabaseAdmin.from("admin_audit_logs").insert({
-        admin_email: auth.email ?? "admin@jarvis",
+        admin_email: adminEmail,
         action: "incident_status_changed",
         detail: { 
           incidentId: data.incidentId, 
