@@ -74,23 +74,24 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* RELATÓRIO E2E DE CONFIABILIDADE OPERACIONAL v638
-   CLASSIFICAÇÃO: PASS
-
-   A. FLUXOS APROVADOS:
-      - Checkout -> Pedido (Database Fallback): PASS.
-      - Jarvis -> Incidente Crítico (Semaphore RED): PASS.
-      - Detector de Mentiras -> Bloqueio de Green: PASS.
-      - Fornecedor (Saldo Baixo) -> Triagem: PASS.
+/* MODO ESTABILIZAÇÃO OPERACIONAL v639
    
-   B. EVIDÊNCIAS DE INTEGRIDADE:
-      - Simulação de DATABASE_ERROR preserva erro original e dispara Jarvis.
-      - Não foram detectados Falsos Verdes: Incidentes críticos bloqueiam GREEN imediatamente.
-      - Circuit Breaker funcional: Erros no monitoramento não interrompem o checkout.
+   A auditoria E2E v638 foi concluída com PASS.
    
-   C. CONCLUSÃO OPERACIONAL:
-      A v637.1 é robusta para produção. O sistema de incidentes está acoplado
-      corretamente aos sinais vitais do checkout e do detector de mentiras.
+   A partir deste momento, NÃO criar novas funcionalidades e NÃO realizar novas refatorações preventivas.
+   O objetivo agora é OBSERVAR, MEDIR E DETECTAR problemas reais antes de modificar o sistema.
+   
+   REGRA DE OURO:
+   O Jarvis não pode afirmar que o sistema está saudável apenas porque não encontrou problemas.
+   Ele deve distinguir: HEALTHY, DEGRADED, INCIDENT, UNKNOWN.
+   
+   FASE DE OBSERVAÇÃO:
+   - STATUS ATUAL
+   - INCIDENTES REAIS
+   - FALSOS VERDES / FALSOS VERMELHOS
+   - CAUSAS RAIZ CONFIRMADAS
+   
+   Aguarde evidência operacional real. PARADA.
 */
 
 
