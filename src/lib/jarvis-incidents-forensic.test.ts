@@ -122,6 +122,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
   describe('5. Requisitos de Encerramento', () => {
     it('deve bloquear CLOSED sem root_cause', async () => {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // @ts-ignore
       (supabaseAdmin.single as any).mockResolvedValueOnce({
         data: { ...mockIncident, status: 'REGRESSION_VERIFIED' },
         error: null
@@ -137,6 +138,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
     it('deve bloquear CLOSED com regression_verified=false', async () => {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      // @ts-ignore
       (supabaseAdmin.single as any).mockResolvedValueOnce({
         data: { ...mockIncident, status: 'REGRESSION_VERIFIED', root_cause: 'RC', fix_applied: 'FIX', validation_notes: 'VAL' },
         error: null
@@ -150,6 +152,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
       expect(res.error).toBe('MISSING_RESOLUTION_DATA');
     });
   });
+
 
   describe('7. Circuit Breaker', () => {
     it('falha no banco não deve lançar exceção (circuit breaker)', async () => {
