@@ -72,12 +72,12 @@ describe('TESTE E2E DE CONFIABILIDADE OPERACIONAL v638', () => {
   });
 
   describe('1. CHECKOUT & 2. DATABASE_ERROR', () => {
-    it('deve simular falha de banco e verificar Jarvis RED', { timeout: 10000 }, async () => {
+    it('deve simular falha de banco e verificar Jarvis RED', async () => {
       // Cenário: Tentativa de checkout onde o banco falha ao salvar o pedido.
       
       // Mock da falha no insert do pedido
       mockSupabaseChain.then.mockImplementation((resolve) => {
-        return resolve({ data: null, error: { message: 'DB_SAVE_FAILED' } });
+        return Promise.resolve(resolve({ data: null, error: { message: 'DB_SAVE_FAILED' } }));
       });
 
       // Chamada do checkout
@@ -103,7 +103,7 @@ describe('TESTE E2E DE CONFIABILIDADE OPERACIONAL v638', () => {
   describe('8. JARVIS & 9. FALSE GREEN', () => {
     it('deve garantir que Jarvis detecta incidentes críticos abertos', async () => {
       mockSupabaseChain.then.mockImplementation((resolve) => 
-        resolve({ data: [], error: null, count: 0 })
+        Promise.resolve(resolve({ data: [], error: null, count: 0 }))
       );
 
       mockSupabaseChain.from.mockImplementation((table) => {
