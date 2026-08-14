@@ -116,15 +116,27 @@ export function JarvisNocDashboard() {
       source: "jarvis_alerts" 
     },
     { 
-      title: "DB Error (Funil)", 
-      value: triage.counters.databaseErrors.toString(), 
+      title: "Latência Checkout", 
+      value: "UNKNOWN", 
+      unit: "NÃO TELEMETRADA", 
+      status: "unknown", 
+      icon: Clock, 
+      data: [], 
+      source: "infra.telemetry" 
+    },
+    { 
+      title: "Profile Errors", 
+      value: triage.counters.invalidTargetAnomalies.toString(), 
       unit: "anomalias", 
-      status: triage.counters.databaseErrors > 0 ? "error" : "healthy", 
-      icon: Database, 
+      status: triage.counters.invalidTargetAnomalies > 3 ? "warning" : "healthy", 
+      icon: ShieldAlert, 
       data: [], 
       source: "funnel_events" 
     }
   ];
+
+  const globalStatus = triage.status === "green" ? "healthy" : (triage.status === "yellow" ? "warning" : "error");
+  const lastUpdate = triage.generatedAt;
 
   return (
     <div className="p-4 md:p-8 font-inter bg-[#121214] min-h-screen">
