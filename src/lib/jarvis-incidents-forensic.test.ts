@@ -66,10 +66,12 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        // @ts-ignore
         (supabaseAdmin.single as any).mockResolvedValueOnce({
           data: { ...mockIncident, status: from },
           error: null
         });
+
 
         // @ts-ignore
         const res = await updateIncidentStatus({ 
