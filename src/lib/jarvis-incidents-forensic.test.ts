@@ -23,24 +23,24 @@ vi.mock("@/lib/admin-guard.server", () => ({
   }
 }));
 
-// Mock do supabaseAdmin com encadeamento completo
-const mockQueryBuilder = {
+// Mock do supabaseAdmin com encadeamento completo e flexível
+const mockQueryBuilder: any = {
   insert: vi.fn().mockReturnThis(),
   select: vi.fn().mockReturnThis(),
   update: vi.fn().mockReturnThis(),
   eq: vi.fn().mockReturnThis(),
-  single: vi.fn().mockResolvedValue({ data: null, error: null }),
+  single: vi.fn(),
 };
+
+// Garantir que todos os métodos retornem o builder para suportar chamadas encadeadas
+mockQueryBuilder.insert.mockReturnValue(mockQueryBuilder);
+mockQueryBuilder.select.mockReturnValue(mockQueryBuilder);
+mockQueryBuilder.update.mockReturnValue(mockQueryBuilder);
+mockQueryBuilder.eq.mockReturnValue(mockQueryBuilder);
 
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
     from: vi.fn().mockReturnValue(mockQueryBuilder),
-    // Atalhos para os métodos mockados
-    insert: mockQueryBuilder.insert,
-    select: mockQueryBuilder.select,
-    update: mockQueryBuilder.update,
-    eq: mockQueryBuilder.eq,
-    single: mockQueryBuilder.single,
   }
 }));
 
@@ -61,30 +61,27 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
 
     transitions.forEach(({ from, to, extra }) => {
       it(`deve permitir transição ${from} -> ${to}`, async () => {
+        // Mock da busca do estado atual
         mockQueryBuilder.single.mockResolvedValueOnce({
           data: { id: 'uuid-1', status: from, root_cause: null, fix_applied: null },
           error: null
         });
-        mockQueryBuilder.update.mockReturnValueOnce(mockQueryBuilder);
+        
+        // Mock do resultado do update
         mockQueryBuilder.eq.mockResolvedValueOnce({ error: null });
 
         // @ts-ignore
         const res = await updateIncidentStatus({ 
           data: { token, incidentId: 'uuid-1', newStatus: to, ...(extra || {}) } 
         });
+        
+        if (!res.ok) console.error('Falha na transição:', from, '->', to, res.error);
         expect(res.ok).toBe(true);
       });
     });
   });
 
   describe('4. Máquina de Estados - Transições Inválidas', () => {
-    const invalid = [
-      { from: 'INVESTIGATING', to: 'DETECTED' }, // Permitido pela lógica real, mas testamos uma negada aqui para confirmar
-      { from: 'DETECTED', to: 'FIX_APPLIED' },   // Não permitida
-      { from: 'FIX_APPLIED', to: 'CLOSED' },     // Não permitida
-      { from: 'CLOSED', to: 'CLOSED' }           // Não permitida (máquina retorna erro de status)
-    ];
-
     it('deve bloquear transição proibida DETECTED -> FIX_APPLIED', async () => {
       mockQueryBuilder.single.mockResolvedValueOnce({
         data: { id: 'uuid-1', status: 'DETECTED' },
@@ -100,6 +97,7 @@ describe('Validação Forense v636.2 - Máquina de Estados e Circuit Breaker', (
     });
 
     it('deve bloquear transição DETECTED -> CLOSED sem dados (conforme regra 3)', async () => {
+        // A máquina de estados permite DETECTED -> CLOSED, mas o validador de encerramento exige dados
         mockQueryBuilder.single.mockResolvedValueOnce({
           data: { id: 'uuid-1', status: 'DETECTED' },
           error: null
