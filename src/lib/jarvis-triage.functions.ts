@@ -65,7 +65,7 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
     };
     const actions: TriageAction[] = [];
     let status: TriageDigest["status"] = "green";
-    let headline = "Tudo em ordem, pode relaxar";
+    let headline = "Tudo em ordem, pode relaxar...";
     let summary = "Nenhuma ação urgente. Sistema operando normal.";
 
     try {

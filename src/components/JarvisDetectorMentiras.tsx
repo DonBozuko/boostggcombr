@@ -110,7 +110,7 @@ export function JarvisDetectorMentiras() {
           disabled={cleaning}
         >
           {cleaning ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
-          Limpeza v640 (Alarme que não anda)
+          Limpeza v640 (Alarme fantasma)
         </Button>
       </div>
 

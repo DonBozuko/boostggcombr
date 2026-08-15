@@ -345,7 +345,7 @@ export async function runBenchAutonomo(
 
     if (options.notify !== false && (precisaRecarga.length > 0 || pausados.length > 0 || margem > 0)) {
       const linhas: string[] = [];
-      linhas.push("🧪 VARREDURA AUTOMÁTICA DE ENTREGA");
+      linhas.push("🧪 VARREDURA AUTOMÁTICA DE VITRINE");
       linhas.push("");
       linhas.push(
         `PROBLEMA: ${travadosVitrine} de ${avaliadosVitrine.length} pacotes da vitrine não teriam entrega garantida agora.`,
@@ -399,7 +399,7 @@ export async function runBenchAutonomo(
         linhas.push(`Não consegui testar agora: ${naoAvaliados} pacote(s) (nada foi pausado por isso).`);
       }
 
-      // v398 — "já corrigi o que dava" era vago. Agora o alerta diz, em
+      // v398 — Limpeza v640: Refatoração de alerta para evitar ruído.
       // português, exatamente o que o sistema mexeu sozinho neste ciclo.
       linhas.push("");
       linhas.push("O QUE JÁ FIZ SOZINHO AGORA:");

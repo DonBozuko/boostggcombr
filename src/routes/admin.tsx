@@ -135,7 +135,7 @@ function ExecutiveHeader({ soundOn, toggleSound }: { soundOn: boolean; toggleSou
     <div className="flex items-center justify-between flex-wrap gap-3 rounded-2xl border border-cyan-400/20 bg-black/50 backdrop-blur-xl px-4 py-3 shadow-[0_0_30px_rgba(0,242,254,0.15)]">
       <div className="flex flex-col">
         <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Olá, Fabiano</span>
-        <span className="text-xs sm:text-sm font-mono text-cyan-300/90 drop-shadow-[0_0_6px_rgba(0,242,254,0.6)]">{ADMIN_EMAIL}</span>
+        <span className="text-[10px] sm:text-xs font-mono text-cyan-300/70">{ADMIN_EMAIL}</span>
       </div>
       <div className="flex items-center gap-2">
         <Button variant={soundOn ? "default" : "outline"} size="sm" onClick={toggleSound}>
