@@ -7,7 +7,11 @@ vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => ({
     validator: () => ({
       handler: (handler: any) => {
-        const fn = async (args: any) => handler(args);
+        // Mock do comportamento do TanStack Start v1
+        const fn = async (input: any) => {
+          // O handler recebe um objeto com { data } contendo o input validado
+          return handler({ data: input });
+        };
         return fn;
       }
     })
@@ -135,7 +139,7 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
     });
 
     // @ts-ignore
-    const res = await runJarvisLieDetector({ data: { token: 'valid-token' } });
+    const res = await runJarvisLieDetector({ token: 'valid-token' });
     
     expect(res.blockDeploy).toBe(true);
     const incCheck = res.checks.find((c: any) => c.id === 'critical_incidents');
@@ -146,7 +150,6 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
   it('7. TESTE DE CIRCUIT BREAKER', async () => {
     // @ts-ignore
     mockSupabaseChain.then.mockImplementationOnce((resolve, reject) => {
-      // Rejeita a promise para simular erro no banco
       const err = new Error("POSTGREST_TIMEOUT");
       if (reject) return reject(err);
       return Promise.reject(err);
