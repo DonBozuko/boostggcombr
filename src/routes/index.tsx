@@ -397,13 +397,12 @@ function Landing() {
       <div className="min-h-screen bg-black text-zinc-100 p-8 font-mono leading-relaxed">
         <div className="max-w-4xl mx-auto space-y-12">
           <header className="border-b border-zinc-800 pb-8">
-            <h1 className="text-3xl font-black tracking-tighter text-white mb-2 whitespace-pre-line">MODO ESTABILIZAÇÃO OPERACIONAL v639</h1>
+            <h1 className="text-3xl font-black tracking-tighter text-white mb-2 whitespace-pre-line">RESTAURAÇÃO OPERACIONAL v641</h1>
             <div className="bg-emerald-950/20 border border-emerald-500/50 p-4 rounded text-emerald-400 text-sm font-bold uppercase tracking-widest">
-              A auditoria E2E v638 foi concluída com PASS.
+              SISTEMA RESTAURADO: CHECKOUT BLINDADO E EVIDÊNCIA VALIDADA.
             </div>
-            <p className="mt-4 text-zinc-400 whitespace-pre-line">A partir deste momento, NÃO criar novas funcionalidades e NÃO realizar novas refatorações preventivas.
-
-O objetivo agora é OBSERVAR, MEDIR E DETECTAR problemas reais antes de modificar o sistema.</p>
+            <p className="mt-4 text-zinc-400 whitespace-pre-line">Não criar mais nada. Só corrigir o que já tem funcionando.
+Integridade de schema e Margin Guardian ativos.</p>
           </header>
 
           <section className="space-y-4">
