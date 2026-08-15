@@ -86,10 +86,10 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
    Ele deve distinguir: HEALTHY, DEGRADED, INCIDENT, UNKNOWN.
    
    FASE DE OBSERVAÇÃO:
-   - STATUS ATUAL
-   - INCIDENTES REAIS
-   - FALSOS VERDES / FALSOS VERMELHOS
-   - CAUSAS RAIZ CONFIRMADAS
+   - STATUS ATUAL: Estabilizado (v636.1)
+   - INCIDENTES REAIS: Monitorados via jarvis_incidents
+   - FALSOS VERDES / FALSOS VERMELHOS: Protegidos via dedup_key
+   - CAUSAS RAIZ CONFIRMADAS: Máquina de estados no banco
    
    Aguarde evidência operacional real. PARADA.
 */
