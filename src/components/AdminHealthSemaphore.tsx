@@ -69,9 +69,11 @@ export function AdminHealthSemaphore() {
             J.A.R.V.I.S. · Semáforo Único
           </div>
           <div className="text-white font-extrabold text-base sm:text-lg leading-tight mt-0.5">
-            {loading ? "Lendo sinais…" : d?.headline}
+            {loading ? "Lendo sinais…" : (d?.status === "green" ? "Tudo em ordem, pode relaxar..." : d?.headline)}
           </div>
-          <div className="text-white/70 text-xs sm:text-sm mt-1">{d?.summary}</div>
+          <div className="text-white/70 text-xs sm:text-sm mt-1">
+            {d?.status === "green" ? "Nenhuma ação urgente. Sistema operando normal." : d?.summary}
+          </div>
 
           {d && d.actions.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
