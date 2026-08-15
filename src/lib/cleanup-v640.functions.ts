@@ -1,6 +1,6 @@
 
 import { createServerFn } from "@tanstack/react-start";
-import { z } from "zed";
+import { z } from "zod";
 import { clearPhantomAlerts } from "./cleanup-v640.server";
 
 export const runCleanupV640 = createServerFn({ method: "POST" })

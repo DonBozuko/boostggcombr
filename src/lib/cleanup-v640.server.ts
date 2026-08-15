@@ -1,5 +1,5 @@
 
-import { supabaseAdmin } from "./integrations/supabase/client.server";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export async function clearPhantomAlerts() {
   console.log("[v640] Iniciando limpeza de alertas fantasmas...");
