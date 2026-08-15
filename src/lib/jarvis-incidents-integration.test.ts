@@ -76,7 +76,9 @@ describe('Jarvis Incidents Integration Logic', () => {
   it('deve deduplicar incidente se já existir um aberto nas últimas 4h', async () => {
     // 1. Mock do SELECT inicial (deduplicação) -> retorna incidente existente
     instance.then = vi.fn()
-      .mockImplementationOnce((resolve) => resolve({ data: [{ id: 'existing-inc-456' }], error: null }));
+      .mockImplementationOnce((resolve) => resolve({ data: [{ id: 'existing-inc-456', occurrence_count: 1 }], error: null }))
+      // 2. Mock do UPDATE (incremento de ocorrências)
+      .mockImplementationOnce((resolve) => resolve({ data: null, error: null }));
 
     const result = await detectIncidentFromAlert({
       id: 'alert-456',
