@@ -14,24 +14,34 @@ vi.mock("@tanstack/react-start", () => ({
   })
 }));
 
-const mockSupabaseChain = {
-  from: vi.fn().mockReturnThis(),
-  select: vi.fn().mockReturnThis(),
-  insert: vi.fn().mockReturnThis(),
-  update: vi.fn().mockReturnThis(),
-  eq: vi.fn().mockReturnThis(),
-  not: vi.fn().mockReturnThis(),
-  gte: vi.fn().mockReturnThis(),
-  limit: vi.fn().mockReturnThis(),
-  single: vi.fn().mockReturnThis(),
-  order: vi.fn().mockReturnThis(),
-  is: vi.fn().mockReturnThis(),
-  lt: vi.fn().mockReturnThis(),
-  in: vi.fn().mockReturnThis(),
-  ilike: vi.fn().mockReturnThis(),
-  like: vi.fn().mockReturnThis(),
-  then: vi.fn(),
+// Mock do supabaseAdmin com suporte a Promise
+const createMockChain = () => {
+  const chain: any = {
+    from: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    insert: vi.fn().mockReturnThis(),
+    update: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockReturnThis(),
+    not: vi.fn().mockReturnThis(),
+    gte: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockReturnThis(),
+    single: vi.fn().mockReturnThis(),
+    order: vi.fn().mockReturnThis(),
+    is: vi.fn().mockReturnThis(),
+    lt: vi.fn().mockReturnThis(),
+    in: vi.fn().mockReturnThis(),
+    ilike: vi.fn().mockReturnThis(),
+    like: vi.fn().mockReturnThis(),
+    // O pulo do gato: o .then permite que await supabase... funcione
+    then: vi.fn(function(onFulfilled, onRejected) {
+      // Por padrão resolve com vazio
+      return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
+    })
+  };
+  return chain;
 };
+
+const mockSupabaseChain = createMockChain();
 
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: mockSupabaseChain,
@@ -51,7 +61,10 @@ import { runJarvisLieDetector } from './jarvis-detector-mentiras.functions';
 describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSupabaseChain.then.mockReset();
+    // Reseta o comportamento do then para cada teste
+    mockSupabaseChain.then.mockImplementation(function(onFulfilled, onRejected) {
+      return Promise.resolve({ data: [], error: null }).then(onFulfilled, onRejected);
+    });
   });
 
   it('1. TESTE DE INCIDENTES INDEPENDENTES (Deduplicação 4h)', async () => {
