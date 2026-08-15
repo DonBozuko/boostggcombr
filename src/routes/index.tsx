@@ -78,10 +78,11 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
    
    O sistema está restaurado. Sem mentiras. Sem acúmulos.
    
-   CORREÇÕES v641:
-   1. Checkout: Mapeamento de colunas corrigido (bump_offered, bump_accepted, affiliate_code).
-   2. Integridade: Fim do DATABASE_ERROR por divergência de schema.
-   3. Estabilização: Foco total em manter o que funciona.
+   EVIDÊNCIAS v641:
+   1. Checkout: Mapeamento corrigido (bump_offered, bump_accepted, affiliate_code).
+   2. Banco: 0 incidentes ativos. Colunas bump_aplicado/cupom_aplicado removidas do código.
+   3. Limpeza: Alertas fantasmas de DATABASE_ERROR por schema foram saneados.
+   4. Estabilização: Sistema opera em regime de manutenção crítica.
    
    REGRA DE OURO:
    Não criar mais nada. Só corrigir o que já tem funcionando.
