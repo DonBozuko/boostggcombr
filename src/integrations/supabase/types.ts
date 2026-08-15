@@ -907,13 +907,16 @@ export type Database = {
       }
       jarvis_incidents: {
         Row: {
-          alert_ids: string[] | null
-          audit_log_ids: string[] | null
+          alert_ids: string[]
+          audit_log_ids: string[]
           closed_at: string | null
           created_at: string
+          dedup_key: string | null
           fix_applied: string | null
           headline: string
           id: string
+          last_seen_at: string
+          occurrence_count: number
           origin: string
           regression_verified: boolean
           root_cause: string | null
@@ -924,13 +927,16 @@ export type Database = {
           validation_notes: string | null
         }
         Insert: {
-          alert_ids?: string[] | null
-          audit_log_ids?: string[] | null
+          alert_ids?: string[]
+          audit_log_ids?: string[]
           closed_at?: string | null
           created_at?: string
+          dedup_key?: string | null
           fix_applied?: string | null
           headline: string
           id?: string
+          last_seen_at?: string
+          occurrence_count?: number
           origin: string
           regression_verified?: boolean
           root_cause?: string | null
@@ -941,13 +947,16 @@ export type Database = {
           validation_notes?: string | null
         }
         Update: {
-          alert_ids?: string[] | null
-          audit_log_ids?: string[] | null
+          alert_ids?: string[]
+          audit_log_ids?: string[]
           closed_at?: string | null
           created_at?: string
+          dedup_key?: string | null
           fix_applied?: string | null
           headline?: string
           id?: string
+          last_seen_at?: string
+          occurrence_count?: number
           origin?: string
           regression_verified?: boolean
           root_cause?: string | null
