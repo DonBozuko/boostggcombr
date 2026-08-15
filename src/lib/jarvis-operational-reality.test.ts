@@ -152,8 +152,8 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
     // Simular falha fatal no banco durante a criação automática de incidente
     
     // Mock do SELECT de deduplicação falhando
-    mockSupabaseChain.then.mockImplementationOnce(() => {
-      throw new Error("POSTGREST_TIMEOUT");
+    mockSupabaseChain.then.mockImplementationOnce((resolve, reject) => {
+      reject(new Error("POSTGREST_TIMEOUT"));
     });
 
     const result = await detectIncidentFromAlert({
@@ -167,7 +167,7 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
     expect(result.ok).toBe(false);
     expect(result.error).toBe('AUTO_CREATE_FAILED');
     // EVIDÊNCIA: O catch em detectIncidentFromAlert captura o erro e retorna ok: false,
-    // permitindo que o chamador (triage) continue sem travar.
+    // permitindo que o chamador continue sem travar o fluxo principal.
   });
 
   it('9. RLS (Auditoria de Políticas)', async () => {
