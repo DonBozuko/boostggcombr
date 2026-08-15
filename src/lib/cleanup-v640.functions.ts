@@ -5,10 +5,12 @@ import { clearPhantomAlerts } from "./cleanup-v640.server";
 
 export const runCleanupV640 = createServerFn({ method: "POST" })
   .validator((input: { token: string }) => z.object({ token: z.string().min(8) }).parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<{ ok: boolean; error?: any }> => {
     const { assertAdmin } = await import("@/lib/admin-guard.server");
-    if (!(await assertAdmin(data.token, "cleanup")).ok) {
+    const adminCheck = await assertAdmin(data.token, "cleanup");
+    if (!adminCheck.ok) {
       return { ok: false, error: "UNAUTHORIZED" };
     }
-    return await clearPhantomAlerts();
+    const result = await clearPhantomAlerts();
+    return result;
   });
