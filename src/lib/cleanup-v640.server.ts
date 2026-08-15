@@ -33,6 +33,15 @@ export async function clearPhantomAlerts() {
   const { reconcileShelf } = await import("./shelf-authority.server");
   const report = await reconcileShelf(pacotes);
 
+  // v396 — Autoridade de Preço: garante que os preços estão corretos após a religação
+  try {
+    const { enforcePriceAuthority } = await import("./price-authority.server");
+    await enforcePriceAuthority("cleanup-v640");
+    console.log("[v640] Autoridade de preço executada.");
+  } catch (e) {
+    console.error("[v640] Erro ao rodar autoridade de preço:", e);
+  }
+
   console.log("[v640] Sucesso: pacotes religados via reconciliação.", report);
   return { ok: true, report };
 }
