@@ -44,12 +44,12 @@ export const createIncident = createServerFn({ method: "POST" })
       const auth = await assertAdmin(data.token, "create-incident");
       if (!auth.ok) return { ok: false as const, error: "UNAUTHORIZED" };
 
-      const adminEmail = "fabiano.majestic@gmail.com"; // Email mestre fixo do projeto (v434)
+      const adminEmail = "fabiano.majestic@gmail.com"; 
 
-      
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       
-      const { data: incident, error } = await supabaseAdmin
+      // v636.1: Registro de incidente com timeout curto (fail-safe)
+      const insertPromise = supabaseAdmin
         .from("jarvis_incidents")
         .insert({
           type: data.type,
@@ -62,9 +62,17 @@ export const createIncident = createServerFn({ method: "POST" })
         .select()
         .single();
 
+      // Timeout de 1s para não travar o fluxo chamador
+      const incidentResult = await Promise.race([
+        insertPromise,
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("DB_TIMEOUT")), 1000))
+      ]);
+
+      const { data: incident, error } = incidentResult as any;
+
       if (error) throw error;
 
-      // Auditoria
+      // Auditoria via service role (bypassing RLS)
       await supabaseAdmin.from("admin_audit_logs").insert({
         admin_email: adminEmail,
         action: "incident_created",
@@ -74,7 +82,7 @@ export const createIncident = createServerFn({ method: "POST" })
       return { ok: true as const, incident };
 
     } catch (e) {
-      console.error("[jarvis-incidents] create failed (circuit breaker active)", e);
+      console.error("[jarvis-incidents] create failed (circuit breaker or timeout)", e);
       return { ok: false as const, error: "CIRCUIT_BREAKER_ACTIVE" };
     }
   });
