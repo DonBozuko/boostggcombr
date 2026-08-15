@@ -3,30 +3,36 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export async function clearPhantomAlerts() {
   console.log("[v640] Iniciando limpeza de alertas fantasmas...");
-  const { error } = await supabaseAdmin
+  
+  // Limpa alertas persistentes no banco
+  const { error: alertError } = await supabaseAdmin
     .from("jarvis_alerts")
     .delete()
     .like("mensagem", "%br-p100|sem_fornecedor%")
     .eq("origem", "bench-nao-convergencia");
   
-  if (error) {
-    console.error("[v640] Erro ao deletar alertas:", error);
-    return { ok: false, error };
+  if (alertError) {
+    console.error("[v640] Erro ao deletar alertas:", alertError);
   }
   
-  console.log("[v640] Alertas limpos. Reativando pacotes...");
-  
+  // v372 — a Bancada não grava is_sellable, ela grava vetos na shelf_vetoes.
+  // Limpa os vetos da bancada para esses pacotes
   const pacotes = ['br-p100', 'br-p10k', 'br-p1k', 'br-p250', 'br-p2k', 'br-p500', 'br-p5k'];
-  const { error: updateError } = await supabaseAdmin
-    .from("pricing_items")
-    .update({ is_sellable: true, sellable_reason: null } as any)
+  console.log("[v640] Limpando vetos de vitrine...");
+  const { error: vetoError } = await supabaseAdmin
+    .from("shelf_vetoes")
+    .delete()
+    .eq("source", "bancada")
     .in("pacote", pacotes);
 
-  if (updateError) {
-    console.error("[v640] Erro ao reativar pacotes:", updateError);
-    return { ok: false, error: updateError };
+  if (vetoError) {
+    console.error("[v640] Erro ao limpar vetos:", vetoError);
   }
 
-  console.log("[v640] Sucesso: pacotes reativados e alertas limpos.");
-  return { ok: true };
+  // Reconcilia a vitrine para aplicar as mudanças
+  const { reconcileShelf } = await import("./shelf-authority.server");
+  const report = await reconcileShelf(pacotes);
+
+  console.log("[v640] Sucesso: pacotes religados via reconciliação.", report);
+  return { ok: true, report };
 }
