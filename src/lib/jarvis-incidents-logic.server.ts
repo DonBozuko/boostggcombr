@@ -46,15 +46,24 @@ export const getIncidentTriage = createServerFn({ method: "POST" })
     }
   });
 
+// v636.1: Flag de recursão para evitar loops infinitos em caso de erro na gravação de incidentes
+let isRecordingIncident = false;
+
 export async function detectIncidentFromAlert(alert: { id: string; type: string; severity: string; origin: string; headline: string }) {
+  if (isRecordingIncident) {
+    console.error("[jarvis-detector] recursive incident detection blocked", alert.headline);
+    return { ok: false, error: "RECURSION_BLOCKED" };
+  }
+
+  isRecordingIncident = true;
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
     
-    // v637: Deduplicação fluente
+    // v637: Deduplicação fluente utilizando a chave composta (origem + tipo) nas últimas 4h
     const { data: existing, error: findError } = await supabaseAdmin
       .from("jarvis_incidents")
-      .select("id")
+      .select("id, occurrence_count")
       .eq("origin", alert.origin)
       .eq("type", alert.type)
       .not("status", "eq", "CLOSED")
@@ -64,8 +73,20 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
     if (findError) throw findError;
 
     if (existing && existing.length > 0) {
+      // Incrementar contador de ocorrências em vez de duplicar a linha
+      await supabaseAdmin
+        .from("jarvis_incidents")
+        .update({ 
+          occurrence_count: (existing[0].occurrence_count || 1) + 1,
+          last_seen_at: new Date().toISOString()
+        })
+        .eq("id", existing[0].id);
+
       return { ok: true, duplicated: true, incidentId: existing[0].id };
     }
+
+    // Gerar dedup_key atômica
+    const dedup_key = `${alert.origin}:${alert.type}:${new Date().toISOString().split('T')[0]}`;
 
     // v637: Inserção fluente
     const { data: incident, error: insertError } = await supabaseAdmin
@@ -76,7 +97,8 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
         severity: alert.severity as any,
         origin: alert.origin,
         alert_ids: [alert.id],
-        status: 'DETECTED'
+        status: 'DETECTED',
+        dedup_key
       })
       .select()
       .single();
@@ -93,5 +115,7 @@ export async function detectIncidentFromAlert(alert: { id: string; type: string;
   } catch (e) {
     console.error("[jarvis-detector] incident auto-creation failed", e);
     return { ok: false, error: "AUTO_CREATE_FAILED" };
+  } finally {
+    isRecordingIncident = false;
   }
 }
