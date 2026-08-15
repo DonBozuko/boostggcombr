@@ -8,8 +8,7 @@ export async function clearPhantomAlerts() {
   const { error: alertError } = await supabaseAdmin
     .from("jarvis_alerts")
     .delete()
-    .or("mensagem.ilike.%br-p100|sem_fornecedor%,mensagem.ilike.%br-p10k|sem_fornecedor%,mensagem.ilike.%br-p1k|sem_fornecedor%,mensagem.ilike.%br-p250|sem_fornecedor%,mensagem.ilike.%br-p2k|sem_fornecedor%,mensagem.ilike.%br-p500|sem_fornecedor%,mensagem.ilike.%br-p5k|sem_fornecedor%")
-    .eq("origem", "bench-nao-convergencia");
+    .or("mensagem.ilike.%bump_aplicado%,mensagem.ilike.%column%,mensagem.ilike.%schema cache%,mensagem.ilike.%br-p100|sem_fornecedor%,mensagem.ilike.%br-p10k|sem_fornecedor%,mensagem.ilike.%br-p1k|sem_fornecedor%,mensagem.ilike.%br-p250|sem_fornecedor%,mensagem.ilike.%br-p2k|sem_fornecedor%,mensagem.ilike.%br-p500|sem_fornecedor%,mensagem.ilike.%br-p5k|sem_fornecedor%");
   
   if (alertError) {
     console.error("[v640] Erro ao deletar alertas:", alertError);

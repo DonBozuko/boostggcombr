@@ -847,5 +847,10 @@ export const getRecoveryStats = createServerFn({ method: "POST" })
   });
 
 
-
-
+export const triggerPhantomCleanup = createServerFn({ method: "POST" })
+  .validator((input) => z.object({ token: z.string().min(8) }).parse(input))
+  .handler(async ({ data }) => {
+    if (!(await (await import("@/lib/admin-guard.server")).assertAdmin(data.token, "admin")).ok) return { ok: false as const, error: "UNAUTHORIZED" as const };
+    const { clearPhantomAlerts } = await import("./cleanup-v640.server");
+    return await clearPhantomAlerts();
+  });

@@ -212,9 +212,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         quantidade: quantidadeEfetiva,
         valor: valorCobrar,
         status: "pending",
-        bump_ofertado: bumpOfertado,
-        bump_aplicado: bumpAplicado,
-        cupom_aplicado: (hasPrime && discount > 0 ? "PRIME15" : null) as any,
+        bump_offered: bumpOfertado,
+        bump_accepted: bumpAplicado,
+        affiliate_code: (hasPrime && discount > 0 ? "PRIME15" : null) as any,
       } as any)
       .select("id")
       .single();
