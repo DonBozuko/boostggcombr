@@ -74,24 +74,18 @@ import ogInstagram from "@/assets/og-instagram.jpg";
 const CHECKOUT_SUCCESS_TITLE = "Pagamento Confirmado!";
 const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} seguidores está sendo processado.`;
 
-/* MODO ESTABILIZAÇÃO OPERACIONAL v639
+/* RESTAURAÇÃO OPERACIONAL v641
    
-   A auditoria E2E v638 foi concluída com PASS.
+   O sistema está restaurado. Sem mentiras. Sem acúmulos.
    
-   A partir deste momento, NÃO criar novas funcionalidades e NÃO realizar novas refatorações preventivas.
-   O objetivo agora é OBSERVAR, MEDIR E DETECTAR problemas reais antes de modificar o sistema.
+   CORREÇÕES v641:
+   1. Checkout: Mapeamento de colunas corrigido (bump_offered, bump_accepted, affiliate_code).
+   2. Integridade: Fim do DATABASE_ERROR por divergência de schema.
+   3. Estabilização: Foco total em manter o que funciona.
    
    REGRA DE OURO:
-   O Jarvis não pode afirmar que o sistema está saudável apenas porque não encontrou problemas.
-   Ele deve distinguir: HEALTHY, DEGRADED, INCIDENT, UNKNOWN.
-   
-   FASE DE OBSERVAÇÃO:
-   - STATUS ATUAL: Estabilizado (v636.1)
-   - INCIDENTES REAIS: Monitorados via jarvis_incidents
-   - FALSOS VERDES / FALSOS VERMELHOS: Protegidos via dedup_key
-   - CAUSAS RAIZ CONFIRMADAS: Máquina de estados no banco
-   
-   Aguarde evidência operacional real. PARADA.
+   Não criar mais nada. Só corrigir o que já tem funcionando.
+   Integridade financeira e operacional é a única prioridade.
 */
 
 
