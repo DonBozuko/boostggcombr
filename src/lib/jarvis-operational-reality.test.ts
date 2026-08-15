@@ -68,9 +68,7 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
 
   it('1. TESTE DE INCIDENTES INDEPENDENTES (Deduplicação 4h)', async () => {
     // Cenário: Dois erros de banco independentes dentro da janela de 4h.
-    // O primeiro cria o incidente. O segundo tenta criar.
     
-    // Mock para a verificação de deduplicação (retorna um incidente existente)
     // @ts-ignore
     mockSupabaseChain.then.mockImplementationOnce((resolve) => 
       resolve({ data: [{ id: 'inc-1', occurrence_count: 1 }], error: null })
@@ -92,19 +90,14 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
   });
 
   it('2. TESTE DE RECORRÊNCIA APÓS ENCERRAMENTO', async () => {
-    // Cenário: DATABASE_ERROR -> CLOSED -> Novo DATABASE_ERROR
-    
-    // Mock para a verificação de deduplicação (retorna vazio porque o anterior está CLOSED)
     // @ts-ignore
     mockSupabaseChain.then.mockImplementationOnce((resolve) => 
       resolve({ data: [], error: null }) 
     );
-    // Mock para o insert do novo incidente
     // @ts-ignore
     mockSupabaseChain.then.mockImplementationOnce((resolve) => 
       resolve({ data: { id: 'inc-new-after-closed' }, error: null })
     );
-    // Mock para auditoria
     // @ts-ignore
     mockSupabaseChain.then.mockImplementationOnce((resolve) => resolve({ error: null }));
 
@@ -122,14 +115,11 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
   });
 
   it('5. TESTE DE FALSO VERDE (NOC & Detector)', async () => {
-    // Validar se incidente crítico aberto bloqueia o GREEN no detector de mentiras.
-    
     // @ts-ignore
     mockSupabaseChain.then.mockImplementation((resolve) => {
       return resolve({ data: [], error: null, count: 0 });
     });
 
-    // Mock específico para o SELECT de jarvis_incidents em runJarvisLieDetector
     // @ts-ignore
     mockSupabaseChain.from.mockImplementation((table) => {
       if (table === 'jarvis_incidents') {
@@ -145,7 +135,7 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
     });
 
     // @ts-ignore
-    const res = await runJarvisLieDetector({ token: 'valid-token' });
+    const res = await runJarvisLieDetector({ data: { token: 'valid-token' } });
     
     expect(res.blockDeploy).toBe(true);
     const incCheck = res.checks.find((c: any) => c.id === 'critical_incidents');
@@ -154,12 +144,12 @@ describe('TESTE DE REALIDADE OPERACIONAL v637.1', () => {
   });
 
   it('7. TESTE DE CIRCUIT BREAKER', async () => {
-    // Simular falha fatal no banco durante a criação automática de incidente
-    
-    // Mock do SELECT de deduplicação falhando
     // @ts-ignore
     mockSupabaseChain.then.mockImplementationOnce((resolve, reject) => {
-      reject(new Error("POSTGREST_TIMEOUT"));
+      // Rejeita a promise para simular erro no banco
+      const err = new Error("POSTGREST_TIMEOUT");
+      if (reject) return reject(err);
+      return Promise.reject(err);
     });
 
     const result = await detectIncidentFromAlert({
