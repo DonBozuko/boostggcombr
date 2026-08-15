@@ -3,9 +3,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { runJarvisLieDetector } from "@/lib/jarvis-detector-mentiras.functions";
 import { resolveJarvisAlerts } from "@/lib/jarvis-resolve.functions";
+import { runCleanupV640 } from "@/lib/cleanup-v640.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, CheckCircle2, ShieldAlert, Loader2, Check } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ShieldAlert, Loader2, Check, Sparkles } from "lucide-react";
 import { sanitizeText } from "@/lib/dom-sanitizer";
+import { toast } from "sonner";
 
 
 type Report = Awaited<ReturnType<typeof runJarvisLieDetector>>;
@@ -13,9 +15,11 @@ type Report = Awaited<ReturnType<typeof runJarvisLieDetector>>;
 export function JarvisDetectorMentiras() {
   const run = useServerFn(runJarvisLieDetector);
   const resolve = useServerFn(resolveJarvisAlerts);
+  const cleanup = useServerFn(runCleanupV640);
   const [report, setReport] = useState<Report | null>(null);
   const [loading, setLoading] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
   const onRun = async () => {
@@ -52,6 +56,26 @@ export function JarvisDetectorMentiras() {
     }
   };
 
+  const onCleanup = async () => {
+    setCleaning(true);
+    try {
+      const token = getAdminToken();
+      if (!token) return;
+      const res = await cleanup({ data: { token } });
+      if (res.ok) {
+        toast.success("Limpeza v640 concluída!");
+        await onRun();
+      } else {
+        toast.error("Erro na limpeza: " + String(res.error));
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro técnico na limpeza");
+    } finally {
+      setCleaning(false);
+    }
+  };
+
 
   const blocked = report?.blockDeploy;
 
@@ -74,6 +98,19 @@ export function JarvisDetectorMentiras() {
           disabled={loading}
         >
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Auditar agora"}
+        </Button>
+      </div>
+
+      <div className="mt-3 flex gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          className="bg-emerald-950/20 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 text-[10px] h-7"
+          onClick={onCleanup}
+          disabled={cleaning}
+        >
+          {cleaning ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
+          Limpeza v640 (Alarme que não anda)
         </Button>
       </div>
 
