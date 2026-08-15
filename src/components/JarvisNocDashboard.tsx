@@ -149,7 +149,7 @@ export function JarvisNocDashboard() {
             <h1 className="text-2xl font-black tracking-tighter text-zinc-100 flex items-center gap-2">
               <ShieldAlert className="text-[#00B37E]" /> J.A.R.V.I.S. NOC
             </h1>
-            <p className="text-zinc-500 text-xs font-mono">Telemetria Real v637 · Última: {new Date(lastUpdate).toLocaleTimeString()}</p>
+            <p className="text-zinc-500 text-xs font-mono">RESTAURAÇÃO v641 · Última: {new Date(lastUpdate).toLocaleTimeString()}</p>
           </div>
           
           <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl border-2 ${
