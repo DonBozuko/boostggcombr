@@ -1,46 +1,26 @@
-# Plano de Implantação: Entidade jarvis_incidents (v636.1)
+# Plano de Implantação: Tabela `jarvis_incidents` (v636.1 - Revisado)
 
-Criação da estrutura de dados para o ciclo de vida de incidentes no J.A.R.V.I.S. NOC, garantindo consistência atômica, RLS restritivo e rastreabilidade total sem afetar o fluxo comercial.
+Objetivo: Criar a infraestrutura de dados para gestão de incidentes com rigor de integridade, deduplicação e máquina de estados em nível de banco de dados.
 
-## 1. Banco de Dados (Supabase Migration)
+## Alterações Técnicas
 
-### Estrutura da Tabela `public.jarvis_incidents`
-- `id`: uuid primary key (default gen_random_uuid())
-- `created_at`: timestamptz (default now())
-- `updated_at`: timestamptz (default now())
-- `status`: public.incident_status
-- `severity`: public.alert_severity
-- `type`: text (ex: 'DATABASE_ERROR')
-- `headline`: text
-- `origin`: text
-- `root_cause`: text
-- `fix_applied`: text
-- `validation_notes`: text
-- `regression_verified`: boolean (default false)
-- `closed_at`: timestamptz
-- `alert_ids`: uuid[] (rastreio de alertas relacionados)
-- `audit_log_ids`: uuid[] (rastreio de logs de auditoria)
+### 1. Banco de Dados (Migration SQL)
+Implementar o schema `public.jarvis_incidents` com as seguintes proteções:
+- **Idempotência Total**: Uso de blocos `DO $$` para criação de tipos `alert_severity` e `incident_status`.
+- **Deduplicação Inteligente**: Índice único parcial em `dedup_key` para incidentes não encerrados.
+- **Constraints de Integridade**: Garantir que um incidente `CLOSED` possua `root_cause`, `validation_notes` e `closed_at`.
+- **Automação de Timestamp**: Trigger para atualização automática de `updated_at`.
+- **Máquina de Estados**: Trigger `BEFORE UPDATE` para validar transições de status (ex: não reabrir incidentes fechados sem passar pelos estados intermediários).
+- **RLS Robusto**: Políticas administrativas utilizando `InitPlan` para performance.
 
-### Tipos e Enums
-- `public.alert_severity`: ('critical', 'error', 'warning', 'info')
-- `public.incident_status`: ('DETECTED', 'INVESTIGATING', 'ROOT_CAUSE_IDENTIFIED', 'FIX_APPLIED', 'VALIDATING', 'REGRESSION_VERIFIED', 'CLOSED')
+### 2. Backend (Server Functions)
+- **Circuit Breaker c/ Anti-Recursão**: Implementar flag de contexto em `src/lib/jarvis-incidents-logic.server.ts` para evitar loops infinitos em caso de erro na persistência do próprio incidente.
+- **Despacho Fire-and-Forget**: Garantir que o registro de incidentes no fluxo de checkout não adicione latência, utilizando timeouts curtos e execução assíncrona.
+- **Validação de Auditoria**: Garantir que logs em `admin_audit_logs` utilizem `supabaseAdmin` para contornar restrições de RLS do cliente.
 
-### RLS e Permissões
-- `GRANT SELECT, INSERT, UPDATE ON public.jarvis_incidents TO authenticated`
-- `GRANT ALL ON public.jarvis_incidents TO service_role`
-- Policy: Apenas usuários com `public.has_role(auth.uid(), 'admin')` podem acessar/editar.
+## Plano de Validação
+- **Teste de Idempotência**: Executar a migration duas vezes seguidas para garantir que não há erros.
+- **Teste de Carga de Erros**: Simular tempestade de erros (1000/min) para validar a eficácia da `dedup_key`.
+- **Validação de Transição**: Tentar forçar um status inválido via SQL para confirmar o bloqueio da trigger.
 
-## 2. Implementação do Backend (`src/lib/jarvis-incidents.server.ts`)
-
-- **Máquina de Estados**: Validação rigorosa das transições (ex: impede encerramento sem causa raiz e validação).
-- **Circuit Breaker**: Try-catch global para garantir que falhas no registro de incidentes não afetem o checkout.
-- **Auditoria**: Registro automático em `admin_audit_logs` para cada transição de estado.
-
-## 3. Validação Operacional
-
-- Testes de integridade de tipos e constraints.
-- Testes de RLS com diferentes perfis de usuário.
-- Verificação de não-interferência no fluxo de pagamento e checkout.
-
----
-*Status: Pronto para execução da migration v636.1.*
+Aprovo a execução com este rigor técnico adicional.
