@@ -123,6 +123,13 @@ export const FAMILIAS: Familia[] = [
     provas: ["checkout-idempotency.test.ts", "mp-webhook-signature.test.ts"],
   },
   {
+    id: "cobranca_real",
+    nome: "Cobrança real (Pix e cartão)",
+    detector: "mercadopago.server (payment Pix + Checkout Pro cartão)",
+    provas: ["cobranca-real.test.ts"],
+  },
+
+  {
     id: "rls",
     nome: "Acesso a dados",
     detector: "linter RLS + autenticação dos robôs",

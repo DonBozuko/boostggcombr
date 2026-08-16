@@ -34,9 +34,20 @@ export const criarPedido = createServerFn({ method: "POST" })
         cupom: z.string().optional(),
         rede_social: z.string().optional(),
         bump_upgrade: z.boolean().optional(),
+        // v643 — método explícito. Sem isto o backend sempre caía no Pix e o
+        // botão de cartão nunca conseguia concluir (nunca recebia checkoutUrl).
+        metodo: z.enum(["pix", "cartao"]).optional(),
+        email: z.string().optional(),
+        whatsapp_contato: z.string().optional(),
+        utm_source: z.string().nullish(),
+        utm_medium: z.string().nullish(),
+        utm_campaign: z.string().nullish(),
+        utm_content: z.string().nullish(),
+        utm_term: z.string().nullish(),
       })
       .parse(d),
   )
+
   .handler(async ({ data }) => {
     const pkg = data.pacote;
     const isBrVariant = pkg.startsWith("br-");
@@ -203,6 +214,17 @@ export const criarPedido = createServerFn({ method: "POST" })
     }
 
 
+    // v643 — cartão é um caminho próprio: valor com a taxa da operadora
+    // repassada e teto de risco. Bloqueio antes de gravar pedido, para não
+    // sujar o funil com pedido que nunca poderia ser cobrado.
+    const metodo = data.metodo === "cartao" ? "cartao" : "pix";
+    const { cardAmount, cardBlockedReason } = await import("./card-pricing");
+    if (metodo === "cartao") {
+      const bloqueio = cardBlockedReason(valorCobrar);
+      if (bloqueio) return { ok: false as const, error: bloqueio };
+    }
+    const valorCharge = metodo === "cartao" ? cardAmount(valorCobrar) : valorCobrar;
+
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: pedido, error } = await supabaseAdmin
       .from("pedidos")
@@ -210,8 +232,16 @@ export const criarPedido = createServerFn({ method: "POST" })
         instagram_user: clean(data.instagram_user),
         pacote: clean(pacoteEfetivo),
         quantidade: quantidadeEfetiva,
-        valor: valorCobrar,
+        valor: valorCharge,
         status: "pending",
+        metodo_pagamento: metodo,
+        email_contato: data.email ?? null,
+        whatsapp_contato: data.whatsapp_contato ?? null,
+        utm_source: data.utm_source ?? null,
+        utm_medium: data.utm_medium ?? null,
+        utm_campaign: data.utm_campaign ?? null,
+        utm_content: data.utm_content ?? null,
+        utm_term: data.utm_term ?? null,
         bump_offered: bumpOfertado,
         bump_accepted: bumpAplicado,
         affiliate_code: (hasPrime && discount > 0 ? "PRIME15" : null) as any,
@@ -235,42 +265,93 @@ export const criarPedido = createServerFn({ method: "POST" })
       return { ok: false as const, error: "DATABASE_ERROR" as const };
     }
 
+    const valorFormatado = `R$ ${valorCharge.toFixed(2).replace(".", ",")}`;
+
     try {
-      const { createMercadoPagoPreference } = await import("./mercadopago.server");
-      const pref = await createMercadoPagoPreference({
+      const gateway = await import("./mercadopago.server");
+      const entrada = {
         id: pedido.id,
         pacote: pacoteEfetivo,
         quantidade: quantidadeEfetiva,
-        valor: valorCobrar,
+        valor: valorCharge,
         alvo: clean(data.instagram_user),
-      });
+        email: data.email,
+      };
+
+      if (metodo === "cartao") {
+        const card = await gateway.createMercadoPagoCardCheckout(entrada);
+        // O webhook carimba o payment id ao receber a notificação (external_reference "pedido:").
+        await supabaseAdmin
+          .from("pedidos")
+          .update({ mp_preference_id: card.id } as any)
+          .eq("id", pedido.id);
+
+        return {
+          ok: true as const,
+          metodo,
+          pedidoId: pedido.id,
+          preferenceId: card.id,
+          checkoutUrl: card.checkoutUrl,
+          initPoint: card.checkoutUrl,
+          sandboxInitPoint: card.sandboxCheckoutUrl,
+          pacoteFinal: pacoteEfetivo,
+          quantidadeFinal: quantidadeEfetiva,
+          valorFormatado,
+          valorCobrado: valorCharge,
+        };
+      }
+
+      const pix = await gateway.createMercadoPagoPixPayment(entrada);
+      // Guardar o payment id já no nascimento é o que permite à contingência
+      // consultar o Mercado Pago se o webhook atrasar ou falhar.
+      if (pix.paymentId) {
+        await supabaseAdmin
+          .from("pedidos")
+          .update({ mercado_pago_id: pix.paymentId } as any)
+          .eq("id", pedido.id);
+      }
 
       return {
         ok: true as const,
+        metodo,
         pedidoId: pedido.id,
-        preferenceId: pref.id,
-        initPoint: pref.initPoint,
-        sandboxInitPoint: pref.sandboxInitPoint,
-        qrCode: pref.qrCode,
-        qrCodeBase64: pref.qrCodeBase64,
+        preferenceId: pix.paymentId,
+        paymentId: pix.paymentId,
+        qrCode: pix.qrCode,
+        qrCodeBase64: pix.qrCodeBase64,
+        ticketUrl: pix.ticketUrl,
+        expiresAt: pix.expiresAt,
         pacoteFinal: pacoteEfetivo,
         quantidadeFinal: quantidadeEfetiva,
-        valorFormatado: `R$ ${valorCobrar.toFixed(2).replace(".", ",")}`,
-        valorCobrado: valorCobrar,
+        valorFormatado,
+        valorCobrado: valorCharge,
       };
     } catch (err) {
       console.error("[criarPedido] erro MP:", err);
+      // Pedido sem cobrança criada não pode ficar como "pending" enganando
+      // funil, recuperação de Pix e semáforo. Marcamos o motivo real.
+      try {
+        await supabaseAdmin
+          .from("pedidos")
+          .update({
+            status: "gateway_error",
+            error_detail: `PAYMENT_GATEWAY_ERROR (${metodo}): ${(err as Error).message}`.slice(0, 500),
+          } as any)
+          .eq("id", pedido.id)
+          .eq("status", "pending");
+      } catch { /* noop */ }
       // v628 — Alerta de erro de gateway
       try {
         const { supabaseAdmin: sbAdmin } = await import("@/integrations/supabase/client.server");
         await sbAdmin.from("jarvis_alerts").insert({
           severidade: "critical",
           origem: "checkout",
-          mensagem: `🚨 PAYMENT_GATEWAY_ERROR: falha ao gerar preferência MP para o pedido ${pedido.id}. Erro: ${(err as Error).message}`,
+          mensagem: `🚨 PAYMENT_GATEWAY_ERROR (${metodo}): falha ao gerar cobrança no Mercado Pago para o pedido ${pedido.id}. Erro: ${(err as Error).message}`,
           created_at: new Date().toISOString()
         });
       } catch { /* noop */ }
 
       return { ok: false as const, error: "PAYMENT_GATEWAY_ERROR" as const };
     }
+
   });
