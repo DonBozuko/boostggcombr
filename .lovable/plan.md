@@ -1,30 +1,41 @@
-# Plano de Restauração e Estabilização Final (v641)
+# Fechamento operacional BOOSTGG
 
-O sistema foi auditado e encontra-se em **Modo Estabilização Operacional**. Este plano foca na correção de inconsistências críticas identificadas na telemetria e na blindagem definitiva do checkout contra regressões de schema.
+## Verdade atual comprovada
 
-## Diagnóstico Técnico (Causa Raiz)
+- **PIX não está 100% funcional:** o backend cria uma preferência de checkout e devolve `init_point` como se fosse o código PIX. O QR base64 é sempre vazio; portanto, o modal mostra imagem inválida e o “copia e cola” recebe uma URL, não um payload PIX `000201...`.
+- **Cartão está visível, mas quebrado:** o frontend envia `metodo: "cartao"`, porém o validador descarta esse campo, o backend sempre segue o caminho PIX e nunca devolve `checkoutUrl`. Cada tentativa ainda pode gerar um pedido pendente sem concluir o pagamento.
+- **Entrega automática existe e está protegida:** webhook, contingência, reconciliador, SLA, smart routing e claim/commit atômicos cobrem pagamento até fornecedor, com travas contra dupla entrega. Ainda será validado o comportamento real dos cron jobs e a janela residual entre envio ao fornecedor e commit.
+- **O Jarvis pode dar falso verde:** componentes assumem verde quando a telemetria falha; alertas críticos deixam de contar após 20 minutos mesmo sem resolução; ausência de saldo também pode ser interpretada como operacional.
+- **Dados reais:** há 87 pedidos registrados como PIX e nenhum como cartão. Nos últimos 30 dias houve 22 PIX gerados e 10 convertidos. A última tentativa bloqueada foi corretamente recusada por perfil privado. Existem 147 alertas em 14 dias, sendo 34 críticos/erros, apesar de zero incidentes persistidos.
+- **Auditoria de UX/SEO:** preço único server-side e proteção da sincronização pública foram corrigidos. Permanecem sem prova final: experiência mobile, privacidade no checkout, anti-enumeração da consulta e saúde individual dos fornecedores.
 
-1.  **Checkout em Crise Silenciosa**: Alertas do Jarvis revelaram falhas `DATABASE_ERROR` no checkout devido ao uso de colunas inexistentes no código (`bump_aplicado`, `cupom_aplicado`, `bump_ofertado`) que divergem da estrutura real do banco (`bump_accepted`, `affiliate_code`, `bump_offered`).
-2.  **Mentira na Vitrine (Pausas)**: Os vetos ativos em 7 pacotes `br-p*` são resíduos de "Bancada: Nenhum fornecedor habilitado", indicando que o roteamento BR não está encontrando fornecedores com Refill + Nome BR ativos.
-3.  **Integridade do Jarvis**: O semáforo apresenta "Falso Verde" ou telemetria inconsistente quando o banco falha parcialmente, corrigido agora com a integração de `jarvis_incidents` e máquina de estados rigorosa.
+## Execução P0 — compra real
 
-## Ações Imediatas (Execução v641)
+1. Separar explicitamente `pix` e `cartao` no contrato de criação do pedido.
+2. Para PIX, criar pagamento PIX real no Mercado Pago e retornar somente os campos oficiais `qr_code` e `qr_code_base64`.
+3. Para cartão, criar Checkout Pro habilitado para cartão, persistir `metodo_pagamento = cartao` e devolver uma URL válida de checkout.
+4. Impedir que falha no gateway deixe pedido órfão enganando funil e Jarvis; registrar estado/erro coerente para recuperação.
+5. Adicionar idempotência por tentativa para impedir pedidos duplicados em duplo clique/retry.
+6. Aplicar retry limitado apenas a erros transitórios do gateway, sem repetir cobrança criada.
 
-### 1. Blindagem do Checkout (Fim do DATABASE_ERROR)
-Corrigir o mapeamento de colunas em `src/lib/pedidos.functions.ts` para alinhar com o schema real do banco e evitar falhas de inserção de pedidos.
-- `bump_aplicado` -> `bump_accepted`
-- `bump_ofertado` -> `bump_offered`
-- `cupom_aplicado` -> `affiliate_code` (ou `cupom` dependendo do uso pretendido)
+## Execução P0 — verdade operacional
 
-### 2. Saneamento de Alertas e Semáforo
-Executar limpeza de alertas "fantasmas" que não representam a realidade operacional e garantir que o semáforo único do Jarvis reflita incidentes abertos na tabela `jarvis_incidents`.
+1. Estado padrão do semáforo será `UNKNOWN`, nunca verde sem telemetria válida.
+2. Incidente/alerta crítico permanecerá vermelho até resolução comprovada, não apenas até envelhecer 20 minutos.
+3. Ausência de saldo, fornecedor ou telemetria será `UNKNOWN/DEGRADED`, não “operacional”.
+4. Consolidar alertas por causa e ciclo de vida, sem apagar evidência nem acumular repetição.
 
-### 3. Estabilização de Preços e Margem
-Manter a regra de **Margin Guardian** ativada: o preço no site nunca cai abaixo do custo real de quem entrega a quantidade (Verified/SMMPanel), ignorando custos teóricos do SMMHype para pacotes grandes.
+## Validação obrigatória
 
-## Verificação de Sucesso
-- **Checkout**: Nenhum erro de coluna inexistente nos logs após a correção.
-- **Jarvis**: Incidentes abertos bloqueiam o checkout via Circuit Breaker.
-- **Transparência**: O texto da rota principal (`/`) deve refletir o estado de restauração completa conforme solicitado.
+- Teste de contrato PIX: payload copia-e-cola válido e QR base64 não vazio.
+- Teste de contrato cartão: método aceito, persistido e `checkoutUrl` retornado.
+- Testes de falha: timeout, 429, 5xx, perfil privado, duplo clique e gateway indisponível.
+- Teste de idempotência webhook + contingência + reconciliador: uma cobrança gera no máximo uma entrega e um lançamento financeiro.
+- E2E no navegador em desktop e mobile para PIX e cartão, sem erros de console.
+- Verificação dos cron jobs, últimas execuções, filas, pedidos pagos travados, fornecedores e circuit breakers.
+- Reexecução da suíte completa e auditoria automatizada.
+- SEO: HTML inicial com preço real, JSON-LD coerente, metadados, canonical, robots e páginas principais.
 
-**Aviso:** Nenhuma funcionalidade nova será adicionada. O foco é 100% em restaurar o que já existia e garantir que funcione sem mentiras.
+## Critério de término
+
+O projeto só será declarado pronto quando houver prova simultânea de: PIX real utilizável, cartão abrindo checkout, pagamento aprovado processado uma vez, entrega despachada uma vez, ledger registrado uma vez, recuperação automática operante, Jarvis sem falso verde e SEO sem regressão. Até lá, o estado correto é **NÃO APROVADO PARA FECHAMENTO**.
