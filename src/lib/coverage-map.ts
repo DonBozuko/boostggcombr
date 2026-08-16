@@ -166,6 +166,8 @@ export const FAMILIAS: Familia[] = [
       "shelf-availability.test.ts",
       "honest-shelf-fallback.test.ts",
       "shelf-single-writer.test.ts",
+      // v642 — linha BR é a de maior margem: se sair da loja, o dono é avisado.
+      "vitrine-br-avisa.test.ts",
     ],
   },
   {
