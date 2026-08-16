@@ -1,29 +1,40 @@
 # Auditoria de Ponta a Ponta
 
-Gerado por `npm run audit` — 2026-08-07T01:58:14.640Z
+Gerado por `npm run audit` — 2026-08-16T21:01:36.302Z
 
-Arquivos lidos: 463
+Arquivos lidos: 488
 
 | Gravidade | Qtd |
 |---|---|
 | bloqueante | 0 |
-| atencao | 0 |
-| nota | 522 |
+| atencao | 9 |
+| nota | 530 |
 
-## arquivo-gigante (10)
+## arquivo-orfao (9)
 
-- **nota** `src/integrations/supabase/types.ts` — 2336 linhas (> 600)
-- **nota** `src/lib/admin.functions.ts` — 852 linhas (> 600)
-- **nota** `src/lib/pedidos.functions.ts` — 760 linhas (> 600)
-- **nota** `src/lib/pricing-cache.server.ts` — 780 linhas (> 600)
-- **nota** `src/lib/pricing-engine.server.ts` — 960 linhas (> 600)
-- **nota** `src/routes/admin.tsx` — 2482 linhas (> 600)
-- **nota** `src/routes/api/public/mp-webhook.ts` — 871 linhas (> 600)
-- **nota** `src/routes/blog.$slug.tsx` — 882 linhas (> 600)
-- **nota** `src/routes/index.tsx` — 1500 linhas (> 600)
+- **atencao** `src/chrome-extension/src/engine/reviewer-core.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/admin-token.server.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/dom-sanitizer.test.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/jarvis-incidents-forensic.test.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/jarvis-incidents-integration.test.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/jarvis-incidents.test.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/jarvis-operational-e2e.test.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/jarvis-operational-reality.test.ts` — ninguém importa este arquivo
+- **atencao** `src/lib/orphan-charge.server.ts` — ninguém importa este arquivo
+
+## arquivo-gigante (9)
+
+- **nota** `src/integrations/supabase/types.ts` — 2458 linhas (> 600)
+- **nota** `src/lib/admin.functions.ts` — 857 linhas (> 600)
+- **nota** `src/lib/pricing-cache.server.ts` — 783 linhas (> 600)
+- **nota** `src/lib/pricing-engine.server.ts` — 959 linhas (> 600)
+- **nota** `src/routes/admin.tsx` — 2484 linhas (> 600)
+- **nota** `src/routes/api/public/mp-webhook.ts` — 875 linhas (> 600)
+- **nota** `src/routes/blog.$slug.tsx` — 897 linhas (> 600)
+- **nota** `src/routes/index.tsx` — 1611 linhas (> 600)
 - **nota** `src/routes/tiktok.tsx` — 636 linhas (> 600)
 
-## cor-hardcoded (454)
+## cor-hardcoded (465)
 
 - **nota** `src/components/AdminAuditLog.tsx` — linha 38
 - **nota** `src/components/AdminAuditLog.tsx` — linha 53
@@ -31,15 +42,16 @@ Arquivos lidos: 463
 - **nota** `src/components/AdminAuditLog.tsx` — linha 57
 - **nota** `src/components/AdminAuditLog.tsx` — linha 62
 - **nota** `src/components/AdminCostAlert.tsx` — linha 41
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 47
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 50
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 73
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 71
 - **nota** `src/components/AdminHealthSemaphore.tsx` — linha 74
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 75
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 76
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 77
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 78
-- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 84
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 103
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 119
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 120
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 124
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 128
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 129
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 130
+- **nota** `src/components/AdminHealthSemaphore.tsx` — linha 136
 - **nota** `src/components/AuditoriaJarvis.tsx` — linha 161
 - **nota** `src/components/AuditoriaJarvis.tsx` — linha 170
 - **nota** `src/components/AuditoriaJarvis.tsx` — linha 198
@@ -55,6 +67,8 @@ Arquivos lidos: 463
 - **nota** `src/components/AutonomiaPanel.tsx` — linha 65
 - **nota** `src/components/BenchPanel.tsx` — linha 93
 - **nota** `src/components/BenefitsGrid.tsx` — linha 61
+- **nota** `src/components/BlogCTA.tsx` — linha 37
+- **nota** `src/components/BlogCTA.tsx` — linha 53
 - **nota** `src/components/BrandHeader.tsx` — linha 12
 - **nota** `src/components/CanaryPanel.tsx` — linha 119
 - **nota** `src/components/CanaryPanel.tsx` — linha 134
@@ -62,12 +76,9 @@ Arquivos lidos: 463
 - **nota** `src/components/CanaryPanel.tsx` — linha 156
 - **nota** `src/components/CanaryPanel.tsx` — linha 164
 - **nota** `src/components/CanaryPanel.tsx` — linha 167
-- **nota** `src/components/CanaryPanel.tsx` — linha 170
-- **nota** `src/components/CanaryPanel.tsx` — linha 174
-- **nota** `src/components/CanaryPanel.tsx` — linha 177
-- … e mais 414
+- … e mais 425
 
-## serverfn-modulo-fino (58)
+## serverfn-modulo-fino (56)
 
 - **nota** `src/lib/admin-session.functions.ts` — linha 4: const ADMIN_EMAIL = "fabiano.majestic@gmail.com";
 - **nota** `src/lib/admin.functions.ts` — linha 34: const adminInput = z.object({ token: z.string().min(8) });
@@ -109,5 +120,5 @@ Arquivos lidos: 463
 - **nota** `src/lib/mystery-box.functions.ts` — linha 7: const MIN_QTY = 200; // v190 — alinhado à UI (Bônus Especial promete "acima de 200 unidades")
 - **nota** `src/lib/mystery-box.functions.ts` — linha 8: const MB_MARKER = /MB_REDEEMED:(\d+)/i;
 - **nota** `src/lib/mystery-box.functions.ts` — linha 10: const input = z.object({
-- … e mais 18
+- … e mais 16
 
