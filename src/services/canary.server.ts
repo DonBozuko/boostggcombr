@@ -421,7 +421,11 @@ async function maybeDispatch(cfg: CanaryConfig, report: CanaryReport): Promise<v
       `💸 TESTES AUTOMÁTICOS PAUSADOS NESTE MÊS\n\n` +
       `PROBLEMA: os pedidos de teste já custaram R$ ${gasto.toFixed(2)} no fornecedor e o limite que você definiu é R$ ${cfg.budget_brl_month.toFixed(2)}.\n\n` +
       `O QUE FAZER: nada, se estiver de bom tamanho — os testes voltam sozinhos no dia 1º. Se quiser continuar testando agora, aumente o limite em Admin › Canário.`;
-    if (await alert("canary:budget", m)) report.alertas.push(m);
+    // v642 — teto de gasto é estado ESPERADO do mês, não incidente novo.
+    // Com cooldown de 6h o mesmo aviso repetia ~4x/dia até virar o mês e
+    // afogava os alertas de verdade. Agora: uma vez por mês, e pronto.
+    const mesKey = new Date().toISOString().slice(0, 7);
+    if (await alert(`canary:budget:${mesKey}`, m, 24 * 40)) report.alertas.push(m);
     return;
   }
 
