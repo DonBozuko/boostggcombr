@@ -91,6 +91,8 @@ const MAP: Record<string, CanonicalStatus> = {
   error: "ERRO",
   amount_mismatch: "ERRO",
   mp_unknown: "ERRO",
+  // v643 — gateway recusou/caiu ao criar a cobrança: nunca cobrou, mas precisa de olho.
+  gateway_error: "ERRO",
 };
 
 /** Estados internos que o sistema reconhece hoje. Usado pelo teste-trava. */
