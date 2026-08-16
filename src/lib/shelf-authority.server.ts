@@ -184,7 +184,7 @@ export async function reconcileShelf(pacotes: string[] = []): Promise<ShelfRepor
 }
 
 /** Avisa o dono quando pacote brasileiro sai da vitrine (ou volta). */
-async function notificarVitrineBr(report: ShelfReport, vetos: ShelfVeto[]): Promise<void> {
+export async function notificarVitrineBr(report: ShelfReport, vetos: ShelfVeto[]): Promise<void> {
   const { isBrPackage } = await import("./critical-guards");
   const caiu = report.pausados.filter((p) => isBrPackage(p));
   const voltou = report.religados.filter((p) => isBrPackage(p));
