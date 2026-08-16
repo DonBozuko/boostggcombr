@@ -93,7 +93,21 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
 
 export const Route = createFileRoute("/")({
 
-  head: () => {
+  head: ({ loaderData }: any) => {
+    // v642 — a faixa de preço dos dados estruturados vinha fixa ("5.00" a
+    // "499.00", 9 ofertas) enquanto a vitrine real já ia muito além. Google
+    // trata divergência entre rich snippet e página como dado não confiável e
+    // deixa de exibir o preço na busca. Agora sai do mesmo banco que a vitrine.
+    const ofertas: Array<{ valor: number }> = [
+      ...(loaderData?.seguidores ?? []),
+      ...(loaderData?.curtidas ?? []),
+      ...(loaderData?.visualizacoes ?? []),
+      ...(loaderData?.seguidoresBr ?? []),
+    ];
+    const precos = ofertas.map((o) => Number(o?.valor)).filter((n) => Number.isFinite(n) && n > 0);
+    const lowPrice = (precos.length ? Math.min(...precos) : 5).toFixed(2);
+    const highPrice = (precos.length ? Math.max(...precos) : 499).toFixed(2);
+    const offerCount = String(precos.length || 9);
     const title = "Comprar Seguidores Instagram Reais via Pix: BOOSTGG";
     const ogTitle = "BOOSTGG: Seguidores no Instagram Reais e Brasileiros";
     const description =
@@ -187,9 +201,9 @@ export const Route = createFileRoute("/")({
                 offers: {
                   "@type": "AggregateOffer",
                   priceCurrency: "BRL",
-                  lowPrice: "5.00",
-                  highPrice: "499.00",
-                  offerCount: "9",
+                  lowPrice,
+                  highPrice,
+                  offerCount,
                   availability: "https://schema.org/InStock",
                   url: "https://www.boostgg.com.br/",
                 },
@@ -229,6 +243,31 @@ export const Route = createFileRoute("/")({
           }),
         },
       ],
+    };
+  },
+  // v642 — PREÇO NASCE NO SERVIDOR.
+  // Causa raiz da divergência "card R$5,50 × seletor R$5,00" apontada na
+  // auditoria: a grade só era buscada no cliente (useEffect). Até hidratar, o
+  // seletor do checkout renderizava a lista estática antiga. Ninguém era
+  // cobrado errado (o servidor sempre reprecifica em `criarPedido`), mas o
+  // cliente via dois preços — e o Googlebot via a lista estática, não a real.
+  // Com o loader, o primeiro HTML já sai com o preço vivo do banco.
+  loader: async () => {
+    const safe = async <T,>(p: Promise<T>): Promise<T | null> => {
+      try { return await p; } catch { return null; }
+    };
+    const [seguidores, curtidas, visualizacoes, br] = await Promise.all([
+      safe(getPricingGrid({ data: { category: "instagram:seguidores" } })),
+      safe(getPricingGrid({ data: { category: "instagram:curtidas" } })),
+      safe(getPricingGrid({ data: { category: "instagram:visualizacoes" } })),
+      safe(getBrPricingGrid({ data: { network: "instagram", kind: "seguidores" } })),
+    ]);
+    return {
+      seguidores: (seguidores as any)?.items ?? [],
+      curtidas: (curtidas as any)?.items ?? [],
+      visualizacoes: (visualizacoes as any)?.items ?? [],
+      seguidoresBr: (br as any)?.items ?? [],
+      gridLoaded: !!(seguidores || curtidas || visualizacoes),
     };
   },
   component: Landing,
@@ -495,14 +534,19 @@ Integridade de schema e Margin Guardian ativos.</p>
   const getPricingGridFn = useServerFn(getPricingGrid);
   const getBrPricingGridFn = useServerFn(getBrPricingGrid);
   type GridItem = { id: string; quantidade: number; valor: number; price: string };
+  // v642 — a grade já chega pronta do servidor (loader). O estado nasce com o
+  // preço real do banco, então card e seletor do checkout nunca divergem.
+  const seed = Route.useLoaderData();
   const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
-    seguidores: [], curtidas: [], visualizacoes: [],
+    seguidores: (seed?.seguidores ?? []) as GridItem[],
+    curtidas: (seed?.curtidas ?? []) as GridItem[],
+    visualizacoes: (seed?.visualizacoes ?? []) as GridItem[],
   });
-  const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>([]);
+  const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>((seed?.seguidoresBr ?? []) as GridItem[]);
   const [soBr, setSoBr] = useState(false);
   // v336 — o banco respondeu (mesmo que vazio)? Só depois disso é honesto
   // esconder pacote; antes disso o estático evita vitrine em branco no SSR.
-  const [gridLoaded, setGridLoaded] = useState(false);
+  const [gridLoaded, setGridLoaded] = useState<boolean>(seed?.gridLoaded ?? false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   // v378 — topo do funil deixou de ser cego: sem esta etapa não dá pra medir conversão.
   useEffect(() => { trackFunnel("abriu_vitrine"); }, []);

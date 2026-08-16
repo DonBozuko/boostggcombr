@@ -53,3 +53,4 @@ Hierarquia de Identidade: BOOSTGG (Marca) > Elite Boost Prime (Legal).
 - [Testes Gate de Deploy](mem://preferences/testes-gate-de-deploy.md)
 - [Tolerância e Hierarquia](mem://preferences/tolerancia-e-hierarquia.md)
 - [Tracking Ads](mem://tracking-ads.md)
+- [Linha BR: vínculo correto](mem://features/linha-br-vinculo-correto.md) — Serviços BR+Refill válidos para br-p*/br-pro*; vínculo errado derruba a vitrine.
