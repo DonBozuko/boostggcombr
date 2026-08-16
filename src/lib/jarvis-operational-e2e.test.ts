@@ -58,8 +58,10 @@ vi.mock("./pricing-engine.server", () => ({
 vi.mock("./route-preflight.server", () => ({ preflightRouteOrBlock: async () => ({ ok: true }) }));
 vi.mock("./target-preflight.server", () => ({ preflightTargetOrBlock: async () => ({ ok: true }) }));
 vi.mock("./mercadopago.server", () => ({ 
-  createMercadoPagoPreference: async () => ({ id: 'pref-123', initPoint: 'http://mp.com', qrCode: 'pix-code', qrCodeBase64: 'base64' }) 
+  createMercadoPagoPixPayment: async () => ({ paymentId: 'pay-1', qrCode: '00020126pix', qrCodeBase64: 'base64', ticketUrl: null, expiresAt: null }),
+  createMercadoPagoCardCheckout: async () => ({ id: 'pref-123', checkoutUrl: 'https://mp.com/checkout', sandboxCheckoutUrl: null }),
 }));
+
 
 import { criarPedido } from './pedidos.functions';
 import { runJarvisLieDetector } from './jarvis-detector-mentiras.functions';
