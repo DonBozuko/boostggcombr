@@ -93,7 +93,21 @@ const getCheckoutSuccessMessage = (qty?: number) => `Seu pedido de ${qty || ""} 
 
 export const Route = createFileRoute("/")({
 
-  head: () => {
+  head: ({ loaderData }: any) => {
+    // v642 — a faixa de preço dos dados estruturados vinha fixa ("5.00" a
+    // "499.00", 9 ofertas) enquanto a vitrine real já ia muito além. Google
+    // trata divergência entre rich snippet e página como dado não confiável e
+    // deixa de exibir o preço na busca. Agora sai do mesmo banco que a vitrine.
+    const ofertas: Array<{ valor: number }> = [
+      ...(loaderData?.seguidores ?? []),
+      ...(loaderData?.curtidas ?? []),
+      ...(loaderData?.visualizacoes ?? []),
+      ...(loaderData?.seguidoresBr ?? []),
+    ];
+    const precos = ofertas.map((o) => Number(o?.valor)).filter((n) => Number.isFinite(n) && n > 0);
+    const lowPrice = (precos.length ? Math.min(...precos) : 5).toFixed(2);
+    const highPrice = (precos.length ? Math.max(...precos) : 499).toFixed(2);
+    const offerCount = String(precos.length || 9);
     const title = "Comprar Seguidores Instagram Reais via Pix: BOOSTGG";
     const ogTitle = "BOOSTGG: Seguidores no Instagram Reais e Brasileiros";
     const description =
