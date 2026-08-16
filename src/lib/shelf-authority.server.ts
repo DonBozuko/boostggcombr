@@ -171,5 +171,47 @@ export async function reconcileShelf(pacotes: string[] = []): Promise<ShelfRepor
       `[vitrine] v372 autoridade: ${report.pausados.length} pausado(s), ${report.religados.length} religado(s)`,
     );
   }
+
+  // v642 — LINHA BR NÃO CAI EM SILÊNCIO.
+  // A linha brasileira é a de maior margem e ficou dias fora da vitrine sem
+  // ninguém notar (vínculo apontava para serviço sem reposição). Veto em
+  // pacote BR agora avisa no Telegram. Não precisa de anti-repetição: as
+  // listas abaixo só contêm MUDANÇA de estado (linha 153 ignora reescrita
+  // do mesmo valor), então cada pacote avisa uma vez ao cair e uma ao voltar.
+  await notificarVitrineBr(report, vetos).catch(() => {});
+
   return report;
+}
+
+/** Avisa o dono quando pacote brasileiro sai da vitrine (ou volta). */
+async function notificarVitrineBr(report: ShelfReport, vetos: ShelfVeto[]): Promise<void> {
+  const { isBrPackage } = await import("./critical-guards");
+  const caiu = report.pausados.filter((p) => isBrPackage(p));
+  const voltou = report.religados.filter((p) => isBrPackage(p));
+  if (caiu.length === 0 && voltou.length === 0) return;
+
+  const { dispatchWhatsappAlert } = await import("./whatsapp-alert.server");
+
+  if (caiu.length > 0) {
+    const motivos = new Map<string, string>();
+    for (const v of vetos) if (caiu.includes(v.pacote) && !motivos.has(v.pacote)) motivos.set(v.pacote, v.motivo);
+    const lista = caiu.map((p) => `• ${p} — ${motivos.get(p) ?? "motivo não informado"}`).join("\n");
+    await dispatchWhatsappAlert(
+      `🇧🇷 PACOTE BRASILEIRO SAIU DA LOJA\n\n` +
+        `PROBLEMA: ${caiu.length} pacote(s) da linha brasileira pararam de aparecer para o cliente. ` +
+        `É a linha de maior margem, então cada hora fora do ar é venda perdida.\n\n${lista}\n\n` +
+        `O QUE FAZER: abrir Admin › Saúde do Catálogo e conferir se o serviço vinculado ainda é brasileiro e com reposição. ` +
+        `Se o fornecedor trocou o serviço, revincular. Volta sozinho assim que a rota ficar boa de novo.`,
+      { severity: "critical", origem: "vitrine-br" },
+    );
+  }
+
+  if (voltou.length > 0) {
+    await dispatchWhatsappAlert(
+      `🇧🇷 LINHA BRASILEIRA DE VOLTA\n\nBOA: ${voltou.length} pacote(s) brasileiro(s) voltaram a aparecer na loja:\n` +
+        voltou.map((p) => `• ${p}`).join("\n") +
+        `\n\nO QUE FAZER: nada. A rota se recuperou sozinha.`,
+      { severity: "info", origem: "vitrine-br" },
+    );
+  }
 }
