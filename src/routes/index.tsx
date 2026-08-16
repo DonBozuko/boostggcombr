@@ -520,14 +520,19 @@ Integridade de schema e Margin Guardian ativos.</p>
   const getPricingGridFn = useServerFn(getPricingGrid);
   const getBrPricingGridFn = useServerFn(getBrPricingGrid);
   type GridItem = { id: string; quantidade: number; valor: number; price: string };
+  // v642 — a grade já chega pronta do servidor (loader). O estado nasce com o
+  // preço real do banco, então card e seletor do checkout nunca divergem.
+  const seed = Route.useLoaderData();
   const [gridBy, setGridBy] = useState<Record<Categoria, GridItem[]>>({
-    seguidores: [], curtidas: [], visualizacoes: [],
+    seguidores: (seed?.seguidores ?? []) as GridItem[],
+    curtidas: (seed?.curtidas ?? []) as GridItem[],
+    visualizacoes: (seed?.visualizacoes ?? []) as GridItem[],
   });
-  const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>([]);
+  const [seguidoresBr, setSeguidoresBr] = useState<GridItem[]>((seed?.seguidoresBr ?? []) as GridItem[]);
   const [soBr, setSoBr] = useState(false);
   // v336 — o banco respondeu (mesmo que vazio)? Só depois disso é honesto
   // esconder pacote; antes disso o estático evita vitrine em branco no SSR.
-  const [gridLoaded, setGridLoaded] = useState(false);
+  const [gridLoaded, setGridLoaded] = useState<boolean>(seed?.gridLoaded ?? false);
 useEffect(() => { trackViewContent({ contentId: "landing_instagram", contentName: "Landing Instagram" }); }, []);
   // v378 — topo do funil deixou de ser cego: sem esta etapa não dá pra medir conversão.
   useEffect(() => { trackFunnel("abriu_vitrine"); }, []);
