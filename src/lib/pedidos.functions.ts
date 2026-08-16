@@ -34,9 +34,20 @@ export const criarPedido = createServerFn({ method: "POST" })
         cupom: z.string().optional(),
         rede_social: z.string().optional(),
         bump_upgrade: z.boolean().optional(),
+        // v643 — método explícito. Sem isto o backend sempre caía no Pix e o
+        // botão de cartão nunca conseguia concluir (nunca recebia checkoutUrl).
+        metodo: z.enum(["pix", "cartao"]).optional(),
+        email: z.string().optional(),
+        whatsapp_contato: z.string().optional(),
+        utm_source: z.string().nullish(),
+        utm_medium: z.string().nullish(),
+        utm_campaign: z.string().nullish(),
+        utm_content: z.string().nullish(),
+        utm_term: z.string().nullish(),
       })
       .parse(d),
   )
+
   .handler(async ({ data }) => {
     const pkg = data.pacote;
     const isBrVariant = pkg.startsWith("br-");
