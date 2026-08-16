@@ -231,6 +231,31 @@ export const Route = createFileRoute("/")({
       ],
     };
   },
+  // v642 — PREÇO NASCE NO SERVIDOR.
+  // Causa raiz da divergência "card R$5,50 × seletor R$5,00" apontada na
+  // auditoria: a grade só era buscada no cliente (useEffect). Até hidratar, o
+  // seletor do checkout renderizava a lista estática antiga. Ninguém era
+  // cobrado errado (o servidor sempre reprecifica em `criarPedido`), mas o
+  // cliente via dois preços — e o Googlebot via a lista estática, não a real.
+  // Com o loader, o primeiro HTML já sai com o preço vivo do banco.
+  loader: async () => {
+    const safe = async <T,>(p: Promise<T>): Promise<T | null> => {
+      try { return await p; } catch { return null; }
+    };
+    const [seguidores, curtidas, visualizacoes, br] = await Promise.all([
+      safe(getPricingGrid({ data: { category: "instagram:seguidores" } })),
+      safe(getPricingGrid({ data: { category: "instagram:curtidas" } })),
+      safe(getPricingGrid({ data: { category: "instagram:visualizacoes" } })),
+      safe(getBrPricingGrid({ data: { network: "instagram", kind: "seguidores" } })),
+    ]);
+    return {
+      seguidores: (seguidores as any)?.items ?? [],
+      curtidas: (curtidas as any)?.items ?? [],
+      visualizacoes: (visualizacoes as any)?.items ?? [],
+      seguidoresBr: (br as any)?.items ?? [],
+      gridLoaded: !!(seguidores || curtidas || visualizacoes),
+    };
+  },
   component: Landing,
 });
 
