@@ -201,9 +201,9 @@ export const Route = createFileRoute("/")({
                 offers: {
                   "@type": "AggregateOffer",
                   priceCurrency: "BRL",
-                  lowPrice: "5.00",
-                  highPrice: "499.00",
-                  offerCount: "9",
+                  lowPrice,
+                  highPrice,
+                  offerCount,
                   availability: "https://schema.org/InStock",
                   url: "https://www.boostgg.com.br/",
                 },
