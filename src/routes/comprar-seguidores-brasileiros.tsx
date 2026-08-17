@@ -4,9 +4,13 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-seguidores-brasileiros";
-const TITLE = "Seguidores Brasileiros — BOOSTGG";
+// v645 — título alinhado à intenção real de busca ("comprar seguidores brasil",
+// 726 impressões/30d na posição 46 com CTR 3,3%). O antigo "Seguidores Brasileiros"
+// não continha o verbo de compra que aparece em 100% das queries que trazem impressão.
+const TITLE = "Comprar Seguidores Brasileiros Reais no Instagram | Pix";
 const DESC =
-  "Seguidores brasileiros reais para Instagram, com foto e postagens. Entrega gradual via Pix e reposição nos pacotes BR.";
+  "Compre seguidores brasileiros reais no Instagram: perfis com foto e postagens, entrega gradual via Pix, sem senha e com reposição de 30 dias.";
+
 
 const FAQ = [
   {
