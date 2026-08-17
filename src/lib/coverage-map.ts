@@ -120,7 +120,12 @@ export const FAMILIAS: Familia[] = [
     id: "caixa",
     nome: "Caixa e cobrança órfã",
     detector: "orphan-charge / reconciliation",
-    provas: ["checkout-idempotency.test.ts", "mp-webhook-signature.test.ts"],
+    provas: [
+      "checkout-idempotency.test.ts",
+      "mp-webhook-signature.test.ts",
+      // v450 — telemetria do webhook (processed_at/ok) para não acusar canal morto à toa
+      "mp-webhook-audit-lifecycle.test.ts",
+    ],
   },
   {
     id: "cobranca_real",
