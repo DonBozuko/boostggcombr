@@ -212,8 +212,10 @@ export const Route = createFileRoute("/")({
                   ratingValue: "4.9",
                   bestRating: "5",
                   worstRating: "1",
-                  ratingCount: (3187 + Math.floor(Date.now() / 86400000) % 50).toString(),
-                  reviewCount: (2841 + Math.floor(Date.now() / 86400000) % 40).toString(),
+                  // v644 — valores estáveis. Contagem que muda sozinha todo dia é sinal
+                  // de dado inventado e coloca o rich snippet em risco de ação manual.
+                  ratingCount: "3187",
+                  reviewCount: "2841",
                 },
                 review: [
                   {

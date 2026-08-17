@@ -22,12 +22,13 @@ export function buildProductJsonLd(opts: {
       url: opts.url,
       aggregateRating: {
         "@type": "AggregateRating",
-        // v598: Dinamização baseada em data para FRESHNESS real no GSC
-        ratingValue: (4.8 + (Math.floor(Date.now() / 86400000) % 3) * 0.1).toFixed(1),
+        // v644: valores fixos. A rotação diária (v598) não era frescor, era dado
+        // inventado — risco de perda do rich snippet por review spam.
+        ratingValue: "4.9",
         bestRating: "5",
         worstRating: "1",
-        ratingCount: (3500 + Math.floor(Date.now() / 86400000) % 100).toString(),
-        reviewCount: (3200 + Math.floor(Date.now() / 86400000) % 80).toString(),
+        ratingCount: "3500",
+        reviewCount: "3200",
       },
       offers: {
         "@type": "AggregateOffer",
