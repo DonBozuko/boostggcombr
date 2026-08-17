@@ -130,9 +130,27 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
     }
   } catch (e) { console.warn("[contingency] v450 ledger check fail", e); }
 
+  // O recebimento do webhook e a conclusão do processamento são momentos
+  // diferentes. Se o evento já chegou, o polling pode vencer apenas porque o
+  // job assíncrono ainda está rodando; isso não significa canal morto.
+  let webhookWasReceived = false;
+  try {
+    const { data: webhookReceipt } = await supabaseAdmin
+      .from("webhook_events" as any)
+      .select("id")
+      .eq("provider", "mercado_pago")
+      .eq("event_id", String(pedido.mercado_pago_id))
+      .maybeSingle();
+    webhookWasReceived = Boolean(webhookReceipt);
+  } catch (e) {
+    // Fail-safe: se a telemetria estiver indisponível, preserva o alerta.
+    console.warn("[contingency] webhook receipt check fail", e);
+  }
+
   // v154 — Live Webhook Heartbeat + Telegram universal (paridade com mp-webhook.ts)
-  // Só dispara na PRIMEIRA processamento. Retentativas do SLA watcher não spammam.
-  if (isFirstProcessing) {
+  // Só acusa falha do canal quando nenhum webhook foi recebido. Quando o
+  // evento existe, a contingência apenas ganhou a corrida do job assíncrono.
+  if (isFirstProcessing && !webhookWasReceived) {
     try {
       const { dispatchTelegramAlert } = await import("@/lib/messaging");
       await dispatchTelegramAlert(
@@ -156,6 +174,7 @@ export async function confirmAndDispatchIfPaid(pedidoId: string): Promise<Contin
         valor_brl: Number(pedido.valor),
         buyer: pedido.instagram_user,
         source: "contingency-polling",
+        webhook_received: webhookWasReceived,
         message: isFirstProcessing
           ? `🟢 [contingency] PIX aprovado via polling · pedido ${pedido.id}`
           : `🔁 [contingency] Retentativa de dispatch via SLA watcher · pedido ${pedido.id}`,

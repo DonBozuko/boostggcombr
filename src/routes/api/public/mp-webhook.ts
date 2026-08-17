@@ -87,6 +87,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         // de forma assíncrona. O uso de worker.waitUntil garante que o processo sobreviva
         // ao retorno da Response principal em ambientes Cloudflare.
         let auditPaymentId: string | null = null;
+        let auditPedidoId: string | null = null;
         let auditError: string | null = null;
 
         const job = (async () => {
@@ -314,6 +315,7 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
             console.error("[mp-webhook] pedido não encontrado", paymentId, selErr);
             return;
           }
+          auditPedidoId = String(pedido.id);
 
           // SEGURANÇA: valor pago tem que bater com o valor do plano salvo (centavos)
           const expectedCents = Math.round(Number(pedido.valor) * 100);
@@ -837,33 +839,31 @@ export const Route = createFileRoute("/api/public/mp-webhook")({
         } catch (err) {
           auditError = String((err as Error)?.message ?? err).slice(0, 500);
           console.error("[mp-webhook] erro inesperado", err);
+        } finally {
+          // Carimba a conclusão DEPOIS do job real. Antes este bloco ficava
+          // fora do job assíncrono e registrava sucesso imediatamente, mesmo
+          // com o processamento ainda em curso ou prestes a falhar.
+          if (auditPaymentId) {
+            try {
+              const { supabaseAdmin: admAudit } = await import("@/integrations/supabase/client.server");
+              await admAudit
+                .from("webhook_events" as any)
+                .update({
+                  processed_ok: !auditError,
+                  processed_at: new Date().toISOString(),
+                  error_detail: auditError,
+                  pedido_id: auditPedidoId,
+                } as any)
+                .eq("provider", "mercado_pago")
+                .eq("event_id", auditPaymentId);
+            } catch (e) { console.warn("[mp-webhook] audit stamp fail", e); }
+          }
         }
         });
 
         // v612 — Otimização Assíncrona: agendamos o processamento pesado e respondemos 200 OK.
         // O MP não ficará pendente aguardando logs deprovisionamento ou ledger.
         scheduleWebhookBackground(job(), context);
-
-
-
-        // v522 — carimba resultado no evento (best-effort, nunca bloqueia a resposta ao MP)
-        if (auditPaymentId) {
-          try {
-            const { supabaseAdmin: admAudit } = await import("@/integrations/supabase/client.server");
-            await admAudit
-              .from("webhook_events" as any)
-              .update({
-                processed_ok: !auditError,
-                processed_at: new Date().toISOString(),
-                error_detail: auditError,
-              } as any)
-              .eq("provider", "mercado_pago")
-              .eq("event_id", auditPaymentId);
-          } catch (e) { console.warn("[mp-webhook] v522 audit stamp fail", e); }
-        }
-
-
-        
         return Response.json({ received: true }, {
           status: 200,
           headers: { "cache-control": "no-store" },

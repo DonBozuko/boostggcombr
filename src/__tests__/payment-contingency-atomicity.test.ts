@@ -19,4 +19,10 @@ describe("v446 — atomicidade do despacho por contingência", () => {
   it("libera a reserva quando nenhum fornecedor conclui", () => {
     expect(SRC).toContain("if (!sucesso) await releaseDispatch(");
   });
+
+  it("não acusa webhook morto quando o evento já foi recebido", () => {
+    expect(SRC).toContain('.from("webhook_events" as any)');
+    expect(SRC).toContain("isFirstProcessing && !webhookWasReceived");
+    expect(SRC).toContain("webhook_received: webhookWasReceived");
+  });
 });
