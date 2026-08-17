@@ -7,7 +7,12 @@ interface SitemapEntry {
   path: string;
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
   priority?: string;
+  /** Data real da última alteração de conteúdo (YYYY-MM-DD). Sem função dinâmica. */
+  lastmod?: string;
 }
+
+/** v644 — data da última revisão editorial ampla. Atualize ao mexer no conteúdo. */
+const DEFAULT_LASTMOD = "2026-08-17";
 
 const sitemapHeaders = () => {
   const headers = new Headers();
@@ -92,16 +97,18 @@ const buildSitemapXml = () => {
   ];
 
 
-  // v606 — Lastmod de Alta Resolução.
-  // Combina frescor de catálogo (dia atual) com sinal de autoridade.
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-
+  // v644 — Lastmod honesto.
+  // A v606 carimbava a data de hoje em TODAS as URLs a cada requisição. O Google
+  // compara o conteúdo entre rastreios: data nova + conteúdo idêntico = sinal de
+  // frescor falso, o crawler passa a ignorar o lastmod inteiro e o orçamento de
+  // rastreio é desperdiçado (57 enviadas / 0 indexadas no relatório atual).
+  // Agora a data só muda quando o conteúdo realmente muda: atualize a constante
+  // abaixo (ou o lastmod da entrada) ao editar uma página.
   const urls = entries.map((e) =>
     [
       `  <url>`,
       `    <loc>${BASE_URL}${e.path}</loc>`,
-      `    <lastmod>${todayStr}</lastmod>`,
+      `    <lastmod>${e.lastmod ?? DEFAULT_LASTMOD}</lastmod>`,
       e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
       e.priority ? `    <priority>${e.priority}</priority>` : null,
       `  </url>`,
