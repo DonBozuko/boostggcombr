@@ -166,15 +166,18 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
     let sellable = false;
     let reason = "OK";
 
-    const providers: Array<[ProviderKey, string | null]> = [];
+    const providers: Array<[ProviderKey, string | null, string]> = [];
     for (const col of columns) {
       for (const suffix of ["_service_id", "_auto_id"]) {
         const v = r[`${col}${suffix}`];
-        if (typeof v === "string" || typeof v === "number") providers.push([col, String(v)]);
+        if (typeof v === "string" || typeof v === "number") providers.push([col, String(v), `${col}${suffix}`]);
       }
     }
     const linkedProviders = providers.filter(([, id]) => !!id && id.trim().length > 0);
 
+    // v646 — colunas cujo serviço vinculado é comprovadamente incompatível
+    // (não-brasileiro em pacote :br, ou marcado como queda pelo fornecedor).
+    const badColumns: string[] = [];
 
     if (!(cost > 0)) {
       reason = "Custo zerado";
@@ -192,12 +195,12 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
       let matched = false;
       let anyKnown = false;
       let contentIssue: string | null = null;
-      for (const [prov, id] of linkedProviders) {
+      for (const [prov, id, column] of linkedProviders) {
         const entry = indices[prov]?.get(id!.trim());
         if (entry) {
           anyKnown = true;
           const issue = serviceContentIssue(entry, String(r.category ?? ""));
-          if (issue) { contentIssue = issue; continue; }
+          if (issue) { contentIssue = issue; badColumns.push(column); continue; }
           if (inRange(qty, entry)) { matched = true; break; }
         }
       }
@@ -220,6 +223,24 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
         reason = "Fornecedor não reconhece o ID";
       }
     }
+
+    // v646 — QUARENTENA DE VÍNCULO PODRE.
+    // Causa raiz do "veto que não anda": um ID manual apontando para serviço
+    // errado (ex.: br-pro* → SMMhype #15057, global e sem reposição) pausava o
+    // pacote para sempre, porque o auto-resolver nunca sobrescreve ID manual.
+    // Agora o vínculo comprovadamente incompatível é solto, e no ciclo seguinte
+    // o auto-resolver procura um serviço válido sozinho.
+    if (!sellable && badColumns.length > 0 && !matchedAnywhere(sellable)) {
+      const patch: Record<string, null> = {};
+      for (const c of new Set(badColumns)) patch[c] = null;
+      const { error } = await supabaseAdmin
+        .from("pricing_items" as any)
+        .update(patch)
+        .eq("pacote", r.pacote);
+      if (error) console.error("[teste-seco] v646 quarentena falhou", { pacote: r.pacote, error: error.message });
+      else console.warn(`[teste-seco] v646 quarentena de vínculo: ${r.pacote} → ${Object.keys(patch).join(", ")} (${reason})`);
+    }
+
 
 
     summary.byReason[reason] = (summary.byReason[reason] ?? 0) + 1;
