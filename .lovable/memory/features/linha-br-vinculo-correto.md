@@ -14,10 +14,17 @@ com veto "nenhum fornecedor habilitado" — sem erro visível, só venda perdida
 
 - **Linha econômica `br-p*`** (br-p100 … br-p10k): SMMhype `#4312` (BR, Refill, ~US$2.11/1k).
   Reservas: Provider4 `#1030`, SMMPainel `#469`.
-- **Linha premium `br-pro*`**: SMMhype `#8431` (~US$7.35/1k).
+- **Linha premium `br-pro*`**: SMMhype `#15240` (Elite BR, Refill 30d, ~US$8.10/1k) +
+  reserva SMMpainel `#469` (BR, R30). O antigo `#8431` **sumiu do painel** (drift do
+  fornecedor) — não usar.
 
 **Nunca** vincular `br-*` ao SMMhype `#15057` — é Global e sem reposição. Foi a causa
-raiz dos 7 vetos corrigidos na v642.
+raiz dos 7 vetos da v642 e dos 6 vetos `br-pro*` da v646.
+
+**v646 — quarentena automática:** o teste seco (`src/lib/dry-run.server.ts`) agora
+zera o vínculo (manual ou auto) cujo serviço reprova na trava BR/tóxico, para o
+auto-resolver rebindar sozinho. Antes, ID manual ruim prendia o pacote para sempre.
+
 
 ## Verificação rápida
 
