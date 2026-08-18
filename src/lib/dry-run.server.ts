@@ -230,7 +230,7 @@ export async function runDryRunAllPackages(): Promise<DryRunSummary> {
     // pacote para sempre, porque o auto-resolver nunca sobrescreve ID manual.
     // Agora o vínculo comprovadamente incompatível é solto, e no ciclo seguinte
     // o auto-resolver procura um serviço válido sozinho.
-    if (!sellable && badColumns.length > 0 && !matchedAnywhere(sellable)) {
+    if (!sellable && badColumns.length > 0) {
       const patch: Record<string, null> = {};
       for (const c of new Set(badColumns)) patch[c] = null;
       const { error } = await supabaseAdmin
