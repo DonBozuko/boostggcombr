@@ -4,9 +4,14 @@ import { SeoLanding } from "@/components/SeoLanding";
 import { buildFaqJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo-jsonld";
 
 const URL = "https://www.boostgg.com.br/comprar-curtidas-instagram";
-const TITLE = "Curtidas no Instagram: Aumente Alcance e Engajamento";
+// v647 — CTR crítico: a página rankeia em posição 1–3 para "curtidas instagram" e
+// "comprar curtidas" (41 impressões/90d) com 0 cliques. O título anterior era
+// informativo ("Aumente Alcance e Engajamento") e não correspondia à intenção de
+// compra (preço + Pix) das queries que realmente geram impressão.
+const TITLE = "Comprar Curtidas Instagram a partir de R$5,50 | Pix";
 const DESC =
-  "Descubra como as curtidas no Instagram impactam o algoritmo e aumentam o alcance dos seus Reels e posts. Pacotes seguros com entrega via Pix e garantia.";
+  "Compre curtidas no Instagram a partir de R$5,50: 100 a 10.000 curtidas com entrega em minutos, pagamento via Pix, sem senha e com reposição.";
+
 
 
 
