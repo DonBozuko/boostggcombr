@@ -68,6 +68,10 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
     let headline = "Tudo em ordem, pode relaxar...";
     let summary = "Nenhuma ação urgente. Sistema operando normal.";
 
+    // v653 — Prioridade de Verdade Operacional: GREEN exige prova.
+    // Ausência de evidência = UNKNOWN (amarelo/red conforme contexto).
+
+
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const since6h = new Date(now - 6 * 60 * 60 * 1000).toISOString();
@@ -101,26 +105,32 @@ export const getJarvisTriage = createServerFn({ method: "POST" })
         const orig = String(a.origem ?? "system");
         const at = new Date(String(a.created_at ?? 0)).getTime();
         
-        // v628: Proteção contra silenciamento — Alertas críticos de checkout/pagamento não podem ser suprimidos
+        // v653: Alertas críticos de checkout/pagamento não podem ser silenciados pelo tempo.
         const isCriticalCheckout = (orig === "checkout" || orig === "payment") && (s === "critical" || s === "error");
         
+        // v653: Incidente aberto PREVALECE sobre tempo de alerta.
+        // Se a origem tem um incidente aberto, o alerta não é "limpo".
+        const hasIncident = incs.some(i => i.origin === orig);
+
         if (vistos.has(orig) && !isCriticalCheckout) continue;
         if (!vistos.has(orig)) vistos.set(orig, SEV_MAP[s] ?? 1);
         
-        if (at < since20m) continue;
+        // Se não tem incidente e passou 20min, podemos considerar o alerta silenciado.
+        if (at < since20m && !hasIncident && !isCriticalCheckout) continue;
+
         if (s === "critical" || s === "error") {
-           counters.criticalAlerts++;
-           // v637: Auto-detecção de incidentes críticos
-           if (orig === "checkout" || orig === "payment" || orig === "infra") {
-             const { detectIncidentFromAlert } = await import("./jarvis-incidents-logic.server");
-             await detectIncidentFromAlert({
-               id: a.id as string,
-               type: orig === "infra" ? "INFRA_FAILURE" : "CRITICAL_FLOW_ERROR",
-               severity: s,
-               origin: orig,
-               headline: String(a.mensagem ?? "").slice(0, 100)
-             }).catch(e => console.error("[jarvis-triage] incident auto-detect failed", e));
-           }
+            counters.criticalAlerts++;
+            // Auto-detecção...
+            if (orig === "checkout" || orig === "payment" || orig === "infra") {
+              const { detectIncidentFromAlert } = await import("./jarvis-incidents-logic.server");
+              await detectIncidentFromAlert({
+                id: a.id as string,
+                type: orig === "infra" ? "INFRA_FAILURE" : "CRITICAL_FLOW_ERROR",
+                severity: s,
+                origin: orig,
+                headline: String(a.mensagem ?? "").slice(0, 100)
+              }).catch(e => console.error("[jarvis-triage] incident auto-detect failed", e));
+            }
         }
         else if (s === "warning") counters.warningAlerts++;
       }
