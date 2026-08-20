@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { claimDispatch } from "./dispatch-claim.server";
-import { commitDispatch } from "./commit-dispatch.server"; // I need to verify the path or name
+import { commitDispatch } from "./dispatch-commit.server";
 import { interpretProviderResponse } from "./dispatch-response";
 
 // Mock do banco de dados (Supabase Admin)
