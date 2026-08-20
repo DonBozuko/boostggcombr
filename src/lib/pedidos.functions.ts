@@ -34,9 +34,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         cupom: z.string().optional(),
         rede_social: z.string().optional(),
         bump_upgrade: z.boolean().optional(),
-        // v643 — método explícito. Sem isto o backend sempre caía no Pix e o
-        // botão de cartão nunca conseguia concluir (nunca recebia checkoutUrl).
-        metodo: z.enum(["pix", "cartao"]).optional(),
+        // v649 — FASE 1: contrato de pagamento obrigatório e estrito.
+        // O backend agora exige explicitamente "pix" ou "cartao" sem defaults.
+        metodo: z.enum(["pix", "cartao"]),
         email: z.string().optional(),
         whatsapp_contato: z.string().optional(),
         utm_source: z.string().nullish(),
