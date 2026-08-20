@@ -214,10 +214,8 @@ export const criarPedido = createServerFn({ method: "POST" })
     }
 
 
-    // v643 — cartão é um caminho próprio: valor com a taxa da operadora
-    // repassada e teto de risco. Bloqueio antes de gravar pedido, para não
-    // sujar o funil com pedido que nunca poderia ser cobrado.
-    const metodo = data.metodo === "cartao" ? "cartao" : "pix";
+    // v649 — FASE 1: Ramificação estrita baseada no contrato.
+    const metodo = data.metodo;
     const { cardAmount, cardBlockedReason } = await import("./card-pricing");
     if (metodo === "cartao") {
       const bloqueio = cardBlockedReason(valorCobrar);
