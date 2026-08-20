@@ -78,6 +78,10 @@ export async function dispatchSmmV2(opts: {
     link,
     quantity: String(opts.quantidade),
   });
+  // v652 — Idempotência Externa: envia o pedidoId como referência única.
+  if (opts.pedidoId) {
+    body.append("external_id", opts.pedidoId);
+  }
 
   // v374 — trilha forense: fornecedor, service id, quantidade, HTTP e corpo bruto.
   const { logDispatchAttempt } = await import("./dispatch-log.server");
