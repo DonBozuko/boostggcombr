@@ -34,9 +34,9 @@ export const criarPedido = createServerFn({ method: "POST" })
         cupom: z.string().optional(),
         rede_social: z.string().optional(),
         bump_upgrade: z.boolean().optional(),
-        // v643 — método explícito. Sem isto o backend sempre caía no Pix e o
-        // botão de cartão nunca conseguia concluir (nunca recebia checkoutUrl).
-        metodo: z.enum(["pix", "cartao"]).optional(),
+        // v649 — FASE 1: contrato de pagamento obrigatório e estrito.
+        // O backend agora exige explicitamente "pix" ou "cartao" sem defaults.
+        metodo: z.enum(["pix", "cartao"]),
         email: z.string().optional(),
         whatsapp_contato: z.string().optional(),
         utm_source: z.string().nullish(),
@@ -214,10 +214,8 @@ export const criarPedido = createServerFn({ method: "POST" })
     }
 
 
-    // v643 — cartão é um caminho próprio: valor com a taxa da operadora
-    // repassada e teto de risco. Bloqueio antes de gravar pedido, para não
-    // sujar o funil com pedido que nunca poderia ser cobrado.
-    const metodo = data.metodo === "cartao" ? "cartao" : "pix";
+    // v649 — FASE 1: Ramificação estrita baseada no contrato.
+    const metodo = data.metodo;
     const { cardAmount, cardBlockedReason } = await import("./card-pricing");
     if (metodo === "cartao") {
       const bloqueio = cardBlockedReason(valorCobrar);
