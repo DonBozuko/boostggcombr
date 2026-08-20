@@ -27,11 +27,16 @@ describe("FASE 4.1 — Eliminação de Janela de Risco (Exatamente Uma Entrega)"
         pedidoId: "boostgg-test-uuid-001"
       });
       
+      expect(result.ok).toBe(true);
+
       const calls = (fetch as any).mock.calls;
-      console.log("All calls details:", JSON.stringify(calls.map(c => ({ url: c[0], method: c[1]?.method })), null, 2));
+      // O smmhype.server faz várias chamadas internas ao supabaseAdmin (que estamos mockando parcialmente ou o import.meta.env está pegando mocks)
+      // Mas o fetch global só deve ser chamado para a API do SMMHype.
       
-      const addCall = calls.find(c => c[0] === "https://smmhype.com/api/v2" && c[1]?.method === "POST");
-      const bodyStr = addCall ? addCall[1].body : "";
+      const addCall = calls.find((c: any) => c[0] === "https://smmhype.com/api/v2" && c[1]?.method === "POST");
+      
+      expect(addCall).toBeDefined();
+      const bodyStr = addCall[1].body;
       const body = new URLSearchParams(bodyStr);
       expect(body.get("external_id")).toBe("boostgg-test-uuid-001");
     });
