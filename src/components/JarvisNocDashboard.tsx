@@ -226,7 +226,7 @@ export function JarvisNocDashboard() {
             </Card>
 
             <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
-              <h2 className="text-xs font-bold text-zinc-400 mb-4 uppercase tracking-widest">Pedidos Travados (>15m)</h2>
+              <h2 className="text-xs font-bold text-zinc-400 mb-4 uppercase tracking-widest">Pedidos Travados ({">"}15m)</h2>
               <div className="flex items-center justify-between">
                 <span className={`text-2xl font-black ${snapshot.pedidos.travados > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
                   {snapshot.pedidos.travados}

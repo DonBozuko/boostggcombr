@@ -34,7 +34,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
     setQ("");
     setThinking(true);
     try {
-      const res: JarvisChatResp = await chatFn({ data: { token, question: text } });
+      const res = await chatFn({ data: { token, question: text } }) as JarvisChatResp;
       if (!res.ok) {
         setChat((c) => [...c, { role: "jarvis", text: `❌ ${res.error}` }]);
       } else if ("requiresConfirmation" in res && res.requiresConfirmation) {
@@ -48,7 +48,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
   };
 
   const runUnifiedDiagnostic = async () => {
-    const t = toast.loading("🔄 Diagnóstico e Sincronização Geral em curso...");
+    const t = toast.loading("🔄 Diagnóstico Truth v653...");
     try {
       const [snapRes, failRes] = await Promise.all([
         snapFn({ data: { token } }),
@@ -57,7 +57,7 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
       setSnap(snapRes);
       await router.invalidate();
       const fr: any = failRes;
-      if (fr?.ok) toast.success(`Sincronizado · Failover: ${fr.action}${fr.to ? " → " + fr.to : ""}`, { id: t });
+      if (fr?.ok) toast.success(`Sincronizado · Truth v653 Active`, { id: t });
       else toast.success("Sincronização concluída", { id: t });
     } catch (e: any) {
       toast.error(e?.message ?? "Falha na sincronização", { id: t });
@@ -66,21 +66,27 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
 
   if (!snap || !snap.ok) {
     return (
-      <div className="rounded-xl border border-red-500/50 bg-black/60 p-4 text-red-200 text-sm font-mono">
-        🛰️ Carregando Central NOC J.A.R.V.I.S....
+      <div className="rounded-xl border border-red-500/50 bg-black/60 p-4 text-red-200 text-sm font-mono animate-pulse">
+        🛰️ Jarvis Truth Protocol v653 Syncing...
       </div>
     );
   }
 
-  const healthPct = Math.round((snap.systemHealth.ok / snap.systemHealth.total) * 100);
-  const healthColor = healthPct === 100 ? "text-emerald-400 border-emerald-500/60" : healthPct >= 80 ? "text-amber-300 border-amber-500/60" : "text-red-400 border-red-500/60";
+  const statusColors: Record<string, string> = {
+    GREEN: "text-emerald-400 border-emerald-500/60",
+    DEGRADED: "text-amber-300 border-amber-500/60",
+    RED: "text-red-400 border-red-500/60",
+    UNKNOWN: "text-zinc-400 border-zinc-500/60"
+  };
+
+  const healthColor = statusColors[snap.globalStatus] || statusColors.UNKNOWN;
 
   return (
     <div className="rounded-2xl border-2 border-red-500/60 bg-gradient-to-br from-black via-red-950/30 to-black backdrop-blur-xl p-4 shadow-[0_0_40px_rgba(255,0,40,0.35)] space-y-4">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <div className="text-red-300 font-black text-lg tracking-widest uppercase">🛰️ J.A.R.V.I.S. NOC</div>
-          <div className="text-[10px] text-red-200/70 font-mono">Central de Inteligência Operacional · Autonomia com Segurança</div>
+          <div className="text-red-300 font-black text-lg tracking-widest uppercase">🛰️ J.A.R.V.I.S. TRUTH</div>
+          <div className="text-[10px] text-red-200/70 font-mono">Protocolo de Verdade v653 · Green Exige Prova</div>
         </div>
         <div className="flex gap-2">
           <Button
@@ -89,25 +95,27 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
             disabled={loading}
             className="bg-gradient-to-r from-red-700 via-red-500 to-red-700 hover:from-red-600 hover:to-red-600 text-white font-bold text-xs shadow-[0_0_20px_rgba(255,0,40,0.6)] border border-red-400/50"
           >
-            {loading ? "🛰️ Sincronizando..." : "🔄 Diagnóstico e Sincronização Geral"}
+            {loading ? "🛰️ Telemetria..." : "🔄 Truth Sync"}
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <div className={`rounded-lg border-2 ${healthColor} bg-black/50 p-3`}>
-          <div className="text-[10px] uppercase opacity-70">Saúde do Sistema</div>
-          <div className="text-2xl font-black font-mono">{snap.systemHealth.ok}/{snap.systemHealth.total} OK</div>
+          <div className="text-[10px] uppercase opacity-70">Saúde Global</div>
+          <div className="text-2xl font-black font-mono">{snap.globalStatus}</div>
         </div>
         <div className="rounded-lg border border-cyan-500/50 bg-black/50 p-3 text-cyan-200">
-          <div className="text-[10px] uppercase opacity-70">Pedidos 24h</div>
-          <div className="text-2xl font-black font-mono">{snap.pedidos.total24h}</div>
-          <div className="text-[10px] font-mono">✅ {snap.pedidos.pagos24h} Aprovados · ⏳ {snap.pedidos.pendentes24h} Pendentes</div>
+          <div className="text-[10px] uppercase opacity-70">Vendas 24h</div>
+          <div className="text-2xl font-black font-mono">{snap.pedidos.pagos24h}</div>
+          <div className={`text-[9px] font-mono mt-1 ${snap.pedidos.travados > 0 ? 'text-red-400' : 'text-zinc-500'}`}>
+             {snap.pedidos.travados} TRAVADOS
+          </div>
         </div>
         <div className="rounded-lg border border-amber-500/50 bg-black/50 p-3 text-amber-200 col-span-2">
-          <div className="text-[10px] uppercase opacity-70">Latência APIs (ms)</div>
-          <div className="flex gap-3 font-mono text-xs mt-1">
-            {snap.apiLatency.map((a) => (
+          <div className="text-[10px] uppercase opacity-70">Latência Crítica (ms)</div>
+          <div className="flex flex-col gap-1 font-mono text-[10px] mt-1">
+            {snapshotToLatency(snap).map((a: any) => (
               <span key={a.name} className={a.ok ? "text-emerald-300" : "text-red-300"}>
                 {a.ok ? "●" : "✕"} {a.name}: {a.ms}ms
               </span>
@@ -117,112 +125,27 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
       </div>
 
       <div>
-        <div className="text-[11px] uppercase tracking-wider text-red-200/80 font-bold mb-1">Fornecedores</div>
+        <div className="text-[11px] uppercase tracking-wider text-red-200/80 font-bold mb-1">Fornecedores v653</div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          {snap.fornecedores.map((f) => (
+          {snap.fornecedores.map((f: any) => (
             <div key={f.id} className={`rounded-lg border p-2 text-xs font-mono ${f.ativo ? "border-emerald-500/60 bg-emerald-950/30 text-emerald-100" : "border-white/10 bg-black/40 text-white/70"}`}>
               <div className="flex justify-between font-bold">
-                <span>{f.nome}</span>
-                <span>{f.ativo ? "🟢 ATIVO" : "⚫"}</span>
+                <span className="truncate max-w-[100px]">{f.nome}</span>
+                <span className={f.state === 'GREEN' ? 'text-emerald-400' : f.state === 'RED' ? 'text-red-400' : 'text-amber-300'}>
+                  {f.state}
+                </span>
               </div>
-              <div>
-                Saldo:{" "}
-                {f.saldoUsd != null ? (
-                  <span className="text-cyan-200 font-bold">
-                    US$ {f.saldoUsd.toFixed(2)}
-                    {f.saldo != null && (
-                      <span className="text-emerald-300"> (R$ {Number(f.saldo).toFixed(2)})</span>
-                    )}
-                  </span>
-                ) : f.saldo != null ? (
-                  <span className="text-emerald-300">R$ {Number(f.saldo).toFixed(2)}</span>
-                ) : (
-                  "aguardando leitura"
-                )}
-                {f.cotacao ? <span className="text-amber-200/70 text-[10px]"> · USD {f.cotacao.toFixed(4)}</span> : null}
+              <div className="text-[10px] mt-1">
+                Saldo: R$ {f.saldo?.toFixed(2) || "0.00"}
               </div>
-              <div>Erros Registrados: {f.falhas ?? 0} · Conexão: {f.status === "online" ? "🟢 Conectado" : (f.status ?? "sincronizando")}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {snap.confiabilidade?.length ? (
-        <div>
-          <div className="text-[11px] uppercase tracking-wider text-red-200/80 font-bold mb-1">
-            Confiabilidade por Fornecedor (7 dias)
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            {snap.confiabilidade.map((c) => {
-              const taxa = c.taxaSucesso;
-              const cor = c.breakerAberto || (taxa != null && taxa < 80)
-                ? "border-red-500/60 bg-red-950/30 text-red-100"
-                : taxa != null && taxa < 95
-                  ? "border-amber-500/60 bg-amber-950/30 text-amber-100"
-                  : "border-emerald-500/50 bg-emerald-950/20 text-emerald-100";
-              return (
-                <div key={c.slug} className={`rounded-lg border p-2 text-xs font-mono ${cor}`}>
-                  <div className="flex justify-between font-bold">
-                    <span>{c.slug}</span>
-                    <span>{taxa != null ? `${taxa}% entregou` : "sem pedidos"}</span>
-                  </div>
-                  <div>✅ {c.entregues} entregues · ❌ {c.falhas} falhas</div>
-                  {c.breakerAberto ? (
-                    <div className="text-red-300 font-bold">⛔ PAUSADO automaticamente (muitas falhas)</div>
-                  ) : null}
-                  {c.ultimoErro ? (
-                    <div className="opacity-70 truncate" title={c.ultimoErro}>último erro: {c.ultimoErro}</div>
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-
-      {snap.guardas?.length ? (
-        <div>
-          <div className="text-[11px] uppercase tracking-wider text-red-200/80 font-bold mb-1">
-            🛡️ Saldo de Guardas (24h) — as travas estão vivas?
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-            {snap.guardas.map((g) => {
-              const cor = g.alto
-                ? "border-amber-500/60 bg-amber-950/30 text-amber-100"
-                : g.count > 0
-                  ? "border-emerald-500/50 bg-emerald-950/20 text-emerald-100"
-                  : "border-white/10 bg-black/40 text-white/60";
-              return (
-                <div key={g.key} className={`rounded-lg border p-2 text-xs font-mono ${cor}`}>
-                  <div className="flex justify-between font-bold gap-2">
-                    <span className="truncate" title={g.label}>{g.label}</span>
-                    <span>{g.count}x</span>
-                  </div>
-                  <div className="opacity-70">
-                    {g.count === 0
-                      ? "não precisou agir nas últimas 24h"
-                      : `última vez: ${new Date(g.last!).toLocaleString("pt-BR")}`}
-                  </div>
-                  {g.alto ? <div className="text-amber-300 font-bold">⚠️ agindo muito — olhar de perto</div> : null}
-                </div>
-              );
-            })}
-          </div>
-          <div className="text-[10px] text-white/40 font-mono mt-1">
-            Vendas retidas por margem agora: {snap.guardasMarginHold24h} · contador em zero é normal quando não houve abuso.
-          </div>
-        </div>
-      ) : null}
-
-
-
-
       <div className="rounded-lg border border-red-500/40 bg-black/70 p-3 space-y-2">
-        <div className="text-[11px] uppercase tracking-wider text-red-300 font-bold">💬 Pergunte ao J.A.R.V.I.S.</div>
+        <div className="text-[11px] uppercase tracking-wider text-red-300 font-bold">💬 J.A.R.V.I.S. Truth Chat</div>
         <div className="max-h-40 overflow-y-auto space-y-1 text-xs">
-          {chat.length === 0 && (
-            <div className="text-white/50 italic">Ex: "Quanto vendi hoje?" · "Qual API está lenta?" · "O que precisa da minha atenção?"</div>
-          )}
           {chat.map((m, i) => (
             <div key={i} className={m.role === "user" ? "text-cyan-300" : "text-red-200"}>
               <span className="font-bold">{m.role === "user" ? "Diretor:" : "J.A.R.V.I.S.:"}</span> {m.text}
@@ -233,35 +156,18 @@ export function JarvisNocCenter({ token, refreshSignal = 0 }: { token: string; r
         <form onSubmit={(e) => { e.preventDefault(); ask(q); }} className="flex gap-2">
           <input
             value={q} onChange={(e) => setQ(e.target.value)}
-            placeholder="Pergunte algo em linguagem natural..."
+            placeholder="Pergunte sobre a verdade do sistema..."
             className="flex-1 bg-black/60 border border-red-500/50 rounded px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-red-400"
           />
           <Button type="submit" disabled={thinking || !q.trim()} className="bg-red-600 hover:bg-red-500 text-white">
-            Enviar
+            Ask
           </Button>
         </form>
       </div>
-
-      {pendingCritical && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm" onClick={() => setPendingCritical(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="max-w-md w-full mx-4 rounded-2xl border-2 border-red-500 bg-gradient-to-br from-red-950 to-black p-6 shadow-[0_0_60px_rgba(255,0,40,0.7)] animate-pulse">
-            <div className="text-red-400 font-black text-xl uppercase tracking-wider">⚠️ AÇÃO CRÍTICA BLOQUEADA</div>
-            <p className="text-red-100 text-sm mt-3">{pendingCritical.reason}</p>
-            <p className="text-white/90 text-xs mt-2 font-mono bg-black/50 p-2 rounded border border-red-500/30">"{pendingCritical.question}"</p>
-            <p className="text-red-200/80 text-xs mt-3">
-              J.A.R.V.I.S. está terminantemente bloqueado para executar esta ação. Requer confirmação manual do Diretor Fabiano.
-            </p>
-            <div className="flex gap-2 mt-4">
-              <Button onClick={() => setPendingCritical(null)} variant="outline" className="flex-1 border-white/30 text-white">
-                Cancelar
-              </Button>
-              <Button onClick={() => { toast.warning("Ação registrada para revisão manual."); setPendingCritical(null); }} className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold">
-                ✋ CONFIRMAR MANUALMENTE
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
+}
+
+function snapshotToLatency(snap: any) {
+  return snap.apiLatency || [];
 }
