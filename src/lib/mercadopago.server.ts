@@ -34,6 +34,7 @@ export type PreferenceInput = z.infer<typeof PreferenceInputSchema>;
 
 export type PixPayment = {
   paymentId: string;
+  status: string;
   qrCode: string;
   qrCodeBase64: string;
   ticketUrl: string | null;
@@ -64,6 +65,7 @@ async function mpFetch(path: string, body: unknown, idempotencyKey: string) {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
       // Duplo clique / retry do cliente não pode virar duas cobranças.
+      // Idempotency key baseada no ID do pedido (ex: pix:UUID ou card:UUID)
       "X-Idempotency-Key": idempotencyKey,
     },
     body: JSON.stringify(body),
@@ -72,9 +74,10 @@ async function mpFetch(path: string, body: unknown, idempotencyKey: string) {
 }
 
 /**
+ * v649/v650 — FASE 2: Pix Real e Contrato de Retorno.
+ *
  * Cria um pagamento Pix de verdade e devolve o BR Code (copia e cola) e o QR
- * em base64. Se o Mercado Pago não devolver o BR Code, isso é falha dura: é
- * melhor o cliente ver um erro claro do que um modal com código inválido.
+ * em base64. Valida rigorosamente a presença dos dados oficiais do gateway.
  */
 export async function createMercadoPagoPixPayment(data: PreferenceInput): Promise<PixPayment> {
   const body = {
@@ -88,11 +91,13 @@ export async function createMercadoPagoPixPayment(data: PreferenceInput): Promis
 
   const response = await mpFetch("/v1/payments", body, `pix:${data.id}`);
   if (!response.ok) {
-    throw new Error(`Mercado Pago Pix error (${response.status}): ${await response.text()}`);
+    const errorText = await response.text();
+    throw new Error(`Mercado Pago Pix error (${response.status}): ${errorText}`);
   }
 
   const result = (await response.json()) as {
     id?: string | number;
+    status?: string;
     date_of_expiration?: string | null;
     point_of_interaction?: {
       transaction_data?: {
@@ -101,18 +106,34 @@ export async function createMercadoPagoPixPayment(data: PreferenceInput): Promis
         ticket_url?: string | null;
       } | null;
     } | null;
+    init_point?: string; // Verificação anti-regressão
   };
 
+  const paymentId = String(result.id ?? "").trim();
+  const status = result.status ?? "pending";
   const td = result.point_of_interaction?.transaction_data ?? {};
   const qrCode = String(td.qr_code ?? "").trim();
   const qrCodeBase64 = String(td.qr_code_base64 ?? "").trim();
 
+  // FASE 2 — VALIDAÇÃO CRÍTICA
+  if (!paymentId) {
+    throw new Error("Mercado Pago respondeu sem ID de pagamento");
+  }
   if (!qrCode) {
-    throw new Error("Mercado Pago não devolveu o código Pix (qr_code ausente)");
+    throw new Error("Mercado Pago respondeu sem código Pix (qr_code)");
+  }
+  if (!qrCodeBase64) {
+    throw new Error("Mercado Pago respondeu sem QR Code Base64");
+  }
+  
+  // Garantia anti-regressão: nunca usar init_point como dados PIX
+  if (result.init_point && (qrCode === result.init_point || qrCodeBase64 === result.init_point)) {
+    throw new Error("Falha Crítica: Gateway retornou init_point no lugar do Pix real");
   }
 
   return {
-    paymentId: String(result.id ?? ""),
+    paymentId,
+    status,
     qrCode,
     qrCodeBase64,
     ticketUrl: td.ticket_url ?? null,
