@@ -29,7 +29,8 @@ describe("FASE 4.1 — Eliminação de Janela de Risco (Exatamente Uma Entrega)"
 
       expect(result.ok).toBe(true);
       const callArgs = (fetch as any).mock.calls[0];
-      const body = new URLSearchParams(callArgs[1].body);
+      const bodyStr = callArgs[1].body;
+      const body = new URLSearchParams(bodyStr);
       expect(body.get("external_id")).toBe("boostgg-test-uuid-001");
     });
   });
