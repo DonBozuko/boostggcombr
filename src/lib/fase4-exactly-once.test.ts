@@ -26,6 +26,12 @@ describe("FASE 4.1 — Eliminação de Janela de Risco (Exatamente Uma Entrega)"
         instagram_user: "user",
         pedidoId: "boostgg-test-uuid-001"
       });
+      
+      console.log("Mock calls length:", (fetch as any).mock.calls.length);
+      if ((fetch as any).mock.calls.length > 0) {
+        const callArgs = (fetch as any).mock.calls[0];
+        console.log("Fetch body:", callArgs[1]?.body);
+      }
 
       expect(result.ok).toBe(true);
       const callArgs = (fetch as any).mock.calls[0];
