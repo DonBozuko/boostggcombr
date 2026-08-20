@@ -3,13 +3,12 @@ import {
   Activity, 
   Zap, 
   Database, 
-  Lock, 
   AlertTriangle, 
   Clock,
-  ShieldAlert
+  ShieldAlert,
+  Server
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useServerFn } from "@tanstack/react-start";
 import { jarvisNocSnapshot } from "@/lib/jarvis-noc.functions";
 import { getJarvisTriage } from "@/lib/jarvis-triage.functions";
@@ -17,24 +16,23 @@ import { getIncidentTriage } from "@/lib/jarvis-incidents-logic.server";
 import { getAdminToken } from "@/lib/admin-token-store";
 import { toast } from "sonner";
 
-type ServiceStatus = "healthy" | "warning" | "error" | "unknown";
+type HealthState = "GREEN" | "DEGRADED" | "RED" | "UNKNOWN";
 
 interface MetricCardProps {
   title: string;
   value: string;
   unit: string;
-  status: ServiceStatus;
+  status: HealthState;
   icon: any;
-  data: number[];
   source: string;
 }
 
-function MetricCard({ title, value, unit, status, icon: Icon, data, source }: MetricCardProps) {
-  const statusColors = {
-    healthy: "#00B37E",
-    warning: "#FBA94C",
-    error: "#F75A68",
-    unknown: "#71717A"
+function MetricCard({ title, value, unit, status, icon: Icon, source }: MetricCardProps) {
+  const statusColors: Record<HealthState, string> = {
+    GREEN: "#00B37E",
+    DEGRADED: "#FBA94C",
+    RED: "#F75A68",
+    UNKNOWN: "#71717A"
   };
 
   return (
@@ -50,7 +48,7 @@ function MetricCard({ title, value, unit, status, icon: Icon, data, source }: Me
         </div>
         <div className="mt-2 flex items-center justify-between text-[9px] text-zinc-500 font-mono">
           <span>{source}</span>
-          <span style={{ color: statusColors[status] }}>{status.toUpperCase()}</span>
+          <span style={{ color: statusColors[status] }}>{status}</span>
         </div>
       </CardContent>
     </Card>
@@ -84,92 +82,82 @@ export function JarvisNocDashboard() {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <div className="p-8 text-zinc-500 text-center font-mono">Carregando telemetria real...</div>;
-  if (!data) return <div className="p-8 text-red-500 text-center font-mono">Erro de conexão com NOC.</div>;
+  if (loading) return <div className="p-8 text-zinc-500 text-center font-mono animate-pulse">🛰️ Telemetria v653 Truth Protocol...</div>;
+  if (!data || !data.snapshot.ok) return <div className="p-8 text-red-500 text-center font-mono">Erro de conexão com NOC J.A.R.V.I.S.</div>;
 
   const { snapshot, triage, incidentData } = data;
+  
   const metrics: MetricCardProps[] = [
     { 
       title: "Checkout 24h", 
-      value: snapshot.ok ? String(snapshot.pedidos.pagos24h) : "??", 
-      unit: "pedidos pagos", 
-      status: snapshot.ok ? "healthy" : "unknown", 
+      value: String(snapshot.pedidos.pagos24h), 
+      unit: "aprovados", 
+      status: snapshot.globalStatus, 
       icon: Activity, 
-      data: [], 
       source: "pedidos.db" 
     },
     { 
-      title: "API Gateway", 
-      value: snapshot.ok ? (snapshot.apiLatency.find((a: any) => a.name === 'MercadoPago')?.ms || 0).toString() : "??", 
+      title: "Gateway MP", 
+      value: String(snapshot.metrics.mp?.value?.ms || "??"), 
       unit: "ms", 
-      status: snapshot.ok ? (snapshot.apiLatency.find((a: any) => a.name === 'MercadoPago')?.ok ? "healthy" : "error") : "unknown", 
+      status: snapshot.metrics.mp?.state || "UNKNOWN", 
       icon: Zap, 
-      data: [], 
-      source: "ping.api" 
+      source: "ping.mp" 
     },
     { 
-      title: "Alerta Crítico", 
-      value: triage.counters.criticalAlerts.toString(), 
-      unit: "eventos", 
-      status: triage.counters.criticalAlerts > 0 ? "error" : "healthy", 
-      icon: AlertTriangle, 
-      data: [], 
-      source: "jarvis_alerts" 
-    },
-    { 
-      title: "Latência Checkout", 
-      value: "UNKNOWN", 
-      unit: "NÃO TELEMETRADA", 
-      status: "unknown", 
-      icon: Clock, 
-      data: [], 
-      source: "infra.telemetry" 
-    },
-    { 
-      title: "Profile Errors", 
-      value: triage.counters.invalidTargetAnomalies.toString(), 
-      unit: "anomalias", 
-      status: triage.counters.invalidTargetAnomalies > 3 ? "warning" : "healthy", 
+      title: "Incidentes", 
+      value: String(snapshot.incidents.totalOpen), 
+      unit: "ativos", 
+      status: snapshot.incidents.critical > 0 ? "RED" : (snapshot.incidents.totalOpen > 0 ? "DEGRADED" : "GREEN"), 
       icon: ShieldAlert, 
-      data: [], 
-      source: "funnel_events" 
+      source: "jarvis_incidents" 
+    },
+    { 
+      title: "Saúde Banco", 
+      value: `${snapshot.systemHealth.ok}/${snapshot.systemHealth.total}`, 
+      unit: "tabelas", 
+      status: snapshot.metrics.database?.state || "UNKNOWN", 
+      icon: Database, 
+      source: "supabase.db" 
     }
   ];
 
-  const globalStatus = triage.status === "green" ? "healthy" : (triage.status === "yellow" ? "warning" : "error");
-  const lastUpdate = triage.generatedAt;
+  const statusColors: Record<HealthState, string> = {
+    GREEN: "#00B37E",
+    DEGRADED: "#FBA94C",
+    RED: "#F75A68",
+    UNKNOWN: "#71717A"
+  };
 
   return (
-    <div className="p-4 md:p-8 font-inter bg-[#121214] min-h-screen">
+    <div className="p-4 md:p-8 font-inter bg-[#121214] min-h-screen text-zinc-100">
       <div className="max-w-7xl mx-auto space-y-6">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-black tracking-tighter text-zinc-100 flex items-center gap-2">
-              <ShieldAlert className="text-[#00B37E]" /> J.A.R.V.I.S. NOC
+              <Server className="text-[#00B37E]" /> J.A.R.V.I.S. NOC
             </h1>
-            <p className="text-zinc-500 text-xs font-mono">RESTAURAÇÃO v641 · Última: {new Date(lastUpdate).toLocaleTimeString()}</p>
+            <p className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest">
+              Protocolo de Verdade v653 · {new Date(snapshot.generatedAt).toLocaleTimeString()}
+            </p>
           </div>
           
-          <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl border-2 ${
-            globalStatus === "healthy" ? "border-[#00B37E]/20 bg-[#00B37E]/5" : 
-            globalStatus === "warning" ? "border-[#FBA94C]/20 bg-[#FBA94C]/5" : 
-            "border-[#F75A68]/20 bg-[#F75A68]/5"
-          }`}>
-            <div className={`h-3 w-3 rounded-full animate-pulse ${
-              globalStatus === "healthy" ? "bg-[#00B37E]" : 
-              globalStatus === "warning" ? "bg-[#FBA94C]" : 
-              "bg-[#F75A68]"
-            }`} />
-            <span className={`font-bold tracking-widest text-sm ${
-              globalStatus === "healthy" ? "text-[#00B37E]" : 
-              globalStatus === "warning" ? "text-[#FBA94C]" : 
-              "text-[#F75A68]"
-            }`}>
-              {globalStatus === "healthy" ? "SISTEMA SAUDÁVEL" : 
-               globalStatus === "warning" ? "ATENÇÃO OPERACIONAL" : 
-               "FALHA CRÍTICA"}
+          <div className={`flex items-center gap-3 px-6 py-3 rounded-2xl border-2 transition-all duration-500`} 
+               style={{ 
+                 borderColor: `${statusColors[snapshot.globalStatus as HealthState]}33`,
+                 backgroundColor: `${statusColors[snapshot.globalStatus as HealthState]}0D` 
+               }}>
+            <div className="h-3 w-3 rounded-full animate-pulse" 
+                 style={{ backgroundColor: statusColors[snapshot.globalStatus as HealthState] }} />
+            <span className="font-black tracking-widest text-sm" 
+                  style={{ color: statusColors[snapshot.globalStatus as HealthState] }}>
+              {snapshot.globalStatus === "GREEN" ? "SISTEMA SAUDÁVEL" : 
+               snapshot.globalStatus === "DEGRADED" ? "DEGRADAÇÃO OPERACIONAL" : 
+               snapshot.globalStatus === "RED" ? "FALHA CRÍTICA" : "ESTADO DESCONHECIDO"}
             </span>
           </div>
         </header>
@@ -178,40 +166,77 @@ export function JarvisNocDashboard() {
           {metrics.map((m) => <MetricCard key={m.title} {...m} />)}
         </div>
 
-        <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
-            <h2 className="text-sm font-bold text-zinc-400 mb-4 uppercase">Status Triagem: {triage.status.toUpperCase()}</h2>
-            <p className="text-lg font-bold">{triage.headline}</p>
-            <p className="text-sm text-zinc-400 mt-2">{triage.summary}</p>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Triagem Jarvis</h2>
+                <span className="text-[10px] font-mono text-zinc-500">{triage.status.toUpperCase()}</span>
+              </div>
+              <p className="text-lg font-bold text-emerald-400">{triage.headline}</p>
+              <p className="text-sm text-zinc-400 mt-2 leading-relaxed">{triage.summary}</p>
+            </Card>
 
-        {incidentData?.ok && incidentData.incidents.length > 0 && (
-          <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
-            <h2 className="text-sm font-bold text-zinc-400 mb-4 uppercase">Incidentes Ativos ({incidentData.incidents.length})</h2>
-            <div className="space-y-4">
-              {incidentData.incidents.map((inc: any) => (
-                <div key={inc.id} className="border-l-4 border-zinc-700 pl-4 py-2 hover:bg-zinc-800/50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                      inc.severity === 'critical' ? 'bg-red-500/20 text-red-500' :
-                      inc.severity === 'error' ? 'bg-red-400/20 text-red-400' :
-                      inc.severity === 'warning' ? 'bg-yellow-500/20 text-yellow-500' :
-                      'bg-zinc-500/20 text-zinc-500'
-                    }`}>
-                      {inc.severity}
-                    </span>
-                    <span className="text-[10px] font-mono text-zinc-500">{inc.status}</span>
+            <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
+              <h2 className="text-xs font-bold text-zinc-400 mb-6 uppercase tracking-widest">Fornecedores (Truth Protocol)</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {snapshot.fornecedores.map((f: any) => (
+                  <div key={f.id} className="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-sm">{f.nome}</span>
+                        {f.ativo && <span className="text-[9px] bg-emerald-500/10 text-emerald-500 px-1.5 py-0.5 rounded border border-emerald-500/20 uppercase font-black">Ativo</span>}
+                      </div>
+                      <div className="text-[10px] font-mono text-zinc-500 mt-1 uppercase">
+                        R$ {f.saldo?.toFixed(2) || "0.00"} · {f.status || "UNKNOWN"}
+                      </div>
+                    </div>
+                    <div className="h-2 w-2 rounded-full shadow-[0_0_8px]" 
+                         style={{ 
+                           backgroundColor: statusColors[f.state as HealthState],
+                           boxShadow: `0 0 8px ${statusColors[f.state as HealthState]}66` 
+                         }} />
                   </div>
-                  <p className="font-bold text-sm mt-1">{inc.headline}</p>
-                  <div className="flex items-center gap-4 mt-2 text-[10px] text-zinc-500 font-mono">
-                    <span>ORIGEM: {inc.origin}</span>
-                    <span>TYPE: {inc.type}</span>
-                    <span>ID: {inc.id.slice(0, 8)}</span>
-                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
+              <h2 className="text-xs font-bold text-zinc-400 mb-4 uppercase tracking-widest">Incidentes Abertos</h2>
+              {incidentData?.incidents?.length > 0 ? (
+                <div className="space-y-3">
+                  {incidentData.incidents.map((inc: any) => (
+                    <div key={inc.id} className="p-3 bg-zinc-900/50 rounded-lg border-l-2 border-red-500">
+                      <div className="flex justify-between items-start">
+                        <span className="text-[10px] font-black text-red-500 uppercase">{inc.severity}</span>
+                        <span className="text-[9px] font-mono text-zinc-600">{inc.status}</span>
+                      </div>
+                      <p className="text-xs font-bold mt-1 text-zinc-200">{inc.headline}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Card>
-        )}
+              ) : (
+                <div className="text-center py-8">
+                  <ShieldAlert className="mx-auto text-zinc-800 mb-2" size={32} />
+                  <p className="text-[10px] font-mono text-zinc-600 uppercase">Nenhum incidente</p>
+                </div>
+              )}
+            </Card>
+
+            <Card className="bg-[#202024] border-none text-white shadow-xl p-6">
+              <h2 className="text-xs font-bold text-zinc-400 mb-4 uppercase tracking-widest">Pedidos Travados (15m+)</h2>
+              <div className="flex items-center justify-between">
+                <span className={`text-2xl font-black ${snapshot.pedidos.travados > 0 ? 'text-red-500' : 'text-emerald-500'}`}>
+                  {snapshot.pedidos.travados}
+                </span>
+                <Clock size={20} className={snapshot.pedidos.travados > 0 ? 'text-red-500/50' : 'text-emerald-500/50'} />
+              </div>
+              <p className="text-[9px] font-mono text-zinc-500 mt-2 uppercase">Verificação atômica em tempo real</p>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
