@@ -292,6 +292,13 @@ export async function dispatchSmmhype(args: {
     link,
     quantity: String(args.quantidade),
   });
+  // v652 — Idempotência Externa (se disponível) ou Chave Única por Pedido.
+  // Regra: se o pedidoId estiver presente, passamos ele como referência para o fornecedor.
+  // Painéis SMM genéricos (v2) costumam aceitar parâmetros extras; mesmo que ignorem,
+  // isso serve para auditoria em logs brutos e identificação de duplicidade no reenvio.
+  if (args.pedidoId) {
+    body.append("external_id", args.pedidoId);
+  }
 
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 15_000);
